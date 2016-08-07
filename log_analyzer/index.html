@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>TPG Log Analyzer</title>
+        <script src="lib/vis/dist/vis.js"></script>
+        <link href="lib/vis/dist/vis.css" rel="stylesheet" type="text/css" />
+        <script src="../build/util.js"></script>
+        <script src="../build/log_analyzer.js" charset="utf-8"></script>
+        <style media="screen">
+            body {
+                font-family: Consolas, serif;
+                font-size: 10pt;
+            }
+            #userlist {
+                width: 150px;
+            }
+            #sessionlist {
+                width: 150px;
+            }
+            #tasknet {
+                width: 900px;
+                height: 600px;
+                border: 1px solid lightgray;
+            }
+        </style>
+    </head>
+    <body>
+        <input type="file" id="log_files" multiple onchange="LogAnalyzer.handleFiles(this.files)">
+        <p> </p>
+        <div class="viewpane">
+            Version: <select class="versionlist" name="version">
+                <option value="0.1">0.1</option>
+            </select>
+            <p>
+                <table>
+                    <tr>
+                        <td>
+                            Users: <br />
+                            <select id="userlist" name="users" multiple size="5">
+                                <option value="none">none</option>
+                            </select>
+                        </td>
+                        <td>
+                            Sessions for (<span>none</span>): <br />
+                            <select id="sessionlist" name="sessions" multiple size="5">
+                                <option value="none">none</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+            </p>
+            <p>
+                View task: <select id="tasklist" name="task">
+                    <option value="0">0</option>
+                </select>
+
+                <div id="tasknet"></div>
+            </p>
+        </div>
+
+    <script type="text/javascript">
+
+        // Set analyzer UI hooks
+        LogAnalyzer.setUserSelect(document.getElementById("userlist"));
+        LogAnalyzer.setSessionSelect(document.getElementById("sessionlist"));
+        LogAnalyzer.setTaskSelect(document.getElementById("tasklist"));
+        LogAnalyzer.setStateGraphCallback((nodes, edges) => {
+
+            console.warn(nodes, edges);
+
+            // create a network
+            var container = document.getElementById('tasknet');
+            var data = {
+                nodes: nodes,
+                edges: edges
+            };
+            var options = {
+                edges: {
+                    arrows: {
+                        'to': {'enabled':true, 'scaleFactor':0.4}
+                    }
+                }
+            };
+            var network = new vis.Network(container, data, options);
+
+        });
+
+        // create an array with nodes
+        /*var nodes = new vis.DataSet([
+            {id: 1, label: 'Node 1'},
+            {id: 2, label: 'Node 2'},
+            {id: 3, label: 'Node 3'},
+            {id: 4, label: 'Node 4'},
+            {id: 5, label: 'Node 5'}
+        ]);
+
+        // create an array with edges
+        var edges = new vis.DataSet([
+            {from: 1, to: 3},
+            {from: 1, to: 2},
+            {from: 2, to: 4},
+            {from: 2, to: 5}
+        ]);*/
+
+    </script>
+
+    </body>
+</html>

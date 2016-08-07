@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width; initial-scale=1; maximum-scale=1; user-scalable=0;" />
+        <title>That programming game</title>
+        <script src="lib/FileSaver.min.js" charset="utf-8"></script>
+        <script src="build/logger.js" charset="utf-8"></script>
+        <script src="build/util.js" charset="utf-8"></script>
+        <script src="build/vis.js" charset="utf-8"></script>
+        <script src="build/structs.js" charset="utf-8"></script>
+        <script src="build/lambda.js" charset="utf-8"></script>
+        <script src="build/lambda_expr.js" charset="utf-8"></script>
+        <script src="build/funcs.js" charset="utf-8"></script>
+        <script src="build/event.js" charset="utf-8"></script>
+        <script src="build/game.js" charset="utf-8"></script>
+        <script src="build/animate.js" charset="utf-8"></script>
+        <script src="build/image.js" charset="utf-8"></script>
+        <script src="build/resource.js" charset="utf-8"></script>
+        <script src="build/effect.js" charset="utf-8"></script>
+        <style media="screen">
+            body {
+                margin: 0;
+            }
+            #canvas {
+                padding: 0;
+                margin-left: auto;
+                margin-right: auto;
+                display: block;
+            }
+            .centered {
+                padding: 0;
+                margin-left: auto;
+                margin-right: auto;
+                width: 100%;
+                display: block;
+                text-align: center;
+            }
+        </style>
+        <script type="text/javascript">
+
+        var GLOBAL_DEFAULT_CTX = null;
+        var GLOBAL_DEFAULT_SCREENSIZE = null;
+        var stage;
+        var level_idx = 0;
+        function init() {
+
+            // Start a new log session (creating userID as necessary),
+            // and then begin the game.
+            Logger.startSession().then((userinfo) => {
+                initBoard();
+            });
+        }
+
+        function initBoard() {
+
+            var canvas = document.getElementById('canvas');
+
+            // Width 100% and height 100%
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
+            }
+
+            if (canvas.getContext) {
+
+                // Resize canvas during a mobile phone orientation change.
+                window.addEventListener('resize', resizeCanvas, false);
+                window.addEventListener('orientationchange', resizeCanvas, false);
+                resizeCanvas();
+
+                GLOBAL_DEFAULT_CTX = canvas.getContext('2d');
+                document.getElementById('lvl_num').innerHTML = level_idx + '';
+
+                stage = Resource.buildLevel(level_idx, canvas);
+
+                Logger.transitionToTask(level_idx, stage.toString()).catch((err) => {
+                    //console.error(err);
+                });
+
+                stage.update();
+                stage.draw();
+            }
+        }
+        function prev() {
+            if (!Logger.sessionBegan()) return;
+            if (level_idx === 0) initBoard();
+            else {
+                level_idx--;
+                initBoard();
+            }
+        }
+        function next() {
+            if (!Logger.sessionBegan()) return;
+            if (level_idx === Resource.level.length-1) initBoard();
+            else {
+                level_idx++;
+                initBoard();
+            }
+        }
+        function undo() {
+            if (!Logger.sessionBegan()) return;
+            stage.restoreState();
+        }
+        function gotoChapter() {
+            var sel = document.getElementById('chapterSelect');
+            var selected_chapter = sel.options[sel.selectedIndex].value;
+            var chapter_to_level_map = {
+                '1':0,
+                '2':28
+            };
+            level_idx = chapter_to_level_map[selected_chapter];
+            initBoard();
+        }
+
+        </script>
+    </head>
+    <body onload="init()" bgcolor="lightgray">
+        <canvas id="canvas" onmousedown="" width="800" height="600" style="background-color:#EEE;"></canvas>
+        <br />
+        <div id="state" class="centered">
+            <button onclick="undo()">Undo</button>
+        </div>
+        <div id="explanation" class="centered">
+            <button onclick="prev()">Prev</button>
+            <button onclick="initBoard()">Reset</button>
+            <button onclick="next()">Next</button>
+            <p>
+                Level #<span id="lvl_num"></span> <br />
+                Jump to: <select id="chapterSelect" name="chapter" onchange="gotoChapter()">
+                    <option value="1">Chapter 1</option>
+                    <option value="2">Chapter 2</option>
+                </select>
+            </p>
+            <p>
+                Drop expressions into <span style="color:#666;">holes</span> inside other expressions. <br />
+                If an expression blinks <span style="color:ForestGreen;">green</span>, click it to reduce.
+            </p>
+        </div>
+        <div id="logdownload" class="centered">
+            <button onclick="Logger.download()">Download log data.</button>
+        </div>
+    </body>
+</html>
