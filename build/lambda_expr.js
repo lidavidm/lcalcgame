@@ -566,6 +566,11 @@ var LambdaExpr = function (_Expression) {
                 return prev && !(arg instanceof MissingExpression);
             }, true);
         }
+    }, {
+        key: 'body',
+        get: function get() {
+            return this.takesArgument ? this.holes[1] : null;
+        }
     }]);
 
     return LambdaExpr;

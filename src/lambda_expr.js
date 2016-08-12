@@ -329,6 +329,7 @@ class LambdaExpr extends Expression {
         if (this.holes.length < 2) return true;
         return this.holes.slice(1).reduce(((prev,arg) => (prev && !(arg instanceof MissingExpression))), true);
     }
+    get body() { return this.takesArgument ? this.holes[1] : null; }
     updateHole() {
         // Determine whether this LambdaExpr has any MissingExpressions:
         if (this.holes[0].name !== 'x')

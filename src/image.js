@@ -14,3 +14,28 @@ class ImageRect extends Rect {
         this.ctx.drawImage(Resource.getImage(this.image), pos.x + this._offset.x, pos.y + this._offset.y, boundingSize.w, boundingSize.h);
     }
 }
+
+class Button extends ImageRect {
+    constructor(x, y, w, h, resource_map, onclick) {
+        // where resource_map properties are:
+        //  { default, hover (optional), down (opt.) }
+        super(x, y, w, h, resource_map.default)
+        this.images = resource_map;
+        this.clickFunc = onclick;
+    }
+    onmouseenter(pos) {
+        if ('hover' in this.images)
+            this.image = this.images.hover;
+    }
+    onmouseleave(pos) {
+        this.image = this.images.default;
+    }
+    onmousedown(pos) {
+        if ('down' in this.images)
+            this.image = this.images.down;
+    }
+    onmouseup(pos) {
+        this.image = this.images.default;
+        if (this.clickFunc) this.clickFunc();
+    }
+}

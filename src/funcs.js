@@ -136,6 +136,7 @@ class MapFunc extends FuncExpr {
         if (reduced_expr && reduced_expr != this) {
 
             let stage = this.stage;
+            let func = this.func;
             let bagCopy = this.bag.clone();
             var superReduce = () => {
                 this.bag = bagCopy;
@@ -153,31 +154,45 @@ class MapFunc extends FuncExpr {
                 //stage.remove(this.bag);
                 //return;
 
+                var bagAfterMap = this.reduce();
+
                 var bagToFuncArrowPath = this.bagToFuncArrowPath;
                 var bag = this.bag;
                 var runNextAnim = (n) => {
                     if (bag.items.length === 0) {
-                        superReduce();
-                        this.bag.spill();
-                        stage.remove(this.bag);
+                        //superReduce();
+                        //this.bag.spill();
+                        //stage.remove(this.bag);
+                        stage.remove(this);
+                        stage.draw();
                     } else {
+
+                        // Pop an item off the bag.
                         let item = bag.popItem();
+                        let itemAfterMap = bagAfterMap.popItem(); // TODO: Replicators...
+
+                        // Add it to the stage, making it smaller
+                        // so that it can 'follow' the path of the arrow from bag into function.
                         stage.add(item);
                         item.scale = { x:0.5, y:0.5 };
                         item.parent = null;
 
                         Animate.followPath(item, bagToFuncArrowPath, 800).after(() => {
+
+                            // Remove item (preview) from the stage when it reaches end of arrow path (enters 'function' hole).
                             stage.remove(item);
 
                             // Spill individial items onto stage as they are created.
-                            /*let theta = Math.random() * Math.PI * 2;
+                            let theta = Math.random() * Math.PI * 2;
                             let rad = bag.size.w * 1.5;
-                            let pos = this.centerPos();
+                            let pos = func.body.absolutePos;
                             let targetPos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) } );
-                            item.pos = pos;
-                            item.scale = { x:1.0, y:1.0 };
-                            stage.add(item);
-                            Animate.tween(item, { 'pos':targetPos }, 100, (elapsed) => Math.pow(elapsed, 0.5));*/
+                            itemAfterMap.pos = pos;
+                            itemAfterMap.scale = { x:1.0, y:1.0 };
+                            itemAfterMap.parent = null;
+                            stage.add(itemAfterMap);
+                            stage.draw();
+                            Animate.tween(itemAfterMap, { 'pos':targetPos }, 500, (elapsed) => Math.pow(elapsed, 0.5));
 
                             runNextAnim( n + 1 );
                         });

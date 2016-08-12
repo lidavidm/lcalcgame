@@ -42,3 +42,45 @@ var ImageRect = function (_Rect) {
 
     return ImageRect;
 }(Rect);
+
+var Button = function (_ImageRect) {
+    _inherits(Button, _ImageRect);
+
+    function Button(x, y, w, h, resource_map, onclick) {
+        _classCallCheck(this, Button);
+
+        var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Button).call(this, x, y, w, h, resource_map.default));
+        // where resource_map properties are:
+        //  { default, hover (optional), down (opt.) }
+
+
+        _this2.images = resource_map;
+        _this2.clickFunc = onclick;
+        return _this2;
+    }
+
+    _createClass(Button, [{
+        key: 'onmouseenter',
+        value: function onmouseenter(pos) {
+            if ('hover' in this.images) this.image = this.images.hover;
+        }
+    }, {
+        key: 'onmouseleave',
+        value: function onmouseleave(pos) {
+            this.image = this.images.default;
+        }
+    }, {
+        key: 'onmousedown',
+        value: function onmousedown(pos) {
+            if ('down' in this.images) this.image = this.images.down;
+        }
+    }, {
+        key: 'onmouseup',
+        value: function onmouseup(pos) {
+            this.image = this.images.default;
+            if (this.clickFunc) this.clickFunc();
+        }
+    }]);
+
+    return Button;
+}(ImageRect);

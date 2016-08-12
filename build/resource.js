@@ -47,7 +47,10 @@ var Resource = function () {
     loadAudio('bag-addItem', 'putaway.wav');
     loadAudio('heatup', 'heatup.wav');
     loadAudio('shatter', 'shatter1.wav');
+    loadAudio('splosion', 'firework1.wav');
+    loadAudio('shootwee', 'firework-shooting.wav');
     loadAudio('victory', '325805__wagna__collect.wav');
+
     loadImage('bag-background', 'bg-stars.png');
     loadImage('lambda-hole', 'lambda-hole.png');
     loadImage('lambda-hole-closed', 'lambda-hole-closed.png');
@@ -61,6 +64,14 @@ var Resource = function () {
     loadImage('lambda-pipe-opening1', 'lambda-pipe-opening1.png');
     loadImage('null-circle', 'null1.png');
     loadImage('null-circle-highlight', 'null1-highlighted.png');
+
+    // UI Images.
+    loadImage('btn-back-default', 'back-button.png');
+    loadImage('btn-back-hover', 'back-button-hover.png');
+    loadImage('btn-back-down', 'back-button-down.png');
+    loadImage('btn-reset-default', 'reset-button.png');
+    loadImage('btn-reset-hover', 'reset-button-hover.png');
+    loadImage('btn-reset-down', 'reset-button-down.png');
 
     // Concreteness faded images.
     loadImage('lambda-hole-x', 'lambda-hole-x.png');
@@ -264,23 +275,6 @@ var Resource = function () {
         levels.push(['(map /(λx _) __) (bag star star star triangle triangle) (== _ /star) (if _b _) (#_x) (#_x)', '(star)(star)(star)', 'The filter question']);
     }
 
-    // DEBUG LEVEL(s)
-    levels.push(['(ifelse _b /star /triangle) (true) (pop __) (define (λy (put #y (bag star star)))) (bag star star star)', 'star']);
-    levels.push(['(reduce (λa (λb (reduce (λx (λy (put #y #x))) #a #b))) (reduce (λx (λy (put (bag (star) (star)) #x))) (bag (star) (star) (star)) (bag )) (bag ))', 'star']);
-
-    //levels.push(['(λx #x #x) (λx /(λy #y #x))', 'star']);
-    //levels.push(['(map /(λx /star) __) (bag star star star star star star) (bag star star star star star) (bag star star) (bag star) (bag star star star star)', 'star']);
-
-    // Must understand how objects in bags are duplicated after a PUT.
-    levels.push(['(reduce /(λx /(λy /(put #y #x))) /(bag dot dot dot) __) (bag) (dot) (dot)', '(bag dot dot dot dot dot)', '"Addition" (union of multisets).']);
-    //levels.push(['(reduce /(λx /(λy /(put #y #x))) (bag star star star) (bag)) (star)', 'star', 'test']);
-    levels.push(['(reduce /(λx /(λy /(== #x _))) (bag star star star) (star)) (star)', 'false', 'Testing boolean chain.']);
-
-    levels.push(['(put #x __) (map /(λx _) __) (λx) (bag) (bag star star star)', '(bag star star star star)', 'Must understand how PUT returns a bag, and how objects in the initial bag in PUT are duplicated.']);
-
-    //levels.push(['(null) (put _ __) (put _ __) (bag) (star) (diamond) (star) (if _ /star) (circle)', 'star']);
-    //levels.push(['(put _ __) (map /(λx _) __) (== #x /star) (bag) (star) (diamond) (star) (if _ /star) (circle)', 'star']);
-
     // VERSION 0.2 LEVELS
     markChapter('Chapter 1', 'Identity, Destruction, and Replication', levels);
     loadIntroToLambdaCalc(levels);
@@ -305,6 +299,24 @@ var Resource = function () {
 
     //levels.push(['(== /star _) (if _ /star) (true) (map /(λx _) _) (bag) (star) (#_x)', 'true']);
     //levels.push(['(== /star _) (if _ /1) (1) (1) (1) (1) (1)', 'true']);
+
+    // DEBUG LEVEL(s)
+    markChapter('Experimental', 'Post-test', levels);
+    levels.push(['(ifelse _b /star /triangle) (true) (pop __) (define (λy (put #y (bag star star)))) (bag star star star)', 'star']);
+    levels.push(['(reduce (λa (λb (reduce (λx (λy (put #y #x))) #a #b))) (reduce (λx (λy (put (bag (star) (star)) #x))) (bag (star) (star) (star)) (bag )) (bag ))', 'star']);
+
+    //levels.push(['(λx #x #x) (λx /(λy #y #x))', 'star']);
+    //levels.push(['(map /(λx /star) __) (bag star star star star star star) (bag star star star star star) (bag star star) (bag star) (bag star star star star)', 'star']);
+
+    // Must understand how objects in bags are duplicated after a PUT.
+    levels.push(['(reduce /(λx /(λy /(put #y #x))) /(bag dot dot dot) __) (bag) (dot) (dot)', '(bag dot dot dot dot dot)', '"Addition" (union of multisets).']);
+    levels.push(['(reduce /(λx /(λy /(== #x _))) (bag star star star) (star)) (star)', 'false', 'Testing boolean chain.']);
+    //levels.push(['(reduce /(λx /(λy /(put #y #x))) (bag star star star) (bag)) (star)', 'star', 'test']);
+
+    levels.push(['(put #x __) (map /(λx _) __) (λx) (bag) (bag star star star)', '(bag star star star star)', 'Must understand how PUT returns a bag, and how objects in the initial bag in PUT are duplicated.']);
+
+    //levels.push(['(null) (put _ __) (put _ __) (bag) (star) (diamond) (star) (if _ /star) (circle)', 'star']);
+    //levels.push(['(put _ __) (map /(λx _) __) (== #x /star) (bag) (star) (diamond) (star) (if _ /star) (circle)', 'star']);
 
     // Introduces concept: Functions as goals.
     //levels.push(['(λx #x) (λx) (star)', '(λx #x)']);

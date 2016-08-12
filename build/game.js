@@ -40,12 +40,12 @@ var Level = function () {
             // levels appear the same each time you play.
             Math.seed = 12045;
 
-            var screen = canvas.getBoundingClientRect();
-            screen = { height: screen.height / 1.4, width: screen.width / 1.4, y: screen.height * (1 - 1 / 1.4) / 2.0, x: screen.width * (1 - 1 / 1.4) / 2.0 };
+            var canvas_screen = canvas.getBoundingClientRect();
+            var screen = { height: canvas_screen.height / 1.4, width: canvas_screen.width / 1.4, y: canvas_screen.height * (1 - 1 / 1.4) / 2.0, x: canvas_screen.width * (1 - 1 / 1.4) / 2.0 };
             var board_packing = this.findBestPacking(this.exprs, screen);
             stage.addAll(board_packing); // add expressions to the stage
 
-            // TODO
+            // TODO: Offload this onto second stage?
             var goal_node = this.goal.nodeRepresentation;
             goal_node[0].pos = { x: 20, y: 10 };
             goal_node[1].pos = { x: 110, y: 10 };
@@ -58,7 +58,21 @@ var Level = function () {
             //var toolbox_vis = this.generateToolboxVisual(toolbox_vis);
             //stage.addAll(toolbox_vis);
 
-            stage.goalNodes = [goal_node[0], goal_node[1]];
+            stage.uiGoalNodes = [goal_node[0], goal_node[1]];
+            stage.goalNodes = goal_node[1].children;
+
+            // UI Buttons
+            var ui_padding = 10;
+            var btn_back = new Button(canvas_screen.width - 128 - ui_padding, ui_padding, 64, 64, { default: 'btn-back-default', hover: 'btn-back-hover', down: 'btn-back-down' }, function () {
+                prev(); // go back to previous level; see index.html.
+            });
+            var btn_reset = new Button(btn_back.pos.x + btn_back.size.w, btn_back.pos.y, 64, 64, { default: 'btn-reset-default', hover: 'btn-reset-hover', down: 'btn-reset-down' }, function () {
+                initBoard(); // reset board state; see index.html.
+            });
+            stage.add(btn_back);
+            stage.add(btn_reset);
+
+            stage.uiNodes = [btn_back, btn_reset];
 
             // Checks if the player has completed the level.
             var goal = this.goal;
@@ -74,8 +88,8 @@ var Level = function () {
                     for (var _iterator = this.nodes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                         var n = _step.value;
 
-                        if (n in this.goalNodes || n.constructor.name === 'Rect' || n.constructor.name === 'ImageRect') continue;
-                        nodes.push(n.clone());
+                        if (n in this.uiGoalNodes || this.uiNodes.indexOf(n) > -1 || n.constructor.name === 'Rect' || n.constructor.name === 'ImageRect') continue;
+                        nodes.push(n);
                     }
                 } catch (err) {
                     _didIteratorError = true;
@@ -95,7 +109,23 @@ var Level = function () {
                 return nodes;
             }.bind(stage);
             stage.isCompleted = function () {
-                return goal.test(this.expressionNodes());
+                var _this2 = this;
+
+                var exprs = this.expressionNodes();
+                var matching = goal.test(exprs.map(function (n) {
+                    return n.clone();
+                }));
+                if (matching) {
+                    // Pair nodes so that goal nodes reference the actual nodes on-screen (they aren't clones).
+                    // goal.test returns an array of indexes, referring to the indexes of the expressions passed into the test,
+                    // ordered by the order of the goal nodes displayed on screen. So the info needed to pair an expression to a goal node.
+                    // With this we can reconstruct the actual pairing for the nodes on-screen (not clones).
+                    var pairs = matching.map(function (j, i) {
+                        return [exprs[j], _this2.goalNodes[i]];
+                    });
+                    return pairs;
+                }
+                return false;
             }.bind(stage);
 
             return stage;
@@ -596,7 +626,8 @@ var Goal = function () {
                 for (var _iterator7 = this.patterns[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
                     var pattern = _step7.value;
 
-                    if (pattern.test(exprs)) return true;
+                    var paired_matching = pattern.test(exprs);
+                    if (paired_matching) return paired_matching;
                 }
             } catch (err) {
                 _didIteratorError7 = true;
@@ -680,6 +711,10 @@ var ExpressionPattern = function () {
             var es = this.exprs.map(function (e) {
                 return e;
             }); // shallow clone
+            var es_idxs = this.exprs.map(function (e, i) {
+                return i;
+            });
+            var paired_matching = [];
 
             // If sets of expressions have different length, they can't be equal.
             if (lvl_exprs.length !== es.length) return false;
@@ -726,6 +761,7 @@ var ExpressionPattern = function () {
                     for (var i = 0; i < es.length; i++) {
                         if (compare(es[i], lvl_e)) {
                             valid = i;
+                            paired_matching.push(es_idxs[i]);
                             break;
                         }
                     }
@@ -733,6 +769,7 @@ var ExpressionPattern = function () {
                         //console.log(' > array was ', es);
                         //console.log(' > removing element ', es[valid]);
                         es.splice(valid, 1);
+                        es_idxs.splice(valid, 1);
                         //console.log(' > array is now ', es);
                     } else return false;
                 }
@@ -751,7 +788,7 @@ var ExpressionPattern = function () {
                 }
             }
 
-            return true;
+            return paired_matching;
         }
     }]);
 

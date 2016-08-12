@@ -124,16 +124,44 @@ class Stage {
 
             if (level_complete) {
 
-                Logger.log( 'victory', { 'final_state':this.toString(), 'num_of_moves':undefined } );
+                // DEBUG TEST FLYTO ANIMATION.
+                if (!this.ranCompletionAnim) {
 
-                var cmp = new TextExpr("YOU WIN!");
-                cmp.pos = { x:320, y:300 };
-                this.add(cmp);
+                    let you_win = () => {
+                        Logger.log( 'victory', { 'final_state':this.toString(), 'num_of_moves':undefined } );
 
-                Resource.play('victory');
-                setTimeout(function () {
-                    next();
-                }, Resource.getAudio('victory').duration * 1000);
+                        var cmp = new TextExpr("YOU WIN!");
+                        cmp.pos = { x:320, y:300 };
+                        this.add(cmp);
+
+                        this.draw();
+
+                        Resource.play('victory');
+                        setTimeout(function () {
+                            next();
+                        }, Resource.getAudio('victory').duration * 1000);
+                    };
+
+                    let pairs = level_complete;
+                    let num_exploded = 0;
+
+                    pairs.forEach((pair, idx) => {
+                        var node = pair[0];
+                        var goalNode = pair[1];
+                        Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x:200, y:300 }, () => {
+                            SplosionEffect.run(node);
+                            console.log(goalNode);
+                            goalNode.parent.removeChild(goalNode);
+                            num_exploded++;
+                            if (num_exploded === pairs.length) {
+                                setTimeout(you_win, 500.0);
+                            }
+                        });
+                    });
+
+                    Resource.play('shootwee');
+                    this.ranCompletionAnim = true;
+                }
             }
 
             console.warn('LEVEL IS COMPLETE? ', level_complete);
@@ -149,7 +177,7 @@ class Stage {
 
     // State.
     saveState() {
-        var clones = this.nodes.map((n) => n.clone());
+        var clones = this.expressionNodes().map((n) => n.clone());
         clones = clones.filter((n) => !(n instanceof ExpressionEffect));
         this.stateStack.push(clones);
     }

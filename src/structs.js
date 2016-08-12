@@ -1122,9 +1122,9 @@ class BagExpr extends CollectionExpr {
         // stage.remove(this);
 
         // Add back all of this bags' items to the stage.
-        items.forEach((item) => {
+        items.forEach((item, index) => {
             item = item.clone();
-            let theta = Math.random() * Math.PI * 2;
+            let theta = index / items.length * Math.PI * 2;
             let rad = this.size.w * 1.5;
             let targetPos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) } );
             item.pos = pos;

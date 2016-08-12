@@ -29,6 +29,42 @@ class Animate {
         return twn;
     }
 
+    static flyToTarget(node, targetPos, accMultiplier=1.0, initVelocity={x:0, y:0}, onReachingTarget=null, max_vel=700 ) {
+        const MAX_VELOCITY = max_vel;
+        var total_dist = lengthOfPos(fromTo(node.pos, targetPos));
+        var vel = initVelocity;
+        var acceleration = scalarMultiply(normalize(fromTo(node.pos, targetPos)), accMultiplier);
+
+        console.warn('Initializing flyToTarget with node ', node);
+
+        var twn = new IndefiniteTween((delta) => {
+
+            node.pos = addPos(node.pos, scalarMultiply(vel, delta / 1000.0));
+
+            let vec = fromTo(node.pos, targetPos);
+            let unit = normalize(vec);
+            acceleration = scalarMultiply(unit, accMultiplier); // always accelerate towards target
+            vel = addPos(vel, scalarMultiply(acceleration, delta / 1000.0));
+
+            if (lengthOfPos(vel) > MAX_VELOCITY) vel = rescalePos(vel, MAX_VELOCITY);
+
+            let remaining_dist = lengthOfPos(vec);
+            let strengthOfCorrection = (total_dist / Math.max(remaining_dist, 1.0)) / total_dist;
+            strengthOfCorrection = Math.pow(strengthOfCorrection, 1.0);
+            node.pos = addPos(scalarMultiply(node.pos, 1.0 - strengthOfCorrection), scalarMultiply(targetPos, strengthOfCorrection) );
+
+            if (onReachingTarget && lengthOfPos(fromTo(node.pos, targetPos)) < 50.0) {
+                console.error('reached end', node);
+                twn.cancel();
+            }
+
+            if (node.stage) node.stage.draw();
+
+        }).after(onReachingTarget);
+        twn.run();
+        return twn;
+    }
+
     static tween(node, targetValue, dur=1000, smoothFunc=((elapsed) => elapsed)) {
         //if (!(propName in node)) {
         //    console.error('@ Animate.tween: "' + propName.toString() + '" is not a property of node', node );
@@ -174,6 +210,42 @@ class Animation {
     }
 }
 
+class _AnimationUpdateLoop {
+    constructor() {
+        this.tweens = [];
+        this.fps = 60;
+    }
+    add(twn) {
+        this.tweens.push(twn);
+        if (this.tweens.length === 1)
+            this.startUpdateLoop();
+    }
+    isRunning(twn) {
+        return this.tweens.indexOf(twn) > -1;
+    }
+    remove(twn) {
+        let i = this.tweens.indexOf(twn);
+        if (i > -1) this.tweens.splice(i, 1);
+        if (this.tweens.length === 0) this.stopUpdateLoop();
+    }
+    startUpdateLoop() {
+        this.stopped = false;
+        this.timeout();
+    }
+    timeout() {
+        var _this = this;
+        this.updateTimeout = setTimeout(function () {
+            if (_this.stopped) return;
+            _this.tweens.forEach((twn) => twn.timeout()); // update all tweens
+            _this.timeout();
+        }, 1000.0 / this.fps);
+    }
+    stopUpdateLoop() {
+        this.stopped = true;
+    }
+}
+var AnimationUpdateLoop = new _AnimationUpdateLoop(); // now we can treat the main update loop like a singleton
+
 class Tween {
     constructor(updateLoopFunc, duration, fps=30) {
         this.dur = duration;
@@ -185,46 +257,40 @@ class Tween {
     }
 
     run() {
-        if (this.dur < 0.0001 && this.update) {
+        if (this.dur && this.dur < 0.0001 && this.update) {
             this.update(0); // run once by default if duration is negligible
             return;
         }
-        this.cancelTimeouts();
 
         var _this = this;
         this.startTimeMS = (new Date()).getTime();
-        this.timeout();
         this.cancelCallback = function() {
             _this.cancel();
         };
+
+        AnimationUpdateLoop.add(this);
     }
     timeout() {
-        var _this = this;
-        this.updateTimeout = setTimeout(function () {
-            let elapsed = Math.min(((new Date()).getTime() - _this.startTimeMS) / _this.dur, 1.0);
-            if (elapsed >= 1.0) _this.cancelCallback();
-            else {
-                _this.update(elapsed); // how much time has passed
-                _this.timeout();
-            }
-        }, 1000.0 / this.fps);
+        let elapsed = Math.min(((new Date()).getTime() - this.startTimeMS) / this.dur, 1.0);
+        if (elapsed >= 1.0) this.cancelCallback();
+        else this.update(elapsed); // how much time has passed
     }
 
     cancel() {
-        this.cancelTimeouts();
+        AnimationUpdateLoop.remove(this);
         if (this.onComplete) {
-            //console.error((new Date()).getTime() - _this.startTimeMS);
             this.onComplete();
             this.onComplete = null;
         }
     }
-    cancelTimeouts() {
-        if (this.updateTimeout) window.clearTimeout(this.updateTimeout);
-        if (this.clearTimeout) window.clearTimeout(this.clearTimeout);
-        this.updateTimeout = null;
-        this.clearTimeout = null;
-    }
+}
 
+class IndefiniteTween extends Tween {
+    timeout() {
+        let delta = ((new Date()).getTime() - this.startTimeMS);
+        this.startTimeMS += delta;
+        this.update(delta); // how much time has passed _between frames_ (in ms)
+    }
 }
 
 class StateGraph {

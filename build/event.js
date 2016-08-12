@@ -123,6 +123,8 @@ var Stage = function () {
     }, {
         key: 'update',
         value: function update() {
+            var _this3 = this;
+
             this.nodes.forEach(function (n) {
                 return n.update();
             });
@@ -132,16 +134,46 @@ var Stage = function () {
 
                 if (level_complete) {
 
-                    Logger.log('victory', { 'final_state': this.toString(), 'num_of_moves': undefined });
+                    // DEBUG TEST FLYTO ANIMATION.
+                    if (!this.ranCompletionAnim) {
+                        (function () {
 
-                    var cmp = new TextExpr("YOU WIN!");
-                    cmp.pos = { x: 320, y: 300 };
-                    this.add(cmp);
+                            var you_win = function you_win() {
+                                Logger.log('victory', { 'final_state': _this3.toString(), 'num_of_moves': undefined });
 
-                    Resource.play('victory');
-                    setTimeout(function () {
-                        next();
-                    }, Resource.getAudio('victory').duration * 1000);
+                                var cmp = new TextExpr("YOU WIN!");
+                                cmp.pos = { x: 320, y: 300 };
+                                _this3.add(cmp);
+
+                                _this3.draw();
+
+                                Resource.play('victory');
+                                setTimeout(function () {
+                                    next();
+                                }, Resource.getAudio('victory').duration * 1000);
+                            };
+
+                            var pairs = level_complete;
+                            var num_exploded = 0;
+
+                            pairs.forEach(function (pair, idx) {
+                                var node = pair[0];
+                                var goalNode = pair[1];
+                                Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x: 200, y: 300 }, function () {
+                                    SplosionEffect.run(node);
+                                    console.log(goalNode);
+                                    goalNode.parent.removeChild(goalNode);
+                                    num_exploded++;
+                                    if (num_exploded === pairs.length) {
+                                        setTimeout(you_win, 500.0);
+                                    }
+                                });
+                            });
+
+                            Resource.play('shootwee');
+                            _this3.ranCompletionAnim = true;
+                        })();
+                    }
                 }
 
                 console.warn('LEVEL IS COMPLETE? ', level_complete);
@@ -164,7 +196,7 @@ var Stage = function () {
     }, {
         key: 'saveState',
         value: function saveState() {
-            var clones = this.nodes.map(function (n) {
+            var clones = this.expressionNodes().map(function (n) {
                 return n.clone();
             });
             clones = clones.filter(function (n) {
@@ -359,7 +391,7 @@ var Stage = function () {
         value: function getNodesWithClass(Class) {
             var excludedNodes = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
 
-            var _this3 = this;
+            var _this4 = this;
 
             var recursive = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
             var nodes = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
@@ -376,7 +408,7 @@ var Stage = function () {
                     return;
                 } else if (n instanceof Class) rt.push(n);
                 if (recursive && n.children.length > 0) {
-                    var childs = _this3.getNodesWithClass(Class, excludedNodes, true, n.children);
+                    var childs = _this4.getNodesWithClass(Class, excludedNodes, true, n.children);
                     childs.forEach(function (c) {
                         return rt.push(c);
                     });

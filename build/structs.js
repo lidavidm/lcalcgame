@@ -1885,9 +1885,9 @@ var BagExpr = function (_CollectionExpr) {
             // stage.remove(this);
 
             // Add back all of this bags' items to the stage.
-            items.forEach(function (item) {
+            items.forEach(function (item, index) {
                 item = item.clone();
-                var theta = Math.random() * Math.PI * 2;
+                var theta = index / items.length * Math.PI * 2;
                 var rad = _this38.size.w * 1.5;
                 var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
                 item.pos = pos;

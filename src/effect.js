@@ -1,3 +1,50 @@
+// Node disappears and is replaced by a firework-like particle explosion.
+class SplosionEffect {
+    static run(node) {
+
+        if (!node.stage) {
+            console.warn('@ SmashsplodeEffect: Node is not member of stage.');
+            return;
+        }
+
+        // Store stage context.
+        var stage = node.stage;
+
+        // Remove node from stage.
+        stage.remove(node);
+
+        // Store node center pos.
+        var center = node.centerPos();
+
+        // Create particles at center.
+        const PARTICLE_COUNT = 20;
+        const PARTICLE_MIN_RAD = 2;
+        const PARTICLE_MAX_RAD = 12;
+        const EXPLOSION_RAD = 100;
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+
+            // Create individual particle + add each to the stage.
+            let part = new Circle(center.x, center.y,
+                Math.floor(PARTICLE_MIN_RAD + (PARTICLE_MAX_RAD - PARTICLE_MIN_RAD) * Math.random()));
+            part.color = 'orange';
+            part.shadowOffset = 0;
+            stage.add(part);
+
+            // 'Explode' outward (move particle to outer edge of explosion radius).
+            let theta = Math.random() * Math.PI * 2;
+            let rad = EXPLOSION_RAD * (Math.random() / 2.0 + 0.5);
+            let targetPos = addPos(part.pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) } );
+            Animate.tween(part, { 'pos':targetPos, 'scale':{x:0.0001, y:0.0001} }, 400, (elapsed) => Math.pow(elapsed, 0.5)).after(() => {
+                stage.remove(part); // self-delete for cleanup
+                stage.draw();
+            });
+        }
+
+        // Play sFx.
+        Resource.play('splosion');
+    }
+}
+
 class ExpressionEffect extends RoundedRect {}
 class ShatterExpressionEffect extends ExpressionEffect {
     constructor(roundRectToShatter) {

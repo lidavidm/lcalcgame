@@ -4,6 +4,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /**
@@ -47,6 +51,47 @@ var Animate = function () {
                 node.pos = addPos(path.absolutePos, path.posAlongPath(smoothFunc(elapsed)));
                 if (node.stage) node.stage.draw();
             }, dur);
+            twn.run();
+            return twn;
+        }
+    }, {
+        key: 'flyToTarget',
+        value: function flyToTarget(node, targetPos) {
+            var accMultiplier = arguments.length <= 2 || arguments[2] === undefined ? 1.0 : arguments[2];
+            var initVelocity = arguments.length <= 3 || arguments[3] === undefined ? { x: 0, y: 0 } : arguments[3];
+            var onReachingTarget = arguments.length <= 4 || arguments[4] === undefined ? null : arguments[4];
+            var max_vel = arguments.length <= 5 || arguments[5] === undefined ? 700 : arguments[5];
+
+            var MAX_VELOCITY = max_vel;
+            var total_dist = lengthOfPos(fromTo(node.pos, targetPos));
+            var vel = initVelocity;
+            var acceleration = scalarMultiply(normalize(fromTo(node.pos, targetPos)), accMultiplier);
+
+            console.warn('Initializing flyToTarget with node ', node);
+
+            var twn = new IndefiniteTween(function (delta) {
+
+                node.pos = addPos(node.pos, scalarMultiply(vel, delta / 1000.0));
+
+                var vec = fromTo(node.pos, targetPos);
+                var unit = normalize(vec);
+                acceleration = scalarMultiply(unit, accMultiplier); // always accelerate towards target
+                vel = addPos(vel, scalarMultiply(acceleration, delta / 1000.0));
+
+                if (lengthOfPos(vel) > MAX_VELOCITY) vel = rescalePos(vel, MAX_VELOCITY);
+
+                var remaining_dist = lengthOfPos(vec);
+                var strengthOfCorrection = total_dist / Math.max(remaining_dist, 1.0) / total_dist;
+                strengthOfCorrection = Math.pow(strengthOfCorrection, 1.0);
+                node.pos = addPos(scalarMultiply(node.pos, 1.0 - strengthOfCorrection), scalarMultiply(targetPos, strengthOfCorrection));
+
+                if (onReachingTarget && lengthOfPos(fromTo(node.pos, targetPos)) < 50.0) {
+                    console.error('reached end', node);
+                    twn.cancel();
+                }
+
+                if (node.stage) node.stage.draw();
+            }).after(onReachingTarget);
             twn.run();
             return twn;
         }
@@ -255,6 +300,62 @@ var Animation = function () {
     return Animation;
 }();
 
+var _AnimationUpdateLoop = function () {
+    function _AnimationUpdateLoop() {
+        _classCallCheck(this, _AnimationUpdateLoop);
+
+        this.tweens = [];
+        this.fps = 60;
+    }
+
+    _createClass(_AnimationUpdateLoop, [{
+        key: 'add',
+        value: function add(twn) {
+            this.tweens.push(twn);
+            if (this.tweens.length === 1) this.startUpdateLoop();
+        }
+    }, {
+        key: 'isRunning',
+        value: function isRunning(twn) {
+            return this.tweens.indexOf(twn) > -1;
+        }
+    }, {
+        key: 'remove',
+        value: function remove(twn) {
+            var i = this.tweens.indexOf(twn);
+            if (i > -1) this.tweens.splice(i, 1);
+            if (this.tweens.length === 0) this.stopUpdateLoop();
+        }
+    }, {
+        key: 'startUpdateLoop',
+        value: function startUpdateLoop() {
+            this.stopped = false;
+            this.timeout();
+        }
+    }, {
+        key: 'timeout',
+        value: function timeout() {
+            var _this = this;
+            this.updateTimeout = setTimeout(function () {
+                if (_this.stopped) return;
+                _this.tweens.forEach(function (twn) {
+                    return twn.timeout();
+                }); // update all tweens
+                _this.timeout();
+            }, 1000.0 / this.fps);
+        }
+    }, {
+        key: 'stopUpdateLoop',
+        value: function stopUpdateLoop() {
+            this.stopped = true;
+        }
+    }]);
+
+    return _AnimationUpdateLoop;
+}();
+
+var AnimationUpdateLoop = new _AnimationUpdateLoop(); // now we can treat the main update loop like a singleton
+
 var Tween = function () {
     function Tween(updateLoopFunc, duration) {
         var fps = arguments.length <= 2 || arguments[2] === undefined ? 30 : arguments[2];
@@ -274,53 +375,59 @@ var Tween = function () {
     _createClass(Tween, [{
         key: 'run',
         value: function run() {
-            if (this.dur < 0.0001 && this.update) {
+            if (this.dur && this.dur < 0.0001 && this.update) {
                 this.update(0); // run once by default if duration is negligible
                 return;
             }
-            this.cancelTimeouts();
 
             var _this = this;
             this.startTimeMS = new Date().getTime();
-            this.timeout();
             this.cancelCallback = function () {
                 _this.cancel();
             };
+
+            AnimationUpdateLoop.add(this);
         }
     }, {
         key: 'timeout',
         value: function timeout() {
-            var _this = this;
-            this.updateTimeout = setTimeout(function () {
-                var elapsed = Math.min((new Date().getTime() - _this.startTimeMS) / _this.dur, 1.0);
-                if (elapsed >= 1.0) _this.cancelCallback();else {
-                    _this.update(elapsed); // how much time has passed
-                    _this.timeout();
-                }
-            }, 1000.0 / this.fps);
+            var elapsed = Math.min((new Date().getTime() - this.startTimeMS) / this.dur, 1.0);
+            if (elapsed >= 1.0) this.cancelCallback();else this.update(elapsed); // how much time has passed
         }
     }, {
         key: 'cancel',
         value: function cancel() {
-            this.cancelTimeouts();
+            AnimationUpdateLoop.remove(this);
             if (this.onComplete) {
-                //console.error((new Date()).getTime() - _this.startTimeMS);
                 this.onComplete();
                 this.onComplete = null;
             }
-        }
-    }, {
-        key: 'cancelTimeouts',
-        value: function cancelTimeouts() {
-            if (this.updateTimeout) window.clearTimeout(this.updateTimeout);
-            if (this.clearTimeout) window.clearTimeout(this.clearTimeout);
-            this.updateTimeout = null;
-            this.clearTimeout = null;
         }
     }]);
 
     return Tween;
 }();
+
+var IndefiniteTween = function (_Tween) {
+    _inherits(IndefiniteTween, _Tween);
+
+    function IndefiniteTween() {
+        _classCallCheck(this, IndefiniteTween);
+
+        return _possibleConstructorReturn(this, Object.getPrototypeOf(IndefiniteTween).apply(this, arguments));
+    }
+
+    _createClass(IndefiniteTween, [{
+        key: 'timeout',
+        value: function timeout() {
+            var delta = new Date().getTime() - this.startTimeMS;
+            this.startTimeMS += delta;
+            this.update(delta); // how much time has passed _between frames_ (in ms)
+        }
+    }]);
+
+    return IndefiniteTween;
+}(Tween);
 
 var StateGraph = function () {
     function StateGraph() {

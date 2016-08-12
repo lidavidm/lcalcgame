@@ -191,6 +191,7 @@ var MapFunc = function (_FuncExpr) {
             var reduced_expr = this.reduce();
             if (reduced_expr && reduced_expr != this) {
                 var superReduce;
+                var bagAfterMap;
                 var bagToFuncArrowPath;
                 var bag;
 
@@ -199,6 +200,7 @@ var MapFunc = function (_FuncExpr) {
                 var _ret = function () {
 
                     var stage = _this4.stage;
+                    var func = _this4.func;
                     var bagCopy = _this4.bag.clone();
 
                     superReduce = function superReduce() {
@@ -219,33 +221,48 @@ var MapFunc = function (_FuncExpr) {
                         //stage.remove(this.bag);
                         //return;
 
+                        bagAfterMap = _this4.reduce();
                         bagToFuncArrowPath = _this4.bagToFuncArrowPath;
                         bag = _this4.bag;
 
                         _runNextAnim = function runNextAnim(n) {
                             if (bag.items.length === 0) {
-                                superReduce();
-                                _this4.bag.spill();
-                                stage.remove(_this4.bag);
+                                //superReduce();
+                                //this.bag.spill();
+                                //stage.remove(this.bag);
+                                stage.remove(_this4);
+                                stage.draw();
                             } else {
                                 (function () {
+
+                                    // Pop an item off the bag.
                                     var item = bag.popItem();
+                                    var itemAfterMap = bagAfterMap.popItem(); // TODO: Replicators...
+
+                                    // Add it to the stage, making it smaller
+                                    // so that it can 'follow' the path of the arrow from bag into function.
                                     stage.add(item);
                                     item.scale = { x: 0.5, y: 0.5 };
                                     item.parent = null;
 
                                     Animate.followPath(item, bagToFuncArrowPath, 800).after(function () {
+
+                                        // Remove item (preview) from the stage when it reaches end of arrow path (enters 'function' hole).
                                         stage.remove(item);
 
                                         // Spill individial items onto stage as they are created.
-                                        /*let theta = Math.random() * Math.PI * 2;
-                                        let rad = bag.size.w * 1.5;
-                                        let pos = this.centerPos();
-                                        let targetPos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) } );
-                                        item.pos = pos;
-                                        item.scale = { x:1.0, y:1.0 };
-                                        stage.add(item);
-                                        Animate.tween(item, { 'pos':targetPos }, 100, (elapsed) => Math.pow(elapsed, 0.5));*/
+                                        var theta = Math.random() * Math.PI * 2;
+                                        var rad = bag.size.w * 1.5;
+                                        var pos = func.body.absolutePos;
+                                        var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
+                                        itemAfterMap.pos = pos;
+                                        itemAfterMap.scale = { x: 1.0, y: 1.0 };
+                                        itemAfterMap.parent = null;
+                                        stage.add(itemAfterMap);
+                                        stage.draw();
+                                        Animate.tween(itemAfterMap, { 'pos': targetPos }, 500, function (elapsed) {
+                                            return Math.pow(elapsed, 0.5);
+                                        });
 
                                         _runNextAnim(n + 1);
                                     });
