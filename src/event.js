@@ -130,9 +130,14 @@ class Stage {
                     let you_win = () => {
                         Logger.log( 'victory', { 'final_state':this.toString(), 'num_of_moves':undefined } );
 
-                        var cmp = new TextExpr("YOU WIN!");
-                        cmp.pos = { x:320, y:300 };
+                        var cmp = new ImageRect(GLOBAL_DEFAULT_SCREENSIZE.width / 2, GLOBAL_DEFAULT_SCREENSIZE.height / 2, 740 / 2, 146 / 2, 'victory');
+                        cmp.anchor = { x:0.5, y:0.5 };
                         this.add(cmp);
+
+                        // Old
+                        //var cmp = new TextExpr("YOU WIN!");
+                        //cmp.pos = { x:320, y:300 };
+                        //this.add(cmp);
 
                         this.draw();
 

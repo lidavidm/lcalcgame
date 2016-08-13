@@ -4,13 +4,28 @@
  * -----------------------------------------------
  * */
 class LambdaHoleExpr extends MissingExpression {
-    openImage() { return this.name === 'x' ? 'lambda-hole' : 'lambda-hole-red'; }
-    closedImage() { return this.name === 'x' ? 'lambda-hole-closed' : 'lambda-hole-red-closed'; }
+    get openImage() { return this.name === 'x' ? 'lambda-hole' : 'lambda-hole-red'; }
+    get closedImage() { return this.name === 'x' ? 'lambda-hole-closed' : 'lambda-hole-red-closed'; }
+    get openingAnimation() {
+        var anim = new Animation();
+        anim.addFrame('lambda-hole-opening0', 50);
+        anim.addFrame('lambda-hole-opening1', 50);
+        anim.addFrame('lambda-hole',          50);
+        return anim;
+    }
+    get closingAnimation() {
+        var anim = new Animation();
+        anim.addFrame('lambda-hole-opening1', 50);
+        anim.addFrame('lambda-hole-opening0', 50);
+        anim.addFrame('lambda-hole-closed',   50);
+        return anim;
+    }
+
     constructor(varname) {
         super(null);
         this._name = varname;
         this.color = this.colorForVarName();
-        this.image = this.openImage();
+        this.image = this.openImage;
         this.isOpen = true;
     }
     get name() { return this._name; }
@@ -46,12 +61,22 @@ class LambdaHoleExpr extends MissingExpression {
 
     // Accessibility
     open() {
-        this.image = this.openImage();
-        this.isOpen = true;
+        if (!this.isOpen) {
+            Animate.play(this.openingAnimation, this, () => {
+                this.image = this.openImage;
+                if (this.stage) this.stage.draw();
+            });
+            this.isOpen = true;
+        }
     }
     close() {
-        this.image = this.closedImage();
-        this.isOpen = false;
+        if (this.isOpen) {
+            Animate.play(this.closingAnimation, this, () => {
+                this.image = this.closedImage;
+                if (this.stage) this.stage.draw();
+            });
+            this.isOpen = false;
+        }
     }
     hits(pos, options=undefined) {
         if (this.isOpen)

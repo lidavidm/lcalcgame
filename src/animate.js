@@ -53,7 +53,7 @@ class Animate {
             strengthOfCorrection = Math.pow(strengthOfCorrection, 1.0);
             node.pos = addPos(scalarMultiply(node.pos, 1.0 - strengthOfCorrection), scalarMultiply(targetPos, strengthOfCorrection) );
 
-            if (onReachingTarget && lengthOfPos(fromTo(node.pos, targetPos)) < 50.0) {
+            if (onReachingTarget && lengthOfPos(fromTo(node.pos, targetPos)) < 40.0) {
                 console.error('reached end', node);
                 twn.cancel();
             }

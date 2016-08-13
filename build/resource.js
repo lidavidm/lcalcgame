@@ -53,6 +53,8 @@ var Resource = function () {
 
     loadImage('bag-background', 'bg-stars.png');
     loadImage('lambda-hole', 'lambda-hole.png');
+    loadImage('lambda-hole-opening0', 'lambda-hole-opening1.png');
+    loadImage('lambda-hole-opening1', 'lambda-hole-opening2.png');
     loadImage('lambda-hole-closed', 'lambda-hole-closed.png');
     loadImage('lambda-hole-red', 'lambda-hole-white.png');
     loadImage('lambda-hole-red-closed', 'lambda-hole-white-closed.png');
@@ -72,6 +74,7 @@ var Resource = function () {
     loadImage('btn-reset-default', 'reset-button.png');
     loadImage('btn-reset-hover', 'reset-button-hover.png');
     loadImage('btn-reset-down', 'reset-button-down.png');
+    loadImage('victory', 'you-win.png');
 
     // Concreteness faded images.
     loadImage('lambda-hole-x', 'lambda-hole-x.png');
