@@ -380,8 +380,10 @@ function delegateMouse(canvas, stage) {
         var ontouchstart = function(e) {
 
             console.log(e);
+            var pos = getMousePos( getTouch(e) );
 
-            stage.onmousedown( getMousePos( getTouch(e) ) );
+            stage.onmousehover( pos );
+            stage.onmousedown( pos );
 
             mouseIsDown = true;
             mouseDragged = false;
