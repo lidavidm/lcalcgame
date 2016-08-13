@@ -48,7 +48,8 @@ var Animate = function () {
 
             node.pos = addPos(path.absolutePos, path.posAlongPath(smoothFunc(0)));
             var twn = new Tween(function (elapsed) {
-                node.pos = addPos(path.absolutePos, path.posAlongPath(smoothFunc(elapsed)));
+                var nextpos = addPos(path.absolutePos, path.posAlongPath(smoothFunc(elapsed)));
+                node.pos = addPos(scalarMultiply(node.pos, 0.5), scalarMultiply(nextpos, 0.5));
                 if (node.stage) node.stage.draw();
             }, dur);
             twn.run();

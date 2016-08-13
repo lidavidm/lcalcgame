@@ -230,7 +230,9 @@ var MapFunc = function (_FuncExpr) {
                                 //superReduce();
                                 //this.bag.spill();
                                 //stage.remove(this.bag);
+                                _this4.isAnimating = false;
                                 stage.remove(_this4);
+                                stage.update();
                                 stage.draw();
                             } else {
                                 (function () {
@@ -239,32 +241,43 @@ var MapFunc = function (_FuncExpr) {
                                     var item = bag.popItem();
                                     var itemAfterMap = bagAfterMap.popItem(); // TODO: Replicators...
 
+                                    func.holes[0].open();
+
                                     // Add it to the stage, making it smaller
                                     // so that it can 'follow' the path of the arrow from bag into function.
                                     stage.add(item);
                                     item.scale = { x: 0.5, y: 0.5 };
                                     item.parent = null;
 
+                                    _this4.isAnimating = true;
                                     Animate.followPath(item, bagToFuncArrowPath, 800).after(function () {
+
+                                        // Preview
+                                        func.holes[0].ondropenter(item.clone());
 
                                         // Remove item (preview) from the stage when it reaches end of arrow path (enters 'function' hole).
                                         stage.remove(item);
 
-                                        // Spill individial items onto stage as they are created.
-                                        var theta = Math.random() * Math.PI * 2;
-                                        var rad = bag.size.w * 1.5;
-                                        var pos = func.body.absolutePos;
-                                        var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
-                                        itemAfterMap.pos = pos;
-                                        itemAfterMap.scale = { x: 1.0, y: 1.0 };
-                                        itemAfterMap.parent = null;
-                                        stage.add(itemAfterMap);
-                                        stage.draw();
-                                        Animate.tween(itemAfterMap, { 'pos': targetPos }, 500, function (elapsed) {
-                                            return Math.pow(elapsed, 0.5);
-                                        });
+                                        setTimeout(function () {
 
-                                        _runNextAnim(n + 1);
+                                            func.holes[0].ondropexit();
+
+                                            // Spill individial items onto stage as they are created.
+                                            var theta = Math.random() * Math.PI * 2;
+                                            var rad = bag.size.w * 1.5;
+                                            var pos = func.body.absolutePos;
+                                            var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
+                                            itemAfterMap.pos = pos;
+                                            itemAfterMap.scale = { x: 1.0, y: 1.0 };
+                                            itemAfterMap.parent = null;
+                                            stage.add(itemAfterMap);
+                                            stage.draw();
+                                            Animate.tween(itemAfterMap, { 'pos': targetPos }, 500, function (elapsed) {
+                                                return Math.pow(elapsed, 0.5);
+                                            });
+
+                                            _runNextAnim(n + 1);
+                                        }, 1000);
                                     });
                                 })();
                             }

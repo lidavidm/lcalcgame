@@ -100,10 +100,12 @@ var LambdaHoleExpr = function (_MissingExpression) {
             var _this2 = this;
 
             if (!this.isOpen) {
-                Animate.play(this.openingAnimation, this, function () {
-                    _this2.image = _this2.openImage;
-                    if (_this2.stage) _this2.stage.draw();
-                });
+                if (this.stage) {
+                    Animate.play(this.openingAnimation, this, function () {
+                        _this2.image = _this2.openImage;
+                        if (_this2.stage) _this2.stage.draw();
+                    });
+                } else this.image = this.openImage;
                 this.isOpen = true;
             }
         }
@@ -113,10 +115,12 @@ var LambdaHoleExpr = function (_MissingExpression) {
             var _this3 = this;
 
             if (this.isOpen) {
-                Animate.play(this.closingAnimation, this, function () {
-                    _this3.image = _this3.closedImage;
-                    if (_this3.stage) _this3.stage.draw();
-                });
+                if (this.stage) {
+                    Animate.play(this.closingAnimation, this, function () {
+                        _this3.image = _this3.closedImage;
+                        if (_this3.stage) _this3.stage.draw();
+                    });
+                } else this.image = this.closedImage;
                 this.isOpen = false;
             }
         }
@@ -201,7 +205,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
         value: function ondropexit(node, pos) {
             if (node instanceof LambdaHoleExpr) node = node.parent;
             _get(Object.getPrototypeOf(LambdaHoleExpr.prototype), 'ondropexit', this).call(this, node, pos);
-            node.opacity = 1.0;
+            if (node) node.opacity = 1.0;
             this.close_opened_subexprs();
         }
     }, {
@@ -481,7 +485,7 @@ var LambdaExpr = function (_Expression) {
             // Determine whether this LambdaExpr has any MissingExpressions:
             if (this.holes[0].name !== 'x') this.color = this.holes[0].color;
             var missing = !this.fullyDefined;
-            if (missing || this.parent && (this.parent instanceof FuncExpr || this.parent instanceof LambdaExpr && this.parent.takesArgument)) this.holes[0].close();else this.holes[0].open();
+            if (missing || this.parent && (this.parent instanceof FuncExpr && !this.parent.isAnimating || this.parent instanceof LambdaExpr && this.parent.takesArgument)) this.holes[0].close();else this.holes[0].open();
         }
 
         // Close lambda holes appropriately.

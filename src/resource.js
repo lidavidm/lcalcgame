@@ -233,6 +233,12 @@ var Resource = (() => {
     function loadIntroToMap(levels) {
 
         // -- INTRO TO MAP --
+        // Let player watch how it works
+        levels.push(['(map /(λx #x) /(bag star star star))', '(star) (star) (star)', 'Identity with map']);
+        levels.push(['(map /(λx #x) __) (bag triangle triangle triangle triangle)', '(triangle) (triangle) (triangle) (triangle)', 'Can place bag as initializer']);
+        levels.push(['(map /(λx #x #x) __) (bag) (star) (star) (star)', '(star) (star) (star) (star) (star)', 'Replication with map']);
+        levels.push(['(map /(λx /(== #x /rect)) __) (bag) (triangle) (rect) (λx)', '(true)', 'Pipes in map can come out of other types of expressions']);
+
         // Simple transform all expressions into stars.
         levels.push(['(map /(λx /star) __) (bag) (rect) (rect) (rect)', '(star) (star) (star)', 'Basic transform']);
 

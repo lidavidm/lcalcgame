@@ -62,19 +62,23 @@ class LambdaHoleExpr extends MissingExpression {
     // Accessibility
     open() {
         if (!this.isOpen) {
-            Animate.play(this.openingAnimation, this, () => {
-                this.image = this.openImage;
-                if (this.stage) this.stage.draw();
-            });
+            if (this.stage) {
+                Animate.play(this.openingAnimation, this, () => {
+                    this.image = this.openImage;
+                    if (this.stage) this.stage.draw();
+                });
+            } else this.image = this.openImage;
             this.isOpen = true;
         }
     }
     close() {
         if (this.isOpen) {
-            Animate.play(this.closingAnimation, this, () => {
-                this.image = this.closedImage;
-                if (this.stage) this.stage.draw();
-            });
+            if (this.stage) {
+                Animate.play(this.closingAnimation, this, () => {
+                    this.image = this.closedImage;
+                    if (this.stage) this.stage.draw();
+                });
+            } else this.image = this.closedImage;
             this.isOpen = false;
         }
     }
@@ -146,7 +150,7 @@ class LambdaHoleExpr extends MissingExpression {
     ondropexit(node, pos) {
         if (node instanceof LambdaHoleExpr) node = node.parent;
         super.ondropexit(node, pos);
-        node.opacity = 1.0;
+        if (node) node.opacity = 1.0;
         this.close_opened_subexprs();
     }
     ondropped(node, pos) {
@@ -360,7 +364,7 @@ class LambdaExpr extends Expression {
         if (this.holes[0].name !== 'x')
             this.color = this.holes[0].color;
         let missing = !this.fullyDefined;
-        if (missing || (this.parent && (this.parent instanceof FuncExpr || this.parent instanceof LambdaExpr && this.parent.takesArgument))) this.holes[0].close();
+        if (missing || (this.parent && ((this.parent instanceof FuncExpr && !this.parent.isAnimating) || this.parent instanceof LambdaExpr && this.parent.takesArgument))) this.holes[0].close();
         else         this.holes[0].open();
     }
 

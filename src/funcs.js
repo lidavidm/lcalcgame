@@ -163,7 +163,9 @@ class MapFunc extends FuncExpr {
                         //superReduce();
                         //this.bag.spill();
                         //stage.remove(this.bag);
+                        this.isAnimating = false;
                         stage.remove(this);
+                        stage.update();
                         stage.draw();
                     } else {
 
@@ -171,30 +173,42 @@ class MapFunc extends FuncExpr {
                         let item = bag.popItem();
                         let itemAfterMap = bagAfterMap.popItem(); // TODO: Replicators...
 
+                        func.holes[0].open();
+
                         // Add it to the stage, making it smaller
                         // so that it can 'follow' the path of the arrow from bag into function.
                         stage.add(item);
                         item.scale = { x:0.5, y:0.5 };
                         item.parent = null;
 
+                        this.isAnimating = true;
                         Animate.followPath(item, bagToFuncArrowPath, 800).after(() => {
+
+                            // Preview
+                            func.holes[0].ondropenter(item.clone());
 
                             // Remove item (preview) from the stage when it reaches end of arrow path (enters 'function' hole).
                             stage.remove(item);
 
-                            // Spill individial items onto stage as they are created.
-                            let theta = Math.random() * Math.PI * 2;
-                            let rad = bag.size.w * 1.5;
-                            let pos = func.body.absolutePos;
-                            let targetPos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) } );
-                            itemAfterMap.pos = pos;
-                            itemAfterMap.scale = { x:1.0, y:1.0 };
-                            itemAfterMap.parent = null;
-                            stage.add(itemAfterMap);
-                            stage.draw();
-                            Animate.tween(itemAfterMap, { 'pos':targetPos }, 500, (elapsed) => Math.pow(elapsed, 0.5));
+                            setTimeout(function () {
 
-                            runNextAnim( n + 1 );
+                                func.holes[0].ondropexit();
+
+                                // Spill individial items onto stage as they are created.
+                                let theta = Math.random() * Math.PI * 2;
+                                let rad = bag.size.w * 1.5;
+                                let pos = func.body.absolutePos;
+                                let targetPos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) } );
+                                itemAfterMap.pos = pos;
+                                itemAfterMap.scale = { x:1.0, y:1.0 };
+                                itemAfterMap.parent = null;
+                                stage.add(itemAfterMap);
+                                stage.draw();
+                                Animate.tween(itemAfterMap, { 'pos':targetPos }, 500, (elapsed) => Math.pow(elapsed, 0.5));
+
+                                runNextAnim( n + 1 );
+
+                            }, 1000);
                         });
                     }
                 };
