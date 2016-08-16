@@ -47,7 +47,7 @@ class Level {
 
         // UI Buttons
         var ui_padding = 10;
-        var btn_back = new Button(canvas_screen.width - 128 - ui_padding, ui_padding, 64, 64,
+        var btn_back = new Button(canvas_screen.width - 64*3 - ui_padding, ui_padding, 64, 64,
             { default:'btn-back-default', hover:'btn-back-hover', down:'btn-back-down' },
             () => {
             prev(); // go back to previous level; see index.html.
@@ -57,10 +57,21 @@ class Level {
             () => {
             initBoard(); // reset board state; see index.html.
         });
+        var btn_next = new Button(btn_reset.pos.x + btn_reset.size.w, ui_padding, 64, 64,
+            { default:'btn-next-default', hover:'btn-next-hover', down:'btn-next-down' },
+            () => {
+            next(); // go back to previous level; see index.html.
+        });
         stage.add(btn_back);
         stage.add(btn_reset);
+        stage.add(btn_next);
 
-        stage.uiNodes = [ btn_back, btn_reset ];
+        // Toolbox
+        const TOOLBOX_HEIGHT = 90;
+        var toolbox = new Toolbox(0, canvas_screen.height - TOOLBOX_HEIGHT, canvas_screen.width, TOOLBOX_HEIGHT);
+        stage.add(toolbox);
+
+        stage.uiNodes = [ btn_back, btn_reset, btn_next, toolbox ];
 
         // Checks if the player has completed the level.
         var goal = this.goal;
@@ -72,7 +83,8 @@ class Level {
                 if (n in this.uiGoalNodes ||
                     this.uiNodes.indexOf(n) > -1 ||
                     n.constructor.name === 'Rect' ||
-                    n.constructor.name === 'ImageRect') continue;
+                    n.constructor.name === 'ImageRect' ||
+                    n.toolbox) continue;
                 nodes.push(n);
             }
             return nodes;

@@ -5,7 +5,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 var Logger = function () {
 
     var __GAME_ID = 7017017;
-    var __VERSION_ID = 0.2;
+    var __VERSION_ID = 0.3;
     var __OFFLINE_NAME_PROMPT = false;
     var __GDIAC_BASEURL = 'http://gdiac.cs.cornell.edu/cs6360/spring2016/';
     var __PAGE_LOAD_URL = __GDIAC_BASEURL + 'page_load.php';

@@ -232,6 +232,9 @@ class Expression extends RoundedRect {
             stage.bringToFront(this);
             this.shell = ghost_expr;
         }
+        if (this.toolbox) {
+            this.toolbox.removeExpression(this); // remove this expression from the toolbox
+        }
     }
 
     lock() {
@@ -271,9 +274,10 @@ class Expression extends RoundedRect {
     onmousedrag(pos) {
         super.onmousedrag(pos);
         const rightX = pos.x + this.absoluteSize.w;
-        //if (rightX < GLOBAL_DEFAULT_SCREENSIZE.width) {
+        //if (rightX < GLOBAL_DEFAULT_SCREENSIZE.width) { // Clipping to edges
             this.pos = pos;
         //} else this.pos = { x:GLOBAL_DEFAULT_SCREENSIZE.width - this.absoluteSize.w, y:pos.y };
+
         if (!this.dragging) {
             this.detach();
             this.stage.bringToFront(this);

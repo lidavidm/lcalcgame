@@ -185,8 +185,20 @@ var Stage = function () {
             }
         }
     }, {
+        key: 'invalidate',
+        value: function invalidate(nodes) {
+            if (typeof nodes === 'undefined') nodes = this.nodes;else if (nodes && nodes.length === 0) return;
+            var _this = this;
+            nodes.forEach(function (n) {
+                n.ctx = null;
+                _this.invalidate(n.children);
+            });
+            this.invalidated = true;
+        }
+    }, {
         key: 'draw',
         value: function draw() {
+            if (this.invalidated) return; // don't draw invalidated stages.
             this.ctx.save();
             this.ctx.scale(1, 1);
             this.clear();

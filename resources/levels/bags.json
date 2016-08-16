@@ -1,0 +1,42 @@
+{
+    "chapterName":"Chapter 5",
+    "description":"Introduction to bags",
+    "levels": [
+        {
+            "description": "Can put items in a bag.",
+            "board": "(bag star) (star) (star)",
+            "goal": "(bag star star star)",
+            "toolbox": ""
+        },
+        {
+            "description": "Can spill items out of a bag.",
+            "board": "(bag star star star) (λx) (λx) (λx)",
+            "goal": "star",
+            "toolbox": ""
+        },
+        {
+            "description": "Bags themselves can be destroyed, along with all items in them.",
+            "board": "(bag triangle circle star) (λx)",
+            "goal": "star",
+            "toolbox": ""
+        },
+        {
+            "description": "You can put expressions in bags.",
+            "board": "(bag star) (λx) (== /triangle /triangle)",
+            "goal": "star",
+            "toolbox": ""
+        },
+        {
+            "description": "You can compare bags (as multisets).",
+            "board": "(bag star star) (star) (== /(bag star star star) _)",
+            "goal": "true",
+            "toolbox": ""
+        },
+        {
+            "description": "Conditionals + bag-to-primitive comparison + deletion with false.",
+            "board": "(bag star) (== /triangle _) (if _b /star)",
+            "goal": "star",
+            "toolbox": ""
+        }
+    ]
+}

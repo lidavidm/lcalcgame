@@ -1,7 +1,7 @@
 var Logger = (function() {
 
     const __GAME_ID = 7017017;
-    const __VERSION_ID = 0.2;
+    const __VERSION_ID = 0.3;
     const __OFFLINE_NAME_PROMPT = false;
     const __GDIAC_BASEURL = 'http://gdiac.cs.cornell.edu/cs6360/spring2016/';
     const __PAGE_LOAD_URL = __GDIAC_BASEURL + 'page_load.php';

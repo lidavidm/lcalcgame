@@ -322,21 +322,25 @@ var LambdaVarExpr = function (_ImageExpr) {
             var preview_expr = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
 
             if (this.stateGraph.currentState !== 'open') {
-                this.stateGraph.enter('opening');
+                (function () {
+                    _this7.stateGraph.enter('opening');
 
-                if (preview_expr) {
-                    setTimeout(function () {
-                        if (_this7.stateGraph.currentState === 'opening') {
-                            var scale = _this7.graphicNode.size.w / preview_expr.size.w * 0.8;
-                            preview_expr.pos = { x: _this7.children[0].size.w / 2.0, y: -10 };
-                            preview_expr.scale = { x: scale, y: scale };
-                            preview_expr.anchor = { x: 0.5, y: 0 };
-                            preview_expr.stroke = null;
-                            _this7.graphicNode.addChild(preview_expr);
-                            _this7.stage.draw();
-                        }
-                    }, 150);
-                }
+                    var stage = _this7.stage;
+
+                    if (preview_expr) {
+                        setTimeout(function () {
+                            if (_this7.stateGraph.currentState === 'opening') {
+                                var scale = _this7.graphicNode.size.w / preview_expr.size.w * 0.8;
+                                preview_expr.pos = { x: _this7.children[0].size.w / 2.0, y: -10 };
+                                preview_expr.scale = { x: scale, y: scale };
+                                preview_expr.anchor = { x: 0.5, y: 0 };
+                                preview_expr.stroke = null;
+                                _this7.graphicNode.addChild(preview_expr);
+                                stage.draw();
+                            }
+                        }, 150);
+                    }
+                })();
             }
         }
     }, {
@@ -485,7 +489,9 @@ var LambdaExpr = function (_Expression) {
             // Determine whether this LambdaExpr has any MissingExpressions:
             if (this.holes[0].name !== 'x') this.color = this.holes[0].color;
             var missing = !this.fullyDefined;
-            if (missing || this.parent && (this.parent instanceof FuncExpr && !this.parent.isAnimating || this.parent instanceof LambdaExpr && this.parent.takesArgument)) this.holes[0].close();else this.holes[0].open();
+            if (missing || this.parent && this.parent instanceof FuncExpr && !this.parent.isAnimating) // ||
+                //this.parent instanceof LambdaExpr && this.parent.takesArgument)))
+                this.holes[0].close();else this.holes[0].open();
         }
 
         // Close lambda holes appropriately.

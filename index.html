@@ -26,6 +26,7 @@
         <script src="build/game.js" charset="utf-8"></script>
         <script src="build/animate.js" charset="utf-8"></script>
         <script src="build/image.js" charset="utf-8"></script>
+        <script src="build/toolbox.js" charset="utf-8"></script>
         <script src="build/resource.js" charset="utf-8"></script>
         <script src="build/effect.js" charset="utf-8"></script>
         <style media="screen">
@@ -53,7 +54,7 @@
         var GLOBAL_DEFAULT_SCREENSIZE = null;
         var stage;
         var canvas;
-        var level_idx = 35;
+        var level_idx = 0;
         function init() {
 
             setWriteALevelPopup("writeALevel", 'write-level-form');
@@ -88,6 +89,8 @@
 
             canvas = document.getElementById('canvas');
             if (canvas.getContext) {
+
+                if (stage) stage.invalidate();
 
                 GLOBAL_DEFAULT_CTX = canvas.getContext('2d');
                 GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
@@ -127,14 +130,15 @@
 
         function loadChapterSelect() {
             var sel = document.getElementById("chapterSelect");
-            var chapters = Resource.getChapters();
-
-            chapters.forEach(function (chap) {
-                var option = document.createElement("option");
-                option.text = chap.description;
-                option.value = chap.name;
-                sel.add(option);
-            });
+            Resource.getChapters().then( function(chapters) {
+                chapters.forEach(function (chap) {
+                    console.error('chapter', chap.name);
+                    var option = document.createElement("option");
+                    option.text = chap.description;
+                    option.value = chap.name;
+                    sel.add(option);
+                });
+            } );
         }
         function gotoChapter() {
             var sel = document.getElementById('chapterSelect');

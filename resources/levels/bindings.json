@@ -1,0 +1,102 @@
+{
+    "chapterName":"Chapter 3",
+    "description":"Constant and One-Parameter Functions",
+    "levels": [
+        {
+            "description": "Introduces concept: Constant function.",
+            "board": "(λx /star) (diamond)",
+            "goal": "star",
+            "toolbox": ""
+        },
+        {
+            "description": "Introduces concept: Constant function; selective.",
+            "board": "(λx diamond) (star)",
+            "goal": "star",
+            "toolbox": ""
+        },
+        {
+            "description": "",
+            "board": "(λx /diamond) (λx /star)",
+            "goal": "diamond",
+            "toolbox": ""
+        },
+        {
+            "description": "",
+            "board": "(λx /diamond) (λx /star) (λx /diamond) (diamond) (λx #x)",
+            "goal": "star",
+            "toolbox": ""
+        },
+        {
+            "description": "",
+            "board": "(λx /star) (diamond) (diamond) (λx #x #x)",
+            "goal": "(star) (star)",
+            "toolbox": ""
+        },
+        {
+            "description": "",
+            "board": "(λx /diamond) (star) (star) (λx #x #x #x) (λx #x)",
+            "goal": "(diamond) (star)",
+            "toolbox": ""
+        },
+        {
+            "description": "",
+            "board": "(λx star) (diamond) (diamond) (λx #x #x)",
+            "goal": "(rect) (rect) (rect)",
+            "toolbox": ""
+        },
+        {
+            "description": "",
+            "board": "(λx _) (star) (#_x)",
+            "goal": "star",
+            "toolbox": ""
+        },
+        {
+            "description": "",
+            "board": "(λx triangle) (star) (λx) (#_x)",
+            "goal": "star",
+            "toolbox": ""
+        },
+        {
+            "description": "",
+            "board": "(λx _) (star) (#_x) (λx)",
+            "goal": "star",
+            "toolbox": ""
+        },
+        {
+            "description": "",
+            "board": "(λx triangle star) (#_x) (#_x) (λx)",
+            "goal": "(star) (star)",
+            "toolbox": ""
+        },
+        {
+            "description": "",
+            "board": "(λx #x #x #_x) (λx diamond) (star) (λx)",
+            "goal": "star",
+            "toolbox": ""
+        },
+        {
+            "description": "",
+            "board": "(λx star) (== #x #x)",
+            "goal": "true",
+            "toolbox": ""
+        },
+        {
+            "description": "",
+            "board": "(λx triangle) (star) (== #x _)",
+            "goal": "false",
+            "toolbox": ""
+        },
+        {
+            "description": "",
+            "board": "(λx #x #x) (λx star) (== #x /diamond) (diamond)",
+            "goal": "(true) (false)",
+            "toolbox": ""
+        },
+        {
+            "description": "",
+            "board": "(λx #x #x) (λx star) (== #x /triangle)",
+            "goal": "false",
+            "toolbox": ""
+        }
+    ]
+}

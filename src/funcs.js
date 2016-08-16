@@ -155,6 +155,7 @@ class MapFunc extends FuncExpr {
                 //return;
 
                 var bagAfterMap = this.reduce();
+                //var popCount = bagAfterMap.count / this.bag.count; // in case ßthere was replication...ß
 
                 var bagToFuncArrowPath = this.bagToFuncArrowPath;
                 var bag = this.bag;
@@ -171,7 +172,10 @@ class MapFunc extends FuncExpr {
 
                         // Pop an item off the bag.
                         let item = bag.popItem();
-                        let itemAfterMap = bagAfterMap.popItem(); // TODO: Replicators...
+                        let itemAfterMap = bagAfterMap.popItem();
+                        //let itemsAfterMap = [];
+                        //for ( let i = 0; i < popCount; i++ )
+                        //    itemsAfterMap.push( bagAfterMap.popItem() ); // TODO: Replicators...
 
                         func.holes[0].open();
 
@@ -181,11 +185,14 @@ class MapFunc extends FuncExpr {
                         item.scale = { x:0.5, y:0.5 };
                         item.parent = null;
 
+                        let preview_item = item.clone();
+                        preview_item.parent = null;
+
                         this.isAnimating = true;
                         Animate.followPath(item, bagToFuncArrowPath, 800).after(() => {
 
                             // Preview
-                            func.holes[0].ondropenter(item.clone());
+                            func.holes[0].ondropenter(preview_item);
 
                             // Remove item (preview) from the stage when it reaches end of arrow path (enters 'function' hole).
                             stage.remove(item);

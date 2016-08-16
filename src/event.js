@@ -172,7 +172,18 @@ class Stage {
             console.warn('LEVEL IS COMPLETE? ', level_complete);
         }
     }
+    invalidate(nodes) {
+        if (typeof nodes === 'undefined') nodes = this.nodes;
+        else if (nodes && nodes.length === 0) return;
+        var _this = this;
+        nodes.forEach((n) => {
+            n.ctx = null;
+            _this.invalidate(n.children);
+        });
+        this.invalidated = true;
+    }
     draw() {
+        if (this.invalidated) return; // don't draw invalidated stages.
         this.ctx.save();
         this.ctx.scale(1,1);
         this.clear();

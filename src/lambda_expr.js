@@ -278,6 +278,8 @@ class LambdaVarExpr extends ImageExpr {
         if (this.stateGraph.currentState !== 'open') {
             this.stateGraph.enter('opening');
 
+            let stage = this.stage;
+
             if(preview_expr) {
                 setTimeout(() => {
                     if (this.stateGraph.currentState === 'opening') {
@@ -287,7 +289,7 @@ class LambdaVarExpr extends ImageExpr {
                         preview_expr.anchor = { x:0.5, y:0 };
                         preview_expr.stroke = null;
                         this.graphicNode.addChild(preview_expr);
-                        this.stage.draw();
+                        stage.draw();
                     }
                 }, 150);
 
@@ -364,7 +366,9 @@ class LambdaExpr extends Expression {
         if (this.holes[0].name !== 'x')
             this.color = this.holes[0].color;
         let missing = !this.fullyDefined;
-        if (missing || (this.parent && ((this.parent instanceof FuncExpr && !this.parent.isAnimating) || this.parent instanceof LambdaExpr && this.parent.takesArgument))) this.holes[0].close();
+        if (missing || (this.parent && ((this.parent instanceof FuncExpr && !this.parent.isAnimating)))) // ||
+            //this.parent instanceof LambdaExpr && this.parent.takesArgument)))
+                     this.holes[0].close();
         else         this.holes[0].open();
     }
 

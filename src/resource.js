@@ -5,6 +5,7 @@ var Resource = (() => {
     const __RESOURCE_PATH = 'resources/';
     const __AUDIO_PATH = __RESOURCE_PATH + 'audio/';
     const __GRAPHICS_PATH = __RESOURCE_PATH + 'graphics/';
+    const __LEVELS_PATH = __RESOURCE_PATH + 'levels/';
     var audioRsc = {};
     var imageRsc = {};
     var animPresets = {};
@@ -12,6 +13,21 @@ var Resource = (() => {
     var chapters = [];
     var markChapter = (alias, desc, prev_levels) => {
         chapters.push({ name:alias, description:desc, startIdx:prev_levels.length });
+    };
+    var loadChapterFromFile = (json_filename) => {
+        return new Promise(function(resolve, reject) {
+            $.getJSON(__LEVELS_PATH + json_filename + '.json', function(json) {
+                markChapter(json.chapterName, json.description, levels);
+                json.levels.forEach((lvl) => {
+                    levels.push([ lvl.board, lvl.goal, lvl.description ]); // TODO: load toolbox
+                });
+                resolve();
+            });
+        });
+    };
+    var loadChaptersFromFiles = (files) => { // Loads all chapters from json files asynchronously.
+        // Chain loading promises
+        return files.reduce( (prev,curr) => prev.then(() => loadChapterFromFile(curr)), Promise.resolve());
     };
     var loadAudio = (alias, filename) => {
         var audio = new Audio(__AUDIO_PATH + filename);
@@ -66,12 +82,16 @@ var Resource = (() => {
     loadImage('null-circle-highlight', 'null1-highlighted.png');
 
     // UI Images.
+    loadImage('btn-next-default', 'next-button.png');
+    loadImage('btn-next-hover', 'next-button-hover.png');
+    loadImage('btn-next-down', 'next-button-down.png');
     loadImage('btn-back-default', 'back-button.png');
     loadImage('btn-back-hover', 'back-button-hover.png');
     loadImage('btn-back-down', 'back-button-down.png');
     loadImage('btn-reset-default', 'reset-button.png');
     loadImage('btn-reset-hover', 'reset-button-hover.png');
     loadImage('btn-reset-down', 'reset-button-down.png');
+    loadImage('toolbox-bg', 'toolbox-tiled-bg.png');
     loadImage('victory', 'you-win.png');
 
     // Concreteness faded images.
@@ -93,6 +113,9 @@ var Resource = (() => {
 
     // Add levels here: (for now)
     // * The '/' character makes the following expression ignore mouse events (can't be drag n dropped). *
+    var chapter_load_prom = loadChaptersFromFiles( ['intro', 'booleans', 'bindings', 'conditionals', 'bags', 'map',     'posttest_v1', 'experimental'] );
+
+/*
     function loadIntroToLambdaCalc(levels) {
 
         // Introduces concept: Identity.
@@ -101,20 +124,11 @@ var Resource = (() => {
         levels.push(['(λx #x) (λx #x) (λx #x) (star)', 'star', 'Introduces concept: Identity.']);
 
         // Introduces concept: Deletion.
-        levels.push(['(λx) (diamond) (star)', 'star', 'Introduces concept: Deletion.']);
+        levels.push(['(λx) (diamond) (star)', 'star', 'Introduces concept: Deletion. (FUTURE: This is where we should introduce the TOOLBOX.)']);
 
         // Furthers Deletion: Can delete multiple items.
-        levels.push(['(λx) (λx) (diamond) (diamond) (star)', 'star', 'Furthers Deletion: Can delete multiple items.']);
+        levels.push(['(λx) (λx) (diamond) (diamond) (star)', 'diamond', 'Furthers Deletion: Can delete multiple items. Also introduces objective other than Star.']);
         //levels.push(['(λx) (λx) (λx) (λx) (diamond) (diamond) (diamond) (star) (star)', 'diamond']);
-
-        // Mixes Identity and Deletion.
-        // > also introduces: Objective other than star.
-        levels.push(['(λx #x) (λx) (diamond) (star)', 'diamond', 'Mixes Identity and Deletion. Introduces objective other than Star.']);
-
-        // Furthers mixing Identity and Deletion.
-        //levels.push(['(λx #x) (λx) (λx) (diamond) (diamond) (star)', 'star']);
-        //levels.push(['(λx #x) (λx #x) (λx) (diamond) (star)', 'star']);
-        levels.push(['(λx #x) (λx #x) (λx) (λx) (diamond) (diamond) (star)', 'diamond', 'Furthers mixing Identity and Deletion.']);
 
         // Introduces concept: Replication.
         levels.push(['(λx #x #x) (star)', '(star) (star)', 'Introduces concept: Replication.']);
@@ -122,20 +136,13 @@ var Resource = (() => {
 
         // Introduces concept: Functions are first-class!
         // > also: Replication of expressions.
-        levels.push(['(λx #x #x) (λx #x) (star)', 'star', 'Functions are first-class!']); // Only solution is to double the identity.
-        levels.push(['(λx #x #x #x) (λx #x) (diamond)', 'diamond', 'Hammers this home a bit more.']); // Hammers this home a bit more.
+        levels.push(['(λx #x #x #x) (λx #x) (star)', 'star', 'Functions are first-class!']); // Only solution is to double the identity.
+
         // > furthers deletion: Can delete expressions.
-        levels.push(['(λx #x #x) (λx) (star)', 'star', 'furthers deletion: Can delete expressions.']);
-        levels.push(['(λx #x #x) (λx) (star) (diamond) (diamond)', 'diamond', 'furthers deletion: Can delete expressions.']);
+        //levels.push(['(λx #x #x) (λx) (star)', 'star', 'furthers deletion: Can delete expressions.']);
+        //levels.push(['(λx #x #x) (λx) (star) (diamond) (diamond)', 'diamond', 'furthers deletion: Can duplicate deletion tokens.']);
         levels.push(['(λx #x #x) (λx #x) (λx) (star) (diamond)', '(star) (diamond)', 'furthers deletion: Can delete expressions.']);
 
-        // Introduces concept: You can drop holes into other holes.
-        levels.push(['(λx) (λx) (star)', 'star', 'Introduces concept: You can drop holes into other holes.']);
-        // > harder puzzle requiring this concept.
-        levels.push(['(λx #x #x #x) (λx) (star) (diamond)', 'star', 'Harder puzzle requiring holes-in-holes.']);
-
-        // Some harder puzzles using prior concepts.
-        levels.push(['(λx #x #x) (λx #x) (λx) (star) (diamond) (diamond)', '(diamond) (diamond)', 'A harder puzzle using prior concepts.']);
         // levels.push(['(λx (λx #x)) (star) (diamond)', 'star']);
         //levels.push(['(λx #x #x #x) (λx (λx #x)) (diamond) (diamond)', '(diamond) (diamond)']);
         levels.push(['(λx #x #x #x) (λx #x #x) (λx #x) (λx) (star) (diamond)', '(star) (star) (star)', 'A harder puzzle using prior concepts.']);
@@ -149,14 +156,14 @@ var Resource = (() => {
         // Introduces concept: Holes.
         levels.push(['(== _ /star) (star)', 'true', 'Introduces concept: Holes.']);
         // > mixes with deletion.
-        levels.push(['(== /diamond _) (diamond) (star) (λx)', 'true', 'Introduces concept: Holes. Mixes with deletion.']);
+        levels.push(['(== /diamond _) (diamond) (star) (λx)', 'true', 'Introduces concept: Choice of true and false.']);
         // > mixes with replication.
-        levels.push(['(star) (== /star _) (λx #x #x)', '(true) (true)']);
-        levels.push(['(== /star /diamond)', 'false']);
-        levels.push(['(== _ /diamond) (star) (diamond) (λx)', 'false']);
-        levels.push(['(== _ _) (star) (diamond)', 'false']);
-        levels.push(['(== /star _) (λx #x #x) (diamond) (diamond)', '(false) (false)']);
-        levels.push(['(== _ _) (λx #x #x) (λx #x #x) (star) (diamond)', '(true) (false)']);
+        levels.push(['(star) (== /star _) (λx #x #x)', '(true) (true)', 'Binding on replication (application).']);
+        levels.push(['(== /star /diamond)', 'false', 'Introduces false.']);
+        levels.push(['(== _ /diamond) (star) (diamond) (λx)', 'false', 'Choice of false.']);
+        levels.push(['(== _ _) (star) (diamond)', 'false', 'Introduces concept: More than one free slot.']);
+        levels.push(['(== /star _) (λx #x #x) (diamond) (diamond)', '(false) (false)', 'Partial application.']);
+        levels.push(['(== _ _) (λx #x #x) (λx #x #x) (star) (diamond)', '(true) (false)', 'Our favorite hard level :)']);
     }
     function loadIntroToConditionals(levels) {
 
@@ -247,7 +254,7 @@ var Resource = (() => {
         // Map + Replication.
         levels.push(['(map /(λx #x #x) __) (bag) (star) (star)', '(star) (star) (star) (star)', 'Duplication']);
         levels.push(['(map /(λx #x #x) __) (bag) (rect) (rect)', '(rect) (rect) (rect)', 'Selective duplication']);
-        levels.push(['(map /(λx #x #x #x) __) (bag) (false) (false) (false) (circle) (if _ /rect)', '(circle)', 'Mapping expressions']);
+        levels.push(['(map /(λx #x #x #x) __) (bag) (false) (false) (false) (circle) (if _b /rect)', '(circle)', 'Mapping expressions']);
 
         // Map + Conditional.
         // Keep all items in the bag.
@@ -291,7 +298,7 @@ var Resource = (() => {
     loadIntroToBooleans(levels);
 
     // Introduces concept: Boundless expansion.
-    levels.push(['(λx #x #x #x) (λx #x #x) (star) (diamond)', '(diamond) (diamond) (diamond) (star) (star) (star) (star) (star)']);
+    levels.push(['(λx #x #x #x) (λx #x #x) (star) (diamond)', '(diamond) (diamond) (diamond) (star) (star) (star) (star) (star)', 'Boundless expansion (from lambda calc).']);
 
     // CHAPTER 2: MOVING LAMBDA BINDINGS
     markChapter('Chapter 2', 'Constant and One-Parameter Functions', levels);
@@ -312,7 +319,7 @@ var Resource = (() => {
 
 
     // DEBUG LEVEL(s)
-    markChapter('Experimental', 'Post-test', levels);
+    markChapter('Experimental', 'Experimental', levels);
     levels.push(['(ifelse _b /star /triangle) (true) (pop __) (define (λy (put #y (bag star star)))) (bag star star star)','star']);
     levels.push(['(reduce (λa (λb (reduce (λx (λy (put #y #x))) #a #b))) (reduce (λx (λy (put (bag (star) (star)) #x))) (bag (star) (star) (star)) (bag )) (bag ))', 'star']);
 
@@ -325,6 +332,21 @@ var Resource = (() => {
     //levels.push(['(reduce /(λx /(λy /(put #y #x))) (bag star star star) (bag)) (star)', 'star', 'test']);
 
     levels.push(['(put #x __) (map /(λx _) __) (λx) (bag) (bag star star star)', '(bag star star star star)', 'Must understand how PUT returns a bag, and how objects in the initial bag in PUT are duplicated.']);
+
+
+
+    // DEBUG
+    var json = [];
+    levels.forEach((lvl) => {
+        json.push({
+            "description":lvl[2] ? lvl[2] : "",
+            "board":lvl[0],
+            "goal":lvl[1],
+            "toolbox":""
+        });
+    });
+    console.log(JSON.stringify(json, null, 4));
+
 
     //levels.push(['(null) (put _ __) (put _ __) (bag) (star) (diamond) (star) (if _ /star) (circle)', 'star']);
     //levels.push(['(put _ __) (map /(λx _) __) (== #x /star) (bag) (star) (diamond) (star) (if _ /star) (circle)', 'star']);
@@ -353,7 +375,17 @@ var Resource = (() => {
         },
         buildLevel:(level_desc, canvas) => Level.make(level_desc[0], level_desc[1]).build(canvas),
         level:levels,
-        getChapters:() => chapters.slice(),
+        getChapters:() => {
+            if (chapter_load_prom) return chapter_load_prom.then(() => {
+                chapter_load_prom = null;
+                return new Promise(function(resolve, reject) {
+                    resolve(chapters.slice());
+                });
+            });
+            else return new Promise(function(resolve, reject) {
+                resolve(chapters.slice());
+            });
+        },
         getChapter:(name) => {
             for (let c of chapters) {
                 if (c.name === name) return c;

@@ -260,6 +260,9 @@ var Expression = function (_RoundedRect) {
                 stage.bringToFront(this);
                 this.shell = ghost_expr;
             }
+            if (this.toolbox) {
+                this.toolbox.removeExpression(this); // remove this expression from the toolbox
+            }
         }
     }, {
         key: 'lock',
@@ -311,9 +314,10 @@ var Expression = function (_RoundedRect) {
         value: function onmousedrag(pos) {
             _get(Object.getPrototypeOf(Expression.prototype), 'onmousedrag', this).call(this, pos);
             var rightX = pos.x + this.absoluteSize.w;
-            //if (rightX < GLOBAL_DEFAULT_SCREENSIZE.width) {
+            //if (rightX < GLOBAL_DEFAULT_SCREENSIZE.width) { // Clipping to edges
             this.pos = pos;
             //} else this.pos = { x:GLOBAL_DEFAULT_SCREENSIZE.width - this.absoluteSize.w, y:pos.y };
+
             if (!this.dragging) {
                 this.detach();
                 this.stage.bringToFront(this);

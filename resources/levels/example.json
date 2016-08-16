@@ -1,0 +1,12 @@
+{
+    "chapterName":"Example",
+    "description":"This is an example chapter JSON file.",
+    "levels": [
+        {
+            "board":"",
+            "goal":"",
+            "toolbox":"",
+            "description":""
+        }
+    ]
+}

@@ -1,0 +1,66 @@
+{
+    "chapterName":"Chapter 1",
+    "description":"Identity, Destruction, and Replication",
+    "levels": [
+        {
+            "description":"Introduces concept: Identity.",
+            "board":"(λx #x) (star)",
+            "goal":"star",
+            "toolbox":""
+        },
+        {
+            "description":"Introduces concept: Identity.",
+            "board":"(λx #x) (λx #x) (star) (star)",
+            "goal":"(star) (star)",
+            "toolbox":""
+        },
+        {
+            "description":"Introduces concept: Identity.",
+            "board":"(λx #x) (λx #x) (λx #x) (star)",
+            "goal":"star",
+            "toolbox":""
+        },
+        {
+            "description":"Introduces concept: Deletion. (FUTURE: This is where we should introduce the TOOLBOX.)",
+            "board":"(λx) (diamond) (star)",
+            "goal":"star",
+            "toolbox":""
+        },
+        {
+            "description":"Furthers Deletion: Can delete multiple items. Also introduces objective other than Star.",
+            "board":"(λx) (λx) (diamond) (diamond) (star)",
+            "goal":"diamond",
+            "toolbox":""
+        },
+        {
+            "description":"Introduces concept: Replication.",
+            "board":"(λx #x #x) (star)",
+            "goal":"(star) (star)",
+            "toolbox":""
+        },
+        {
+            "description":"Introduces concept: Replication. Selective.",
+            "board":"(λx #x #x) (λx) (star) (diamond)",
+            "goal":"(diamond) (diamond)",
+            "toolbox":""
+        },
+        {
+            "description":"Functions are first-class!",
+            "board":"(λx #x #x #x) (λx #x) (star)",
+            "goal":"star",
+            "toolbox":""
+        },
+        {
+            "description":"Furthers deletion: Can delete expressions.",
+            "board":"(λx #x #x) (λx #x) (λx) (star) (diamond)",
+            "goal":"(star) (diamond)",
+            "toolbox":""
+        },
+        {
+            "description":"A harder puzzle using prior concepts.",
+            "board":"(λx #x #x #x) (λx #x #x) (λx #x) (λx) (star) (diamond)",
+            "goal":"(star) (star) (star)",
+            "toolbox":""
+        }
+    ]
+}

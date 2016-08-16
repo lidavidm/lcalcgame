@@ -222,6 +222,8 @@ var MapFunc = function (_FuncExpr) {
                         //return;
 
                         bagAfterMap = _this4.reduce();
+                        //var popCount = bagAfterMap.count / this.bag.count; // in case ßthere was replication...ß
+
                         bagToFuncArrowPath = _this4.bagToFuncArrowPath;
                         bag = _this4.bag;
 
@@ -239,7 +241,10 @@ var MapFunc = function (_FuncExpr) {
 
                                     // Pop an item off the bag.
                                     var item = bag.popItem();
-                                    var itemAfterMap = bagAfterMap.popItem(); // TODO: Replicators...
+                                    var itemAfterMap = bagAfterMap.popItem();
+                                    //let itemsAfterMap = [];
+                                    //for ( let i = 0; i < popCount; i++ )
+                                    //    itemsAfterMap.push( bagAfterMap.popItem() ); // TODO: Replicators...
 
                                     func.holes[0].open();
 
@@ -249,11 +254,14 @@ var MapFunc = function (_FuncExpr) {
                                     item.scale = { x: 0.5, y: 0.5 };
                                     item.parent = null;
 
+                                    var preview_item = item.clone();
+                                    preview_item.parent = null;
+
                                     _this4.isAnimating = true;
                                     Animate.followPath(item, bagToFuncArrowPath, 800).after(function () {
 
                                         // Preview
-                                        func.holes[0].ondropenter(item.clone());
+                                        func.holes[0].ondropenter(preview_item);
 
                                         // Remove item (preview) from the stage when it reaches end of arrow path (enters 'function' hole).
                                         stage.remove(item);
