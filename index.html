@@ -95,7 +95,7 @@
                 GLOBAL_DEFAULT_CTX = canvas.getContext('2d');
                 GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
                 document.getElementById('lvl_num').innerHTML = level_idx + '';
-                document.getElementById('lvl_desc').innerHTML = Resource.level[level_idx][2] || '(No description.)';
+                document.getElementById('lvl_desc').innerHTML = Resource.level[level_idx].description || '(No description.)';
 
                 stage = Resource.buildLevel(Resource.level[level_idx], canvas);
 

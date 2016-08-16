@@ -70,6 +70,13 @@ class Level {
         const TOOLBOX_HEIGHT = 90;
         var toolbox = new Toolbox(0, canvas_screen.height - TOOLBOX_HEIGHT, canvas_screen.width, TOOLBOX_HEIGHT);
         stage.add(toolbox);
+        if (this.toolbox) {
+            this.toolbox.forEach((item) => {
+                stage.add(item);
+                toolbox.addExpression(item, false);
+            });
+            console.log(toolbox);
+        }
 
         stage.uiNodes = [ btn_back, btn_reset, btn_next, toolbox ];
 
@@ -109,11 +116,14 @@ class Level {
     // * In Scheme-esque format, with _ for holes:
     // * '(if _ triangle star) (== triangle _) (rect)'
     // NOTE: This does not do error checking! Make sure your desc is correct.
-    static make(expr_descs, goal_descs) {
-        var lvl = new Level(Level.parse(expr_descs), new Goal(new ExpressionPattern(Level.parse(goal_descs))));
+    static make(expr_descs, goal_descs, toolbox_descs) {
+        var lvl = new Level(Level.parse(expr_descs), new Goal(new ExpressionPattern(Level.parse(goal_descs))),
+            toolbox_descs ? Level.parse(toolbox_descs) : null );
         return lvl;
     }
     static parse(desc) {
+        if (desc.length === 0) return [];
+
         function splitParen(s) {
             s = s.trim();
             var depth = 0;

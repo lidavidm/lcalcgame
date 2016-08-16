@@ -19,7 +19,7 @@ var Resource = (() => {
             $.getJSON(__LEVELS_PATH + json_filename + '.json', function(json) {
                 markChapter(json.chapterName, json.description, levels);
                 json.levels.forEach((lvl) => {
-                    levels.push([ lvl.board, lvl.goal, lvl.description ]); // TODO: load toolbox
+                    levels.push(lvl); // TODO: load toolbox
                 });
                 resolve();
             });
@@ -373,7 +373,7 @@ var Resource = (() => {
             else audioRsc[alias].volume = 1.0;
             audioRsc[alias].play();
         },
-        buildLevel:(level_desc, canvas) => Level.make(level_desc[0], level_desc[1]).build(canvas),
+        buildLevel:(level_desc, canvas) => Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas),
         level:levels,
         getChapters:() => {
             if (chapter_load_prom) return chapter_load_prom.then(() => {

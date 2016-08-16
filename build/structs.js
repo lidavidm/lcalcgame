@@ -335,6 +335,12 @@ var Expression = function (_RoundedRect) {
                 //this.shell.parent.swap(this.shell, this); // put it back
                 //this.shell = null;
             }
+            if (this.dragging) {
+                if (this.toolbox && !this.toolbox.hits(pos)) {
+                    this.toolbox = null;
+                }
+            }
+            //if (this.toolbox) this.toolbox = null;
             this.dragging = false;
         }
 

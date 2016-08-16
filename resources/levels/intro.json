@@ -21,10 +21,10 @@
             "toolbox":""
         },
         {
-            "description":"Introduces concept: Deletion. (FUTURE: This is where we should introduce the TOOLBOX.)",
-            "board":"(λx) (diamond) (star)",
+            "description":"Introduces concept: Toolbox. (*used to be deletion)",
+            "board":"",
             "goal":"star",
-            "toolbox":""
+            "toolbox":"(diamond) (star)"
         },
         {
             "description":"Furthers Deletion: Can delete multiple items. Also introduces objective other than Star.",

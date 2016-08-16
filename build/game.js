@@ -80,6 +80,13 @@ var Level = function () {
             var TOOLBOX_HEIGHT = 90;
             var toolbox = new Toolbox(0, canvas_screen.height - TOOLBOX_HEIGHT, canvas_screen.width, TOOLBOX_HEIGHT);
             stage.add(toolbox);
+            if (this.toolbox) {
+                this.toolbox.forEach(function (item) {
+                    stage.add(item);
+                    toolbox.addExpression(item, false);
+                });
+                console.log(toolbox);
+            }
 
             stage.uiNodes = [btn_back, btn_reset, btn_next, toolbox];
 
@@ -358,13 +365,15 @@ var Level = function () {
         }
     }], [{
         key: 'make',
-        value: function make(expr_descs, goal_descs) {
-            var lvl = new Level(Level.parse(expr_descs), new Goal(new ExpressionPattern(Level.parse(goal_descs))));
+        value: function make(expr_descs, goal_descs, toolbox_descs) {
+            var lvl = new Level(Level.parse(expr_descs), new Goal(new ExpressionPattern(Level.parse(goal_descs))), toolbox_descs ? Level.parse(toolbox_descs) : null);
             return lvl;
         }
     }, {
         key: 'parse',
         value: function parse(desc) {
+            if (desc.length === 0) return [];
+
             function splitParen(s) {
                 s = s.trim();
                 var depth = 0;
