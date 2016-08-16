@@ -134,6 +134,15 @@ Number.isNumber = function(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 };
 
+/**
+   Thanks to Fabiano @ SO:
+   http://stackoverflow.com/a/3364546 */
+function removeOptions(selectbox) {
+    let i;
+    for(i = selectbox.options.length - 1 ; i >= 0 ; i--)
+        selectbox.remove(i);
+}
+
 var isClass = function(cls) {
     return ((cls && cls.constructor) ? cls.constructor.name === 'Function' : false);
 };

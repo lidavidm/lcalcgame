@@ -27,10 +27,10 @@
             "toolbox":"(diamond) (star)"
         },
         {
-            "description":"Furthers Deletion: Can delete multiple items. Also introduces objective other than Star.",
-            "board":"(λx) (λx) (diamond) (diamond) (star)",
-            "goal":"diamond",
-            "toolbox":""
+            "description":"Goal can include multiple items. Also introduces objective other than Star.",
+            "board":"(diamond) (λx #x)",
+            "goal":"(diamond) (diamond)",
+            "toolbox":"(diamond) (star)"
         },
         {
             "description":"Introduces concept: Replication.",
@@ -40,9 +40,9 @@
         },
         {
             "description":"Introduces concept: Replication. Selective.",
-            "board":"(λx #x #x) (λx) (star) (diamond)",
+            "board":"(λx #x #x)",
             "goal":"(diamond) (diamond)",
-            "toolbox":""
+            "toolbox":"(star) (diamond)"
         },
         {
             "description":"Functions are first-class!",
@@ -51,16 +51,16 @@
             "toolbox":""
         },
         {
-            "description":"Furthers deletion: Can delete expressions.",
-            "board":"(λx #x #x) (λx #x) (λx) (star) (diamond)",
+            "description":"Toolbox can hold expressions.",
+            "board":"(diamond) (λx #x #x)",
             "goal":"(star) (diamond)",
-            "toolbox":""
+            "toolbox":"(star) (λx #x)"
         },
         {
             "description":"A harder puzzle using prior concepts.",
-            "board":"(λx #x #x #x) (λx #x #x) (λx #x) (λx) (star) (diamond)",
+            "board":"(λx #x #x) (λx #x)",
             "goal":"(star) (star) (star)",
-            "toolbox":""
+            "toolbox":"(λx #x #x #x) (star) (diamond)"
         }
     ]
 }

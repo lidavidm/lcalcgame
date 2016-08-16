@@ -15,13 +15,16 @@ var Resource = function () {
     var markChapter = function markChapter(alias, desc, prev_levels) {
         chapters.push({ name: alias, description: desc, startIdx: prev_levels.length });
     };
+    var pushChapter = function pushChapter(json) {
+        markChapter(json.chapterName, json.description, levels);
+        json.levels.forEach(function (lvl) {
+            levels.push(lvl);
+        });
+    };
     var loadChapterFromFile = function loadChapterFromFile(json_filename) {
         return new Promise(function (resolve, reject) {
             $.getJSON(__LEVELS_PATH + json_filename + '.json', function (json) {
-                markChapter(json.chapterName, json.description, levels);
-                json.levels.forEach(function (lvl) {
-                    levels.push(lvl); // TODO: load toolbox
-                });
+                pushChapter(json);
                 resolve();
             });
         });
@@ -426,6 +429,7 @@ var Resource = function () {
             }
 
             return undefined;
-        }
+        },
+        pushChapter: pushChapter
     };
 }();

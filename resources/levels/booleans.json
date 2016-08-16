@@ -16,9 +16,9 @@
         },
         {
             "description": "Introduces concept: Choice of true and false.",
-            "board": "(== /diamond _) (diamond) (star) (λx)",
+            "board": "(== /diamond _)",
             "goal": "true",
-            "toolbox": ""
+            "toolbox": "(diamond) (star)"
         },
         {
             "description": "Binding on replication (application).",
@@ -33,22 +33,22 @@
             "toolbox": ""
         },
         {
-            "description": "Choice of false.",
-            "board": "(== _ /diamond) (star) (diamond) (λx)",
+            "description": "Introduces concept: More than one free slot. Also choice of false.",
+            "board": "(== _ _) (star)",
             "goal": "false",
-            "toolbox": ""
-        },
-        {
-            "description": "Introduces concept: More than one free slot.",
-            "board": "(== _ _) (star) (diamond)",
-            "goal": "false",
-            "toolbox": ""
+            "toolbox": "(diamond) (star)"
         },
         {
             "description": "Partial application.",
             "board": "(== /star _) (λx #x #x) (diamond) (diamond)",
             "goal": "(false) (false)",
             "toolbox": ""
+        },
+        {
+            "description": "Writing a boolean expression from scratch.",
+            "board": "(star)",
+            "goal": "true",
+            "toolbox": "(== _ _) (λx #x #x) (diamond) (λx #x)"
         },
         {
             "description": "Our favorite hard level :)",

@@ -130,6 +130,7 @@
 
         function loadChapterSelect() {
             var sel = document.getElementById("chapterSelect");
+            removeOptions(sel); // clear old options.
             Resource.getChapters().then( function(chapters) {
                 chapters.forEach(function (chap) {
                     console.error('chapter', chap.name);
@@ -189,9 +190,19 @@
                   <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
                 </fieldset>
               </form>
+
+              <p>
+                  Or upload a JSON spec for a new chapter:
+              </p>
+              <input id="add_chapter_json" value="asdad" type="file" />
+
             </div>
 
         </div>
+
+        <div class="centered">
+        </div>
+
         <div id="logdownload" class="centered">
             <button onclick="Logger.download()">Download log data.</button>
         </div>

@@ -3,10 +3,10 @@
     "description":"This is an example chapter JSON file.",
     "levels": [
         {
-            "board":"",
-            "goal":"",
+            "board":"(star) (λx #x #x)",
+            "goal":"(star) (star)",
             "toolbox":"",
-            "description":""
+            "description":"Duplicate the star!"
         }
     ]
 }
