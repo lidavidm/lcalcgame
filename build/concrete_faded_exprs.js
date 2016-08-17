@@ -129,13 +129,13 @@ var FadedLambdaVarExpr = function (_LambdaVarExpr) {
     return FadedLambdaVarExpr;
 }(LambdaVarExpr);
 
-var FadedMapFunc = function (_MapFunc) {
-    _inherits(FadedMapFunc, _MapFunc);
+var FadedSimpleMapFunc = function (_SimpleMapFunc) {
+    _inherits(FadedSimpleMapFunc, _SimpleMapFunc);
 
-    function FadedMapFunc(oneParamFunc, bag) {
-        _classCallCheck(this, FadedMapFunc);
+    function FadedSimpleMapFunc(oneParamFunc, bag) {
+        _classCallCheck(this, FadedSimpleMapFunc);
 
-        var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(FadedMapFunc).call(this, oneParamFunc, bag));
+        var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(FadedSimpleMapFunc).call(this, oneParamFunc, bag));
 
         var txt_color = 'black';
         var txt = new TextExpr('map(');
@@ -152,19 +152,16 @@ var FadedMapFunc = function (_MapFunc) {
         _this4.addArg(bag);
         _this4.addArg(txt2);
         _this4.arrowPaths = [];
-        _this4.heightScalar = 1.0;
-        _this4.exprOffsetY = 0;
-        _this4.animatedReduction = false;
+        //this.heightScalar = 1.0;
+        //this.exprOffsetY = 0;
+        //this.animatedReduction = false;
         _this4.update();
 
         _this4.color = "YellowGreen";
         return _this4;
     }
 
-    _createClass(FadedMapFunc, [{
-        key: 'updateArrowPaths',
-        value: function updateArrowPaths() {}
-    }, {
+    _createClass(FadedSimpleMapFunc, [{
         key: 'returnBag',
         get: function get() {
             return null;
@@ -184,5 +181,30 @@ var FadedMapFunc = function (_MapFunc) {
         }
     }]);
 
+    return FadedSimpleMapFunc;
+}(SimpleMapFunc);
+
+var FadedMapFunc = function (_FadedSimpleMapFunc) {
+    _inherits(FadedMapFunc, _FadedSimpleMapFunc);
+
+    function FadedMapFunc(oneParamFunc, bag) {
+        _classCallCheck(this, FadedMapFunc);
+
+        // Remove animations + arrow
+
+        var _this5 = _possibleConstructorReturn(this, Object.getPrototypeOf(FadedMapFunc).call(this, oneParamFunc, bag));
+
+        _this5.heightScalar = 1.0;
+        _this5.exprOffsetY = 0;
+        _this5.animatedReduction = false;
+        return _this5;
+    }
+
+    _createClass(FadedMapFunc, [{
+        key: 'updateArrowPaths',
+        value: function updateArrowPaths() {} // remove arrow
+
+    }]);
+
     return FadedMapFunc;
-}(MapFunc);
+}(FadedSimpleMapFunc);

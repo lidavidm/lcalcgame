@@ -385,6 +385,8 @@ var SimpleMapFunc = function (_MapFunc) {
         key: 'updateArrowPaths',
         value: function updateArrowPaths() {
 
+            if (!this.bag || !this.func) return;
+
             // Arrow from func expr to left bag:
             function topMiddlePoint(expr) {
                 return expr.posOnRectAt(CONST.POS.UNITSQUARE.TOP.MID());

@@ -591,7 +591,7 @@ class IfElseStatement extends IfStatement {
 // A boolean compare function like ==, !=, >, >=, <=, <.
 class CompareExpr extends Expression {
     static operatorMap() {
-        return { '==':'is', '!=':'≠' };
+        return { '==':'is', '!=':'is not' };
     }
     static textForFuncName(fname) {
         var map = CompareExpr.operatorMap();

@@ -952,7 +952,7 @@ var CompareExpr = function (_Expression6) {
     _createClass(CompareExpr, null, [{
         key: 'operatorMap',
         value: function operatorMap() {
-            return { '==': 'is', '!=': '≠' };
+            return { '==': 'is', '!=': 'is not' };
         }
     }, {
         key: 'textForFuncName',

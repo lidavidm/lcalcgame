@@ -53,7 +53,7 @@ class FadedLambdaVarExpr extends LambdaVarExpr {
     }
 }
 
-class FadedMapFunc extends MapFunc {
+class FadedSimpleMapFunc extends SimpleMapFunc {
     constructor(oneParamFunc, bag) {
         super(oneParamFunc, bag);
 
@@ -72,14 +72,13 @@ class FadedMapFunc extends MapFunc {
         this.addArg(bag);
         this.addArg(txt2);
         this.arrowPaths = [];
-        this.heightScalar = 1.0;
-        this.exprOffsetY = 0;
-        this.animatedReduction = false;
+        //this.heightScalar = 1.0;
+        //this.exprOffsetY = 0;
+        //this.animatedReduction = false;
         this.update();
 
         this.color = "YellowGreen";
     }
-    updateArrowPaths() {}
     get returnBag() { return null; }
     get func() {
         return this.holes[1];
@@ -90,4 +89,15 @@ class FadedMapFunc extends MapFunc {
     set bag(bg) {
         this.holes[3] = bg;
     }
+}
+class FadedMapFunc extends FadedSimpleMapFunc {
+    constructor(oneParamFunc, bag) {
+        super(oneParamFunc, bag);
+
+        // Remove animations + arrow
+        this.heightScalar = 1.0;
+        this.exprOffsetY = 0;
+        this.animatedReduction = false;
+    }
+    updateArrowPaths() { } // remove arrow
 }
