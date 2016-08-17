@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <title>Level writing tutorial</title>
     </head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
     <script src="build/resource.js" charset="utf-8"></script>
     <style media="screen">
         .levels td {
@@ -93,13 +94,15 @@
             var row = table.insertRow(1);
             row.insertCell(0).innerHTML = '<h4>Level</h4>';
             row.insertCell(1).innerHTML = '<h4>Goal</h4>';
-            row.insertCell(2).innerHTML = '<h4>Description</h4>';
+            row.insertCell(2).innerHTML = '<h4>Toolbox</h4>';
+            row.insertCell(3).innerHTML = '<h4>Description</h4>';
 
             for (var i = 0; i < num_levels; i++) {
                 row = table.insertRow(i+2);
-                row.insertCell(0).innerHTML = '<a href="' + 'index.html?level=' + (i + startIdx) + '" target="_blank">' + levels[i][0] + '</a>';
-                row.insertCell(1).innerHTML = levels[i][1];
-                row.insertCell(2).innerHTML = levels[i][2] || '';
+                row.insertCell(0).innerHTML = '<a href="' + 'index.html?level=' + (i + startIdx) + '" target="_blank">' + levels[i].board + '</a>';
+                row.insertCell(1).innerHTML = levels[i].goal;
+                row.insertCell(2).innerHTML = levels[i].toolbox || '';
+                row.insertCell(3).innerHTML = levels[i].description || '';
             }
         }
 
@@ -116,22 +119,21 @@
             constructTable(table_lambdas, lambdas);
 
             var div_levels = document.getElementById('level_tables');
-            var chapters = Resource.getChapters();
-            var all_levels = Resource.level;
+            Resource.getChapters().then((chapters) => {
+                var all_levels = Resource.level;
 
-            for (var c = 0; c < chapters.length; c++) {
-                var name = chapters[c].name;
-                var desc = chapters[c].description;
-                var idx = chapters[c].startIdx;
-                var next_idx = ((c < chapters.length - 1) ? chapters[c+1].startIdx : all_levels.length);
+                for (var c = 0; c < chapters.length; c++) {
+                    var name = chapters[c].name;
+                    var desc = chapters[c].description;
+                    var idx = chapters[c].startIdx;
+                    var next_idx = ((c < chapters.length - 1) ? chapters[c+1].startIdx : all_levels.length);
 
-                var table = document.createElement('table');
-                constructLevelsTable(name, desc, table, all_levels.slice(idx, next_idx), idx);
-                div_levels.appendChild(table);
-                div_levels.appendChild(document.createElement('p'));
-            }
-
-
+                    var table = document.createElement('table');
+                    constructLevelsTable(name, desc, table, all_levels.slice(idx, next_idx), idx);
+                    div_levels.appendChild(table);
+                    div_levels.appendChild(document.createElement('p'));
+                }
+            });
         }
 
     </script>

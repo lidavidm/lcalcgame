@@ -39,6 +39,8 @@ class MapFunc extends FuncExpr {
 
         super([returnBag, oneParamFunc, bag]);
         this.exprOffsetY = DEFAULT_EXPR_HEIGHT / 4.0;
+        this.heightScalar = 1.5;
+        this.animatedReduction = true;
         this.update();
 
         this.color = "YellowGreen";
@@ -149,10 +151,12 @@ class MapFunc extends FuncExpr {
             if (this.bag instanceof BagExpr) {
 
                 // debug
-                //superReduce();
-                //this.bag.spill();
-                //stage.remove(this.bag);
-                //return;
+                if (!this.animatedReduction) {
+                    superReduce();
+                    this.bag.spill();
+                    stage.remove(this.bag);
+                    return;
+                }
 
                 var bagAfterMap = this.reduce();
                 //var popCount = bagAfterMap.count / this.bag.count; // in case ßthere was replication...ß
@@ -251,7 +255,7 @@ class MapFunc extends FuncExpr {
     // Sizes to match its children.
     get size() {
         let sz = super.size;
-        sz.h = DEFAULT_EXPR_HEIGHT * 1.5;
+        sz.h = DEFAULT_EXPR_HEIGHT * this.heightScalar;
         return sz;
     }
 }

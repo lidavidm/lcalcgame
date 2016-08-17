@@ -51,7 +51,7 @@ class Toolbox extends ImageRect {
 
     ondropped(node, pos) {
         console.log('fdsfsd');
-        if (!node.toolbox && false) {
+        if (!node.toolbox) {
             // Can't drag nodes onto toolbox that aren't already elements --
             // once it's placed on the board, you can't drag it back.
             return;

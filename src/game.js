@@ -294,7 +294,11 @@ class Level {
             '!=':CompareExpr,
             'bag':new BagExpr(0,0,54,54,[]),
             'count':new CountExpr(),
-            'map':SimpleMapFunc,
+            'map':(() => {
+                console.log(FadedMapFunc);
+                if (__FADED_FUNCS)   return FadedMapFunc;
+                else                 return SimpleMapFunc;
+            })(),
             'reduce':ReduceFunc,
             'put':PutExpr,
             'pop':PopExpr,
@@ -322,7 +326,7 @@ class Level {
             return e;
         } else if (arg.indexOf('λ') > -1) {
             let varname = arg.replace('λ', '');
-            if (__FADED_LAMBDAS) return new FadedLambdaHoleExpr(varname);
+            if (__FADED_LAMBDAS) return new FadedPythonLambdaHoleExpr(varname);
             else                 return new LambdaHoleExpr(varname); // lambda hole in parentheses
         } else if (arg.indexOf('#') > -1) {
             let varname = arg.replace('#', '');

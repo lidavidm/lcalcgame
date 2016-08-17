@@ -104,6 +104,8 @@ var MapFunc = function (_FuncExpr) {
         var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(MapFunc).call(this, [returnBag, oneParamFunc, bag]));
 
         _this3.exprOffsetY = DEFAULT_EXPR_HEIGHT / 4.0;
+        _this3.heightScalar = 1.5;
+        _this3.animatedReduction = true;
         _this3.update();
 
         _this3.color = "YellowGreen";
@@ -216,10 +218,14 @@ var MapFunc = function (_FuncExpr) {
                     if (_this4.bag instanceof BagExpr) {
 
                         // debug
-                        //superReduce();
-                        //this.bag.spill();
-                        //stage.remove(this.bag);
-                        //return;
+                        if (!_this4.animatedReduction) {
+                            superReduce();
+                            _this4.bag.spill();
+                            stage.remove(_this4.bag);
+                            return {
+                                v: void 0
+                            };
+                        }
 
                         bagAfterMap = _this4.reduce();
                         //var popCount = bagAfterMap.count / this.bag.count; // in case ßthere was replication...ß
@@ -350,7 +356,7 @@ var MapFunc = function (_FuncExpr) {
         key: 'size',
         get: function get() {
             var sz = _get(Object.getPrototypeOf(MapFunc.prototype), 'size', this);
-            sz.h = DEFAULT_EXPR_HEIGHT * 1.5;
+            sz.h = DEFAULT_EXPR_HEIGHT * this.heightScalar;
             return sz;
         }
     }]);

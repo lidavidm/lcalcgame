@@ -20,8 +20,8 @@
         <script src="build/structs.js" charset="utf-8"></script>
         <script src="build/lambda.js" charset="utf-8"></script>
         <script src="build/lambda_expr.js" charset="utf-8"></script>
-        <script src="build/concrete_faded_exprs.js" charset="utf-8"></script>
         <script src="build/funcs.js" charset="utf-8"></script>
+        <script src="build/concrete_faded_exprs.js" charset="utf-8"></script>
         <script src="build/event.js" charset="utf-8"></script>
         <script src="build/game.js" charset="utf-8"></script>
         <script src="build/animate.js" charset="utf-8"></script>
@@ -69,14 +69,15 @@
                 if (faded_lambdas && faded_lambdas.toLowerCase() === 'true') {
                     __FADED_LAMBDAS = true;
                 } else __FADED_LAMBDAS = false;
+
+                __FADED_FUNCS = true;
             }
 
             // Start a new log session (creating userID as necessary),
             // and then begin the game.
             Logger.startSession().then((userinfo) => {
-                loadChapterSelect();
-                initBoard();
-            });
+                return loadChapterSelect();
+            }).then(initBoard);
         }
 
         function loadCustomLevel(lvl_desc, goal_desc) {
@@ -131,13 +132,16 @@
         function loadChapterSelect() {
             var sel = document.getElementById("chapterSelect");
             removeOptions(sel); // clear old options.
-            Resource.getChapters().then( function(chapters) {
+            return Resource.getChapters().then( function(chapters) {
                 chapters.forEach(function (chap) {
                     console.error('chapter', chap.name);
                     var option = document.createElement("option");
                     option.text = chap.description;
                     option.value = chap.name;
                     sel.add(option);
+                });
+                return new Promise(function(resolve, reject) {
+                    resolve();
                 });
             } );
         }

@@ -100,6 +100,8 @@ var Resource = (() => {
     // Concreteness faded images.
     loadImage('lambda-hole-x', 'lambda-hole-x.png');
     loadImage('lambda-hole-x-closed', 'lambda-hole-x-closed.png');
+    loadImage('lambda-hole-x-python', 'lambda-hole-x-python.png');
+    loadImage('lambda-hole-x-closed-python', 'lambda-hole-x-closed-python.png');
     loadImage('lambda-pipe-x', 'lambda-pipe-x-closed.png');
     loadImage('lambda-pipe-x-open', 'lambda-pipe-x-open.png');
     loadImage('lambda-pipe-x-opening0', 'lambda-pipe-x-opening0.png');
