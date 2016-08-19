@@ -194,6 +194,7 @@ var MapFunc = function (_FuncExpr) {
             if (reduced_expr && reduced_expr != this) {
                 var superReduce;
                 var bagAfterMap;
+                var popCount;
                 var bagToFuncArrowPath;
                 var bag;
 
@@ -228,7 +229,7 @@ var MapFunc = function (_FuncExpr) {
                         }
 
                         bagAfterMap = _this4.reduce();
-                        //var popCount = bagAfterMap.count / this.bag.count; // in case ßthere was replication...ß
+                        popCount = bagAfterMap.items.length / _this4.bag.items.length; // in case ßthere was replication...ß
 
                         bagToFuncArrowPath = _this4.bagToFuncArrowPath;
                         bag = _this4.bag;
@@ -243,14 +244,17 @@ var MapFunc = function (_FuncExpr) {
                                 stage.update();
                                 stage.draw();
                             } else {
+                                var itemsAfterMap;
+
                                 (function () {
 
                                     // Pop an item off the bag.
                                     var item = bag.popItem();
-                                    var itemAfterMap = bagAfterMap.popItem();
-                                    //let itemsAfterMap = [];
-                                    //for ( let i = 0; i < popCount; i++ )
-                                    //    itemsAfterMap.push( bagAfterMap.popItem() ); // TODO: Replicators...
+                                    itemsAfterMap = [];
+
+                                    for (var i = 0; i < popCount; i++) {
+                                        itemsAfterMap.push(bagAfterMap.popItem());
+                                    } // TODO: Replicators...
 
                                     func.holes[0].open();
 
@@ -277,18 +281,21 @@ var MapFunc = function (_FuncExpr) {
                                             func.holes[0].ondropexit();
 
                                             // Spill individial items onto stage as they are created.
-                                            var theta = Math.random() * Math.PI * 2;
-                                            var rad = bag.size.w * 1.5;
-                                            var pos = func.body.absolutePos;
-                                            var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
-                                            itemAfterMap.pos = pos;
-                                            itemAfterMap.scale = { x: 1.0, y: 1.0 };
-                                            itemAfterMap.parent = null;
-                                            stage.add(itemAfterMap);
+                                            for (var _i = 0; _i < itemsAfterMap.length; _i++) {
+                                                var itemAfterMap = itemsAfterMap[_i];
+                                                var theta = Math.random() * Math.PI * 2;
+                                                var rad = bag.size.w * 1.5;
+                                                var pos = func.body.absolutePos;
+                                                var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
+                                                itemAfterMap.pos = pos;
+                                                itemAfterMap.scale = { x: 1.0, y: 1.0 };
+                                                itemAfterMap.parent = null;
+                                                stage.add(itemAfterMap);
+                                                Animate.tween(itemAfterMap, { 'pos': targetPos }, 500, function (elapsed) {
+                                                    return Math.pow(elapsed, 0.5);
+                                                });
+                                            }
                                             stage.draw();
-                                            Animate.tween(itemAfterMap, { 'pos': targetPos }, 500, function (elapsed) {
-                                                return Math.pow(elapsed, 0.5);
-                                            });
 
                                             _runNextAnim(n + 1);
                                         }, 1000);

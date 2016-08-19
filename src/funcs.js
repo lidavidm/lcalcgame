@@ -159,7 +159,7 @@ class MapFunc extends FuncExpr {
                 }
 
                 var bagAfterMap = this.reduce();
-                //var popCount = bagAfterMap.count / this.bag.count; // in case ßthere was replication...ß
+                var popCount = bagAfterMap.items.length / this.bag.items.length; // in case ßthere was replication...ß
 
                 var bagToFuncArrowPath = this.bagToFuncArrowPath;
                 var bag = this.bag;
@@ -176,10 +176,9 @@ class MapFunc extends FuncExpr {
 
                         // Pop an item off the bag.
                         let item = bag.popItem();
-                        let itemAfterMap = bagAfterMap.popItem();
-                        //let itemsAfterMap = [];
-                        //for ( let i = 0; i < popCount; i++ )
-                        //    itemsAfterMap.push( bagAfterMap.popItem() ); // TODO: Replicators...
+                        var itemsAfterMap = [];
+                        for ( let i = 0; i < popCount; i++ )
+                            itemsAfterMap.push( bagAfterMap.popItem() ); // TODO: Replicators...
 
                         func.holes[0].open();
 
@@ -206,16 +205,19 @@ class MapFunc extends FuncExpr {
                                 func.holes[0].ondropexit();
 
                                 // Spill individial items onto stage as they are created.
-                                let theta = Math.random() * Math.PI * 2;
-                                let rad = bag.size.w * 1.5;
-                                let pos = func.body.absolutePos;
-                                let targetPos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) } );
-                                itemAfterMap.pos = pos;
-                                itemAfterMap.scale = { x:1.0, y:1.0 };
-                                itemAfterMap.parent = null;
-                                stage.add(itemAfterMap);
+                                for (let i = 0; i < itemsAfterMap.length; i++) {
+                                    let itemAfterMap = itemsAfterMap[i];
+                                    let theta = Math.random() * Math.PI * 2;
+                                    let rad = bag.size.w * 1.5;
+                                    let pos = func.body.absolutePos;
+                                    let targetPos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) } );
+                                    itemAfterMap.pos = pos;
+                                    itemAfterMap.scale = { x:1.0, y:1.0 };
+                                    itemAfterMap.parent = null;
+                                    stage.add(itemAfterMap);
+                                    Animate.tween(itemAfterMap, { 'pos':targetPos }, 500, (elapsed) => Math.pow(elapsed, 0.5));
+                                }
                                 stage.draw();
-                                Animate.tween(itemAfterMap, { 'pos':targetPos }, 500, (elapsed) => Math.pow(elapsed, 0.5));
 
                                 runNextAnim( n + 1 );
 
