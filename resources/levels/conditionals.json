@@ -34,7 +34,7 @@
         },
         {
             "description": "intro to if; selective destruction extended",
-            "board": "(if _b /star) (if _b /triangle) (λx #x #x) (== /star /star) (== /false /true)",
+            "board": "(if _b /star) (if _b /triangle) (λx #x #x) (== /star /star) (== /circle /triangle)",
             "goal": "triangle",
             "toolbox": ""
         },

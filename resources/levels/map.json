@@ -22,9 +22,9 @@
         },
         {
             "description": "Pipes in map can come out of other types of expressions",
-            "board": "(map /(λx /(== #x /rect)) __) (bag) (triangle) (rect) (λx)",
+            "board": "(map /(λx /(== #x /rect)) __) (bag)",
             "goal": "(true)",
-            "toolbox": ""
+            "toolbox": "(rect) (triangle)"
         },
         {
             "description": "Basic transform",

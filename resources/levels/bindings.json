@@ -3,6 +3,42 @@
     "description":"Constant and One-Parameter Functions",
     "levels": [
         {
+            "description": "Introduces concept: Pipes outside of pure lambdas.",
+            "board": "(λx /(== #x #x)) (star)",
+            "goal": "true",
+            "toolbox": ""
+        },
+        {
+            "description": "Reinforces concept: Pipes outside of pure lambdas.",
+            "board": "(λx /(== #x /rect)) (λx /(== /star #x))",
+            "goal": "(true) (true)",
+            "toolbox": "(triangle) (star) (rect)"
+        },
+        {
+            "description": "Choice of function.",
+            "board": "(star)",
+            "goal": "false",
+            "toolbox": "(λx /(== #x /rect)) (λx /(== #x /star))"
+        },
+        {
+            "description": "Constructing a function.",
+            "board": "(λx /(== #x _))",
+            "goal": "true",
+            "toolbox": "(star) (rect) (star) (rect)"
+        },
+        {
+            "description": "Must be solved with free binding.",
+            "board": "(λx /(== _ _))",
+            "goal": "true",
+            "toolbox": "(star) (#_x) (#_x) (triangle)"
+        },
+        {
+            "description": "Replication with free binding.",
+            "board": "(λx _ _) (#_x) (#_x)",
+            "goal": "(triangle) (triangle)",
+            "toolbox": "(triangle) (star) (rect)"
+        },
+        {
             "description": "Introduces concept: Constant function.",
             "board": "(λx /star) (diamond)",
             "goal": "star",
@@ -45,37 +81,7 @@
             "toolbox": ""
         },
         {
-            "description": "",
-            "board": "(λx _) (star) (#_x)",
-            "goal": "star",
-            "toolbox": ""
-        },
-        {
-            "description": "",
-            "board": "(λx triangle) (star) (λx) (#_x)",
-            "goal": "star",
-            "toolbox": ""
-        },
-        {
-            "description": "",
-            "board": "(λx _) (star) (#_x) (λx)",
-            "goal": "star",
-            "toolbox": ""
-        },
-        {
-            "description": "",
-            "board": "(λx triangle star) (#_x) (#_x) (λx)",
-            "goal": "(star) (star)",
-            "toolbox": ""
-        },
-        {
-            "description": "",
-            "board": "(λx #x #x #_x) (λx diamond) (star) (λx)",
-            "goal": "star",
-            "toolbox": ""
-        },
-        {
-            "description": "",
+            "description": "Binding statements.",
             "board": "(λx star) (== #x #x)",
             "goal": "true",
             "toolbox": ""
@@ -87,15 +93,9 @@
             "toolbox": ""
         },
         {
-            "description": "",
+            "description": "The same function, different inputs, can have different output.",
             "board": "(λx #x #x) (λx star) (== #x /diamond) (diamond)",
             "goal": "(true) (false)",
-            "toolbox": ""
-        },
-        {
-            "description": "",
-            "board": "(λx #x #x) (λx star) (== #x /triangle)",
-            "goal": "false",
             "toolbox": ""
         }
     ]

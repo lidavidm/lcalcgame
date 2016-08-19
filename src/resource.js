@@ -23,6 +23,7 @@ var Resource = (() => {
     var loadChapterFromFile = (json_filename) => {
         return new Promise(function(resolve, reject) {
             $.getJSON(__LEVELS_PATH + json_filename + '.json', function(json) {
+                console.log(json_filename);
                 pushChapter(json);
                 resolve();
             });
