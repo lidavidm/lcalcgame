@@ -21,10 +21,28 @@
             "toolbox": ""
         },
         {
+                "description":"Choice of boolean",
+                "board":"(if _b /star) ",
+                "goal":"(star)",
+                "toolbox":"(true) (false)"
+        },
+        {
             "description": "intro to booleans with conditionals",
-            "board": "(== /star _) (if _b star) (rect) (triangle)",
+            "board": "(== /triangle _) (if _b /star)",
             "goal": "star",
-            "toolbox": ""
+            "toolbox": "(triangle) (rect)"
+        },
+        {
+                "description":"conditional as selective destruction",
+                "board":"(if _ star) (diamond)",
+                "goal":"(diamond)",
+                "toolbox":"(true) (false)"
+        },
+        {
+            "description": "harder booleans with conditionals",
+            "board": "(== /star _) (if _b star)",
+            "goal": "star",
+            "toolbox": "(rect) (triangle) (circle)"
         },
         {
             "description": "intro to if; selective destruction + replication",
@@ -64,9 +82,9 @@
         },
         {
             "description": "**Loop-less, bag-less filter.**",
-            "board": "(star) (star) (diamond) (λx #x #x) (λx /(if (== #x _) #x))",
+            "board": "(star) (triangle) (diamond)",
             "goal": "(star)",
-            "toolbox": ""
+            "toolbox": "(λx /(if (== #x /star) #x)) (λx #x #x #x)"
         }
     ]
 }

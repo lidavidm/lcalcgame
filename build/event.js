@@ -71,15 +71,19 @@ var Stage = function () {
 
                 this.nodes[i].ctx = null;
                 this.nodes[i].stage = null;
-                var pos = this.nodes[i].upperLeftPos(this.nodes[i].absolutePos, this.nodes[i].absoluteSize);
+                var origpos = this.nodes[i].upperLeftPos(this.nodes[i].absolutePos, this.nodes[i].absoluteSize);
+                var pos;
+                var total_width = 0;
                 var rightpos;
                 var scale = this.nodes[i].scale;
 
                 var anotherNode = anotherNodeOrNodes;
                 if (!Array.isArray(anotherNode)) {
                     anotherNode = [anotherNode];
-                    pos = this.nodes[i].centerPos();
+                    origpos = this.nodes[i].centerPos();
                 }
+
+                pos = clonePos(origpos);
 
                 for (var j = 0; j < anotherNode.length; j++) {
                     var an = anotherNode[j];
@@ -92,9 +96,22 @@ var Stage = function () {
                     if (anotherNode.length === 1) an.anchor = { x: 0.5, y: 0.5 };
                     an.onmouseleave();
                     pos = addPos({ x: an.size.w + 6, y: 0 }, pos);
+                    total_width += an.size.w + 6;
                     if (j === 0) this.nodes.splice(i, 1, an);else this.nodes.splice(i + j, 0, an);
                 }
 
+                // Can't duplicate horizontally or we'll go off-screen.
+                // So, duplicate vertically.
+                if (total_width > GLOBAL_DEFAULT_SCREENSIZE.width) {
+                    pos = clonePos(origpos);
+                    anotherNode.forEach(function (n) {
+                        var p = n.pos;
+                        n.pos = pos;
+                        n.anchor = { x: 0, y: 0.5 };
+                        pos = addPos({ x: 0, y: an.size.h + 6 }, pos);
+                    });
+                    console.log('asssd');
+                }
                 if (pos.x > GLOBAL_DEFAULT_SCREENSIZE.width) {
                     (function () {
                         var offset = pos.x - GLOBAL_DEFAULT_SCREENSIZE.width;

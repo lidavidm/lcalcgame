@@ -588,6 +588,40 @@ class IfElseStatement extends IfStatement {
     }
 }
 
+// Lock and key metaphor for if.
+class LockIfStatement extends IfStatement {
+    constructor(cond, branch) {
+        super(cond, branch);
+        var lock = new ImageExpr(0, 0, 56, 56, 'lock-icon');
+        lock.lock();
+        this.holes = [ cond, lock, branch ];
+    }
+    get cond() { return this.holes[0]; }
+    get branch() { return this.holes[2]; }
+}
+class KeyTrueExpr extends TrueExpr {
+    constructor() {
+        super();
+        this.holes = [];
+        this.children = [];
+
+        var key = new ImageExpr(0, 0, 56, 28, 'key-icon');
+        key.lock();
+        this.addArg(key);
+    }
+}
+class KeyFalseExpr extends FalseExpr {
+    constructor() {
+        super();
+        this.holes = [];
+        this.children = [];
+
+        var key = new ImageExpr(0, 0, 56, 34, 'broken-key-icon');
+        key.lock();
+        this.addArg(key);
+    }
+}
+
 // A boolean compare function like ==, !=, >, >=, <=, <.
 class CompareExpr extends Expression {
     static operatorMap() {
@@ -615,8 +649,8 @@ class CompareExpr extends Expression {
     }
     reduce() {
         var cmp = this.compare();
-        if (cmp === true)       return new TrueExpr();
-        else if (cmp === false) return new FalseExpr();
+        if (cmp === true)       return new KeyTrueExpr();
+        else if (cmp === false) return new KeyFalseExpr();
         else                    return this;
     }
     performReduction() {

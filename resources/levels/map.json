@@ -39,6 +39,12 @@
             "toolbox": ""
         },
         {
+            "description": "Inception.",
+            "board": "(map /(λx /star) __) (bag star star star star star star) (bag star star star star star) (bag star star) (bag star) (bag star star star star)",
+            "goal": "star",
+            "toolbox": ""
+        },
+        {
             "description": "Duplication",
             "board": "(map /(λx #x #x) __) (bag) (star) (star)",
             "goal": "(star) (star) (star) (star)",
@@ -51,16 +57,10 @@
             "toolbox": ""
         },
         {
-            "description": "Mapping expressions",
-            "board": "(map /(λx #x #x #x) __) (bag) (false) (false) (false) (circle) (if _b /rect)",
-            "goal": "(circle)",
-            "toolbox": ""
-        },
-        {
-            "description": "Conditional identity",
-            "board": "(map /(λx /(if /true #x)) __) (bag) (star) (star) (star)",
-            "goal": "(star) (star) (star)",
-            "toolbox": ""
+            "board": "(map _ __)",
+            "description": "\"Building a duplicator.\"",
+            "goal": "(star)(star)",
+            "toolbox": "(λx #x)(λx #x #x) (bag) (star)"
         },
         {
             "description": "Player writes a constant transform.",
@@ -81,16 +81,16 @@
             "toolbox": ""
         },
         {
-            "description": "Filter with one line missing. Must understand function in order to win.",
-            "board": "(map /(λx /(if /(== #x _) #x)) __) (bag) (star) (diamond) (diamond) (star) (triangle) (triangle) (circle)",
-            "goal": "star",
-            "toolbox": ""
+            "description":"Introducing, the filter function!",
+            "board":"(map /(λx /(if (== #x /star) /#x)) (bag star diamond circle))",
+            "goal":"(star)",
+            "toolbox":""
         },
         {
-            "description": "Inception.",
-            "board": "(map /(λx /star) __) (bag star star star star star star) (bag star star star star star) (bag star star) (bag star) (bag star star star star)",
+            "description": "Filter with one line missing. Must understand function in order to win.",
+            "board": "(map /(λx /(if /(== #x _) #x)) __) (star) (diamond) (star)",
             "goal": "star",
-            "toolbox": ""
+            "toolbox": "(bag (triangle) (triangle) (circle))"
         }
     ]
 }

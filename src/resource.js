@@ -84,6 +84,9 @@ var Resource = (() => {
     loadImage('lambda-pipe-opening1', 'lambda-pipe-opening1.png');
     loadImage('null-circle', 'null1.png');
     loadImage('null-circle-highlight', 'null1-highlighted.png');
+    loadImage('lock-icon', 'lock-icon.png');
+    loadImage('key-icon', 'key-icon.png');
+    loadImage('broken-key-icon', 'broken-key-icon.png');
 
     // UI Images.
     loadImage('btn-next-default', 'next-button.png');

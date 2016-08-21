@@ -545,7 +545,7 @@ var Level = function () {
 
             // Why can we do this? Because JS allows us to do .length on class names to check # of arguments.
             var op_mappings = {
-                'if': IfStatement,
+                'if': LockIfStatement,
                 'ifelse': IfElseStatement,
                 'triangle': new TriangleExpr(0, 0, 44, 44),
                 'rect': new RectExpr(0, 0, 44, 44),
@@ -555,15 +555,14 @@ var Level = function () {
                 '_': MissingExpression,
                 '__': MissingBagExpression,
                 '_b': MissingBooleanExpression,
-                'true': new TrueExpr(),
-                'false': new FalseExpr(),
+                'true': new KeyTrueExpr(),
+                'false': new KeyFalseExpr(),
                 'cmp': CompareExpr,
                 '==': CompareExpr,
                 '!=': CompareExpr,
                 'bag': new BagExpr(0, 0, 54, 54, []),
                 'count': new CountExpr(),
                 'map': function () {
-                    console.log(FadedMapFunc);
                     if (__FADED_FUNCS) return FadedMapFunc;else return SimpleMapFunc;
                 }(),
                 'reduce': ReduceFunc,

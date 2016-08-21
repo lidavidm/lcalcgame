@@ -45,6 +45,12 @@
             "toolbox": ""
         },
         {
+            "board": "(== /star _)",
+            "description": "\"Applying function to boolean\"",
+            "goal": "(true)(true)",
+            "toolbox": "(λx #x #x)(star)(rect)(λx #x)"
+        },
+        {
             "description": "Writing a boolean expression from scratch.",
             "board": "(star)",
             "goal": "true",
