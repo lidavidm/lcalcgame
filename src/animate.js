@@ -3,6 +3,12 @@
  */
 class Animate {
 
+    static wait(node, dur=1000) {
+        var twn = new Tween(() => {}, dur);
+        twn.run();
+        return twn;
+    }
+
     static blink(nodes, dur=1000, colorWeights=[1,1,1]) {
         if (!Array.isArray(nodes)) nodes = [nodes];
         nodes.forEach((n) => {

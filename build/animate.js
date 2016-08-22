@@ -20,6 +20,15 @@ var Animate = function () {
     }
 
     _createClass(Animate, null, [{
+        key: 'wait',
+        value: function wait(node) {
+            var dur = arguments.length <= 1 || arguments[1] === undefined ? 1000 : arguments[1];
+
+            var twn = new Tween(function () {}, dur);
+            twn.run();
+            return twn;
+        }
+    }, {
         key: 'blink',
         value: function blink(nodes) {
             var dur = arguments.length <= 1 || arguments[1] === undefined ? 1000 : arguments[1];

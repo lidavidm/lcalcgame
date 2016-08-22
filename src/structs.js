@@ -192,7 +192,8 @@ class Expression extends RoundedRect {
                 }
             }
 
-            reduced_expr.update();
+            if (reduced_expr)
+                reduced_expr.update();
 
             return reduced_expr;
         }
@@ -537,11 +538,30 @@ class IfStatement extends Expression {
     }
 
     performReduction() {
-        if (this.reduce() != this) {
-            var shatter = new ShatterExpressionEffect(this);
-            shatter.run(stage, (() => {
+        var reduction = this.reduce();
+        if (reduction != this) {
+
+            let stage = this.stage;
+            let afterEffects = () => {
                 super.performReduction();
-            }).bind(this));
+                stage.update();
+                stage.draw();
+            };
+
+            if (reduction === null) {
+                Resource.play('key-jiggle');
+                Animate.wait(this, Resource.getAudio('key-jiggle').duration * 1000).after(afterEffects);
+            }
+            else {
+                Resource.play('key-unlock');
+                Animate.wait(this, 860).after(afterEffects);
+            }
+
+
+            //var shatter = new ShatterExpressionEffect(this);
+            //shatter.run(stage, (() => {
+            //    super.performReduction();
+            //}).bind(this));
         }
     }
 

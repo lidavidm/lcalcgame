@@ -327,7 +327,7 @@ class Level {
             return e;
         } else if (arg.indexOf('λ') > -1) {
             let varname = arg.replace('λ', '');
-            if (__FADED_LAMBDAS) return new FadedPythonLambdaHoleExpr(varname);
+            if (__FADED_LAMBDAS) return new FadedLambdaHoleExpr(varname);
             else                 return new LambdaHoleExpr(varname); // lambda hole in parentheses
         } else if (arg.indexOf('#') > -1) {
             let varname = arg.replace('#', '');

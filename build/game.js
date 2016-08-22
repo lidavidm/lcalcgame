@@ -591,7 +591,7 @@ var Level = function () {
                 return e;
             } else if (arg.indexOf('λ') > -1) {
                 var varname = arg.replace('λ', '');
-                if (__FADED_LAMBDAS) return new FadedPythonLambdaHoleExpr(varname);else return new LambdaHoleExpr(varname); // lambda hole in parentheses
+                if (__FADED_LAMBDAS) return new FadedLambdaHoleExpr(varname);else return new LambdaHoleExpr(varname); // lambda hole in parentheses
             } else if (arg.indexOf('#') > -1) {
                     var _varname = arg.replace('#', '');
                     var lambdavar = void 0;

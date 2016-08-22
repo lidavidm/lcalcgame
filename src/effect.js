@@ -75,8 +75,8 @@ class ShatterExpressionEffect extends ExpressionEffect {
                     stage.update();
                     stage.draw();
 
-            })
-        }
+            });
+        };
     }
     get constructorArgs() { return [this._effectParent.clone()]; }
 

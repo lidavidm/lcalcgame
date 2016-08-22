@@ -219,7 +219,7 @@ var Expression = function (_RoundedRect) {
                     }
                 }
 
-                reduced_expr.update();
+                if (reduced_expr) reduced_expr.update();
 
                 return reduced_expr;
             }
@@ -826,11 +826,30 @@ var IfStatement = function (_Expression5) {
         value: function performReduction() {
             var _this13 = this;
 
-            if (this.reduce() != this) {
-                var shatter = new ShatterExpressionEffect(this);
-                shatter.run(stage, function () {
-                    _get(Object.getPrototypeOf(IfStatement.prototype), 'performReduction', _this13).call(_this13);
-                }.bind(this));
+            var reduction = this.reduce();
+            if (reduction != this) {
+                (function () {
+
+                    var stage = _this13.stage;
+                    var afterEffects = function afterEffects() {
+                        _get(Object.getPrototypeOf(IfStatement.prototype), 'performReduction', _this13).call(_this13);
+                        stage.update();
+                        stage.draw();
+                    };
+
+                    if (reduction === null) {
+                        Resource.play('key-jiggle');
+                        Animate.wait(_this13, Resource.getAudio('key-jiggle').duration * 1000).after(afterEffects);
+                    } else {
+                        Resource.play('key-unlock');
+                        Animate.wait(_this13, 860).after(afterEffects);
+                    }
+
+                    //var shatter = new ShatterExpressionEffect(this);
+                    //shatter.run(stage, (() => {
+                    //    super.performReduction();
+                    //}).bind(this));
+                })();
             }
         }
     }, {
