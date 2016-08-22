@@ -192,6 +192,8 @@ class Expression extends RoundedRect {
                 }
             }
 
+            reduced_expr.update();
+
             return reduced_expr;
         }
     }

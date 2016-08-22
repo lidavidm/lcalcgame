@@ -219,6 +219,8 @@ var Expression = function (_RoundedRect) {
                     }
                 }
 
+                reduced_expr.update();
+
                 return reduced_expr;
             }
         }

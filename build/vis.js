@@ -79,7 +79,11 @@ var Node = function () {
         }
     }, {
         key: 'update',
-        value: function update() {}
+        value: function update() {
+            this.children.forEach(function (c) {
+                return c.update();
+            });
+        }
     }, {
         key: 'draw',
         value: function draw(offset) {

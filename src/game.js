@@ -39,6 +39,8 @@ class Level {
         stage.add(goal_node[0]);
         stage.add(goal_node[1]);
 
+        //goal_node[1].children.forEach((c) => c.update());
+
         //var toolbox_vis = this.generateToolboxVisual(toolbox_vis);
         //stage.addAll(toolbox_vis);
 

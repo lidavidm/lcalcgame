@@ -56,7 +56,9 @@ class Node {
         if (typeof offset === 'undefined') return this.pos;
         else return shiftPos(this.pos, offset);
     }
-    update() { }
+    update() {
+        this.children.forEach((c) => c.update());
+    }
     draw(offset) {
         var pos = this.posWithOffset(offset);
         this.drawInternal(pos);
