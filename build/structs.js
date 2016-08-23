@@ -1107,7 +1107,11 @@ var CompareExpr = function (_Expression6) {
             if (this.funcName === '==') {
                 var lval = this.leftExpr.value();
                 var rval = this.rightExpr.value();
-                console.log('leftexpr', this.leftExpr.constructor.name, lval);
+
+                // Variables that are equal reduce to TRUE, regardless of whether they are bound!!
+                if (!lval && !rval && this.leftExpr instanceof LambdaVarExpr && this.rightExpr instanceof LambdaVarExpr) return this.leftExpr.name === this.rightExpr.name;
+
+                console.log('leftexpr', this.leftExpr.constructor.name, this.leftExpr instanceof LambdaVarExpr, lval);
                 console.log('rightexpr', this.rightExpr.constructor.name, rval);
                 if (lval === undefined || rval === undefined) return undefined;else if (Array.isArray(lval) && Array.isArray(rval)) return setCompare(lval, rval, function (e, f) {
                     return e.toString() === f.toString();

@@ -692,7 +692,12 @@ class CompareExpr extends Expression {
         if (this.funcName === '==') {
             var lval = this.leftExpr.value();
             var rval = this.rightExpr.value();
-            console.log('leftexpr', this.leftExpr.constructor.name, lval);
+
+            // Variables that are equal reduce to TRUE, regardless of whether they are bound!!
+            if (!lval && !rval && this.leftExpr instanceof LambdaVarExpr && this.rightExpr instanceof LambdaVarExpr)
+                return this.leftExpr.name === this.rightExpr.name;
+
+            console.log('leftexpr', this.leftExpr.constructor.name, this.leftExpr instanceof LambdaVarExpr, lval);
             console.log('rightexpr', this.rightExpr.constructor.name, rval);
             if (lval === undefined || rval === undefined)
                 return undefined;
