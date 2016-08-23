@@ -96,6 +96,7 @@ var Resource = (() => {
     loadImage('mirror-icon-fade-false', 'mirror-fade-false.png');
     loadImage('mirror-icon-fade-false-lefthalf', 'mirror-fade-false-lefthalf.png');
     loadImage('mirror-icon-fade-false-righthalf', 'mirror-fade-false-righthalf.png');
+    loadImage('funnel', 'funnel.png');
 
     // UI Images.
     loadImage('btn-next-default', 'next-button.png');

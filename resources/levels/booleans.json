@@ -10,7 +10,7 @@
         },
         {
             "description": "Introduces concept: Holes.",
-            "board": "(== _ /star) (star)",
+            "board": "(== /star _) (star)",
             "goal": "true",
             "toolbox": ""
         },
