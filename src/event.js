@@ -110,7 +110,6 @@ class Stage {
                     n.anchor = { x:0, y:0.5 };
                     pos = addPos({x:0, y:an.size.h + 6}, pos);
                 });
-                console.log('asssd');
             }
             if (pos.x > GLOBAL_DEFAULT_SCREENSIZE.width) {
                 let offset = pos.x - GLOBAL_DEFAULT_SCREENSIZE.width;
@@ -181,7 +180,7 @@ class Stage {
                         });
                     });
 
-                    Resource.play('shootwee');
+                    //Resource.play('shootwee');
                     this.ranCompletionAnim = true;
                 }
             }

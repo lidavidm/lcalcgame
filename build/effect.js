@@ -164,3 +164,125 @@ var ShatterExpressionEffect = function (_ExpressionEffect) {
 
     return ShatterExpressionEffect;
 }(ExpressionEffect);
+
+var MirrorShatterEffect = function (_ImageExpr) {
+    _inherits(MirrorShatterEffect, _ImageExpr);
+
+    function MirrorShatterEffect(mirrorToShatter) {
+        _classCallCheck(this, MirrorShatterEffect);
+
+        var shouldBreak = mirrorToShatter.broken;
+        var size = { w: 86, h: 86 };
+        var pos = mirrorToShatter.upperLeftPos(mirrorToShatter.absolutePos, size);
+        pos = addPos(pos, { x: size.w / 2.0 - 4, y: size.h / 2.0 - 11 });
+
+
+        //this.size = size;
+
+        var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(MirrorShatterEffect).call(this, pos.x, pos.y, size.w, size.h, shouldBreak ? 'mirror-icon-fade-false' : 'mirror-icon-fade-true'));
+
+        _this4.pos = pos;
+        _this4.scale = mirrorToShatter.absoluteScale;
+        _this4.lock();
+        _this4.opacity = 0.0;
+        _this4.stroke = { color: 'white', lineWidth: 3 };
+        _this4.color = 'white';
+        _this4._effectParent = mirrorToShatter;
+
+        var _this = _this4;
+        _this4.run = function (stage, afterFadeCb, afterShatterCb) {
+            _this.anchor = { x: 0.5, y: 0.5 };
+            _this.fadeCb = afterFadeCb;
+            _this.shatterCb = afterShatterCb;
+            stage.add(_this);
+            _this.fadeIn().then(_this.shatter.bind(_this4)).then(function () {
+
+                // .. //
+                stage.update();
+            });
+        };
+        return _this4;
+    }
+
+    _createClass(MirrorShatterEffect, [{
+        key: 'fadeIn',
+        value: function fadeIn() {
+            var _this = this;
+            this.opacity = 0.0;
+            return new Promise(function (resolve, reject) {
+                Animate.tween(_this, { 'opacity': 1.0 }, 400, function (elapsed) {
+                    return Math.pow(elapsed, 0.4);
+                }).after(function () {
+                    if (_this.fadeCb) _this.fadeCb();
+                    resolve();
+                });
+                Resource.play('heatup');
+            });
+        }
+    }, {
+        key: 'shatter',
+        value: function shatter() {
+            var _this = this;
+            var stage = _this.parent || _this.stage;
+            _this.stroke = { color: 'white', lineWidth: 3 };
+
+            if (this._effectParent.broken) {
+
+                var lefthalf = _this.clone();
+                var righthalf = _this.clone();
+                lefthalf.graphicNode.image = 'mirror-icon-fade-false-lefthalf';
+                righthalf.graphicNode.image = 'mirror-icon-fade-false-righthalf';
+                stage.add(lefthalf);
+                stage.add(righthalf);
+
+                Animate.tween(lefthalf, { pos: addPos(lefthalf.pos, { x: -50, y: 0 }), opacity: 0 }, 300, function (elapsed) {
+                    return Math.pow(elapsed, 0.4);
+                }).after(function () {
+                    stage.remove(lefthalf);
+                });
+
+                // Removes self after completion.
+                stage.remove(_this);
+                stage.update();
+                stage.draw();
+
+                return new Promise(function (resolve, reject) {
+                    Animate.tween(righthalf, { pos: addPos(righthalf.pos, { x: 50, y: 0 }), opacity: 0 }, 300, function (elapsed) {
+                        return Math.pow(elapsed, 0.4);
+                    }).after(function () {
+                        if (_this.shatterCb) _this.shatterCb();
+                        stage.remove(righthalf);
+                        resolve();
+                    });
+                    Resource.play('mirror-shatter');
+                });
+            } else return new Promise(function (resolve, reject) {
+                Animate.tween(_this, { 'opacity': 0.0, 'scale': { x: 1.2, y: 1.4 } }, 300, function (elapsed) {
+                    return Math.pow(elapsed, 0.2);
+                }).after(function () {
+                    if (_this.shatterCb) _this.shatterCb();
+
+                    // Removes self after completion.
+                    stage.remove(_this);
+                    stage.update();
+                    stage.draw();
+
+                    resolve();
+                });
+                Resource.play('shatter');
+            });
+        }
+    }, {
+        key: 'toString',
+        value: function toString() {
+            return '';
+        }
+    }, {
+        key: 'constructorArgs',
+        get: function get() {
+            return [this._effectParent.clone()];
+        }
+    }]);
+
+    return MirrorShatterEffect;
+}(ImageExpr);

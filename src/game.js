@@ -291,9 +291,9 @@ class Level {
             '_b':MissingBooleanExpression,
             'true':new KeyTrueExpr(),
             'false':new KeyFalseExpr(),
-            'cmp':CompareExpr,
-            '==':CompareExpr,
-            '!=':CompareExpr,
+            'cmp':MirrorCompareExpr,
+            '==':MirrorCompareExpr,
+            '!=':MirrorCompareExpr,
             'bag':new BagExpr(0,0,54,54,[]),
             'count':new CountExpr(),
             'map':(() => {

@@ -107,3 +107,102 @@ class ShatterExpressionEffect extends ExpressionEffect {
         return '';
     }
 }
+
+class MirrorShatterEffect extends ImageExpr {
+    constructor(mirrorToShatter) {
+        let shouldBreak = mirrorToShatter.broken;
+        let size = { w:86, h:86 };
+        let pos = mirrorToShatter.upperLeftPos(mirrorToShatter.absolutePos, size);
+        pos = addPos(pos, { x:size.w/2.0-4, y:size.h/2.0-11 });
+        super(pos.x, pos.y, size.w, size.h,
+             (shouldBreak ? 'mirror-icon-fade-false' : 'mirror-icon-fade-true'));
+
+        //this.size = size;
+        this.pos = pos;
+        this.scale = mirrorToShatter.absoluteScale;
+        this.lock();
+        this.opacity = 0.0;
+        this.stroke = { color:'white', lineWidth:3 };
+        this.color = 'white';
+        this._effectParent = mirrorToShatter;
+
+        var _this = this;
+        this.run = (stage, afterFadeCb, afterShatterCb) => {
+            _this.anchor = { x:0.5, y:0.5 };
+            _this.fadeCb = afterFadeCb;
+            _this.shatterCb = afterShatterCb;
+            stage.add(_this);
+            _this.fadeIn()
+                .then(_this.shatter.bind(this))
+                .then(() => {
+
+                    // .. //
+                    stage.update();
+
+            });
+        };
+    }
+    get constructorArgs() { return [this._effectParent.clone()]; }
+
+    fadeIn() {
+        var _this = this;
+        this.opacity = 0.0;
+        return new Promise(function(resolve, reject) {
+            Animate.tween(_this, { 'opacity':1.0 }, 400, (elapsed) => Math.pow(elapsed, 0.4)).after(() => {
+                if (_this.fadeCb) _this.fadeCb();
+                resolve();
+            });
+            Resource.play('heatup');
+        });
+    }
+    shatter() {
+        var _this = this;
+        var stage = (_this.parent || _this.stage);
+        _this.stroke = { color:'white', lineWidth:3 };
+
+        if (this._effectParent.broken) {
+
+            var lefthalf  = _this.clone();
+            var righthalf = _this.clone();
+            lefthalf.graphicNode.image = 'mirror-icon-fade-false-lefthalf';
+            righthalf.graphicNode.image = 'mirror-icon-fade-false-righthalf';
+            stage.add(lefthalf);
+            stage.add(righthalf);
+
+            Animate.tween(lefthalf, { pos:addPos(lefthalf.pos, { x:-50, y:0 }), opacity:0 }, 300, (elapsed) => Math.pow(elapsed, 0.4)).after(() => {
+                stage.remove(lefthalf);
+            });
+
+            // Removes self after completion.
+            stage.remove(_this);
+            stage.update();
+            stage.draw();
+
+            return new Promise(function(resolve, reject) {
+                Animate.tween(righthalf, { pos:addPos(righthalf.pos, { x:50, y:0 }), opacity:0 }, 300, (elapsed) => Math.pow(elapsed, 0.4)).after(() => {
+                    if (_this.shatterCb) _this.shatterCb();
+                    stage.remove(righthalf);
+                    resolve();
+                });
+                Resource.play('mirror-shatter');
+            });
+        }
+        else return new Promise(function(resolve, reject) {
+            Animate.tween(_this, { 'opacity':0.0, 'scale':{x:1.2, y:1.4} }, 300, (elapsed) => Math.pow(elapsed, 0.2)).after(() => {
+                if (_this.shatterCb) _this.shatterCb();
+
+                // Removes self after completion.
+                stage.remove(_this);
+                stage.update();
+                stage.draw();
+
+                resolve();
+            });
+            Resource.play('shatter');
+        });
+    }
+
+    toString() {
+        return '';
+    }
+}

@@ -630,6 +630,7 @@ class KeyTrueExpr extends TrueExpr {
         var key = new ImageExpr(0, 0, 56, 28, 'key-icon');
         key.lock();
         this.addArg(key);
+        this.graphicNode = key;
     }
 }
 class KeyFalseExpr extends FalseExpr {
@@ -641,6 +642,7 @@ class KeyFalseExpr extends FalseExpr {
         var key = new ImageExpr(0, 0, 56, 34, 'broken-key-icon');
         key.lock();
         this.addArg(key);
+        this.graphicNode = key;
     }
 }
 
@@ -675,12 +677,15 @@ class CompareExpr extends Expression {
         else if (cmp === false) return new KeyFalseExpr();
         else                    return this;
     }
-    performReduction() {
+    performReduction(animated=true) {
         if (this.reduce() != this) {
-            var shatter = new ShatterExpressionEffect(this);
-            shatter.run(stage, (() => {
-                super.performReduction();
-            }).bind(this));
+            if (animated) {
+                var shatter = new ShatterExpressionEffect(this);
+                shatter.run(stage, (() => {
+                    super.performReduction();
+                }).bind(this));
+            }
+            else super.performReduction();
         }
     }
     compare() {
@@ -721,6 +726,52 @@ class CompareExpr extends Expression {
 
     toString() {
         return '(' + this.funcName + ' ' + this.leftExpr.toString() + ' ' + this.rightExpr.toString() + ')';
+    }
+}
+
+class MirrorCompareExpr extends CompareExpr {
+    constructor(b1, b2, compareFuncName='==') {
+        super(b1, b2, compareFuncName);
+
+        this.children = [];
+        this.holes = [];
+        this.padding = { left:20, inner:0, right:40 };
+
+        this.addArg(b1);
+
+        // Mirror graphic
+        var mirror = new MirrorExpr(0, 0, 86, 86);
+        mirror.exprInMirror = b2.clone();
+        this.addArg(mirror);
+
+        this.addArg(b2);
+    }
+    get constructorArgs() { return [this.holes[0].clone(), this.holes[2].clone(), this.funcName]; }
+    get leftExpr() { return this.holes[0]; }
+    get mirror() { return this.holes[1]; }
+    get rightExpr() { return this.holes[2]; }
+    update() {
+        super.update();
+        if (this.reduce() != this) {
+            this.mirror.exprInMirror = (this.compare() ? new KeyTrueExpr().graphicNode : new KeyTrueExpr().graphicNode);
+            this.mirror.broken = !this.compare();
+        } else {
+            if (this.leftExpr instanceof MissingExpression && this.rightExpr instanceof MissingExpression)
+                this.mirror.exprInMirror = null;
+            else this.mirror.exprInMirror = (this.leftExpr instanceof MissingExpression ? this.rightExpr.clone() : this.leftExpr.clone());
+            this.mirror.broken = false;
+        }
+    }
+
+    // Animation effects
+    performReduction() {
+        if (this.reduce() != this) {
+            var stage = this.stage;
+            var shatter = new MirrorShatterEffect(this.mirror);
+            shatter.run(stage, (() => {
+                super.performReduction(false);
+            }).bind(this));
+        }
     }
 }
 
@@ -897,6 +948,50 @@ class NullExpr extends ImageExpr {
         return 'null';
     }
     value() { return null; }
+}
+class MirrorExpr extends ImageExpr {
+    constructor(x, y, w, h) {
+        super(x, y, w, h, 'mirror-icon');
+        this.lock();
+        this.graphicNode.offset = { x:0, y:-10 };
+        this.innerExpr = null;
+        this._broken = false;
+    }
+    set exprInMirror(e) {
+        this.innerExpr = e;
+
+        if (e) {
+            e.scale = { x:1, y:1 };
+            e.parent = this.graphicNode;
+            e.update();
+        }
+    }
+    set broken(b) {
+        this._broken = b;
+        console.log(b);
+        if (b) this.graphicNode.image = 'mirror-icon-broken';
+        else   this.graphicNode.image = 'mirror-icon';
+    }
+    get broken() {
+        return this._broken;
+    }
+    get exprInMirror() {
+        return this.innerExpr;
+    }
+    drawInternalAfterChildren(pos, boundingSize) {
+        if (!this.innerExpr) return;
+
+        var ctx = this.ctx;
+
+        ctx.save();
+        ctx.globalCompositeOperation = "overlay";
+        this.innerExpr.parent = this.graphicNode;
+        this.innerExpr.pos = { x:this.graphicNode.size.w / 2.0, y:this.graphicNode.size.h / 2.0 };
+        this.innerExpr.anchor = { x:0.5, y:0.8 };
+        this.innerExpr.ctx = ctx;
+        this.innerExpr.draw();
+        ctx.restore();
+    }
 }
 
 /** Collections */

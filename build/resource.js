@@ -72,6 +72,7 @@ var Resource = function () {
     loadAudio('bag-addItem', 'putaway.wav');
     loadAudio('heatup', 'heatup.wav');
     loadAudio('shatter', 'shatter1.wav');
+    loadAudio('mirror-shatter', 'shatter2.wav');
     loadAudio('splosion', 'firework1.wav');
     loadAudio('shootwee', 'firework-shooting.wav');
     loadAudio('key-jiggle', 'key-jiggle.wav');
@@ -96,6 +97,12 @@ var Resource = function () {
     loadImage('lock-icon', 'lock-icon.png');
     loadImage('key-icon', 'key-icon.png');
     loadImage('broken-key-icon', 'broken-key-icon.png');
+    loadImage('mirror-icon', 'mirror.png');
+    loadImage('mirror-icon-broken', 'mirror-broken.png');
+    loadImage('mirror-icon-fade-true', 'mirror-fade-true.png');
+    loadImage('mirror-icon-fade-false', 'mirror-fade-false.png');
+    loadImage('mirror-icon-fade-false-lefthalf', 'mirror-fade-false-lefthalf.png');
+    loadImage('mirror-icon-fade-false-righthalf', 'mirror-fade-false-righthalf.png');
 
     // UI Images.
     loadImage('btn-next-default', 'next-button.png');
