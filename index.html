@@ -106,6 +106,9 @@
 
                 stage.update();
                 stage.draw();
+
+                // This fixes some render bugs. Not exactly sure why.
+                stage.draw();
             }
         }
         function prev() {

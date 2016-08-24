@@ -70,6 +70,7 @@ var Expression = function (_RoundedRect) {
             c.children = [];
             c.holes = [];
             c.stroke = null;
+            c.toolbox = null;
             children.forEach(function (child) {
                 return c.addArg(child);
             });
@@ -1185,6 +1186,14 @@ var MirrorCompareExpr = function (_CompareExpr) {
     }
 
     _createClass(MirrorCompareExpr, [{
+        key: 'expressionToMirror',
+        value: function expressionToMirror() {
+            var isMirrorable = function isMirrorable(expr) {
+                return !(!expr || expr instanceof LambdaVarExpr || expr instanceof MissingExpression);
+            };
+            if (isMirrorable(this.leftExpr)) return this.leftExpr.clone();else if (isMirrorable(this.rightExpr)) return this.rightExpr.clone();else return null;
+        }
+    }, {
         key: 'update',
         value: function update() {
             _get(Object.getPrototypeOf(MirrorCompareExpr.prototype), 'update', this).call(this);
@@ -1192,7 +1201,7 @@ var MirrorCompareExpr = function (_CompareExpr) {
                 this.mirror.exprInMirror = this.compare() ? new KeyTrueExpr().graphicNode : new KeyTrueExpr().graphicNode;
                 this.mirror.broken = !this.compare();
             } else {
-                if (this.leftExpr instanceof MissingExpression && this.rightExpr instanceof MissingExpression) this.mirror.exprInMirror = null;else this.mirror.exprInMirror = this.leftExpr instanceof MissingExpression ? this.rightExpr.clone() : this.leftExpr.clone();
+                this.mirror.exprInMirror = this.expressionToMirror();
                 this.mirror.broken = false;
             }
         }
@@ -1560,8 +1569,46 @@ var ImageExpr = function (_VarExpr6) {
     return ImageExpr;
 }(VarExpr);
 
-var NullExpr = function (_ImageExpr) {
-    _inherits(NullExpr, _ImageExpr);
+var FunnelExpr = function (_ImageExpr) {
+    _inherits(FunnelExpr, _ImageExpr);
+
+    function FunnelExpr(x, y, w, h) {
+        _classCallCheck(this, FunnelExpr);
+
+        var _this33 = _possibleConstructorReturn(this, Object.getPrototypeOf(FunnelExpr).call(this, x, y, w, h, 'funnel'));
+
+        _this33.graphicNode.anchor = { x: 0, y: 0.5 };
+        return _this33;
+    }
+
+    _createClass(FunnelExpr, [{
+        key: 'update',
+        value: function update() {}
+    }, {
+        key: 'onmouseenter',
+        value: function onmouseenter() {
+            this.graphicNode.image = 'funnel-selected';
+        }
+    }, {
+        key: 'onmouseleave',
+        value: function onmouseleave() {
+            this.graphicNode.image = 'funnel';
+        }
+    }, {
+        key: 'drawInternal',
+        value: function drawInternal(pos, boundingSize) {}
+    }, {
+        key: 'size',
+        get: function get() {
+            return this.graphicNode.size;
+        }
+    }]);
+
+    return FunnelExpr;
+}(ImageExpr);
+
+var NullExpr = function (_ImageExpr2) {
+    _inherits(NullExpr, _ImageExpr2);
 
     function NullExpr(x, y, w, h) {
         _classCallCheck(this, NullExpr);
@@ -1610,19 +1657,19 @@ var NullExpr = function (_ImageExpr) {
     return NullExpr;
 }(ImageExpr);
 
-var MirrorExpr = function (_ImageExpr2) {
-    _inherits(MirrorExpr, _ImageExpr2);
+var MirrorExpr = function (_ImageExpr3) {
+    _inherits(MirrorExpr, _ImageExpr3);
 
     function MirrorExpr(x, y, w, h) {
         _classCallCheck(this, MirrorExpr);
 
-        var _this34 = _possibleConstructorReturn(this, Object.getPrototypeOf(MirrorExpr).call(this, x, y, w, h, 'mirror-icon'));
+        var _this35 = _possibleConstructorReturn(this, Object.getPrototypeOf(MirrorExpr).call(this, x, y, w, h, 'mirror-icon'));
 
-        _this34.lock();
-        _this34.graphicNode.offset = { x: 0, y: -10 };
-        _this34.innerExpr = null;
-        _this34._broken = false;
-        return _this34;
+        _this35.lock();
+        _this35.graphicNode.offset = { x: 0, y: -10 };
+        _this35.innerExpr = null;
+        _this35._broken = false;
+        return _this35;
     }
 
     _createClass(MirrorExpr, [{
@@ -1684,10 +1731,10 @@ var PutExpr = function (_Expression9) {
         txt_put.color = 'black';
         txt_in.color = 'black';
 
-        var _this35 = _possibleConstructorReturn(this, Object.getPrototypeOf(PutExpr).call(this, [txt_put, item, txt_in, collection]));
+        var _this36 = _possibleConstructorReturn(this, Object.getPrototypeOf(PutExpr).call(this, [txt_put, item, txt_in, collection]));
 
-        _this35.color = 'violet';
-        return _this35;
+        _this36.color = 'violet';
+        return _this36;
     }
 
     _createClass(PutExpr, [{
@@ -1742,10 +1789,10 @@ var PopExpr = function (_Expression10) {
         var txt_pop = new TextExpr('pop');
         txt_pop.color = 'black';
 
-        var _this36 = _possibleConstructorReturn(this, Object.getPrototypeOf(PopExpr).call(this, [txt_pop, collection]));
+        var _this37 = _possibleConstructorReturn(this, Object.getPrototypeOf(PopExpr).call(this, [txt_pop, collection]));
 
-        _this36.color = 'violet';
-        return _this36;
+        _this37.color = 'violet';
+        return _this37;
     }
 
     _createClass(PopExpr, [{
@@ -1793,10 +1840,10 @@ var DefineExpr = function (_Expression11) {
         var txt_define = new TextExpr('define');
         txt_define.color = 'black';
 
-        var _this37 = _possibleConstructorReturn(this, Object.getPrototypeOf(DefineExpr).call(this, [txt_define, expr]));
+        var _this38 = _possibleConstructorReturn(this, Object.getPrototypeOf(DefineExpr).call(this, [txt_define, expr]));
 
-        _this37.color = 'OrangeRed';
-        return _this37;
+        _this38.color = 'OrangeRed';
+        return _this38;
     }
 
     _createClass(DefineExpr, [{
@@ -1867,15 +1914,15 @@ var NamedExpr = function (_Expression12) {
         for (var i = 0; i < args.length; i++) {
             exprs.push(args[i].clone());
         }
-        var _this38 = _possibleConstructorReturn(this, Object.getPrototypeOf(NamedExpr).call(this, exprs));
+        var _this39 = _possibleConstructorReturn(this, Object.getPrototypeOf(NamedExpr).call(this, exprs));
 
-        _this38.color = 'orange';
-        _this38.name = name;
-        _this38._args = args.map(function (a) {
+        _this39.color = 'orange';
+        _this39.name = name;
+        _this39._args = args.map(function (a) {
             return a.clone();
         });
-        _this38._wrapped_expr = expr;
-        return _this38;
+        _this39._wrapped_expr = expr;
+        return _this39;
     }
 
     _createClass(NamedExpr, [{
@@ -1972,30 +2019,30 @@ var BagExpr = function (_CollectionExpr) {
         //super(new Bag(x, y, w, h));
         var radius = (w + h) / 4.0;
 
-        var _this40 = _possibleConstructorReturn(this, Object.getPrototypeOf(BagExpr).call(this, new Bag(x, y, radius)));
+        var _this41 = _possibleConstructorReturn(this, Object.getPrototypeOf(BagExpr).call(this, new Bag(x, y, radius)));
 
-        _this40._items = holding;
-        _this40.bigScale = 4;
-        _this40.graphicNode.color = 'tan';
-        _this40.graphicNode.anchor = { x: 0.5, y: 0.5 };
+        _this41._items = holding;
+        _this41.bigScale = 4;
+        _this41.graphicNode.color = 'tan';
+        _this41.graphicNode.anchor = { x: 0.5, y: 0.5 };
         //this.graphicNode.clipChildren = true;
         //this.graphicNode.clipBackground = 'bag-background';
-        _this40.anchor = { x: 0.5, y: 0.5 };
-        return _this40;
+        _this41.anchor = { x: 0.5, y: 0.5 };
+        return _this41;
     }
 
     _createClass(BagExpr, [{
         key: 'arrangeNicely',
         value: function arrangeNicely() {
-            var _this41 = this;
+            var _this42 = this;
 
             var dotpos = DiceNumber.drawPositionsFor(this.items.length);
             if (dotpos.length > 0) {
                 (function () {
                     // Arrange items according to dot positions.
-                    var sz = _this41.graphicNode.size;
-                    var topsz = _this41.graphicNode.topSize(sz.w / 2.0);
-                    _this41.graphicNode.children.slice(1).forEach(function (e, idx) {
+                    var sz = _this42.graphicNode.size;
+                    var topsz = _this42.graphicNode.topSize(sz.w / 2.0);
+                    _this42.graphicNode.children.slice(1).forEach(function (e, idx) {
                         e.pos = { x: dotpos[idx].x * sz.w * 0.4 + topsz.w / 3.4, y: dotpos[idx].y * sz.h * 0.4 + topsz.h * 1.9 };
                     });
                 })();
@@ -2041,12 +2088,12 @@ var BagExpr = function (_CollectionExpr) {
     }, {
         key: 'popItem',
         value: function popItem() {
-            var _this42 = this;
+            var _this43 = this;
 
             var item = this._items.pop();
             this.graphicNode.removeAllItems();
             this._items.forEach(function (item) {
-                _this42.graphicNode.addItem(item);
+                _this43.graphicNode.addItem(item);
             });
             return item;
         }
@@ -2057,7 +2104,7 @@ var BagExpr = function (_CollectionExpr) {
     }, {
         key: 'map',
         value: function map(lambdaExpr) {
-            var _this43 = this;
+            var _this44 = this;
 
             if (!(lambdaExpr instanceof LambdaExpr) || !lambdaExpr.takesArgument) {
                 console.error('@ BagExpr.applyFunc: Func expr does not take argument.');
@@ -2072,7 +2119,7 @@ var BagExpr = function (_CollectionExpr) {
                 var c = item.clone();
                 var pos = item.pos;
                 var func = lambdaExpr.clone();
-                _this43.stage.add(func);
+                _this44.stage.add(func);
                 func.update();
                 var new_funcs = func.applyExpr(c);
                 if (!Array.isArray(new_funcs)) new_funcs = [new_funcs];
@@ -2085,7 +2132,7 @@ var BagExpr = function (_CollectionExpr) {
                     for (var _iterator2 = new_funcs[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                         var new_func = _step2.value;
 
-                        _this43.stage.remove(new_func);
+                        _this44.stage.remove(new_func);
                         new_func.pos = pos;
                         new_func.unlockSubexpressions();
                         new_func.lockSubexpressions(function (expr) {
@@ -2117,7 +2164,7 @@ var BagExpr = function (_CollectionExpr) {
     }, {
         key: 'spill',
         value: function spill() {
-            var _this44 = this;
+            var _this45 = this;
 
             if (!this.stage) {
                 console.error('@ BagExpr.spill: Bag is not attached to a Stage.');
@@ -2139,7 +2186,7 @@ var BagExpr = function (_CollectionExpr) {
             items.forEach(function (item, index) {
                 item = item.clone();
                 var theta = index / items.length * Math.PI * 2;
-                var rad = _this44.size.w * 1.5;
+                var rad = _this45.size.w * 1.5;
                 var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
                 item.pos = pos;
                 Animate.tween(item, { 'pos': targetPos }, 100, function (elapsed) {
@@ -2147,7 +2194,7 @@ var BagExpr = function (_CollectionExpr) {
                 });
                 //item.pos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) });
                 item.parent = null;
-                _this44.graphicNode.removeItem(item);
+                _this45.graphicNode.removeItem(item);
                 item.scale = { x: 1, y: 1 };
                 stage.add(item);
             });
@@ -2262,14 +2309,14 @@ var BagExpr = function (_CollectionExpr) {
             return this._items.slice();
         },
         set: function set(items) {
-            var _this45 = this;
+            var _this46 = this;
 
             this._items.forEach(function (item) {
-                return _this45.graphicNode.removeItem(item);
+                return _this46.graphicNode.removeItem(item);
             });
             this._items = [];
             items.forEach(function (item) {
-                _this45.addItem(item);
+                _this46.addItem(item);
             });
         }
     }, {
@@ -2294,11 +2341,11 @@ var CountExpr = function (_Expression13) {
         }
         var txt = new TextExpr('count');
 
-        var _this46 = _possibleConstructorReturn(this, Object.getPrototypeOf(CountExpr).call(this, [txt, collectionExpr]));
+        var _this47 = _possibleConstructorReturn(this, Object.getPrototypeOf(CountExpr).call(this, [txt, collectionExpr]));
 
-        _this46.color = 'DarkTurquoise';
+        _this47.color = 'DarkTurquoise';
         txt.color = 'white';
-        return _this46;
+        return _this47;
     }
 
     _createClass(CountExpr, [{

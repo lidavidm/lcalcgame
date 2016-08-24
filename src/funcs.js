@@ -38,6 +38,7 @@ class MapFunc extends FuncExpr {
         returnBag.lock();
 
         super([returnBag, oneParamFunc, bag]);
+        this._arrows = [];
         this.exprOffsetY = DEFAULT_EXPR_HEIGHT / 4.0;
         this.heightScalar = 1.5;
         this.animatedReduction = true;
@@ -165,13 +166,13 @@ class MapFunc extends FuncExpr {
                 var bag = this.bag;
                 var runNextAnim = (n) => {
                     if (bag.items.length === 0) {
-                        //superReduce();
-                        //this.bag.spill();
-                        //stage.remove(this.bag);
+
+                        // Reached end of bag. Terminate animation.
                         this.isAnimating = false;
                         stage.remove(this);
                         stage.update();
                         stage.draw();
+
                     } else {
 
                         // Pop an item off the bag.
@@ -192,8 +193,8 @@ class MapFunc extends FuncExpr {
                         preview_item.parent = null;
 
                         this.isAnimating = true;
-                        Animate.followPath(item, bagToFuncArrowPath, 800).after(() => {
 
+                        var dropItem = () => {
                             // Preview
                             func.holes[0].ondropenter(preview_item);
 
@@ -222,7 +223,11 @@ class MapFunc extends FuncExpr {
                                 runNextAnim( n + 1 );
 
                             }, 1000);
-                        });
+                        };
+
+                        if (bagToFuncArrowPath)
+                            Animate.followPath(item, bagToFuncArrowPath, 800).after(dropItem);
+                        else dropItem();
                     }
                 };
 
@@ -242,17 +247,6 @@ class MapFunc extends FuncExpr {
 
         }
     }
-
-    /*onmouseenter(pos) {
-        super.onmouseenter(pos);
-        this.bagToFuncArrowPath.color = this.stroke.color;
-        this.funcToReturnBagArrowPath.color = this.stroke.color;
-    }
-    onmouseleave(pos) {
-        super.onmouseleave(pos);
-        this.bagToFuncArrowPath.color = MapFunc.arrowPathColor();
-        this.funcToReturnBagArrowPath.color = MapFunc.arrowPathColor();
-    }*/
 
     // Sizes to match its children.
     get size() {
@@ -322,6 +316,8 @@ class SimpleMapFunc extends MapFunc {
         this.holes[0] = bg;
     }
 }
+
+
 
 class ReduceFunc extends FuncExpr {
 

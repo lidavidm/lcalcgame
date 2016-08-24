@@ -103,6 +103,7 @@ var MapFunc = function (_FuncExpr) {
 
         var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(MapFunc).call(this, [returnBag, oneParamFunc, bag]));
 
+        _this3._arrows = [];
         _this3.exprOffsetY = DEFAULT_EXPR_HEIGHT / 4.0;
         _this3.heightScalar = 1.5;
         _this3.animatedReduction = true;
@@ -236,15 +237,15 @@ var MapFunc = function (_FuncExpr) {
 
                         _runNextAnim = function runNextAnim(n) {
                             if (bag.items.length === 0) {
-                                //superReduce();
-                                //this.bag.spill();
-                                //stage.remove(this.bag);
+
+                                // Reached end of bag. Terminate animation.
                                 _this4.isAnimating = false;
                                 stage.remove(_this4);
                                 stage.update();
                                 stage.draw();
                             } else {
                                 var itemsAfterMap;
+                                var dropItem;
 
                                 (function () {
 
@@ -268,8 +269,8 @@ var MapFunc = function (_FuncExpr) {
                                     preview_item.parent = null;
 
                                     _this4.isAnimating = true;
-                                    Animate.followPath(item, bagToFuncArrowPath, 800).after(function () {
 
+                                    dropItem = function dropItem() {
                                         // Preview
                                         func.holes[0].ondropenter(preview_item);
 
@@ -299,7 +300,9 @@ var MapFunc = function (_FuncExpr) {
 
                                             _runNextAnim(n + 1);
                                         }, 1000);
-                                    });
+                                    };
+
+                                    if (bagToFuncArrowPath) Animate.followPath(item, bagToFuncArrowPath, 800).after(dropItem);else dropItem();
                                 })();
                             }
                         };
@@ -322,17 +325,6 @@ var MapFunc = function (_FuncExpr) {
                 if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
             }
         }
-
-        /*onmouseenter(pos) {
-            super.onmouseenter(pos);
-            this.bagToFuncArrowPath.color = this.stroke.color;
-            this.funcToReturnBagArrowPath.color = this.stroke.color;
-        }
-        onmouseleave(pos) {
-            super.onmouseleave(pos);
-            this.bagToFuncArrowPath.color = MapFunc.arrowPathColor();
-            this.funcToReturnBagArrowPath.color = MapFunc.arrowPathColor();
-        }*/
 
         // Sizes to match its children.
 

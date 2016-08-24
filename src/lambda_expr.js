@@ -63,7 +63,8 @@ class LambdaHoleExpr extends MissingExpression {
     open() {
         if (!this.isOpen) {
             if (this.stage) {
-                Animate.play(this.openingAnimation, this, () => {
+                if (this._runningAnim) this._runningAnim.cancel();
+                this._runningAnim = Animate.play(this.openingAnimation, this, () => {
                     this.image = this.openImage;
                     if (this.stage) this.stage.draw();
                 });
@@ -74,7 +75,8 @@ class LambdaHoleExpr extends MissingExpression {
     close() {
         if (this.isOpen) {
             if (this.stage) {
-                Animate.play(this.closingAnimation, this, () => {
+                if (this._runningAnim) this._runningAnim.cancel();
+                this._runningAnim = Animate.play(this.closingAnimation, this, () => {
                     this.image = this.closedImage;
                     if (this.stage) this.stage.draw();
                 });

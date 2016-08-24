@@ -183,6 +183,7 @@ var Animate = function () {
                 }
             }, animation.totalDuration).after(onComplete);
             twn.run();
+            return twn;
         }
     }, {
         key: 'poof',

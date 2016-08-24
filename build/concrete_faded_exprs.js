@@ -184,6 +184,9 @@ var FadedSimpleMapFunc = function (_SimpleMapFunc) {
     return FadedSimpleMapFunc;
 }(SimpleMapFunc);
 
+// Full-faded map function.
+
+
 var FadedMapFunc = function (_FadedSimpleMapFunc) {
     _inherits(FadedMapFunc, _FadedSimpleMapFunc);
 
@@ -208,3 +211,105 @@ var FadedMapFunc = function (_FadedSimpleMapFunc) {
 
     return FadedMapFunc;
 }(FadedSimpleMapFunc);
+
+// Fully-concrete map function.
+
+
+var FunnelMapFunc = function (_MapFunc) {
+    _inherits(FunnelMapFunc, _MapFunc);
+
+    function FunnelMapFunc(oneParamFunc, bag) {
+        _classCallCheck(this, FunnelMapFunc);
+
+        var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(FunnelMapFunc).call(this, oneParamFunc, bag));
+
+        _this6.children = [];
+        _this6.holes = [];
+        //this.animatedReduction = false;
+
+        // Expression it fits over.
+        oneParamFunc.unlock();
+        _this6.addArg(oneParamFunc);
+
+        // Funnel graphic.
+        var funnel = new FunnelExpr(0, 0, 198 / 2, 281 / 2);
+        _this6.funnel = funnel;
+        _this6.addArg(funnel);
+
+        // Bag.
+        bag.unlock();
+        _this6.addArg(bag);
+        return _this6;
+    }
+
+    _createClass(FunnelMapFunc, [{
+        key: 'update',
+        value: function update() {
+            var _this7 = this;
+
+            if (this.func && this.funnel) {
+                this.func.pos = { x: this.funnel.size.w * 38 / 200, y: this.funnel.size.h / 2.0 - this.func.size.h / 1.3 };
+                this.func.update();
+                this.func.holes[0].open();
+            }
+            if (this.bag && this.funnel) {
+                if (this.bag instanceof MissingExpression) this.bag.shadowOffset = -4;
+                this.bag.pos = { x: this.funnel.size.w / 2.0 + 3, y: -this.funnel.size.h * (280 / 2 - 50) / 280 };
+                this.bag.anchor = { x: 0.5, y: 0.5 };
+                this.bag.update();
+            }
+            this.children = [];
+            this.holes.forEach(function (h) {
+                _this7.addChild(h);
+            });
+        }
+    }, {
+        key: 'onmouseenter',
+        value: function onmouseenter(pos) {
+            this.funnel.onmouseenter(pos);
+            this.func.onmouseenter(pos);
+        }
+    }, {
+        key: 'onmouseleave',
+        value: function onmouseleave(pos) {
+            this.funnel.onmouseleave(pos);
+            this.func.onmouseleave(pos);
+        }
+    }, {
+        key: 'updateArrowPaths',
+        value: function updateArrowPaths() {}
+    }, {
+        key: 'drawInternal',
+        value: function drawInternal(pos, boundingSize) {}
+    }, {
+        key: 'hits',
+        value: function hits(pos, options) {
+            var b = this.bag.hits(pos, options);
+            if (b) return b;
+            var e = this.func.hits(pos, options);
+            if (e) return e != this.func && e != this.func.holes[0] ? e : this;
+            var h = this.funnel.hits(pos, options);
+            if (h) return this;else return null;
+        }
+    }, {
+        key: 'returnBag',
+        get: function get() {
+            return null;
+        }
+    }, {
+        key: 'func',
+        get: function get() {
+            return this.holes[0];
+        }
+    }, {
+        key: 'bag',
+        get: function get() {
+            return this.holes[2];
+        },
+        set: function set(bg) {
+            this.holes[2] = bg;
+        }
+    }]);
+
+    return FunnelMapFunc;
+}(MapFunc);

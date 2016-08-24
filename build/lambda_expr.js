@@ -101,7 +101,8 @@ var LambdaHoleExpr = function (_MissingExpression) {
 
             if (!this.isOpen) {
                 if (this.stage) {
-                    Animate.play(this.openingAnimation, this, function () {
+                    if (this._runningAnim) this._runningAnim.cancel();
+                    this._runningAnim = Animate.play(this.openingAnimation, this, function () {
                         _this2.image = _this2.openImage;
                         if (_this2.stage) _this2.stage.draw();
                     });
@@ -116,7 +117,8 @@ var LambdaHoleExpr = function (_MissingExpression) {
 
             if (this.isOpen) {
                 if (this.stage) {
-                    Animate.play(this.closingAnimation, this, function () {
+                    if (this._runningAnim) this._runningAnim.cancel();
+                    this._runningAnim = Animate.play(this.closingAnimation, this, function () {
                         _this3.image = _this3.closedImage;
                         if (_this3.stage) _this3.stage.draw();
                     });

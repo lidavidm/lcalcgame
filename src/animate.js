@@ -147,6 +147,7 @@ class Animate {
             }
         }, animation.totalDuration).after(onComplete);
         twn.run();
+        return twn;
     }
 
     static poof(expr, sfx='poof') {

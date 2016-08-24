@@ -46,6 +46,7 @@ class Expression extends RoundedRect {
         c.children = [];
         c.holes = [];
         c.stroke = null;
+        c.toolbox = null;
         children.forEach((child) => c.addArg(child));
         return c;
     }
@@ -755,15 +756,22 @@ class MirrorCompareExpr extends CompareExpr {
     get leftExpr() { return this.holes[0]; }
     get mirror() { return this.holes[1]; }
     get rightExpr() { return this.holes[2]; }
+    expressionToMirror() {
+        let isMirrorable = (expr) => (!(!expr || expr instanceof LambdaVarExpr || expr instanceof MissingExpression));
+        if (isMirrorable(this.leftExpr))
+            return this.leftExpr.clone();
+        else if (isMirrorable(this.rightExpr))
+            return this.rightExpr.clone();
+        else
+            return null;
+    }
     update() {
         super.update();
         if (this.reduce() != this) {
             this.mirror.exprInMirror = (this.compare() ? new KeyTrueExpr().graphicNode : new KeyTrueExpr().graphicNode);
             this.mirror.broken = !this.compare();
         } else {
-            if (this.leftExpr instanceof MissingExpression && this.rightExpr instanceof MissingExpression)
-                this.mirror.exprInMirror = null;
-            else this.mirror.exprInMirror = (this.leftExpr instanceof MissingExpression ? this.rightExpr.clone() : this.leftExpr.clone());
+            this.mirror.exprInMirror = this.expressionToMirror();
             this.mirror.broken = false;
         }
     }
@@ -928,6 +936,23 @@ class ImageExpr extends VarExpr {
         this.graphicNode.image = img;
     }
     toString() { return this._image; }
+}
+class FunnelExpr extends ImageExpr {
+    constructor(x, y, w, h) {
+        super(x, y, w, h, 'funnel');
+        this.graphicNode.anchor = { x:0, y:0.5 };
+    }
+    update() { }
+    get size() {
+        return this.graphicNode.size;
+    }
+    onmouseenter() {
+        this.graphicNode.image = 'funnel-selected';
+    }
+    onmouseleave() {
+        this.graphicNode.image = 'funnel';
+    }
+    drawInternal(pos, boundingSize) {  }
 }
 class NullExpr extends ImageExpr {
     constructor(x, y, w, h) {

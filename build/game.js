@@ -565,7 +565,7 @@ var Level = function () {
                 'bag': new BagExpr(0, 0, 54, 54, []),
                 'count': new CountExpr(),
                 'map': function () {
-                    if (__FADED_FUNCS) return FadedMapFunc;else return SimpleMapFunc;
+                    if (__FADED_FUNCS) return FadedMapFunc;else return FunnelMapFunc;
                 }(),
                 'reduce': ReduceFunc,
                 'put': PutExpr,

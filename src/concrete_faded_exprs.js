@@ -90,6 +90,8 @@ class FadedSimpleMapFunc extends SimpleMapFunc {
         this.holes[3] = bg;
     }
 }
+
+// Full-faded map function.
 class FadedMapFunc extends FadedSimpleMapFunc {
     constructor(oneParamFunc, bag) {
         super(oneParamFunc, bag);
@@ -100,4 +102,71 @@ class FadedMapFunc extends FadedSimpleMapFunc {
         this.animatedReduction = false;
     }
     updateArrowPaths() { } // remove arrow
+}
+
+// Fully-concrete map function.
+class FunnelMapFunc extends MapFunc {
+    constructor(oneParamFunc, bag) {
+        super(oneParamFunc, bag);
+        this.children = [];
+        this.holes = [];
+        //this.animatedReduction = false;
+
+        // Expression it fits over.
+        oneParamFunc.unlock();
+        this.addArg(oneParamFunc);
+
+        // Funnel graphic.
+        var funnel = new FunnelExpr(0, 0, 198/2, 281/2);
+        this.funnel = funnel;
+        this.addArg(funnel);
+
+        // Bag.
+        bag.unlock();
+        this.addArg(bag);
+    }
+    update() {
+        if (this.func && this.funnel) {
+            this.func.pos = { x:this.funnel.size.w * 38 / 200, y:this.funnel.size.h / 2.0 - this.func.size.h / 1.3 };
+            this.func.update();
+            this.func.holes[0].open();
+        }
+        if (this.bag && this.funnel) {
+            if (this.bag instanceof MissingExpression) this.bag.shadowOffset = -4;
+            this.bag.pos = { x:this.funnel.size.w / 2.0 + 3, y:-this.funnel.size.h * (280/2 - 50) / 280};
+            this.bag.anchor = { x:0.5, y:0.5 };
+            this.bag.update();
+        }
+        this.children = [];
+        this.holes.forEach((h) => {this.addChild(h);});
+    }
+    onmouseenter(pos) {
+        this.funnel.onmouseenter(pos);
+        this.func.onmouseenter(pos);
+    }
+    onmouseleave(pos) {
+        this.funnel.onmouseleave(pos);
+        this.func.onmouseleave(pos);
+    }
+    updateArrowPaths() { }
+    drawInternal(pos, boundingSize) { }
+    hits(pos, options) {
+        var b = this.bag.hits(pos, options);
+        if (b) return b;
+        var e = this.func.hits(pos, options);
+        if (e) return (e != this.func && e != this.func.holes[0]) ? e : this;
+        var h = this.funnel.hits(pos, options);
+        if (h) return this;
+        else   return null;
+    }
+    get returnBag() { return null; }
+    get func() {
+        return this.holes[0];
+    }
+    get bag() {
+        return this.holes[2];
+    }
+    set bag(bg) {
+        this.holes[2] = bg;
+    }
 }

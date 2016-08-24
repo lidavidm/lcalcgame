@@ -298,7 +298,7 @@ class Level {
             'count':new CountExpr(),
             'map':(() => {
                 if (__FADED_FUNCS)   return FadedMapFunc;
-                else                 return SimpleMapFunc;
+                else                 return FunnelMapFunc;
             })(),
             'reduce':ReduceFunc,
             'put':PutExpr,
