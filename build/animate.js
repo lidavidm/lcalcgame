@@ -33,12 +33,17 @@ var Animate = function () {
         value: function blink(nodes) {
             var dur = arguments.length <= 1 || arguments[1] === undefined ? 1000 : arguments[1];
             var colorWeights = arguments.length <= 2 || arguments[2] === undefined ? [1, 1, 1] : arguments[2];
+            var blinkCount = arguments.length <= 3 || arguments[3] === undefined ? 2 : arguments[3];
 
             if (!Array.isArray(nodes)) nodes = [nodes];
+            nodes = nodes.map(function (n) {
+                return n instanceof VarExpr ? n.graphicNode : n;
+            });
             nodes.forEach(function (n) {
                 var last_color = null;
                 var twn = new Tween(function (elapsed) {
-                    n.stroke = { color: colorFrom255((Math.sin(4 * elapsed * Math.PI) + 1) * 255 / 2, colorWeights), lineWidth: 2 };
+                    n.stroke = { color: colorFrom255((Math.sin(2 * blinkCount * elapsed * Math.PI) + 1) * 255 / 2, colorWeights), lineWidth: 4 };
+                    console.log(n.stroke);
                     if (n.stage) n.stage.draw();
                 }, dur).after(function () {
                     n.stroke = null;
@@ -46,6 +51,9 @@ var Animate = function () {
                 });
                 twn.run();
             });
+            var twn = new Tween(function () {}, dur);
+            twn.run();
+            return twn;
         }
     }, {
         key: 'followPath',
@@ -96,7 +104,7 @@ var Animate = function () {
                 node.pos = addPos(scalarMultiply(node.pos, 1.0 - strengthOfCorrection), scalarMultiply(targetPos, strengthOfCorrection));
 
                 if (onReachingTarget && lengthOfPos(fromTo(node.pos, targetPos)) < 40.0) {
-                    console.error('reached end', node);
+                    //console.error('reached end', node);
                     twn.cancel();
                 }
 

@@ -160,12 +160,6 @@ var Stage = function () {
                                 var cmp = new ImageRect(GLOBAL_DEFAULT_SCREENSIZE.width / 2, GLOBAL_DEFAULT_SCREENSIZE.height / 2, 740 / 2, 146 / 2, 'victory');
                                 cmp.anchor = { x: 0.5, y: 0.5 };
                                 _this3.add(cmp);
-
-                                // Old
-                                //var cmp = new TextExpr("YOU WIN!");
-                                //cmp.pos = { x:320, y:300 };
-                                //this.add(cmp);
-
                                 _this3.draw();
 
                                 Resource.play('victory');
@@ -180,14 +174,22 @@ var Stage = function () {
                             pairs.forEach(function (pair, idx) {
                                 var node = pair[0];
                                 var goalNode = pair[1];
-                                Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x: 200, y: 300 }, function () {
-                                    SplosionEffect.run(node);
-                                    console.log(goalNode);
-                                    goalNode.parent.removeChild(goalNode);
-                                    num_exploded++;
-                                    if (num_exploded === pairs.length) {
-                                        setTimeout(you_win, 500.0);
-                                    }
+                                node.ignoreEvents = true;
+
+                                Resource.play('matching-goal');
+
+                                var blinkCount = level_idx < 2 ? 2 : 1;
+                                Animate.blink([node, goalNode], 3800 / 2.0 * blinkCount, [0, 1, 1], blinkCount).after(function () {
+
+                                    Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x: 200, y: 300 }, function () {
+                                        SplosionEffect.run(node);
+                                        console.log(goalNode);
+                                        goalNode.parent.removeChild(goalNode);
+                                        num_exploded++;
+                                        if (num_exploded === pairs.length) {
+                                            setTimeout(you_win, 500);
+                                        }
+                                    });
                                 });
                             });
 

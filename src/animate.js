@@ -9,12 +9,16 @@ class Animate {
         return twn;
     }
 
-    static blink(nodes, dur=1000, colorWeights=[1,1,1]) {
+    static blink(nodes, dur=1000, colorWeights=[1,1,1], blinkCount=2) {
         if (!Array.isArray(nodes)) nodes = [nodes];
+        nodes = nodes.map((n) => {
+            return n instanceof VarExpr ? n.graphicNode : n;
+        });
         nodes.forEach((n) => {
             var last_color = null;
             var twn = new Tween((elapsed) => {
-                n.stroke = { color: colorFrom255((Math.sin(4*elapsed*Math.PI)+1) * 255 / 2, colorWeights), lineWidth:2 };
+                n.stroke = { color: colorFrom255((Math.sin(2*blinkCount*elapsed*Math.PI)+1) * 255 / 2, colorWeights), lineWidth:4 };
+                console.log(n.stroke);
                 if(n.stage) n.stage.draw();
             }, dur).after(() => {
                 n.stroke = null;
@@ -22,6 +26,9 @@ class Animate {
             });
             twn.run();
         });
+        var twn = new Tween(() => {}, dur);
+        twn.run();
+        return twn;
     }
 
     static followPath(node, path, dur=1000, smoothFunc=((elapsed) => elapsed)) {
@@ -61,7 +68,7 @@ class Animate {
             node.pos = addPos(scalarMultiply(node.pos, 1.0 - strengthOfCorrection), scalarMultiply(targetPos, strengthOfCorrection) );
 
             if (onReachingTarget && lengthOfPos(fromTo(node.pos, targetPos)) < 40.0) {
-                console.error('reached end', node);
+                //console.error('reached end', node);
                 twn.cancel();
             }
 

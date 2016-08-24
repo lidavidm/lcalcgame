@@ -78,6 +78,7 @@ var Resource = function () {
     loadAudio('key-jiggle', 'key-jiggle.wav');
     loadAudio('key-unlock', 'key-unlock.wav');
     loadAudio('victory', '325805__wagna__collect.wav');
+    loadAudio('matching-goal', 'matching-the-goal2.wav');
 
     loadImage('bag-background', 'bg-stars.png');
     loadImage('lambda-hole', 'lambda-hole.png');

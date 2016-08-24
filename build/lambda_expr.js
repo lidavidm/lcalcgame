@@ -181,7 +181,15 @@ var LambdaHoleExpr = function (_MissingExpression) {
 
             if (node instanceof LambdaHoleExpr) node = node.parent;
             _get(Object.getPrototypeOf(LambdaHoleExpr.prototype), 'ondropenter', this).call(this, node, pos);
-            node.opacity = 0.2;
+
+            // Special case: Funnel representation of 'map' hovered over hole.
+            if (node instanceof FunnelMapFunc) {
+                node.onmouseenter();
+                return;
+            }
+
+            node.opacity = 0.4;
+
             if (this.parent) {
                 var subvarexprs = Stage.getNodesWithClass(LambdaVarExpr, [], true, [this.parent]);
                 subvarexprs.forEach(function (e) {
@@ -206,64 +214,93 @@ var LambdaHoleExpr = function (_MissingExpression) {
         key: 'ondropexit',
         value: function ondropexit(node, pos) {
             if (node instanceof LambdaHoleExpr) node = node.parent;
+
             _get(Object.getPrototypeOf(LambdaHoleExpr.prototype), 'ondropexit', this).call(this, node, pos);
+
+            if (node instanceof FunnelMapFunc) {
+                return;
+            }
+
             if (node) node.opacity = 1.0;
             this.close_opened_subexprs();
         }
     }, {
         key: 'ondropped',
         value: function ondropped(node, pos) {
+            var _this6 = this;
+
             if (node instanceof LambdaHoleExpr) node = node.parent;
             if (node.dragging) {
                 // Make sure node is being dragged by the user.
 
-                // Cleanup
-                node.opacity = 1.0;
-                this.close_opened_subexprs();
+                // Special case: Funnel dropped over hole.
+                if (node instanceof FunnelMapFunc) {
+                    node.func = this.parent;
+                    this.parent.parent = null;
+                    this.parent.stage = null;
+                    this.onmouseleave();
+                    this.parent.onmouseenter();
+                    node.update();
+                    return;
+                }
 
-                // User dropped an expression into the lambda hole.
-                Resource.play('pop');
+                var afterDrop = function afterDrop() {
+                    // Cleanup
+                    node.opacity = 1.0;
+                    _this6.close_opened_subexprs();
 
-                // Clone the dropped expression.
-                var dropped_expr = node.clone();
+                    // User dropped an expression into the lambda hole.
+                    Resource.play('pop');
 
-                // Save the current state of the board.
-                var stage = node.stage;
-                stage.saveState();
+                    // Clone the dropped expression.
+                    var dropped_expr = node.clone();
 
-                Logger.log('state-save', stage.toString());
+                    // Save the current state of the board.
+                    var stage = node.stage;
+                    stage.saveState();
 
-                // Remove the original expression from its stage.
-                stage.remove(node);
-
-                // If this hole is part of a larger expression tree (it should be!),
-                // attempt recursive substitution on any found LambdaVarExpressions.
-                if (this.parent) {
-                    var parent = this.parent;
-                    var orig_exp_str = this.parent.toString();
-                    var dropped_exp_str = node.toString();
-
-                    this.applyExpr(node);
-
-                    // Log the reduction.
-                    Logger.log('reduction-lambda', { 'before': orig_exp_str, 'applied': dropped_exp_str, 'after': parent.toString() });
                     Logger.log('state-save', stage.toString());
 
-                    if (parent.children.length === 0) {
+                    // Remove the original expression from its stage.
+                    stage.remove(node);
 
-                        // This hole expression is a destructor token.
-                        // (a) Play nifty 'POOF' animation.
-                        Animate.poof(parent);
+                    // If this hole is part of a larger expression tree (it should be!),
+                    // attempt recursive substitution on any found LambdaVarExpressions.
+                    if (_this6.parent) {
+                        var parent = _this6.parent;
+                        var orig_exp_str = _this6.parent.toString();
+                        var dropped_exp_str = node.toString();
 
-                        // (b) Remove expression from the parent stage.
-                        (parent.parent || parent.stage).remove(parent);
-                    } else stage.dumpState();
-                } else {
-                    console.warn('ERROR: Cannot perform lambda-substitution: Hole has no parent.');
+                        _this6.applyExpr(node);
 
-                    // Hole is singular; acts as abyss. Remove it after one drop.
-                    this.stage.remove(this);
-                }
+                        // Log the reduction.
+                        Logger.log('reduction-lambda', { 'before': orig_exp_str, 'applied': dropped_exp_str, 'after': parent.toString() });
+                        Logger.log('state-save', stage.toString());
+
+                        if (parent.children.length === 0) {
+
+                            // This hole expression is a destructor token.
+                            // (a) Play nifty 'POOF' animation.
+                            Animate.poof(parent);
+
+                            // (b) Remove expression from the parent stage.
+                            (parent.parent || parent.stage).remove(parent);
+                        } else stage.dumpState();
+                    } else {
+                        console.warn('ERROR: Cannot perform lambda-substitution: Hole has no parent.');
+
+                        // Hole is singular; acts as abyss. Remove it after one drop.
+                        _this6.stage.remove(_this6);
+                    }
+
+                    stage.update();
+                };
+
+                if (level_idx < 8) {
+                    Animate.tween(node, { opacity: 0 }, 400, function (elapsed) {
+                        return Math.pow(elapsed, 0.5);
+                    }).after(afterDrop);
+                } else afterDrop();
             }
         }
     }, {
@@ -296,16 +333,16 @@ var LambdaVarExpr = function (_ImageExpr) {
     function LambdaVarExpr(varname) {
         _classCallCheck(this, LambdaVarExpr);
 
-        var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(LambdaVarExpr).call(this, 0, 0, 54 * 1.2, 70 * 1.2, 'lambda-pipe'));
+        var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(LambdaVarExpr).call(this, 0, 0, 54 * 1.2, 70 * 1.2, 'lambda-pipe'));
 
-        _this6.graphicNode.offset = { x: 0, y: -8 };
-        _this6.name = varname ? varname.replace('_', '') : undefined;
-        _this6.ignoreEvents = true;
-        _this6.handleOffset = -8;
+        _this7.graphicNode.offset = { x: 0, y: -8 };
+        _this7.name = varname ? varname.replace('_', '') : undefined;
+        _this7.ignoreEvents = true;
+        _this7.handleOffset = -8;
 
         // Graphic animation.
-        _this6.stateGraph.enter('closed');
-        return _this6;
+        _this7.stateGraph.enter('closed');
+        return _this7;
     }
 
     _createClass(LambdaVarExpr, [{
@@ -319,25 +356,25 @@ var LambdaVarExpr = function (_ImageExpr) {
     }, {
         key: 'open',
         value: function open() {
-            var _this7 = this;
+            var _this8 = this;
 
             var preview_expr = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
 
             if (this.stateGraph.currentState !== 'open') {
                 (function () {
-                    _this7.stateGraph.enter('opening');
+                    _this8.stateGraph.enter('opening');
 
-                    var stage = _this7.stage;
+                    var stage = _this8.stage;
 
                     if (preview_expr) {
                         setTimeout(function () {
-                            if (_this7.stateGraph.currentState === 'opening') {
-                                var scale = _this7.graphicNode.size.w / preview_expr.size.w * 0.8;
-                                preview_expr.pos = { x: _this7.children[0].size.w / 2.0, y: -10 };
+                            if (_this8.stateGraph.currentState === 'opening') {
+                                var scale = _this8.graphicNode.size.w / preview_expr.size.w * 0.8;
+                                preview_expr.pos = { x: _this8.children[0].size.w / 2.0, y: -10 };
                                 preview_expr.scale = { x: scale, y: scale };
                                 preview_expr.anchor = { x: 0.5, y: 0 };
                                 preview_expr.stroke = null;
-                                _this7.graphicNode.addChild(preview_expr);
+                                _this8.graphicNode.addChild(preview_expr);
                                 stage.draw();
                             }
                         }, 150);
@@ -407,27 +444,27 @@ var LambdaVarExpr = function (_ImageExpr) {
     }, {
         key: 'stateGraph',
         get: function get() {
-            var _this8 = this;
+            var _this9 = this;
 
             if (!this._stateGraph) {
                 var g = new StateGraph();
                 g.addState('closed', function () {
-                    _this8.image = _this8.closedImage;
+                    _this9.image = _this9.closedImage;
                 });
                 if (this.stage) this.stage.draw();
                 g.addState('opening', function () {
-                    var anim = _this8.openingAnimation;
-                    Animate.play(anim, _this8, function () {
+                    var anim = _this9.openingAnimation;
+                    Animate.play(anim, _this9, function () {
                         g.enter('open');
                     });
                 });
                 g.addState('open', function () {
-                    _this8.image = _this8.openImage;
+                    _this9.image = _this9.openImage;
                 });
                 if (this.stage) this.stage.draw();
                 g.addState('closing', function () {
-                    var anim = _this8.closingAnimation;
-                    Animate.play(anim, _this8, function () {
+                    var anim = _this9.closingAnimation;
+                    Animate.play(anim, _this9, function () {
                         g.enter('closed');
                     });
                 });
@@ -534,7 +571,7 @@ var LambdaExpr = function (_Expression) {
     }, {
         key: 'performReduction',
         value: function performReduction() {
-            var _this10 = this;
+            var _this11 = this;
 
             var reduced_expr = this.reduce();
             if (reduced_expr && reduced_expr != this) {
@@ -551,7 +588,7 @@ var LambdaExpr = function (_Expression) {
                         else {
                                 parent = this.stage;
                                 reduced_expr.forEach(function (e) {
-                                    if (_this10.locked) e.lock();else e.unlock();
+                                    if (_this11.locked) e.lock();else e.unlock();
                                 });
                                 parent.swap(this, reduced_expr); // swap 'this' (on the board) with an array of its reduced expressions
                                 return reduced_expr;

@@ -83,10 +83,13 @@ var Toolbox = function (_ImageRect) {
     }, {
         key: 'ondropped',
         value: function ondropped(node, pos) {
-            console.log('fdsfsd');
+
             if (!node.toolbox) {
                 // Can't drag nodes onto toolbox that aren't already elements --
                 // once it's placed on the board, you can't drag it back.
+                Animate.tween(node, { pos: { x: node.pos.x, y: this.pos.y - node.size.h * 1.2 } }, 200, function (elapsed) {
+                    return Math.pow(elapsed, 2);
+                });
                 return;
             } else if (node.toolbox && node.toolbox != this) {
                 console.error('@ Toolbox.ondropped: Node toolbox does not match current toolbox instance.');

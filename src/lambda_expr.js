@@ -128,7 +128,15 @@ class LambdaHoleExpr extends MissingExpression {
     ondropenter(node, pos) {
         if (node instanceof LambdaHoleExpr) node = node.parent;
         super.ondropenter(node, pos);
-        node.opacity = 0.2;
+
+        // Special case: Funnel representation of 'map' hovered over hole.
+        if (node instanceof FunnelMapFunc) {
+            node.onmouseenter();
+            return;
+        }
+
+        node.opacity = 0.4;
+
         if (this.parent) {
             var subvarexprs = Stage.getNodesWithClass(LambdaVarExpr, [], true, [this.parent]);
             subvarexprs.forEach((e) => {
@@ -151,7 +159,13 @@ class LambdaHoleExpr extends MissingExpression {
     }
     ondropexit(node, pos) {
         if (node instanceof LambdaHoleExpr) node = node.parent;
+
         super.ondropexit(node, pos);
+
+        if (node instanceof FunnelMapFunc) {
+            return;
+        }
+
         if (node) node.opacity = 1.0;
         this.close_opened_subexprs();
     }
@@ -159,56 +173,76 @@ class LambdaHoleExpr extends MissingExpression {
         if (node instanceof LambdaHoleExpr) node = node.parent;
         if (node.dragging) { // Make sure node is being dragged by the user.
 
-            // Cleanup
-            node.opacity = 1.0;
-            this.close_opened_subexprs();
+            // Special case: Funnel dropped over hole.
+            if (node instanceof FunnelMapFunc) {
+                node.func = this.parent;
+                this.parent.parent = null;
+                this.parent.stage = null;
+                this.onmouseleave();
+                this.parent.onmouseenter();
+                node.update();
+                return;
+            }
 
-            // User dropped an expression into the lambda hole.
-            Resource.play('pop');
+            var afterDrop = () => {
+                // Cleanup
+                node.opacity = 1.0;
+                this.close_opened_subexprs();
 
-            // Clone the dropped expression.
-            var dropped_expr = node.clone();
+                // User dropped an expression into the lambda hole.
+                Resource.play('pop');
 
-            // Save the current state of the board.
-            var stage = node.stage;
-            stage.saveState();
+                // Clone the dropped expression.
+                var dropped_expr = node.clone();
 
-            Logger.log('state-save', stage.toString());
+                // Save the current state of the board.
+                var stage = node.stage;
+                stage.saveState();
 
-            // Remove the original expression from its stage.
-            stage.remove(node);
-
-            // If this hole is part of a larger expression tree (it should be!),
-            // attempt recursive substitution on any found LambdaVarExpressions.
-            if (this.parent) {
-                var parent = this.parent;
-                let orig_exp_str = this.parent.toString();
-                let dropped_exp_str = node.toString();
-
-                this.applyExpr(node);
-
-                // Log the reduction.
-                Logger.log('reduction-lambda', { 'before':orig_exp_str, 'applied':dropped_exp_str, 'after':parent.toString() });
                 Logger.log('state-save', stage.toString());
 
-                if (parent.children.length === 0) {
+                // Remove the original expression from its stage.
+                stage.remove(node);
 
-                    // This hole expression is a destructor token.
-                    // (a) Play nifty 'POOF' animation.
-                    Animate.poof(parent);
+                // If this hole is part of a larger expression tree (it should be!),
+                // attempt recursive substitution on any found LambdaVarExpressions.
+                if (this.parent) {
+                    var parent = this.parent;
+                    let orig_exp_str = this.parent.toString();
+                    let dropped_exp_str = node.toString();
 
-                    // (b) Remove expression from the parent stage.
-                    (parent.parent || parent.stage).remove(parent);
+                    this.applyExpr(node);
 
-                } else
-                    stage.dumpState();
+                    // Log the reduction.
+                    Logger.log('reduction-lambda', { 'before':orig_exp_str, 'applied':dropped_exp_str, 'after':parent.toString() });
+                    Logger.log('state-save', stage.toString());
 
-            } else {
-                console.warn('ERROR: Cannot perform lambda-substitution: Hole has no parent.');
+                    if (parent.children.length === 0) {
 
-                // Hole is singular; acts as abyss. Remove it after one drop.
-                this.stage.remove(this);
-            }
+                        // This hole expression is a destructor token.
+                        // (a) Play nifty 'POOF' animation.
+                        Animate.poof(parent);
+
+                        // (b) Remove expression from the parent stage.
+                        (parent.parent || parent.stage).remove(parent);
+
+                    } else
+                        stage.dumpState();
+
+                } else {
+                    console.warn('ERROR: Cannot perform lambda-substitution: Hole has no parent.');
+
+                    // Hole is singular; acts as abyss. Remove it after one drop.
+                    this.stage.remove(this);
+                }
+
+                stage.update();
+            };
+
+            if (level_idx < 8) {
+                Animate.tween(node, { opacity:0 }, 400, (elapsed) => Math.pow(elapsed, 0.5)).after(afterDrop);
+            } else
+                afterDrop();
         }
     }
 

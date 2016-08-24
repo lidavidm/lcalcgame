@@ -250,7 +250,10 @@ var FunnelMapFunc = function (_MapFunc) {
             if (this.func && this.funnel) {
                 this.func.pos = { x: this.funnel.size.w * 38 / 200, y: this.funnel.size.h / 2.0 - this.func.size.h / 1.3 };
                 this.func.update();
-                this.func.holes[0].open();
+                if (this.func.holes.length > 0) this.func.holes[0].open();else {
+                    if (!this.funcDraw) this.funcDraw = this.func.draw;
+                    this.func.draw = function () {};
+                }
             }
             if (this.bag && this.funnel) {
                 if (this.bag instanceof MissingExpression) this.bag.shadowOffset = -4;
@@ -300,6 +303,10 @@ var FunnelMapFunc = function (_MapFunc) {
         key: 'func',
         get: function get() {
             return this.holes[0];
+        },
+        set: function set(f) {
+            f.anchor = { x: 0, y: 0 };
+            this.holes[0] = f;
         }
     }, {
         key: 'bag',
