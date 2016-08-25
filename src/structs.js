@@ -735,6 +735,13 @@ class CompareExpr extends Expression {
     }
 }
 
+class FadedCompareExpr extends CompareExpr {
+    constructor(b1, b2, compareFuncName='==') {
+        super(b1, b2, compareFuncName);
+        this.holes[1].text = compareFuncName;
+    }
+}
+
 class MirrorCompareExpr extends CompareExpr {
     constructor(b1, b2, compareFuncName='==') {
         super(b1, b2, compareFuncName);
