@@ -547,30 +547,28 @@ var Level = function () {
 
             // Why can we do this? Because JS allows us to do .length on class names to check # of arguments.
             var op_mappings = {
-                'if': LockIfStatement,
-                'ifelse': IfElseStatement,
-                'triangle': new TriangleExpr(0, 0, 44, 44),
-                'rect': new RectExpr(0, 0, 44, 44),
-                'star': new StarExpr(0, 0, 25, 5),
-                'circle': new CircleExpr(0, 0, 22),
-                'diamond': new RectExpr(0, 0, 44, 44), // for now
-                '_': MissingExpression,
-                '__': MissingBagExpression,
-                '_b': MissingBooleanExpression,
-                'true': new KeyTrueExpr(),
-                'false': new KeyFalseExpr(),
-                'cmp': MirrorCompareExpr,
-                '==': MirrorCompareExpr,
-                '!=': MirrorCompareExpr,
-                'bag': new BagExpr(0, 0, 54, 54, []),
-                'count': new CountExpr(),
-                'map': function () {
-                    if (__FADED_FUNCS) return FadedMapFunc;else return FunnelMapFunc;
-                }(),
-                'reduce': ReduceFunc,
-                'put': PutExpr,
-                'pop': PopExpr,
-                'define': DefineExpr,
+                'if': ExprManager.getClass('if'),
+                'ifelse': ExprManager.getClass('ifelse'),
+                'triangle': new (ExprManager.getClass('triangle'))(0, 0, 44, 44),
+                'rect': new (ExprManager.getClass('rect'))(0, 0, 44, 44),
+                'star': new (ExprManager.getClass('star'))(0, 0, 25, 5),
+                'circle': new (ExprManager.getClass('circle'))(0, 0, 22),
+                'diamond': new (ExprManager.getClass('diamond'))(0, 0, 44, 44), // for now
+                '_': ExprManager.getClass('_'),
+                '__': ExprManager.getClass('__'),
+                '_b': ExprManager.getClass('_b'),
+                'true': new (ExprManager.getClass('true'))(),
+                'false': new (ExprManager.getClass('false'))(),
+                'cmp': ExprManager.getClass('cmp'),
+                '==': ExprManager.getClass('=='),
+                '!=': ExprManager.getClass('!='),
+                'bag': new (ExprManager.getClass('bag'))(0, 0, 54, 54, []),
+                'count': new (ExprManager.getClass('count'))(),
+                'map': ExprManager.getClass('map'),
+                'reduce': ExprManager.getClass('reduce'),
+                'put': ExprManager.getClass('put'),
+                'pop': ExprManager.getClass('pop'),
+                'define': ExprManager.getClass('define'),
                 'null': new NullExpr(0, 0, 64, 64),
                 'dot': function () {
                     var circ = new CircleExpr(0, 0, 18);
@@ -591,22 +589,22 @@ var Level = function () {
                 return e;
             } else if (arg.indexOf('λ') > -1) {
                 var varname = arg.replace('λ', '');
-                if (__FADED_LAMBDAS) return new FadedLambdaHoleExpr(varname);else return new LambdaHoleExpr(varname); // lambda hole in parentheses
+                return new (ExprManager.getClass('hole'))(varname);
             } else if (arg.indexOf('#') > -1) {
-                    var _varname = arg.replace('#', '');
-                    var lambdavar = void 0;
-                    if (__FADED_LAMBDAS) lambdavar = new FadedLambdaVarExpr(_varname);else lambdavar = new LambdaVarExpr(_varname);
-                    if (_varname.indexOf('_') > -1) {
-                        // Vars like #/x are draggable.
-                        _varname = _varname.replace('_', '');
-                        lambdavar.ignoreEvents = false; // makes draggable
-                        lambdavar.name = _varname;
-                    }
-                    return lambdavar;
-                } else {
-                    console.error('Unknown argument: ', arg);
-                    return new Expression();
+                var _varname = arg.replace('#', '');
+                var lambdavar = void 0;
+                lambdavar = new (ExprManager.getClass('var'))(_varname);
+                if (_varname.indexOf('_') > -1) {
+                    // Vars like #/x are draggable.
+                    _varname = _varname.replace('_', '');
+                    lambdavar.ignoreEvents = false; // makes draggable
+                    lambdavar.name = _varname;
                 }
+                return lambdavar;
+            } else {
+                console.error('Unknown argument: ', arg);
+                return new Expression();
+            }
         }
     }]);
 

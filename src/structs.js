@@ -189,7 +189,7 @@ class Expression extends RoundedRect {
             if (reduced_expr && reduced_expr.parent) {
                 var try_reduce = reduced_expr.parent.reduceCompletely();
                 if (try_reduce != reduced_expr.parent && try_reduce !== null) {
-                    Animate.blink(reduced_expr.parent, 400, [0,1,0]);
+                    Animate.blink(reduced_expr.parent, 400, [0,1,0], 1);
                 }
             }
 
@@ -551,7 +551,7 @@ class IfStatement extends Expression {
 
             if (reduction === null) {
                 Resource.play('key-jiggle');
-                Animate.wait(esource.getAudio('key-jiggle').duration * 1000).after(afterEffects);
+                Animate.wait(Resource.getAudio('key-jiggle').duration * 1000).after(afterEffects);
             }
             else {
                 Resource.play('key-unlock');
@@ -674,8 +674,8 @@ class CompareExpr extends Expression {
     }
     reduce() {
         var cmp = this.compare();
-        if (cmp === true)       return new KeyTrueExpr();
-        else if (cmp === false) return new KeyFalseExpr();
+        if (cmp === true)       return new (ExprManager.getClass('true'))();
+        else if (cmp === false) return new (ExprManager.getClass('false'))();
         else                    return this;
     }
     performReduction(animated=true) {
@@ -768,7 +768,7 @@ class MirrorCompareExpr extends CompareExpr {
     update() {
         super.update();
         if (this.reduce() != this) {
-            this.mirror.exprInMirror = (this.compare() ? new KeyTrueExpr().graphicNode : new KeyTrueExpr().graphicNode);
+            this.mirror.exprInMirror = new (ExprManager.getClass('true'))().graphicNode;
             this.mirror.broken = !this.compare();
         } else {
             this.mirror.exprInMirror = this.expressionToMirror();

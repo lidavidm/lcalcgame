@@ -29,6 +29,7 @@
         <script src="build/toolbox.js" charset="utf-8"></script>
         <script src="build/resource.js" charset="utf-8"></script>
         <script src="build/effect.js" charset="utf-8"></script>
+        <script src="build/fademap.js" charset="utf-8"></script>
         <style media="screen">
             #canvas {
                 padding: 0;
@@ -75,7 +76,7 @@
 
             // Start a new log session (creating userID as necessary),
             // and then begin the game.
-            Logger.startSession().then((userinfo) => {
+            Logger.startSession().then(function (userinfo) {
                 return loadChapterSelect();
             }).then(initBoard);
         }
@@ -105,7 +106,7 @@
 
                 stage = Resource.buildLevel(Resource.level[level_idx], canvas);
 
-                Logger.transitionToTask(level_idx, stage.toString()).catch((err) => {
+                Logger.transitionToTask(level_idx, stage.toString()).catch(function (err) {
                     //console.error(err);
                 });
 
