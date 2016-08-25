@@ -840,10 +840,10 @@ var IfStatement = function (_Expression5) {
 
                     if (reduction === null) {
                         Resource.play('key-jiggle');
-                        Animate.wait(_this13, Resource.getAudio('key-jiggle').duration * 1000).after(afterEffects);
+                        Animate.wait(esource.getAudio('key-jiggle').duration * 1000).after(afterEffects);
                     } else {
                         Resource.play('key-unlock');
-                        Animate.wait(_this13, 860).after(afterEffects);
+                        Animate.wait(860).after(afterEffects);
                     }
 
                     //var shatter = new ShatterExpressionEffect(this);

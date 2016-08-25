@@ -367,8 +367,8 @@ var LambdaVarExpr = function (_ImageExpr) {
                     var stage = _this8.stage;
 
                     if (preview_expr) {
-                        setTimeout(function () {
-                            if (_this8.stateGraph.currentState === 'opening') {
+                        Animate.wait(140).after(function () {
+                            if (_this8.stateGraph.currentState === 'opening' || _this8.stateGraph.currentState === 'open') {
                                 var scale = _this8.graphicNode.size.w / preview_expr.size.w * 0.8;
                                 preview_expr.pos = { x: _this8.children[0].size.w / 2.0, y: -10 };
                                 preview_expr.scale = { x: scale, y: scale };
@@ -377,7 +377,7 @@ var LambdaVarExpr = function (_ImageExpr) {
                                 _this8.graphicNode.addChild(preview_expr);
                                 stage.draw();
                             }
-                        }, 150);
+                        });
                     }
                 })();
             }

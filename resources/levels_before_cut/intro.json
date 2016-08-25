@@ -10,6 +10,12 @@
         },
         {
             "description":"Introduces concept: Identity.",
+            "board":"(λx #x) (λx #x) (star) (star)",
+            "goal":"(star) (star)",
+            "toolbox":""
+        },
+        {
+            "description":"Introduces concept: Identity.",
             "board":"(λx #x) (λx #x) (λx #x) (star)",
             "goal":"star",
             "toolbox":""
@@ -18,6 +24,12 @@
             "description":"Introduces concept: Toolbox. (*used to be deletion)",
             "board":"",
             "goal":"star",
+            "toolbox":"(diamond) (star)"
+        },
+        {
+            "description":"Goal can include multiple items. Also introduces objective other than Star.",
+            "board":"(diamond) (λx #x)",
+            "goal":"(diamond) (diamond)",
             "toolbox":"(diamond) (star)"
         },
         {
@@ -33,28 +45,22 @@
             "toolbox":"(star) (diamond) (λx #x #x)"
         },
         {
-            "description": "Replication with free binding.",
-            "board": "(λx _ _) (#_x) (#_x)",
-            "goal": "(triangle) (triangle)",
-            "toolbox": "(triangle) (star) (rect)"
-        },
-        {
-            "description":"Functions are first-class.",
-            "board":"(λx #x) (λx #x #x)",
-            "goal":"(λx #x) (λx #x)",
-            "toolbox":""
-        },
-        {
             "description":"Functions are first-class!",
             "board":"(λx #x #x #x) (λx #x) (star)",
             "goal":"star",
             "toolbox":""
         },
         {
-            "description":"Tests knowledge of all concepts in this chapter.",
+            "description":"Selective function application.",
             "board":"(diamond) (λx #x #x)",
             "goal":"(star) (diamond)",
             "toolbox":"(star) (λx #x)"
+        },
+        {
+            "description":"A harder puzzle using prior concepts.",
+            "board":"(λx #x #x) (λx #x)",
+            "goal":"(star) (star) (star)",
+            "toolbox":"(λx #x #x #x) (star) (diamond)"
         }
     ]
 }

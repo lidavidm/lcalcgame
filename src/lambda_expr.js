@@ -317,8 +317,8 @@ class LambdaVarExpr extends ImageExpr {
             let stage = this.stage;
 
             if(preview_expr) {
-                setTimeout(() => {
-                    if (this.stateGraph.currentState === 'opening') {
+                Animate.wait(140).after(() => {
+                    if (this.stateGraph.currentState === 'opening' || this.stateGraph.currentState === 'open') {
                         let scale = this.graphicNode.size.w / preview_expr.size.w * 0.8;
                         preview_expr.pos = { x:this.children[0].size.w/2.0, y:-10 };
                         preview_expr.scale = { x:scale, y:scale };
@@ -327,8 +327,7 @@ class LambdaVarExpr extends ImageExpr {
                         this.graphicNode.addChild(preview_expr);
                         stage.draw();
                     }
-                }, 150);
-
+                });
             }
         }
     }

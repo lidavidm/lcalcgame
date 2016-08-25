@@ -277,7 +277,7 @@ var MapFunc = function (_FuncExpr) {
                                         // Remove item (preview) from the stage when it reaches end of arrow path (enters 'function' hole).
                                         stage.remove(item);
 
-                                        setTimeout(function () {
+                                        Animate.wait(1000).after(function () {
 
                                             func.holes[0].ondropexit();
 
@@ -299,7 +299,7 @@ var MapFunc = function (_FuncExpr) {
                                             stage.draw();
 
                                             _runNextAnim(n + 1);
-                                        }, 1000);
+                                        });
                                     };
 
                                     if (bagToFuncArrowPath) Animate.followPath(item, bagToFuncArrowPath, 800).after(dropItem);else dropItem();

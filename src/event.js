@@ -152,9 +152,9 @@ class Stage {
                         this.draw();
 
                         Resource.play('victory');
-                        setTimeout(function () {
+                        Animate.wait(Resource.getAudio('victory').duration * 1000).after(function () {
                             next();
-                        }, Resource.getAudio('victory').duration * 1000);
+                        });
                     };
 
                     let pairs = level_complete;
@@ -167,8 +167,9 @@ class Stage {
 
                         Resource.play('matching-goal');
 
-                        var blinkCount = level_idx < 2 ? 2 : 1;
+                        var blinkCount = level_idx === 0 ? 2 : 1;
                         Animate.blink([node, goalNode], 3800 / 2.0 * blinkCount, [0, 1, 1], blinkCount).after(() => {
+                            //Resource.play('shootwee');
 
                             Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x:200, y:300 }, () => {
                                 SplosionEffect.run(node);
@@ -176,7 +177,7 @@ class Stage {
                                 goalNode.parent.removeChild(goalNode);
                                 num_exploded++;
                                 if (num_exploded === pairs.length) {
-                                    setTimeout(you_win, 500);
+                                    Animate.wait(500).after(you_win);
                                 }
                             });
 
@@ -185,7 +186,6 @@ class Stage {
 
                     });
 
-                    //Resource.play('shootwee');
                     this.ranCompletionAnim = true;
                 }
             }

@@ -26,6 +26,7 @@ var SplosionEffect = function () {
 
             // Store stage context.
             var stage = node.stage;
+            var parts = [];
 
             // Remove node from stage.
             stage.remove(node);
@@ -45,6 +46,7 @@ var SplosionEffect = function () {
                 var part = new Circle(center.x, center.y, Math.floor(PARTICLE_MIN_RAD + (PARTICLE_MAX_RAD - PARTICLE_MIN_RAD) * Math.random()));
                 part.color = 'orange';
                 part.shadowOffset = 0;
+                parts.push(part);
                 stage.add(part);
 
                 // 'Explode' outward (move particle to outer edge of explosion radius).
@@ -62,6 +64,14 @@ var SplosionEffect = function () {
             for (var i = 0; i < PARTICLE_COUNT; i++) {
                 _loop(i);
             }
+
+            Animate.wait(400).after(function () {
+                parts.forEach(function (p) {
+                    return stage.remove(p);
+                });
+                parts = null;
+                stage.draw();
+            });
 
             // Play sFx.
             Resource.play('splosion');

@@ -9,6 +9,7 @@ class SplosionEffect {
 
         // Store stage context.
         var stage = node.stage;
+        var parts = [];
 
         // Remove node from stage.
         stage.remove(node);
@@ -28,6 +29,7 @@ class SplosionEffect {
                 Math.floor(PARTICLE_MIN_RAD + (PARTICLE_MAX_RAD - PARTICLE_MIN_RAD) * Math.random()));
             part.color = 'orange';
             part.shadowOffset = 0;
+            parts.push(part);
             stage.add(part);
 
             // 'Explode' outward (move particle to outer edge of explosion radius).
@@ -39,6 +41,12 @@ class SplosionEffect {
                 stage.draw();
             });
         }
+
+        Animate.wait(400).after(() => {
+            parts.forEach((p) => stage.remove(p));
+            parts = null;
+            stage.draw();
+        });
 
         // Play sFx.
         Resource.play('splosion');

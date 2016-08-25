@@ -3,7 +3,7 @@
  */
 class Animate {
 
-    static wait(node, dur=1000) {
+    static wait(dur=1000) {
         var twn = new Tween(() => {}, dur);
         twn.run();
         return twn;
@@ -17,8 +17,7 @@ class Animate {
         nodes.forEach((n) => {
             var last_color = null;
             var twn = new Tween((elapsed) => {
-                n.stroke = { color: colorFrom255((Math.sin(2*blinkCount*elapsed*Math.PI)+1) * 255 / 2, colorWeights), lineWidth:4 };
-                console.log(n.stroke);
+                n.stroke = { color: colorFrom255((Math.sin(2*blinkCount*elapsed*Math.PI*3/4)+1) * 255 / 2, colorWeights), lineWidth:4 };
                 if(n.stage) n.stage.draw();
             }, dur).after(() => {
                 n.stroke = null;
@@ -126,16 +125,17 @@ class Animate {
             }
 
             if (node.stage) node.stage.draw();
-        }, dur).after(() => {
+        }, dur);//.after(() => {
 
-            for (let prop in finalValue) {
+            /*for (let prop in finalValue) {
                 if (finalValue.hasOwnProperty(prop)) {
                     node[prop] = finalValue[prop];
                 }
             }
 
-            if (node.stage) node.stage.draw();
-        });
+            if (node.stage) node.stage.draw();*/
+
+        //});
         twn.run();
         return twn;
     }
@@ -238,9 +238,16 @@ class _AnimationUpdateLoop {
     isRunning(twn) {
         return this.tweens.indexOf(twn) > -1;
     }
+    clear() {
+        this.tweens.forEach((tween) => tween.cancel());
+        this.tweens = [];
+        this.stopUpdateLoop();
+    }
     remove(twn) {
         let i = this.tweens.indexOf(twn);
-        if (i > -1) this.tweens.splice(i, 1);
+        if (i > -1) {
+            this.tweens.splice(i, 1);
+        }
         if (this.tweens.length === 0) this.stopUpdateLoop();
     }
     startUpdateLoop() {
@@ -266,8 +273,9 @@ class Tween {
         this.dur = duration;
         this.update = updateLoopFunc;
         this.fps = fps;
+        this.onComplete = [];
         var _this = this;
-        this.after = (onComplete) => { _this.onComplete = onComplete; return _this; };
+        this.after = (onComplete) => { _this.onComplete.push(onComplete); return _this; };
         return this;
     }
 
@@ -293,9 +301,11 @@ class Tween {
 
     cancel() {
         AnimationUpdateLoop.remove(this);
-        if (this.onComplete) {
-            this.onComplete();
-            this.onComplete = null;
+        if (this.onComplete.length > 0) {
+            this.onComplete.forEach((f) => {
+                f();
+            });
+            this.onComplete = [];
         }
     }
 }

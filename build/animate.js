@@ -21,8 +21,8 @@ var Animate = function () {
 
     _createClass(Animate, null, [{
         key: 'wait',
-        value: function wait(node) {
-            var dur = arguments.length <= 1 || arguments[1] === undefined ? 1000 : arguments[1];
+        value: function wait() {
+            var dur = arguments.length <= 0 || arguments[0] === undefined ? 1000 : arguments[0];
 
             var twn = new Tween(function () {}, dur);
             twn.run();
@@ -42,8 +42,7 @@ var Animate = function () {
             nodes.forEach(function (n) {
                 var last_color = null;
                 var twn = new Tween(function (elapsed) {
-                    n.stroke = { color: colorFrom255((Math.sin(2 * blinkCount * elapsed * Math.PI) + 1) * 255 / 2, colorWeights), lineWidth: 4 };
-                    console.log(n.stroke);
+                    n.stroke = { color: colorFrom255((Math.sin(2 * blinkCount * elapsed * Math.PI * 3 / 4) + 1) * 255 / 2, colorWeights), lineWidth: 4 };
                     if (n.stage) n.stage.draw();
                 }, dur).after(function () {
                     n.stroke = null;
@@ -162,16 +161,16 @@ var Animate = function () {
                 }
 
                 if (node.stage) node.stage.draw();
-            }, dur).after(function () {
+            }, dur); //.after(() => {
 
-                for (var prop in finalValue) {
-                    if (finalValue.hasOwnProperty(prop)) {
-                        node[prop] = finalValue[prop];
-                    }
+            /*for (let prop in finalValue) {
+                if (finalValue.hasOwnProperty(prop)) {
+                    node[prop] = finalValue[prop];
                 }
+            }
+             if (node.stage) node.stage.draw();*/
 
-                if (node.stage) node.stage.draw();
-            });
+            //});
             twn.run();
             return twn;
         }
@@ -339,10 +338,21 @@ var _AnimationUpdateLoop = function () {
             return this.tweens.indexOf(twn) > -1;
         }
     }, {
+        key: 'clear',
+        value: function clear() {
+            this.tweens.forEach(function (tween) {
+                return tween.cancel();
+            });
+            this.tweens = [];
+            this.stopUpdateLoop();
+        }
+    }, {
         key: 'remove',
         value: function remove(twn) {
             var i = this.tweens.indexOf(twn);
-            if (i > -1) this.tweens.splice(i, 1);
+            if (i > -1) {
+                this.tweens.splice(i, 1);
+            }
             if (this.tweens.length === 0) this.stopUpdateLoop();
         }
     }, {
@@ -384,9 +394,10 @@ var Tween = function () {
         this.dur = duration;
         this.update = updateLoopFunc;
         this.fps = fps;
+        this.onComplete = [];
         var _this = this;
         this.after = function (onComplete) {
-            _this.onComplete = onComplete;return _this;
+            _this.onComplete.push(onComplete);return _this;
         };
         return this;
     }
@@ -417,9 +428,11 @@ var Tween = function () {
         key: 'cancel',
         value: function cancel() {
             AnimationUpdateLoop.remove(this);
-            if (this.onComplete) {
-                this.onComplete();
-                this.onComplete = null;
+            if (this.onComplete.length > 0) {
+                this.onComplete.forEach(function (f) {
+                    f();
+                });
+                this.onComplete = [];
             }
         }
     }]);

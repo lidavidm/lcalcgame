@@ -163,9 +163,9 @@ var Stage = function () {
                                 _this3.draw();
 
                                 Resource.play('victory');
-                                setTimeout(function () {
+                                Animate.wait(Resource.getAudio('victory').duration * 1000).after(function () {
                                     next();
-                                }, Resource.getAudio('victory').duration * 1000);
+                                });
                             };
 
                             var pairs = level_complete;
@@ -178,8 +178,9 @@ var Stage = function () {
 
                                 Resource.play('matching-goal');
 
-                                var blinkCount = level_idx < 2 ? 2 : 1;
+                                var blinkCount = level_idx === 0 ? 2 : 1;
                                 Animate.blink([node, goalNode], 3800 / 2.0 * blinkCount, [0, 1, 1], blinkCount).after(function () {
+                                    //Resource.play('shootwee');
 
                                     Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x: 200, y: 300 }, function () {
                                         SplosionEffect.run(node);
@@ -187,13 +188,12 @@ var Stage = function () {
                                         goalNode.parent.removeChild(goalNode);
                                         num_exploded++;
                                         if (num_exploded === pairs.length) {
-                                            setTimeout(you_win, 500);
+                                            Animate.wait(500).after(you_win);
                                         }
                                     });
                                 });
                             });
 
-                            //Resource.play('shootwee');
                             _this3.ranCompletionAnim = true;
                         })();
                     }

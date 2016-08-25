@@ -551,11 +551,11 @@ class IfStatement extends Expression {
 
             if (reduction === null) {
                 Resource.play('key-jiggle');
-                Animate.wait(this, Resource.getAudio('key-jiggle').duration * 1000).after(afterEffects);
+                Animate.wait(esource.getAudio('key-jiggle').duration * 1000).after(afterEffects);
             }
             else {
                 Resource.play('key-unlock');
-                Animate.wait(this, 860).after(afterEffects);
+                Animate.wait(860).after(afterEffects);
             }
 
 

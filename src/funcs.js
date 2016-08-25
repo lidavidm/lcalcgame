@@ -201,7 +201,7 @@ class MapFunc extends FuncExpr {
                             // Remove item (preview) from the stage when it reaches end of arrow path (enters 'function' hole).
                             stage.remove(item);
 
-                            setTimeout(function () {
+                            Animate.wait(1000).after(function () {
 
                                 func.holes[0].ondropexit();
 
@@ -222,7 +222,7 @@ class MapFunc extends FuncExpr {
 
                                 runNextAnim( n + 1 );
 
-                            }, 1000);
+                            });
                         };
 
                         if (bagToFuncArrowPath)
