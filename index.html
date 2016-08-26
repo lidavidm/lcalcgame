@@ -62,16 +62,14 @@
 
             if (__GET_PARAMS) {
                 var start_from = __GET_PARAMS.level;
-                var faded_lambdas = __GET_PARAMS.faded;
+                var fade_level = __GET_PARAMS.fade;
                 if (start_from) {
                     console.log(start_from);
                     level_idx = parseInt(start_from);
                 }
-                if (faded_lambdas && faded_lambdas.toLowerCase() === 'true') {
-                    __FADED_LAMBDAS = true;
-                } else __FADED_LAMBDAS = false;
-
-                __FADED_FUNCS = false;
+                if (fade_level && fade_level > 0) {
+                    ExprManager.setDefaultFadeLevel(parseInt(fade_level));
+                }
             }
 
             // Start a new log session (creating userID as necessary),
@@ -82,7 +80,7 @@
         }
 
         function loadCustomLevel(lvl_desc, goal_desc) {
-            stage = Resource.buildLevel( [lvl_desc, goal_desc], canvas );
+            stage = Resource.buildLevel( { board:lvl_desc, goal:goal_desc, toolbox:"" }, canvas );
             stage.update();
             stage.draw();
         }

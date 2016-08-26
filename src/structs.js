@@ -412,7 +412,10 @@ class MissingBooleanExpression extends MissingTypedExpression {
     constructor(expr_to_miss) {
         super(expr_to_miss);
         this._size = { w:80, h:50 };
+        this.color = "#0c2c52";
+
         this.graphicNode = new HexaRect(0, 0, 44, 44);
+
         this.acceptedClasses = [ BooleanPrimitive, CompareExpr ];
     }
     getClass() { return MissingBooleanExpression; }
@@ -426,6 +429,37 @@ class MissingBooleanExpression extends MissingTypedExpression {
     }
 
     toString() { return '_b'; }
+}
+class MissingKeyExpression extends MissingBooleanExpression {
+    constructor(expr_to_miss) {
+        super(expr_to_miss);
+
+        var keyhole = new ImageRect(0, 0, 26/2, 42/2, 'lock-keyhole');
+        this.graphicNode.addChild(keyhole);
+
+        var bluebg = new RoundedRect(0, 0, 25, 25);
+        bluebg.color = "#2484f5";
+        this._bg = bluebg;
+
+        var top = new ImageRect(0, 0, 112/2.0, 74/2.0, 'lock-top-locked');
+        this._top = top;
+    }
+    drawInternal(pos, boundingSize) {
+        this._bg.ctx = this.ctx;
+        //this._bg.stroke = this.graphicNode.stroke;
+        let bgsz = { w:boundingSize.w*1.3, h:boundingSize.h*1.3 };
+        let bgpos = addPos(pos, {x:-(bgsz.w-boundingSize.w)/2.0, y:-(bgsz.h-boundingSize.h)/2.0});
+        this._bg.drawInternal( bgpos, bgsz );
+
+        let topsz = this._top.size;
+        this._top.ctx = this.ctx;
+        this._top.drawInternal( addPos(bgpos, {x:bgsz.w / 2.0 - topsz.w/2.0, y:-topsz.h } ), topsz );
+
+        super.drawInternal(pos, boundingSize);
+
+        let sz = this.graphicNode.children[0].size;
+        this.graphicNode.children[0].drawInternal( addPos(pos, { x:boundingSize.w/2.0-sz.w/2, y:boundingSize.h/2.0-sz.h/2 }), sz);
+    }
 }
 
 class TextExpr extends Expression {

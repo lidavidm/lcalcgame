@@ -98,6 +98,8 @@ var Resource = function () {
     loadImage('lock-icon', 'lock-icon.png');
     loadImage('key-icon', 'key-icon.png');
     loadImage('broken-key-icon', 'broken-key-icon.png');
+    loadImage('lock-keyhole', 'lock-keyhole.png');
+    loadImage('lock-top-locked', 'lock-top-locked.png');
     loadImage('mirror-icon', 'mirror.png');
     loadImage('mirror-icon-broken', 'mirror-broken.png');
     loadImage('mirror-icon-fade-true', 'mirror-fade-true.png');
@@ -407,6 +409,13 @@ var Resource = function () {
             audioRsc[alias].play();
         },
         buildLevel: function buildLevel(level_desc, canvas) {
+            ExprManager.clearFadeLevels();
+            if ('fade' in level_desc) {
+                for (var key in level_desc.fade) {
+                    console.log(key);
+                    ExprManager.setFadeLevel(key, level_desc.fade[key]);
+                }
+            }
             return Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
         },
         level: levels,

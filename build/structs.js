@@ -586,7 +586,10 @@ var MissingBooleanExpression = function (_MissingTypedExpressi2) {
         var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(MissingBooleanExpression).call(this, expr_to_miss));
 
         _this6._size = { w: 80, h: 50 };
+        _this6.color = "#0c2c52";
+
         _this6.graphicNode = new HexaRect(0, 0, 44, 44);
+
         _this6.acceptedClasses = [BooleanPrimitive, CompareExpr];
         return _this6;
     }
@@ -615,6 +618,49 @@ var MissingBooleanExpression = function (_MissingTypedExpressi2) {
     return MissingBooleanExpression;
 }(MissingTypedExpression);
 
+var MissingKeyExpression = function (_MissingBooleanExpres) {
+    _inherits(MissingKeyExpression, _MissingBooleanExpres);
+
+    function MissingKeyExpression(expr_to_miss) {
+        _classCallCheck(this, MissingKeyExpression);
+
+        var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(MissingKeyExpression).call(this, expr_to_miss));
+
+        var keyhole = new ImageRect(0, 0, 26 / 2, 42 / 2, 'lock-keyhole');
+        _this7.graphicNode.addChild(keyhole);
+
+        var bluebg = new RoundedRect(0, 0, 25, 25);
+        bluebg.color = "#2484f5";
+        _this7._bg = bluebg;
+
+        var top = new ImageRect(0, 0, 112 / 2.0, 74 / 2.0, 'lock-top-locked');
+        _this7._top = top;
+        return _this7;
+    }
+
+    _createClass(MissingKeyExpression, [{
+        key: 'drawInternal',
+        value: function drawInternal(pos, boundingSize) {
+            this._bg.ctx = this.ctx;
+            //this._bg.stroke = this.graphicNode.stroke;
+            var bgsz = { w: boundingSize.w * 1.3, h: boundingSize.h * 1.3 };
+            var bgpos = addPos(pos, { x: -(bgsz.w - boundingSize.w) / 2.0, y: -(bgsz.h - boundingSize.h) / 2.0 });
+            this._bg.drawInternal(bgpos, bgsz);
+
+            var topsz = this._top.size;
+            this._top.ctx = this.ctx;
+            this._top.drawInternal(addPos(bgpos, { x: bgsz.w / 2.0 - topsz.w / 2.0, y: -topsz.h }), topsz);
+
+            _get(Object.getPrototypeOf(MissingKeyExpression.prototype), 'drawInternal', this).call(this, pos, boundingSize);
+
+            var sz = this.graphicNode.children[0].size;
+            this.graphicNode.children[0].drawInternal(addPos(pos, { x: boundingSize.w / 2.0 - sz.w / 2, y: boundingSize.h / 2.0 - sz.h / 2 }), sz);
+        }
+    }]);
+
+    return MissingKeyExpression;
+}(MissingBooleanExpression);
+
 var TextExpr = function (_Expression2) {
     _inherits(TextExpr, _Expression2);
 
@@ -624,13 +670,13 @@ var TextExpr = function (_Expression2) {
 
         _classCallCheck(this, TextExpr);
 
-        var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(TextExpr).call(this));
+        var _this8 = _possibleConstructorReturn(this, Object.getPrototypeOf(TextExpr).call(this));
 
-        _this7.text = txt;
-        _this7.font = font;
-        _this7.fontSize = fontSize; // in pixels
-        _this7.color = 'black';
-        return _this7;
+        _this8.text = txt;
+        _this8.font = font;
+        _this8.fontSize = fontSize; // in pixels
+        _this8.color = 'black';
+        return _this8;
     }
 
     _createClass(TextExpr, [{
@@ -684,14 +730,14 @@ var BooleanPrimitive = function (_Expression3) {
     function BooleanPrimitive(name) {
         _classCallCheck(this, BooleanPrimitive);
 
-        var _this8 = _possibleConstructorReturn(this, Object.getPrototypeOf(BooleanPrimitive).call(this));
+        var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf(BooleanPrimitive).call(this));
 
         var text = new TextExpr(name);
         text.pos = { x: 0, y: 0 };
         text.anchor = { x: -0.1, y: 1.5 }; // TODO: Fix this bug.
-        _this8.color = "HotPink";
-        _this8.addArg(text);
-        return _this8;
+        _this9.color = "HotPink";
+        _this9.addArg(text);
+        return _this9;
     }
 
     _createClass(BooleanPrimitive, [{
@@ -801,10 +847,10 @@ var IfStatement = function (_Expression5) {
         if_text.color = 'black';
         then_text.color = 'black';
 
-        var _this12 = _possibleConstructorReturn(this, Object.getPrototypeOf(IfStatement).call(this, [if_text, cond, then_text, branch]));
+        var _this13 = _possibleConstructorReturn(this, Object.getPrototypeOf(IfStatement).call(this, [if_text, cond, then_text, branch]));
 
-        _this12.color = 'LightBlue';
-        return _this12;
+        _this13.color = 'LightBlue';
+        return _this13;
     }
 
     _createClass(IfStatement, [{
@@ -825,15 +871,15 @@ var IfStatement = function (_Expression5) {
     }, {
         key: 'performReduction',
         value: function performReduction() {
-            var _this13 = this;
+            var _this14 = this;
 
             var reduction = this.reduce();
             if (reduction != this) {
                 (function () {
 
-                    var stage = _this13.stage;
+                    var stage = _this14.stage;
                     var afterEffects = function afterEffects() {
-                        _get(Object.getPrototypeOf(IfStatement.prototype), 'performReduction', _this13).call(_this13);
+                        _get(Object.getPrototypeOf(IfStatement.prototype), 'performReduction', _this14).call(_this14);
                         stage.update();
                         stage.draw();
                     };
@@ -897,12 +943,12 @@ var ArrowIfStatement = function (_IfStatement) {
     function ArrowIfStatement(cond, branch) {
         _classCallCheck(this, ArrowIfStatement);
 
-        var _this14 = _possibleConstructorReturn(this, Object.getPrototypeOf(ArrowIfStatement).call(this, cond, branch));
+        var _this15 = _possibleConstructorReturn(this, Object.getPrototypeOf(ArrowIfStatement).call(this, cond, branch));
 
         var arrow = new TextExpr('→');
         arrow.color = 'black';
-        _this14.holes = [cond, arrow, branch];
-        return _this14;
+        _this15.holes = [cond, arrow, branch];
+        return _this15;
     }
 
     _createClass(ArrowIfStatement, [{
@@ -926,13 +972,13 @@ var IfElseStatement = function (_IfStatement2) {
     function IfElseStatement(cond, branch, elseBranch) {
         _classCallCheck(this, IfElseStatement);
 
-        var _this15 = _possibleConstructorReturn(this, Object.getPrototypeOf(IfElseStatement).call(this, cond, branch));
+        var _this16 = _possibleConstructorReturn(this, Object.getPrototypeOf(IfElseStatement).call(this, cond, branch));
 
         var txt = new TextExpr('else');
         txt.color = 'black';
-        _this15.addArg(txt);
-        _this15.addArg(elseBranch);
-        return _this15;
+        _this16.addArg(txt);
+        _this16.addArg(elseBranch);
+        return _this16;
     }
 
     _createClass(IfElseStatement, [{
@@ -974,12 +1020,12 @@ var LockIfStatement = function (_IfStatement3) {
     function LockIfStatement(cond, branch) {
         _classCallCheck(this, LockIfStatement);
 
-        var _this16 = _possibleConstructorReturn(this, Object.getPrototypeOf(LockIfStatement).call(this, cond, branch));
+        var _this17 = _possibleConstructorReturn(this, Object.getPrototypeOf(LockIfStatement).call(this, cond, branch));
 
         var lock = new ImageExpr(0, 0, 56, 56, 'lock-icon');
         lock.lock();
-        _this16.holes = [cond, lock, branch];
-        return _this16;
+        _this17.holes = [cond, lock, branch];
+        return _this17;
     }
 
     _createClass(LockIfStatement, [{
@@ -1003,16 +1049,16 @@ var KeyTrueExpr = function (_TrueExpr) {
     function KeyTrueExpr() {
         _classCallCheck(this, KeyTrueExpr);
 
-        var _this17 = _possibleConstructorReturn(this, Object.getPrototypeOf(KeyTrueExpr).call(this));
+        var _this18 = _possibleConstructorReturn(this, Object.getPrototypeOf(KeyTrueExpr).call(this));
 
-        _this17.holes = [];
-        _this17.children = [];
+        _this18.holes = [];
+        _this18.children = [];
 
         var key = new ImageExpr(0, 0, 56, 28, 'key-icon');
         key.lock();
-        _this17.addArg(key);
-        _this17.graphicNode = key;
-        return _this17;
+        _this18.addArg(key);
+        _this18.graphicNode = key;
+        return _this18;
     }
 
     return KeyTrueExpr;
@@ -1024,16 +1070,16 @@ var KeyFalseExpr = function (_FalseExpr) {
     function KeyFalseExpr() {
         _classCallCheck(this, KeyFalseExpr);
 
-        var _this18 = _possibleConstructorReturn(this, Object.getPrototypeOf(KeyFalseExpr).call(this));
+        var _this19 = _possibleConstructorReturn(this, Object.getPrototypeOf(KeyFalseExpr).call(this));
 
-        _this18.holes = [];
-        _this18.children = [];
+        _this19.holes = [];
+        _this19.children = [];
 
         var key = new ImageExpr(0, 0, 56, 34, 'broken-key-icon');
         key.lock();
-        _this18.addArg(key);
-        _this18.graphicNode = key;
-        return _this18;
+        _this19.addArg(key);
+        _this19.graphicNode = key;
+        return _this19;
     }
 
     return KeyFalseExpr;
@@ -1066,12 +1112,12 @@ var CompareExpr = function (_Expression6) {
         var compare_text = new TextExpr(CompareExpr.textForFuncName(compareFuncName));
         compare_text.color = 'black';
 
-        var _this19 = _possibleConstructorReturn(this, Object.getPrototypeOf(CompareExpr).call(this, [b1, compare_text, b2]));
+        var _this20 = _possibleConstructorReturn(this, Object.getPrototypeOf(CompareExpr).call(this, [b1, compare_text, b2]));
 
-        _this19.funcName = compareFuncName;
-        _this19.color = "HotPink";
-        _this19.padding = { left: 20, inner: 10, right: 30 };
-        return _this19;
+        _this20.funcName = compareFuncName;
+        _this20.color = "HotPink";
+        _this20.padding = { left: 20, inner: 10, right: 30 };
+        return _this20;
     }
 
     _createClass(CompareExpr, [{
@@ -1089,7 +1135,7 @@ var CompareExpr = function (_Expression6) {
     }, {
         key: 'performReduction',
         value: function performReduction() {
-            var _this20 = this;
+            var _this21 = this;
 
             var animated = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
 
@@ -1097,7 +1143,7 @@ var CompareExpr = function (_Expression6) {
                 if (animated) {
                     var shatter = new ShatterExpressionEffect(this);
                     shatter.run(stage, function () {
-                        _get(Object.getPrototypeOf(CompareExpr.prototype), 'performReduction', _this20).call(_this20);
+                        _get(Object.getPrototypeOf(CompareExpr.prototype), 'performReduction', _this21).call(_this21);
                     }.bind(this));
                 } else _get(Object.getPrototypeOf(CompareExpr.prototype), 'performReduction', this).call(this);
             }
@@ -1168,10 +1214,10 @@ var FadedCompareExpr = function (_CompareExpr) {
 
         _classCallCheck(this, FadedCompareExpr);
 
-        var _this21 = _possibleConstructorReturn(this, Object.getPrototypeOf(FadedCompareExpr).call(this, b1, b2, compareFuncName));
+        var _this22 = _possibleConstructorReturn(this, Object.getPrototypeOf(FadedCompareExpr).call(this, b1, b2, compareFuncName));
 
-        _this21.holes[1].text = compareFuncName;
-        return _this21;
+        _this22.holes[1].text = compareFuncName;
+        return _this22;
     }
 
     return FadedCompareExpr;
@@ -1185,21 +1231,21 @@ var MirrorCompareExpr = function (_CompareExpr2) {
 
         _classCallCheck(this, MirrorCompareExpr);
 
-        var _this22 = _possibleConstructorReturn(this, Object.getPrototypeOf(MirrorCompareExpr).call(this, b1, b2, compareFuncName));
+        var _this23 = _possibleConstructorReturn(this, Object.getPrototypeOf(MirrorCompareExpr).call(this, b1, b2, compareFuncName));
 
-        _this22.children = [];
-        _this22.holes = [];
-        _this22.padding = { left: 20, inner: 0, right: 40 };
+        _this23.children = [];
+        _this23.holes = [];
+        _this23.padding = { left: 20, inner: 0, right: 40 };
 
-        _this22.addArg(b1);
+        _this23.addArg(b1);
 
         // Mirror graphic
         var mirror = new MirrorExpr(0, 0, 86, 86);
         mirror.exprInMirror = b2.clone();
-        _this22.addArg(mirror);
+        _this23.addArg(mirror);
 
-        _this22.addArg(b2);
-        return _this22;
+        _this23.addArg(b2);
+        return _this23;
     }
 
     _createClass(MirrorCompareExpr, [{
@@ -1228,13 +1274,13 @@ var MirrorCompareExpr = function (_CompareExpr2) {
     }, {
         key: 'performReduction',
         value: function performReduction() {
-            var _this23 = this;
+            var _this24 = this;
 
             if (this.reduce() != this) {
                 var stage = this.stage;
                 var shatter = new MirrorShatterEffect(this.mirror);
                 shatter.run(stage, function () {
-                    _get(Object.getPrototypeOf(MirrorCompareExpr.prototype), 'performReduction', _this23).call(_this23, false);
+                    _get(Object.getPrototypeOf(MirrorCompareExpr.prototype), 'performReduction', _this24).call(_this24, false);
                 }.bind(this));
             }
         }
@@ -1272,12 +1318,12 @@ var NumberExpr = function (_Expression7) {
     function NumberExpr(num) {
         _classCallCheck(this, NumberExpr);
 
-        var _this24 = _possibleConstructorReturn(this, Object.getPrototypeOf(NumberExpr).call(this, [new DiceNumber(num)]));
+        var _this25 = _possibleConstructorReturn(this, Object.getPrototypeOf(NumberExpr).call(this, [new DiceNumber(num)]));
 
-        _this24.number = num;
-        _this24.color = 'Ivory';
-        _this24.highlightColor = 'OrangeRed';
-        return _this24;
+        _this25.number = num;
+        _this25.color = 'Ivory';
+        _this25.highlightColor = 'OrangeRed';
+        return _this25;
     }
 
     _createClass(NumberExpr, [{
@@ -1334,13 +1380,13 @@ var DiceNumber = function (_Rect) {
 
         _classCallCheck(this, DiceNumber);
 
-        var _this25 = _possibleConstructorReturn(this, Object.getPrototypeOf(DiceNumber).call(this, 0, 0, 44, 44));
+        var _this26 = _possibleConstructorReturn(this, Object.getPrototypeOf(DiceNumber).call(this, 0, 0, 44, 44));
 
-        _this25.number = num;
-        _this25.circlePos = DiceNumber.drawPositionsFor(num);
-        _this25.radius = radius;
-        _this25.color = 'black';
-        return _this25;
+        _this26.number = num;
+        _this26.circlePos = DiceNumber.drawPositionsFor(num);
+        _this26.radius = radius;
+        _this26.color = 'black';
+        return _this26;
     }
 
     _createClass(DiceNumber, [{
@@ -1351,16 +1397,16 @@ var DiceNumber = function (_Rect) {
     }, {
         key: 'drawInternal',
         value: function drawInternal(pos, boundingSize) {
-            var _this26 = this;
+            var _this27 = this;
 
             if (this.circlePos && this.circlePos.length > 0) {
                 (function () {
 
-                    var ctx = _this26.ctx;
-                    var rad = _this26.radius * boundingSize.w / _this26.size.w;
-                    var fill = _this26.color;
-                    var stroke = _this26.stroke;
-                    _this26.circlePos.forEach(function (relpos) {
+                    var ctx = _this27.ctx;
+                    var rad = _this27.radius * boundingSize.w / _this27.size.w;
+                    var fill = _this27.color;
+                    var stroke = _this27.stroke;
+                    _this27.circlePos.forEach(function (relpos) {
                         var drawpos = { x: pos.x + boundingSize.w * relpos.x - rad, y: pos.y + boundingSize.h * relpos.y - rad };
                         drawCircle(ctx, drawpos.x, drawpos.y, rad, fill, stroke);
                     });
@@ -1386,10 +1432,10 @@ var VarExpr = function (_Expression8) {
     function VarExpr(graphic_node) {
         _classCallCheck(this, VarExpr);
 
-        var _this27 = _possibleConstructorReturn(this, Object.getPrototypeOf(VarExpr).call(this, [graphic_node]));
+        var _this28 = _possibleConstructorReturn(this, Object.getPrototypeOf(VarExpr).call(this, [graphic_node]));
 
-        _this27.color = 'gold';
-        return _this27;
+        _this28.color = 'gold';
+        return _this28;
     }
 
     _createClass(VarExpr, [{
@@ -1561,10 +1607,10 @@ var ImageExpr = function (_VarExpr6) {
     function ImageExpr(x, y, w, h, resource_key) {
         _classCallCheck(this, ImageExpr);
 
-        var _this33 = _possibleConstructorReturn(this, Object.getPrototypeOf(ImageExpr).call(this, new ImageRect(x, y, w, h, resource_key)));
+        var _this34 = _possibleConstructorReturn(this, Object.getPrototypeOf(ImageExpr).call(this, new ImageRect(x, y, w, h, resource_key)));
 
-        _this33._image = resource_key;
-        return _this33;
+        _this34._image = resource_key;
+        return _this34;
     }
 
     _createClass(ImageExpr, [{
@@ -1592,10 +1638,10 @@ var FunnelExpr = function (_ImageExpr) {
     function FunnelExpr(x, y, w, h) {
         _classCallCheck(this, FunnelExpr);
 
-        var _this34 = _possibleConstructorReturn(this, Object.getPrototypeOf(FunnelExpr).call(this, x, y, w, h, 'funnel'));
+        var _this35 = _possibleConstructorReturn(this, Object.getPrototypeOf(FunnelExpr).call(this, x, y, w, h, 'funnel'));
 
-        _this34.graphicNode.anchor = { x: 0, y: 0.5 };
-        return _this34;
+        _this35.graphicNode.anchor = { x: 0, y: 0.5 };
+        return _this35;
     }
 
     _createClass(FunnelExpr, [{
@@ -1680,13 +1726,13 @@ var MirrorExpr = function (_ImageExpr3) {
     function MirrorExpr(x, y, w, h) {
         _classCallCheck(this, MirrorExpr);
 
-        var _this36 = _possibleConstructorReturn(this, Object.getPrototypeOf(MirrorExpr).call(this, x, y, w, h, 'mirror-icon'));
+        var _this37 = _possibleConstructorReturn(this, Object.getPrototypeOf(MirrorExpr).call(this, x, y, w, h, 'mirror-icon'));
 
-        _this36.lock();
-        _this36.graphicNode.offset = { x: 0, y: -10 };
-        _this36.innerExpr = null;
-        _this36._broken = false;
-        return _this36;
+        _this37.lock();
+        _this37.graphicNode.offset = { x: 0, y: -10 };
+        _this37.innerExpr = null;
+        _this37._broken = false;
+        return _this37;
     }
 
     _createClass(MirrorExpr, [{
@@ -1748,10 +1794,10 @@ var PutExpr = function (_Expression9) {
         txt_put.color = 'black';
         txt_in.color = 'black';
 
-        var _this37 = _possibleConstructorReturn(this, Object.getPrototypeOf(PutExpr).call(this, [txt_put, item, txt_in, collection]));
+        var _this38 = _possibleConstructorReturn(this, Object.getPrototypeOf(PutExpr).call(this, [txt_put, item, txt_in, collection]));
 
-        _this37.color = 'violet';
-        return _this37;
+        _this38.color = 'violet';
+        return _this38;
     }
 
     _createClass(PutExpr, [{
@@ -1806,10 +1852,10 @@ var PopExpr = function (_Expression10) {
         var txt_pop = new TextExpr('pop');
         txt_pop.color = 'black';
 
-        var _this38 = _possibleConstructorReturn(this, Object.getPrototypeOf(PopExpr).call(this, [txt_pop, collection]));
+        var _this39 = _possibleConstructorReturn(this, Object.getPrototypeOf(PopExpr).call(this, [txt_pop, collection]));
 
-        _this38.color = 'violet';
-        return _this38;
+        _this39.color = 'violet';
+        return _this39;
     }
 
     _createClass(PopExpr, [{
@@ -1857,10 +1903,10 @@ var DefineExpr = function (_Expression11) {
         var txt_define = new TextExpr('define');
         txt_define.color = 'black';
 
-        var _this39 = _possibleConstructorReturn(this, Object.getPrototypeOf(DefineExpr).call(this, [txt_define, expr]));
+        var _this40 = _possibleConstructorReturn(this, Object.getPrototypeOf(DefineExpr).call(this, [txt_define, expr]));
 
-        _this39.color = 'OrangeRed';
-        return _this39;
+        _this40.color = 'OrangeRed';
+        return _this40;
     }
 
     _createClass(DefineExpr, [{
@@ -1931,15 +1977,15 @@ var NamedExpr = function (_Expression12) {
         for (var i = 0; i < args.length; i++) {
             exprs.push(args[i].clone());
         }
-        var _this40 = _possibleConstructorReturn(this, Object.getPrototypeOf(NamedExpr).call(this, exprs));
+        var _this41 = _possibleConstructorReturn(this, Object.getPrototypeOf(NamedExpr).call(this, exprs));
 
-        _this40.color = 'orange';
-        _this40.name = name;
-        _this40._args = args.map(function (a) {
+        _this41.color = 'orange';
+        _this41.name = name;
+        _this41._args = args.map(function (a) {
             return a.clone();
         });
-        _this40._wrapped_expr = expr;
-        return _this40;
+        _this41._wrapped_expr = expr;
+        return _this41;
     }
 
     _createClass(NamedExpr, [{
@@ -2036,30 +2082,30 @@ var BagExpr = function (_CollectionExpr) {
         //super(new Bag(x, y, w, h));
         var radius = (w + h) / 4.0;
 
-        var _this42 = _possibleConstructorReturn(this, Object.getPrototypeOf(BagExpr).call(this, new Bag(x, y, radius)));
+        var _this43 = _possibleConstructorReturn(this, Object.getPrototypeOf(BagExpr).call(this, new Bag(x, y, radius)));
 
-        _this42._items = holding;
-        _this42.bigScale = 4;
-        _this42.graphicNode.color = 'tan';
-        _this42.graphicNode.anchor = { x: 0.5, y: 0.5 };
+        _this43._items = holding;
+        _this43.bigScale = 4;
+        _this43.graphicNode.color = 'tan';
+        _this43.graphicNode.anchor = { x: 0.5, y: 0.5 };
         //this.graphicNode.clipChildren = true;
         //this.graphicNode.clipBackground = 'bag-background';
-        _this42.anchor = { x: 0.5, y: 0.5 };
-        return _this42;
+        _this43.anchor = { x: 0.5, y: 0.5 };
+        return _this43;
     }
 
     _createClass(BagExpr, [{
         key: 'arrangeNicely',
         value: function arrangeNicely() {
-            var _this43 = this;
+            var _this44 = this;
 
             var dotpos = DiceNumber.drawPositionsFor(this.items.length);
             if (dotpos.length > 0) {
                 (function () {
                     // Arrange items according to dot positions.
-                    var sz = _this43.graphicNode.size;
-                    var topsz = _this43.graphicNode.topSize(sz.w / 2.0);
-                    _this43.graphicNode.children.slice(1).forEach(function (e, idx) {
+                    var sz = _this44.graphicNode.size;
+                    var topsz = _this44.graphicNode.topSize(sz.w / 2.0);
+                    _this44.graphicNode.children.slice(1).forEach(function (e, idx) {
                         e.pos = { x: dotpos[idx].x * sz.w * 0.4 + topsz.w / 3.4, y: dotpos[idx].y * sz.h * 0.4 + topsz.h * 1.9 };
                     });
                 })();
@@ -2105,12 +2151,12 @@ var BagExpr = function (_CollectionExpr) {
     }, {
         key: 'popItem',
         value: function popItem() {
-            var _this44 = this;
+            var _this45 = this;
 
             var item = this._items.pop();
             this.graphicNode.removeAllItems();
             this._items.forEach(function (item) {
-                _this44.graphicNode.addItem(item);
+                _this45.graphicNode.addItem(item);
             });
             return item;
         }
@@ -2121,7 +2167,7 @@ var BagExpr = function (_CollectionExpr) {
     }, {
         key: 'map',
         value: function map(lambdaExpr) {
-            var _this45 = this;
+            var _this46 = this;
 
             if (!(lambdaExpr instanceof LambdaExpr) || !lambdaExpr.takesArgument) {
                 console.error('@ BagExpr.applyFunc: Func expr does not take argument.');
@@ -2136,7 +2182,7 @@ var BagExpr = function (_CollectionExpr) {
                 var c = item.clone();
                 var pos = item.pos;
                 var func = lambdaExpr.clone();
-                _this45.stage.add(func);
+                _this46.stage.add(func);
                 func.update();
                 var new_funcs = func.applyExpr(c);
                 if (!Array.isArray(new_funcs)) new_funcs = [new_funcs];
@@ -2149,7 +2195,7 @@ var BagExpr = function (_CollectionExpr) {
                     for (var _iterator2 = new_funcs[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                         var new_func = _step2.value;
 
-                        _this45.stage.remove(new_func);
+                        _this46.stage.remove(new_func);
                         new_func.pos = pos;
                         new_func.unlockSubexpressions();
                         new_func.lockSubexpressions(function (expr) {
@@ -2181,7 +2227,7 @@ var BagExpr = function (_CollectionExpr) {
     }, {
         key: 'spill',
         value: function spill() {
-            var _this46 = this;
+            var _this47 = this;
 
             if (!this.stage) {
                 console.error('@ BagExpr.spill: Bag is not attached to a Stage.');
@@ -2203,7 +2249,7 @@ var BagExpr = function (_CollectionExpr) {
             items.forEach(function (item, index) {
                 item = item.clone();
                 var theta = index / items.length * Math.PI * 2;
-                var rad = _this46.size.w * 1.5;
+                var rad = _this47.size.w * 1.5;
                 var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
                 item.pos = pos;
                 Animate.tween(item, { 'pos': targetPos }, 100, function (elapsed) {
@@ -2211,7 +2257,7 @@ var BagExpr = function (_CollectionExpr) {
                 });
                 //item.pos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) });
                 item.parent = null;
-                _this46.graphicNode.removeItem(item);
+                _this47.graphicNode.removeItem(item);
                 item.scale = { x: 1, y: 1 };
                 stage.add(item);
             });
@@ -2326,14 +2372,14 @@ var BagExpr = function (_CollectionExpr) {
             return this._items.slice();
         },
         set: function set(items) {
-            var _this47 = this;
+            var _this48 = this;
 
             this._items.forEach(function (item) {
-                return _this47.graphicNode.removeItem(item);
+                return _this48.graphicNode.removeItem(item);
             });
             this._items = [];
             items.forEach(function (item) {
-                _this47.addItem(item);
+                _this48.addItem(item);
             });
         }
     }, {
@@ -2358,11 +2404,11 @@ var CountExpr = function (_Expression13) {
         }
         var txt = new TextExpr('count');
 
-        var _this48 = _possibleConstructorReturn(this, Object.getPrototypeOf(CountExpr).call(this, [txt, collectionExpr]));
+        var _this49 = _possibleConstructorReturn(this, Object.getPrototypeOf(CountExpr).call(this, [txt, collectionExpr]));
 
-        _this48.color = 'DarkTurquoise';
+        _this49.color = 'DarkTurquoise';
         txt.color = 'white';
-        return _this48;
+        return _this49;
     }
 
     _createClass(CountExpr, [{

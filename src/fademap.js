@@ -11,7 +11,7 @@ var ExprManager = (function() {
         'diamond':  [RectExpr],
         '_':        [MissingExpression],
         '__':       [MissingBagExpression],
-        '_b':       [MissingBooleanExpression],
+        '_b':       [MissingKeyExpression, MissingBooleanExpression],
         'true':     [KeyTrueExpr, TrueExpr],
         'false':    [KeyFalseExpr, FalseExpr],
         'cmp':      [MirrorCompareExpr, CompareExpr, FadedCompareExpr],
@@ -19,16 +19,17 @@ var ExprManager = (function() {
         '!=':       [MirrorCompareExpr, CompareExpr, FadedCompareExpr],
         'bag':      [BagExpr],
         'count':    [CountExpr],
-        'map':      [FunnelMapFunc, SimpleMapFunc, MapFunc, FadedMapFunc],
+        'map':      [FunnelMapFunc, SimpleMapFunc, FadedMapFunc],
         'reduce':   [ReduceFunc],
         'put':      [PutExpr],
         'pop':      [PopExpr],
         'define':   [DefineExpr],
         'var':      [LambdaVarExpr, FadedLambdaVarExpr],
-        'hole':     [LambdaHoleExpr, FadedLambdaHoleExpr]
+        'hole':     [LambdaHoleExpr, FadedLambdaHoleExpr],
+        'lambda':   [LambdaHoleExpr, FadedLambdaHoleExpr]
     };
     var fade_level = {};
-    var DEFAULT_FADE_LEVEL = 100;
+    var DEFAULT_FADE_LEVEL = 0;
 
     pub.getClass = (ename) => {
         if (ename in _FADE_MAP) {
@@ -41,6 +42,8 @@ var ExprManager = (function() {
     pub.getFadeLevel = (ename) => {
         if (ename in fade_level)
             return fade_level[ename];
+        else if ((ename === 'var' || ename === 'hole') && 'lambda' in fade_level)
+            return fade_level['lambda'];
         else if (DEFAULT_FADE_LEVEL >= pub.getNumOfFadeLevels(ename))
             return pub.getNumOfFadeLevels(ename) - 1;
         else
@@ -64,6 +67,12 @@ var ExprManager = (function() {
             index = pub.getNumOfFadeLevels(ename) - 1; // Set to max fade.
         }
         fade_level[ename] = index;
+    };
+    pub.setDefaultFadeLevel = (index) => {
+        if (index >= 0) DEFAULT_FADE_LEVEL = index;
+    };
+    pub.clearFadeLevels = () => {
+        fade_level = {};
     };
 
     return pub;
