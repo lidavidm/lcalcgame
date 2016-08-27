@@ -315,7 +315,10 @@ var Expression = function (_RoundedRect) {
     }, {
         key: 'onmousedrag',
         value: function onmousedrag(pos) {
+            if (this.ignoreEvents) return;
+
             _get(Object.getPrototypeOf(Expression.prototype), 'onmousedrag', this).call(this, pos);
+
             var rightX = pos.x + this.absoluteSize.w;
             //if (rightX < GLOBAL_DEFAULT_SCREENSIZE.width) { // Clipping to edges
             this.pos = pos;
@@ -1143,8 +1146,10 @@ var CompareExpr = function (_Expression6) {
                 if (animated) {
                     var shatter = new ShatterExpressionEffect(this);
                     shatter.run(stage, function () {
+                        _this21.ignoreEvents = false;
                         _get(Object.getPrototypeOf(CompareExpr.prototype), 'performReduction', _this21).call(_this21);
                     }.bind(this));
+                    this.ignoreEvents = true;
                 } else _get(Object.getPrototypeOf(CompareExpr.prototype), 'performReduction', this).call(this);
             }
         }
@@ -1158,8 +1163,9 @@ var CompareExpr = function (_Expression6) {
                 // Variables that are equal reduce to TRUE, regardless of whether they are bound!!
                 if (!lval && !rval && this.leftExpr instanceof LambdaVarExpr && this.rightExpr instanceof LambdaVarExpr) return this.leftExpr.name === this.rightExpr.name;
 
-                console.log('leftexpr', this.leftExpr.constructor.name, this.leftExpr instanceof LambdaVarExpr, lval);
-                console.log('rightexpr', this.rightExpr.constructor.name, rval);
+                //console.log('leftexpr', this.leftExpr.constructor.name, this.leftExpr instanceof LambdaVarExpr, lval);
+                //console.log('rightexpr', this.rightExpr.constructor.name, rval);
+
                 if (lval === undefined || rval === undefined) return undefined;else if (Array.isArray(lval) && Array.isArray(rval)) return setCompare(lval, rval, function (e, f) {
                     return e.toString() === f.toString();
                 });else return lval === rval;
@@ -1276,12 +1282,15 @@ var MirrorCompareExpr = function (_CompareExpr2) {
         value: function performReduction() {
             var _this24 = this;
 
-            if (this.reduce() != this) {
+            if (!this.isReducing && this.reduce() != this) {
                 var stage = this.stage;
                 var shatter = new MirrorShatterEffect(this.mirror);
                 shatter.run(stage, function () {
+                    _this24.ignoreEvents = false;
                     _get(Object.getPrototypeOf(MirrorCompareExpr.prototype), 'performReduction', _this24).call(_this24, false);
                 }.bind(this));
+                this.ignoreEvents = true;
+                this.isReducing = true;
             }
         }
     }, {
@@ -1769,7 +1778,6 @@ var MirrorExpr = function (_ImageExpr3) {
         key: 'broken',
         set: function set(b) {
             this._broken = b;
-            console.log(b);
             if (b) this.graphicNode.image = 'mirror-icon-broken';else this.graphicNode.image = 'mirror-icon';
         },
         get: function get() {

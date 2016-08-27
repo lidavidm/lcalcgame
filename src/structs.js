@@ -276,7 +276,10 @@ class Expression extends RoundedRect {
     }
 
     onmousedrag(pos) {
+        if (this.ignoreEvents) return;
+
         super.onmousedrag(pos);
+
         const rightX = pos.x + this.absoluteSize.w;
         //if (rightX < GLOBAL_DEFAULT_SCREENSIZE.width) { // Clipping to edges
             this.pos = pos;
@@ -717,8 +720,10 @@ class CompareExpr extends Expression {
             if (animated) {
                 var shatter = new ShatterExpressionEffect(this);
                 shatter.run(stage, (() => {
+                    this.ignoreEvents = false;
                     super.performReduction();
                 }).bind(this));
+                this.ignoreEvents = true;
             }
             else super.performReduction();
         }
@@ -732,8 +737,9 @@ class CompareExpr extends Expression {
             if (!lval && !rval && this.leftExpr instanceof LambdaVarExpr && this.rightExpr instanceof LambdaVarExpr)
                 return this.leftExpr.name === this.rightExpr.name;
 
-            console.log('leftexpr', this.leftExpr.constructor.name, this.leftExpr instanceof LambdaVarExpr, lval);
-            console.log('rightexpr', this.rightExpr.constructor.name, rval);
+            //console.log('leftexpr', this.leftExpr.constructor.name, this.leftExpr instanceof LambdaVarExpr, lval);
+            //console.log('rightexpr', this.rightExpr.constructor.name, rval);
+
             if (lval === undefined || rval === undefined)
                 return undefined;
             else if (Array.isArray(lval) && Array.isArray(rval))
@@ -819,12 +825,15 @@ class MirrorCompareExpr extends CompareExpr {
 
     // Animation effects
     performReduction() {
-        if (this.reduce() != this) {
+        if (!this.isReducing && this.reduce() != this) {
             var stage = this.stage;
             var shatter = new MirrorShatterEffect(this.mirror);
             shatter.run(stage, (() => {
+                this.ignoreEvents = false;
                 super.performReduction(false);
             }).bind(this));
+            this.ignoreEvents = true;
+            this.isReducing = true;
         }
     }
 }
@@ -1039,7 +1048,6 @@ class MirrorExpr extends ImageExpr {
     }
     set broken(b) {
         this._broken = b;
-        console.log(b);
         if (b) this.graphicNode.image = 'mirror-icon-broken';
         else   this.graphicNode.image = 'mirror-icon';
     }

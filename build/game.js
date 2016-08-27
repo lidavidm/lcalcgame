@@ -87,7 +87,6 @@ var Level = function () {
                     stage.add(item);
                     toolbox.addExpression(item, false);
                 });
-                console.log(toolbox);
             }
 
             stage.uiNodes = [btn_back, btn_reset, btn_next, toolbox];
@@ -396,7 +395,7 @@ var Level = function () {
 
             // Split string by top-level parentheses.
             var descs = splitParen(desc);
-            console.log('descs', descs);
+            //console.log('descs', descs);
 
             // Parse expressions recursively.
             var es = descs.map(function (expr_desc) {
@@ -405,7 +404,7 @@ var Level = function () {
             es = es.map(function (e) {
                 return e instanceof LambdaHoleExpr ? new LambdaExpr([e]) : e;
             });
-            console.log('exprs', es);
+            //console.log('exprs', es);
             return es;
         }
     }, {
@@ -465,12 +464,12 @@ var Level = function () {
             // If there are multiple arguments, parse them recursively, then compress into single expression.
             if (args.length > 1) {
 
-                console.log('parsing expr with multiple args', args, toplevel_lock);
+                //console.log('parsing expr with multiple args', args, toplevel_lock);
 
                 var exprs = args.map(function (arg) {
                     return Level.parseExpr(arg);
                 });
-                console.log(' >> inner exprs', exprs);
+                //console.log(' >> inner exprs', exprs);
                 if (Array.isArray(exprs[0])) {
                     // array of expressions
                     return lock(new Expression(exprs), toplevel_lock);
@@ -528,11 +527,11 @@ var Level = function () {
                         if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
                     } else if (args[0] in CompareExpr.operatorMap()) {
                         // op name is supported comparison operation like ==, !=, etc
-                        console.log('constructing comparator ' + args[0] + ' with exprs ', exprs.slice(1));
+                        //console.log('constructing comparator ' + args[0] + ' with exprs ', exprs.slice(1));
                         var es = exprs.slice(1);es.push(args[0]);
                         return lock(constructClassInstance(op_class, es), toplevel_lock); // pass the operator name to the comparator
                     } else {
-                            console.log(exprs);
+                            //console.log(exprs);
                             return lock(constructClassInstance(op_class, exprs.slice(1)), toplevel_lock); // (this is really generic, man)
                         }
                 }
@@ -543,7 +542,7 @@ var Level = function () {
             var locked = arg.indexOf(LOCK_MARKER) > -1 || toplevel_lock;
             arg = arg.replace(LOCK_MARKER, '');
             var e;
-            console.log('Handling single arg: ', arg);
+            //console.log('Handling single arg: ', arg);
 
             // Why can we do this? Because JS allows us to do .length on class names to check # of arguments.
             var op_mappings = {

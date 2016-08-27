@@ -128,7 +128,6 @@ class MirrorShatterEffect extends ImageExpr {
         //this.size = size;
         this.pos = pos;
         this.scale = mirrorToShatter.absoluteScale;
-        this.lock();
         this.opacity = 0.0;
         this.stroke = { color:'white', lineWidth:3 };
         this.color = 'white';
@@ -140,6 +139,9 @@ class MirrorShatterEffect extends ImageExpr {
             _this.fadeCb = afterFadeCb;
             _this.shatterCb = afterShatterCb;
             stage.add(_this);
+
+            this.lock();
+
             _this.fadeIn()
                 .then(_this.shatter.bind(this))
                 .then(() => {
@@ -151,6 +153,9 @@ class MirrorShatterEffect extends ImageExpr {
         };
     }
     get constructorArgs() { return [this._effectParent.clone()]; }
+    onmousedrag(pos) {
+        debugger;
+    }
 
     fadeIn() {
         var _this = this;
@@ -167,6 +172,7 @@ class MirrorShatterEffect extends ImageExpr {
         var _this = this;
         var stage = (_this.parent || _this.stage);
         _this.stroke = { color:'white', lineWidth:3 };
+        _this.ignoreEvents = true;
 
         if (this._effectParent.broken) {
 
@@ -174,6 +180,8 @@ class MirrorShatterEffect extends ImageExpr {
             var righthalf = _this.clone();
             lefthalf.graphicNode.image = 'mirror-icon-fade-false-lefthalf';
             righthalf.graphicNode.image = 'mirror-icon-fade-false-righthalf';
+            lefthalf.ignoreEvents = true;
+            righthalf.ignoreEvents = true;
             stage.add(lefthalf);
             stage.add(righthalf);
 

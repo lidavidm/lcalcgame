@@ -303,6 +303,7 @@ var Stage = function () {
                     if (!this.heldNodeOrigOffset) this.heldNodeOrigOffset = fromTo(pos, this.heldNode.absolutePos);
                     nodepos = addPos(pos, this.heldNodeOrigOffset);
                 }
+
                 this.heldNode.onmousedrag(nodepos);
 
                 // Check which node lies below the heldNode. If there is one,

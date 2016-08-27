@@ -287,7 +287,8 @@ class LambdaVarExpr extends ImageExpr {
             g.addState('opening', () => {
                 var anim = this.openingAnimation;
                 Animate.play(anim, this, () => {
-                    g.enter('open');
+                    if (g.currentState === 'opening')
+                        g.enter('open');
                 });
             });
             g.addState('open', () => {
@@ -296,7 +297,8 @@ class LambdaVarExpr extends ImageExpr {
             g.addState('closing', () => {
                 var anim = this.closingAnimation;
                 Animate.play(anim, this, () => {
-                    g.enter('closed');
+                    if (g.currentState === 'closing')
+                        g.enter('closed');
                 });
             });
             this._stateGraph = g;
@@ -314,17 +316,22 @@ class LambdaVarExpr extends ImageExpr {
         if (this.stateGraph.currentState !== 'open') {
             this.stateGraph.enter('opening');
 
+            let _this = this;
             let stage = this.stage;
 
+            console.log('@ open(): Called.');
+
             if(preview_expr) {
+                let stateGraph = this.stateGraph;
                 Animate.wait(140).after(() => {
-                    if (this.stateGraph.currentState === 'opening' || this.stateGraph.currentState === 'open') {
+                    if (stateGraph.currentState === 'opening' || stateGraph.currentState === 'open') {
+                        console.log('@ open(): ', stateGraph.currentState);
                         let scale = this.graphicNode.size.w / preview_expr.size.w * 0.8;
                         preview_expr.pos = { x:this.children[0].size.w/2.0, y:-10 };
                         preview_expr.scale = { x:scale, y:scale };
                         preview_expr.anchor = { x:0.5, y:0 };
                         preview_expr.stroke = null;
-                        this.graphicNode.addChild(preview_expr);
+                        _this.graphicNode.addChild(preview_expr);
                         stage.draw();
                     }
                 });
@@ -333,8 +340,12 @@ class LambdaVarExpr extends ImageExpr {
     }
     close() {
         if (this.stateGraph.currentState !== 'closed') {
+            let stage = this.stage;
             this.stateGraph.enter('closing');
             this.graphicNode.children = [];
+            stage.draw();
+
+            console.log('@ close(): ', this.stateGraph.currentState);
         }
     }
 

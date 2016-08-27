@@ -193,7 +193,6 @@ var MirrorShatterEffect = function (_ImageExpr) {
 
         _this4.pos = pos;
         _this4.scale = mirrorToShatter.absoluteScale;
-        _this4.lock();
         _this4.opacity = 0.0;
         _this4.stroke = { color: 'white', lineWidth: 3 };
         _this4.color = 'white';
@@ -205,6 +204,9 @@ var MirrorShatterEffect = function (_ImageExpr) {
             _this.fadeCb = afterFadeCb;
             _this.shatterCb = afterShatterCb;
             stage.add(_this);
+
+            _this4.lock();
+
             _this.fadeIn().then(_this.shatter.bind(_this4)).then(function () {
 
                 // .. //
@@ -215,6 +217,11 @@ var MirrorShatterEffect = function (_ImageExpr) {
     }
 
     _createClass(MirrorShatterEffect, [{
+        key: 'onmousedrag',
+        value: function onmousedrag(pos) {
+            debugger;
+        }
+    }, {
         key: 'fadeIn',
         value: function fadeIn() {
             var _this = this;
@@ -235,6 +242,7 @@ var MirrorShatterEffect = function (_ImageExpr) {
             var _this = this;
             var stage = _this.parent || _this.stage;
             _this.stroke = { color: 'white', lineWidth: 3 };
+            _this.ignoreEvents = true;
 
             if (this._effectParent.broken) {
 
@@ -242,6 +250,8 @@ var MirrorShatterEffect = function (_ImageExpr) {
                 var righthalf = _this.clone();
                 lefthalf.graphicNode.image = 'mirror-icon-fade-false-lefthalf';
                 righthalf.graphicNode.image = 'mirror-icon-fade-false-righthalf';
+                lefthalf.ignoreEvents = true;
+                righthalf.ignoreEvents = true;
                 stage.add(lefthalf);
                 stage.add(righthalf);
 
