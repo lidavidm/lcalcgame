@@ -171,9 +171,12 @@ class Stage {
                         Animate.blink([node, goalNode], 2500 / 2.0 * blinkCount, [0, 1, 1], blinkCount).after(() => {
                             //Resource.play('shootwee');
 
+                            this.playerWon = true;
+
                             //Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x:200, y:300 }, () => {
                                 SplosionEffect.run(node);
                                 SplosionEffect.run(goalNode);
+
                                 console.log(goalNode);
                                 goalNode.parent.removeChild(goalNode);
                                 num_exploded++;
@@ -221,7 +224,12 @@ class Stage {
     }
     restoreState() {
         if (this.stateStack.length > 0) {
-            this.nodes = this.stateStack.pop();
+            //this.nodes = this.stateStack.pop();
+
+            this.expressionNodes().forEach((n) => this.remove(n));
+            let restored_nodes = this.stateStack.pop();
+            restored_nodes.forEach((n) => this.add(n));
+
             this.update();
             this.draw();
 
@@ -322,6 +330,11 @@ class Stage {
         }
     }
     onmouseclick(pos) {
+
+        // Let player click to continue.
+        if (this.playerWon)
+            next();
+
         if (this.heldNode) {
             this.heldNode.onmouseclick(pos);
         }

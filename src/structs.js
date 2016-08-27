@@ -66,6 +66,7 @@ class Expression extends RoundedRect {
         this.holes.push(arg);
         this.addChild(arg);
     }
+
     removeArg(arg) {
         var idx = this.holes.indexOf(arg);
         if (idx > -1) {
@@ -74,23 +75,31 @@ class Expression extends RoundedRect {
             //this.stage.draw();
         } else console.error('@ removeArg: Could not find arg ', arg, ' in expression.');
     }
+
     swap(arg, anotherArg) {
         if (!arg || anotherArg === undefined) return;
         var i = this.holes.indexOf(arg);
         if (i > -1) {
 
-            this.holes.splice(i, 1, anotherArg);
+            if (anotherArg === null) {
+                arg.detach();
+                this.holes[i]._size = { w:50, h:50 };
+                arg.stage.remove(arg);
+            } else {
 
-            if (anotherArg) {
-                anotherArg.pos = arg.pos;
-                anotherArg.dragging = false;
-                anotherArg.parent = this;
-                anotherArg.scale = { x:0.85, y:0.85 };
-                anotherArg.onmouseleave();
-                anotherArg.onmouseup();
+                this.holes.splice(i, 1, anotherArg);
+
+                if (anotherArg) {
+                    anotherArg.pos = arg.pos;
+                    anotherArg.dragging = false;
+                    anotherArg.parent = this;
+                    anotherArg.scale = { x:0.85, y:0.85 };
+                    anotherArg.onmouseleave();
+                    anotherArg.onmouseup();
+                }
+
+                arg.parent = null;
             }
-
-            arg.parent = null;
             this.update();
         }
         else console.log('Cannot swap: Argument ', arg, ' not found in parent.');
@@ -342,6 +351,11 @@ class MissingExpression extends Expression {
     ondropped(node, pos) {
         super.ondropped(node, pos);
         if (node.dragging) { // Reattach node.
+
+            // Should not be able to stick lambdas in MissingExpression holes (exception of Map)
+            if (node instanceof LambdaExpr && !(this.parent instanceof MapFunc))
+                return;
+
             Resource.play('pop');
             node.stage.remove(node);
             node.droppedInClass = this.getClass();
@@ -479,6 +493,8 @@ class TextExpr extends Expression {
             console.error('Cannot size text: No context.');
             return { w:4, h:this.fontSize };
         }
+        else if (this.manualWidth)
+            return { w:this.manualWidth, h:DEFAULT_EXPR_HEIGHT };
         ctx.font = this.contextFont;
         var measure = ctx.measureText(this.text);
         return { w:measure.width, h:DEFAULT_EXPR_HEIGHT };
@@ -906,7 +922,8 @@ class DiceNumber extends Rect {
 }
 
 // Wrapper class to make arbitrary nodes into draggable expressions.
-class VarExpr extends Expression {
+class VarExpr extends Expression { }
+class GraphicVarExpr extends VarExpr {
     constructor(graphic_node) {
         super([graphic_node]);
         this.color = 'gold';
@@ -945,37 +962,37 @@ class VarExpr extends Expression {
     }
     value() { return this.holes[0].value(); }
 }
-class StarExpr extends VarExpr {
+class StarExpr extends GraphicVarExpr {
     constructor(x, y, rad, pts=5) {
         super(new Star(x, y, rad, pts));
     }
     toString() { return 'star'; }
 }
-class CircleExpr extends VarExpr {
+class CircleExpr extends GraphicVarExpr {
     constructor(x, y, rad) {
         super(new Circle(x, y, rad));
     }
     toString() { return 'circle'; }
 }
-class PipeExpr extends VarExpr {
+class PipeExpr extends GraphicVarExpr {
     constructor(x, y, w, h) {
         super(new Pipe(x, y, w, h-12));
     }
     toString() { return 'pipe'; }
 }
-class TriangleExpr extends VarExpr {
+class TriangleExpr extends GraphicVarExpr {
     constructor(x, y, w, h) {
         super(new Triangle(x, y, w, h));
     }
     toString() { return 'triangle'; }
 }
-class RectExpr extends VarExpr {
+class RectExpr extends GraphicVarExpr {
     constructor(x, y, w, h) {
         super(new Rect(x, y, w, h));
     }
     toString() { return 'diamond'; }
 }
-class ImageExpr extends VarExpr {
+class ImageExpr extends GraphicVarExpr {
     constructor(x, y, w, h, resource_key) {
         super(new ImageRect(x, y, w, h, resource_key));
         this._image = resource_key;
@@ -1239,7 +1256,7 @@ class NamedExpr extends Expression {
     }
 }
 
-class CollectionExpr extends VarExpr { }
+class CollectionExpr extends GraphicVarExpr { }
 class BagExpr extends CollectionExpr {
     constructor(x, y, w, h, holding=[]) {
         //super(new Bag(x, y, w, h));
@@ -1247,10 +1264,15 @@ class BagExpr extends CollectionExpr {
         super(new Bag(x, y, radius));
         this._items = holding;
         this.bigScale = 4;
-        this.graphicNode.color = 'tan';
-        this.graphicNode.anchor = { x:0.5, y:0.5 };
+
+        if (this.graphicNode) {
+            this.graphicNode.color = 'tan';
+            this.graphicNode.anchor = { x:0.5, y:0.5 };
+        }
+
         //this.graphicNode.clipChildren = true;
         //this.graphicNode.clipBackground = 'bag-background';
+
         this.anchor = { x:0.5, y:0.5 };
     }
     get items() { return this._items.slice(); }
@@ -1296,8 +1318,6 @@ class BagExpr extends CollectionExpr {
 
         this.arrangeNicely();
 
-        //Resource.play('pop');
-        Resource.play('bag-addItem');
     }
 
     // Removes an item from the bag and returns it.
@@ -1335,7 +1355,7 @@ class BagExpr extends CollectionExpr {
                 this.stage.remove(new_func);
                 new_func.pos = pos;
                 new_func.unlockSubexpressions();
-                new_func.lockSubexpressions((expr) => (expr instanceof VarExpr || expr instanceof BooleanPrimitive)); // lock primitives
+                new_func.lockSubexpressions((expr) => (expr instanceof VarExpr || expr instanceof FadedVarExpr || expr instanceof BooleanPrimitive)); // lock primitives
                 bag.addItem(new_func);
             }
         });
@@ -1458,6 +1478,8 @@ class BagExpr extends CollectionExpr {
         let n = node.clone();
         n.pos.x = 100;//(n.absolutePos.x - this.graphicNode.absolutePos.x + this.graphicNode.absoluteSize.w / 2.0) / this.graphicNode.absoluteSize.w;
         this.addItem(n);
+
+        Resource.play('bag-addItem');
     }
 }
 

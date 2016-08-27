@@ -95,7 +95,9 @@
                     delete stage;
                 }
 
-                if(AnimationUpdateLoop) AnimationUpdateLoop.clear();
+                if(AnimationUpdateLoop) {
+                    AnimationUpdateLoop.clear();
+                }
 
                 GLOBAL_DEFAULT_CTX = canvas.getContext('2d');
                 GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();

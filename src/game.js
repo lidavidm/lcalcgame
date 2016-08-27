@@ -241,19 +241,21 @@ class Level {
                 else if (op_class instanceof BagExpr) {
                     let bag = op_class;
                     let sz = bag.graphicNode.size;
-                    let topsz = bag.graphicNode.topSize(sz.w / 2.0);
-                    for (let i = 1; i < exprs.length; i++) {
+                    let topsz = bag.graphicNode.topSize ? bag.graphicNode.topSize(sz.w / 2.0) : { w:0, h:0 };
+
+                    for (let i = 1; i < exprs.length; i++)
                         bag.addItem(exprs[i]);
-                    }
 
                     // Set start positions of bag items. If from 1 to 6, arrange like dice dots.
-                    let dotpos = DiceNumber.drawPositionsFor(exprs.length-1);
-                    if (dotpos.length > 0) { // Arrange items according to dot positions.
-                        bag.arrangeNicely();
-                    } else { // Arrange items randomly in bag.
-                        exprs.slice(1).forEach((e) => {
-                            e.pos = { x:(Math.random() + 0.4) * sz.w / 2.0, y:(Math.random() + 0.7) * sz.h / 2.0 };
-                        });
+                    if (op_class instanceof BracketArrayExpr) {
+                        let dotpos = DiceNumber.drawPositionsFor(exprs.length-1);
+                        if (dotpos.length > 0) { // Arrange items according to dot positions.
+                            bag.arrangeNicely();
+                        } else { // Arrange items randomly in bag.
+                            exprs.slice(1).forEach((e) => {
+                                e.pos = { x:(Math.random() + 0.4) * sz.w / 2.0, y:(Math.random() + 0.7) * sz.h / 2.0 };
+                            });
+                        }
                     }
 
                     return lock(bag, toplevel_lock);

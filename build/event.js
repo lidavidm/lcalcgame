@@ -182,9 +182,12 @@ var Stage = function () {
                                 Animate.blink([node, goalNode], 2500 / 2.0 * blinkCount, [0, 1, 1], blinkCount).after(function () {
                                     //Resource.play('shootwee');
 
+                                    _this3.playerWon = true;
+
                                     //Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x:200, y:300 }, () => {
                                     SplosionEffect.run(node);
                                     SplosionEffect.run(goalNode);
+
                                     console.log(goalNode);
                                     goalNode.parent.removeChild(goalNode);
                                     num_exploded++;
@@ -243,8 +246,19 @@ var Stage = function () {
     }, {
         key: 'restoreState',
         value: function restoreState() {
+            var _this4 = this;
+
             if (this.stateStack.length > 0) {
-                this.nodes = this.stateStack.pop();
+                //this.nodes = this.stateStack.pop();
+
+                this.expressionNodes().forEach(function (n) {
+                    return _this4.remove(n);
+                });
+                var restored_nodes = this.stateStack.pop();
+                restored_nodes.forEach(function (n) {
+                    return _this4.add(n);
+                });
+
                 this.update();
                 this.draw();
 
@@ -360,6 +374,10 @@ var Stage = function () {
     }, {
         key: 'onmouseclick',
         value: function onmouseclick(pos) {
+
+            // Let player click to continue.
+            if (this.playerWon) next();
+
             if (this.heldNode) {
                 this.heldNode.onmouseclick(pos);
             }
@@ -428,7 +446,7 @@ var Stage = function () {
         value: function getNodesWithClass(Class) {
             var excludedNodes = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
 
-            var _this4 = this;
+            var _this5 = this;
 
             var recursive = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
             var nodes = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
@@ -445,7 +463,7 @@ var Stage = function () {
                     return;
                 } else if (n instanceof Class) rt.push(n);
                 if (recursive && n.children.length > 0) {
-                    var childs = _this4.getNodesWithClass(Class, excludedNodes, true, n.children);
+                    var childs = _this5.getNodesWithClass(Class, excludedNodes, true, n.children);
                     childs.forEach(function (c) {
                         return rt.push(c);
                     });

@@ -320,3 +320,272 @@ var FunnelMapFunc = function (_MapFunc) {
 
     return FunnelMapFunc;
 }(MapFunc);
+
+var FadedVarExpr = function (_Expression) {
+    _inherits(FadedVarExpr, _Expression);
+
+    function FadedVarExpr(name) {
+        _classCallCheck(this, FadedVarExpr);
+
+        var txt = new TextExpr(name);
+
+        var _this8 = _possibleConstructorReturn(this, Object.getPrototypeOf(FadedVarExpr).call(this, [txt]));
+
+        txt.color = "OrangeRed";
+        _this8.color = "gold";
+        _this8.primitiveName = name;
+        return _this8;
+    }
+
+    _createClass(FadedVarExpr, [{
+        key: 'reduceCompletely',
+        value: function reduceCompletely() {
+            return this;
+        }
+    }, {
+        key: 'reduce',
+        value: function reduce() {
+            return this;
+        }
+    }, {
+        key: 'toString',
+        value: function toString() {
+            return this.primitiveName;
+        }
+    }, {
+        key: 'value',
+        value: function value() {
+            return this.toString();
+        }
+    }]);
+
+    return FadedVarExpr;
+}(Expression);
+
+var FadedStarExpr = function (_FadedVarExpr) {
+    _inherits(FadedStarExpr, _FadedVarExpr);
+
+    function FadedStarExpr() {
+        _classCallCheck(this, FadedStarExpr);
+
+        return _possibleConstructorReturn(this, Object.getPrototypeOf(FadedStarExpr).call(this, 'star'));
+    }
+
+    return FadedStarExpr;
+}(FadedVarExpr);
+
+var FadedRectExpr = function (_FadedVarExpr2) {
+    _inherits(FadedRectExpr, _FadedVarExpr2);
+
+    function FadedRectExpr() {
+        _classCallCheck(this, FadedRectExpr);
+
+        return _possibleConstructorReturn(this, Object.getPrototypeOf(FadedRectExpr).call(this, 'rect'));
+    }
+
+    return FadedRectExpr;
+}(FadedVarExpr);
+
+var FadedTriangleExpr = function (_FadedVarExpr3) {
+    _inherits(FadedTriangleExpr, _FadedVarExpr3);
+
+    function FadedTriangleExpr() {
+        _classCallCheck(this, FadedTriangleExpr);
+
+        return _possibleConstructorReturn(this, Object.getPrototypeOf(FadedTriangleExpr).call(this, 'triangle'));
+    }
+
+    return FadedTriangleExpr;
+}(FadedVarExpr);
+
+var FadedCircleExpr = function (_FadedVarExpr4) {
+    _inherits(FadedCircleExpr, _FadedVarExpr4);
+
+    function FadedCircleExpr() {
+        _classCallCheck(this, FadedCircleExpr);
+
+        return _possibleConstructorReturn(this, Object.getPrototypeOf(FadedCircleExpr).call(this, 'circle'));
+    }
+
+    return FadedCircleExpr;
+}(FadedVarExpr);
+
+var BracketArrayExpr = function (_BagExpr) {
+    _inherits(BracketArrayExpr, _BagExpr);
+
+    function BracketArrayExpr(x, y, w, h) {
+        var holding = arguments.length <= 4 || arguments[4] === undefined ? [] : arguments[4];
+
+        _classCallCheck(this, BracketArrayExpr);
+
+        var _this13 = _possibleConstructorReturn(this, Object.getPrototypeOf(BracketArrayExpr).call(this, x, y, w, h, holding));
+
+        _this13.holes = [];
+        _this13.children = [];
+
+        _this13.addArg(new Expression());
+
+        _this13._items = holding;
+
+        _this13.l_brak = new TextExpr('[');
+        _this13.r_brak = new TextExpr(']');
+        _this13.graphicNode.addArg(_this13.l_brak);
+        _this13.graphicNode.addArg(_this13.r_brak);
+
+        _this13.graphicNode.padding = { left: 10, inner: 0, right: 20 };
+        return _this13;
+    }
+
+    _createClass(BracketArrayExpr, [{
+        key: 'arrangeNicely',
+        value: function arrangeNicely() {}
+    }, {
+        key: 'addItem',
+
+
+        // Adds an item to the bag.
+        value: function addItem(item) {
+
+            item.onmouseleave();
+
+            item.lock();
+
+            this._items.push(item);
+
+            if (this._items.length > 1) {
+                var comma = new TextExpr(',');
+                this.graphicNode.holes.splice(this.graphicNode.holes.length - 1, 0, comma);
+            }
+
+            this.graphicNode.holes.splice(this.graphicNode.holes.length - 1, 0, item);
+
+            this.graphicNode.update();
+
+            console.log(this.graphicNode.children, this.graphicNode.children.length);
+        }
+
+        // Removes an item from the bag and returns it.
+
+    }, {
+        key: 'popItem',
+        value: function popItem() {
+            var item = this._items.pop();
+            this.graphicNode.removeArg(item);
+            return item;
+        }
+
+        // Spills the entire bag onto the play field.
+
+    }, {
+        key: 'spill',
+        value: function spill() {
+            var _this14 = this;
+
+            if (!this.stage) {
+                console.error('@ BagExpr.spill: Bag is not attached to a Stage.');
+                return;
+            } else if (this.parent) {
+                console.error('@ BagExpr.spill: Cannot spill a bag while it\'s inside of another expression.');
+                return;
+            }
+
+            var stage = this.stage;
+            var items = this.items;
+            var pos = this.pos;
+
+            // GAME DESIGN CHOICE:
+            // Remove the bag from the stage.
+            // stage.remove(this);
+
+            // Add back all of this bags' items to the stage.
+            items.forEach(function (item, index) {
+
+                item = item.clone();
+                var theta = index / items.length * Math.PI * 2;
+                var rad = _this14.size.h * 2.0;
+                var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
+                item.pos = pos;
+                Animate.tween(item, { 'pos': targetPos }, 100, function (elapsed) {
+                    return Math.pow(elapsed, 0.5);
+                });
+                //item.pos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) });
+                item.parent = null;
+                _this14.graphicNode.removeChild(item);
+                item.scale = { x: 1, y: 1 };
+                stage.add(item);
+            });
+
+            // Set the items in the bag back to nothing.
+            this.items = [];
+            this.graphicNode.holes = [this.l_brak, this.r_brak]; // just to be sure!
+            this.graphicNode.update();
+
+            // Play spill sfx
+            Resource.play('bag-spill');
+        }
+    }, {
+        key: 'ondropenter',
+        value: function ondropenter(node, pos) {
+
+            this.onmouseenter(pos);
+        }
+    }, {
+        key: 'ondropexit',
+        value: function ondropexit(node, pos) {
+
+            this.onmouseleave(pos);
+        }
+    }, {
+        key: 'ondropped',
+        value: function ondropped(node, pos) {
+            this.ondropexit(node, pos);
+
+            if (this.parent) return;
+
+            if (!(node instanceof Expression)) {
+                console.error('@ BagExpr.ondropped: Dropped node is not an Expression.', node);
+                return;
+            } else if (!node.stage) {
+                console.error('@ BagExpr.ondropped: Dropped node is not attached to a Stage.', node);
+                return;
+            } else if (node.parent) {
+                console.error('@ BagExpr.ondropped: Dropped node has a parent expression.', node);
+                return;
+            }
+
+            // Remove node from the stage:
+            var stage = node.stage;
+            stage.remove(node);
+
+            // Dump clone of node into the bag:
+            var n = node.clone();
+            this.addItem(n);
+
+            Resource.play('bag-addItem');
+        }
+    }, {
+        key: 'items',
+        get: function get() {
+            return this._items.slice();
+        },
+        set: function set(items) {
+            var _this15 = this;
+
+            this._items.forEach(function (item) {
+                return _this15.graphicNode.removeArg(item);
+            });
+            this.graphicNode.children = [this.l_brak, this.r_brak];
+            this._items = [];
+            items.forEach(function (item) {
+                _this15.addItem(item);
+            });
+        }
+    }, {
+        key: 'delegateToInner',
+        get: function get() {
+            return true;
+        }
+    }]);
+
+    return BracketArrayExpr;
+}(BagExpr);

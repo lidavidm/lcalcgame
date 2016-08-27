@@ -502,21 +502,22 @@ var Level = function () {
                         var _ret = function () {
                             var bag = op_class;
                             var sz = bag.graphicNode.size;
-                            var topsz = bag.graphicNode.topSize(sz.w / 2.0);
+                            var topsz = bag.graphicNode.topSize ? bag.graphicNode.topSize(sz.w / 2.0) : { w: 0, h: 0 };
+
                             for (var _i3 = 1; _i3 < exprs.length; _i3++) {
                                 bag.addItem(exprs[_i3]);
-                            }
-
-                            // Set start positions of bag items. If from 1 to 6, arrange like dice dots.
-                            var dotpos = DiceNumber.drawPositionsFor(exprs.length - 1);
-                            if (dotpos.length > 0) {
-                                // Arrange items according to dot positions.
-                                bag.arrangeNicely();
-                            } else {
-                                // Arrange items randomly in bag.
-                                exprs.slice(1).forEach(function (e) {
-                                    e.pos = { x: (Math.random() + 0.4) * sz.w / 2.0, y: (Math.random() + 0.7) * sz.h / 2.0 };
-                                });
+                            } // Set start positions of bag items. If from 1 to 6, arrange like dice dots.
+                            if (op_class instanceof BracketArrayExpr) {
+                                var dotpos = DiceNumber.drawPositionsFor(exprs.length - 1);
+                                if (dotpos.length > 0) {
+                                    // Arrange items according to dot positions.
+                                    bag.arrangeNicely();
+                                } else {
+                                    // Arrange items randomly in bag.
+                                    exprs.slice(1).forEach(function (e) {
+                                        e.pos = { x: (Math.random() + 0.4) * sz.w / 2.0, y: (Math.random() + 0.7) * sz.h / 2.0 };
+                                    });
+                                }
                             }
 
                             return {

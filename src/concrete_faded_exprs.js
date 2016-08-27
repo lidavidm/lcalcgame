@@ -181,3 +181,177 @@ class FunnelMapFunc extends MapFunc {
         this.holes[2] = bg;
     }
 }
+
+class FadedVarExpr extends Expression {
+    constructor(name) {
+        let txt = new TextExpr(name);
+        super([txt]);
+        txt.color = "OrangeRed";
+        this.color = "gold";
+        this.primitiveName = name;
+    }
+    reduceCompletely() { return this; }
+    reduce() { return this; }
+    toString() {
+        return this.primitiveName;
+    }
+    value() { return this.toString(); }
+}
+class FadedStarExpr extends FadedVarExpr {
+    constructor() { super('star'); }
+}
+class FadedRectExpr extends FadedVarExpr {
+    constructor() { super('rect'); }
+}
+class FadedTriangleExpr extends FadedVarExpr {
+    constructor() { super('triangle'); }
+}
+class FadedCircleExpr extends FadedVarExpr {
+    constructor() { super('circle'); }
+}
+
+
+
+
+
+class BracketArrayExpr extends BagExpr {
+    constructor(x, y, w, h, holding=[]) {
+        super(x, y, w, h, holding);
+
+        this.holes = [];
+        this.children = [];
+
+        this.addArg(new Expression());
+
+        this._items = holding;
+
+        this.l_brak = new TextExpr('[');
+        this.r_brak = new TextExpr(']');
+        this.graphicNode.addArg(this.l_brak);
+        this.graphicNode.addArg(this.r_brak);
+
+        this.graphicNode.padding = { left:10, inner:0, right:20 };
+    }
+    get items() { return this._items.slice(); }
+    set items(items) {
+        this._items.forEach((item) => this.graphicNode.removeArg(item));
+        this.graphicNode.children = [this.l_brak, this.r_brak];
+        this._items = [];
+        items.forEach((item) => {
+            this.addItem(item);
+        });
+    }
+    arrangeNicely() { }
+    get delegateToInner() { return true; }
+
+    // Adds an item to the bag.
+    addItem(item) {
+
+        item.onmouseleave();
+
+        item.lock();
+
+        this._items.push(item);
+
+        if (this._items.length > 1) {
+            let comma = new TextExpr(',');
+            this.graphicNode.holes.splice(this.graphicNode.holes.length-1, 0, comma);
+        }
+
+        this.graphicNode.holes.splice(this.graphicNode.holes.length-1, 0, item);
+
+
+        this.graphicNode.update();
+
+        console.log(this.graphicNode.children, this.graphicNode.children.length);
+
+    }
+
+    // Removes an item from the bag and returns it.
+    popItem() {
+        let item = this._items.pop();
+        this.graphicNode.removeArg(item);
+        return item;
+    }
+
+    // Spills the entire bag onto the play field.
+    spill() {
+
+        if (!this.stage) {
+            console.error('@ BagExpr.spill: Bag is not attached to a Stage.');
+            return;
+        } else if (this.parent) {
+            console.error('@ BagExpr.spill: Cannot spill a bag while it\'s inside of another expression.');
+            return;
+        }
+
+        let stage = this.stage;
+        let items = this.items;
+        let pos = this.pos;
+
+        // GAME DESIGN CHOICE:
+        // Remove the bag from the stage.
+        // stage.remove(this);
+
+        // Add back all of this bags' items to the stage.
+        items.forEach((item, index) => {
+
+            item = item.clone();
+            let theta = index / items.length * Math.PI * 2;
+            let rad = this.size.h * 2.0;
+            let targetPos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) } );
+            item.pos = pos;
+            Animate.tween(item, { 'pos':targetPos }, 100, (elapsed) => Math.pow(elapsed, 0.5));
+            //item.pos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) });
+            item.parent = null;
+            this.graphicNode.removeChild(item);
+            item.scale = { x:1, y:1 };
+            stage.add(item);
+        });
+
+        // Set the items in the bag back to nothing.
+        this.items = [];
+        this.graphicNode.holes = [this.l_brak, this.r_brak]; // just to be sure!
+        this.graphicNode.update();
+
+        // Play spill sfx
+        Resource.play('bag-spill');
+    }
+
+    ondropenter(node, pos) {
+
+        this.onmouseenter(pos);
+
+    }
+    ondropexit(node, pos) {
+
+        this.onmouseleave(pos);
+
+    }
+    ondropped(node, pos) {
+        this.ondropexit(node, pos);
+
+        if (this.parent) return;
+
+        if (!(node instanceof Expression)) {
+            console.error('@ BagExpr.ondropped: Dropped node is not an Expression.', node);
+            return;
+        } else if (!node.stage) {
+            console.error('@ BagExpr.ondropped: Dropped node is not attached to a Stage.', node);
+            return;
+        } else if (node.parent) {
+            console.error('@ BagExpr.ondropped: Dropped node has a parent expression.', node);
+            return;
+        }
+
+        // Remove node from the stage:
+        let stage = node.stage;
+        stage.remove(node);
+
+        // Dump clone of node into the bag:
+        let n = node.clone();
+        this.addItem(n);
+
+        Resource.play('bag-addItem');
+    }
+}
