@@ -21,7 +21,7 @@ class Animate {
                 if(n.stage) n.stage.draw();
             }, dur).after(() => {
                 n.stroke = null;
-                n.stage.draw();
+                if(n.stage) n.stage.draw();
             });
             twn.run();
         });

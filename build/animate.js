@@ -46,7 +46,7 @@ var Animate = function () {
                     if (n.stage) n.stage.draw();
                 }, dur).after(function () {
                     n.stroke = null;
-                    n.stage.draw();
+                    if (n.stage) n.stage.draw();
                 });
                 twn.run();
             });

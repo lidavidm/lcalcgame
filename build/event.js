@@ -179,18 +179,19 @@ var Stage = function () {
                                 Resource.play('matching-goal');
 
                                 var blinkCount = level_idx === 0 ? 2 : 1;
-                                Animate.blink([node, goalNode], 3800 / 2.0 * blinkCount, [0, 1, 1], blinkCount).after(function () {
+                                Animate.blink([node, goalNode], 2500 / 2.0 * blinkCount, [0, 1, 1], blinkCount).after(function () {
                                     //Resource.play('shootwee');
 
-                                    Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x: 200, y: 300 }, function () {
-                                        SplosionEffect.run(node);
-                                        console.log(goalNode);
-                                        goalNode.parent.removeChild(goalNode);
-                                        num_exploded++;
-                                        if (num_exploded === pairs.length) {
-                                            Animate.wait(500).after(you_win);
-                                        }
-                                    });
+                                    //Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x:200, y:300 }, () => {
+                                    SplosionEffect.run(node);
+                                    SplosionEffect.run(goalNode);
+                                    console.log(goalNode);
+                                    goalNode.parent.removeChild(goalNode);
+                                    num_exploded++;
+                                    if (num_exploded === pairs.length) {
+                                        Animate.wait(500).after(you_win);
+                                    }
+                                    //});
                                 });
                             });
 
