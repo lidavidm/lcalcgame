@@ -179,6 +179,8 @@ class Expression extends RoundedRect {
 
             console.warn('performReduction with ', this, reduced_expr);
 
+            if (!this.stage) return;
+
             this.stage.saveState();
             Logger.log('state-save', this.stage.toString());
 
@@ -240,7 +242,9 @@ class Expression extends RoundedRect {
                 ghost_expr = new MissingExpression(this);
             var _this = this;
             var stage = this.parent.stage;
-            this.parent.swap(this, ghost_expr);
+            var parent = this.parent;
+            parent.swap(this, ghost_expr);
+            this.parent = null;
             stage.add(this);
             stage.bringToFront(this);
             this.shell = ghost_expr;
@@ -454,26 +458,11 @@ class MissingKeyExpression extends MissingBooleanExpression {
         var keyhole = new ImageRect(0, 0, 26/2, 42/2, 'lock-keyhole');
         this.graphicNode.addChild(keyhole);
 
-        var bluebg = new RoundedRect(0, 0, 25, 25);
-        bluebg.color = "#2484f5";
-        this._bg = bluebg;
-
-        var top = new ImageRect(0, 0, 112/2.0, 74/2.0, 'lock-top-locked');
-        this._top = top;
     }
     drawInternal(pos, boundingSize) {
-        this._bg.ctx = this.ctx;
-        //this._bg.stroke = this.graphicNode.stroke;
-        let bgsz = { w:boundingSize.w*1.3, h:boundingSize.h*1.3 };
-        let bgpos = addPos(pos, {x:-(bgsz.w-boundingSize.w)/2.0, y:-(bgsz.h-boundingSize.h)/2.0});
-        this._bg.drawInternal( bgpos, bgsz );
-
-        let topsz = this._top.size;
-        this._top.ctx = this.ctx;
-        this._top.drawInternal( addPos(bgpos, {x:bgsz.w / 2.0 - topsz.w/2.0, y:-topsz.h } ), topsz );
-
         super.drawInternal(pos, boundingSize);
 
+        // Draw keyhole.
         let sz = this.graphicNode.children[0].size;
         this.graphicNode.children[0].drawInternal( addPos(pos, { x:boundingSize.w/2.0-sz.w/2, y:boundingSize.h/2.0-sz.h/2 }), sz);
     }
@@ -591,6 +580,15 @@ class IfStatement extends Expression {
         else                            return this; // something's not reducable...
     }
 
+    playJimmyAnimation(onComplete) {
+        Resource.play('key-jiggle');
+        Animate.wait(Resource.getAudio('key-jiggle').duration * 1000).after(onComplete);
+    }
+    playUnlockAnimation(onComplete) {
+        Resource.play('key-unlock');
+        Animate.wait(860).after(onComplete);
+    }
+
     performReduction() {
         var reduction = this.reduce();
         if (reduction != this) {
@@ -602,14 +600,10 @@ class IfStatement extends Expression {
                 stage.draw();
             };
 
-            if (reduction === null) {
-                Resource.play('key-jiggle');
-                Animate.wait(Resource.getAudio('key-jiggle').duration * 1000).after(afterEffects);
-            }
-            else {
-                Resource.play('key-unlock');
-                Animate.wait(860).after(afterEffects);
-            }
+            if (reduction === null)
+                this.playJimmyAnimation(afterEffects);
+            else
+                this.playUnlockAnimation(afterEffects);
 
 
             //var shatter = new ShatterExpressionEffect(this);
@@ -668,12 +662,126 @@ class IfElseStatement extends IfStatement {
 class LockIfStatement extends IfStatement {
     constructor(cond, branch) {
         super(cond, branch);
+        this.holes = [ cond, branch ];
+
+        var bluebg = new RoundedRect(0, 0, 25, 25);
+        bluebg.color = "#2484f5";
+        this._bg = bluebg;
+
+        var top = new ImageRect(0, 0, 112/2.0, 74/2.0, 'lock-top-locked');
+        this._top = top;
+
+        var shinewrap = new PatternRect(0, 0, 24, 100, 'shinewrap');
+        shinewrap.opacity = 0.8;
+        this._shinewrap = shinewrap;
+    }
+    get cond() { return this.holes[0]; }
+    get branch() { return this.holes[1]; }
+
+    playJimmyAnimation(onComplete) {
+        Resource.play('key-jiggle');
+        Animate.wait(Resource.getAudio('key-jiggle').duration * 1000).after(onComplete);
+        if(this.stage) this.stage.draw();
+
+        let pos = this.pos;
+        Animate.tween(this, { 'pos':{x:pos.x+16, y:pos.y} }, 100 ).after(() => {
+            Animate.tween(this, { 'pos':{x:pos.x-16, y:pos.y} }, 100 ).after(() => {
+                Animate.tween(this, { 'pos':{x:pos.x, y:pos.y} }, 100 ).after(() => {
+                    Animate.wait(300).after(() => {
+                        this.opacity = 1.0;
+                        this._shinewrap.opacity = 0;
+                        Animate.tween(this, { 'opacity':0 }, 100 ).after(() => {
+                            this.opacity = 0;
+                            if (this.stage) {
+                                let stage = this.stage;
+                                stage.remove(this);
+                                stage.draw();
+                            }
+                        });
+                    });
+                });
+            });
+        });
+    }
+    playUnlockAnimation(onComplete) {
+        Resource.play('key-unlock');
+        Animate.wait(600).after(onComplete);
+
+        Animate.wait(200).after(() => {
+            this._top.image = 'lock-top-unlocked';
+            this._top.size = { w:this._top.size.w, h:128/2 };
+            this._shinewrap.opacity = 0;
+            if(this.stage) this.stage.draw();
+        });
+    }
+
+    drawInternal(pos, boundingSize) {
+        super.drawInternal(pos, boundingSize);
+
+        let ctx = this.ctx;
+        let condsz = this.cond.absoluteSize;
+
+        let bgsz = { w:condsz.w+14, h:condsz.h+16 };
+        let bgpos = addPos(pos, {x:-(bgsz.w-condsz.w)/2.0+this.cond.pos.x, y:-(bgsz.h-condsz.h)/2.0+3});
+        let topsz = this._top.size;
+        let wrapsz = { w:boundingSize.w - condsz.w, h:boundingSize.h };
+        let wrappos = { x:bgpos.x+bgsz.w, y:pos.y };
+
+        this._shinewrap.size = wrapsz;
+        this._shinewrap.pos = wrappos;
+
+        this._bg.ctx = ctx;
+        this._bg.stroke = this.stroke;
+        this._top.ctx = ctx;
+
+        this._bg.drawInternal( bgpos, bgsz );
+        this._top.drawInternal( addPos(bgpos, {x:bgsz.w / 2.0 - topsz.w/2.0, y:-topsz.h } ), topsz );
+    }
+    drawInternalAfterChildren(pos, boundingSize) {
+        let ctx = this.ctx;
+        this._shinewrap.ctx = ctx;
+
+        if ((!this.opacity || this.opacity > 0) && this._shinewrap.opacity > 0 && !(this.branch instanceof MissingExpression)) {
+            ctx.save();
+            roundRect(ctx,
+                      pos.x, pos.y,
+                      boundingSize.w, boundingSize.h,
+                      this.radius*this.absoluteScale.x, false, false);
+            ctx.clip();
+
+            ctx.globalCompositeOperation = "screen";
+            ctx.globalAlpha = this._shinewrap.opacity;
+            this._shinewrap.drawInternal( this._shinewrap.pos, this._shinewrap.size );
+            ctx.restore();
+        }
+    }
+}
+class InlineLockIfStatement extends IfStatement {
+    constructor(cond, branch) {
+        super(cond, branch);
         var lock = new ImageExpr(0, 0, 56, 56, 'lock-icon');
         lock.lock();
         this.holes = [ cond, lock, branch ];
     }
     get cond() { return this.holes[0]; }
     get branch() { return this.holes[2]; }
+    playJimmyAnimation(onComplete) {
+        super.playJimmyAnimation(onComplete);
+
+        this.opacity = 1.0;
+        Animate.tween(this, { 'opacity':0 }, 100 ).after(() => {
+            this.opacity = 0;
+            if (this.stage) {
+                let stage = this.stage;
+                stage.remove(this);
+                stage.draw();
+            }
+        });
+    }
+    playUnlockAnimation(onComplete) {
+        this.holes[1].image = 'lock-icon-unlocked';
+        super.playUnlockAnimation(onComplete);
+    }
 }
 class KeyTrueExpr extends TrueExpr {
     constructor() {
@@ -686,6 +794,14 @@ class KeyTrueExpr extends TrueExpr {
         this.addArg(key);
         this.graphicNode = key;
     }
+    onmouseclick(pos) {
+
+        // Clicking on the key in a lock (if statement) will act as if they clicked the if statement.
+        if (this.parent && this.parent instanceof IfStatement && this.parent.cond == this)
+            this.parent.onmouseclick(pos);
+        else
+            super.onmouseclick(pos);
+    }
 }
 class KeyFalseExpr extends FalseExpr {
     constructor() {
@@ -697,6 +813,14 @@ class KeyFalseExpr extends FalseExpr {
         key.lock();
         this.addArg(key);
         this.graphicNode = key;
+    }
+    onmouseclick(pos) {
+
+        // Clicking on the key in a lock (if statement) will act as if they clicked the if statement.
+        if (this.parent && this.parent instanceof IfStatement && this.parent.cond == this)
+            this.parent.onmouseclick(pos);
+        else
+            super.onmouseclick(pos);
     }
 }
 
@@ -862,7 +986,9 @@ class NumberExpr extends Expression {
         this.color = 'Ivory';
         this.highlightColor = 'OrangeRed';
     }
-    get constructorArgs() { return [this.number]; }
+    get constructorArgs() {
+        return [this.number];
+    }
     value() {
         return this.number;
     }
@@ -870,6 +996,7 @@ class NumberExpr extends Expression {
         return this.number.toString();
     }
 }
+
 // Draws the circles for a dice number inside its boundary.
 class DiceNumber extends Rect {
     static drawPositionsFor(num) {
@@ -1313,11 +1440,11 @@ class BagExpr extends CollectionExpr {
         item.anchor = { x:0.5, y:0.5 };
         item.scale = { x:scale, y:scale };
         item.onmouseleave();
+        item.toolbox = null;
         this._items.push(item);
         this.graphicNode.addItem(item);
 
         this.arrangeNicely();
-
     }
 
     // Removes an item from the bag and returns it.

@@ -158,6 +158,7 @@ class MapFunc extends FuncExpr {
                     stage.remove(this.bag);
                     return;
                 }
+                else this.bag.lock();
 
                 var bagAfterMap = this.reduce();
                 var popCount = bagAfterMap.items.length / this.bag.items.length; // in case ßthere was replication...ß

@@ -237,7 +237,7 @@ var FunnelMapFunc = function (_MapFunc) {
         _this6.addArg(funnel);
 
         // Bag.
-        bag.unlock();
+        //bag.unlock();
         _this6.addArg(bag);
         return _this6;
     }

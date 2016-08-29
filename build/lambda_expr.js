@@ -237,7 +237,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
                 if (node instanceof FunnelMapFunc) {
                     node.func = this.parent;
                     this.parent.parent = null;
-                    this.parent.stage = null;
+                    this.parent.stage.remove(this.parent);
                     this.onmouseleave();
                     this.parent.onmouseenter();
                     node.update();

@@ -206,6 +206,8 @@ var Expression = function (_RoundedRect) {
 
                 console.warn('performReduction with ', this, reduced_expr);
 
+                if (!this.stage) return;
+
                 this.stage.saveState();
                 Logger.log('state-save', this.stage.toString());
 
@@ -265,7 +267,9 @@ var Expression = function (_RoundedRect) {
                 if (this.droppedInClass) ghost_expr = new this.droppedInClass(this);else ghost_expr = new MissingExpression(this);
                 var _this = this;
                 var stage = this.parent.stage;
-                this.parent.swap(this, ghost_expr);
+                var parent = this.parent;
+                parent.swap(this, ghost_expr);
+                this.parent = null;
                 stage.add(this);
                 stage.bringToFront(this);
                 this.shell = ghost_expr;
@@ -643,30 +647,15 @@ var MissingKeyExpression = function (_MissingBooleanExpres) {
         var keyhole = new ImageRect(0, 0, 26 / 2, 42 / 2, 'lock-keyhole');
         _this7.graphicNode.addChild(keyhole);
 
-        var bluebg = new RoundedRect(0, 0, 25, 25);
-        bluebg.color = "#2484f5";
-        _this7._bg = bluebg;
-
-        var top = new ImageRect(0, 0, 112 / 2.0, 74 / 2.0, 'lock-top-locked');
-        _this7._top = top;
         return _this7;
     }
 
     _createClass(MissingKeyExpression, [{
         key: 'drawInternal',
         value: function drawInternal(pos, boundingSize) {
-            this._bg.ctx = this.ctx;
-            //this._bg.stroke = this.graphicNode.stroke;
-            var bgsz = { w: boundingSize.w * 1.3, h: boundingSize.h * 1.3 };
-            var bgpos = addPos(pos, { x: -(bgsz.w - boundingSize.w) / 2.0, y: -(bgsz.h - boundingSize.h) / 2.0 });
-            this._bg.drawInternal(bgpos, bgsz);
-
-            var topsz = this._top.size;
-            this._top.ctx = this.ctx;
-            this._top.drawInternal(addPos(bgpos, { x: bgsz.w / 2.0 - topsz.w / 2.0, y: -topsz.h }), topsz);
-
             _get(Object.getPrototypeOf(MissingKeyExpression.prototype), 'drawInternal', this).call(this, pos, boundingSize);
 
+            // Draw keyhole.
             var sz = this.graphicNode.children[0].size;
             this.graphicNode.children[0].drawInternal(addPos(pos, { x: boundingSize.w / 2.0 - sz.w / 2, y: boundingSize.h / 2.0 - sz.h / 2 }), sz);
         }
@@ -883,6 +872,18 @@ var IfStatement = function (_Expression5) {
                 else return this; // something's not reducable...
         }
     }, {
+        key: 'playJimmyAnimation',
+        value: function playJimmyAnimation(onComplete) {
+            Resource.play('key-jiggle');
+            Animate.wait(Resource.getAudio('key-jiggle').duration * 1000).after(onComplete);
+        }
+    }, {
+        key: 'playUnlockAnimation',
+        value: function playUnlockAnimation(onComplete) {
+            Resource.play('key-unlock');
+            Animate.wait(860).after(onComplete);
+        }
+    }, {
         key: 'performReduction',
         value: function performReduction() {
             var _this14 = this;
@@ -898,13 +899,7 @@ var IfStatement = function (_Expression5) {
                         stage.draw();
                     };
 
-                    if (reduction === null) {
-                        Resource.play('key-jiggle');
-                        Animate.wait(Resource.getAudio('key-jiggle').duration * 1000).after(afterEffects);
-                    } else {
-                        Resource.play('key-unlock');
-                        Animate.wait(860).after(afterEffects);
-                    }
+                    if (reduction === null) _this14.playJimmyAnimation(afterEffects);else _this14.playUnlockAnimation(afterEffects);
 
                     //var shatter = new ShatterExpressionEffect(this);
                     //shatter.run(stage, (() => {
@@ -1036,13 +1031,159 @@ var LockIfStatement = function (_IfStatement3) {
 
         var _this17 = _possibleConstructorReturn(this, Object.getPrototypeOf(LockIfStatement).call(this, cond, branch));
 
-        var lock = new ImageExpr(0, 0, 56, 56, 'lock-icon');
-        lock.lock();
-        _this17.holes = [cond, lock, branch];
+        _this17.holes = [cond, branch];
+
+        var bluebg = new RoundedRect(0, 0, 25, 25);
+        bluebg.color = "#2484f5";
+        _this17._bg = bluebg;
+
+        var top = new ImageRect(0, 0, 112 / 2.0, 74 / 2.0, 'lock-top-locked');
+        _this17._top = top;
+
+        var shinewrap = new PatternRect(0, 0, 24, 100, 'shinewrap');
+        shinewrap.opacity = 0.8;
+        _this17._shinewrap = shinewrap;
         return _this17;
     }
 
     _createClass(LockIfStatement, [{
+        key: 'playJimmyAnimation',
+        value: function playJimmyAnimation(onComplete) {
+            var _this18 = this;
+
+            Resource.play('key-jiggle');
+            Animate.wait(Resource.getAudio('key-jiggle').duration * 1000).after(onComplete);
+            if (this.stage) this.stage.draw();
+
+            var pos = this.pos;
+            Animate.tween(this, { 'pos': { x: pos.x + 16, y: pos.y } }, 100).after(function () {
+                Animate.tween(_this18, { 'pos': { x: pos.x - 16, y: pos.y } }, 100).after(function () {
+                    Animate.tween(_this18, { 'pos': { x: pos.x, y: pos.y } }, 100).after(function () {
+                        Animate.wait(300).after(function () {
+                            _this18.opacity = 1.0;
+                            _this18._shinewrap.opacity = 0;
+                            Animate.tween(_this18, { 'opacity': 0 }, 100).after(function () {
+                                _this18.opacity = 0;
+                                if (_this18.stage) {
+                                    var _stage = _this18.stage;
+                                    _stage.remove(_this18);
+                                    _stage.draw();
+                                }
+                            });
+                        });
+                    });
+                });
+            });
+        }
+    }, {
+        key: 'playUnlockAnimation',
+        value: function playUnlockAnimation(onComplete) {
+            var _this19 = this;
+
+            Resource.play('key-unlock');
+            Animate.wait(600).after(onComplete);
+
+            Animate.wait(200).after(function () {
+                _this19._top.image = 'lock-top-unlocked';
+                _this19._top.size = { w: _this19._top.size.w, h: 128 / 2 };
+                _this19._shinewrap.opacity = 0;
+                if (_this19.stage) _this19.stage.draw();
+            });
+        }
+    }, {
+        key: 'drawInternal',
+        value: function drawInternal(pos, boundingSize) {
+            _get(Object.getPrototypeOf(LockIfStatement.prototype), 'drawInternal', this).call(this, pos, boundingSize);
+
+            var ctx = this.ctx;
+            var condsz = this.cond.absoluteSize;
+
+            var bgsz = { w: condsz.w + 14, h: condsz.h + 16 };
+            var bgpos = addPos(pos, { x: -(bgsz.w - condsz.w) / 2.0 + this.cond.pos.x, y: -(bgsz.h - condsz.h) / 2.0 + 3 });
+            var topsz = this._top.size;
+            var wrapsz = { w: boundingSize.w - condsz.w, h: boundingSize.h };
+            var wrappos = { x: bgpos.x + bgsz.w, y: pos.y };
+
+            this._shinewrap.size = wrapsz;
+            this._shinewrap.pos = wrappos;
+
+            this._bg.ctx = ctx;
+            this._bg.stroke = this.stroke;
+            this._top.ctx = ctx;
+
+            this._bg.drawInternal(bgpos, bgsz);
+            this._top.drawInternal(addPos(bgpos, { x: bgsz.w / 2.0 - topsz.w / 2.0, y: -topsz.h }), topsz);
+        }
+    }, {
+        key: 'drawInternalAfterChildren',
+        value: function drawInternalAfterChildren(pos, boundingSize) {
+            var ctx = this.ctx;
+            this._shinewrap.ctx = ctx;
+
+            if ((!this.opacity || this.opacity > 0) && this._shinewrap.opacity > 0 && !(this.branch instanceof MissingExpression)) {
+                ctx.save();
+                roundRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, this.radius * this.absoluteScale.x, false, false);
+                ctx.clip();
+
+                ctx.globalCompositeOperation = "screen";
+                ctx.globalAlpha = this._shinewrap.opacity;
+                this._shinewrap.drawInternal(this._shinewrap.pos, this._shinewrap.size);
+                ctx.restore();
+            }
+        }
+    }, {
+        key: 'cond',
+        get: function get() {
+            return this.holes[0];
+        }
+    }, {
+        key: 'branch',
+        get: function get() {
+            return this.holes[1];
+        }
+    }]);
+
+    return LockIfStatement;
+}(IfStatement);
+
+var InlineLockIfStatement = function (_IfStatement4) {
+    _inherits(InlineLockIfStatement, _IfStatement4);
+
+    function InlineLockIfStatement(cond, branch) {
+        _classCallCheck(this, InlineLockIfStatement);
+
+        var _this20 = _possibleConstructorReturn(this, Object.getPrototypeOf(InlineLockIfStatement).call(this, cond, branch));
+
+        var lock = new ImageExpr(0, 0, 56, 56, 'lock-icon');
+        lock.lock();
+        _this20.holes = [cond, lock, branch];
+        return _this20;
+    }
+
+    _createClass(InlineLockIfStatement, [{
+        key: 'playJimmyAnimation',
+        value: function playJimmyAnimation(onComplete) {
+            var _this21 = this;
+
+            _get(Object.getPrototypeOf(InlineLockIfStatement.prototype), 'playJimmyAnimation', this).call(this, onComplete);
+
+            this.opacity = 1.0;
+            Animate.tween(this, { 'opacity': 0 }, 100).after(function () {
+                _this21.opacity = 0;
+                if (_this21.stage) {
+                    var _stage2 = _this21.stage;
+                    _stage2.remove(_this21);
+                    _stage2.draw();
+                }
+            });
+        }
+    }, {
+        key: 'playUnlockAnimation',
+        value: function playUnlockAnimation(onComplete) {
+            this.holes[1].image = 'lock-icon-unlocked';
+            _get(Object.getPrototypeOf(InlineLockIfStatement.prototype), 'playUnlockAnimation', this).call(this, onComplete);
+        }
+    }, {
         key: 'cond',
         get: function get() {
             return this.holes[0];
@@ -1054,7 +1195,7 @@ var LockIfStatement = function (_IfStatement3) {
         }
     }]);
 
-    return LockIfStatement;
+    return InlineLockIfStatement;
 }(IfStatement);
 
 var KeyTrueExpr = function (_TrueExpr) {
@@ -1063,17 +1204,26 @@ var KeyTrueExpr = function (_TrueExpr) {
     function KeyTrueExpr() {
         _classCallCheck(this, KeyTrueExpr);
 
-        var _this18 = _possibleConstructorReturn(this, Object.getPrototypeOf(KeyTrueExpr).call(this));
+        var _this22 = _possibleConstructorReturn(this, Object.getPrototypeOf(KeyTrueExpr).call(this));
 
-        _this18.holes = [];
-        _this18.children = [];
+        _this22.holes = [];
+        _this22.children = [];
 
         var key = new ImageExpr(0, 0, 56, 28, 'key-icon');
         key.lock();
-        _this18.addArg(key);
-        _this18.graphicNode = key;
-        return _this18;
+        _this22.addArg(key);
+        _this22.graphicNode = key;
+        return _this22;
     }
+
+    _createClass(KeyTrueExpr, [{
+        key: 'onmouseclick',
+        value: function onmouseclick(pos) {
+
+            // Clicking on the key in a lock (if statement) will act as if they clicked the if statement.
+            if (this.parent && this.parent instanceof IfStatement && this.parent.cond == this) this.parent.onmouseclick(pos);else _get(Object.getPrototypeOf(KeyTrueExpr.prototype), 'onmouseclick', this).call(this, pos);
+        }
+    }]);
 
     return KeyTrueExpr;
 }(TrueExpr);
@@ -1084,17 +1234,26 @@ var KeyFalseExpr = function (_FalseExpr) {
     function KeyFalseExpr() {
         _classCallCheck(this, KeyFalseExpr);
 
-        var _this19 = _possibleConstructorReturn(this, Object.getPrototypeOf(KeyFalseExpr).call(this));
+        var _this23 = _possibleConstructorReturn(this, Object.getPrototypeOf(KeyFalseExpr).call(this));
 
-        _this19.holes = [];
-        _this19.children = [];
+        _this23.holes = [];
+        _this23.children = [];
 
         var key = new ImageExpr(0, 0, 56, 34, 'broken-key-icon');
         key.lock();
-        _this19.addArg(key);
-        _this19.graphicNode = key;
-        return _this19;
+        _this23.addArg(key);
+        _this23.graphicNode = key;
+        return _this23;
     }
+
+    _createClass(KeyFalseExpr, [{
+        key: 'onmouseclick',
+        value: function onmouseclick(pos) {
+
+            // Clicking on the key in a lock (if statement) will act as if they clicked the if statement.
+            if (this.parent && this.parent instanceof IfStatement && this.parent.cond == this) this.parent.onmouseclick(pos);else _get(Object.getPrototypeOf(KeyFalseExpr.prototype), 'onmouseclick', this).call(this, pos);
+        }
+    }]);
 
     return KeyFalseExpr;
 }(FalseExpr);
@@ -1126,12 +1285,12 @@ var CompareExpr = function (_Expression6) {
         var compare_text = new TextExpr(CompareExpr.textForFuncName(compareFuncName));
         compare_text.color = 'black';
 
-        var _this20 = _possibleConstructorReturn(this, Object.getPrototypeOf(CompareExpr).call(this, [b1, compare_text, b2]));
+        var _this24 = _possibleConstructorReturn(this, Object.getPrototypeOf(CompareExpr).call(this, [b1, compare_text, b2]));
 
-        _this20.funcName = compareFuncName;
-        _this20.color = "HotPink";
-        _this20.padding = { left: 20, inner: 10, right: 30 };
-        return _this20;
+        _this24.funcName = compareFuncName;
+        _this24.color = "HotPink";
+        _this24.padding = { left: 20, inner: 10, right: 30 };
+        return _this24;
     }
 
     _createClass(CompareExpr, [{
@@ -1149,7 +1308,7 @@ var CompareExpr = function (_Expression6) {
     }, {
         key: 'performReduction',
         value: function performReduction() {
-            var _this21 = this;
+            var _this25 = this;
 
             var animated = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
 
@@ -1157,8 +1316,8 @@ var CompareExpr = function (_Expression6) {
                 if (animated) {
                     var shatter = new ShatterExpressionEffect(this);
                     shatter.run(stage, function () {
-                        _this21.ignoreEvents = false;
-                        _get(Object.getPrototypeOf(CompareExpr.prototype), 'performReduction', _this21).call(_this21);
+                        _this25.ignoreEvents = false;
+                        _get(Object.getPrototypeOf(CompareExpr.prototype), 'performReduction', _this25).call(_this25);
                     }.bind(this));
                     this.ignoreEvents = true;
                 } else _get(Object.getPrototypeOf(CompareExpr.prototype), 'performReduction', this).call(this);
@@ -1231,10 +1390,10 @@ var FadedCompareExpr = function (_CompareExpr) {
 
         _classCallCheck(this, FadedCompareExpr);
 
-        var _this22 = _possibleConstructorReturn(this, Object.getPrototypeOf(FadedCompareExpr).call(this, b1, b2, compareFuncName));
+        var _this26 = _possibleConstructorReturn(this, Object.getPrototypeOf(FadedCompareExpr).call(this, b1, b2, compareFuncName));
 
-        _this22.holes[1].text = compareFuncName;
-        return _this22;
+        _this26.holes[1].text = compareFuncName;
+        return _this26;
     }
 
     return FadedCompareExpr;
@@ -1248,21 +1407,21 @@ var MirrorCompareExpr = function (_CompareExpr2) {
 
         _classCallCheck(this, MirrorCompareExpr);
 
-        var _this23 = _possibleConstructorReturn(this, Object.getPrototypeOf(MirrorCompareExpr).call(this, b1, b2, compareFuncName));
+        var _this27 = _possibleConstructorReturn(this, Object.getPrototypeOf(MirrorCompareExpr).call(this, b1, b2, compareFuncName));
 
-        _this23.children = [];
-        _this23.holes = [];
-        _this23.padding = { left: 20, inner: 0, right: 40 };
+        _this27.children = [];
+        _this27.holes = [];
+        _this27.padding = { left: 20, inner: 0, right: 40 };
 
-        _this23.addArg(b1);
+        _this27.addArg(b1);
 
         // Mirror graphic
         var mirror = new MirrorExpr(0, 0, 86, 86);
         mirror.exprInMirror = b2.clone();
-        _this23.addArg(mirror);
+        _this27.addArg(mirror);
 
-        _this23.addArg(b2);
-        return _this23;
+        _this27.addArg(b2);
+        return _this27;
     }
 
     _createClass(MirrorCompareExpr, [{
@@ -1291,14 +1450,14 @@ var MirrorCompareExpr = function (_CompareExpr2) {
     }, {
         key: 'performReduction',
         value: function performReduction() {
-            var _this24 = this;
+            var _this28 = this;
 
             if (!this.isReducing && this.reduce() != this) {
                 var stage = this.stage;
                 var shatter = new MirrorShatterEffect(this.mirror);
                 shatter.run(stage, function () {
-                    _this24.ignoreEvents = false;
-                    _get(Object.getPrototypeOf(MirrorCompareExpr.prototype), 'performReduction', _this24).call(_this24, false);
+                    _this28.ignoreEvents = false;
+                    _get(Object.getPrototypeOf(MirrorCompareExpr.prototype), 'performReduction', _this28).call(_this28, false);
                 }.bind(this));
                 this.ignoreEvents = true;
                 this.isReducing = true;
@@ -1338,12 +1497,12 @@ var NumberExpr = function (_Expression7) {
     function NumberExpr(num) {
         _classCallCheck(this, NumberExpr);
 
-        var _this25 = _possibleConstructorReturn(this, Object.getPrototypeOf(NumberExpr).call(this, [new DiceNumber(num)]));
+        var _this29 = _possibleConstructorReturn(this, Object.getPrototypeOf(NumberExpr).call(this, [new DiceNumber(num)]));
 
-        _this25.number = num;
-        _this25.color = 'Ivory';
-        _this25.highlightColor = 'OrangeRed';
-        return _this25;
+        _this29.number = num;
+        _this29.color = 'Ivory';
+        _this29.highlightColor = 'OrangeRed';
+        return _this29;
     }
 
     _createClass(NumberExpr, [{
@@ -1365,6 +1524,7 @@ var NumberExpr = function (_Expression7) {
 
     return NumberExpr;
 }(Expression);
+
 // Draws the circles for a dice number inside its boundary.
 
 
@@ -1400,13 +1560,13 @@ var DiceNumber = function (_Rect) {
 
         _classCallCheck(this, DiceNumber);
 
-        var _this26 = _possibleConstructorReturn(this, Object.getPrototypeOf(DiceNumber).call(this, 0, 0, 44, 44));
+        var _this30 = _possibleConstructorReturn(this, Object.getPrototypeOf(DiceNumber).call(this, 0, 0, 44, 44));
 
-        _this26.number = num;
-        _this26.circlePos = DiceNumber.drawPositionsFor(num);
-        _this26.radius = radius;
-        _this26.color = 'black';
-        return _this26;
+        _this30.number = num;
+        _this30.circlePos = DiceNumber.drawPositionsFor(num);
+        _this30.radius = radius;
+        _this30.color = 'black';
+        return _this30;
     }
 
     _createClass(DiceNumber, [{
@@ -1417,16 +1577,16 @@ var DiceNumber = function (_Rect) {
     }, {
         key: 'drawInternal',
         value: function drawInternal(pos, boundingSize) {
-            var _this27 = this;
+            var _this31 = this;
 
             if (this.circlePos && this.circlePos.length > 0) {
                 (function () {
 
-                    var ctx = _this27.ctx;
-                    var rad = _this27.radius * boundingSize.w / _this27.size.w;
-                    var fill = _this27.color;
-                    var stroke = _this27.stroke;
-                    _this27.circlePos.forEach(function (relpos) {
+                    var ctx = _this31.ctx;
+                    var rad = _this31.radius * boundingSize.w / _this31.size.w;
+                    var fill = _this31.color;
+                    var stroke = _this31.stroke;
+                    _this31.circlePos.forEach(function (relpos) {
                         var drawpos = { x: pos.x + boundingSize.w * relpos.x - rad, y: pos.y + boundingSize.h * relpos.y - rad };
                         drawCircle(ctx, drawpos.x, drawpos.y, rad, fill, stroke);
                     });
@@ -1464,10 +1624,10 @@ var GraphicVarExpr = function (_VarExpr) {
     function GraphicVarExpr(graphic_node) {
         _classCallCheck(this, GraphicVarExpr);
 
-        var _this29 = _possibleConstructorReturn(this, Object.getPrototypeOf(GraphicVarExpr).call(this, [graphic_node]));
+        var _this33 = _possibleConstructorReturn(this, Object.getPrototypeOf(GraphicVarExpr).call(this, [graphic_node]));
 
-        _this29.color = 'gold';
-        return _this29;
+        _this33.color = 'gold';
+        return _this33;
     }
 
     _createClass(GraphicVarExpr, [{
@@ -1639,10 +1799,10 @@ var ImageExpr = function (_GraphicVarExpr6) {
     function ImageExpr(x, y, w, h, resource_key) {
         _classCallCheck(this, ImageExpr);
 
-        var _this35 = _possibleConstructorReturn(this, Object.getPrototypeOf(ImageExpr).call(this, new ImageRect(x, y, w, h, resource_key)));
+        var _this39 = _possibleConstructorReturn(this, Object.getPrototypeOf(ImageExpr).call(this, new ImageRect(x, y, w, h, resource_key)));
 
-        _this35._image = resource_key;
-        return _this35;
+        _this39._image = resource_key;
+        return _this39;
     }
 
     _createClass(ImageExpr, [{
@@ -1670,10 +1830,10 @@ var FunnelExpr = function (_ImageExpr) {
     function FunnelExpr(x, y, w, h) {
         _classCallCheck(this, FunnelExpr);
 
-        var _this36 = _possibleConstructorReturn(this, Object.getPrototypeOf(FunnelExpr).call(this, x, y, w, h, 'funnel'));
+        var _this40 = _possibleConstructorReturn(this, Object.getPrototypeOf(FunnelExpr).call(this, x, y, w, h, 'funnel'));
 
-        _this36.graphicNode.anchor = { x: 0, y: 0.5 };
-        return _this36;
+        _this40.graphicNode.anchor = { x: 0, y: 0.5 };
+        return _this40;
     }
 
     _createClass(FunnelExpr, [{
@@ -1758,13 +1918,13 @@ var MirrorExpr = function (_ImageExpr3) {
     function MirrorExpr(x, y, w, h) {
         _classCallCheck(this, MirrorExpr);
 
-        var _this38 = _possibleConstructorReturn(this, Object.getPrototypeOf(MirrorExpr).call(this, x, y, w, h, 'mirror-icon'));
+        var _this42 = _possibleConstructorReturn(this, Object.getPrototypeOf(MirrorExpr).call(this, x, y, w, h, 'mirror-icon'));
 
-        _this38.lock();
-        _this38.graphicNode.offset = { x: 0, y: -10 };
-        _this38.innerExpr = null;
-        _this38._broken = false;
-        return _this38;
+        _this42.lock();
+        _this42.graphicNode.offset = { x: 0, y: -10 };
+        _this42.innerExpr = null;
+        _this42._broken = false;
+        return _this42;
     }
 
     _createClass(MirrorExpr, [{
@@ -1825,10 +1985,10 @@ var PutExpr = function (_Expression9) {
         txt_put.color = 'black';
         txt_in.color = 'black';
 
-        var _this39 = _possibleConstructorReturn(this, Object.getPrototypeOf(PutExpr).call(this, [txt_put, item, txt_in, collection]));
+        var _this43 = _possibleConstructorReturn(this, Object.getPrototypeOf(PutExpr).call(this, [txt_put, item, txt_in, collection]));
 
-        _this39.color = 'violet';
-        return _this39;
+        _this43.color = 'violet';
+        return _this43;
     }
 
     _createClass(PutExpr, [{
@@ -1883,10 +2043,10 @@ var PopExpr = function (_Expression10) {
         var txt_pop = new TextExpr('pop');
         txt_pop.color = 'black';
 
-        var _this40 = _possibleConstructorReturn(this, Object.getPrototypeOf(PopExpr).call(this, [txt_pop, collection]));
+        var _this44 = _possibleConstructorReturn(this, Object.getPrototypeOf(PopExpr).call(this, [txt_pop, collection]));
 
-        _this40.color = 'violet';
-        return _this40;
+        _this44.color = 'violet';
+        return _this44;
     }
 
     _createClass(PopExpr, [{
@@ -1934,10 +2094,10 @@ var DefineExpr = function (_Expression11) {
         var txt_define = new TextExpr('define');
         txt_define.color = 'black';
 
-        var _this41 = _possibleConstructorReturn(this, Object.getPrototypeOf(DefineExpr).call(this, [txt_define, expr]));
+        var _this45 = _possibleConstructorReturn(this, Object.getPrototypeOf(DefineExpr).call(this, [txt_define, expr]));
 
-        _this41.color = 'OrangeRed';
-        return _this41;
+        _this45.color = 'OrangeRed';
+        return _this45;
     }
 
     _createClass(DefineExpr, [{
@@ -2008,15 +2168,15 @@ var NamedExpr = function (_Expression12) {
         for (var i = 0; i < args.length; i++) {
             exprs.push(args[i].clone());
         }
-        var _this42 = _possibleConstructorReturn(this, Object.getPrototypeOf(NamedExpr).call(this, exprs));
+        var _this46 = _possibleConstructorReturn(this, Object.getPrototypeOf(NamedExpr).call(this, exprs));
 
-        _this42.color = 'orange';
-        _this42.name = name;
-        _this42._args = args.map(function (a) {
+        _this46.color = 'orange';
+        _this46.name = name;
+        _this46._args = args.map(function (a) {
             return a.clone();
         });
-        _this42._wrapped_expr = expr;
-        return _this42;
+        _this46._wrapped_expr = expr;
+        return _this46;
     }
 
     _createClass(NamedExpr, [{
@@ -2113,35 +2273,35 @@ var BagExpr = function (_CollectionExpr) {
         //super(new Bag(x, y, w, h));
         var radius = (w + h) / 4.0;
 
-        var _this44 = _possibleConstructorReturn(this, Object.getPrototypeOf(BagExpr).call(this, new Bag(x, y, radius)));
+        var _this48 = _possibleConstructorReturn(this, Object.getPrototypeOf(BagExpr).call(this, new Bag(x, y, radius)));
 
-        _this44._items = holding;
-        _this44.bigScale = 4;
+        _this48._items = holding;
+        _this48.bigScale = 4;
 
-        if (_this44.graphicNode) {
-            _this44.graphicNode.color = 'tan';
-            _this44.graphicNode.anchor = { x: 0.5, y: 0.5 };
+        if (_this48.graphicNode) {
+            _this48.graphicNode.color = 'tan';
+            _this48.graphicNode.anchor = { x: 0.5, y: 0.5 };
         }
 
         //this.graphicNode.clipChildren = true;
         //this.graphicNode.clipBackground = 'bag-background';
 
-        _this44.anchor = { x: 0.5, y: 0.5 };
-        return _this44;
+        _this48.anchor = { x: 0.5, y: 0.5 };
+        return _this48;
     }
 
     _createClass(BagExpr, [{
         key: 'arrangeNicely',
         value: function arrangeNicely() {
-            var _this45 = this;
+            var _this49 = this;
 
             var dotpos = DiceNumber.drawPositionsFor(this.items.length);
             if (dotpos.length > 0) {
                 (function () {
                     // Arrange items according to dot positions.
-                    var sz = _this45.graphicNode.size;
-                    var topsz = _this45.graphicNode.topSize(sz.w / 2.0);
-                    _this45.graphicNode.children.slice(1).forEach(function (e, idx) {
+                    var sz = _this49.graphicNode.size;
+                    var topsz = _this49.graphicNode.topSize(sz.w / 2.0);
+                    _this49.graphicNode.children.slice(1).forEach(function (e, idx) {
                         e.pos = { x: dotpos[idx].x * sz.w * 0.4 + topsz.w / 3.4, y: dotpos[idx].y * sz.h * 0.4 + topsz.h * 1.9 };
                     });
                 })();
@@ -2173,6 +2333,7 @@ var BagExpr = function (_CollectionExpr) {
             item.anchor = { x: 0.5, y: 0.5 };
             item.scale = { x: scale, y: scale };
             item.onmouseleave();
+            item.toolbox = null;
             this._items.push(item);
             this.graphicNode.addItem(item);
 
@@ -2184,12 +2345,12 @@ var BagExpr = function (_CollectionExpr) {
     }, {
         key: 'popItem',
         value: function popItem() {
-            var _this46 = this;
+            var _this50 = this;
 
             var item = this._items.pop();
             this.graphicNode.removeAllItems();
             this._items.forEach(function (item) {
-                _this46.graphicNode.addItem(item);
+                _this50.graphicNode.addItem(item);
             });
             return item;
         }
@@ -2200,7 +2361,7 @@ var BagExpr = function (_CollectionExpr) {
     }, {
         key: 'map',
         value: function map(lambdaExpr) {
-            var _this47 = this;
+            var _this51 = this;
 
             if (!(lambdaExpr instanceof LambdaExpr) || !lambdaExpr.takesArgument) {
                 console.error('@ BagExpr.applyFunc: Func expr does not take argument.');
@@ -2215,7 +2376,7 @@ var BagExpr = function (_CollectionExpr) {
                 var c = item.clone();
                 var pos = item.pos;
                 var func = lambdaExpr.clone();
-                _this47.stage.add(func);
+                _this51.stage.add(func);
                 func.update();
                 var new_funcs = func.applyExpr(c);
                 if (!Array.isArray(new_funcs)) new_funcs = [new_funcs];
@@ -2228,7 +2389,7 @@ var BagExpr = function (_CollectionExpr) {
                     for (var _iterator2 = new_funcs[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                         var new_func = _step2.value;
 
-                        _this47.stage.remove(new_func);
+                        _this51.stage.remove(new_func);
                         new_func.pos = pos;
                         new_func.unlockSubexpressions();
                         new_func.lockSubexpressions(function (expr) {
@@ -2260,7 +2421,7 @@ var BagExpr = function (_CollectionExpr) {
     }, {
         key: 'spill',
         value: function spill() {
-            var _this48 = this;
+            var _this52 = this;
 
             if (!this.stage) {
                 console.error('@ BagExpr.spill: Bag is not attached to a Stage.');
@@ -2282,7 +2443,7 @@ var BagExpr = function (_CollectionExpr) {
             items.forEach(function (item, index) {
                 item = item.clone();
                 var theta = index / items.length * Math.PI * 2;
-                var rad = _this48.size.w * 1.5;
+                var rad = _this52.size.w * 1.5;
                 var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
                 item.pos = pos;
                 Animate.tween(item, { 'pos': targetPos }, 100, function (elapsed) {
@@ -2290,7 +2451,7 @@ var BagExpr = function (_CollectionExpr) {
                 });
                 //item.pos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) });
                 item.parent = null;
-                _this48.graphicNode.removeItem(item);
+                _this52.graphicNode.removeItem(item);
                 item.scale = { x: 1, y: 1 };
                 stage.add(item);
             });
@@ -2407,14 +2568,14 @@ var BagExpr = function (_CollectionExpr) {
             return this._items.slice();
         },
         set: function set(items) {
-            var _this49 = this;
+            var _this53 = this;
 
             this._items.forEach(function (item) {
-                return _this49.graphicNode.removeItem(item);
+                return _this53.graphicNode.removeItem(item);
             });
             this._items = [];
             items.forEach(function (item) {
-                _this49.addItem(item);
+                _this53.addItem(item);
             });
         }
     }, {
@@ -2439,11 +2600,11 @@ var CountExpr = function (_Expression13) {
         }
         var txt = new TextExpr('count');
 
-        var _this50 = _possibleConstructorReturn(this, Object.getPrototypeOf(CountExpr).call(this, [txt, collectionExpr]));
+        var _this54 = _possibleConstructorReturn(this, Object.getPrototypeOf(CountExpr).call(this, [txt, collectionExpr]));
 
-        _this50.color = 'DarkTurquoise';
+        _this54.color = 'DarkTurquoise';
         txt.color = 'white';
-        return _this50;
+        return _this54;
     }
 
     _createClass(CountExpr, [{

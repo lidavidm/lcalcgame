@@ -239,7 +239,7 @@ class _AnimationUpdateLoop {
         return this.tweens.indexOf(twn) > -1;
     }
     clear() {
-        this.tweens.forEach((tween) => tween.cancel());
+        this.tweens.forEach((tween) => tween.cancelWithoutFiringCallbacks());
         this.tweens = [];
         this.stopUpdateLoop();
     }
@@ -299,6 +299,10 @@ class Tween {
         else this.update(elapsed); // how much time has passed
     }
 
+    cancelWithoutFiringCallbacks() {
+        this.onComplete = [];
+        AnimationUpdateLoop.remove(this);
+    }
     cancel() {
         AnimationUpdateLoop.remove(this);
         if (this.onComplete.length > 0) {

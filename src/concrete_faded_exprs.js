@@ -122,7 +122,7 @@ class FunnelMapFunc extends MapFunc {
         this.addArg(funnel);
 
         // Bag.
-        bag.unlock();
+        //bag.unlock();
         this.addArg(bag);
     }
     update() {

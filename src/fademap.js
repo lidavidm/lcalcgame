@@ -2,7 +2,7 @@ var ExprManager = (function() {
     let pub = {};
 
     var _FADE_MAP = {
-        'if':       [LockIfStatement, IfStatement],
+        'if':       [LockIfStatement, InlineLockIfStatement, IfStatement],
         'ifelse':   [IfElseStatement],
         'triangle': [TriangleExpr, FadedTriangleExpr],
         'rect':     [RectExpr, FadedRectExpr],
@@ -11,7 +11,7 @@ var ExprManager = (function() {
         'diamond':  [RectExpr, FadedRectExpr],
         '_':        [MissingExpression],
         '__':       [MissingBagExpression],
-        '_b':       [MissingBooleanExpression],
+        '_b':       [MissingKeyExpression, MissingBooleanExpression],
         'true':     [KeyTrueExpr, TrueExpr],
         'false':    [KeyFalseExpr, FalseExpr],
         'cmp':      [MirrorCompareExpr, CompareExpr, FadedCompareExpr],
@@ -31,6 +31,16 @@ var ExprManager = (function() {
     var fade_level = {};
     var DEFAULT_FADE_LEVEL = 0;
 
+    var DEFAULT_FADE_PROGRESSION = {
+        'var'   : [[8, 42]],
+        'hole'  : [[8, 42]],
+        'if'    : [32],
+        '_b'    : [32],
+        '=='    : [21],
+        'true'  : [41],
+        'false' : [41]
+    };
+
     pub.getClass = (ename) => {
         if (ename in _FADE_MAP) {
             return _FADE_MAP[ename][pub.getFadeLevel(ename)];
@@ -43,7 +53,21 @@ var ExprManager = (function() {
         if (ename in fade_level)
             return fade_level[ename];
         else if ((ename === 'var' || ename === 'hole') && 'lambda' in fade_level)
-            return fade_level['lambda'];
+            return fade_level.lambda;
+        else if (ename in DEFAULT_FADE_PROGRESSION) {
+            let lvl_map = DEFAULT_FADE_PROGRESSION[ename];
+            let fadeclass_idx = 0;
+            for (let i = 0; i < lvl_map.length; i++) {
+                let range = lvl_map[i];
+                if (Array.isArray(range)) {
+                    if (level_idx >= range[0] && level_idx < range[1])
+                        fadeclass_idx = i + 1;
+                }
+                else if (level_idx >= range)
+                    fadeclass_idx = i + 1;
+            }
+            return fadeclass_idx;
+        }
         else if (DEFAULT_FADE_LEVEL >= pub.getNumOfFadeLevels(ename))
             return pub.getNumOfFadeLevels(ename) - 1;
         else

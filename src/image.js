@@ -14,6 +14,16 @@ class ImageRect extends Rect {
         this.ctx.drawImage(Resource.getImage(this.image), pos.x + this._offset.x, pos.y + this._offset.y, boundingSize.w, boundingSize.h);
     }
 }
+class PatternRect extends ImageRect {
+    drawInternal(pos, boundingSize) {
+        if (!this.ctx || !this.image) return;
+        this.ctx.save();
+        var ptrn = this.ctx.createPattern( Resource.getImage(this.image), 'repeat' );
+        this.ctx.fillStyle = ptrn;
+        this.ctx.fillRect(pos.x + this._offset.x, pos.y + this._offset.y, boundingSize.w, boundingSize.h);
+        this.ctx.restore();
+    }
+}
 
 class Button extends ImageRect {
     constructor(x, y, w, h, resource_map, onclick) {

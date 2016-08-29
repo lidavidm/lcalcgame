@@ -507,7 +507,7 @@ var Level = function () {
                             for (var _i3 = 1; _i3 < exprs.length; _i3++) {
                                 bag.addItem(exprs[_i3]);
                             } // Set start positions of bag items. If from 1 to 6, arrange like dice dots.
-                            if (op_class instanceof BracketArrayExpr) {
+                            if (!(op_class instanceof BracketArrayExpr)) {
                                 var dotpos = DiceNumber.drawPositionsFor(exprs.length - 1);
                                 if (dotpos.length > 0) {
                                     // Arrange items according to dot positions.
@@ -692,7 +692,8 @@ var Goal = function () {
 
             // TODO: Fix the need for this hack.
             if (exprs[0] instanceof BagExpr) {
-                exprs[0].pos = { x: 70, y: 50 };
+                //exprs[0].pos = { x:70, y:50 };
+                exprs[0].anchor = { x: 0, y: 0 };
             }
 
             exprs[0].ignoreEvents = true;

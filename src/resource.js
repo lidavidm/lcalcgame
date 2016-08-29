@@ -69,7 +69,7 @@ var Resource = (() => {
     loadAudio('splosion', 'firework1.wav');
     loadAudio('shootwee', 'firework-shooting.wav');
     loadAudio('key-jiggle', 'key-jiggle.wav');
-    loadAudio('key-unlock', 'key-unlock.wav');
+    loadAudio('key-unlock', 'key-unlock-fast.wav');
     loadAudio('victory', '325805__wagna__collect.wav');
     loadAudio('matching-goal', 'matching-the-goal2.wav');
 
@@ -89,10 +89,14 @@ var Resource = (() => {
     loadImage('null-circle', 'null1.png');
     loadImage('null-circle-highlight', 'null1-highlighted.png');
     loadImage('lock-icon', 'lock-icon.png');
+    loadImage('lock-icon-unlocked', 'lock-icon-unlocked.png');
     loadImage('key-icon', 'key-icon.png');
     loadImage('broken-key-icon', 'broken-key-icon.png');
     loadImage('lock-keyhole', 'lock-keyhole.png');
     loadImage('lock-top-locked', 'lock-top-locked.png');
+    loadImage('lock-top-unlocked', 'lock-top-unlocked.png');
+    loadImage('shinewrap', 'stripeshine-wrap.png');
+    loadImage('shinewrap-rightend', 'stripeshine-wrap-rightend.png');
     loadImage('mirror-icon', 'mirror.png');
     loadImage('mirror-icon-broken', 'mirror-broken.png');
     loadImage('mirror-icon-fade-true', 'mirror-fade-true.png');

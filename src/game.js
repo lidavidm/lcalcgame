@@ -247,7 +247,7 @@ class Level {
                         bag.addItem(exprs[i]);
 
                     // Set start positions of bag items. If from 1 to 6, arrange like dice dots.
-                    if (op_class instanceof BracketArrayExpr) {
+                    if (!(op_class instanceof BracketArrayExpr)) {
                         let dotpos = DiceNumber.drawPositionsFor(exprs.length-1);
                         if (dotpos.length > 0) { // Arrange items according to dot positions.
                             bag.arrangeNicely();
@@ -482,7 +482,8 @@ class Goal {
 
         // TODO: Fix the need for this hack.
         if (exprs[0] instanceof BagExpr) {
-            exprs[0].pos = { x:70, y:50 };
+            //exprs[0].pos = { x:70, y:50 };
+            exprs[0].anchor = { x:0, y:0 };
         }
 
         exprs[0].ignoreEvents = true;

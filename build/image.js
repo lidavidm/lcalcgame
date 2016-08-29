@@ -43,20 +43,44 @@ var ImageRect = function (_Rect) {
     return ImageRect;
 }(Rect);
 
-var Button = function (_ImageRect) {
-    _inherits(Button, _ImageRect);
+var PatternRect = function (_ImageRect) {
+    _inherits(PatternRect, _ImageRect);
+
+    function PatternRect() {
+        _classCallCheck(this, PatternRect);
+
+        return _possibleConstructorReturn(this, Object.getPrototypeOf(PatternRect).apply(this, arguments));
+    }
+
+    _createClass(PatternRect, [{
+        key: 'drawInternal',
+        value: function drawInternal(pos, boundingSize) {
+            if (!this.ctx || !this.image) return;
+            this.ctx.save();
+            var ptrn = this.ctx.createPattern(Resource.getImage(this.image), 'repeat');
+            this.ctx.fillStyle = ptrn;
+            this.ctx.fillRect(pos.x + this._offset.x, pos.y + this._offset.y, boundingSize.w, boundingSize.h);
+            this.ctx.restore();
+        }
+    }]);
+
+    return PatternRect;
+}(ImageRect);
+
+var Button = function (_ImageRect2) {
+    _inherits(Button, _ImageRect2);
 
     function Button(x, y, w, h, resource_map, onclick) {
         _classCallCheck(this, Button);
 
-        var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Button).call(this, x, y, w, h, resource_map.default));
+        var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(Button).call(this, x, y, w, h, resource_map.default));
         // where resource_map properties are:
         //  { default, hover (optional), down (opt.) }
 
 
-        _this2.images = resource_map;
-        _this2.clickFunc = onclick;
-        return _this2;
+        _this3.images = resource_map;
+        _this3.clickFunc = onclick;
+        return _this3;
     }
 
     _createClass(Button, [{

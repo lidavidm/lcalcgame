@@ -227,7 +227,7 @@ var MapFunc = function (_FuncExpr) {
                             return {
                                 v: void 0
                             };
-                        }
+                        } else _this4.bag.lock();
 
                         bagAfterMap = _this4.reduce();
                         popCount = bagAfterMap.items.length / _this4.bag.items.length; // in case ßthere was replication...ß

@@ -341,7 +341,7 @@ var _AnimationUpdateLoop = function () {
         key: 'clear',
         value: function clear() {
             this.tweens.forEach(function (tween) {
-                return tween.cancel();
+                return tween.cancelWithoutFiringCallbacks();
             });
             this.tweens = [];
             this.stopUpdateLoop();
@@ -423,6 +423,12 @@ var Tween = function () {
         value: function timeout() {
             var elapsed = Math.min((new Date().getTime() - this.startTimeMS) / this.dur, 1.0);
             if (elapsed >= 1.0) this.cancelCallback();else this.update(elapsed); // how much time has passed
+        }
+    }, {
+        key: 'cancelWithoutFiringCallbacks',
+        value: function cancelWithoutFiringCallbacks() {
+            this.onComplete = [];
+            AnimationUpdateLoop.remove(this);
         }
     }, {
         key: 'cancel',
