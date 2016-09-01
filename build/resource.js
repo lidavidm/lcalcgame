@@ -1,5 +1,7 @@
 'use strict';
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 // USAGE EXAMPLE: Resource.audio('pop');
 var Resource = function () {
 
@@ -423,7 +425,102 @@ var Resource = function () {
                     ExprManager.setFadeLevel(key, level_desc.fade[key]);
                 }
             }
-            return Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+
+            var fadedBorders = ExprManager.fadeBordersAt(level_idx);
+            if (fadedBorders.length > 0) {
+                var _ret = function () {
+
+                    ExprManager.fadesAtBorder = false;
+                    var unfaded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+                    ExprManager.fadesAtBorder = true;
+                    var faded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+
+                    var unfaded_exprs = unfaded.nodes;
+                    var faded_exprs = faded.nodes;
+
+                    if (unfaded_exprs.length !== faded_exprs.length) {
+                        console.error('Cannot execute fade animation at fade border: Node arrays of unequal length.');
+                        return {
+                            v: faded
+                        };
+                    }
+
+                    unfaded.invalidate();
+                    //faded.invalidate();
+
+                    var _iteratorNormalCompletion = true;
+                    var _didIteratorError = false;
+                    var _iteratorError = undefined;
+
+                    try {
+                        for (var _iterator = fadedBorders[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                            var border = _step.value;
+
+
+                            console.log(border);
+
+                            var unfaded_roots = unfaded.getRootNodesThatIncludeClass(border.unfadedClass);
+                            var faded_roots = faded.getRootNodesThatIncludeClass(border.fadedClass);
+
+                            if (unfaded_roots.length !== faded_roots.length) {
+                                console.error('Cannot fade border ', border, ': Different # of root expressions.', unfaded_roots, faded_roots);
+                                continue;
+                            }
+
+                            var _loop = function _loop(r) {
+                                var unfaded_root = unfaded_roots[r];
+                                var root = faded_roots[r];
+
+                                if (unfaded_root.fadingOut) return 'continue';
+
+                                unfaded_root.fadingOut = true;
+                                unfaded_root.opacity = 1.0;
+                                unfaded_root._stage = null;
+                                unfaded_root.pos = root.pos;
+                                faded.add(unfaded_root);
+                                root.opacity = 0;
+
+                                // Cross-fade old expression to new.
+                                root.ignoreEvents = true;
+                                unfaded_root.ignoreEvents = true;
+                                Animate.tween(root, { 'opacity': 1.0 }, 3000).after(function () {
+                                    root.ignoreEvents = false;
+                                });
+                                Animate.tween(unfaded_root, { 'opacity': 0.0 }, 2000).after(function () {
+                                    faded.remove(unfaded_root);
+                                });
+                            };
+
+                            for (var r = 0; r < faded_roots.length; r++) {
+                                var _ret2 = _loop(r);
+
+                                if (_ret2 === 'continue') continue;
+                            }
+                        }
+                    } catch (err) {
+                        _didIteratorError = true;
+                        _iteratorError = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion && _iterator.return) {
+                                _iterator.return();
+                            }
+                        } finally {
+                            if (_didIteratorError) {
+                                throw _iteratorError;
+                            }
+                        }
+                    }
+
+                    return {
+                        v: faded
+                    };
+                }();
+
+                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+            } else {
+                return Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+            }
         },
         level: levels,
         getChapters: function getChapters() {
@@ -437,27 +534,27 @@ var Resource = function () {
             });
         },
         getChapter: function getChapter(name) {
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
 
             try {
-                for (var _iterator = chapters[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var c = _step.value;
+                for (var _iterator2 = chapters[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var c = _step2.value;
 
                     if (c.name === name) return c;
                 }
             } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
                     }
                 } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
                     }
                 }
             }

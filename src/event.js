@@ -27,6 +27,12 @@ class Stage {
         var _this = this;
         nodes.forEach((n) => _this.add(n));
     }
+    getRootNodesThatIncludeClass(Class, excludedNodes=[]) {
+        console.log(Class);
+        let ns = this.getNodesWithClass(Class, excludedNodes);
+        let topns = ns.map((n) => n.rootParent);
+        return topns.filter((n) => !n.parent && n._stage !== undefined);
+    }
     getNodesWithClass(Class, excludedNodes=[], recursive=true, nodes=null) {
         if (!nodes) nodes = this.nodes;
         return Stage.getNodesWithClass(Class, excludedNodes, recursive, nodes);

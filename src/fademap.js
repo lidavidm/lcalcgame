@@ -32,8 +32,8 @@ var ExprManager = (function() {
     var DEFAULT_FADE_LEVEL = 0;
 
     var DEFAULT_FADE_PROGRESSION = {
-        'var'   : [[8, 34], 30, 39],
-        'hole'  : [[8, 34], 30, 39],
+        'var'   : [[8, 14], 30, 39],
+        'hole'  : [[8, 14], 30, 39],
         'if'    : [25, 42],
         '_b'    : [32],
         '=='    : [24],
@@ -43,6 +43,27 @@ var ExprManager = (function() {
         'primitives' : [58]
     };
     const primitives = ['triangle', 'rect', 'star', 'circle', 'diamond'];
+
+    pub.fadeBordersAt = (lvl) => {
+        let prog = DEFAULT_FADE_PROGRESSION;
+        let borders = [];
+        for (let t in prog) {
+            let ranges = prog[t];
+            for (let i = 0; i < ranges.length; i++) {
+                let r = ranges[i];
+                if (Array.isArray(r)) {
+                    if (r[0] === lvl)      borders.push( [t, i, i+1, true]  );
+                    else if (r[1] === lvl) borders.push( [t, i+1, i, false] );
+                } else if (r === lvl) {
+                    borders.push( [t, i, i+1, true] );
+                }
+            }
+        }
+        return borders.map((b) => ({ 'unfadedClass': _FADE_MAP[b[0]][b[1]],
+                                     'fadedClass':   _FADE_MAP[b[0]][b[2]],
+                                     'key':          b[0]                   }));
+    };
+    pub.fadesAtBorder = true;
 
     pub.getClass = (ename) => {
         if (ename in _FADE_MAP) {
@@ -70,9 +91,15 @@ var ExprManager = (function() {
             for (let i = 0; i < lvl_map.length; i++) {
                 let range = lvl_map[i];
                 if (Array.isArray(range)) {
-                    if (level_idx >= range[0] && level_idx < range[1])
-                        fadeclass_idx = i + 1;
+                    if (level_idx >= range[0] && level_idx < range[1]) {
+                        if (!pub.fadesAtBorder && level_idx === range[0])
+                            fadeclass_idx = i;
+                        else
+                            fadeclass_idx = i + 1;
+                    }
                 }
+                else if (!pub.fadesAtBorder && level_idx === range)
+                    fadeclass_idx = i;
                 else if (level_idx >= range)
                     fadeclass_idx = i + 1;
             }

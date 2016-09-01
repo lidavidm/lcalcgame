@@ -411,7 +411,68 @@ var Resource = (() => {
                     ExprManager.setFadeLevel(key, level_desc.fade[key]);
                 }
             }
-            return Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+
+            let fadedBorders = ExprManager.fadeBordersAt(level_idx);
+            if (fadedBorders.length > 0) {
+
+                ExprManager.fadesAtBorder = false;
+                let unfaded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+                ExprManager.fadesAtBorder = true;
+                let faded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+
+                let unfaded_exprs = unfaded.nodes;
+                let faded_exprs   = faded.nodes;
+
+                if (unfaded_exprs.length !== faded_exprs.length) {
+                    console.error('Cannot execute fade animation at fade border: Node arrays of unequal length.');
+                    return faded;
+                }
+
+                unfaded.invalidate();
+                //faded.invalidate();
+
+                for (let border of fadedBorders) {
+
+                    console.log(border);
+
+                    let unfaded_roots = unfaded.getRootNodesThatIncludeClass(border.unfadedClass);
+                    let faded_roots   = faded.getRootNodesThatIncludeClass(border.fadedClass);
+
+                    if (unfaded_roots.length !== faded_roots.length) {
+                        console.error('Cannot fade border ', border, ': Different # of root expressions.', unfaded_roots, faded_roots);
+                        continue;
+                    }
+
+                    for (let r = 0; r < faded_roots.length; r++) {
+                        let unfaded_root = unfaded_roots[r];
+                        let root = faded_roots[r];
+
+                        if (unfaded_root.fadingOut) continue;
+
+                        unfaded_root.fadingOut = true;
+                        unfaded_root.opacity = 1.0;
+                        unfaded_root._stage = null;
+                        unfaded_root.pos = root.pos;
+                        faded.add(unfaded_root);
+                        root.opacity = 0;
+
+                        // Cross-fade old expression to new.
+                        root.ignoreEvents = true;
+                        unfaded_root.ignoreEvents = true;
+                        Animate.tween(root, { 'opacity':1.0 }, 3000).after(() => {
+                            root.ignoreEvents = false;
+                        });
+                        Animate.tween(unfaded_root, { 'opacity':0.0 }, 2000).after(() => {
+                            faded.remove(unfaded_root);
+                        });
+                    }
+                }
+
+                return faded;
+            }
+            else {
+                return Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+            }
         },
         level:levels,
         getChapters:() => {

@@ -217,6 +217,11 @@ var Node = function () {
             this._stage = stg;
         }
     }, {
+        key: 'rootParent',
+        get: function get() {
+            if (this.parent) return this.parent.rootParent;else if (this._stage) return this;else return null;
+        }
+    }, {
         key: 'ctx',
         get: function get() {
             return this._ctx;
@@ -333,22 +338,27 @@ var Rect = function (_Node) {
             this.ctx.restore();
         }
     }, {
+        key: 'strokeRect',
+        value: function strokeRect(x, y, w, h) {
+            if (this.stroke) {
+                if (this.stroke.opacity && this.stroke.opacity < 1.0) {
+                    this.ctx.save();
+                    this.ctx.globalAlpha *= this.stroke.opacity;
+                    this.ctx.strokeRect(x, y, w, h);
+                    this.ctx.restore();
+                } else this.ctx.strokeRect(x, y, w, h);
+            }
+        }
+    }, {
         key: 'drawInternal',
         value: function drawInternal(pos, boundingSize) {
             setStrokeStyle(this.ctx, this.stroke);
             this.ctx.fillStyle = 'black';
             this.ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h + this.shadowOffset);
-            if (this.stroke) this.ctx.strokeRect(pos.x, pos.y, boundingSize.w, boundingSize.h + this.shadowOffset);
+            this.strokeRect(pos.x, pos.y, boundingSize.w, boundingSize.h + this.shadowOffset);
             this.ctx.fillStyle = this.color;
             this.ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
-            if (this.stroke) {
-                if (this.stroke.opacity && this.stroke.opacity < 1.0) {
-                    this.ctx.save();
-                    this.ctx.globalAlpha *= this.stroke.opacity;
-                    this.ctx.strokeRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
-                    this.ctx.restore();
-                } else this.ctx.strokeRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
-            }
+            this.strokeRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
         }
     }, {
         key: 'drawInternalAfterChildren',

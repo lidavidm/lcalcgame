@@ -38,6 +38,20 @@ var Stage = function () {
             });
         }
     }, {
+        key: 'getRootNodesThatIncludeClass',
+        value: function getRootNodesThatIncludeClass(Class) {
+            var excludedNodes = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+
+            console.log(Class);
+            var ns = this.getNodesWithClass(Class, excludedNodes);
+            var topns = ns.map(function (n) {
+                return n.rootParent;
+            });
+            return topns.filter(function (n) {
+                return !n.parent && n._stage !== undefined;
+            });
+        }
+    }, {
         key: 'getNodesWithClass',
         value: function getNodesWithClass(Class) {
             var excludedNodes = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];

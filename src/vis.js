@@ -9,6 +9,11 @@ class Node {
     }
     get stage() { if(!this._stage && this.parent) return this.parent.stage; else return this._stage; }
     set stage(stg) { this._stage = stg; }
+    get rootParent() {
+        if (this.parent) return this.parent.rootParent;
+        else if (this._stage) return this;
+        else return null;
+    }
     get ctx() { return this._ctx; }
     get pos() { return { x:this._pos.x, y:this._pos.y }; }
     get absolutePos() {
@@ -190,22 +195,25 @@ class Rect extends Node {
         if (this._color || this.stroke) this.drawInternalAfterChildren(upperLeftPos, boundingSize);
         this.ctx.restore();
     }
-    drawInternal(pos, boundingSize) {
-        setStrokeStyle(this.ctx, this.stroke);
-        this.ctx.fillStyle = 'black';
-        this.ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h+this.shadowOffset);
-        if(this.stroke) this.ctx.strokeRect(pos.x, pos.y, boundingSize.w, boundingSize.h+this.shadowOffset);
-        this.ctx.fillStyle = this.color;
-        this.ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+    strokeRect(x, y, w, h) {
         if(this.stroke) {
             if (this.stroke.opacity && this.stroke.opacity < 1.0) {
                 this.ctx.save();
                 this.ctx.globalAlpha *= this.stroke.opacity;
-                this.ctx.strokeRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+                this.ctx.strokeRect(x, y, w, h);
                 this.ctx.restore();
             }
-            else this.ctx.strokeRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+            else this.ctx.strokeRect(x, y, w, h);
         }
+    }
+    drawInternal(pos, boundingSize) {
+        setStrokeStyle(this.ctx, this.stroke);
+        this.ctx.fillStyle = 'black';
+        this.ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h+this.shadowOffset);
+        this.strokeRect(pos.x, pos.y, boundingSize.w, boundingSize.h+this.shadowOffset);
+        this.ctx.fillStyle = this.color;
+        this.ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+        this.strokeRect(pos.x, pos.y, boundingSize.w, boundingSize.h)
     }
     drawInternalAfterChildren(pos, boundingSize) { }
 
