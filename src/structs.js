@@ -197,6 +197,7 @@ class Expression extends RoundedRect {
             if (reduced_expr) reduced_expr.ignoreEvents = this.ignoreEvents; // the new expression should inherit whatever this expression was capable of as input
             parent.swap(this, reduced_expr);
 
+            // Check if parent expression is now reducable.
             if (reduced_expr && reduced_expr.parent) {
                 var try_reduce = reduced_expr.parent.reduceCompletely();
                 if (try_reduce != reduced_expr.parent && try_reduce !== null) {
@@ -381,8 +382,8 @@ class MissingExpression extends Expression {
 
             // Blink blue if reduction is possible with this config.
             var try_reduce = node.parent.reduceCompletely();
-            if (try_reduce != node.parent && try_reduce !== null) {
-                Animate.blink(node.parent, 400, [0,1,0]);
+            if (try_reduce != node.parent && try_reduce !== undefined) {
+                Animate.blink(node.parent, 1000, [1,1,0], 1);
             }
         }
     }
@@ -532,13 +533,15 @@ class BooleanPrimitive extends Expression {
             hexaRect(this.ctx,
                       pos.x, pos.y+this.shadowOffset,
                       boundingSize.w, boundingSize.h,
-                      true, this.stroke ? true : false); // just fill for now
+                      true, this.stroke ? true : false,
+                      this.stroke ? this.stroke.opacity : null);
         }
         this.ctx.fillStyle = this.color;
         hexaRect(this.ctx,
                   pos.x, pos.y,
                   boundingSize.w, boundingSize.h,
-                  true, this.stroke ? true : false); // just fill for now
+                  true, this.stroke ? true : false,
+                  this.stroke ? this.stroke.opacity : null);
     }
 }
 class TrueExpr extends BooleanPrimitive {
@@ -909,13 +912,15 @@ class CompareExpr extends Expression {
             hexaRect(this.ctx,
                       pos.x, pos.y+this.shadowOffset,
                       boundingSize.w, boundingSize.h,
-                      true, this.stroke ? true : false); // just fill for now
+                      true, this.stroke ? true : false,
+                      this.stroke ? this.stroke.opacity : null);
         }
         this.ctx.fillStyle = this.color;
         hexaRect(this.ctx,
                   pos.x, pos.y,
                   boundingSize.w, boundingSize.h,
-                  true, this.stroke ? true : false); // just fill for now
+                  true, this.stroke ? true : false,
+                  this.stroke ? this.stroke.opacity : null);
     }
 
     toString() {

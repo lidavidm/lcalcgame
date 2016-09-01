@@ -17,7 +17,11 @@ class Animate {
         nodes.forEach((n) => {
             var last_color = null;
             var twn = new Tween((elapsed) => {
-                n.stroke = { color: colorFrom255((Math.sin(2*blinkCount*elapsed*Math.PI*3/4)+1) * 255 / 2, colorWeights), lineWidth:4 };
+                let gray = (Math.sin(2*blinkCount*elapsed*Math.PI*3/4)+1) * 255 / 2;
+                let clr = colorFrom255(gray, colorWeights);
+                n.stroke = { color: clr,
+                             lineWidth:4,
+                             opacity:gray / 255 };
                 if(n.stage) n.stage.draw();
             }, dur).after(() => {
                 n.stroke = null;

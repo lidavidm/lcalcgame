@@ -341,7 +341,14 @@ var Rect = function (_Node) {
             if (this.stroke) this.ctx.strokeRect(pos.x, pos.y, boundingSize.w, boundingSize.h + this.shadowOffset);
             this.ctx.fillStyle = this.color;
             this.ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
-            if (this.stroke) this.ctx.strokeRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+            if (this.stroke) {
+                if (this.stroke.opacity && this.stroke.opacity < 1.0) {
+                    this.ctx.save();
+                    this.ctx.globalAlpha *= this.stroke.opacity;
+                    this.ctx.strokeRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+                    this.ctx.restore();
+                } else this.ctx.strokeRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+            }
         }
     }, {
         key: 'drawInternalAfterChildren',
@@ -543,10 +550,10 @@ var RoundedRect = function (_Rect) {
             this.ctx.fillStyle = 'black';
             setStrokeStyle(this.ctx, this.stroke);
             if (this.shadowOffset !== 0) {
-                roundRect(this.ctx, pos.x, pos.y + this.shadowOffset, boundingSize.w, boundingSize.h, this.radius * this.absoluteScale.x, true, this.stroke ? true : false); // just fill for now
+                roundRect(this.ctx, pos.x, pos.y + this.shadowOffset, boundingSize.w, boundingSize.h, this.radius * this.absoluteScale.x, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null); // just fill for now
             }
             this.ctx.fillStyle = this.color;
-            roundRect(this.ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, this.radius * this.absoluteScale.x, true, this.stroke ? true : false); // just fill for now
+            roundRect(this.ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, this.radius * this.absoluteScale.x, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null); // just fill for now
         }
     }]);
 
@@ -632,7 +639,7 @@ var Triangle = function (_Rect4) {
             ctx.lineTo(pos.x + boundingSize.w / 2.0, pos.y);
             ctx.closePath();
             ctx.fill();
-            if (this.stroke) ctx.stroke();
+            if (this.stroke) strokeWithOpacity(ctx, this.stroke.opacity);
         }
     }]);
 

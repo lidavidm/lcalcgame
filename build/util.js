@@ -112,6 +112,14 @@ function setStrokeStyle(ctx, stroke) {
         ctx.strokeStyle = stroke.color;
     }
 }
+function strokeWithOpacity(ctx, opacity) {
+    if (!opacity || opacity >= 1.0) ctx.stroke();else {
+        var a = ctx.globalAlpha;
+        ctx.globalAlpha = a * opacity;
+        ctx.stroke();
+        ctx.globalAlpha = a;
+    }
+}
 function colorFrom255(val) {
     var colorWeights = arguments.length <= 1 || arguments[1] === undefined ? [1, 1, 1] : arguments[1];
 
@@ -379,7 +387,7 @@ function deBruijn(s) {
  * @param {Boolean} [fill = false] Whether to fill the rectangle.
  * @param {Boolean} [stroke = true] Whether to stroke the rectangle.
  */
-function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+function roundRect(ctx, x, y, width, height, radius, fill, stroke, strokeOpacity) {
     if (typeof stroke == 'undefined') stroke = true;
     if (typeof radius === 'undefined') radius = 5;
     if (typeof radius === 'number') radius = { tl: radius, tr: radius, br: radius, bl: radius };else {
@@ -400,9 +408,9 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
     ctx.quadraticCurveTo(x, y, x + radius.tl, y);
     ctx.closePath();
     if (fill) ctx.fill();
-    if (stroke) ctx.stroke();
+    if (stroke) strokeWithOpacity(ctx, strokeOpacity);
 }
-function hexaRect(ctx, x, y, width, height, fill, stroke) {
+function hexaRect(ctx, x, y, width, height, fill, stroke, strokeOpacity) {
     if (typeof stroke == 'undefined') stroke = true;
     var h2 = height / 2.0;
     ctx.beginPath();
@@ -414,7 +422,7 @@ function hexaRect(ctx, x, y, width, height, fill, stroke) {
     ctx.lineTo(x, y + h2);
     ctx.closePath();
     if (fill) ctx.fill();
-    if (stroke) ctx.stroke();
+    if (stroke) strokeWithOpacity(ctx, strokeOpacity);
 }
 
 /** Thanks to markE @ SO: http://stackoverflow.com/a/25840319 */
@@ -444,8 +452,7 @@ function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius) {
     ctx.closePath();
     ctx.lineWidth = 5;
     if (strokeStyle) {
-        ctx.strokeStyle = strokeStyle;
-        ctx.stroke();
+        strokeWithOpacity(ctx, strokeStyle.opacity);
     }
     if (fillStyle) {
         ctx.fillStyle = fillStyle;
@@ -459,7 +466,7 @@ function drawCircle(ctx, x, y, rad, fill, stroke) {
     ctx.beginPath();
     ctx.arc(x + rad, y + rad, rad, 0, 2 * Math.PI);
     if (fill) ctx.fill();
-    if (stroke) ctx.stroke();
+    if (stroke) strokeWithOpacity(ctx, stroke.opacity);
 }
 
 /** Thanks to protonfish @ SO:
@@ -529,7 +536,7 @@ function drawBag(ctx, x, y, w, h, bagRadius, fill, stroke) {
 
     if (stroke) {
         setStrokeStyle(ctx, stroke);
-        ctx.stroke();
+        strokeWithOpacity(ctx, stroke.opacity);
     }
     if (fill) {
         ctx.fill();

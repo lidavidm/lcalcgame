@@ -42,7 +42,11 @@ var Animate = function () {
             nodes.forEach(function (n) {
                 var last_color = null;
                 var twn = new Tween(function (elapsed) {
-                    n.stroke = { color: colorFrom255((Math.sin(2 * blinkCount * elapsed * Math.PI * 3 / 4) + 1) * 255 / 2, colorWeights), lineWidth: 4 };
+                    var gray = (Math.sin(2 * blinkCount * elapsed * Math.PI * 3 / 4) + 1) * 255 / 2;
+                    var clr = colorFrom255(gray, colorWeights);
+                    n.stroke = { color: clr,
+                        lineWidth: 4,
+                        opacity: gray / 255 };
                     if (n.stage) n.stage.draw();
                 }, dur).after(function () {
                     n.stroke = null;

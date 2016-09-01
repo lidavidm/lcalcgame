@@ -36,7 +36,7 @@ var ExprManager = function () {
     var DEFAULT_FADE_PROGRESSION = {
         'var': [[8, 34], 30, 39],
         'hole': [[8, 34], 30, 39],
-        'if': [32, 42],
+        'if': [25, 42],
         '_b': [32],
         '==': [24],
         'true': [41],
