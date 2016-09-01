@@ -2,6 +2,10 @@ class FadedLambdaHoleExpr extends LambdaHoleExpr {
     get openImage() { return this.name === 'x' ? 'lambda-hole-x' : 'lambda-hole-y'; }
     get closedImage() { return this.name === 'x' ? 'lambda-hole-x-closed' : 'lambda-hole-y-closed'; }
 }
+class HalfFadedLambdaHoleExpr extends LambdaHoleExpr {
+    get openImage() { return this.name === 'x' ? 'lambda-hole-xside' : 'lambda-hole-y'; }
+    get closedImage() { return this.name === 'x' ? 'lambda-hole-xside-closed' : 'lambda-hole-y-closed'; }
+}
 class FadedPythonLambdaHoleExpr extends LambdaHoleExpr {
     get openImage() { return this.name === 'x' ? 'lambda-hole-x-python' : 'lambda-hole-y'; }
     get closedImage() { return this.name === 'x' ? 'lambda-hole-x-closed-python' : 'lambda-hole-y-closed'; }
@@ -10,6 +14,21 @@ class FadedPythonLambdaHoleExpr extends LambdaHoleExpr {
         sz.w = 120;
         return sz;
     }
+
+    // Draw special circle representing a hole.
+    drawInternal(pos, boundingSize) {
+        var ctx = this.ctx;
+        var rad = boundingSize.w / 2.0;
+        setStrokeStyle(ctx, this.stroke);
+        ctx.fillStyle = this.color;
+        ctx.drawImage(Resource.getImage(this.image), pos.x, pos.y, boundingSize.w, boundingSize.h);
+        if(this.stroke) roundRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, 6, false, true);
+    }
+}
+
+class HalfFadedLambdaVarExpr extends LambdaVarExpr {
+    get openImage() { return 'lambda-pipe-open'; }
+    get closedImage() { return this.name === 'x' ? 'lambda-pipe-xside-closed' : 'lambda-pipe-xside-closed'; }
 }
 
 class FadedLambdaVarExpr extends LambdaVarExpr {
@@ -19,8 +38,8 @@ class FadedLambdaVarExpr extends LambdaVarExpr {
         this.graphicNode.offset = this.name === 'x' ? { x:0, y:0 } : { x:0, y:2 };
         this.handleOffset = 2;
     }
-    get openImage() { 'lambda-pipe-x-open'; }
-    get closedImage() { return this.name === 'x' ? 'lambda-pipe-x' : 'lambda-pipe-y'; }
+    get openImage() { return 'lambda-pipe-x-open'; }
+    get closedImage() { return this.name === 'x' ? 'lambda-pipe-x' : 'lambda-pipe-x'; }
     get openingAnimation() {
         var anim = new Animation();
         anim.addFrame('lambda-pipe-x-opening0', 50);
@@ -231,6 +250,8 @@ class BracketArrayExpr extends BagExpr {
         this.graphicNode.addArg(this.r_brak);
 
         this.graphicNode.padding = { left:10, inner:0, right:20 };
+
+        //this.color = "tan";
     }
     get items() { return this._items.slice(); }
     set items(items) {

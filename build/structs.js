@@ -276,6 +276,7 @@ var Expression = function (_RoundedRect) {
             }
             if (this.toolbox) {
                 this.toolbox.removeExpression(this); // remove this expression from the toolbox
+                Logger.log('toolbox-dragout', this.toString());
             }
         }
     }, {
@@ -355,6 +356,13 @@ var Expression = function (_RoundedRect) {
             if (this.dragging) {
                 if (this.toolbox && !this.toolbox.hits(pos)) {
                     this.toolbox = null;
+
+                    Logger.log('toolbox-remove', this.toString());
+
+                    if (this.stage) {
+                        this.stage.saveState();
+                        Logger.log('state-save', this.stage.toString());
+                    }
                 }
             }
             //if (this.toolbox) this.toolbox = null;
@@ -2325,6 +2333,12 @@ var BagExpr = function (_CollectionExpr) {
 
         // Adds an item to the bag.
         value: function addItem(item) {
+
+            if (item.toolbox) {
+                item.detach();
+                item.toolbox = null;
+            }
+
             var scale = 1.0 / this.bigScale;
             var center = this.graphicNode.size.w / 2.0;
             var x = (item.pos.x - this.pos.x) / (1.0 / scale) + center + item.size.w / 2.0 * scale;
@@ -2332,10 +2346,10 @@ var BagExpr = function (_CollectionExpr) {
             item.pos = { x: x, y: y };
             item.anchor = { x: 0.5, y: 0.5 };
             item.scale = { x: scale, y: scale };
-            item.onmouseleave();
-            item.toolbox = null;
             this._items.push(item);
             this.graphicNode.addItem(item);
+
+            item.onmouseleave();
 
             this.arrangeNicely();
         }
@@ -2504,6 +2518,7 @@ var BagExpr = function (_CollectionExpr) {
 
             if (this._tween) this._tween.cancel();
             if (this.parent) return;
+            if (node instanceof FunnelMapFunc) return;
 
             if (this.stage) {
                 var _pos = this.pos;
@@ -2526,6 +2541,7 @@ var BagExpr = function (_CollectionExpr) {
         value: function ondropexit(node, pos) {
 
             if (this.parent) return;
+            if (node instanceof FunnelMapFunc) return;
 
             this._tween.cancel();
             this._tween = Animate.tween(this.graphicNode, { 'scale': this._beforeScale }, 100, function (elapsed) {
@@ -2539,6 +2555,7 @@ var BagExpr = function (_CollectionExpr) {
             this.ondropexit(node, pos);
 
             if (this.parent) return;
+            if (node instanceof FunnelMapFunc) return;
 
             if (!(node instanceof Expression)) {
                 console.error('@ BagExpr.ondropped: Dropped node is not an Expression.', node);
@@ -2557,8 +2574,18 @@ var BagExpr = function (_CollectionExpr) {
 
             // Dump clone of node into the bag:
             var n = node.clone();
+            var before_str = this.toString();
             n.pos.x = 100; //(n.absolutePos.x - this.graphicNode.absolutePos.x + this.graphicNode.absoluteSize.w / 2.0) / this.graphicNode.absoluteSize.w;
             this.addItem(n);
+
+            Logger.log('bag-add', { 'before': before_str, 'after': this.toString(), 'item': n.toString() });
+
+            if (this.stage) {
+                this.stage.saveState();
+                Logger.log('state-save', this.stage.toString());
+            } else {
+                console.warn('@ BagExpr.ondroppped: Item dropped into bag which is not member of a Stage.');
+            }
 
             Resource.play('bag-addItem');
         }

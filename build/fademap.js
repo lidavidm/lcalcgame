@@ -16,32 +16,35 @@ var ExprManager = function () {
         '_b': [MissingKeyExpression, MissingBooleanExpression],
         'true': [KeyTrueExpr, TrueExpr],
         'false': [KeyFalseExpr, FalseExpr],
-        'cmp': [MirrorCompareExpr, CompareExpr, FadedCompareExpr],
-        '==': [MirrorCompareExpr, CompareExpr, FadedCompareExpr],
-        '!=': [MirrorCompareExpr, CompareExpr, FadedCompareExpr],
+        'cmp': [MirrorCompareExpr, FadedCompareExpr],
+        '==': [MirrorCompareExpr, FadedCompareExpr],
+        '!=': [MirrorCompareExpr, FadedCompareExpr],
         'bag': [BagExpr, BracketArrayExpr],
         'count': [CountExpr],
-        'map': [FunnelMapFunc, SimpleMapFunc, FadedMapFunc],
+        'map': [SimpleMapFunc, FadedMapFunc],
         'reduce': [ReduceFunc],
         'put': [PutExpr],
         'pop': [PopExpr],
         'define': [DefineExpr],
-        'var': [LambdaVarExpr, FadedLambdaVarExpr],
-        'hole': [LambdaHoleExpr, FadedLambdaHoleExpr],
-        'lambda': [LambdaHoleExpr, FadedLambdaHoleExpr]
+        'var': [LambdaVarExpr, HalfFadedLambdaVarExpr, FadedLambdaVarExpr, FadedLambdaVarExpr],
+        'hole': [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedLambdaHoleExpr, FadedPythonLambdaHoleExpr],
+        'lambda': [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedPythonLambdaHoleExpr]
     };
     var fade_level = {};
     var DEFAULT_FADE_LEVEL = 0;
 
     var DEFAULT_FADE_PROGRESSION = {
-        'var': [[8, 42]],
-        'hole': [[8, 42]],
-        'if': [32],
+        'var': [[8, 34], 30, 39],
+        'hole': [[8, 34], 30, 39],
+        'if': [32, 42],
         '_b': [32],
-        '==': [21],
+        '==': [24],
         'true': [41],
-        'false': [41]
+        'false': [41],
+        'bag': [48],
+        'primitives': [58]
     };
+    var primitives = ['triangle', 'rect', 'star', 'circle', 'diamond'];
 
     pub.getClass = function (ename) {
         if (ename in _FADE_MAP) {
@@ -52,8 +55,12 @@ var ExprManager = function () {
         }
     };
     pub.getFadeLevel = function (ename) {
-        if (ename in fade_level) return fade_level[ename];else if ((ename === 'var' || ename === 'hole') && 'lambda' in fade_level) return fade_level.lambda;else if (ename in DEFAULT_FADE_PROGRESSION) {
-            var lvl_map = DEFAULT_FADE_PROGRESSION[ename];
+
+        var is_primitive = primitives.indexOf(ename) > -1;
+
+        if (ename in fade_level) return fade_level[ename];else if ((ename === 'var' || ename === 'hole') && 'lambda' in fade_level) return fade_level.lambda;else if (ename in DEFAULT_FADE_PROGRESSION || is_primitive && "primitives" in DEFAULT_FADE_PROGRESSION) {
+
+            var lvl_map = DEFAULT_FADE_PROGRESSION[is_primitive ? 'primitives' : ename];
             var fadeclass_idx = 0;
             for (var i = 0; i < lvl_map.length; i++) {
                 var range = lvl_map[i];
@@ -61,8 +68,11 @@ var ExprManager = function () {
                     if (level_idx >= range[0] && level_idx < range[1]) fadeclass_idx = i + 1;
                 } else if (level_idx >= range) fadeclass_idx = i + 1;
             }
-            return fadeclass_idx;
-        } else if (DEFAULT_FADE_LEVEL >= pub.getNumOfFadeLevels(ename)) return pub.getNumOfFadeLevels(ename) - 1;else return DEFAULT_FADE_LEVEL;
+            if (DEFAULT_FADE_LEVEL > fadeclass_idx) return pub.getDefaultFadeLevel(ename);else return fadeclass_idx;
+        } else return pub.getDefaultFadeLevel(ename);
+    };
+    pub.getDefaultFadeLevel = function (ename) {
+        if (DEFAULT_FADE_LEVEL >= pub.getNumOfFadeLevels(ename)) return pub.getNumOfFadeLevels(ename) - 1;else return DEFAULT_FADE_LEVEL;
     };
     pub.getNumOfFadeLevels = function (ename) {
         if (!ename) return;else if (!(ename in _FADE_MAP)) {

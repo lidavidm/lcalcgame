@@ -201,8 +201,6 @@ var Stage = function () {
                             _this3.ranCompletionAnim = true;
                         })();
                     }
-                } else {
-                    console.log(this.expressionNodes(), this);
                 }
 
                 console.warn('LEVEL IS COMPLETE? ', level_complete);

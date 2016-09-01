@@ -106,6 +106,13 @@ class LambdaHoleExpr extends MissingExpression {
                 c.stage = null;
                 expr.parent.swap(expr, c); // Swap the expression for a clone of the dropped node.
                 c.parent.bindSubexpressions();
+
+                // TODO: Move this somewhere more stable.
+                // Top-level if statements should unlock
+                // reducable boolean expressions.
+                if (c.parent instanceof IfStatement && c.parent.cond instanceof CompareExpr) {
+                    c.parent.cond.unlock();
+                }
             }
         });
 

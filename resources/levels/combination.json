@@ -1,0 +1,60 @@
+{
+    "chapterName":"Combination",
+    "description":"Reinforces concepts from previous chapters.",
+    "levels": [
+        {
+            "board":"(if /true /(bag)) (if _b /star)",
+            "goal":"(bag star star)",
+            "toolbox":"(star) (true)",
+            "description":"Duplicate the star!"
+        },
+        {
+            "board":"(if _b /star) (if _b /rect)",
+            "goal":"star",
+            "toolbox":"(true) (false)",
+            "description":"Teaching if and true and false."
+        },
+        {
+            "board":"(== /(bag star star) _) (== /(bag) _)",
+            "goal":"(true) (false)",
+            "toolbox":"(bag star star) (bag circle circle circle circle)",
+            "description":"Introducing true"
+        },
+        {
+            "board":"(== _ _) (bag)",
+            "goal":"(true)",
+            "toolbox":"(rect) (bag) (star) (star)",
+            "description":"Introducing true"
+        },
+        {
+            "board":"(== /(bag star) _) (== /(bag star) _)",
+            "goal":"(true) (false)",
+            "toolbox":"(bag star star)",
+            "description":"Teaching true and false."
+        },
+        {
+            "board":"(star) (λx #x #x #x) (if /true /(bag star star star))",
+            "goal":"true",
+            "toolbox":"(== _ _) (if /false _)",
+            "description":"This can be solved a number of ways, but the player must use all pieces and concepts introduced in this chapter."
+        },
+        {
+            "board":"(bag) (star)",
+            "goal":"(bag star)",
+            "toolbox":"",
+            "description":"Faded bag."
+        },
+        {
+            "board":"(bag star star)",
+            "goal":"(bag star star star)",
+            "toolbox":"(star) (rect)",
+            "description":"Faded bag 2."
+        },
+        {
+            "board":"(bag star)",
+            "goal":"(bag rect star triangle)",
+            "toolbox":"(rect) (triangle)",
+            "description":"Order matters. :)"
+        }
+    ]
+}

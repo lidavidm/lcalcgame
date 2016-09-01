@@ -87,6 +87,7 @@ var Toolbox = function (_ImageRect) {
             if (!node.toolbox) {
                 // Can't drag nodes onto toolbox that aren't already elements --
                 // once it's placed on the board, you can't drag it back.
+                Logger.log('toolbox-reject', node.toString());
                 Animate.tween(node, { pos: { x: node.pos.x, y: this.pos.y - node.size.h * 1.2 } }, 200, function (elapsed) {
                     return Math.pow(elapsed, 2);
                 });
@@ -99,6 +100,7 @@ var Toolbox = function (_ImageRect) {
             // User changed their minds about removing item from toolbox.
             // Add item back to the toolbox.
             this.addExpression(node);
+            Logger.log('toolbox-addback', node.toString());
         }
     }, {
         key: 'leftEdgePos',

@@ -138,6 +138,9 @@ var Resource = function () {
     loadImage('lambda-hole-y', 'lambda-hole-y.png');
     loadImage('lambda-hole-y-closed', 'lambda-hole-y-closed.png');
     loadImage('lambda-pipe-y', 'lambda-pipe-y-closed.png');
+    loadImage('lambda-hole-xside', 'lambda-hole-xside.png');
+    loadImage('lambda-hole-xside-closed', 'lambda-hole-xside-closed.png');
+    loadImage('lambda-pipe-xside-closed', 'lambda-pipe-xside-closed.png');
 
     // Loads poof0.png, poof1.png, ..., poof4.png (as poof0, poof1, ..., poof4, respectively).
     loadImageSequence('poof', 'poof.png', [0, 4]);
@@ -147,7 +150,7 @@ var Resource = function () {
 
     // Add levels here: (for now)
     // * The '/' character makes the following expression ignore mouse events (can't be drag n dropped). *
-    var chapter_load_prom = loadChaptersFromFiles(['intro', 'booleans', 'bindings', 'conditionals', 'bags', 'map', 'posttest_v1', 'experimental']);
+    var chapter_load_prom = loadChaptersFromFiles(['intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map', 'posttest_v1', 'experimental']);
 
     /*
         function loadIntroToLambdaCalc(levels) {

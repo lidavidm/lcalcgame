@@ -43,6 +43,18 @@
             "board": "(λx #x #x) (λx star) (== #x /diamond) (diamond)",
             "goal": "(true) (false)",
             "toolbox": ""
+        },
+        {
+            "description": "Conditionals, booleans, and one-param functions.",
+            "board": "(star) (== #x /star) (λx /(if _b /triangle))",
+            "goal": "triangle",
+            "toolbox": ""
+        },
+        {
+            "description": "**Loop-less, bag-less filter.**",
+            "board": "(star) (triangle) (diamond)",
+            "goal": "(star)",
+            "toolbox": "(λx /(if /(== #x /star) #x)) (λx #x #x #x)"
         }
     ]
 }
