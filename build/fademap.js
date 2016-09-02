@@ -41,7 +41,7 @@ var ExprManager = function () {
         '==': [24],
         'true': [43],
         'false': [43],
-        'bag': [48],
+        'bag': [[48, 51]],
         'primitives': [59],
         'map': [58]
     };

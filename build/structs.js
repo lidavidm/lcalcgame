@@ -916,13 +916,15 @@ var IfStatement = function (_Expression5) {
         key: 'playJimmyAnimation',
         value: function playJimmyAnimation(onComplete) {
             Resource.play('key-jiggle');
-            Animate.wait(Resource.getAudio('key-jiggle').duration * 1000).after(onComplete);
+            this.opacity = 1.0;
+            Animate.tween(this, { 'opacity': 0 }, 500).after(onComplete);
+            //Animate.wait(Resource.getAudio('key-jiggle').duration * 1000).after(onComplete);
         }
     }, {
         key: 'playUnlockAnimation',
         value: function playUnlockAnimation(onComplete) {
             Resource.play('key-unlock');
-            Animate.wait(860).after(onComplete);
+            Animate.wait(150).after(onComplete);
         }
     }, {
         key: 'performReduction',
