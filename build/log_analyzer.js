@@ -93,7 +93,7 @@ var LogAnalyzer = function () {
 
             // Convert lambda expressions to an invariant representation.
             this.exprs = exprs.map(function (e) {
-                if (isLambdaExpr(e)) return deBruijn(e);else return e.replace(/diamond/g, '■').replace(/star/g, '★');
+                if (isLambdaExpr(e)) return deBruijn(e);else return e.replace(/diamond/g, '■').replace(/star/g, '★').replace(/triangle/g, '▲').replace(/circle/g, '●');
             });
         }
 

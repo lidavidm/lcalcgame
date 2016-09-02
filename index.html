@@ -20,6 +20,7 @@
         <script src="lib/jquery-ui.min.js" charset="utf-8"></script>
         <script src="lib/jquery-ui.structure.min.css" charset="utf-8"></script>
         <script src="lib/writeALevelPopup.js"></script>
+        <script src="lib/progressBar.js"></script>
 
         <!-- Game dependencies -->
         <script src="build/logger.js" charset="utf-8"></script>
@@ -45,6 +46,18 @@
                 margin-right: auto;
                 display: block;
             }
+            #progressBarContainer {
+                display: block;
+                width:800px;
+                height:4px;
+                background-color: white;
+            }
+            #progressBar {
+                display: block;
+                width:5px;
+                height:100%;
+                background-color: gold;
+            }
             .centered {
                 padding: 0;
                 margin-left: auto;
@@ -52,6 +65,11 @@
                 width: 100%;
                 display: block;
                 text-align: center;
+            }
+            .shadow {
+               -moz-box-shadow:    inset 0 0 10px #000000;
+               -webkit-box-shadow: inset 0 0 10px #000000;
+               box-shadow:         inset 0 0 10px #000000;
             }
             .expr_input {
                 font-family: Consolas, sans-serif;
@@ -109,6 +127,8 @@
                     AnimationUpdateLoop.clear();
                 }
 
+                updateProgressBar();
+
                 GLOBAL_DEFAULT_CTX = canvas.getContext('2d');
                 GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
                 document.getElementById('lvl_num').innerHTML = level_idx + '';
@@ -126,6 +146,10 @@
                 // This fixes some render bugs. Not exactly sure why.
                 stage.draw();
             }
+        }
+
+        function updateProgressBar() {
+            setProgressBar('progressBar', 'progressBarContainer', level_idx / Resource.level.length);
         }
         function prev() {
             if (!Logger.sessionBegan()) return;
@@ -173,6 +197,10 @@
         </script>
     </head>
     <body onload="init()" bgcolor="lightgray">
+        <div id="progressBarContainer" class="centered shadow">
+            <div id="progressBar">
+            </div>
+        </div>
         <canvas id="canvas" onmousedown="" width="800" height="600" style="background-color:#EEE;"></canvas>
         <br />
         <div id="state" class="centered">

@@ -60,7 +60,10 @@ var LogAnalyzer = (function() {
                 if (isLambdaExpr(e))
                     return deBruijn(e);
                 else
-                    return e.replace(/diamond/g, '■').replace(/star/g, '★');
+                    return e.replace(/diamond/g, '■')
+                            .replace(/star/g, '★')
+                            .replace(/triangle/g, '▲')
+                            .replace(/circle/g, '●');
             });
         }
         static areExpressionsEqual(e1, e2) {

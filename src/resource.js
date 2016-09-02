@@ -93,6 +93,7 @@ var Resource = (() => {
         loadAudio('key-unlock', 'key-unlock-fast.wav');
         loadAudio('victory', '325805__wagna__collect.wav');
         loadAudio('matching-goal', 'matching-the-goal2.wav');
+        loadAudio('mutate', 'deflate.wav');
     };
 
     loadImage('bag-background', 'bg-stars.png');
@@ -165,7 +166,7 @@ var Resource = (() => {
 
     // Add levels here: (for now)
     // * The '/' character makes the following expression ignore mouse events (can't be drag n dropped). *
-    var chapter_load_prom = loadChaptersFromFiles( ['intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map',     'posttest_v1', 'experimental'] );
+    var chapter_load_prom = loadChaptersFromFiles( ['intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map'] ); //,     'posttest_v1', 'experimental'] );
 
 /*
     function loadIntroToLambdaCalc(levels) {
@@ -486,7 +487,8 @@ var Resource = (() => {
                         SparkleTrigger.run(unfaded_root, () => {
 
                             Logger.log('faded-expr', { 'expr':unfaded_root.toString(), 'state':faded.toString() } );
-                            
+                            Resource.play('mutate');
+
                             Animate.tween(root, { 'opacity':1.0 }, 2000).after(() => {
                                 root.ignoreEvents = false;
                             });
