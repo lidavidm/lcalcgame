@@ -51,9 +51,6 @@ class SplosionEffect {
         Animate.drawUntil(stage, () => {
             return parts === null;
         });
-
-        // Play sFx.
-        Resource.play('splosion');
     }
 }
 class SparkleTrigger {

@@ -177,13 +177,14 @@ var Stage = function () {
                                 _this3.draw();
 
                                 Resource.play('victory');
-                                Animate.wait(Resource.getAudio('victory').duration * 1000).after(function () {
+                                Animate.wait(1080).after(function () {
                                     next();
                                 });
                             };
 
                             var pairs = level_complete;
                             var num_exploded = 0;
+                            var playedSplosionAudio = false;
 
                             pairs.forEach(function (pair, idx) {
                                 var node = pair[0];
@@ -201,6 +202,12 @@ var Stage = function () {
                                     //Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x:200, y:300 }, () => {
                                     SplosionEffect.run(node);
                                     SplosionEffect.run(goalNode);
+
+                                    if (!playedSplosionAudio) {
+                                        // Play sFx.
+                                        Resource.play('splosion');
+                                        playedSplosionAudio = true;
+                                    }
 
                                     console.log(goalNode);
                                     goalNode.parent.removeChild(goalNode);

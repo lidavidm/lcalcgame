@@ -76,9 +76,6 @@ var SplosionEffect = function () {
             Animate.drawUntil(stage, function () {
                 return parts === null;
             });
-
-            // Play sFx.
-            Resource.play('splosion');
         }
     }]);
 

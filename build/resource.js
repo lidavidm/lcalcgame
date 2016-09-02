@@ -9,7 +9,11 @@ var Resource = function () {
     var __AUDIO_PATH = __RESOURCE_PATH + 'audio/';
     var __GRAPHICS_PATH = __RESOURCE_PATH + 'graphics/';
     var __LEVELS_PATH = __RESOURCE_PATH + 'levels/';
+
     var audioRsc = {};
+    var audioEngineLoaded = false;
+    var audioEngine = 'html5';
+
     var imageRsc = {};
     var animPresets = {};
     var levels = [];
@@ -42,8 +46,24 @@ var Resource = function () {
         }, Promise.resolve());
     };
     var loadAudio = function loadAudio(alias, filename) {
+        if (!audioEngineLoaded) {
+            if (lowLag) {
+                try {
+                    lowLag.init({ 'sm2url': 'lib/sm2/swf/' });
+                    audioEngine = 'lowLag';
+                } catch (err) {
+                    console.error(err);
+                    audioEngine = 'html5';
+                }
+            }
+            audioEngineLoaded = true;
+        }
+
         var audio = new Audio(__AUDIO_PATH + filename);
         audioRsc[alias] = audio;
+
+        // Cross-browser low-latency audio.
+        lowLag.load([__AUDIO_PATH + filename], alias);
     };
     var loadImage = function loadImage(alias, filename) {
         var img = new Image();
@@ -68,19 +88,21 @@ var Resource = function () {
     };
 
     // Add resources here:
-    loadAudio('pop', 'pop.wav');
-    loadAudio('poof', 'poof.wav');
-    loadAudio('bag-spill', 'spill.wav');
-    loadAudio('bag-addItem', 'putaway.wav');
-    loadAudio('heatup', 'heatup.wav');
-    loadAudio('shatter', 'shatter1.wav');
-    loadAudio('mirror-shatter', 'shatter2.wav');
-    loadAudio('splosion', 'firework1.wav');
-    loadAudio('shootwee', 'firework-shooting.wav');
-    loadAudio('key-jiggle', 'key-jiggle.wav');
-    loadAudio('key-unlock', 'key-unlock-fast.wav');
-    loadAudio('victory', '325805__wagna__collect.wav');
-    loadAudio('matching-goal', 'matching-the-goal2.wav');
+    var initAudio = function initAudio() {
+        loadAudio('pop', 'pop.wav');
+        loadAudio('poof', 'poof.wav');
+        loadAudio('bag-spill', 'spill.wav');
+        loadAudio('bag-addItem', 'putaway.wav');
+        loadAudio('heatup', 'heatup.wav');
+        loadAudio('shatter', 'shatter1.wav');
+        loadAudio('mirror-shatter', 'shatter2.wav');
+        loadAudio('splosion', 'firework1.wav');
+        loadAudio('shootwee', 'firework-shooting.wav');
+        loadAudio('key-jiggle', 'key-jiggle.wav');
+        loadAudio('key-unlock', 'key-unlock-fast.wav');
+        loadAudio('victory', '325805__wagna__collect.wav');
+        loadAudio('matching-goal', 'matching-the-goal2.wav');
+    };
 
     loadImage('bag-background', 'bg-stars.png');
     loadImage('lambda-hole', 'lambda-hole.png');
@@ -404,6 +426,7 @@ var Resource = function () {
     return { // TODO: Add more resource types.
         audio: audioRsc,
         image: imageRsc,
+        initAudio: initAudio,
         getImage: function getImage(name) {
             return imageRsc[name];
         },
@@ -414,8 +437,13 @@ var Resource = function () {
             return animPresets[name].clone();
         },
         play: function play(alias, volume) {
-            if (volume) audioRsc[alias].volume = volume;else audioRsc[alias].volume = 1.0;
-            audioRsc[alias].play();
+
+            if (audioEngine === 'html5') {
+                if (volume) audioRsc[alias].volume = volume;else audioRsc[alias].volume = 1.0;
+                audioRsc[alias].play();
+            } else {
+                lowLag.play(alias);
+            }
         },
         buildLevel: function buildLevel(level_desc, canvas) {
             ExprManager.clearFadeLevels();

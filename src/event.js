@@ -158,13 +158,14 @@ class Stage {
                         this.draw();
 
                         Resource.play('victory');
-                        Animate.wait(Resource.getAudio('victory').duration * 1000).after(function () {
+                        Animate.wait(1080).after(function () {
                             next();
                         });
                     };
 
                     let pairs = level_complete;
                     let num_exploded = 0;
+                    let playedSplosionAudio = false;
 
                     pairs.forEach((pair, idx) => {
                         var node = pair[0];
@@ -182,6 +183,12 @@ class Stage {
                             //Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x:200, y:300 }, () => {
                                 SplosionEffect.run(node);
                                 SplosionEffect.run(goalNode);
+
+                                if (!playedSplosionAudio) {
+                                    // Play sFx.
+                                    Resource.play('splosion');
+                                    playedSplosionAudio = true;
+                                }
 
                                 console.log(goalNode);
                                 goalNode.parent.removeChild(goalNode);
