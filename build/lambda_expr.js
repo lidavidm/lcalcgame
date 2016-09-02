@@ -374,14 +374,11 @@ var LambdaVarExpr = function (_ImageExpr) {
                     var _this = _this9;
                     var stage = _this9.stage;
 
-                    console.log('@ open(): Called.');
-
                     if (preview_expr) {
                         (function () {
                             var stateGraph = _this9.stateGraph;
                             Animate.wait(140).after(function () {
                                 if (stateGraph.currentState === 'opening' || stateGraph.currentState === 'open') {
-                                    console.log('@ open(): ', stateGraph.currentState);
                                     var scale = _this9.graphicNode.size.w / preview_expr.size.w * 0.8;
                                     preview_expr.pos = { x: _this9.children[0].size.w / 2.0, y: -10 };
                                     preview_expr.scale = { x: scale, y: scale };
@@ -404,8 +401,6 @@ var LambdaVarExpr = function (_ImageExpr) {
                 this.stateGraph.enter('closing');
                 this.graphicNode.children = [];
                 stage.draw();
-
-                console.log('@ close(): ', this.stateGraph.currentState);
             }
         }
 

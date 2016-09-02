@@ -40,7 +40,8 @@ var ExprManager = (function() {
         'true'  : [43],
         'false' : [43],
         'bag'   : [48],
-        'primitives' : [58]
+        'primitives' : [59],
+        'map'   : [58]
     };
     const primitives = ['triangle', 'rect', 'star', 'circle', 'diamond'];
 
@@ -48,6 +49,7 @@ var ExprManager = (function() {
         let prog = DEFAULT_FADE_PROGRESSION;
         let borders = [];
         for (let t in prog) {
+            if (t === 'primitives') continue;
             let ranges = prog[t];
             for (let i = 0; i < ranges.length; i++) {
                 let r = ranges[i];

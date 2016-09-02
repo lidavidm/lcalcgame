@@ -78,6 +78,7 @@ class Level {
                 toolbox.addExpression(item, false);
             });
         }
+        stage.toolbox = toolbox;
 
         stage.uiNodes = [ btn_back, btn_reset, btn_next, toolbox ];
 
@@ -92,10 +93,15 @@ class Level {
                     this.uiNodes.indexOf(n) > -1 ||
                     n.constructor.name === 'Rect' ||
                     n.constructor.name === 'ImageRect' ||
+                    !(n instanceof Expression) ||
+                    n.fadingOut ||
                     n.toolbox) continue;
                 nodes.push(n);
             }
             return nodes;
+        }.bind(stage);
+        stage.toolboxNodes = function() {
+            return this.nodes.filter((n) => n.toolbox && n.toolbox instanceof Toolbox && !n.fadingOut);
         }.bind(stage);
         stage.isCompleted = function() {
             let exprs = this.expressionNodes();

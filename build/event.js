@@ -168,8 +168,9 @@ var Stage = function () {
                     if (!this.ranCompletionAnim) {
                         (function () {
 
+                            Logger.log('victory', { 'final_state': _this3.toString(), 'num_of_moves': undefined });
+
                             var you_win = function you_win() {
-                                Logger.log('victory', { 'final_state': _this3.toString(), 'num_of_moves': undefined });
 
                                 var cmp = new ImageRect(GLOBAL_DEFAULT_SCREENSIZE.width / 2, GLOBAL_DEFAULT_SCREENSIZE.height / 2, 740 / 2, 146 / 2, 'victory');
                                 cmp.anchor = { x: 0.5, y: 0.5 };
@@ -209,7 +210,6 @@ var Stage = function () {
                                         playedSplosionAudio = true;
                                     }
 
-                                    console.log(goalNode);
                                     goalNode.parent.removeChild(goalNode);
                                     num_exploded++;
                                     if (num_exploded === pairs.length) {
@@ -224,7 +224,7 @@ var Stage = function () {
                     }
                 }
 
-                console.warn('LEVEL IS COMPLETE? ', level_complete);
+                //console.warn('LEVEL IS COMPLETE? ', level_complete);
             }
         }
     }, {
@@ -256,13 +256,16 @@ var Stage = function () {
     }, {
         key: 'saveState',
         value: function saveState() {
-            var clones = this.expressionNodes().map(function (n) {
+            var board = this.expressionNodes().map(function (n) {
                 return n.clone();
             });
-            clones = clones.filter(function (n) {
+            board = board.filter(function (n) {
                 return !(n instanceof ExpressionEffect);
             });
-            this.stateStack.push(clones);
+            var toolbox = this.toolboxNodes().map(function (n) {
+                return n.clone();
+            });
+            this.stateStack.push({ 'board': board, 'toolbox': toolbox });
         }
     }, {
         key: 'restoreState',
@@ -275,9 +278,16 @@ var Stage = function () {
                 this.expressionNodes().forEach(function (n) {
                     return _this4.remove(n);
                 });
-                var restored_nodes = this.stateStack.pop();
-                restored_nodes.forEach(function (n) {
+                this.toolboxNodes().forEach(function (n) {
+                    return _this4.remove(n);
+                });
+                var restored_state = this.stateStack.pop();
+                restored_nodes.board.forEach(function (n) {
                     return _this4.add(n);
+                });
+                restored_nodes.toolbox.forEach(function (n) {
+                    n.toolbox = _this4.toolbox;
+                    _this4.add(n);
                 });
 
                 this.update();
@@ -397,7 +407,10 @@ var Stage = function () {
         value: function onmouseclick(pos) {
 
             // Let player click to continue.
-            if (this.playerWon) next();
+            if (this.playerWon) {
+                Logger.log('clicked-to-continue', '');
+                next();
+            }
 
             if (this.heldNode) {
                 this.heldNode.onmouseclick(pos);
@@ -440,13 +453,23 @@ var Stage = function () {
     }, {
         key: 'toString',
         value: function toString() {
-            var nodes = this.expressionNodes();
-            var exp = nodes.reduce(function (prev, curr) {
-                var s = curr.toString();
-                if (s === '()') return prev; // Skip empty expressions.
-                else return prev + curr.toString() + ' ';
-            }, '').trim();
-            return exp;
+
+            var stringify = function stringify(nodes) {
+                return nodes.reduce(function (prev, curr) {
+                    var s = curr.toString();
+                    if (s === '()') return prev; // Skip empty expressions.
+                    else return prev + curr.toString() + ' ';
+                }, '').trim();
+            };
+
+            var board = this.expressionNodes();
+            var toolbox = this.toolboxNodes();
+            var exp = {
+                'board': stringify(board),
+                'toolbox': stringify(toolbox)
+            };
+
+            return JSON.stringify(exp);
         }
     }, {
         key: 'canvas',

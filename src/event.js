@@ -149,8 +149,9 @@ class Stage {
                 // DEBUG TEST FLYTO ANIMATION.
                 if (!this.ranCompletionAnim) {
 
+                    Logger.log( 'victory', { 'final_state':this.toString(), 'num_of_moves':undefined } );
+
                     let you_win = () => {
-                        Logger.log( 'victory', { 'final_state':this.toString(), 'num_of_moves':undefined } );
 
                         var cmp = new ImageRect(GLOBAL_DEFAULT_SCREENSIZE.width / 2, GLOBAL_DEFAULT_SCREENSIZE.height / 2, 740 / 2, 146 / 2, 'victory');
                         cmp.anchor = { x:0.5, y:0.5 };
@@ -190,7 +191,6 @@ class Stage {
                                     playedSplosionAudio = true;
                                 }
 
-                                console.log(goalNode);
                                 goalNode.parent.removeChild(goalNode);
                                 num_exploded++;
                                 if (num_exploded === pairs.length) {
@@ -207,7 +207,7 @@ class Stage {
                 }
             }
 
-            console.warn('LEVEL IS COMPLETE? ', level_complete);
+            //console.warn('LEVEL IS COMPLETE? ', level_complete);
         }
     }
     invalidate(nodes) {
@@ -231,17 +231,23 @@ class Stage {
 
     // State.
     saveState() {
-        var clones = this.expressionNodes().map((n) => n.clone());
-        clones = clones.filter((n) => !(n instanceof ExpressionEffect));
-        this.stateStack.push(clones);
+        var board = this.expressionNodes().map((n) => n.clone());
+        board = board.filter((n) => !(n instanceof ExpressionEffect));
+        var toolbox = this.toolboxNodes().map((n) => n.clone());
+        this.stateStack.push( { 'board':board, 'toolbox':toolbox } );
     }
     restoreState() {
         if (this.stateStack.length > 0) {
             //this.nodes = this.stateStack.pop();
 
             this.expressionNodes().forEach((n) => this.remove(n));
-            let restored_nodes = this.stateStack.pop();
-            restored_nodes.forEach((n) => this.add(n));
+            this.toolboxNodes().forEach((n) => this.remove(n));
+            let restored_state = this.stateStack.pop();
+            restored_nodes.board.forEach((n) => this.add(n));
+            restored_nodes.toolbox.forEach((n) => {
+                n.toolbox = this.toolbox;
+                this.add(n);
+            });
 
             this.update();
             this.draw();
@@ -345,8 +351,10 @@ class Stage {
     onmouseclick(pos) {
 
         // Let player click to continue.
-        if (this.playerWon)
+        if (this.playerWon) {
+            Logger.log('clicked-to-continue', '');
             next();
+        }
 
         if (this.heldNode) {
             this.heldNode.onmouseclick(pos);
@@ -379,14 +387,23 @@ class Stage {
         return hits;
     }
 
+
     toString() {
-        let nodes = this.expressionNodes();
-        let exp = nodes.reduce((prev, curr) => {
+
+        let stringify = (nodes) => nodes.reduce((prev, curr) => {
             let s = curr.toString();
             if (s === '()') return prev; // Skip empty expressions.
             else            return (prev + curr.toString() + ' ');
         }, '').trim();
-        return exp;
+
+        let board = this.expressionNodes();
+        let toolbox = this.toolboxNodes();
+        let exp = {
+            'board': stringify(board),
+            'toolbox': stringify(toolbox)
+        };
+
+        return JSON.stringify(exp);
     }
 }
 

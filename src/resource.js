@@ -27,7 +27,6 @@ var Resource = (() => {
     var loadChapterFromFile = (json_filename) => {
         return new Promise(function(resolve, reject) {
             $.getJSON(__LEVELS_PATH + json_filename + '.json', function(json) {
-                console.log(json_filename);
                 pushChapter(json);
                 resolve();
             });
@@ -41,7 +40,7 @@ var Resource = (() => {
         if (!audioEngineLoaded) {
             if (lowLag) {
                 try {
-                    lowLag.init( {'sm2url':'lib/sm2/swf/'} );
+                    lowLag.init( {'sm2url':'lib/sm2/swf/', 'debug':'none'} );
                     audioEngine = 'lowLag';
                 }
                 catch(err) {
@@ -463,8 +462,6 @@ var Resource = (() => {
 
                 for (let border of fadedBorders) {
 
-                    console.log(border);
-
                     let unfaded_roots = unfaded.getRootNodesThatIncludeClass(border.unfadedClass);
                     let faded_roots   = faded.getRootNodesThatIncludeClass(border.fadedClass);
 
@@ -487,6 +484,9 @@ var Resource = (() => {
                         root.opacity = 0;
 
                         SparkleTrigger.run(unfaded_root, () => {
+
+                            Logger.log('faded-expr', { 'expr':unfaded_root.toString(), 'state':faded.toString() } );
+                            
                             Animate.tween(root, { 'opacity':1.0 }, 2000).after(() => {
                                 root.ignoreEvents = false;
                             });

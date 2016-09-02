@@ -148,7 +148,7 @@ var LogAnalyzer = (function() {
         }
 
         get initialState() {
-            var state = new StateRepr( this.logs.filter((log) => log[0] === 'startTask')[0][1]['quest_detail'] );
+            var state = new StateRepr( JSON.parse( this.logs.filter((log) => log[0] === 'startTask')[0][1]['quest_detail'] ).board );
             state.initial = true;
             return state;
         }
@@ -175,6 +175,8 @@ var LogAnalyzer = (function() {
                 }
                 if (name === 'state-save' || victory) {
 
+                    data = JSON.parse(data).board;
+
                     let state = new StateRepr(data);
                     console.log(' >> state-save', data, state);
                     if (victory) state.final = true;
@@ -195,6 +197,8 @@ var LogAnalyzer = (function() {
                     prev_node = node;
 
                 } else if (name === 'state-restore') {
+
+                    data = JSON.parse(data).board;
 
                     let state = new StateRepr(data);
 

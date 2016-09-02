@@ -67,7 +67,7 @@
         function init() {
 
             setWriteALevelPopup("writeALevel", 'write-level-form');
-            
+
             Resource.initAudio();
 
             if (__GET_PARAMS) {
@@ -153,7 +153,6 @@
             removeOptions(sel); // clear old options.
             return Resource.getChapters().then( function(chapters) {
                 chapters.forEach(function (chap) {
-                    console.error('chapter', chap.name);
                     var option = document.createElement("option");
                     option.text = chap.description;
                     option.value = chap.name;

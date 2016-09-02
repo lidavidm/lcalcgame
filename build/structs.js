@@ -266,16 +266,32 @@ var Expression = function (_RoundedRect) {
             if (this.parent) {
                 var ghost_expr;
                 if (this.droppedInClass) ghost_expr = new this.droppedInClass(this);else ghost_expr = new MissingExpression(this);
-                var _this = this;
-                var stage = this.parent.stage;
+
+                var _stage = this.parent.stage;
+                var beforeState = _stage.toString();
+                var detachedExp = this.toString();
                 var parent = this.parent;
+
                 parent.swap(this, ghost_expr);
+
                 this.parent = null;
-                stage.add(this);
-                stage.bringToFront(this);
+                _stage.add(this);
+                _stage.bringToFront(this);
+
+                var afterState = _stage.toString();
+                Logger.log('detached-expr', { 'before': beforeState, 'after': afterState, 'item': detachedExp });
+                _stage.saveState();
+                Logger.log('state-save', afterState);
+
                 this.shell = ghost_expr;
             }
             if (this.toolbox) {
+
+                if (this.stage) {
+                    this.stage.saveState();
+                    Logger.log('state-save', this.stage.toString());
+                }
+
                 this.toolbox.removeExpression(this); // remove this expression from the toolbox
                 Logger.log('toolbox-dragout', this.toString());
             }
@@ -339,6 +355,7 @@ var Expression = function (_RoundedRect) {
 
             if (!this.dragging) {
                 this.detach();
+                this.posBeforeDrag = this.absolutePos;
                 this.stage.bringToFront(this);
                 this.dragging = true;
             }
@@ -349,6 +366,9 @@ var Expression = function (_RoundedRect) {
             if (this.dragging && this.shell) {
                 if (!this.parent) this.scale = { x: 1, y: 1 };
                 this.shell = null;
+
+                Logger.log('detach-commit', this.toString());
+
                 //this.shell.stage.remove(this);
                 //this.shell.stage = null;
                 //this.shell.parent.swap(this.shell, this); // put it back
@@ -365,6 +385,8 @@ var Expression = function (_RoundedRect) {
                         Logger.log('state-save', this.stage.toString());
                     }
                 }
+
+                Logger.log('moved', { 'item': this.toString(), 'prevPos': JSON.stringify(this.posBeforeDrag), 'newPos': JSON.stringify(this.pos) });
             }
             //if (this.toolbox) this.toolbox = null;
             this.dragging = false;
@@ -465,10 +487,20 @@ var MissingExpression = function (_Expression) {
                 // Should not be able to stick lambdas in MissingExpression holes (exception of Map)
                 if (node instanceof LambdaExpr && !(this.parent instanceof MapFunc)) return;
 
+                var _stage2 = this.stage;
+                var beforeState = _stage2.toString();
+                var droppedExp = node.toString();
+
                 Resource.play('pop');
                 node.stage.remove(node);
                 node.droppedInClass = this.getClass();
                 this.parent.swap(this, node); // put it back
+
+                var afterState = _stage2.toString();
+                Logger.log('placed-expr', { 'before': beforeState, 'after': afterState, 'item': droppedExp });
+
+                _stage2.saveState();
+                Logger.log('state-save', afterState);
 
                 // Blink red if total reduction is not possible with this config.
                 /*var try_reduce = node.parent.reduceCompletely();
@@ -1074,9 +1106,9 @@ var LockIfStatement = function (_IfStatement3) {
                             Animate.tween(_this18, { 'opacity': 0 }, 100).after(function () {
                                 _this18.opacity = 0;
                                 if (_this18.stage) {
-                                    var _stage = _this18.stage;
-                                    _stage.remove(_this18);
-                                    _stage.draw();
+                                    var _stage3 = _this18.stage;
+                                    _stage3.remove(_this18);
+                                    _stage3.draw();
                                 }
                             });
                         });
@@ -1180,9 +1212,9 @@ var InlineLockIfStatement = function (_IfStatement4) {
             Animate.tween(this, { 'opacity': 0 }, 100).after(function () {
                 _this21.opacity = 0;
                 if (_this21.stage) {
-                    var _stage2 = _this21.stage;
-                    _stage2.remove(_this21);
-                    _stage2.draw();
+                    var _stage4 = _this21.stage;
+                    _stage4.remove(_this21);
+                    _stage4.draw();
                 }
             });
         }

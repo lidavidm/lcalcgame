@@ -326,13 +326,10 @@ class LambdaVarExpr extends ImageExpr {
             let _this = this;
             let stage = this.stage;
 
-            console.log('@ open(): Called.');
-
             if(preview_expr) {
                 let stateGraph = this.stateGraph;
                 Animate.wait(140).after(() => {
                     if (stateGraph.currentState === 'opening' || stateGraph.currentState === 'open') {
-                        console.log('@ open(): ', stateGraph.currentState);
                         let scale = this.graphicNode.size.w / preview_expr.size.w * 0.8;
                         preview_expr.pos = { x:this.children[0].size.w/2.0, y:-10 };
                         preview_expr.scale = { x:scale, y:scale };
@@ -351,8 +348,6 @@ class LambdaVarExpr extends ImageExpr {
             this.stateGraph.enter('closing');
             this.graphicNode.children = [];
             stage.draw();
-
-            console.log('@ close(): ', this.stateGraph.currentState);
         }
     }
 

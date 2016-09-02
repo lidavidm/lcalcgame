@@ -88,6 +88,7 @@ var Level = function () {
                     toolbox.addExpression(item, false);
                 });
             }
+            stage.toolbox = toolbox;
 
             stage.uiNodes = [btn_back, btn_reset, btn_next, toolbox];
 
@@ -105,7 +106,7 @@ var Level = function () {
                     for (var _iterator = this.nodes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                         var n = _step.value;
 
-                        if (n in this.uiGoalNodes || this.uiNodes.indexOf(n) > -1 || n.constructor.name === 'Rect' || n.constructor.name === 'ImageRect' || n.toolbox) continue;
+                        if (n in this.uiGoalNodes || this.uiNodes.indexOf(n) > -1 || n.constructor.name === 'Rect' || n.constructor.name === 'ImageRect' || !(n instanceof Expression) || n.fadingOut || n.toolbox) continue;
                         nodes.push(n);
                     }
                 } catch (err) {
@@ -124,6 +125,11 @@ var Level = function () {
                 }
 
                 return nodes;
+            }.bind(stage);
+            stage.toolboxNodes = function () {
+                return this.nodes.filter(function (n) {
+                    return n.toolbox && n.toolbox instanceof Toolbox && !n.fadingOut;
+                });
             }.bind(stage);
             stage.isCompleted = function () {
                 var _this2 = this;
