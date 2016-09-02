@@ -456,15 +456,24 @@ var Resource = (() => {
                         faded.add(unfaded_root);
                         root.opacity = 0;
 
+                        SparkleTrigger.run(unfaded_root, () => {
+                            Animate.tween(root, { 'opacity':1.0 }, 2000).after(() => {
+                                root.ignoreEvents = false;
+                            });
+                            Animate.tween(unfaded_root, { 'opacity':0.0 }, 1000).after(() => {
+                                faded.remove(unfaded_root);
+                            });
+                        });
+
                         // Cross-fade old expression to new.
                         root.ignoreEvents = true;
                         unfaded_root.ignoreEvents = true;
-                        Animate.tween(root, { 'opacity':1.0 }, 3000).after(() => {
+                        /*Animate.tween(root, { 'opacity':1.0 }, 3000).after(() => {
                             root.ignoreEvents = false;
                         });
                         Animate.tween(unfaded_root, { 'opacity':0.0 }, 2000).after(() => {
                             faded.remove(unfaded_root);
-                        });
+                        });*/
                     }
                 }
 

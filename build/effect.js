@@ -55,7 +55,7 @@ var SplosionEffect = function () {
                 var targetPos = addPos(part.pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
                 Animate.tween(part, { 'pos': targetPos, 'scale': { x: 0.0001, y: 0.0001 } }, 400, function (elapsed) {
                     return Math.pow(elapsed, 0.5);
-                }).after(function () {
+                }, false).after(function () {
                     stage.remove(part); // self-delete for cleanup
                     stage.draw();
                 });
@@ -73,12 +73,108 @@ var SplosionEffect = function () {
                 stage.draw();
             });
 
+            Animate.drawUntil(stage, function () {
+                return parts === null;
+            });
+
             // Play sFx.
             Resource.play('splosion');
         }
     }]);
 
     return SplosionEffect;
+}();
+
+var SparkleTrigger = function () {
+    function SparkleTrigger() {
+        _classCallCheck(this, SparkleTrigger);
+    }
+
+    _createClass(SparkleTrigger, null, [{
+        key: 'run',
+        value: function run(node, onTrigger) {
+
+            if (!node.stage) {
+                console.warn('@ SparkleTrigger: Node is not member of stage.');
+                return;
+            }
+
+            // Store stage context.
+            var stage = node.stage;
+            node.update();
+
+            // Store node center pos.
+            var center = node.centerPos();
+            var size = node.absoluteSize;
+            if (size.w === 0) size = { w: 50, h: 50 };
+            var triggered = false;
+            var parts = [];
+            var activeparts = 0;
+            var cancelRenderLoop = false;
+
+            // Create a bunch of floaty particles.
+            var PARTICLE_COUNT = Math.min(100, 30 * (size.w / 50.0));
+            var PARTICLE_MIN_RAD = 2;
+            var PARTICLE_MAX_RAD = 8;
+
+            var _loop2 = function _loop2(i) {
+
+                var part = new Star(center.x, center.y, Math.floor(PARTICLE_MIN_RAD + (PARTICLE_MAX_RAD - PARTICLE_MIN_RAD) * Math.random()));
+                parts.push(part);
+                //part.ignoreEvents = true;
+
+                var ghostySparkle = function ghostySparkle() {
+                    if (triggered) return;
+                    var vec = { x: (Math.random() - 0.5) * size.w * 1.2,
+                        y: (Math.random() - 0.5) * size.h * 1.2 - part.size.h / 2.0 };
+                    part.pos = addPos(center, vec);
+                    part.color = "#0F0";
+                    part.shadowOffset = 0;
+                    part.opacity = 1.0;
+                    part.onmouseenter = function (pos) {
+                        if (!triggered) {
+                            onTrigger();
+                            triggered = true;
+                        }
+                    };
+                    stage.add(part);
+                    activeparts++;
+                    part.anim = Animate.tween(part, { opacity: 0.0 }, Math.max(3000 * Math.random(), 800), function (elapsed) {
+                        return elapsed;
+                    }, false).after(function () {
+                        stage.remove(part);
+                        activeparts--;
+                        if (!triggered) ghostySparkle();else if (activeparts === 0) cancelRenderLoop = true;
+                    });
+                };
+                ghostySparkle();
+
+                // Whooosh!
+                /*let flyFromCenter = () => {
+                    part.pos = clonePos(center);
+                    part.color = "blue";
+                    part.shadowOffset = 0;
+                    part.opacity = 1.0;
+                    stage.add(part);
+                    Animate.tween(part, { pos:addPos(center, rescalePos(vec, 200)), opacity:0.0 }, 400).after(() => {
+                        stage.remove(part);
+                        flyFromCenter();
+                    });
+                };
+                flyFromCenter();*/
+            };
+
+            for (var i = 0; i < PARTICLE_COUNT; i++) {
+                _loop2(i);
+            }
+
+            Animate.drawUntil(stage, function () {
+                return cancelRenderLoop;
+            });
+        }
+    }]);
+
+    return SparkleTrigger;
 }();
 
 var ExpressionEffect = function (_RoundedRect) {

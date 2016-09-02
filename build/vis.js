@@ -324,7 +324,7 @@ var Rect = function (_Node) {
 
             if (!this.ctx) return;
             this.ctx.save();
-            if (this.opacity && this.opacity < 1.0) {
+            if (this.opacity !== undefined && this.opacity < 1.0) {
                 this.ctx.globalAlpha = this.opacity;
             }
             var boundingSize = this.absoluteSize;

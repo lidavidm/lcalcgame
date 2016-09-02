@@ -480,15 +480,24 @@ var Resource = function () {
                                 faded.add(unfaded_root);
                                 root.opacity = 0;
 
+                                SparkleTrigger.run(unfaded_root, function () {
+                                    Animate.tween(root, { 'opacity': 1.0 }, 2000).after(function () {
+                                        root.ignoreEvents = false;
+                                    });
+                                    Animate.tween(unfaded_root, { 'opacity': 0.0 }, 1000).after(function () {
+                                        faded.remove(unfaded_root);
+                                    });
+                                });
+
                                 // Cross-fade old expression to new.
                                 root.ignoreEvents = true;
                                 unfaded_root.ignoreEvents = true;
-                                Animate.tween(root, { 'opacity': 1.0 }, 3000).after(function () {
+                                /*Animate.tween(root, { 'opacity':1.0 }, 3000).after(() => {
                                     root.ignoreEvents = false;
                                 });
-                                Animate.tween(unfaded_root, { 'opacity': 0.0 }, 2000).after(function () {
+                                Animate.tween(unfaded_root, { 'opacity':0.0 }, 2000).after(() => {
                                     faded.remove(unfaded_root);
-                                });
+                                });*/
                             };
 
                             for (var r = 0; r < faded_roots.length; r++) {

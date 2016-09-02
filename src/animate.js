@@ -8,6 +8,16 @@ class Animate {
         twn.run();
         return twn;
     }
+    static drawUntil(stage, condition) {
+        if (!stage) return null;
+        var twn = new IndefiniteTween(() => {
+            stage.draw();
+
+            if (condition()) twn.cancel();
+        });
+        twn.run();
+        return twn;
+    }
 
     static blink(nodes, dur=1000, colorWeights=[1,1,1], blinkCount=2) {
         if (!Array.isArray(nodes)) nodes = [nodes];
@@ -82,7 +92,7 @@ class Animate {
         return twn;
     }
 
-    static tween(node, targetValue, dur=1000, smoothFunc=((elapsed) => elapsed)) {
+    static tween(node, targetValue, dur=1000, smoothFunc=((elapsed) => elapsed), autodraw=true) {
         //if (!(propName in node)) {
         //    console.error('@ Animate.tween: "' + propName.toString() + '" is not a property of node', node );
         //    return;
@@ -128,7 +138,7 @@ class Animate {
                 }
             }
 
-            if (node.stage) node.stage.draw();
+            if (autodraw && node.stage) node.stage.draw();
         }, dur);//.after(() => {
 
             /*for (let prop in finalValue) {

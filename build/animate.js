@@ -29,6 +29,18 @@ var Animate = function () {
             return twn;
         }
     }, {
+        key: 'drawUntil',
+        value: function drawUntil(stage, condition) {
+            if (!stage) return null;
+            var twn = new IndefiniteTween(function () {
+                stage.draw();
+
+                if (condition()) twn.cancel();
+            });
+            twn.run();
+            return twn;
+        }
+    }, {
         key: 'blink',
         value: function blink(nodes) {
             var dur = arguments.length <= 1 || arguments[1] === undefined ? 1000 : arguments[1];
@@ -123,6 +135,7 @@ var Animate = function () {
             var smoothFunc = arguments.length <= 3 || arguments[3] === undefined ? function (elapsed) {
                 return elapsed;
             } : arguments[3];
+            var autodraw = arguments.length <= 4 || arguments[4] === undefined ? true : arguments[4];
 
             //if (!(propName in node)) {
             //    console.error('@ Animate.tween: "' + propName.toString() + '" is not a property of node', node );
@@ -164,7 +177,7 @@ var Animate = function () {
                     }
                 }
 
-                if (node.stage) node.stage.draw();
+                if (autodraw && node.stage) node.stage.draw();
             }, dur); //.after(() => {
 
             /*for (let prop in finalValue) {

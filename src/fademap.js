@@ -32,13 +32,13 @@ var ExprManager = (function() {
     var DEFAULT_FADE_LEVEL = 0;
 
     var DEFAULT_FADE_PROGRESSION = {
-        'var'   : [[8, 14], 30, 39],
-        'hole'  : [[8, 14], 30, 39],
+        'var'   : [[8, 30], 30, 39],
+        'hole'  : [[8, 30], 30, 39],
         'if'    : [25, 42],
         '_b'    : [32],
         '=='    : [24],
-        'true'  : [41],
-        'false' : [41],
+        'true'  : [43],
+        'false' : [43],
         'bag'   : [48],
         'primitives' : [58]
     };
