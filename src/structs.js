@@ -597,16 +597,23 @@ class EmptyExpr extends Expression {
 // An if statement.
 class IfStatement extends Expression {
     constructor(cond, branch) {
-        var if_text = new TextExpr('if');
+
+        var question_mark = new TextExpr('?');
+        var else_text = new TextExpr(': null');
+        question_mark.color = else_text.color = 'black';
+        super([cond, question_mark, branch, else_text]);
+
+        // OLD -- if ... then ...
+        /*var if_text = new TextExpr('if');
         var then_text = new TextExpr('then');
         if_text.color = 'black';
         then_text.color = 'black';
-        super([if_text, cond, then_text, branch]);
+        super([if_text, cond, then_text, branch]);*/
         this.color = 'LightBlue';
     }
 
-    get cond() { return this.holes[1]; }
-    get branch() { return this.holes[3]; }
+    get cond() { return this.holes[0]; }
+    get branch() { return this.holes[2]; }
     get emptyExpr() { return null; }
     get constructorArgs() { return [this.cond.clone(), this.branch.clone()]; }
 
@@ -1593,7 +1600,7 @@ class BagExpr extends CollectionExpr {
 
         // Log changes
         Logger.log('bag-spill', {'before':before_str, 'after':stage.toString(), 'item':bag_before_str});
-        
+
         // Play spill sfx
         Resource.play('bag-spill');
     }

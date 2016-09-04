@@ -63,6 +63,24 @@
             "toolbox": "(λx #x)(λx #x #x) (bag) (star)"
         },
         {
+            "description": "Introducing binded booleans inside arrow functions.",
+            "board": "(map /(λx /(== #x /circle)) __)",
+            "goal": "(false)(false)(true)",
+            "toolbox": "(bag star circle triangle)"
+        },
+        {
+            "description": "Harder binded booleans inside arrow functions.",
+            "board": "(map /(λx /(== #x _)) /(bag star star star))",
+            "goal": "(true)(true)(true)",
+            "toolbox": "(star) (rect) (triangle)"
+        },
+        {
+            "description": "Reversed harder binded booleans inside arrow functions.",
+            "board": "(map /(λx _b) /(bag triangle star))",
+            "goal": "(false)(false)",
+            "toolbox": "(== #x /rect) (== #x /star) (== #x /triangle)"
+        },
+        {
             "description": "Player writes a constant transform.",
             "board": "(map /(λx /(if /true _)) __) (bag) (triangle) (star) (circle) (rect)",
             "goal": "(triangle) (triangle) (triangle)",

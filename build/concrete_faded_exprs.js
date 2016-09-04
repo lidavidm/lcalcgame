@@ -102,6 +102,30 @@ var FadedPythonLambdaHoleExpr = function (_LambdaHoleExpr3) {
     return FadedPythonLambdaHoleExpr;
 }(LambdaHoleExpr);
 
+var FadedES6LambdaHoleExpr = function (_FadedPythonLambdaHol) {
+    _inherits(FadedES6LambdaHoleExpr, _FadedPythonLambdaHol);
+
+    function FadedES6LambdaHoleExpr() {
+        _classCallCheck(this, FadedES6LambdaHoleExpr);
+
+        return _possibleConstructorReturn(this, Object.getPrototypeOf(FadedES6LambdaHoleExpr).apply(this, arguments));
+    }
+
+    _createClass(FadedES6LambdaHoleExpr, [{
+        key: 'openImage',
+        get: function get() {
+            return this.name === 'x' ? 'lambda-hole-x-es6' : 'lambda-hole-y';
+        }
+    }, {
+        key: 'closedImage',
+        get: function get() {
+            return this.name === 'x' ? 'lambda-hole-x-closed-es6' : 'lambda-hole-y-closed';
+        }
+    }]);
+
+    return FadedES6LambdaHoleExpr;
+}(FadedPythonLambdaHoleExpr);
+
 var HalfFadedLambdaVarExpr = function (_LambdaVarExpr) {
     _inherits(HalfFadedLambdaVarExpr, _LambdaVarExpr);
 
@@ -132,12 +156,12 @@ var FadedLambdaVarExpr = function (_LambdaVarExpr2) {
     function FadedLambdaVarExpr(varname) {
         _classCallCheck(this, FadedLambdaVarExpr);
 
-        var _this5 = _possibleConstructorReturn(this, Object.getPrototypeOf(FadedLambdaVarExpr).call(this, varname));
+        var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(FadedLambdaVarExpr).call(this, varname));
 
-        _this5.graphicNode.size = _this5.name === 'x' ? { w: 24, h: 24 } : { w: 24, h: 30 };
-        _this5.graphicNode.offset = _this5.name === 'x' ? { x: 0, y: 0 } : { x: 0, y: 2 };
-        _this5.handleOffset = 2;
-        return _this5;
+        _this6.graphicNode.size = _this6.name === 'x' ? { w: 24, h: 24 } : { w: 24, h: 30 };
+        _this6.graphicNode.offset = _this6.name === 'x' ? { x: 0, y: 0 } : { x: 0, y: 2 };
+        _this6.handleOffset = 2;
+        return _this6;
     }
 
     _createClass(FadedLambdaVarExpr, [{
@@ -198,30 +222,27 @@ var FadedSimpleMapFunc = function (_SimpleMapFunc) {
     function FadedSimpleMapFunc(oneParamFunc, bag) {
         _classCallCheck(this, FadedSimpleMapFunc);
 
-        var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(FadedSimpleMapFunc).call(this, oneParamFunc, bag));
+        var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(FadedSimpleMapFunc).call(this, oneParamFunc, bag));
 
         var txt_color = 'black';
-        var txt = new TextExpr('map(');
+        var txt = new TextExpr('.map(');
         txt.color = txt_color;
-        var comma = new TextExpr(',');
-        comma.color = txt_color;
         var txt2 = new TextExpr(')');
         txt2.color = txt_color;
 
-        _this6.holes = [];
-        _this6.addArg(txt);
-        _this6.addArg(oneParamFunc);
-        _this6.addArg(comma);
-        _this6.addArg(bag);
-        _this6.addArg(txt2);
-        _this6.arrowPaths = [];
+        _this7.holes = [];
+        _this7.addArg(bag);
+        _this7.addArg(txt);
+        _this7.addArg(oneParamFunc);
+        _this7.addArg(txt2);
+        _this7.arrowPaths = [];
         //this.heightScalar = 1.0;
         //this.exprOffsetY = 0;
         //this.animatedReduction = false;
-        _this6.update();
+        _this7.update();
 
-        _this6.color = "YellowGreen";
-        return _this6;
+        _this7.color = "YellowGreen";
+        return _this7;
     }
 
     _createClass(FadedSimpleMapFunc, [{
@@ -232,15 +253,15 @@ var FadedSimpleMapFunc = function (_SimpleMapFunc) {
     }, {
         key: 'func',
         get: function get() {
-            return this.holes[1];
+            return this.holes[2];
         }
     }, {
         key: 'bag',
         get: function get() {
-            return this.holes[3];
+            return this.holes[0];
         },
         set: function set(bg) {
-            this.holes[3] = bg;
+            this.holes[0] = bg;
         }
     }]);
 
@@ -258,12 +279,12 @@ var FadedMapFunc = function (_FadedSimpleMapFunc) {
 
         // Remove animations + arrow
 
-        var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(FadedMapFunc).call(this, oneParamFunc, bag));
+        var _this8 = _possibleConstructorReturn(this, Object.getPrototypeOf(FadedMapFunc).call(this, oneParamFunc, bag));
 
-        _this7.heightScalar = 1.0;
-        _this7.exprOffsetY = 0;
-        _this7.animatedReduction = false;
-        return _this7;
+        _this8.heightScalar = 1.0;
+        _this8.exprOffsetY = 0;
+        _this8.animatedReduction = false;
+        return _this8;
     }
 
     _createClass(FadedMapFunc, [{
@@ -284,31 +305,31 @@ var FunnelMapFunc = function (_MapFunc) {
     function FunnelMapFunc(oneParamFunc, bag) {
         _classCallCheck(this, FunnelMapFunc);
 
-        var _this8 = _possibleConstructorReturn(this, Object.getPrototypeOf(FunnelMapFunc).call(this, oneParamFunc, bag));
+        var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf(FunnelMapFunc).call(this, oneParamFunc, bag));
 
-        _this8.children = [];
-        _this8.holes = [];
+        _this9.children = [];
+        _this9.holes = [];
         //this.animatedReduction = false;
 
         // Expression it fits over.
         oneParamFunc.unlock();
-        _this8.addArg(oneParamFunc);
+        _this9.addArg(oneParamFunc);
 
         // Funnel graphic.
         var funnel = new FunnelExpr(0, 0, 198 / 2, 281 / 2);
-        _this8.funnel = funnel;
-        _this8.addArg(funnel);
+        _this9.funnel = funnel;
+        _this9.addArg(funnel);
 
         // Bag.
         //bag.unlock();
-        _this8.addArg(bag);
-        return _this8;
+        _this9.addArg(bag);
+        return _this9;
     }
 
     _createClass(FunnelMapFunc, [{
         key: 'update',
         value: function update() {
-            var _this9 = this;
+            var _this10 = this;
 
             if (this.func && this.funnel) {
                 this.func.pos = { x: this.funnel.size.w * 38 / 200, y: this.funnel.size.h / 2.0 - this.func.size.h / 1.3 };
@@ -326,7 +347,7 @@ var FunnelMapFunc = function (_MapFunc) {
             }
             this.children = [];
             this.holes.forEach(function (h) {
-                _this9.addChild(h);
+                _this10.addChild(h);
             });
         }
     }, {
@@ -392,12 +413,12 @@ var FadedVarExpr = function (_Expression) {
 
         var txt = new TextExpr(name);
 
-        var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(FadedVarExpr).call(this, [txt]));
+        var _this11 = _possibleConstructorReturn(this, Object.getPrototypeOf(FadedVarExpr).call(this, [txt]));
 
         txt.color = "OrangeRed";
-        _this10.color = "gold";
-        _this10.primitiveName = name;
-        return _this10;
+        _this11.color = "gold";
+        _this11.primitiveName = name;
+        return _this11;
     }
 
     _createClass(FadedVarExpr, [{
@@ -481,24 +502,24 @@ var BracketArrayExpr = function (_BagExpr) {
 
         _classCallCheck(this, BracketArrayExpr);
 
-        var _this15 = _possibleConstructorReturn(this, Object.getPrototypeOf(BracketArrayExpr).call(this, x, y, w, h, holding));
+        var _this16 = _possibleConstructorReturn(this, Object.getPrototypeOf(BracketArrayExpr).call(this, x, y, w, h, holding));
 
-        _this15.holes = [];
-        _this15.children = [];
+        _this16.holes = [];
+        _this16.children = [];
 
-        _this15.addArg(new Expression());
+        _this16.addArg(new Expression());
 
-        _this15._items = holding;
+        _this16._items = holding;
 
-        _this15.l_brak = new TextExpr('[');
-        _this15.r_brak = new TextExpr(']');
-        _this15.graphicNode.addArg(_this15.l_brak);
-        _this15.graphicNode.addArg(_this15.r_brak);
+        _this16.l_brak = new TextExpr('[');
+        _this16.r_brak = new TextExpr(']');
+        _this16.graphicNode.addArg(_this16.l_brak);
+        _this16.graphicNode.addArg(_this16.r_brak);
 
-        _this15.graphicNode.padding = { left: 10, inner: 0, right: 20 };
+        _this16.graphicNode.padding = { left: 10, inner: 0, right: 20 };
 
         //this.color = "tan";
-        return _this15;
+        return _this16;
     }
 
     _createClass(BracketArrayExpr, [{
@@ -544,7 +565,7 @@ var BracketArrayExpr = function (_BagExpr) {
     }, {
         key: 'spill',
         value: function spill() {
-            var _this16 = this;
+            var _this17 = this;
 
             if (!this.stage) {
                 console.error('@ BagExpr.spill: Bag is not attached to a Stage.');
@@ -567,7 +588,7 @@ var BracketArrayExpr = function (_BagExpr) {
 
                 item = item.clone();
                 var theta = index / items.length * Math.PI * 2;
-                var rad = _this16.size.h * 2.0;
+                var rad = _this17.size.h * 2.0;
                 var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
                 item.pos = pos;
                 Animate.tween(item, { 'pos': targetPos }, 100, function (elapsed) {
@@ -575,7 +596,7 @@ var BracketArrayExpr = function (_BagExpr) {
                 });
                 //item.pos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) });
                 item.parent = null;
-                _this16.graphicNode.removeChild(item);
+                _this17.graphicNode.removeChild(item);
                 item.scale = { x: 1, y: 1 };
                 stage.add(item);
             });
@@ -634,15 +655,15 @@ var BracketArrayExpr = function (_BagExpr) {
             return this._items.slice();
         },
         set: function set(items) {
-            var _this17 = this;
+            var _this18 = this;
 
             this._items.forEach(function (item) {
-                return _this17.graphicNode.removeArg(item);
+                return _this18.graphicNode.removeArg(item);
             });
             this.graphicNode.children = [this.l_brak, this.r_brak];
             this._items = [];
             items.forEach(function (item) {
-                _this17.addItem(item);
+                _this18.addItem(item);
             });
         }
     }, {

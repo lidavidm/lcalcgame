@@ -25,6 +25,10 @@ class FadedPythonLambdaHoleExpr extends LambdaHoleExpr {
         if(this.stroke) roundRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, 6, false, true);
     }
 }
+class FadedES6LambdaHoleExpr extends FadedPythonLambdaHoleExpr {
+    get openImage() { return this.name === 'x' ? 'lambda-hole-x-es6' : 'lambda-hole-y'; }
+    get closedImage() { return this.name === 'x' ? 'lambda-hole-x-closed-es6' : 'lambda-hole-y-closed'; }
+}
 
 class HalfFadedLambdaVarExpr extends LambdaVarExpr {
     get openImage() { return 'lambda-pipe-open'; }
@@ -77,18 +81,15 @@ class FadedSimpleMapFunc extends SimpleMapFunc {
         super(oneParamFunc, bag);
 
         let txt_color = 'black';
-        let txt = new TextExpr('map(');
+        let txt = new TextExpr('.map(');
         txt.color = txt_color;
-        let comma = new TextExpr(',');
-        comma.color = txt_color;
         let txt2 = new TextExpr(')');
         txt2.color = txt_color;
 
         this.holes = [];
+        this.addArg(bag);
         this.addArg(txt);
         this.addArg(oneParamFunc);
-        this.addArg(comma);
-        this.addArg(bag);
         this.addArg(txt2);
         this.arrowPaths = [];
         //this.heightScalar = 1.0;
@@ -100,13 +101,13 @@ class FadedSimpleMapFunc extends SimpleMapFunc {
     }
     get returnBag() { return null; }
     get func() {
-        return this.holes[1];
+        return this.holes[2];
     }
     get bag() {
-        return this.holes[3];
+        return this.holes[0];
     }
     set bag(bg) {
-        this.holes[3] = bg;
+        this.holes[0] = bg;
     }
 }
 

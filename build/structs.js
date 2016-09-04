@@ -886,12 +886,19 @@ var IfStatement = function (_Expression5) {
     function IfStatement(cond, branch) {
         _classCallCheck(this, IfStatement);
 
-        var if_text = new TextExpr('if');
+        var question_mark = new TextExpr('?');
+        var else_text = new TextExpr(': null');
+        question_mark.color = else_text.color = 'black';
+
+
+        // OLD -- if ... then ...
+        /*var if_text = new TextExpr('if');
         var then_text = new TextExpr('then');
         if_text.color = 'black';
         then_text.color = 'black';
+        super([if_text, cond, then_text, branch]);*/
 
-        var _this13 = _possibleConstructorReturn(this, Object.getPrototypeOf(IfStatement).call(this, [if_text, cond, then_text, branch]));
+        var _this13 = _possibleConstructorReturn(this, Object.getPrototypeOf(IfStatement).call(this, [cond, question_mark, branch, else_text]));
 
         _this13.color = 'LightBlue';
         return _this13;
@@ -964,12 +971,12 @@ var IfStatement = function (_Expression5) {
     }, {
         key: 'cond',
         get: function get() {
-            return this.holes[1];
+            return this.holes[0];
         }
     }, {
         key: 'branch',
         get: function get() {
-            return this.holes[3];
+            return this.holes[2];
         }
     }, {
         key: 'emptyExpr',
