@@ -32,16 +32,16 @@ var ExprManager = (function() {
     var DEFAULT_FADE_LEVEL = 0;
 
     var DEFAULT_FADE_PROGRESSION = {
-        'var'   : [[8, 30], 30, 39],
-        'hole'  : [[8, 30], 30, 39],
-        'if'    : [25, 42],
+        'var'   : [[8, 28], 28, 39],
+        'hole'  : [[8, 28], 28, 39],
+        'if'    : [24, 43],
         '_b'    : [32],
-        '=='    : [24],
-        'true'  : [43],
-        'false' : [43],
-        'bag'   : [[48, 51]],
-        'primitives' : [59],
-        'map'   : [58]
+        '=='    : [22],
+        'true'  : [44],
+        'false' : [44],
+        'bag'   : [[49, 58]],
+        'primitives' : [60],
+        'map'   : [59]
     };
     const primitives = ['triangle', 'rect', 'star', 'circle', 'diamond'];
 

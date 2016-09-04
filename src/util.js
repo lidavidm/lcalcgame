@@ -40,6 +40,23 @@
  function multiplyPos(p, q) {
      return { x:p.x*q.x, y:p.y*q.y };
  }
+ function clipToRect(upperLeftPos, itemSize, clipOrigin, clipSize) {
+     let q = clonePos(upperLeftPos);
+     let right_boundary = clipOrigin.x + clipSize.w - itemSize.w;
+     let left_boundary = clipOrigin.x;
+     let top_boundary = clipOrigin.y;
+     let bot_boundary = clipOrigin.y + clipSize.h - itemSize.h;
+     if (q.x > right_boundary)
+         q.x = right_boundary;
+     else if (q.x < left_boundary)
+        q.x = left_boundary;
+     if (q.y > bot_boundary)
+        q.y = bot_boundary;
+     else if (q.y < top_boundary)
+        q.y = top_boundary;
+     return q;
+ }
+ function zeroPos() { return {x:0, y:0}; }
  function middleOf(p, q) {
      return { x:(p.x + q.x) / 2.0, y:(p.y + q.y) / 2.0 };
  }

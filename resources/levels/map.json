@@ -75,12 +75,6 @@
             "toolbox": ""
         },
         {
-            "description": "Selective Destruction",
-            "board": "(map /(λx /(if /false #x)) __) (bag) (star) (rect) (rect) (star) (triangle) (star) (circle) (circle)",
-            "goal": "(triangle) (circle) (rect)",
-            "toolbox": ""
-        },
-        {
             "description":"Introducing, the filter function!",
             "board":"(map /(λx /(if (== #x /star) /#x)) (bag star diamond circle))",
             "goal":"(star)",

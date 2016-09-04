@@ -2488,12 +2488,21 @@ var BagExpr = function (_CollectionExpr) {
             // Remove the bag from the stage.
             // stage.remove(this);
 
+            var before_str = stage.toString();
+            var bag_before_str = this.toString();
+            stage.saveState();
+            Logger.log('state-save', stage.toString());
+
             // Add back all of this bags' items to the stage.
             items.forEach(function (item, index) {
                 item = item.clone();
                 var theta = index / items.length * Math.PI * 2;
                 var rad = _this52.size.w * 1.5;
                 var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
+
+                targetPos = clipToRect(targetPos, item.absoluteSize, { x: 25, y: 0 }, { w: GLOBAL_DEFAULT_SCREENSIZE.width - 25,
+                    h: GLOBAL_DEFAULT_SCREENSIZE.height - stage.toolbox.size.h });
+
                 item.pos = pos;
                 Animate.tween(item, { 'pos': targetPos }, 100, function (elapsed) {
                     return Math.pow(elapsed, 0.5);
@@ -2509,6 +2518,9 @@ var BagExpr = function (_CollectionExpr) {
             this.items = [];
             this.graphicNode.removeAllItems(); // just to be sure!
             console.warn(this.graphicNode);
+
+            // Log changes
+            Logger.log('bag-spill', { 'before': before_str, 'after': stage.toString(), 'item': bag_before_str });
 
             // Play spill sfx
             Resource.play('bag-spill');

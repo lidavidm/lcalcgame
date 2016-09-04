@@ -243,8 +243,8 @@ class Stage {
             this.expressionNodes().forEach((n) => this.remove(n));
             this.toolboxNodes().forEach((n) => this.remove(n));
             let restored_state = this.stateStack.pop();
-            restored_nodes.board.forEach((n) => this.add(n));
-            restored_nodes.toolbox.forEach((n) => {
+            restored_state.board.forEach((n) => this.add(n));
+            restored_state.toolbox.forEach((n) => {
                 n.toolbox = this.toolbox;
                 this.add(n);
             });

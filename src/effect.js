@@ -27,7 +27,7 @@ class SplosionEffect {
             // Create individual particle + add each to the stage.
             let part = new Circle(center.x, center.y,
                 Math.floor(PARTICLE_MIN_RAD + (PARTICLE_MAX_RAD - PARTICLE_MIN_RAD) * Math.random()));
-            part.color = 'orange';
+            part.color = 'gold';
             part.shadowOffset = 0;
             parts.push(part);
             stage.add(part);

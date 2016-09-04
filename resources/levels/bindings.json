@@ -9,6 +9,12 @@
             "toolbox": ""
         },
         {
+            "description": "Fades lambdas.",
+            "board": "(λx /(== #x /star)) (λx #x) (rect)",
+            "goal": "false",
+            "toolbox": ""
+        },
+        {
             "description": "Reinforces concept: Pipes outside of pure lambdas.",
             "board": "(λx /(== #x /rect)) (λx /(== /star #x))",
             "goal": "(true) (true)",
@@ -40,9 +46,9 @@
         },
         {
             "description": "The same function, different inputs, can have different output.",
-            "board": "(λx #x #x) (λx star) (== #x /diamond) (diamond)",
+            "board": "(λx #x #x) (λx _) (== #x /diamond)",
             "goal": "(true) (false)",
-            "toolbox": ""
+            "toolbox": "(diamond) (star)"
         },
         {
             "description": "Conditionals, booleans, and one-param functions.",

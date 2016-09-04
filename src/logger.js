@@ -1,8 +1,11 @@
 var Logger = (function() {
 
     const __GAME_ID = 7017017;
-    const __VERSION_ID = 0.3;
+    const __VERSION_ID = 0.54;
     const __OFFLINE_NAME_PROMPT = false;
+    const __RUNNING_LOCALLY = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+    const __LOCAL_LOGGING = __RUNNING_LOCALLY;
+    const __LOCAL_LOGGER_PORT = 3333;
     const __GDIAC_BASEURL = 'http://gdiac.cs.cornell.edu/cs6360/spring2016/';
     const __PAGE_LOAD_URL = __GDIAC_BASEURL + 'page_load.php';
     const __TASK_BEGIN_URL = __GDIAC_BASEURL + 'player_quest.php';
@@ -16,6 +19,8 @@ var Logger = (function() {
     var currentTaskID = null;
     var dynamicTaskID = null;
 
+    pub.playerId = null;
+
     // Static logging. (as backup)
     var isOfflineSession = false;
     var static_log = [];
@@ -23,6 +28,13 @@ var Logger = (function() {
         if (!uploaded) data['error_message'] = 'This log failed to upload to the server.';
         static_log.push( [funcname, data] );
         //console.log('Log static: ', funcname, data);
+
+        if (__LOCAL_LOGGING) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", 'http://localhost:' + __LOCAL_LOGGER_PORT, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify([funcname, data], null, 2));
+        }
     };
 
     /** Thanks to aroth @ SO:
@@ -30,7 +42,7 @@ var Logger = (function() {
     var SERIALIZE = (paramobj) => {
         var str = "";
         for (var key in paramobj) {
-            if (str != "") str += "&";
+            if (str !== "") str += "&";
             str += key + "=" + encodeURIComponent(paramobj[key]); }
         return str;
     };
@@ -105,6 +117,8 @@ var Logger = (function() {
                 // Rejected response. Create dummy ID and session ID to let user play game.
                 if (__OFFLINE_NAME_PROMPT)
                     currentUserID = window.prompt('Welcome! Please enter your name.', 'unknown');
+                else if (pub.playerId)
+                    currentUserID = pub.playerId;
                 else
                     currentUserID = Date.now();
                 currentSessionID = Date.now();

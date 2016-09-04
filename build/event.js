@@ -282,10 +282,10 @@ var Stage = function () {
                     return _this4.remove(n);
                 });
                 var restored_state = this.stateStack.pop();
-                restored_nodes.board.forEach(function (n) {
+                restored_state.board.forEach(function (n) {
                     return _this4.add(n);
                 });
-                restored_nodes.toolbox.forEach(function (n) {
+                restored_state.toolbox.forEach(function (n) {
                     n.toolbox = _this4.toolbox;
                     _this4.add(n);
                 });
