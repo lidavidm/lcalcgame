@@ -12,7 +12,7 @@ var ExprManager = function () {
         'circle': [CircleExpr, FadedCircleExpr],
         'diamond': [RectExpr, FadedRectExpr],
         '_': [MissingExpression],
-        '__': [MissingBagExpression],
+        '__': [MissingBagExpression, MissingBracketExpression],
         '_b': [MissingKeyExpression, MissingBooleanExpression],
         'true': [KeyTrueExpr, TrueExpr],
         'false': [KeyFalseExpr, FalseExpr],
@@ -42,6 +42,7 @@ var ExprManager = function () {
         'true': [44],
         'false': [44],
         'bag': [[49, 518]],
+        '__': [49],
         'primitives': [70],
         'map': [59]
     };

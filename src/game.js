@@ -344,7 +344,8 @@ class Level {
             return lambdavar;
         } else {
             console.error('Unknown argument: ', arg);
-            return new Expression();
+            return new FadedVarExpr(arg);
+            //return new Expression();
         }
 
         // Unreachable....

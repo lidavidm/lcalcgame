@@ -151,6 +151,8 @@ var Resource = function () {
     loadImage('victory', 'you-win.png');
 
     // Concreteness faded images.
+    loadImage('missing-bracket', 'missing-bracket.png');
+    loadImage('missing-bracket-selected', 'missing-bracket-selected.png');
     loadImage('lambda-hole-x', 'lambda-hole-x.png');
     loadImage('lambda-hole-x-closed', 'lambda-hole-x-closed.png');
     //loadImage('lambda-hole-x-python', 'lambda-hole-x-python.png');

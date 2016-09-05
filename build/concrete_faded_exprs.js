@@ -573,6 +573,9 @@ var BracketArrayExpr = function (_BagExpr) {
             } else if (this.parent) {
                 console.error('@ BagExpr.spill: Cannot spill a bag while it\'s inside of another expression.');
                 return;
+            } else if (this.toolbox) {
+                console.warn('@ BagExpr.spill: Cannot spill bag while it\'s inside the toolbox.');
+                return;
             }
 
             var stage = this.stage;

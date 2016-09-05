@@ -162,6 +162,8 @@ var Level = function () {
     }, {
         key: 'findBestPacking',
 
+        //return new Expression();
+
 
         // Unreachable....
 
@@ -609,7 +611,7 @@ var Level = function () {
                 return lambdavar;
             } else {
                 console.error('Unknown argument: ', arg);
-                return new Expression();
+                return new FadedVarExpr(arg);
             }
         }
     }]);

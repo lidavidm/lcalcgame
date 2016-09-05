@@ -522,6 +522,7 @@ var Stage = function () {
 
 function delegateMouse(canvas, stage) {
 
+    var RIGHT_BTN = 2;
     var mouseIsDown = false;
     var mouseDragged = false;
     var mouseDownTime = 0;
@@ -545,6 +546,8 @@ function delegateMouse(canvas, stage) {
 
         // MOUSE EVENTS
         canvas.onmousedown = function (e) {
+            if (e.button === RIGHT_BTN) return;
+
             stage.onmousedown(getMousePos(e));
 
             mouseIsDown = true;
@@ -553,6 +556,8 @@ function delegateMouse(canvas, stage) {
             missedDragCalls = [];
         };
         canvas.onmouseup = function (e) {
+            if (e.button === RIGHT_BTN) return;
+
             var mousepos = getMousePos(e);
 
             if (!mouseDragged) stage.onmouseclick(mousepos);
@@ -563,6 +568,8 @@ function delegateMouse(canvas, stage) {
             mouseDragged = false;
         };
         canvas.onmousemove = function (e) {
+            if (e.button === RIGHT_BTN) return;
+
             if (!mouseIsDown) {
                 stage.onmousehover(getMousePos(e));
             } else if (mouseDragged || Date.now() - mouseDownTime > CLICK_DEBOUNCE_TIME) {
