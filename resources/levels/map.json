@@ -40,7 +40,7 @@
         },
         {
             "description": "Inception.",
-            "board": "(map /(λx /star) __) (bag star star star star star star) (bag star star star star star) (bag star star) (bag star) (bag star star star star)",
+            "board": "(map /(λx /star) __) (bag star star star) (bag star star) (bag star)",
             "goal": "star",
             "toolbox": ""
         },
