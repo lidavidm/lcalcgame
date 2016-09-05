@@ -62,6 +62,14 @@
                 height:100%;
                 background-color: gold;
             }
+            #endscreen {
+                position: absolute;
+                display: none;
+                font-family: Arial, sans-serif;
+            }
+            #endscreen > h1 {
+                color: Salmon;
+            }
             .centered {
                 padding: 0;
                 margin-left: auto;
@@ -81,6 +89,8 @@
         </style>
         <script type="text/javascript">
 
+        var __SHOW_DEV_INFO = false;
+
         var GLOBAL_DEFAULT_CTX = null;
         var GLOBAL_DEFAULT_SCREENSIZE = null;
         var stage;
@@ -91,6 +101,9 @@
             setWriteALevelPopup("writeALevel", 'write-level-form');
 
             Resource.initAudio();
+
+            if (!__SHOW_DEV_INFO)
+                $('#devinfo').hide();
 
             if (__GET_PARAMS) {
                 var start_from = __GET_PARAMS.level;
@@ -121,20 +134,26 @@
             stage.draw();
         }
 
+        function clearStage() {
+            if (stage) {
+                stage.clear();
+                stage.invalidate();
+                delete stage;
+            }
+
+            if (AnimationUpdateLoop) {
+                AnimationUpdateLoop.clear();
+            }
+        }
+
         function initBoard() {
 
             canvas = document.getElementById('canvas');
             if (canvas.getContext) {
 
-                if (stage) {
-                    stage.invalidate();
-                    delete stage;
-                }
+                clearStage();
 
-                if(AnimationUpdateLoop) {
-                    AnimationUpdateLoop.clear();
-                }
-
+                hideEndGame();
                 updateProgressBar();
 
                 GLOBAL_DEFAULT_CTX = canvas.getContext('2d');
@@ -156,8 +175,39 @@
             }
         }
 
+        function initEndGame() {
+            canvas = document.getElementById('canvas');
+            if (canvas.getContext) {
+
+                clearStage();
+                updateProgressBar();
+
+                let size = canvas.getBoundingClientRect();
+                $('#endscreen').css( { top:size.height / 3.0 } );
+                $('#endscreen').show();
+
+                Resource.play('game-complete');
+
+            }
+        }
+        function hideEndGame() {
+            $('#endscreen').hide();
+        }
+
+        function toggleDevInfo() {
+            let devinfo = $('#devinfo');
+            let txt = $('#devInfoBtnText');
+            if (devinfo.is(':visible')) {
+                devinfo.hide();
+                txt.text('Show');
+            } else {
+                devinfo.show();
+                txt.text('Hide');
+            }
+        }
+
         function updateProgressBar() {
-            setProgressBar('progressBar', 'progressBarContainer', level_idx / Resource.level.length);
+            setProgressBar('progressBar', 'progressBarContainer', level_idx / (Resource.level.length - 1));
         }
         function prev() {
             if (!Logger.sessionBegan()) return;
@@ -169,7 +219,9 @@
         }
         function next() {
             if (!Logger.sessionBegan()) return;
-            if (level_idx === Resource.level.length-1) initBoard();
+            if (level_idx === Resource.level.length-1) {
+                initEndGame();
+            }
             else {
                 level_idx++;
                 initBoard();
@@ -204,64 +256,86 @@
 
         </script>
     </head>
+
     <body onload="init()" bgcolor="lightgray">
+
         <div id="progressBarContainer" class="centered shadow">
             <div id="progressBar">
             </div>
         </div>
-        <canvas id="canvas" onmousedown="" width="800" height="600" style="background-color:#EEE;"></canvas>
+
+        <div id="canvasContainer">
+            <canvas id="canvas" onmousedown="" width="800" height="600" style="background-color:#EEE;"></canvas>
+            <div id="endscreen" class="centered">
+                <h1>Thanks for playing!</h1>
+                <p>
+                    If you have any feedback or questions, <br /> contact us at iaa32 - at - cornell.edu
+                </p>
+            </div>
+        </div>
+
         <br />
+
         <div id="state" class="centered">
             <button onclick="undo()">Undo</button>
         </div>
-        <div id="explanation" class="centered">
+
+        <div id="duplicate_buttons" class="centered">
             <button onclick="prev()">Prev</button>
             <button onclick="initBoard()">Reset</button>
             <button onclick="next()">Next</button>
-            <p>
-                Level #<span id="lvl_num"></span> <br />
-                <span style="color:grey;"><span id="lvl_desc">[description]</span></span> <br />
-                Jump to: <select id="chapterSelect" name="chapter" onchange="gotoChapter()">
-                </select>
-            </p>
-            <p>
-                Drop expressions into <span style="color:#666;">holes</span> inside other expressions. <br />
-                If an expression blinks <span style="color:ForestGreen;">green</span>, click it to reduce.
-            </p>
         </div>
-        <div class="centered">
-            <p>
-                <button id="writeALevel">Write your own level!</button>
-            </p>
 
-            <div id="write-level-form" title="Write a level">
-              <p class="validateTips">Refer to <a href="writing_levels.html" target="blank">this sheet</a> for more info.</p>
+        <div id="devinfo">
 
-              <form>
-                <fieldset>
-                  <label for="name">Level:</label>
-                  <input type="text" name="name" id="level_expr_input" value="(λx #x) (star)" class="expr_input" size="45"> <br />
-                  <label for="email">Goal:</label>
-                  <input type="text" name="email" id="goal_expr_input" value="(star)" class="expr_input" size="45">
-
-                  <!-- Allow form submission with keyboard without duplicating the dialog button -->
-                  <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-                </fieldset>
-              </form>
-
-              <p>
-                  Or upload a JSON spec for a new chapter:
-              </p>
-              <input id="add_chapter_json" value="asdad" type="file" />
-
+            <div id="explanation" class="centered">
+                <p>
+                    Level #<span id="lvl_num"></span> <br />
+                    <span style="color:grey;"><span id="lvl_desc">[description]</span></span> <br />
+                    Jump to: <select id="chapterSelect" name="chapter" onchange="gotoChapter()">
+                    </select>
+                </p>
+                <p>
+                    Drop expressions into <span style="color:#666;">holes</span> inside other expressions. <br />
+                    If an expression blinks <span style="color:ForestGreen;">green</span>, click it to reduce.
+                </p>
             </div>
 
+            <div class="centered">
+                <p>
+                    <button id="writeALevel">Write your own level!</button>
+                </p>
+
+                <div id="write-level-form" title="Write a level">
+                  <p class="validateTips">Refer to <a href="writing_levels.html" target="blank">this sheet</a> for more info.</p>
+
+                  <form>
+                    <fieldset>
+                      <label for="name">Level:</label>
+                      <input type="text" name="name" id="level_expr_input" value="(λx #x) (star)" class="expr_input" size="45"> <br />
+                      <label for="email">Goal:</label>
+                      <input type="text" name="email" id="goal_expr_input" value="(star)" class="expr_input" size="45">
+
+                      <!-- Allow form submission with keyboard without duplicating the dialog button -->
+                      <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+                    </fieldset>
+                  </form>
+
+                  <p>
+                      Or upload a JSON spec for a new chapter:
+                  </p>
+                  <input id="add_chapter_json" value="asdad" type="file" />
+
+                </div>
+            </div>
         </div>
 
         <div class="centered">
         </div>
 
         <div id="logdownload" class="centered">
+            <br />
+            <button onclick="toggleDevInfo()"><span id="devInfoBtnText">Show</span> dev info box.</button>
             <button onclick="Logger.download()">Download log data.</button>
         </div>
     </body>

@@ -102,6 +102,7 @@ var Resource = function () {
         loadAudio('victory', '325805__wagna__collect.wav');
         loadAudio('matching-goal', 'matching-the-goal2.wav');
         loadAudio('mutate', 'deflate.wav');
+        loadAudio('game-complete', 'game-complete.wav');
     };
 
     loadImage('bag-background', 'bg-stars.png');
