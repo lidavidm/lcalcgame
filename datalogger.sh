@@ -1,1 +1,1 @@
-node log_analyzer/nodejs-log-listener/log-listener.js
+cd log_analyzer/nodejs-log-listener && npm update && node log-listener.js
