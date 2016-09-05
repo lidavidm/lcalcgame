@@ -661,6 +661,11 @@ var LambdaExpr = function (_Expression) {
             }, true);
         }
     }, {
+        key: 'isConstantFunction',
+        get: function get() {
+            return this.takesArgument && Stage.getNodesWithClass(LambdaVarExpr, [], true, [this]).length === 0;
+        }
+    }, {
         key: 'body',
         get: function get() {
             return this.takesArgument ? this.holes[1] : null;

@@ -270,7 +270,6 @@ class BracketArrayExpr extends BagExpr {
     addItem(item) {
 
         item.onmouseleave();
-
         item.lock();
 
         this._items.push(item);
@@ -282,17 +281,17 @@ class BracketArrayExpr extends BagExpr {
 
         this.graphicNode.holes.splice(this.graphicNode.holes.length-1, 0, item);
 
-
         this.graphicNode.update();
-
-        console.log(this.graphicNode.children, this.graphicNode.children.length);
-
     }
 
     // Removes an item from the bag and returns it.
     popItem() {
         let item = this._items.pop();
         this.graphicNode.removeArg(item);
+        if(this._items.length >= 1) {
+            let last_comma_idx = this.graphicNode.holes.length - 2;
+            this.graphicNode.holes.splice(last_comma_idx, 1);
+        }
         return item;
     }
 
@@ -300,13 +299,13 @@ class BracketArrayExpr extends BagExpr {
     spill() {
 
         if (!this.stage) {
-            console.error('@ BagExpr.spill: Bag is not attached to a Stage.');
+            console.error('@ BracketArrayExpr.spill: Array is not attached to a Stage.');
             return;
         } else if (this.parent) {
-            console.error('@ BagExpr.spill: Cannot spill a bag while it\'s inside of another expression.');
+            console.error('@ BracketArrayExpr.spill: Cannot spill array while it\'s inside of another expression.');
             return;
         } else if (this.toolbox) {
-            console.warn('@ BagExpr.spill: Cannot spill bag while it\'s inside the toolbox.');
+            console.warn('@ BracketArrayExpr.spill: Cannot spill array while it\'s inside the toolbox.');
             return;
         }
 

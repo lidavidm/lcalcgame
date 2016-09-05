@@ -196,6 +196,9 @@ var MapFunc = function (_FuncExpr) {
                 var superReduce;
                 var bagAfterMap;
                 var popCount;
+
+                var _this;
+
                 var bagToFuncArrowPath;
                 var bag;
 
@@ -232,10 +235,11 @@ var MapFunc = function (_FuncExpr) {
                         bagAfterMap = _this4.reduce();
                         popCount = bagAfterMap.items.length / _this4.bag.items.length; // in case ßthere was replication...ß
 
-                        bagToFuncArrowPath = _this4.bagToFuncArrowPath;
+                        _this = _this4;
                         bag = _this4.bag;
 
                         _runNextAnim = function runNextAnim(n) {
+
                             if (bag.items.length === 0) {
 
                                 // Reached end of bag. Terminate animation.
@@ -262,6 +266,9 @@ var MapFunc = function (_FuncExpr) {
                                     // Add it to the stage, making it smaller
                                     // so that it can 'follow' the path of the arrow from bag into function.
                                     stage.add(item);
+                                    stage.update();
+                                    bagToFuncArrowPath = _this.bagToFuncArrowPath;
+
                                     item.scale = { x: 0.5, y: 0.5 };
                                     item.parent = null;
 
@@ -271,13 +278,17 @@ var MapFunc = function (_FuncExpr) {
                                     _this4.isAnimating = true;
 
                                     dropItem = function dropItem() {
+
                                         // Preview
                                         func.holes[0].ondropenter(preview_item);
 
                                         // Remove item (preview) from the stage when it reaches end of arrow path (enters 'function' hole).
                                         stage.remove(item);
+                                        stage.update();
 
-                                        Animate.wait(1000).after(function () {
+                                        var preview_duration = func.isConstantFunction ? 100 : 1000;
+
+                                        Animate.wait(preview_duration).after(function () {
 
                                             func.holes[0].ondropexit();
 
@@ -285,7 +296,7 @@ var MapFunc = function (_FuncExpr) {
                                             for (var _i = 0; _i < itemsAfterMap.length; _i++) {
                                                 var itemAfterMap = itemsAfterMap[_i];
                                                 var theta = Math.random() * Math.PI * 2;
-                                                var rad = bag.size.w * 1.5;
+                                                var rad = bag.size.h * 1.5;
                                                 var pos = func.body.absolutePos;
                                                 var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
                                                 itemAfterMap.pos = pos;

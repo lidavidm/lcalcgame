@@ -408,6 +408,9 @@ class LambdaExpr extends Expression {
         if (this.holes.length < 2) return true;
         return this.holes.slice(1).reduce(((prev,arg) => (prev && !(arg instanceof MissingExpression))), true);
     }
+    get isConstantFunction() {
+        return this.takesArgument && Stage.getNodesWithClass(LambdaVarExpr, [], true, [this]).length === 0;
+    }
     get body() { return this.takesArgument ? this.holes[1] : null; }
     updateHole() {
         // Determine whether this LambdaExpr has any MissingExpressions:

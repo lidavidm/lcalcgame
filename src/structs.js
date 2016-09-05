@@ -474,6 +474,8 @@ class MissingBracketExpression extends MissingBagExpression {
         super(expr_to_miss);
         this.graphicNode = new ImageRect(0, 0, 22, 22, 'missing-bracket');
     }
+    getClass() { return MissingBracketExpression; }
+
     onmouseenter(pos) {
         super.onmouseenter(pos);
         this.graphicNode.image = 'missing-bracket-selected';
@@ -501,8 +503,8 @@ class MissingBracketExpression extends MissingBagExpression {
         }
     }
     drawInternal(pos, boundingSize) {
-        pos.x -= boundingSize.w / 1.4 - boundingSize.w;
-        pos.y -= boundingSize.h / 1.1 - boundingSize.h;
+        pos.x -= boundingSize.w / 1.1 - boundingSize.w;
+        pos.y -= boundingSize.h / 1.05 - boundingSize.h;
         boundingSize.w /= 1.1;
         boundingSize.h /= 1.1;
         this.graphicNode.ctx = this.ctx;

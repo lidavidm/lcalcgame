@@ -649,6 +649,11 @@ var MissingBracketExpression = function (_MissingBagExpression) {
     }
 
     _createClass(MissingBracketExpression, [{
+        key: 'getClass',
+        value: function getClass() {
+            return MissingBracketExpression;
+        }
+    }, {
         key: 'onmouseenter',
         value: function onmouseenter(pos) {
             _get(Object.getPrototypeOf(MissingBracketExpression.prototype), 'onmouseenter', this).call(this, pos);
@@ -687,8 +692,8 @@ var MissingBracketExpression = function (_MissingBagExpression) {
     }, {
         key: 'drawInternal',
         value: function drawInternal(pos, boundingSize) {
-            pos.x -= boundingSize.w / 1.4 - boundingSize.w;
-            pos.y -= boundingSize.h / 1.1 - boundingSize.h;
+            pos.x -= boundingSize.w / 1.1 - boundingSize.w;
+            pos.y -= boundingSize.h / 1.05 - boundingSize.h;
             boundingSize.w /= 1.1;
             boundingSize.h /= 1.1;
             this.graphicNode.ctx = this.ctx;

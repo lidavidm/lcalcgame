@@ -163,9 +163,11 @@ class MapFunc extends FuncExpr {
                 var bagAfterMap = this.reduce();
                 var popCount = bagAfterMap.items.length / this.bag.items.length; // in case ßthere was replication...ß
 
-                var bagToFuncArrowPath = this.bagToFuncArrowPath;
+                var _this = this;
+                var bagToFuncArrowPath;
                 var bag = this.bag;
                 var runNextAnim = (n) => {
+
                     if (bag.items.length === 0) {
 
                         // Reached end of bag. Terminate animation.
@@ -187,6 +189,9 @@ class MapFunc extends FuncExpr {
                         // Add it to the stage, making it smaller
                         // so that it can 'follow' the path of the arrow from bag into function.
                         stage.add(item);
+                        stage.update();
+                        bagToFuncArrowPath = _this.bagToFuncArrowPath;
+
                         item.scale = { x:0.5, y:0.5 };
                         item.parent = null;
 
@@ -196,13 +201,17 @@ class MapFunc extends FuncExpr {
                         this.isAnimating = true;
 
                         var dropItem = () => {
+
                             // Preview
                             func.holes[0].ondropenter(preview_item);
 
                             // Remove item (preview) from the stage when it reaches end of arrow path (enters 'function' hole).
                             stage.remove(item);
+                            stage.update();
 
-                            Animate.wait(1000).after(function () {
+                            let preview_duration = func.isConstantFunction ? 100 : 1000;
+
+                            Animate.wait(preview_duration).after(function () {
 
                                 func.holes[0].ondropexit();
 
@@ -210,7 +219,7 @@ class MapFunc extends FuncExpr {
                                 for (let i = 0; i < itemsAfterMap.length; i++) {
                                     let itemAfterMap = itemsAfterMap[i];
                                     let theta = Math.random() * Math.PI * 2;
-                                    let rad = bag.size.w * 1.5;
+                                    let rad = bag.size.h * 1.5;
                                     let pos = func.body.absolutePos;
                                     let targetPos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) } );
                                     itemAfterMap.pos = pos;
