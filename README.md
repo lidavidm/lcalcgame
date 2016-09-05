@@ -2,7 +2,7 @@
 A prototype of a game to teach programming
 
 ## Instructions
-To play on Mac, download the .zip and spin up a local server with:
+To play, download the .zip and spin up a local server with:
 
 > bash server.sh
 
@@ -19,3 +19,6 @@ and use the GET param player=<index> when visiting the game URL. For instance,
 
 logs data only for player 7. This is useful since data can be logged across sessions (visits to the game),
 in case the game breaks or Chrome crashes.
+
+### Requirements
+This game has been tested on a Mac in Google Chrome.
