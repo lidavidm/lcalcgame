@@ -382,8 +382,6 @@ var Rect = function (_Node) {
 
                         if (e == this) return null;
                     }
-                    //console.log('excluding ', this);
-                    //return null; // skip excluded nodes
                 } catch (err) {
                     _didIteratorError3 = true;
                     _iteratorError3 = err;

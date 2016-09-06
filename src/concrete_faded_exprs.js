@@ -30,6 +30,27 @@ class FadedES6LambdaHoleExpr extends FadedPythonLambdaHoleExpr {
     get openImage() { return this.name === 'x' ? 'lambda-hole-x-es6' : 'lambda-hole-y'; }
     get closedImage() { return this.name === 'x' ? 'lambda-hole-x-closed-es6' : 'lambda-hole-y-closed'; }
 
+    // Events
+    hits(pos, options) {
+        if (this.ignoreEvents) return null; // All children are ignored as well.
+
+        if (typeof options !== 'undefined' && options.hasOwnProperty('exclude')) {
+            for(let e of options.exclude) {
+                if (e == this) return null;
+            }
+        }
+
+        var hitChild = this.hitsChild(pos, options);
+        if (hitChild) return hitChild;
+
+        // Hasn't hit any children, so test if the point lies on this node.
+        var boundingSize = this.absoluteSize;
+        boundingSize.w /= 2.0;
+        var upperLeftPos = this.upperLeftPos(this.absolutePos, boundingSize);
+        if (pointInRect(pos, rectFromPosAndSize(upperLeftPos, boundingSize) )) return this;
+        else return null;
+    }
+
     // Draw special round rect around just x term.
     drawInternal(pos, boundingSize) {
         var ctx = this.ctx;

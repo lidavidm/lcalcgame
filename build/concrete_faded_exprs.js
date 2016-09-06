@@ -113,10 +113,54 @@ var FadedES6LambdaHoleExpr = function (_FadedPythonLambdaHol) {
     }
 
     _createClass(FadedES6LambdaHoleExpr, [{
-        key: 'drawInternal',
+        key: 'hits',
 
+
+        // Events
+        value: function hits(pos, options) {
+            if (this.ignoreEvents) return null; // All children are ignored as well.
+
+            if (typeof options !== 'undefined' && options.hasOwnProperty('exclude')) {
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
+
+                try {
+                    for (var _iterator = options.exclude[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        var e = _step.value;
+
+                        if (e == this) return null;
+                    }
+                } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion && _iterator.return) {
+                            _iterator.return();
+                        }
+                    } finally {
+                        if (_didIteratorError) {
+                            throw _iteratorError;
+                        }
+                    }
+                }
+            }
+
+            var hitChild = this.hitsChild(pos, options);
+            if (hitChild) return hitChild;
+
+            // Hasn't hit any children, so test if the point lies on this node.
+            var boundingSize = this.absoluteSize;
+            boundingSize.w /= 2.0;
+            var upperLeftPos = this.upperLeftPos(this.absolutePos, boundingSize);
+            if (pointInRect(pos, rectFromPosAndSize(upperLeftPos, boundingSize))) return this;else return null;
+        }
 
         // Draw special round rect around just x term.
+
+    }, {
+        key: 'drawInternal',
         value: function drawInternal(pos, boundingSize) {
             var ctx = this.ctx;
             setStrokeStyle(ctx, this.stroke);

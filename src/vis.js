@@ -225,8 +225,6 @@ class Rect extends Node {
             for(let e of options.exclude) {
                 if (e == this) return null;
             }
-            //console.log('excluding ', this);
-            //return null; // skip excluded nodes
         }
 
         var hitChild = this.hitsChild(pos, options);
