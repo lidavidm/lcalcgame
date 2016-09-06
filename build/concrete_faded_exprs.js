@@ -71,14 +71,15 @@ var FadedPythonLambdaHoleExpr = function (_LambdaHoleExpr3) {
         key: 'drawInternal',
 
 
-        // Draw special circle representing a hole.
+        // Draw special round rect around term.
         value: function drawInternal(pos, boundingSize) {
             var ctx = this.ctx;
-            var rad = boundingSize.w / 2.0;
             setStrokeStyle(ctx, this.stroke);
             ctx.fillStyle = this.color;
             ctx.drawImage(Resource.getImage(this.image), pos.x, pos.y, boundingSize.w, boundingSize.h);
-            if (this.stroke) roundRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, 6, false, true);
+            if (this.stroke) {
+                roundRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, 6, false, true, this.stroke.opacity);
+            }
         }
     }, {
         key: 'openImage',
@@ -112,6 +113,20 @@ var FadedES6LambdaHoleExpr = function (_FadedPythonLambdaHol) {
     }
 
     _createClass(FadedES6LambdaHoleExpr, [{
+        key: 'drawInternal',
+
+
+        // Draw special round rect around just x term.
+        value: function drawInternal(pos, boundingSize) {
+            var ctx = this.ctx;
+            setStrokeStyle(ctx, this.stroke);
+            ctx.fillStyle = this.color;
+            ctx.drawImage(Resource.getImage(this.image), pos.x, pos.y, boundingSize.w, boundingSize.h);
+            if (this.stroke) {
+                roundRect(ctx, pos.x, pos.y, boundingSize.w / 2.0, boundingSize.h, 6, false, true, this.stroke.opacity);
+            }
+        }
+    }, {
         key: 'openImage',
         get: function get() {
             return this.name === 'x' ? 'lambda-hole-x-es6' : 'lambda-hole-y';

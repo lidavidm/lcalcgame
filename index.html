@@ -167,6 +167,24 @@
                     //console.error(err);
                 });
 
+                // One-time only blink of lambda holes on first level.
+                if (level_idx === 0) {
+                    let holes = stage.getNodesWithClass(LambdaHoleExpr, [], true);
+                    let waitBlink = (waittime, blinktime, cancelCond) => {
+                        Animate.wait(waittime).after(() => {
+                            if (cancelCond()) {
+                                return;
+                            }
+                            else Animate.blink(holes, blinktime, [1,1,0], 1).after(() => {
+                                waitBlink(waittime, blinktime, cancelCond)
+                            });
+                        });
+                    };
+                    waitBlink(2000, 1000, () => {
+                        return !(holes[0].stage) || !(holes[0].parent) || stage.ranCompletionAnim;
+                    });
+                }
+
                 stage.update();
                 stage.draw();
 
