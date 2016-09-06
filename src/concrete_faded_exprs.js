@@ -224,10 +224,10 @@ class FadedRectExpr extends FadedVarExpr {
     constructor() { super('rect'); }
 }
 class FadedTriangleExpr extends FadedVarExpr {
-    constructor() { super('triangle'); }
+    constructor() { super('tri'); }
 }
 class FadedCircleExpr extends FadedVarExpr {
-    constructor() { super('circle'); }
+    constructor() { super('dot'); }
 }
 
 
@@ -317,6 +317,11 @@ class BracketArrayExpr extends BagExpr {
         // Remove the bag from the stage.
         // stage.remove(this);
 
+        let before_str = stage.toString();
+        let bag_before_str = this.toString();
+        stage.saveState();
+        Logger.log('state-save', stage.toString());
+
         // Add back all of this bags' items to the stage.
         items.forEach((item, index) => {
 
@@ -324,6 +329,11 @@ class BracketArrayExpr extends BagExpr {
             let theta = index / items.length * Math.PI * 2;
             let rad = this.size.h * 2.0;
             let targetPos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) } );
+
+            targetPos = clipToRect(targetPos, item.absoluteSize, { x:25, y:0 },
+                                    {w:GLOBAL_DEFAULT_SCREENSIZE.width-25,
+                                     h:GLOBAL_DEFAULT_SCREENSIZE.height - stage.toolbox.size.h});
+
             item.pos = pos;
             Animate.tween(item, { 'pos':targetPos }, 100, (elapsed) => Math.pow(elapsed, 0.5));
             //item.pos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) });
@@ -337,6 +347,9 @@ class BracketArrayExpr extends BagExpr {
         this.items = [];
         this.graphicNode.holes = [this.l_brak, this.r_brak]; // just to be sure!
         this.graphicNode.update();
+
+        // Log changes
+        Logger.log('bag-spill', {'before':before_str, 'after':stage.toString(), 'item':bag_before_str});
 
         // Play spill sfx
         Resource.play('bag-spill');

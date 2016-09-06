@@ -186,8 +186,9 @@
                 $('#endscreen').css( { top:size.height / 3.0 } );
                 $('#endscreen').show();
 
-                Resource.play('game-complete');
+                Logger.log('game-complete', {});
 
+                Resource.play('game-complete');
             }
         }
         function hideEndGame() {

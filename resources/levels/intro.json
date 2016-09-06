@@ -15,6 +15,12 @@
             "toolbox":""
         },
         {
+            "description":"Introduces concept: Constant functions.",
+            "board":"(λx /star) (rect) (star)",
+            "goal":"(star) (star)",
+            "toolbox":""
+        },
+        {
             "description":"Introduces concept: Toolbox. (*used to be deletion)",
             "board":"",
             "goal":"star",

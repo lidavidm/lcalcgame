@@ -476,7 +476,7 @@ var FadedTriangleExpr = function (_FadedVarExpr3) {
     function FadedTriangleExpr() {
         _classCallCheck(this, FadedTriangleExpr);
 
-        return _possibleConstructorReturn(this, Object.getPrototypeOf(FadedTriangleExpr).call(this, 'triangle'));
+        return _possibleConstructorReturn(this, Object.getPrototypeOf(FadedTriangleExpr).call(this, 'tri'));
     }
 
     return FadedTriangleExpr;
@@ -488,7 +488,7 @@ var FadedCircleExpr = function (_FadedVarExpr4) {
     function FadedCircleExpr() {
         _classCallCheck(this, FadedCircleExpr);
 
-        return _possibleConstructorReturn(this, Object.getPrototypeOf(FadedCircleExpr).call(this, 'circle'));
+        return _possibleConstructorReturn(this, Object.getPrototypeOf(FadedCircleExpr).call(this, 'dot'));
     }
 
     return FadedCircleExpr;
@@ -587,6 +587,11 @@ var BracketArrayExpr = function (_BagExpr) {
             // Remove the bag from the stage.
             // stage.remove(this);
 
+            var before_str = stage.toString();
+            var bag_before_str = this.toString();
+            stage.saveState();
+            Logger.log('state-save', stage.toString());
+
             // Add back all of this bags' items to the stage.
             items.forEach(function (item, index) {
 
@@ -594,6 +599,10 @@ var BracketArrayExpr = function (_BagExpr) {
                 var theta = index / items.length * Math.PI * 2;
                 var rad = _this17.size.h * 2.0;
                 var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
+
+                targetPos = clipToRect(targetPos, item.absoluteSize, { x: 25, y: 0 }, { w: GLOBAL_DEFAULT_SCREENSIZE.width - 25,
+                    h: GLOBAL_DEFAULT_SCREENSIZE.height - stage.toolbox.size.h });
+
                 item.pos = pos;
                 Animate.tween(item, { 'pos': targetPos }, 100, function (elapsed) {
                     return Math.pow(elapsed, 0.5);
@@ -609,6 +618,9 @@ var BracketArrayExpr = function (_BagExpr) {
             this.items = [];
             this.graphicNode.holes = [this.l_brak, this.r_brak]; // just to be sure!
             this.graphicNode.update();
+
+            // Log changes
+            Logger.log('bag-spill', { 'before': before_str, 'after': stage.toString(), 'item': bag_before_str });
 
             // Play spill sfx
             Resource.play('bag-spill');

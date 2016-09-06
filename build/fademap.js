@@ -34,19 +34,23 @@ var ExprManager = function () {
     var DEFAULT_FADE_LEVEL = 0;
 
     var DEFAULT_FADE_PROGRESSION = {
-        'var': [[8, 28], 28, 40],
-        'hole': [[8, 28], 28, 40],
-        'if': [24, 43],
-        '_b': [32],
-        '==': [22],
-        'true': [44],
-        'false': [44],
-        'bag': [[49, 518]],
-        '__': [49],
-        'primitives': [70],
-        'map': [59]
+        'var': [[9, 29], 29, 41],
+        'hole': [[9, 29], 29, 41],
+        'if': [25, 44],
+        '_b': [33],
+        '==': [23],
+        'true': [45],
+        'false': [45],
+        'bag': [[50, 518]],
+        '__': [50],
+        'primitives': [65],
+        'map': [60]
     };
     var primitives = ['triangle', 'rect', 'star', 'circle', 'diamond'];
+    primitives.forEach(function (p) {
+        DEFAULT_FADE_PROGRESSION[p] = DEFAULT_FADE_PROGRESSION.primitives;
+    });
+    DEFAULT_FADE_PROGRESSION.primitives = undefined;
 
     pub.fadeBordersAt = function (lvl) {
         var prog = DEFAULT_FADE_PROGRESSION;
@@ -85,7 +89,7 @@ var ExprManager = function () {
 
         if (ename in fade_level) return fade_level[ename];else if ((ename === 'var' || ename === 'hole') && 'lambda' in fade_level) return fade_level.lambda;else if (ename in DEFAULT_FADE_PROGRESSION || is_primitive && "primitives" in DEFAULT_FADE_PROGRESSION) {
 
-            var lvl_map = DEFAULT_FADE_PROGRESSION[is_primitive ? 'primitives' : ename];
+            var lvl_map = DEFAULT_FADE_PROGRESSION[ename];
             var fadeclass_idx = 0;
             for (var i = 0; i < lvl_map.length; i++) {
                 var range = lvl_map[i];
