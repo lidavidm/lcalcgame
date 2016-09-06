@@ -464,7 +464,6 @@ var Resource = (() => {
                 }
 
                 unfaded.invalidate();
-                //faded.invalidate();
 
                 for (let border of fadedBorders) {
 
@@ -480,7 +479,14 @@ var Resource = (() => {
                         let unfaded_root = unfaded_roots[r];
                         let root = faded_roots[r];
 
-                        if (unfaded_root.fadingOut) continue;
+                        // DEBUG: This only works for level 50!
+                        if (unfaded.uiGoalNodes.indexOf(unfaded_root) > -1) {
+                            unfaded_root = unfaded_root.children[0];
+                            root = root.children[0];
+                        }
+
+                        if (unfaded_root.fadingOut)
+                            continue;
 
                         unfaded_root.fadingOut = true;
                         unfaded_root.opacity = 1.0;

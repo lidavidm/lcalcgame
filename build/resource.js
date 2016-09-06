@@ -479,7 +479,6 @@ var Resource = function () {
                     }
 
                     unfaded.invalidate();
-                    //faded.invalidate();
 
                     var _iteratorNormalCompletion = true;
                     var _didIteratorError = false;
@@ -501,6 +500,12 @@ var Resource = function () {
                             var _loop = function _loop(r) {
                                 var unfaded_root = unfaded_roots[r];
                                 var root = faded_roots[r];
+
+                                // DEBUG: This only works for level 50!
+                                if (unfaded.uiGoalNodes.indexOf(unfaded_root) > -1) {
+                                    unfaded_root = unfaded_root.children[0];
+                                    root = root.children[0];
+                                }
 
                                 if (unfaded_root.fadingOut) return 'continue';
 
