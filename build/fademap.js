@@ -41,7 +41,7 @@ var ExprManager = function () {
         '==': [23],
         'true': [45],
         'false': [45],
-        'bag': [[50, 518]],
+        'bag': [50],
         '__': [50],
         'primitives': [65],
         'map': [60]
@@ -53,6 +53,8 @@ var ExprManager = function () {
     DEFAULT_FADE_PROGRESSION.primitives = undefined;
 
     pub.fadeBordersAt = function (lvl) {
+        if (DEFAULT_FADE_LEVEL > 4) return [];
+
         var prog = DEFAULT_FADE_PROGRESSION;
         var borders = [];
         for (var t in prog) {
