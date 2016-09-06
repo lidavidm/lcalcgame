@@ -51,8 +51,8 @@ var ExprManager = (function() {
     DEFAULT_FADE_PROGRESSION.primitives = undefined;
 
     pub.fadeBordersAt = (lvl) => {
-        if (DEFAULT_FADE_LEVEL > 4) return [];
-        
+        if (DEFAULT_FADE_LEVEL >= 4) return [];
+
         let prog = DEFAULT_FADE_PROGRESSION;
         let borders = [];
         for (let t in prog) {

@@ -1015,12 +1015,23 @@ var IfStatement = function (_Expression5) {
 
                     var stage = _this15.stage;
                     var afterEffects = function afterEffects() {
-                        _get(Object.getPrototypeOf(IfStatement.prototype), 'performReduction', _this15).call(_this15);
+                        var rtn = _get(Object.getPrototypeOf(IfStatement.prototype), 'performReduction', _this15).call(_this15);
                         stage.update();
                         stage.draw();
+                        return rtn;
                     };
 
-                    if (reduction === null) _this15.playJimmyAnimation(afterEffects);else _this15.playUnlockAnimation(afterEffects);
+                    if (reduction === null) _this15.playJimmyAnimation(afterEffects);else if (reduction instanceof FadedNullExpr) {
+                        (function () {
+                            var red = afterEffects();
+                            red.ignoreEvents = true; // don't let them move a null.
+                            Resource.play('pop');
+                            Animate.blink(red, 1000, [1, 1, 1], 0.4).after(function () {
+                                red.poof();
+                            });
+                            //this.playJimmyAnimation(afterEffects);
+                        })();
+                    } else _this15.playUnlockAnimation(afterEffects);
 
                     //var shatter = new ShatterExpressionEffect(this);
                     //shatter.run(stage, (() => {
@@ -1052,7 +1063,7 @@ var IfStatement = function (_Expression5) {
     }, {
         key: 'emptyExpr',
         get: function get() {
-            return null;
+            return this.parent ? null : new FadedNullExpr();
         }
     }, {
         key: 'constructorArgs',
@@ -1082,6 +1093,11 @@ var ArrowIfStatement = function (_IfStatement) {
     }
 
     _createClass(ArrowIfStatement, [{
+        key: 'emptyExpr',
+        get: function get() {
+            return null;
+        }
+    }, {
         key: 'cond',
         get: function get() {
             return this.holes[0];
@@ -1253,6 +1269,11 @@ var LockIfStatement = function (_IfStatement3) {
             }
         }
     }, {
+        key: 'emptyExpr',
+        get: function get() {
+            return null;
+        }
+    }, {
         key: 'cond',
         get: function get() {
             return this.holes[0];
@@ -1303,6 +1324,11 @@ var InlineLockIfStatement = function (_IfStatement4) {
         value: function playUnlockAnimation(onComplete) {
             this.holes[1].image = 'lock-icon-unlocked';
             _get(Object.getPrototypeOf(InlineLockIfStatement.prototype), 'playUnlockAnimation', this).call(this, onComplete);
+        }
+    }, {
+        key: 'emptyExpr',
+        get: function get() {
+            return null;
         }
     }, {
         key: 'cond',
@@ -1448,6 +1474,8 @@ var CompareExpr = function (_Expression6) {
         key: 'compare',
         value: function compare() {
             if (this.funcName === '==') {
+                if (!this.rightExpr || !this.leftExpr) return undefined;
+
                 var lval = this.leftExpr.value();
                 var rval = this.rightExpr.value();
 

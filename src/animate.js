@@ -172,19 +172,22 @@ class Animate {
     }
 
     static poof(expr, sfx='poof') {
+
         if (expr.stage) {
+
+            let stg = expr.stage;
             let sz = expr.size;
-            let len = (sz.w + sz.h) / 2.0;
-            let pos = expr.pos;
+            let len = sz.h;
+            let pos = expr.centerPos();
             let scale = 1.4;
-            let img = new ImageRect(pos.x - len*(scale-1.0)/2.0,
-                                    pos.y - len*(scale-1.0)/2.0,
+            let img = new ImageRect(pos.x - len*1.4/2.0, pos.y - len*1.4/2.0,
                                     len*1.4, len*1.4, 'poof0');
-            expr.stage.add(img);
+            stg.add(img);
+
             let anim = Resource.getAnimation('poof');
             Animate.play(anim, img, () => {
-                let stg = img.stage;
                 stg.remove(img); // remove self from stage on animation end.
+                stg.update();
                 stg.draw();
             });
 

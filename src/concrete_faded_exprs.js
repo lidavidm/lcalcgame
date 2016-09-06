@@ -243,6 +243,7 @@ class FadedVarExpr extends Expression {
         this.color = "gold";
         this.primitiveName = name;
     }
+    get graphicNode() { return this.holes[0]; }
     reduceCompletely() { return this; }
     reduce() { return this; }
     toString() {
@@ -261,6 +262,19 @@ class FadedTriangleExpr extends FadedVarExpr {
 }
 class FadedCircleExpr extends FadedVarExpr {
     constructor() { super('dot'); }
+}
+class FadedNullExpr extends FadedVarExpr {
+    constructor() {
+        super('null');
+        this.color = "lightgray";
+        this.graphicNode.color = 'black';
+        this.opacity = 0.8;
+    }
+    poof() {
+        if (!this.stage) return;
+        Animate.poof(this);
+        this.stage.remove(this);
+    }
 }
 
 

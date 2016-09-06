@@ -500,6 +500,11 @@ var FadedVarExpr = function (_Expression) {
         value: function value() {
             return this.toString();
         }
+    }, {
+        key: 'graphicNode',
+        get: function get() {
+            return this.holes[0];
+        }
     }]);
 
     return FadedVarExpr;
@@ -553,6 +558,32 @@ var FadedCircleExpr = function (_FadedVarExpr4) {
     return FadedCircleExpr;
 }(FadedVarExpr);
 
+var FadedNullExpr = function (_FadedVarExpr5) {
+    _inherits(FadedNullExpr, _FadedVarExpr5);
+
+    function FadedNullExpr() {
+        _classCallCheck(this, FadedNullExpr);
+
+        var _this16 = _possibleConstructorReturn(this, Object.getPrototypeOf(FadedNullExpr).call(this, 'null'));
+
+        _this16.color = "lightgray";
+        _this16.graphicNode.color = 'black';
+        _this16.opacity = 0.8;
+        return _this16;
+    }
+
+    _createClass(FadedNullExpr, [{
+        key: 'poof',
+        value: function poof() {
+            if (!this.stage) return;
+            Animate.poof(this);
+            this.stage.remove(this);
+        }
+    }]);
+
+    return FadedNullExpr;
+}(FadedVarExpr);
+
 var BracketArrayExpr = function (_BagExpr) {
     _inherits(BracketArrayExpr, _BagExpr);
 
@@ -561,24 +592,24 @@ var BracketArrayExpr = function (_BagExpr) {
 
         _classCallCheck(this, BracketArrayExpr);
 
-        var _this16 = _possibleConstructorReturn(this, Object.getPrototypeOf(BracketArrayExpr).call(this, x, y, w, h, holding));
+        var _this17 = _possibleConstructorReturn(this, Object.getPrototypeOf(BracketArrayExpr).call(this, x, y, w, h, holding));
 
-        _this16.holes = [];
-        _this16.children = [];
+        _this17.holes = [];
+        _this17.children = [];
 
-        _this16.addArg(new Expression());
+        _this17.addArg(new Expression());
 
-        _this16._items = holding;
+        _this17._items = holding;
 
-        _this16.l_brak = new TextExpr('[');
-        _this16.r_brak = new TextExpr(']');
-        _this16.graphicNode.addArg(_this16.l_brak);
-        _this16.graphicNode.addArg(_this16.r_brak);
+        _this17.l_brak = new TextExpr('[');
+        _this17.r_brak = new TextExpr(']');
+        _this17.graphicNode.addArg(_this17.l_brak);
+        _this17.graphicNode.addArg(_this17.r_brak);
 
-        _this16.graphicNode.padding = { left: 10, inner: 0, right: 20 };
+        _this17.graphicNode.padding = { left: 10, inner: 0, right: 20 };
 
         //this.color = "tan";
-        return _this16;
+        return _this17;
     }
 
     _createClass(BracketArrayExpr, [{
@@ -625,7 +656,7 @@ var BracketArrayExpr = function (_BagExpr) {
     }, {
         key: 'spill',
         value: function spill() {
-            var _this17 = this;
+            var _this18 = this;
 
             if (!this.stage) {
                 console.error('@ BracketArrayExpr.spill: Array is not attached to a Stage.');
@@ -656,7 +687,7 @@ var BracketArrayExpr = function (_BagExpr) {
 
                 item = item.clone();
                 var theta = index / items.length * Math.PI * 2;
-                var rad = _this17.size.h * 2.0;
+                var rad = _this18.size.h * 2.0;
                 var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
 
                 targetPos = clipToRect(targetPos, item.absoluteSize, { x: 25, y: 0 }, { w: GLOBAL_DEFAULT_SCREENSIZE.width - 25,
@@ -668,7 +699,7 @@ var BracketArrayExpr = function (_BagExpr) {
                 });
                 //item.pos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) });
                 item.parent = null;
-                _this17.graphicNode.removeChild(item);
+                _this18.graphicNode.removeChild(item);
                 item.scale = { x: 1, y: 1 };
                 stage.add(item);
             });
@@ -730,15 +761,15 @@ var BracketArrayExpr = function (_BagExpr) {
             return this._items.slice();
         },
         set: function set(items) {
-            var _this18 = this;
+            var _this19 = this;
 
             this._items.forEach(function (item) {
-                return _this18.graphicNode.removeArg(item);
+                return _this19.graphicNode.removeArg(item);
             });
             this.graphicNode.children = [this.l_brak, this.r_brak];
             this._items = [];
             items.forEach(function (item) {
-                _this18.addItem(item);
+                _this19.addItem(item);
             });
         }
     }, {

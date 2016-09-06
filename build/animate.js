@@ -214,18 +214,22 @@ var Animate = function () {
         value: function poof(expr) {
             var sfx = arguments.length <= 1 || arguments[1] === undefined ? 'poof' : arguments[1];
 
+
             if (expr.stage) {
                 (function () {
+
+                    var stg = expr.stage;
                     var sz = expr.size;
-                    var len = (sz.w + sz.h) / 2.0;
-                    var pos = expr.pos;
+                    var len = sz.h;
+                    var pos = expr.centerPos();
                     var scale = 1.4;
-                    var img = new ImageRect(pos.x - len * (scale - 1.0) / 2.0, pos.y - len * (scale - 1.0) / 2.0, len * 1.4, len * 1.4, 'poof0');
-                    expr.stage.add(img);
+                    var img = new ImageRect(pos.x - len * 1.4 / 2.0, pos.y - len * 1.4 / 2.0, len * 1.4, len * 1.4, 'poof0');
+                    stg.add(img);
+
                     var anim = Resource.getAnimation('poof');
                     Animate.play(anim, img, function () {
-                        var stg = img.stage;
                         stg.remove(img); // remove self from stage on animation end.
+                        stg.update();
                         stg.draw();
                     });
 

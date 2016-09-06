@@ -659,7 +659,7 @@ class IfStatement extends Expression {
 
     get cond() { return this.holes[0]; }
     get branch() { return this.holes[2]; }
-    get emptyExpr() { return null; }
+    get emptyExpr() { return this.parent ? null : new FadedNullExpr(); }
     get constructorArgs() { return [this.cond.clone(), this.branch.clone()]; }
 
     onmouseclick(pos) {
@@ -692,13 +692,23 @@ class IfStatement extends Expression {
 
             let stage = this.stage;
             let afterEffects = () => {
-                super.performReduction();
+                let rtn = super.performReduction();
                 stage.update();
                 stage.draw();
+                return rtn;
             };
 
             if (reduction === null)
                 this.playJimmyAnimation(afterEffects);
+            else if (reduction instanceof FadedNullExpr) {
+                let red = afterEffects();
+                red.ignoreEvents = true; // don't let them move a null.
+                Resource.play('pop');
+                Animate.blink(red, 1000, [1,1,1], 0.4).after(() => {
+                    red.poof();
+                });
+                //this.playJimmyAnimation(afterEffects);
+            }
             else
                 this.playUnlockAnimation(afterEffects);
 
@@ -726,6 +736,7 @@ class ArrowIfStatement extends IfStatement {
         arrow.color = 'black';
         this.holes = [ cond, arrow, branch ];
     }
+    get emptyExpr() { return null; }
     get cond() { return this.holes[0]; }
     get branch() { return this.holes[2]; }
 }
@@ -772,6 +783,7 @@ class LockIfStatement extends IfStatement {
         shinewrap.opacity = 0.8;
         this._shinewrap = shinewrap;
     }
+    get emptyExpr() { return null; }
     get cond() { return this.holes[0]; }
     get branch() { return this.holes[1]; }
 
@@ -860,8 +872,11 @@ class InlineLockIfStatement extends IfStatement {
         lock.lock();
         this.holes = [ cond, lock, branch ];
     }
+
+    get emptyExpr() { return null; }
     get cond() { return this.holes[0]; }
     get branch() { return this.holes[2]; }
+
     playJimmyAnimation(onComplete) {
         super.playJimmyAnimation(onComplete);
 
@@ -967,6 +982,8 @@ class CompareExpr extends Expression {
     }
     compare() {
         if (this.funcName === '==') {
+            if (!this.rightExpr || !this.leftExpr) return undefined;
+
             var lval = this.leftExpr.value();
             var rval = this.rightExpr.value();
 
