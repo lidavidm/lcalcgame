@@ -33,6 +33,7 @@ class FadedES6LambdaHoleExpr extends FadedPythonLambdaHoleExpr {
     // Events
     hits(pos, options) {
         if (this.ignoreEvents) return null; // All children are ignored as well.
+        else if (!this.isOpen) return null;
 
         if (typeof options !== 'undefined' && options.hasOwnProperty('exclude')) {
             for(let e of options.exclude) {

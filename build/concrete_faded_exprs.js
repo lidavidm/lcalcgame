@@ -119,6 +119,7 @@ var FadedES6LambdaHoleExpr = function (_FadedPythonLambdaHol) {
         // Events
         value: function hits(pos, options) {
             if (this.ignoreEvents) return null; // All children are ignored as well.
+            else if (!this.isOpen) return null;
 
             if (typeof options !== 'undefined' && options.hasOwnProperty('exclude')) {
                 var _iteratorNormalCompletion = true;
