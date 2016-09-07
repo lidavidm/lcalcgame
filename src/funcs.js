@@ -136,7 +136,7 @@ class MapFunc extends FuncExpr {
 
     performReduction() {
         var reduced_expr = this.reduce();
-        if (reduced_expr && reduced_expr != this) {
+        if (!this.isAnimating && reduced_expr && reduced_expr != this) {
 
             let stage = this.stage;
             let func = this.func;

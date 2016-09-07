@@ -192,7 +192,7 @@ var MapFunc = function (_FuncExpr) {
             var _this4 = this;
 
             var reduced_expr = this.reduce();
-            if (reduced_expr && reduced_expr != this) {
+            if (!this.isAnimating && reduced_expr && reduced_expr != this) {
                 var superReduce;
                 var bagAfterMap;
                 var popCount;
