@@ -166,6 +166,8 @@ class MapFunc extends FuncExpr {
                 var _this = this;
                 var bagToFuncArrowPath;
                 var bag = this.bag;
+                var mapSize = this.absoluteSize;
+                var mapCenterPos = this.centerPos();
                 var runNextAnim = (n) => {
 
                     if (bag.items.length === 0) {
@@ -209,6 +211,8 @@ class MapFunc extends FuncExpr {
                             stage.remove(item);
                             stage.update();
 
+                            mapCenterPos = _this.centerPos();
+
                             let preview_duration = func.isConstantFunction ? 100 : 1000;
 
                             Animate.wait(preview_duration).after(function () {
@@ -217,15 +221,31 @@ class MapFunc extends FuncExpr {
 
                                 // Spill individial items onto stage as they are created.
                                 for (let i = 0; i < itemsAfterMap.length; i++) {
+
                                     let itemAfterMap = itemsAfterMap[i];
-                                    let theta = Math.random() * Math.PI * 2;
-                                    let rad = bag.size.h * 1.5;
                                     let pos = func.body.absolutePos;
-                                    let targetPos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) } );
+
                                     itemAfterMap.pos = pos;
                                     itemAfterMap.scale = { x:1.0, y:1.0 };
                                     itemAfterMap.parent = null;
                                     stage.add(itemAfterMap);
+
+                                    let theta = Math.random() * Math.PI * 2;
+                                    //let radX = mapSize.w / 2.0;
+                                    //let radY = mapSize.h / 2.0 * 2.0;
+                                    let radX = bag.size.h * 1.5;
+                                    let radY = radX;
+                                    let sz = itemAfterMap.absoluteSize;
+                                    let center = addPos(pos, { x:-sz.w, y:0 } );
+
+                                    let targetPos = addPos(center, { x:radX * Math.cos(theta),
+                                                                     y:radY * Math.sin(theta) } );
+                                    //                                 y:radY + radY * Math.abs(Math.sin(theta)) / 2.0 } );
+
+                                    targetPos = clipToRect(targetPos, itemAfterMap.absoluteSize, { x:25, y:0 },
+                                                             {w:GLOBAL_DEFAULT_SCREENSIZE.width-25,
+                                                              h:GLOBAL_DEFAULT_SCREENSIZE.height - stage.toolbox.size.h});
+
                                     Animate.tween(itemAfterMap, { 'pos':targetPos }, 500, (elapsed) => Math.pow(elapsed, 0.5));
                                 }
                                 stage.draw();

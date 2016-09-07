@@ -201,6 +201,8 @@ var MapFunc = function (_FuncExpr) {
 
                 var bagToFuncArrowPath;
                 var bag;
+                var mapSize;
+                var mapCenterPos;
 
                 var _runNextAnim;
 
@@ -237,6 +239,8 @@ var MapFunc = function (_FuncExpr) {
 
                         _this = _this4;
                         bag = _this4.bag;
+                        mapSize = _this4.absoluteSize;
+                        mapCenterPos = _this4.centerPos();
 
                         _runNextAnim = function runNextAnim(n) {
 
@@ -286,6 +290,8 @@ var MapFunc = function (_FuncExpr) {
                                         stage.remove(item);
                                         stage.update();
 
+                                        mapCenterPos = _this.centerPos();
+
                                         var preview_duration = func.isConstantFunction ? 100 : 1000;
 
                                         Animate.wait(preview_duration).after(function () {
@@ -294,15 +300,30 @@ var MapFunc = function (_FuncExpr) {
 
                                             // Spill individial items onto stage as they are created.
                                             for (var _i = 0; _i < itemsAfterMap.length; _i++) {
+
                                                 var itemAfterMap = itemsAfterMap[_i];
-                                                var theta = Math.random() * Math.PI * 2;
-                                                var rad = bag.size.h * 1.5;
                                                 var pos = func.body.absolutePos;
-                                                var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
+
                                                 itemAfterMap.pos = pos;
                                                 itemAfterMap.scale = { x: 1.0, y: 1.0 };
                                                 itemAfterMap.parent = null;
                                                 stage.add(itemAfterMap);
+
+                                                var theta = Math.random() * Math.PI * 2;
+                                                //let radX = mapSize.w / 2.0;
+                                                //let radY = mapSize.h / 2.0 * 2.0;
+                                                var radX = bag.size.h * 1.5;
+                                                var radY = radX;
+                                                var sz = itemAfterMap.absoluteSize;
+                                                var center = addPos(pos, { x: -sz.w, y: 0 });
+
+                                                var targetPos = addPos(center, { x: radX * Math.cos(theta),
+                                                    y: radY * Math.sin(theta) });
+                                                //                                 y:radY + radY * Math.abs(Math.sin(theta)) / 2.0 } );
+
+                                                targetPos = clipToRect(targetPos, itemAfterMap.absoluteSize, { x: 25, y: 0 }, { w: GLOBAL_DEFAULT_SCREENSIZE.width - 25,
+                                                    h: GLOBAL_DEFAULT_SCREENSIZE.height - stage.toolbox.size.h });
+
                                                 Animate.tween(itemAfterMap, { 'pos': targetPos }, 500, function (elapsed) {
                                                     return Math.pow(elapsed, 0.5);
                                                 });

@@ -74,7 +74,7 @@ var Level = function () {
             var btn_next = new Button(btn_reset.pos.x + btn_reset.size.w, ui_padding, 64, 64, { default: 'btn-next-default', hover: 'btn-next-hover', down: 'btn-next-down' }, function () {
                 next(); // go back to previous level; see index.html.
             });
-            stage.add(btn_back);
+            //stage.add(btn_back);
             stage.add(btn_reset);
             stage.add(btn_next);
 

@@ -146,6 +146,14 @@
             stage.update();
             stage.draw();
         }
+        function levelChanged(val) {
+            if (!isNaN(parseInt(val))) {
+                if (val < 0) val = 0;
+                else if (val >= Resource.level.length) val = Resource.level.length - 1;
+                level_idx = val;
+                initBoard();
+            }
+        }
 
         function clearStage() {
             if (stage) {
@@ -172,7 +180,7 @@
 
                 GLOBAL_DEFAULT_CTX = canvas.getContext('2d');
                 GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
-                document.getElementById('lvl_num').innerHTML = level_idx + '';
+                document.getElementById('lvl_num').value = level_idx + '';
                 document.getElementById('lvl_desc').innerHTML = Resource.level[level_idx].description || '(No description.)';
 
                 stage = Resource.buildLevel(Resource.level[level_idx], canvas);
@@ -328,21 +336,21 @@
 
         <br />
 
-        <div id="state" class="centered">
-            <button onclick="undo()">Undo</button>
-        </div>
-
-        <div id="duplicate_buttons" class="centered">
-            <button onclick="prev()">Prev</button>
-            <button onclick="initBoard()">Reset</button>
-            <button onclick="next()">Next</button>
-        </div>
-
         <div id="devinfo">
+
+            <div id="state" class="centered">
+                <button onclick="undo()">Undo</button>
+            </div>
+
+            <div id="duplicate_buttons" class="centered">
+                <button onclick="prev()">Prev</button>
+                <button onclick="initBoard()">Reset</button>
+                <button onclick="next()">Next</button>
+            </div>
 
             <div id="explanation" class="centered">
                 <p>
-                    Level #<span id="lvl_num"></span> <br />
+                    Level #<input id="lvl_num" type="text" name="level" value="0" size=6 onchange="levelChanged(this.value)"><br />
                     <span style="color:grey;"><span id="lvl_desc">[description]</span></span> <br />
                     Jump to: <select id="chapterSelect" name="chapter" onchange="gotoChapter()">
                     </select>

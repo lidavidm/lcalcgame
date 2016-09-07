@@ -64,7 +64,7 @@ class Level {
             () => {
             next(); // go back to previous level; see index.html.
         });
-        stage.add(btn_back);
+        //stage.add(btn_back);
         stage.add(btn_reset);
         stage.add(btn_next);
 
