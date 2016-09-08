@@ -34,17 +34,17 @@ var ExprManager = function () {
     var DEFAULT_FADE_LEVEL = 0;
 
     var DEFAULT_FADE_PROGRESSION = {
-        'var': [[9, 29], 29, 41],
-        'hole': [[9, 29], 29, 41],
-        'if': [25, 44],
-        '_b': [33],
-        '==': [23],
-        'true': [45],
-        'false': [45],
-        'bag': [50],
-        '__': [50],
-        'primitives': [65],
-        'map': [60]
+        'var': [[9, 30], 30, 42],
+        'hole': [[9, 30], 30, 42],
+        'if': [26, 45],
+        '_b': [34],
+        '==': [24],
+        'true': [46],
+        'false': [46],
+        'bag': [51],
+        '__': [51],
+        'primitives': [66],
+        'map': [61]
     };
     var primitives = ['triangle', 'rect', 'star', 'circle', 'diamond'];
     primitives.forEach(function (p) {

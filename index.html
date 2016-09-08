@@ -56,6 +56,9 @@
                 height:4px;
                 background-color: white;
             }
+            #lvl_num_visible_box {
+                color:gray;
+            }
             #progressBar {
                 display: block;
                 width:5px;
@@ -181,6 +184,7 @@
                 GLOBAL_DEFAULT_CTX = canvas.getContext('2d');
                 GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
                 document.getElementById('lvl_num').value = level_idx + '';
+                document.getElementById('lvl_num_visible').innerHTML = level_idx + '';
                 document.getElementById('lvl_desc').innerHTML = Resource.level[level_idx].description || '(No description.)';
 
                 stage = Resource.buildLevel(Resource.level[level_idx], canvas);
@@ -335,6 +339,10 @@
         </div>
 
         <br />
+
+        <div class="centered" id="lvl_num_visible_box">
+            Level #<span id="lvl_num_visible">0</span>
+        </div>
 
         <div id="devinfo">
 

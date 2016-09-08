@@ -40,7 +40,7 @@
         },
         {
             "description": "harder booleans with conditionals",
-            "board": "(== /star _) (if _b star)",
+            "board": "(== /star _) (if _b _) (star)",
             "goal": "star",
             "toolbox": "(rect) (triangle) (circle)"
         },

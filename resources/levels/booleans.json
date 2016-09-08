@@ -51,6 +51,12 @@
             "toolbox": "(== _ _) (λx #x #x) (diamond) (λx #x)"
         },
         {
+            "description": "Teaching partial binding with choice.",
+            "board": "(== _ _) (λx #x #x) (star) (star) (diamond)",
+            "goal": "(true) (false)",
+            "toolbox": ""
+        },
+        {
             "description": "Our favorite hard level :)",
             "board": "(== _ _) (λx #x #x) (λx #x #x) (star) (diamond)",
             "goal": "(true) (false)",
