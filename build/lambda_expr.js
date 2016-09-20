@@ -303,7 +303,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
                     stage.update();
                 };
 
-                if (level_idx < 8) {
+                if (level_idx < 1) {
                     Animate.tween(node, { opacity: 0 }, 400, function (elapsed) {
                         return Math.pow(elapsed, 0.5);
                     }).after(afterDrop);

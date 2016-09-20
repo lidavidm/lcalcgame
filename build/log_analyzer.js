@@ -65,7 +65,7 @@ var LogAnalyzer = function () {
         _createClass(Session, [{
             key: 'getTasksNamed',
             value: function getTasksNamed(taskName) {
-                console.log('getting tasks named ' + taskName, this);
+                //console.log('getting tasks named ' + taskName, this);
                 return this.tasks.filter(function (task) {
                     return task.name === taskName;
                 });
@@ -93,7 +93,10 @@ var LogAnalyzer = function () {
 
             // Convert lambda expressions to an invariant representation.
             this.exprs = exprs.map(function (e) {
-                if (isLambdaExpr(e)) return deBruijn(e);else return e.replace(/diamond/g, '■').replace(/star/g, '★').replace(/triangle/g, '▲').replace(/circle/g, '●');
+
+                e = e.replace(/diamond/g, '■').replace(/rect/g, '■').replace(/star/g, '★').replace(/triangle/g, '▲').replace(/tri/g, '▲').replace(/circle/g, '●');
+
+                if (isLambdaExpr(e)) return deBruijn(e);else return e;
             });
         }
 
@@ -218,7 +221,6 @@ var LogAnalyzer = function () {
                 nodes.update(this.initialState);
                 prev_node = nodes.last();
 
-                console.log('actions', actions);
                 actions.forEach(function (action) {
                     var name = action['action_id'];
                     var data = action['action_detail'];
@@ -231,7 +233,7 @@ var LogAnalyzer = function () {
                         data = JSON.parse(data).board;
 
                         var state = new StateRepr(data);
-                        console.log(' >> state-save', data, state);
+                        //console.log(' >> state-save', data, state);
                         if (victory) state.final = true;
 
                         // Add a node for this state (does nothing if node already exists).
@@ -278,12 +280,58 @@ var LogAnalyzer = function () {
                 return { nodes: nodes, edges: edges };
             }
         }, {
+            key: 'playTime',
+            get: function get() {
+                if (this.logs.length === 0) return 0;
+
+                var startTask = this.logs[0][1];
+                var vic = this.victoryAction;
+                if (vic) return vic.client_timestamp - startTask.client_timestamp;else return this.logs[this.logs.length - 1][1].client_timestamp - startTask.client_timestamp;
+            }
+        }, {
             key: 'actions',
             get: function get() {
                 return this.logs.filter(function (log) {
                     return log[0] === 'action';
                 }).map(function (action) {
                     return action[1];
+                });
+            }
+        }, {
+            key: 'logIntervals',
+            get: function get() {
+                var len = this.logs.length;
+                var intervalTimesMS = [];
+                for (var i = 0; i < len - 1; i++) {
+                    intervalTimesMS.push(this.logs[i + 1][1]['client_timestamp'] - this.logs[i][1]['client_timestamp']);
+                }
+                return intervalTimesMS;
+            }
+        }, {
+            key: 'moves',
+            get: function get() {
+                //let v = this.victoryAction;
+                var moveActionIDs = ['reduction-lambda', 'toolbox-remove', 'bag-spill', 'reduction', 'detach-commit', 'placed-expr']; // bag-add...
+                return this.actions.filter(function (act, idx, arr) {
+
+                    // this patches map level logs in the late-game...
+                    var bagspillCheck = function bagspillCheck() {
+                        var isMapReductPair = function isMapReductPair(i) {
+                            if (i < 0) return false;
+                            var a = arr[i];
+                            return a.action_id === 'reduction' && a.action_detail.indexOf('map') > -1 && i < arr.length - 2 && arr[i + 2].action_id === 'bag-spill';
+                        };
+
+                        // Skip BOTH elements of the pair.
+                        if (isMapReductPair(idx) || isMapReductPair(idx - 2)) return false;
+
+                        return true;
+                    };
+
+                    return moveActionIDs.indexOf(act.action_id) > -1 && bagspillCheck();
+                    //if (act.action_id === 'state-save' && (!v || v.client_timestamp > act.client_timestamp)) return true;
+                    //else if (act.action_id === 'bag-add') return true;
+                    //return false;
                 });
             }
         }, {
@@ -295,6 +343,42 @@ var LogAnalyzer = function () {
                 state.initial = true;
                 return state;
             }
+        }, {
+            key: 'victoryAction',
+            get: function get() {
+                var actions = this.actions;
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
+
+                try {
+                    for (var _iterator = actions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        var a = _step.value;
+
+                        if (a.action_id === 'victory') return a;
+                    }
+                } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion && _iterator.return) {
+                            _iterator.return();
+                        }
+                    } finally {
+                        if (_didIteratorError) {
+                            throw _iteratorError;
+                        }
+                    }
+                }
+
+                return null;
+            }
+        }, {
+            key: 'playerWon',
+            get: function get() {
+                return this.victoryAction !== null;
+            }
         }], [{
             key: 'tasksFor',
             value: function tasksFor(logs) {
@@ -303,7 +387,10 @@ var LogAnalyzer = function () {
                 var start_idx = -1;
                 for (var i = 0; i < len; i++) {
                     var log = logs[i];
-                    if (log[0] === 'startTask') start_idx = i;else if (log[0] === 'endTask') tasks.push(new Task(logs.slice(start_idx, i + 1)));
+                    if (log[0] === 'startTask') start_idx = i;else if (log[0] === 'endTask') {
+                        if (i === start_idx + 1) continue; // skip tasks with no inner actions (skip overs)
+                        tasks.push(new Task(logs.slice(start_idx, i + 1)));
+                    }
                 }
                 tasks.push(new Task(logs.slice(start_idx, logs.length)));
                 return tasks;
@@ -323,6 +410,7 @@ var LogAnalyzer = function () {
             refreshSessionList();
             sessionSelElem.selectedIndex = -1;
             refreshTaskVis();
+            refreshTimeCompletionBar();
         };
     };
     pub.setSessionSelect = function (selectElem) {
@@ -343,10 +431,10 @@ var LogAnalyzer = function () {
         createStateGraph = cb;
     };
     var removeAllOptions = function removeAllOptions(selectElem) {
-        var opts = selectElem.options;
-        for (var i = 0; i < opts.length; i++) {
-            selectElem.remove(opts[i]);
-        }
+        $(selectElem).empty();
+        //var opts = selectElem.options;
+        //for (let i = 0; i < opts.length; i++)
+        //    selectElem.remove(opts[i]);
     };
     var getSelectedOptions = function getSelectedOptions(selectElem) {
         var opts = selectElem.options;
@@ -362,9 +450,11 @@ var LogAnalyzer = function () {
             return users[opt.text];
         });
     };
+    pub.getSelectedUsers = getSelectedUsers;
     var getSelectedTask = function getSelectedTask() {
         return parseInt(taskSelElem.options[taskSelElem.selectedIndex].value);
     };
+    pub.getSelectedTask = getSelectedTask;
     var refreshUserList = function refreshUserList() {
         removeAllOptions(userSelElem);
         for (var user in users) {
@@ -385,13 +475,108 @@ var LogAnalyzer = function () {
                 opt.text = session.name;
                 opt.value = session.name;
                 sessionSelElem.add(opt);
-                console.log('ADDED ', opt);
             });
         });
     };
+    var refreshTimeCompletionBar = function refreshTimeCompletionBar() {
+
+        if (parseInt(userSelElem.selectedIndex) === -1) return;
+        if (parseInt(sessionSelElem.selectedIndex) === -1) {
+            // No sessions selected. Go off user selection.
+            var sel_users = getSelectedUsers();
+
+            var users_with_tasks = {};
+            var avg_time_by_name = {};
+            var avg_resets = {};
+            var skip_overs = {};
+            var total_moves = {};
+
+            var action_times = {};
+            var single_user = sel_users.length === 1;
+
+            sel_users.forEach(function (user) {
+
+                // Get all tasks for this user.
+                var all_tasks = user.getAllTasks();
+
+                // For each task, compile the average playtime, and sort by task #.
+                var tasks_by_name = {};
+                all_tasks.forEach(function (task) {
+                    //if (!task.playerWon) {} // skip tasks the player skipped.
+                    if (task.name in tasks_by_name) tasks_by_name[task.name].push(task);else {
+                        tasks_by_name[task.name] = [task];
+                        if (task.name in users_with_tasks) users_with_tasks[task.name]++;else users_with_tasks[task.name] = 1;
+                    }
+                });
+
+                for (var name in tasks_by_name) {
+                    var ts = tasks_by_name[name];
+                    var cumu_playtime = ts.reduce(function (acc, t) {
+                        return acc + t.playTime;
+                    }, 0);
+                    var skipped = ts.reduce(function (acc, t) {
+                        return acc || t.playerWon;
+                    }, false) ? 0 : 1;
+                    var num_resets = ts.length - 1;
+                    //let min_move = Math.min.apply(null, ts.filter((t) => t.victoryAction !== null)
+                    //                                      .map((t) => t.moves.length));
+                    //min_moves[name] = min_move;
+
+                    if (single_user) {
+                        action_times[name] = ts.map(function (t) {
+                            return t.logIntervals.map(function (a) {
+                                return a / 1000.0;
+                            });
+                        });
+                        total_moves[name] = ts.map(function (t) {
+                            return t.moves.length;
+                        }).reduce(function (a, b) {
+                            return a + b;
+                        }, 0);
+                    }
+
+                    if (name in avg_time_by_name) avg_time_by_name[name] += cumu_playtime;else avg_time_by_name[name] = cumu_playtime;
+
+                    if (name in avg_resets) avg_resets[name] += num_resets;else avg_resets[name] = num_resets;
+
+                    if (name in skip_overs) skip_overs[name] += skipped;else skip_overs[name] = skipped;
+                }
+            });
+
+            for (var name in users_with_tasks) {
+                avg_time_by_name[name] /= users_with_tasks[name];
+                avg_resets[name] /= users_with_tasks[name];
+                skip_overs[name] /= users_with_tasks[name];
+            }
+
+            var parts = [];
+            var names = Object.keys(avg_time_by_name);
+            names.sort(function (a, b) {
+                return a - b;
+            });
+            for (var i = 0; i < names.length; i++) {
+                var _name = names[i];
+                parts.push({
+                    name: _name,
+                    value: 1.0 / names.length,
+                    time: avg_time_by_name[_name],
+                    resets: avg_resets[_name],
+                    skips: skip_overs[_name],
+                    actionTimes: _name in action_times ? action_times[_name] : undefined,
+                    moves: _name in total_moves ? Math.max(total_moves[_name], 1) : undefined // cannot have zero moves!
+                    //optimalMoves: min_moves[name]
+                });
+            }
+
+            // Get data on all tasks that the selected users have played.
+            //var all_tasks = sel_users.reduce((tasks, user) => tasks.concat(user.getAllTasks()), []);
+
+            console.log('selected users: ', sel_users);
+            loadPartitionBar('levelTimeBarContainer', parts);
+        } else loadPartitionBar('levelTimeBarContainer', []);
+    };
     var refreshTaskVis = function refreshTaskVis() {
         var task = getSelectedTask();
-        console.log('task ', task);
 
         if (parseInt(userSelElem.selectedIndex) === -1) return;
         if (parseInt(sessionSelElem.selectedIndex) === -1) {
@@ -404,11 +589,9 @@ var LogAnalyzer = function () {
             }, []);
 
             // Convert these tasks into state graphs.
-            console.log(sel_tasks);
             var state_graphs = sel_tasks.map(function (task) {
                 return task.getStateGraph();
             });
-            console.log(state_graphs);
 
             // Merge the state graphs.
             // (a) Merge the nodes.
@@ -425,9 +608,7 @@ var LogAnalyzer = function () {
             var raw_edges = state_graphs.reduce(function (edges, graph) {
                 return edges.concat(graph.edges.slice());
             }, []);
-            console.log(all_nodes.states);
             raw_edges = raw_edges.map(function (edge) {
-                console.log(edge.from, edge.to);
                 var e = { from: all_nodes.get(edge.from),
                     to: all_nodes.get(edge.to),
                     reduce: edge.reduce,
@@ -436,7 +617,6 @@ var LogAnalyzer = function () {
                 return e;
             });
             // (c) Merge identical edges.
-            console.log('edges:', raw_edges);
             for (var i = 0; i < raw_edges.length - 1; i++) {
                 var e1 = raw_edges[i];
                 for (var j = i + 1; j < raw_edges.length; j++) {
@@ -466,6 +646,7 @@ var LogAnalyzer = function () {
                             border: 'LightSeaGreen'
                         }
                     };
+                    node.initial = true;
                 } else if (state.final) {
                     node.color = {
                         background: 'Gold',
@@ -475,6 +656,7 @@ var LogAnalyzer = function () {
                             border: 'OrangeRed'
                         }
                     };
+                    node.final = true;
                 }
                 return node;
             }), raw_edges.map(function (edge) {
@@ -489,6 +671,7 @@ var LogAnalyzer = function () {
                 console.error('Not yet implemented.');
             }
     };
+    pub.refreshTaskVis = refreshTaskVis;
 
     /** DATA */
     var getTasks = function getTasks(taskName, logs) {
@@ -504,7 +687,17 @@ var LogAnalyzer = function () {
     };
 
     var parseLog = function parseLog(json) {
-        var logs = JSON.parse(json);
+
+        // Convert format of NodeJS data logs...
+        var logs;
+        if (json[0] === '{') {
+            var lines = json.match(/[^\r\n]+/g);
+            logs = lines.map(function (line) {
+                var logobj = JSON.parse(line);
+                return [logobj["0"], logobj["1"]];
+            });
+        } else logs = JSON.parse(json);
+
         var username = User.for(logs);
         var sessionID = Session.for(logs);
         var new_user = false;

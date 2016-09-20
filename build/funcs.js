@@ -227,7 +227,7 @@ var MapFunc = function (_FuncExpr) {
                         // debug
                         if (!_this4.animatedReduction) {
                             superReduce();
-                            _this4.bag.spill();
+                            _this4.bag.spill(false); // don't log this spill
                             stage.remove(_this4.bag);
                             return {
                                 v: void 0

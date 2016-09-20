@@ -154,7 +154,7 @@ class MapFunc extends FuncExpr {
                 // debug
                 if (!this.animatedReduction) {
                     superReduce();
-                    this.bag.spill();
+                    this.bag.spill(false); // don't log this spill
                     stage.remove(this.bag);
                     return;
                 }

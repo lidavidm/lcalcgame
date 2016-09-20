@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>A game to teach code comprehension</title>
+        <title>That programming game</title>
 
         <!-- Third-party dependencies -->
         <script src="lib/FileSaver.min.js" charset="utf-8"></script>
@@ -44,10 +44,6 @@
         <script src="build/effect.js" charset="utf-8"></script>
         <script src="build/fademap.js" charset="utf-8"></script>
         <style media="screen">
-            .body {
-                min-width: 840px;
-                min-height: 700px;
-            }
             #canvas {
                 padding: 0;
                 margin-left: auto;
@@ -76,9 +72,6 @@
                 position: absolute;
                 display: none;
             }
-            .blendedlink {
-                color: inherit;
-            }
             #help {
                 position: absolute;
                 display: none;
@@ -89,12 +82,6 @@
                 user-select: none;
                 cursor: default;
                 pointer-events: none;
-            }
-            #footer {
-                padding: 1rem;
-                color: #aaa;
-                font-size: 1em;
-                text-align: center;
             }
             .textOverlay > h1 {
                 color: Salmon;
@@ -119,13 +106,12 @@
         <script type="text/javascript">
 
         var __SHOW_DEV_INFO = false;
-        var __COND = 'unknown';
 
         var GLOBAL_DEFAULT_CTX = null;
         var GLOBAL_DEFAULT_SCREENSIZE = null;
         var stage;
         var canvas;
-        var level_idx = getCookie('level_idx') || 0;
+        var level_idx = 0;
         function init() {
 
             // -- TEST CORS --
@@ -138,7 +124,7 @@
                 dataType : 'jsonp',   //you may use jsonp for cross origin request
                 crossDomain:true,
                 success: function(data, status, xhr) {
-                    //console.log('Connected to server.');
+                    console.log('balh');
                 }
             });
 
@@ -156,7 +142,7 @@
             req.open("GET", 'http://gdiac.cs.cornell.edu/research_games/page_load.php', true); // true for asynchronous
             req.send(null);*/
 
-            //setWriteALevelPopup("writeALevel", 'write-level-form');
+            setWriteALevelPopup("writeALevel", 'write-level-form');
 
             Resource.initAudio();
 
@@ -165,31 +151,23 @@
 
             if (__GET_PARAMS) {
                 var start_from = __GET_PARAMS.level;
-                //var fade_level = __GET_PARAMS.fade;
-                //var playerId = __GET_PARAMS.player;
+                var fade_level = __GET_PARAMS.fade;
+                var playerId = __GET_PARAMS.player;
                 if (start_from) {
                     console.log(start_from);
                     level_idx = parseInt(start_from);
                 }
-                //if (playerId) {
-                //    Logger.playerId = playerId;
-                //}
-                //if (fade_level && fade_level > 0) {
-                //    ExprManager.setDefaultFadeLevel(parseInt(fade_level));
-                //}
+                if (playerId) {
+                    Logger.playerId = playerId;
+                }
+                if (fade_level && fade_level > 0) {
+                    ExprManager.setDefaultFadeLevel(parseInt(fade_level));
+                }
             }
 
             // Start a new log session (creating userID as necessary),
             // and then begin the game.
             Logger.startSession().then(function (userinfo) {
-
-                if (userinfo.cond) {
-                    __COND = userinfo.cond;
-
-                    if (userinfo.cond === 'B')
-                        ExprManager.setDefaultFadeLevel(100);
-                }
-
                 return loadChapterSelect();
             }).then(initBoard);
         }
@@ -231,21 +209,15 @@
                 hideEndGame();
                 updateProgressBar();
 
-                // New: saves progress upon reload.
-                setCookie('level_idx', level_idx);
-
                 GLOBAL_DEFAULT_CTX = canvas.getContext('2d');
                 GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
-                document.getElementById('lvl_num_visible').innerHTML = (level_idx+1) + '';
-                //document.getElementById('lvl_desc').innerHTML = Resource.level[level_idx].description || '(No description.)';
+                document.getElementById('lvl_num').value = level_idx + '';
+                document.getElementById('lvl_num_visible').innerHTML = level_idx + '';
+                document.getElementById('lvl_desc').innerHTML = Resource.level[level_idx].description || '(No description.)';
 
                 stage = Resource.buildLevel(Resource.level[level_idx], canvas);
 
-                Logger.transitionToTask(level_idx, stage.toString()).then(function() {
-
-                    Logger.log('condition', __COND);
-
-                }).catch(function (err) {
+                Logger.transitionToTask(level_idx, stage.toString()).catch(function (err) {
                     //console.error(err);
                 });
 
@@ -323,18 +295,6 @@
             }
         }
 
-        var __IS_LOGGING = true;
-        function toggleLogging() {
-            var l = $('#toggleLogLink');
-            if (Logger.isLogging()) {
-                Logger.toggleLogging(false);
-                l.text("Click here you'd like to turn data logging back on.");
-            } else {
-                Logger.toggleLogging(true);
-                l.text("Click here you'd prefer to turn data logging off.");
-            }
-        }
-
         function updateProgressBar() {
             setProgressBar('progressBar', 'progressBarContainer', level_idx / (Resource.level.length - 1));
         }
@@ -362,7 +322,7 @@
         }
 
         function loadChapterSelect() {
-            /*var sel = document.getElementById("chapterSelect");
+            var sel = document.getElementById("chapterSelect");
             removeOptions(sel); // clear old options.
             return Resource.getChapters().then( function(chapters) {
                 chapters.forEach(function (chap) {
@@ -370,9 +330,11 @@
                     option.text = chap.description;
                     option.value = chap.name;
                     sel.add(option);
-                });*/
-            return Resource.getChapters();
-            //} );
+                });
+                return new Promise(function(resolve, reject) {
+                    resolve();
+                });
+            } );
         }
         function gotoChapter() {
             var sel = document.getElementById('chapterSelect');
@@ -407,37 +369,70 @@
         <br />
 
         <div class="centered" id="lvl_num_visible_box">
-            Level #<span id="lvl_num_visible">1</span>
-            / 72
+            Level #<span id="lvl_num_visible">0</span>
         </div>
 
         <div id="devinfo">
 
+            <div id="state" class="centered">
+                <button onclick="undo()">Undo</button>
+            </div>
+
             <div id="duplicate_buttons" class="centered">
                 <button onclick="prev()">Prev</button>
                 <button onclick="initBoard()">Reset</button>
+                <button onclick="next()">Next</button>
             </div>
 
             <div id="explanation" class="centered">
+                <p>
+                    Level #<input id="lvl_num" type="text" name="level" value="0" size=6 onchange="levelChanged(this.value)"><br />
+                    <span style="color:grey;"><span id="lvl_desc">[description]</span></span> <br />
+                    Jump to: <select id="chapterSelect" name="chapter" onchange="gotoChapter()">
+                    </select>
+                </p>
                 <p>
                     Drop expressions into <span style="color:#666;">holes</span> inside other expressions. <br />
                     If an expression blinks <span style="color:ForestGreen;">green</span>, click it to reduce.
                 </p>
             </div>
+
+            <div class="centered">
+                <p>
+                    <button id="writeALevel">Write your own level!</button>
+                </p>
+
+                <div id="write-level-form" title="Write a level">
+                  <p class="validateTips">Refer to <a href="writing_levels.html" target="blank">this sheet</a> for more info.</p>
+
+                  <form>
+                    <fieldset>
+                      <label for="name">Level:</label>
+                      <input type="text" name="name" id="level_expr_input" value="(λx #x) (star)" class="expr_input" size="45"> <br />
+                      <label for="email">Goal:</label>
+                      <input type="text" name="email" id="goal_expr_input" value="(star)" class="expr_input" size="45">
+
+                      <!-- Allow form submission with keyboard without duplicating the dialog button -->
+                      <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+                    </fieldset>
+                  </form>
+
+                  <p>
+                      Or upload a JSON spec for a new chapter:
+                  </p>
+                  <input id="add_chapter_json" value="asdad" type="file" />
+
+                </div>
+            </div>
         </div>
 
-        <div id="footer">
+        <div class="centered">
+        </div>
 
-            <span style="color:#777;">If you encounter a bug, you can click <a href="#" onclick="next()" class="blendedlink">here</a> to skip to the next level.</span>
-
-            <br> <br>
-
-            <div class="centered" style="width:400px">
-                Privacy disclaimer: We will use your usage statistics to further the improvement of the game (for science!). <br> <a href="#" onclick="toggleLogging()" id="toggleLogLink" class="blendedlink">Click here you'd prefer to turn data logging off.</a>
-            </div>
-
-            <br>
-            Copyright © 2016 Cornell University Educational Technology Lab. <br> Prototype by <a href="http://ianarawjo.therottingcartridge.com/about/" class="blendedlink" target="_blank">Ian Arawjo</a>. <br> <a href="mailto:iaa32@cornell.edu?Subject=Reduct" class="blendedlink">Contact us @ iaa32 -at- cornell.edu</a>
+        <div id="logdownload" class="centered">
+            <br />
+            <button onclick="toggleDevInfo()"><span id="devInfoBtnText">Show</span> dev info box.</button>
+            <button onclick="Logger.download()">Download log data.</button>
         </div>
     </body>
 </html>

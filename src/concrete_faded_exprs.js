@@ -344,7 +344,7 @@ class BracketArrayExpr extends BagExpr {
     }
 
     // Spills the entire bag onto the play field.
-    spill() {
+    spill(logspill=true) {
 
         if (!this.stage) {
             console.error('@ BracketArrayExpr.spill: Array is not attached to a Stage.');
@@ -397,7 +397,8 @@ class BracketArrayExpr extends BagExpr {
         this.graphicNode.update();
 
         // Log changes
-        Logger.log('bag-spill', {'before':before_str, 'after':stage.toString(), 'item':bag_before_str});
+        if (logspill)
+            Logger.log('bag-spill', {'before':before_str, 'after':stage.toString(), 'item':bag_before_str});
 
         // Play spill sfx
         Resource.play('bag-spill');
@@ -435,7 +436,17 @@ class BracketArrayExpr extends BagExpr {
 
         // Dump clone of node into the bag:
         let n = node.clone();
+        let before_str = this.toString();
         this.addItem(n);
+
+        Logger.log('bag-add', {'before':before_str, 'after':this.toString(), 'item':n.toString()});
+
+        if (this.stage) {
+            this.stage.saveState();
+            Logger.log('state-save', this.stage.toString());
+        } else {
+            console.warn('@ BracketArrayExpr.ondroppped: Item dropped into bag which is not member of a Stage.');
+        }
 
         Resource.play('bag-addItem');
     }

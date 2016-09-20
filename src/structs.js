@@ -692,6 +692,7 @@ class IfStatement extends Expression {
 
             let stage = this.stage;
             let afterEffects = () => {
+                this.ignoreEvents = false;
                 let rtn = super.performReduction();
                 stage.update();
                 stage.draw();
@@ -712,7 +713,7 @@ class IfStatement extends Expression {
             else
                 this.playUnlockAnimation(afterEffects);
 
-
+            this.ignoreEvents = true;
             //var shatter = new ShatterExpressionEffect(this);
             //shatter.run(stage, (() => {
             //    super.performReduction();
@@ -1613,7 +1614,7 @@ class BagExpr extends CollectionExpr {
     }
 
     // Spills the entire bag onto the play field.
-    spill() {
+    spill(logspill=true) {
         if (!this.stage) {
             console.error('@ BagExpr.spill: Bag is not attached to a Stage.');
             return;
@@ -1664,7 +1665,8 @@ class BagExpr extends CollectionExpr {
         console.warn(this.graphicNode);
 
         // Log changes
-        Logger.log('bag-spill', {'before':before_str, 'after':stage.toString(), 'item':bag_before_str});
+        if (logspill)
+            Logger.log('bag-spill', {'before':before_str, 'after':stage.toString(), 'item':bag_before_str});
 
         // Play spill sfx
         Resource.play('bag-spill');

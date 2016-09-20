@@ -64,9 +64,10 @@ class Level {
             () => {
             next(); // go back to previous level; see index.html.
         });
+        btn_reset.pos = btn_next.pos;
         //stage.add(btn_back);
         stage.add(btn_reset);
-        stage.add(btn_next);
+        //stage.add(btn_next);
 
         // Toolbox
         const TOOLBOX_HEIGHT = 90;

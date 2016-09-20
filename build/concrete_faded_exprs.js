@@ -659,6 +659,9 @@ var BracketArrayExpr = function (_BagExpr) {
         value: function spill() {
             var _this18 = this;
 
+            var logspill = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+
+
             if (!this.stage) {
                 console.error('@ BracketArrayExpr.spill: Array is not attached to a Stage.');
                 return;
@@ -711,7 +714,7 @@ var BracketArrayExpr = function (_BagExpr) {
             this.graphicNode.update();
 
             // Log changes
-            Logger.log('bag-spill', { 'before': before_str, 'after': stage.toString(), 'item': bag_before_str });
+            if (logspill) Logger.log('bag-spill', { 'before': before_str, 'after': stage.toString(), 'item': bag_before_str });
 
             // Play spill sfx
             Resource.play('bag-spill');
@@ -752,7 +755,17 @@ var BracketArrayExpr = function (_BagExpr) {
 
             // Dump clone of node into the bag:
             var n = node.clone();
+            var before_str = this.toString();
             this.addItem(n);
+
+            Logger.log('bag-add', { 'before': before_str, 'after': this.toString(), 'item': n.toString() });
+
+            if (this.stage) {
+                this.stage.saveState();
+                Logger.log('state-save', this.stage.toString());
+            } else {
+                console.warn('@ BracketArrayExpr.ondroppped: Item dropped into bag which is not member of a Stage.');
+            }
 
             Resource.play('bag-addItem');
         }

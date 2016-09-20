@@ -1015,6 +1015,7 @@ var IfStatement = function (_Expression5) {
 
                     var stage = _this15.stage;
                     var afterEffects = function afterEffects() {
+                        _this15.ignoreEvents = false;
                         var rtn = _get(Object.getPrototypeOf(IfStatement.prototype), 'performReduction', _this15).call(_this15);
                         stage.update();
                         stage.draw();
@@ -1033,6 +1034,7 @@ var IfStatement = function (_Expression5) {
                         })();
                     } else _this15.playUnlockAnimation(afterEffects);
 
+                    _this15.ignoreEvents = true;
                     //var shatter = new ShatterExpressionEffect(this);
                     //shatter.run(stage, (() => {
                     //    super.performReduction();
@@ -2578,6 +2580,8 @@ var BagExpr = function (_CollectionExpr) {
         value: function spill() {
             var _this53 = this;
 
+            var logspill = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+
             if (!this.stage) {
                 console.error('@ BagExpr.spill: Bag is not attached to a Stage.');
                 return;
@@ -2629,7 +2633,7 @@ var BagExpr = function (_CollectionExpr) {
             console.warn(this.graphicNode);
 
             // Log changes
-            Logger.log('bag-spill', { 'before': before_str, 'after': stage.toString(), 'item': bag_before_str });
+            if (logspill) Logger.log('bag-spill', { 'before': before_str, 'after': stage.toString(), 'item': bag_before_str });
 
             // Play spill sfx
             Resource.play('bag-spill');

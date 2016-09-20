@@ -246,7 +246,7 @@ class LambdaHoleExpr extends MissingExpression {
                 stage.update();
             };
 
-            if (level_idx < 8) {
+            if (level_idx < 1) {
                 Animate.tween(node, { opacity:0 }, 400, (elapsed) => Math.pow(elapsed, 0.5)).after(afterDrop);
             } else
                 afterDrop();

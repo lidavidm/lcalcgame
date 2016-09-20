@@ -138,6 +138,18 @@ function colorFrom255(val) {
 
     return 'rgb(' + Math.round(val * colorWeights[0]) + ',' + Math.round(val * colorWeights[1]) + ',' + Math.round(val * colorWeights[2]) + ')';
 }
+function computeVariance(arr) {
+    if (arr.length <= 1) return 0;
+    var mean = arr.reduce(function (a, b) {
+        return a + b;
+    }, 0) / arr.length;
+    var dists = arr.map(function (a) {
+        return Math.pow(a - mean, 2);
+    });
+    return dists.reduce(function (a, b) {
+        return a + b;
+    }, 0) / (arr.length - 1);
+}
 
 /** Thanks to Gumbo @ SO:
     http://stackoverflow.com/a/10865042 */
@@ -224,6 +236,16 @@ Math.seededRandom = function (max, min) {
     return min + rnd * (max - min);
 };
 
+/* Thanks to Anatolly @ SO: http://stackoverflow.com/a/1484514 */
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
 /**
  * GET params in URL field.
  ** Thanks to Quentin @ SO: http://stackoverflow.com/a/979995.
@@ -308,7 +330,7 @@ function argsForExprString(s) {
 function deBruijn(s) {
     var varindices = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-    console.log('> deBruijn', s, varindices);
+    //console.log('> deBruijn', s, varindices);
 
     var len = s.length;
     var depth = 0;
@@ -342,7 +364,6 @@ function deBruijn(s) {
 
         if (reading && (s[i] === ' ' || i === len - 1)) {
             var name = s.substring(reading_idx + 1, i === len - 1 ? i + 1 : i);
-            console.log(' >> read name ', name);
             if (name in varindices) {
                 if (reading === '#') {
 

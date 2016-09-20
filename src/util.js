@@ -119,6 +119,12 @@
  function colorFrom255(val, colorWeights=[1,1,1]) {
      return 'rgb(' + Math.round(val*colorWeights[0]) + ',' + Math.round(val*colorWeights[1]) + ',' + Math.round(val*colorWeights[2]) + ')';
  }
+ function computeVariance(arr) {
+     if (arr.length <= 1) return 0;
+     let mean = arr.reduce((a,b) => a + b, 0) / arr.length;
+     let dists = arr.map((a) => Math.pow(a - mean, 2));
+     return dists.reduce((a, b) => a + b, 0) / (arr.length - 1);
+ }
 
 /** Thanks to Gumbo @ SO:
     http://stackoverflow.com/a/10865042 */
@@ -205,6 +211,16 @@ var isInstanceOfClass = function(ins, Class) {
 
      return min + rnd * (max - min);
  };
+
+/* Thanks to Anatolly @ SO: http://stackoverflow.com/a/1484514 */
+ function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 
  /**
   * GET params in URL field.
@@ -296,7 +312,7 @@ function argsForExprString(s) {
 // with respect to alpha conversion. Alpha equivalence is then
 // the same as string equivalence.
 function deBruijn(s, varindices={}) {
-    console.log('> deBruijn', s, varindices);
+    //console.log('> deBruijn', s, varindices);
 
     let len = s.length;
     let depth = 0;
@@ -331,7 +347,6 @@ function deBruijn(s, varindices={}) {
 
         if (reading && (s[i] === ' ' || i === len-1)) {
             let name = s.substring(reading_idx + 1, ((i===len-1) ? i+1 : i));
-            console.log(' >> read name ', name);
             if (name in varindices) {
                 if (reading === '#') {
 
