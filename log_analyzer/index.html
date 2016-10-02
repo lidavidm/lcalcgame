@@ -98,7 +98,7 @@
 
                 console.warn('Efficiencies: ' + efficiencies.reduce((str, s) => str + (1 - s) + '\t', ''));
                 //console.warn('Optimal moves: ' + Object.keys(optimalMoves).reduce((str, s) => str + optimalMoves[s] + '\t', ''));
-                //console.warn('Playtimes: ' + parts.reduce((str, s) => str + s.time / 1000.0 + '\t', ''));
+                console.warn('Playtimes: ' + parts.reduce((str, s) => str + s.time / 1000.0 + '\t', ''));
                 //console.warn('Skips: ', parts.reduce((str, s) => str + Math.min(s.skips, 1) + '\t', ''));
 
                 function createPartDiv(left, width, height, color) {

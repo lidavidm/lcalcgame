@@ -134,7 +134,7 @@ function strokeWithOpacity(ctx, opacity) {
     }
 }
 function colorFrom255(val) {
-    var colorWeights = arguments.length <= 1 || arguments[1] === undefined ? [1, 1, 1] : arguments[1];
+    var colorWeights = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [1, 1, 1];
 
     return 'rgb(' + Math.round(val * colorWeights[0]) + ',' + Math.round(val * colorWeights[1]) + ',' + Math.round(val * colorWeights[2]) + ')';
 }
@@ -328,7 +328,7 @@ function argsForExprString(s) {
 // with respect to alpha conversion. Alpha equivalence is then
 // the same as string equivalence.
 function deBruijn(s) {
-    var varindices = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+    var varindices = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     //console.log('> deBruijn', s, varindices);
 
@@ -461,8 +461,8 @@ function hexaRect(ctx, x, y, width, height, fill, stroke, strokeOpacity) {
 
 /** Thanks to markE @ SO: http://stackoverflow.com/a/25840319 */
 function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius) {
-    var strokeStyle = arguments.length <= 6 || arguments[6] === undefined ? null : arguments[6];
-    var fillStyle = arguments.length <= 7 || arguments[7] === undefined ? 'white' : arguments[7];
+    var strokeStyle = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
+    var fillStyle = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : 'white';
 
     var rot = Math.PI / 2 * 3;
     var x = cx;
