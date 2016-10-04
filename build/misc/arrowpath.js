@@ -13,8 +13,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * @module arrowpath
  */
 
-var ArrowPath = function (_Node) {
-    _inherits(ArrowPath, _Node);
+var ArrowPath = function (_mag$Node) {
+    _inherits(ArrowPath, _mag$Node);
 
     function ArrowPath() {
         var points = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
@@ -154,4 +154,4 @@ var ArrowPath = function (_Node) {
     }]);
 
     return ArrowPath;
-}(Node);
+}(mag.Node);

@@ -211,7 +211,7 @@ var MissingBracketExpression = function (_MissingBagExpression) {
 
         var _this4 = _possibleConstructorReturn(this, (MissingBracketExpression.__proto__ || Object.getPrototypeOf(MissingBracketExpression)).call(this, expr_to_miss));
 
-        _this4.graphicNode = new ImageRect(0, 0, 22, 22, 'missing-bracket');
+        _this4.graphicNode = new mag.ImageRect(0, 0, 22, 22, 'missing-bracket');
         return _this4;
     }
 
@@ -284,7 +284,7 @@ var MissingBooleanExpression = function (_MissingTypedExpressi2) {
         _this5._size = { w: 80, h: 50 };
         _this5.color = "#0c2c52";
 
-        _this5.graphicNode = new HexaRect(0, 0, 44, 44);
+        _this5.graphicNode = new mag.HexaRect(0, 0, 44, 44);
 
         _this5.acceptedClasses = [BooleanPrimitive, CompareExpr];
         return _this5;
@@ -321,7 +321,7 @@ var MissingKeyExpression = function (_MissingBooleanExpres) {
 
         var _this6 = _possibleConstructorReturn(this, (MissingKeyExpression.__proto__ || Object.getPrototypeOf(MissingKeyExpression)).call(this, expr_to_miss));
 
-        var keyhole = new ImageRect(0, 0, 26 / 2, 42 / 2, 'lock-keyhole');
+        var keyhole = new mag.ImageRect(0, 0, 26 / 2, 42 / 2, 'lock-keyhole');
         _this6.graphicNode.addChild(keyhole);
 
         return _this6;

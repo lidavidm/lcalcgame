@@ -1,13 +1,6 @@
 /**
  * Special function expressions inside the game, like map, fold, etc.
  */
-
-
-
-
-
-
-
 class MapFunc extends FuncExpr {
     constructor(oneParamFunc, bag) {
         //let txt = new TextExpr('map');

@@ -43,7 +43,7 @@ var SplosionEffect = function () {
             var _loop = function _loop(i) {
 
                 // Create individual particle + add each to the stage.
-                var part = new Circle(center.x, center.y, Math.floor(PARTICLE_MIN_RAD + (PARTICLE_MAX_RAD - PARTICLE_MIN_RAD) * Math.random()));
+                var part = new mag.Circle(center.x, center.y, Math.floor(PARTICLE_MIN_RAD + (PARTICLE_MAX_RAD - PARTICLE_MIN_RAD) * Math.random()));
                 part.color = 'gold';
                 part.shadowOffset = 0;
                 parts.push(part);
@@ -116,7 +116,7 @@ var SparkleTrigger = function () {
 
             var _loop2 = function _loop2(i) {
 
-                var part = new Star(center.x, center.y, Math.floor(PARTICLE_MIN_RAD + (PARTICLE_MAX_RAD - PARTICLE_MIN_RAD) * Math.random()));
+                var part = new mag.Star(center.x, center.y, Math.floor(PARTICLE_MIN_RAD + (PARTICLE_MAX_RAD - PARTICLE_MIN_RAD) * Math.random()));
                 parts.push(part);
                 //part.ignoreEvents = true;
 
@@ -174,8 +174,8 @@ var SparkleTrigger = function () {
     return SparkleTrigger;
 }();
 
-var ExpressionEffect = function (_RoundedRect) {
-    _inherits(ExpressionEffect, _RoundedRect);
+var ExpressionEffect = function (_mag$RoundedRect) {
+    _inherits(ExpressionEffect, _mag$RoundedRect);
 
     function ExpressionEffect() {
         _classCallCheck(this, ExpressionEffect);
@@ -184,7 +184,7 @@ var ExpressionEffect = function (_RoundedRect) {
     }
 
     return ExpressionEffect;
-}(RoundedRect);
+}(mag.RoundedRect);
 
 var ShatterExpressionEffect = function (_ExpressionEffect) {
     _inherits(ShatterExpressionEffect, _ExpressionEffect);

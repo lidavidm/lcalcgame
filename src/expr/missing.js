@@ -113,7 +113,7 @@ class MissingBagExpression extends MissingTypedExpression {
 class MissingBracketExpression extends MissingBagExpression {
     constructor(expr_to_miss) {
         super(expr_to_miss);
-        this.graphicNode = new ImageRect(0, 0, 22, 22, 'missing-bracket');
+        this.graphicNode = new mag.ImageRect(0, 0, 22, 22, 'missing-bracket');
     }
     getClass() { return MissingBracketExpression; }
 
@@ -161,7 +161,7 @@ class MissingBooleanExpression extends MissingTypedExpression {
         this._size = { w:80, h:50 };
         this.color = "#0c2c52";
 
-        this.graphicNode = new HexaRect(0, 0, 44, 44);
+        this.graphicNode = new mag.HexaRect(0, 0, 44, 44);
 
         this.acceptedClasses = [ BooleanPrimitive, CompareExpr ];
     }
@@ -180,7 +180,7 @@ class MissingKeyExpression extends MissingBooleanExpression {
     constructor(expr_to_miss) {
         super(expr_to_miss);
 
-        var keyhole = new ImageRect(0, 0, 26/2, 42/2, 'lock-keyhole');
+        var keyhole = new mag.ImageRect(0, 0, 26/2, 42/2, 'lock-keyhole');
         this.graphicNode.addChild(keyhole);
 
     }

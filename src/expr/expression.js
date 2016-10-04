@@ -10,7 +10,7 @@ var DEFAULT_RENDER_CTX = null;
 
 /** A generic expression. Could be a lambda expression, could be an if statement, could be a for.
     In general, anything that takes in arguments and can reduce to some other value based on those arguments. */
-class Expression extends RoundedRect {
+class Expression extends mag.RoundedRect {
     constructor(holes=[]) {
         super(0, 0, EMPTY_EXPR_WIDTH, DEFAULT_EXPR_HEIGHT, DEFAULT_CORNER_RAD);
 

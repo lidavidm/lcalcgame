@@ -22,8 +22,8 @@ var DEFAULT_RENDER_CTX = null;
 /** A generic expression. Could be a lambda expression, could be an if statement, could be a for.
     In general, anything that takes in arguments and can reduce to some other value based on those arguments. */
 
-var Expression = function (_RoundedRect) {
-    _inherits(Expression, _RoundedRect);
+var Expression = function (_mag$RoundedRect) {
+    _inherits(Expression, _mag$RoundedRect);
 
     function Expression() {
         var holes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
@@ -430,4 +430,4 @@ var Expression = function (_RoundedRect) {
     }]);
 
     return Expression;
-}(RoundedRect);
+}(mag.RoundedRect);

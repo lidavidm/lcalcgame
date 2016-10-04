@@ -141,14 +141,14 @@ class LockIfStatement extends IfStatement {
         super(cond, branch);
         this.holes = [ cond, branch ];
 
-        var bluebg = new RoundedRect(0, 0, 25, 25);
+        var bluebg = new mag.RoundedRect(0, 0, 25, 25);
         bluebg.color = "#2484f5";
         this._bg = bluebg;
 
-        var top = new ImageRect(0, 0, 112/2.0, 74/2.0, 'lock-top-locked');
+        var top = new mag.ImageRect(0, 0, 112/2.0, 74/2.0, 'lock-top-locked');
         this._top = top;
 
-        var shinewrap = new PatternRect(0, 0, 24, 100, 'shinewrap');
+        var shinewrap = new mag.PatternRect(0, 0, 24, 100, 'shinewrap');
         shinewrap.opacity = 0.8;
         this._shinewrap = shinewrap;
     }

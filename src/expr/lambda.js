@@ -3,27 +3,18 @@
  * The LambdaHoleExpr performs substitution on LambdaVar subexpressions in its parent expression context.
  * -----------------------------------------------
  * */
-
-
-
-
-
-
-//
-
-
 class LambdaHoleExpr extends MissingExpression {
     get openImage() { return this.name === 'x' ? 'lambda-hole' : 'lambda-hole-red'; }
     get closedImage() { return this.name === 'x' ? 'lambda-hole-closed' : 'lambda-hole-red-closed'; }
     get openingAnimation() {
-        var anim = new Animation();
+        var anim = new mag.Animation();
         anim.addFrame('lambda-hole-opening0', 50);
         anim.addFrame('lambda-hole-opening1', 50);
         anim.addFrame('lambda-hole',          50);
         return anim;
     }
     get closingAnimation() {
-        var anim = new Animation();
+        var anim = new mag.Animation();
         anim.addFrame('lambda-hole-opening1', 50);
         anim.addFrame('lambda-hole-opening0', 50);
         anim.addFrame('lambda-hole-closed',   50);
@@ -106,7 +97,7 @@ class LambdaHoleExpr extends MissingExpression {
         }
 
         var parent = this.parent;
-        var subvarexprs = Stage.getNodesWithClass(LambdaVarExpr, [], true, [parent]);
+        var subvarexprs = mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [parent]);
         subvarexprs.forEach((expr) => {
             if (expr.name === this.name) {
                 let c = node.clone();
@@ -153,7 +144,7 @@ class LambdaHoleExpr extends MissingExpression {
         node.opacity = 0.4;
 
         if (this.parent) {
-            var subvarexprs = Stage.getNodesWithClass(LambdaVarExpr, [], true, [this.parent]);
+            var subvarexprs = mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [this.parent]);
             subvarexprs.forEach((e) => {
                 if (e.name === this.name) {
                     let preview_node = node.clone();
@@ -279,14 +270,14 @@ class LambdaVarExpr extends ImageExpr {
     get openImage() { return this.name === 'x' ? 'lambda-pipe-open' : 'lambda-pipe-red-open'; }
     get closedImage() { return this.name === 'x' ? 'lambda-pipe' : 'lambda-pipe-red'; }
     get openingAnimation() {
-        var anim = new Animation();
+        var anim = new mag.Animation();
         anim.addFrame('lambda-pipe-opening0', 50);
         anim.addFrame('lambda-pipe-opening1', 50);
         anim.addFrame('lambda-pipe-open',     50);
         return anim;
     }
     get closingAnimation() {
-        var anim = new Animation();
+        var anim = new mag.Animation();
         anim.addFrame('lambda-pipe-opening1', 50);
         anim.addFrame('lambda-pipe-opening0', 50);
         anim.addFrame('lambda-pipe',          50);
@@ -295,7 +286,7 @@ class LambdaVarExpr extends ImageExpr {
 
     get stateGraph() {
         if (!this._stateGraph) {
-            var g = new StateGraph();
+            var g = new mag.StateGraph();
             g.addState('closed', () => {
                 this.image = this.closedImage; });
                 if(this.stage) this.stage.draw();
@@ -401,7 +392,7 @@ class LambdaExpr extends Expression {
             this.updateHole();
 
             var hole = this.holes[0];
-            var lvars = Stage.getNodesWithClass(LambdaVarExpr, [], true, [this]);
+            var lvars = mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [this]);
             lvars.forEach((v) => {
                 if (v.name === hole.name) {
                     v.color = hole.colorForVarName();
@@ -417,7 +408,7 @@ class LambdaExpr extends Expression {
         return this.holes.slice(1).reduce(((prev,arg) => (prev && !(arg instanceof MissingExpression))), true);
     }
     get isConstantFunction() {
-        return this.takesArgument && Stage.getNodesWithClass(LambdaVarExpr, [], true, [this]).length === 0;
+        return this.takesArgument && mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [this]).length === 0;
     }
     get body() { return this.takesArgument ? this.holes[1] : null; }
     updateHole() {
@@ -598,14 +589,14 @@ class FadedLambdaVarExpr extends LambdaVarExpr {
     get openImage() { return 'lambda-pipe-x-open'; }
     get closedImage() { return this.name === 'x' ? 'lambda-pipe-x' : 'lambda-pipe-x'; }
     get openingAnimation() {
-        var anim = new Animation();
+        var anim = new mag.Animation();
         anim.addFrame('lambda-pipe-x-opening0', 50);
         anim.addFrame('lambda-pipe-x-opening1', 50);
         anim.addFrame(this.openImage,           50);
         return anim;
     }
     get closingAnimation() {
-        var anim = new Animation();
+        var anim = new mag.Animation();
         anim.addFrame('lambda-pipe-x-opening1', 50);
         anim.addFrame('lambda-pipe-x-opening0', 50);
         anim.addFrame(this.closedImage,         50);

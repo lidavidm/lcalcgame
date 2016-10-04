@@ -1,7 +1,7 @@
- 
- 
- 
- 
+
+
+
+
 
 // Node disappears and is replaced by a firework-like particle explosion.
 class SplosionEffect {
@@ -30,7 +30,7 @@ class SplosionEffect {
         for (let i = 0; i < PARTICLE_COUNT; i++) {
 
             // Create individual particle + add each to the stage.
-            let part = new Circle(center.x, center.y,
+            let part = new mag.Circle(center.x, center.y,
                 Math.floor(PARTICLE_MIN_RAD + (PARTICLE_MAX_RAD - PARTICLE_MIN_RAD) * Math.random()));
             part.color = 'gold';
             part.shadowOffset = 0;
@@ -85,7 +85,7 @@ class SparkleTrigger {
         const PARTICLE_MAX_RAD = 8;
         for (let i = 0; i < PARTICLE_COUNT; i++) {
 
-            let part = new Star(center.x, center.y,
+            let part = new mag.Star(center.x, center.y,
                                 Math.floor(PARTICLE_MIN_RAD + (PARTICLE_MAX_RAD - PARTICLE_MIN_RAD) * Math.random()));
             parts.push(part);
             //part.ignoreEvents = true;
@@ -137,7 +137,7 @@ class SparkleTrigger {
     }
 }
 
-class ExpressionEffect extends RoundedRect {}
+class ExpressionEffect extends mag.RoundedRect {}
 class ShatterExpressionEffect extends ExpressionEffect {
     constructor(roundRectToShatter) {
         let size = roundRectToShatter.absoluteSize;

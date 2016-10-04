@@ -3,8 +3,7 @@
  * @module arrowpath
  */
 
-
-class ArrowPath extends Node {
+class ArrowPath extends mag.Node {
     constructor(points=[], stroke={color:'black', lineWidth:1}, arrowWidth=8) {
         super(0, 0);
         this.stroke = stroke;

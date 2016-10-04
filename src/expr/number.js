@@ -21,7 +21,7 @@ class NumberExpr extends Expression {
 }
 
 // Draws the circles for a dice number inside its boundary.
-class DiceNumber extends Rect {
+class DiceNumber extends mag.Rect {
     static drawPositionsFor(num) {
         let L = 0.15;
         let T = L;

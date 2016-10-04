@@ -1,6 +1,6 @@
 /** A subclass of Stage that assumes Nodes are Expressions
     and allows for saving state. */
-class ReductStage extends Stage {
+class ReductStage extends mag.Stage {
     constructor(canvas=null) {
         super(canvas);
         this.stateStack = [];
@@ -56,7 +56,7 @@ class ReductStage extends Stage {
 
                     let you_win = () => {
 
-                        var cmp = new ImageRect(GLOBAL_DEFAULT_SCREENSIZE.width / 2, GLOBAL_DEFAULT_SCREENSIZE.height / 2, 740 / 2, 146 / 2, 'victory');
+                        var cmp = new mag.ImageRect(GLOBAL_DEFAULT_SCREENSIZE.width / 2, GLOBAL_DEFAULT_SCREENSIZE.height / 2, 740 / 2, 146 / 2, 'victory');
                         cmp.anchor = { x:0.5, y:0.5 };
                         this.add(cmp);
                         this.draw();

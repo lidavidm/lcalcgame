@@ -10,8 +10,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 // The panel at the bottom of the screen.
 
-var Toolbox = function (_ImageRect) {
-    _inherits(Toolbox, _ImageRect);
+var Toolbox = function (_mag$ImageRect) {
+    _inherits(Toolbox, _mag$ImageRect);
 
     function Toolbox(x, y, w, h) {
         var exprs = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : [];
@@ -110,4 +110,4 @@ var Toolbox = function (_ImageRect) {
     }]);
 
     return Toolbox;
-}(ImageRect);
+}(mag.ImageRect);

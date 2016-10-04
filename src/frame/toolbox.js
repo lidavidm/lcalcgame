@@ -1,9 +1,5 @@
- 
- 
- 
-
 // The panel at the bottom of the screen.
-class Toolbox extends ImageRect {
+class Toolbox extends mag.ImageRect {
 
     constructor(x, y, w, h, exprs=[]) {
         super(x, y, w, h, 'toolbox-bg');

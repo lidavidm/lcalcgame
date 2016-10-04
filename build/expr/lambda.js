@@ -16,8 +16,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * -----------------------------------------------
  * */
 
-//
-
 var LambdaHoleExpr = function (_MissingExpression) {
     _inherits(LambdaHoleExpr, _MissingExpression);
 
@@ -34,7 +32,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
     }, {
         key: 'openingAnimation',
         get: function get() {
-            var anim = new Animation();
+            var anim = new mag.Animation();
             anim.addFrame('lambda-hole-opening0', 50);
             anim.addFrame('lambda-hole-opening1', 50);
             anim.addFrame('lambda-hole', 50);
@@ -43,7 +41,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
     }, {
         key: 'closingAnimation',
         get: function get() {
-            var anim = new Animation();
+            var anim = new mag.Animation();
             anim.addFrame('lambda-hole-opening1', 50);
             anim.addFrame('lambda-hole-opening0', 50);
             anim.addFrame('lambda-hole-closed', 50);
@@ -145,7 +143,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
             }
 
             var parent = this.parent;
-            var subvarexprs = Stage.getNodesWithClass(LambdaVarExpr, [], true, [parent]);
+            var subvarexprs = mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [parent]);
             subvarexprs.forEach(function (expr) {
                 if (expr.name === _this5.name) {
                     var c = node.clone();
@@ -199,7 +197,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
             node.opacity = 0.4;
 
             if (this.parent) {
-                var subvarexprs = Stage.getNodesWithClass(LambdaVarExpr, [], true, [this.parent]);
+                var subvarexprs = mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [this.parent]);
                 subvarexprs.forEach(function (e) {
                     if (e.name === _this6.name) {
                         var preview_node = node.clone();
@@ -440,7 +438,7 @@ var LambdaVarExpr = function (_ImageExpr) {
     }, {
         key: 'openingAnimation',
         get: function get() {
-            var anim = new Animation();
+            var anim = new mag.Animation();
             anim.addFrame('lambda-pipe-opening0', 50);
             anim.addFrame('lambda-pipe-opening1', 50);
             anim.addFrame('lambda-pipe-open', 50);
@@ -449,7 +447,7 @@ var LambdaVarExpr = function (_ImageExpr) {
     }, {
         key: 'closingAnimation',
         get: function get() {
-            var anim = new Animation();
+            var anim = new mag.Animation();
             anim.addFrame('lambda-pipe-opening1', 50);
             anim.addFrame('lambda-pipe-opening0', 50);
             anim.addFrame('lambda-pipe', 50);
@@ -461,7 +459,7 @@ var LambdaVarExpr = function (_ImageExpr) {
             var _this10 = this;
 
             if (!this._stateGraph) {
-                var g = new StateGraph();
+                var g = new mag.StateGraph();
                 g.addState('closed', function () {
                     _this10.image = _this10.closedImage;
                 });
@@ -528,7 +526,7 @@ var LambdaExpr = function (_Expression) {
                 this.updateHole();
 
                 var hole = this.holes[0];
-                var lvars = Stage.getNodesWithClass(LambdaVarExpr, [], true, [this]);
+                var lvars = mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [this]);
                 lvars.forEach(function (v) {
                     if (v.name === hole.name) {
                         v.color = hole.colorForVarName();
@@ -664,7 +662,7 @@ var LambdaExpr = function (_Expression) {
     }, {
         key: 'isConstantFunction',
         get: function get() {
-            return this.takesArgument && Stage.getNodesWithClass(LambdaVarExpr, [], true, [this]).length === 0;
+            return this.takesArgument && mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [this]).length === 0;
         }
     }, {
         key: 'body',
@@ -923,7 +921,7 @@ var FadedLambdaVarExpr = function (_LambdaVarExpr2) {
     }, {
         key: 'openingAnimation',
         get: function get() {
-            var anim = new Animation();
+            var anim = new mag.Animation();
             anim.addFrame('lambda-pipe-x-opening0', 50);
             anim.addFrame('lambda-pipe-x-opening1', 50);
             anim.addFrame(this.openImage, 50);
@@ -932,7 +930,7 @@ var FadedLambdaVarExpr = function (_LambdaVarExpr2) {
     }, {
         key: 'closingAnimation',
         get: function get() {
-            var anim = new Animation();
+            var anim = new mag.Animation();
             anim.addFrame('lambda-pipe-x-opening1', 50);
             anim.addFrame('lambda-pipe-x-opening0', 50);
             anim.addFrame(this.closedImage, 50);

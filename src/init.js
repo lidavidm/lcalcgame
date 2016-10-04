@@ -82,8 +82,8 @@ function clearStage() {
         stage = null;
     }
 
-    if (AnimationUpdateLoop) {
-        AnimationUpdateLoop.clear();
+    if (mag.AnimationUpdateLoop) {
+        mag.AnimationUpdateLoop.clear();
     }
 }
 

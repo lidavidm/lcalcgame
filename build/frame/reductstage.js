@@ -13,8 +13,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 /** A subclass of Stage that assumes Nodes are Expressions
     and allows for saving state. */
 
-var ReductStage = function (_Stage) {
-    _inherits(ReductStage, _Stage);
+var ReductStage = function (_mag$Stage) {
+    _inherits(ReductStage, _mag$Stage);
 
     function ReductStage() {
         var canvas = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -106,7 +106,7 @@ var ReductStage = function (_Stage) {
 
                             var you_win = function you_win() {
 
-                                var cmp = new ImageRect(GLOBAL_DEFAULT_SCREENSIZE.width / 2, GLOBAL_DEFAULT_SCREENSIZE.height / 2, 740 / 2, 146 / 2, 'victory');
+                                var cmp = new mag.ImageRect(GLOBAL_DEFAULT_SCREENSIZE.width / 2, GLOBAL_DEFAULT_SCREENSIZE.height / 2, 740 / 2, 146 / 2, 'victory');
                                 cmp.anchor = { x: 0.5, y: 0.5 };
                                 _this3.add(cmp);
                                 _this3.draw();
@@ -194,4 +194,4 @@ var ReductStage = function (_Stage) {
     }]);
 
     return ReductStage;
-}(Stage);
+}(mag.Stage);

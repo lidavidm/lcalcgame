@@ -8,8 +8,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Bag = function (_Circle) {
-    _inherits(Bag, _Circle);
+var Bag = function (_mag$Circle) {
+    _inherits(Bag, _mag$Circle);
 
     function Bag(x, y, rad) {
         var includeInner = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
@@ -21,7 +21,7 @@ var Bag = function (_Circle) {
         if (includeInner) {
             var outerRad = rad - _this.topSize(rad).h / 2.0;
             var innerRad = outerRad / 1.3;
-            var inner = new Circle(0, 0, innerRad);
+            var inner = new mag.Circle(0, 0, innerRad);
             inner.pos = { x: outerRad - innerRad, y: rad / 2.2 + (outerRad - innerRad) };
             inner.clipChildren = true;
             inner.clipBackground = 'bag-background';
@@ -73,8 +73,7 @@ var Bag = function (_Circle) {
         }
     }, {
         key: 'drawInternalAfterChildren',
-        value: function drawInternalAfterChildren(pos, boundingSize) {
-            var ctx = this.ctx;
+        value: function drawInternalAfterChildren(ctx, pos, boundingSize) {
             var rad = boundingSize.w / 2.0;
             var topSize = this.topSize(rad);
             rad -= topSize.h / 2.0;
@@ -83,4 +82,4 @@ var Bag = function (_Circle) {
     }]);
 
     return Bag;
-}(Circle);
+}(mag.Circle);

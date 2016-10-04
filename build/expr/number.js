@@ -47,8 +47,8 @@ var NumberExpr = function (_Expression) {
 // Draws the circles for a dice number inside its boundary.
 
 
-var DiceNumber = function (_Rect) {
-    _inherits(DiceNumber, _Rect);
+var DiceNumber = function (_mag$Rect) {
+    _inherits(DiceNumber, _mag$Rect);
 
     _createClass(DiceNumber, null, [{
         key: 'drawPositionsFor',
@@ -119,4 +119,4 @@ var DiceNumber = function (_Rect) {
     }]);
 
     return DiceNumber;
-}(Rect);
+}(mag.Rect);

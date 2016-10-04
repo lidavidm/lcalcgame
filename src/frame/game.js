@@ -49,17 +49,17 @@ class Level {
 
         // UI Buttons
         var ui_padding = 10;
-        var btn_back = new Button(canvas_screen.width - 64*3 - ui_padding, ui_padding, 64, 64,
+        var btn_back = new mag.Button(canvas_screen.width - 64*3 - ui_padding, ui_padding, 64, 64,
             { default:'btn-back-default', hover:'btn-back-hover', down:'btn-back-down' },
             () => {
             prev(); // go back to previous level; see index.html.
         });
-        var btn_reset = new Button(btn_back.pos.x + btn_back.size.w, btn_back.pos.y, 64, 64,
+        var btn_reset = new mag.Button(btn_back.pos.x + btn_back.size.w, btn_back.pos.y, 64, 64,
             { default:'btn-reset-default', hover:'btn-reset-hover', down:'btn-reset-down' },
             () => {
             initBoard(); // reset board state; see index.html.
         });
-        var btn_next = new Button(btn_reset.pos.x + btn_reset.size.w, ui_padding, 64, 64,
+        var btn_next = new mag.Button(btn_reset.pos.x + btn_reset.size.w, ui_padding, 64, 64,
             { default:'btn-next-default', hover:'btn-next-hover', down:'btn-next-down' },
             () => {
             next(); // go back to previous level; see index.html.
@@ -472,18 +472,18 @@ class Goal {
 
     get nodeRepresentation() {
         var exprs = flatten(this.patterns.map((p) => p.exprs)).map((expr) => expr.clone());
-        var bg = new Rect(-20,-10,200,80);
+        var bg = new mag.Rect(-20,-10,200,80);
         bg.color = "#444";
         bg.shadowOffset = 0;
         var txt = new TextExpr('Goal: ', 'Georgia');
-        var node = new Rect(0,0,100,50);
+        var node = new mag.Rect(0,0,100,50);
         node.color = null;
         node.ignoreEvents = true;
         txt.pos = { x:0, y:node.size.h/2 };
         txt.anchor = { x:0, y:0.5 };
         txt.color = "#EEE";
 
-        var exprs_node = new Rect(0,0,0,0);
+        var exprs_node = new mag.Rect(0,0,0,0);
         exprs_node.addAll(exprs);
 
         exprs[0].pos = { x:0, y:0 };

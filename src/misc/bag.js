@@ -1,13 +1,13 @@
 
 
-class Bag extends Circle {
+class Bag extends mag.Circle {
     constructor(x, y, rad, includeInner=true) {
         super(x, y, rad);
 
         if (includeInner) {
             var outerRad = rad - this.topSize(rad).h / 2.0;
             var innerRad = outerRad / 1.3;
-            var inner = new Circle(0, 0, innerRad);
+            var inner = new mag.Circle(0, 0, innerRad);
             inner.pos = { x:outerRad - innerRad, y:rad/2.2 + (outerRad - innerRad) };
             inner.clipChildren = true;
             inner.clipBackground = 'bag-background';
@@ -39,8 +39,7 @@ class Bag extends Circle {
         drawBag(ctx, pos.x, pos.y + this.shadowOffset, topSize.w, topSize.h, rad, 'black',    this.stroke);
         drawBag(ctx, pos.x, pos.y,                     topSize.w, topSize.h, rad, this.color, this.stroke);
     }
-    drawInternalAfterChildren(pos, boundingSize) {
-        var ctx = this.ctx;
+    drawInternalAfterChildren(ctx, pos, boundingSize) {
         var rad = boundingSize.w / 2.0;
         var topSize = this.topSize(rad);
         rad -= topSize.h / 2.0;

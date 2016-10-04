@@ -46,37 +46,37 @@ class GraphicVarExpr extends VarExpr {
 }
 class StarExpr extends GraphicVarExpr {
     constructor(x, y, rad, pts=5) {
-        super(new Star(x, y, rad, pts));
+        super(new mag.Star(x, y, rad, pts));
     }
     toString() { return 'star'; }
 }
 class CircleExpr extends GraphicVarExpr {
     constructor(x, y, rad) {
-        super(new Circle(x, y, rad));
+        super(new mag.Circle(x, y, rad));
     }
     toString() { return 'circle'; }
 }
 class PipeExpr extends GraphicVarExpr {
     constructor(x, y, w, h) {
-        super(new Pipe(x, y, w, h-12));
+        super(new mag.Pipe(x, y, w, h-12));
     }
     toString() { return 'pipe'; }
 }
 class TriangleExpr extends GraphicVarExpr {
     constructor(x, y, w, h) {
-        super(new Triangle(x, y, w, h));
+        super(new mag.Triangle(x, y, w, h));
     }
     toString() { return 'triangle'; }
 }
 class RectExpr extends GraphicVarExpr {
     constructor(x, y, w, h) {
-        super(new Rect(x, y, w, h));
+        super(new mag.Rect(x, y, w, h));
     }
     toString() { return 'diamond'; }
 }
 class ImageExpr extends GraphicVarExpr {
     constructor(x, y, w, h, resource_key) {
-        super(new ImageRect(x, y, w, h, resource_key));
+        super(new mag.ImageRect(x, y, w, h, resource_key));
         this._image = resource_key;
     }
     get image() { return this._image; }

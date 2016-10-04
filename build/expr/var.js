@@ -110,7 +110,7 @@ var StarExpr = function (_GraphicVarExpr) {
 
         _classCallCheck(this, StarExpr);
 
-        return _possibleConstructorReturn(this, (StarExpr.__proto__ || Object.getPrototypeOf(StarExpr)).call(this, new Star(x, y, rad, pts)));
+        return _possibleConstructorReturn(this, (StarExpr.__proto__ || Object.getPrototypeOf(StarExpr)).call(this, new mag.Star(x, y, rad, pts)));
     }
 
     _createClass(StarExpr, [{
@@ -129,7 +129,7 @@ var CircleExpr = function (_GraphicVarExpr2) {
     function CircleExpr(x, y, rad) {
         _classCallCheck(this, CircleExpr);
 
-        return _possibleConstructorReturn(this, (CircleExpr.__proto__ || Object.getPrototypeOf(CircleExpr)).call(this, new Circle(x, y, rad)));
+        return _possibleConstructorReturn(this, (CircleExpr.__proto__ || Object.getPrototypeOf(CircleExpr)).call(this, new mag.Circle(x, y, rad)));
     }
 
     _createClass(CircleExpr, [{
@@ -148,7 +148,7 @@ var PipeExpr = function (_GraphicVarExpr3) {
     function PipeExpr(x, y, w, h) {
         _classCallCheck(this, PipeExpr);
 
-        return _possibleConstructorReturn(this, (PipeExpr.__proto__ || Object.getPrototypeOf(PipeExpr)).call(this, new Pipe(x, y, w, h - 12)));
+        return _possibleConstructorReturn(this, (PipeExpr.__proto__ || Object.getPrototypeOf(PipeExpr)).call(this, new mag.Pipe(x, y, w, h - 12)));
     }
 
     _createClass(PipeExpr, [{
@@ -167,7 +167,7 @@ var TriangleExpr = function (_GraphicVarExpr4) {
     function TriangleExpr(x, y, w, h) {
         _classCallCheck(this, TriangleExpr);
 
-        return _possibleConstructorReturn(this, (TriangleExpr.__proto__ || Object.getPrototypeOf(TriangleExpr)).call(this, new Triangle(x, y, w, h)));
+        return _possibleConstructorReturn(this, (TriangleExpr.__proto__ || Object.getPrototypeOf(TriangleExpr)).call(this, new mag.Triangle(x, y, w, h)));
     }
 
     _createClass(TriangleExpr, [{
@@ -186,7 +186,7 @@ var RectExpr = function (_GraphicVarExpr5) {
     function RectExpr(x, y, w, h) {
         _classCallCheck(this, RectExpr);
 
-        return _possibleConstructorReturn(this, (RectExpr.__proto__ || Object.getPrototypeOf(RectExpr)).call(this, new Rect(x, y, w, h)));
+        return _possibleConstructorReturn(this, (RectExpr.__proto__ || Object.getPrototypeOf(RectExpr)).call(this, new mag.Rect(x, y, w, h)));
     }
 
     _createClass(RectExpr, [{
@@ -205,7 +205,7 @@ var ImageExpr = function (_GraphicVarExpr6) {
     function ImageExpr(x, y, w, h, resource_key) {
         _classCallCheck(this, ImageExpr);
 
-        var _this8 = _possibleConstructorReturn(this, (ImageExpr.__proto__ || Object.getPrototypeOf(ImageExpr)).call(this, new ImageRect(x, y, w, h, resource_key)));
+        var _this8 = _possibleConstructorReturn(this, (ImageExpr.__proto__ || Object.getPrototypeOf(ImageExpr)).call(this, new mag.ImageRect(x, y, w, h, resource_key)));
 
         _this8._image = resource_key;
         return _this8;
