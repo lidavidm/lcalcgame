@@ -3,10 +3,6 @@
  *	@module expression
  */
 
-
-
-
-
 const EMPTY_EXPR_WIDTH = 50;
 const DEFAULT_EXPR_HEIGHT = 50;
 const DEFAULT_CORNER_RAD = 20;

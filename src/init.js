@@ -12,18 +12,17 @@ if (level_idx !== 0) level_idx = parseInt(level_idx);
 function init() {
 
     // -- TEST CORS --
-
-    $.ajax({
-        type: "GET",
-        url: 'http://gdiac.cs.cornell.edu/research_games/page_load.php',
-        data:{game_id:7017018, client_timestamp:1},
-        async:true,
-        dataType : 'jsonp',   //you may use jsonp for cross origin request
-        crossDomain:true,
-        success: function(data, status, xhr) {
-            //console.log('Connected to server.');
-        }
-    });
+    // $.ajax({
+    //     type: "GET",
+    //     url: 'http://gdiac.cs.cornell.edu/research_games/page_load.php',
+    //     data:{game_id:7017018, client_timestamp:1},
+    //     async:true,
+    //     dataType : 'jsonp',   //you may use jsonp for cross origin request
+    //     crossDomain:true,
+    //     success: function(data, status, xhr) {
+    //         //console.log('Connected to server.');
+    //     }
+    // });
 
     Resource.initAudio();
 

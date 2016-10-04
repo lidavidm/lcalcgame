@@ -1,9 +1,3 @@
-/// TODO: Remove these dependencies.
- 
- 
- 
- 
-
 class Stage {
     constructor(canvas=null) {
         if (canvas) this.canvas = canvas;
