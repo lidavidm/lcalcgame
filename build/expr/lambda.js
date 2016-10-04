@@ -16,7 +16,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * -----------------------------------------------
  * */
 
-// 
+//
 
 var LambdaHoleExpr = function (_MissingExpression) {
     _inherits(LambdaHoleExpr, _MissingExpression);
@@ -83,14 +83,13 @@ var LambdaHoleExpr = function (_MissingExpression) {
 
     }, {
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
-            var ctx = this.ctx;
+        value: function drawInternal(ctx, pos, boundingSize) {
             var rad = boundingSize.w / 2.0;
             setStrokeStyle(ctx, this.stroke);
             ctx.fillStyle = this.color;
             ctx.beginPath();
             ctx.arc(pos.x + rad, pos.y + rad, rad, 0, 2 * Math.PI);
-            this.ctx.drawImage(Resource.getImage(this.image), pos.x, pos.y, boundingSize.w, boundingSize.h);
+            ctx.drawImage(Resource.getImage(this.image), pos.x, pos.y, boundingSize.w, boundingSize.h);
             if (this.stroke) ctx.stroke();
         }
 
@@ -410,12 +409,12 @@ var LambdaVarExpr = function (_ImageExpr) {
 
     }, {
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
-            _get(LambdaVarExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaVarExpr.prototype), 'drawInternal', this).call(this, pos, boundingSize);
-            if (this.ctx && !this.parent) {
+        value: function drawInternal(ctx, pos, boundingSize) {
+            _get(LambdaVarExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaVarExpr.prototype), 'drawInternal', this).call(this, ctx, pos, boundingSize);
+            if (ctx && !this.parent) {
                 this.scale = { x: 0.8, y: 0.8 };
-                drawCircle(this.ctx, pos.x, pos.y + this.handleOffset + this.shadowOffset, boundingSize.w / 2.0, 'black', this.graphicNode.stroke);
-                drawCircle(this.ctx, pos.x, pos.y + this.handleOffset, boundingSize.w / 2.0, 'lightgray', this.graphicNode.stroke);
+                drawCircle(ctx, pos.x, pos.y + this.handleOffset + this.shadowOffset, boundingSize.w / 2.0, 'black', this.graphicNode.stroke);
+                drawCircle(ctx, pos.x, pos.y + this.handleOffset, boundingSize.w / 2.0, 'lightgray', this.graphicNode.stroke);
             }
         }
     }, {
@@ -742,8 +741,7 @@ var FadedPythonLambdaHoleExpr = function (_LambdaHoleExpr3) {
 
 
         // Draw special round rect around term.
-        value: function drawInternal(pos, boundingSize) {
-            var ctx = this.ctx;
+        value: function drawInternal(ctx, pos, boundingSize) {
             setStrokeStyle(ctx, this.stroke);
             ctx.fillStyle = this.color;
             ctx.drawImage(Resource.getImage(this.image), pos.x, pos.y, boundingSize.w, boundingSize.h);
@@ -832,8 +830,7 @@ var FadedES6LambdaHoleExpr = function (_FadedPythonLambdaHol) {
 
     }, {
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
-            var ctx = this.ctx;
+        value: function drawInternal(ctx, pos, boundingSize) {
             setStrokeStyle(ctx, this.stroke);
             ctx.fillStyle = this.color;
             ctx.drawImage(Resource.getImage(this.image), pos.x, pos.y, boundingSize.w, boundingSize.h);

@@ -1,7 +1,7 @@
- 
- 
- 
- 
+
+
+
+
 
 // Wrapper class to make arbitrary nodes into draggable expressions.
 class VarExpr extends Expression { }
@@ -36,10 +36,10 @@ class GraphicVarExpr extends VarExpr {
         if (!this.delegateToInner) super.onmouseleave(pos);
         this.holes[0].onmouseleave(pos);
     }
-    drawInternal(pos, boundingSize) {
+    drawInternal(ctx, pos, boundingSize) {
         if (!this.delegateToInner) {
             this._color = '#777';
-            super.drawInternal(pos, boundingSize);
+            super.drawInternal(ctx, pos, boundingSize);
         }
     }
     value() { return this.holes[0].value(); }
@@ -101,7 +101,7 @@ class FunnelExpr extends ImageExpr {
     onmouseleave() {
         this.graphicNode.image = 'funnel';
     }
-    drawInternal(pos, boundingSize) {  }
+    drawInternal(ctx, pos, boundingSize) {  }
 }
 class NullExpr extends ImageExpr {
     constructor(x, y, w, h) {
@@ -156,18 +156,15 @@ class MirrorExpr extends ImageExpr {
     get exprInMirror() {
         return this.innerExpr;
     }
-    drawInternalAfterChildren(pos, boundingSize) {
+    drawInternalAfterChildren(ctx, pos, boundingSize) {
         if (!this.innerExpr) return;
-
-        var ctx = this.ctx;
 
         ctx.save();
         ctx.globalCompositeOperation = "overlay";
         this.innerExpr.parent = this.graphicNode;
         this.innerExpr.pos = { x:this.graphicNode.size.w / 2.0, y:this.graphicNode.size.h / 2.0 };
         this.innerExpr.anchor = { x:0.5, y:0.8 };
-        this.innerExpr.ctx = ctx;
-        this.innerExpr.draw();
+        this.innerExpr.draw(ctx);
         ctx.restore();
     }
 }

@@ -1,4 +1,4 @@
- 
+
 
 class TextExpr extends Expression {
     constructor(txt, font='Consolas', fontSize=35) {
@@ -23,8 +23,7 @@ class TextExpr extends Expression {
     get contextFont() {
         return this.fontSize + 'px ' + this.font;
     }
-    drawInternal(pos, boundingSize) {
-        var ctx = this.ctx;
+    drawInternal(ctx, pos, boundingSize) {
         var abs_scale = this.absoluteScale;
         ctx.save();
         ctx.font = this.contextFont;

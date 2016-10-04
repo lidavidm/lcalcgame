@@ -10,7 +10,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-// 
+//
 
 // A boolean compare function like ==, !=, >, >=, <=, <.
 
@@ -103,14 +103,14 @@ var CompareExpr = function (_Expression) {
         }
     }, {
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
-            this.ctx.fillStyle = 'black';
-            setStrokeStyle(this.ctx, this.stroke);
+        value: function drawInternal(ctx, pos, boundingSize) {
+            ctx.fillStyle = 'black';
+            setStrokeStyle(ctx, this.stroke);
             if (this.shadowOffset !== 0) {
-                hexaRect(this.ctx, pos.x, pos.y + this.shadowOffset, boundingSize.w, boundingSize.h, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null);
+                hexaRect(ctx, pos.x, pos.y + this.shadowOffset, boundingSize.w, boundingSize.h, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null);
             }
-            this.ctx.fillStyle = this.color;
-            hexaRect(this.ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null);
+            ctx.fillStyle = this.color;
+            hexaRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null);
         }
     }, {
         key: 'toString',

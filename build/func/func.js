@@ -41,8 +41,8 @@ var FuncExpr = function (_Expression) {
         }
     }, {
         key: 'draw',
-        value: function draw(offset) {
-            _get(FuncExpr.prototype.__proto__ || Object.getPrototypeOf(FuncExpr.prototype), 'draw', this).call(this, offset);
+        value: function draw(ctx, offset) {
+            _get(FuncExpr.prototype.__proto__ || Object.getPrototypeOf(FuncExpr.prototype), 'draw', this).call(this, ctx, offset);
 
             // Annoying hack until I divorce this.children from this.holes...
             var _iteratorNormalCompletion = true;
@@ -53,9 +53,8 @@ var FuncExpr = function (_Expression) {
                 for (var _iterator = this.arrowPaths[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                     var arrow = _step.value;
 
-                    arrow.ctx = this.ctx;
                     arrow.parent = this;
-                    arrow.draw(offset);
+                    arrow.draw(ctx, offset);
                 }
             } catch (err) {
                 _didIteratorError = true;

@@ -292,10 +292,9 @@ var LockIfStatement = function (_IfStatement3) {
         }
     }, {
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
-            _get(LockIfStatement.prototype.__proto__ || Object.getPrototypeOf(LockIfStatement.prototype), 'drawInternal', this).call(this, pos, boundingSize);
+        value: function drawInternal(ctx, pos, boundingSize) {
+            _get(LockIfStatement.prototype.__proto__ || Object.getPrototypeOf(LockIfStatement.prototype), 'drawInternal', this).call(this, ctx, pos, boundingSize);
 
-            var ctx = this.ctx;
             var condsz = this.cond.absoluteSize;
 
             var bgsz = { w: condsz.w + 14, h: condsz.h + 16 };
@@ -307,18 +306,14 @@ var LockIfStatement = function (_IfStatement3) {
             this._shinewrap.size = wrapsz;
             this._shinewrap.pos = wrappos;
 
-            this._bg.ctx = ctx;
             this._bg.stroke = this.stroke;
-            this._top.ctx = ctx;
 
-            this._bg.drawInternal(bgpos, bgsz);
-            this._top.drawInternal(addPos(bgpos, { x: bgsz.w / 2.0 - topsz.w / 2.0, y: -topsz.h }), topsz);
+            this._bg.drawInternal(ctx, bgpos, bgsz);
+            this._top.drawInternal(ctx, addPos(bgpos, { x: bgsz.w / 2.0 - topsz.w / 2.0, y: -topsz.h }), topsz);
         }
     }, {
         key: 'drawInternalAfterChildren',
-        value: function drawInternalAfterChildren(pos, boundingSize) {
-            var ctx = this.ctx;
-            this._shinewrap.ctx = ctx;
+        value: function drawInternalAfterChildren(ctx, pos, boundingSize) {
 
             if ((!this.opacity || this.opacity > 0) && this._shinewrap.opacity > 0 && !(this.branch instanceof MissingExpression)) {
                 ctx.save();
@@ -327,7 +322,7 @@ var LockIfStatement = function (_IfStatement3) {
 
                 ctx.globalCompositeOperation = "screen";
                 ctx.globalAlpha = this._shinewrap.opacity;
-                this._shinewrap.drawInternal(this._shinewrap.pos, this._shinewrap.size);
+                this._shinewrap.drawInternal(ctx, this._shinewrap.pos, this._shinewrap.size);
                 ctx.restore();
             }
         }

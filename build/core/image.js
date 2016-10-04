@@ -23,12 +23,12 @@ var ImageRect = function (_Rect) {
 
     _createClass(ImageRect, [{
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
-            if (!this.ctx || !this.image) {
-                console.error('@ ImageRect: Cannot draw image ', this.image, ' in context ', this.ctx);
+        value: function drawInternal(ctx, pos, boundingSize) {
+            if (!ctx || !this.image) {
+                console.error('@ ImageRect: Cannot draw image ', this.image, ' in context ', ctx);
                 return;
             }
-            this.ctx.drawImage(Resource.getImage(this.image), pos.x + this._offset.x, pos.y + this._offset.y, boundingSize.w, boundingSize.h);
+            ctx.drawImage(Resource.getImage(this.image), pos.x + this._offset.x, pos.y + this._offset.y, boundingSize.w, boundingSize.h);
         }
     }, {
         key: 'offset',
@@ -54,13 +54,13 @@ var PatternRect = function (_ImageRect) {
 
     _createClass(PatternRect, [{
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
-            if (!this.ctx || !this.image) return;
-            this.ctx.save();
-            var ptrn = this.ctx.createPattern(Resource.getImage(this.image), 'repeat');
-            this.ctx.fillStyle = ptrn;
-            this.ctx.fillRect(pos.x + this._offset.x, pos.y + this._offset.y, boundingSize.w, boundingSize.h);
-            this.ctx.restore();
+        value: function drawInternal(ctx, pos, boundingSize) {
+            if (!ctx || !this.image) return;
+            ctx.save();
+            var ptrn = ctx.createPattern(Resource.getImage(this.image), 'repeat');
+            ctx.fillStyle = ptrn;
+            ctx.fillRect(pos.x + this._offset.x, pos.y + this._offset.y, boundingSize.w, boundingSize.h);
+            ctx.restore();
         }
     }]);
 

@@ -64,8 +64,7 @@ var Bag = function (_Circle) {
         }
     }, {
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
-            var ctx = this.ctx;
+        value: function drawInternal(ctx, pos, boundingSize) {
             var rad = boundingSize.w / 2.0;
             var topSize = this.topSize(rad);
             rad -= topSize.h / 2.0;

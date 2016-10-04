@@ -61,50 +61,50 @@ var Rect = function (_Node) {
         }
     }, {
         key: 'draw',
-        value: function draw() {
+        value: function draw(ctx) {
             var _this2 = this;
 
-            if (!this.ctx) return;
-            this.ctx.save();
+            if (!ctx) return;
+            ctx.save();
             if (this.opacity !== undefined && this.opacity < 1.0) {
-                this.ctx.globalAlpha = this.opacity;
+                ctx.globalAlpha = this.opacity;
             }
             var boundingSize = this.absoluteSize;
             var upperLeftPos = this.upperLeftPos(this.absolutePos, boundingSize);
-            if (this._color || this.stroke) this.drawInternal(upperLeftPos, boundingSize);
+            if (this._color || this.stroke) this.drawInternal(ctx, upperLeftPos, boundingSize);
             this.children.forEach(function (child) {
                 child.parent = _this2;
-                child.draw();
+                child.draw(ctx);
             });
-            if (this._color || this.stroke) this.drawInternalAfterChildren(upperLeftPos, boundingSize);
-            this.ctx.restore();
+            if (this._color || this.stroke) this.drawInternalAfterChildren(ctx, upperLeftPos, boundingSize);
+            ctx.restore();
         }
     }, {
         key: 'strokeRect',
-        value: function strokeRect(x, y, w, h) {
+        value: function strokeRect(ctx, x, y, w, h) {
             if (this.stroke) {
                 if (this.stroke.opacity && this.stroke.opacity < 1.0) {
-                    this.ctx.save();
-                    this.ctx.globalAlpha *= this.stroke.opacity;
-                    this.ctx.strokeRect(x, y, w, h);
-                    this.ctx.restore();
-                } else this.ctx.strokeRect(x, y, w, h);
+                    ctx.save();
+                    ctx.globalAlpha *= this.stroke.opacity;
+                    ctx.strokeRect(x, y, w, h);
+                    ctx.restore();
+                } else ctx.strokeRect(x, y, w, h);
             }
         }
     }, {
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
-            setStrokeStyle(this.ctx, this.stroke);
-            this.ctx.fillStyle = 'black';
-            this.ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h + this.shadowOffset);
-            this.strokeRect(pos.x, pos.y, boundingSize.w, boundingSize.h + this.shadowOffset);
-            this.ctx.fillStyle = this.color;
-            this.ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
-            this.strokeRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+        value: function drawInternal(ctx, pos, boundingSize) {
+            setStrokeStyle(ctx, this.stroke);
+            ctx.fillStyle = 'black';
+            ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h + this.shadowOffset);
+            this.strokeRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h + this.shadowOffset);
+            ctx.fillStyle = this.color;
+            ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+            this.strokeRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h);
         }
     }, {
         key: 'drawInternalAfterChildren',
-        value: function drawInternalAfterChildren(pos, boundingSize) {}
+        value: function drawInternalAfterChildren(ctx, pos, boundingSize) {}
 
         // Events
 
@@ -295,15 +295,14 @@ var RoundedRect = function (_Rect) {
 
     _createClass(RoundedRect, [{
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
-            //console.log('drawing with color: ', this.color, boundingSize);
-            this.ctx.fillStyle = 'black';
-            setStrokeStyle(this.ctx, this.stroke);
+        value: function drawInternal(ctx, pos, boundingSize) {
+            ctx.fillStyle = 'black';
+            setStrokeStyle(ctx, this.stroke);
             if (this.shadowOffset !== 0) {
-                roundRect(this.ctx, pos.x, pos.y + this.shadowOffset, boundingSize.w, boundingSize.h, this.radius * this.absoluteScale.x, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null); // just fill for now
+                roundRect(ctx, pos.x, pos.y + this.shadowOffset, boundingSize.w, boundingSize.h, this.radius * this.absoluteScale.x, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null); // just fill for now
             }
-            this.ctx.fillStyle = this.color;
-            roundRect(this.ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, this.radius * this.absoluteScale.x, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null); // just fill for now
+            ctx.fillStyle = this.color;
+            roundRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, this.radius * this.absoluteScale.x, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null); // just fill for now
         }
     }]);
 
@@ -321,14 +320,14 @@ var HexaRect = function (_Rect2) {
 
     _createClass(HexaRect, [{
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
-            this.ctx.fillStyle = 'black';
-            setStrokeStyle(this.ctx, this.stroke);
+        value: function drawInternal(ctx, pos, boundingSize) {
+            ctx.fillStyle = 'black';
+            setStrokeStyle(ctx, this.stroke);
             if (this.shadowOffset !== 0) {
-                hexaRect(this.ctx, pos.x, pos.y + this.shadowOffset, boundingSize.w, boundingSize.h, true, this.stroke ? true : false); // just fill for now
+                hexaRect(ctx, pos.x, pos.y + this.shadowOffset, boundingSize.w, boundingSize.h, true, this.stroke ? true : false); // just fill for now
             }
-            this.ctx.fillStyle = this.color;
-            hexaRect(this.ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, true, this.stroke ? true : false); // just fill for now
+            ctx.fillStyle = this.color;
+            hexaRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, true, this.stroke ? true : false); // just fill for now
         }
     }]);
 
@@ -351,9 +350,9 @@ var Star = function (_Rect3) {
 
     _createClass(Star, [{
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
-            drawStar(this.ctx, pos.x + boundingSize.w / 2, pos.y + boundingSize.h / 2 + this.shadowOffset, this.starPoints, boundingSize.w / 2, boundingSize.w / 4, this.stroke, 'black');
-            drawStar(this.ctx, pos.x + boundingSize.w / 2, pos.y + boundingSize.h / 2, this.starPoints, boundingSize.w / 2, boundingSize.w / 4, this.stroke, this.color);
+        value: function drawInternal(ctx, pos, boundingSize) {
+            drawStar(ctx, pos.x + boundingSize.w / 2, pos.y + boundingSize.h / 2 + this.shadowOffset, this.starPoints, boundingSize.w / 2, boundingSize.w / 4, this.stroke, 'black');
+            drawStar(ctx, pos.x + boundingSize.w / 2, pos.y + boundingSize.h / 2, this.starPoints, boundingSize.w / 2, boundingSize.w / 4, this.stroke, this.color);
         }
     }]);
 
@@ -371,8 +370,7 @@ var Triangle = function (_Rect4) {
 
     _createClass(Triangle, [{
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
-            var ctx = this.ctx;
+        value: function drawInternal(ctx, pos, boundingSize) {
             setStrokeStyle(ctx, this.stroke);
             ctx.fillStyle = 'black';
             ctx.beginPath();
@@ -411,19 +409,17 @@ var Circle = function (_Rect5) {
 
     _createClass(Circle, [{
         key: 'drawInternalAfterChildren',
-        value: function drawInternalAfterChildren(pos, boundingSize) {
+        value: function drawInternalAfterChildren(ctx, pos, boundingSize) {
             if (this.clipChildren) {
-                this.ctx.restore();
+                ctx.restore();
 
-                var ctx = this.ctx;
                 var rad = boundingSize.w / 2.0;
                 drawCircle(ctx, pos.x, pos.y, rad, null, { color: 'black', lineWidth: 1 });
             }
         }
     }, {
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
-            var ctx = this.ctx;
+        value: function drawInternal(ctx, pos, boundingSize) {
             var rad = boundingSize.w / 2.0;
             if (this.shadowOffset !== 0) drawCircle(ctx, pos.x, pos.y + this.shadowOffset, rad, 'black', this.stroke);
             drawCircle(ctx, pos.x, pos.y, rad, this.color, this.stroke);
@@ -480,8 +476,7 @@ var Pipe = function (_Rect6) {
 
     _createClass(Pipe, [{
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
-            var ctx = this.ctx;
+        value: function drawInternal(ctx, pos, boundingSize) {
             var l = boundingSize.h / 4;
             var w = boundingSize.w / 2;
             var yoffset = -20;

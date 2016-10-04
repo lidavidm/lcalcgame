@@ -38,14 +38,14 @@ var BooleanPrimitive = function (_Expression) {
         }
     }, {
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
-            this.ctx.fillStyle = 'black';
-            setStrokeStyle(this.ctx, this.stroke);
+        value: function drawInternal(ctx, pos, boundingSize) {
+            ctx.fillStyle = 'black';
+            setStrokeStyle(ctx, this.stroke);
             if (this.shadowOffset !== 0) {
-                hexaRect(this.ctx, pos.x, pos.y + this.shadowOffset, boundingSize.w, boundingSize.h, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null);
+                hexaRect(ctx, pos.x, pos.y + this.shadowOffset, boundingSize.w, boundingSize.h, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null);
             }
-            this.ctx.fillStyle = this.color;
-            hexaRect(this.ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null);
+            ctx.fillStyle = this.color;
+            hexaRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null);
         }
     }]);
 

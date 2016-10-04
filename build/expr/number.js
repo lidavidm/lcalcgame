@@ -95,13 +95,12 @@ var DiceNumber = function (_Rect) {
         }
     }, {
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
+        value: function drawInternal(ctx, pos, boundingSize) {
             var _this3 = this;
 
             if (this.circlePos && this.circlePos.length > 0) {
                 (function () {
 
-                    var ctx = _this3.ctx;
                     var rad = _this3.radius * boundingSize.w / _this3.size.w;
                     var fill = _this3.color;
                     var stroke = _this3.stroke;

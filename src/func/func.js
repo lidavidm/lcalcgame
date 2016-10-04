@@ -1,7 +1,7 @@
 /**
  * Special function expressions inside the game, like map, fold, etc.
  */
- 
+
 
 class FuncExpr extends Expression {
     static arrowPathColor() { return 'DarkGreen'; }
@@ -19,14 +19,13 @@ class FuncExpr extends Expression {
         this.performReduction();
     }
 
-    draw(offset) {
-        super.draw(offset);
+    draw(ctx, offset) {
+        super.draw(ctx, offset);
 
         // Annoying hack until I divorce this.children from this.holes...
         for (let arrow of this.arrowPaths) {
-            arrow.ctx = this.ctx;
             arrow.parent = this;
-            arrow.draw(offset);
+            arrow.draw(ctx, offset);
         }
     }
 }

@@ -16,7 +16,6 @@ var Node = function () {
         this.children = [];
         this.parent = null;
         this._stage = null;
-        this._ctx = null;
         this.ignoreEvents = false;
     }
 
@@ -26,7 +25,6 @@ var Node = function () {
             this.children.push(child);
             if (child) {
                 child.parent = this;
-                child.ctx = this.ctx;
             }
         }
     }, {
@@ -38,14 +36,12 @@ var Node = function () {
             }
             this.children.splice(idx, 0, child);
             child.parent = this;
-            child.ctx = this.ctx;
         }
     }, {
         key: 'removeChild',
         value: function removeChild(node) {
             var i = this.children.indexOf(node);
             if (i > -1) {
-                this.children[i].ctx = null;
                 this.children[i].stage = null;
                 this.children.splice(i, 1);
             }
@@ -82,16 +78,16 @@ var Node = function () {
         }
     }, {
         key: 'draw',
-        value: function draw(offset) {
+        value: function draw(ctx, offset) {
             var pos = this.posWithOffset(offset);
-            this.drawInternal(pos);
+            this.drawInternal(ctx, pos);
             this.children.forEach(function (child) {
-                return child.draw(pos);
+                return child.draw(ctx, pos);
             });
         }
     }, {
         key: 'drawInternal',
-        value: function drawInternal(pos) {}
+        value: function drawInternal(ctx, pos) {}
 
         // Events
 
@@ -216,38 +212,6 @@ var Node = function () {
         key: 'rootParent',
         get: function get() {
             if (this.parent) return this.parent.rootParent;else if (this._stage) return this;else return null;
-        }
-    }, {
-        key: 'ctx',
-        get: function get() {
-            return this._ctx;
-        },
-        set: function set(c) {
-            this._ctx = c;
-            var _iteratorNormalCompletion2 = true;
-            var _didIteratorError2 = false;
-            var _iteratorError2 = undefined;
-
-            try {
-                for (var _iterator2 = this.children[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    var child = _step2.value;
-
-                    child.ctx = c;
-                }
-            } catch (err) {
-                _didIteratorError2 = true;
-                _iteratorError2 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                        _iterator2.return();
-                    }
-                } finally {
-                    if (_didIteratorError2) {
-                        throw _iteratorError2;
-                    }
-                }
-            }
         }
     }, {
         key: 'pos',

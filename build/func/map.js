@@ -549,7 +549,7 @@ var FunnelMapFunc = function (_MapFunc2) {
         value: function updateArrowPaths() {}
     }, {
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {}
+        value: function drawInternal(ctx, pos, boundingSize) {}
     }, {
         key: 'hits',
         value: function hits(pos, options) {

@@ -1,6 +1,6 @@
- 
- 
- 
+
+
+
 
 class BooleanPrimitive extends Expression {
     constructor(name) {
@@ -14,18 +14,18 @@ class BooleanPrimitive extends Expression {
     reduce() { return this; }
     reduceCompletely() { return this; }
 
-    drawInternal(pos, boundingSize) {
-        this.ctx.fillStyle = 'black';
-        setStrokeStyle(this.ctx, this.stroke);
+    drawInternal(ctx, pos, boundingSize) {
+        ctx.fillStyle = 'black';
+        setStrokeStyle(ctx, this.stroke);
         if (this.shadowOffset !== 0) {
-            hexaRect(this.ctx,
+            hexaRect(ctx,
                       pos.x, pos.y+this.shadowOffset,
                       boundingSize.w, boundingSize.h,
                       true, this.stroke ? true : false,
                       this.stroke ? this.stroke.opacity : null);
         }
-        this.ctx.fillStyle = this.color;
-        hexaRect(this.ctx,
+        ctx.fillStyle = this.color;
+        hexaRect(ctx,
                   pos.x, pos.y,
                   boundingSize.w, boundingSize.h,
                   true, this.stroke ? true : false,

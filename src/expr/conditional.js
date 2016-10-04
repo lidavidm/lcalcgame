@@ -1,11 +1,11 @@
- 
- 
- 
- 
- 
- 
- 
- 
+
+
+
+
+
+
+
+
 
 // An if statement.
 class IfStatement extends Expression {
@@ -193,10 +193,9 @@ class LockIfStatement extends IfStatement {
         });
     }
 
-    drawInternal(pos, boundingSize) {
-        super.drawInternal(pos, boundingSize);
+    drawInternal(ctx, pos, boundingSize) {
+        super.drawInternal(ctx, pos, boundingSize);
 
-        let ctx = this.ctx;
         let condsz = this.cond.absoluteSize;
 
         let bgsz = { w:condsz.w+14, h:condsz.h+16 };
@@ -208,16 +207,12 @@ class LockIfStatement extends IfStatement {
         this._shinewrap.size = wrapsz;
         this._shinewrap.pos = wrappos;
 
-        this._bg.ctx = ctx;
         this._bg.stroke = this.stroke;
-        this._top.ctx = ctx;
 
-        this._bg.drawInternal( bgpos, bgsz );
-        this._top.drawInternal( addPos(bgpos, {x:bgsz.w / 2.0 - topsz.w/2.0, y:-topsz.h } ), topsz );
+        this._bg.drawInternal( ctx, bgpos, bgsz );
+        this._top.drawInternal( ctx, addPos(bgpos, {x:bgsz.w / 2.0 - topsz.w/2.0, y:-topsz.h } ), topsz );
     }
-    drawInternalAfterChildren(pos, boundingSize) {
-        let ctx = this.ctx;
-        this._shinewrap.ctx = ctx;
+    drawInternalAfterChildren(ctx, pos, boundingSize) {
 
         if ((!this.opacity || this.opacity > 0) && this._shinewrap.opacity > 0 && !(this.branch instanceof MissingExpression)) {
             ctx.save();
@@ -229,7 +224,7 @@ class LockIfStatement extends IfStatement {
 
             ctx.globalCompositeOperation = "screen";
             ctx.globalAlpha = this._shinewrap.opacity;
-            this._shinewrap.drawInternal( this._shinewrap.pos, this._shinewrap.size );
+            this._shinewrap.drawInternal( ctx, this._shinewrap.pos, this._shinewrap.size );
             ctx.restore();
         }
     }

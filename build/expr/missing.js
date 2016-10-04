@@ -155,15 +155,14 @@ var MissingTypedExpression = function (_MissingExpression) {
         }
     }, {
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
+        value: function drawInternal(ctx, pos, boundingSize) {
             pos.x -= boundingSize.w / 1.2 - boundingSize.w;
             pos.y -= boundingSize.h / 1.14 - boundingSize.h; // aesthetic resizing
             boundingSize.w /= 1.2;
-            this.graphicNode.ctx = this.ctx;
             this.graphicNode.stroke = this.stroke;
             this.graphicNode.color = this.color;
             this.graphicNode.shadowOffset = this.shadowOffset;
-            this.graphicNode.drawInternal(pos, boundingSize);
+            this.graphicNode.drawInternal(ctx, pos, boundingSize);
         }
     }, {
         key: 'toString',
@@ -259,16 +258,15 @@ var MissingBracketExpression = function (_MissingBagExpression) {
         }
     }, {
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
+        value: function drawInternal(ctx, pos, boundingSize) {
             pos.x -= boundingSize.w / 1.1 - boundingSize.w;
             pos.y -= boundingSize.h / 1.05 - boundingSize.h;
             boundingSize.w /= 1.1;
             boundingSize.h /= 1.1;
-            this.graphicNode.ctx = this.ctx;
             this.graphicNode.stroke = this.stroke;
             this.graphicNode.color = this.color;
             this.graphicNode.shadowOffset = this.shadowOffset;
-            this.graphicNode.drawInternal(pos, boundingSize);
+            this.graphicNode.drawInternal(ctx, pos, boundingSize);
         }
     }]);
 
@@ -299,12 +297,11 @@ var MissingBooleanExpression = function (_MissingTypedExpressi2) {
         }
     }, {
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
-            this.graphicNode.ctx = this.ctx;
+        value: function drawInternal(ctx, pos, boundingSize) {
             this.graphicNode.stroke = this.stroke;
             this.graphicNode.color = this.color;
             this.graphicNode.shadowOffset = this.shadowOffset;
-            this.graphicNode.drawInternal(pos, boundingSize);
+            this.graphicNode.drawInternal(ctx, pos, boundingSize);
         }
     }, {
         key: 'toString',
@@ -332,12 +329,12 @@ var MissingKeyExpression = function (_MissingBooleanExpres) {
 
     _createClass(MissingKeyExpression, [{
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
-            _get(MissingKeyExpression.prototype.__proto__ || Object.getPrototypeOf(MissingKeyExpression.prototype), 'drawInternal', this).call(this, pos, boundingSize);
+        value: function drawInternal(ctx, pos, boundingSize) {
+            _get(MissingKeyExpression.prototype.__proto__ || Object.getPrototypeOf(MissingKeyExpression.prototype), 'drawInternal', this).call(this, ctx, pos, boundingSize);
 
             // Draw keyhole.
             var sz = this.graphicNode.children[0].size;
-            this.graphicNode.children[0].drawInternal(addPos(pos, { x: boundingSize.w / 2.0 - sz.w / 2, y: boundingSize.h / 2.0 - sz.h / 2 }), sz);
+            this.graphicNode.children[0].drawInternal(ctx, addPos(pos, { x: boundingSize.w / 2.0 - sz.w / 2, y: boundingSize.h / 2.0 - sz.h / 2 }), sz);
         }
     }]);
 

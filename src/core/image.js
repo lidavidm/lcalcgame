@@ -1,5 +1,5 @@
- 
- 
+
+
 
 class ImageRect extends Rect {
     constructor(x, y, w, h, resource_key) {
@@ -9,23 +9,23 @@ class ImageRect extends Rect {
     }
     get offset() { return { x:this._offset.x, y:this._offset.y }; }
     set offset(o) { this._offset = { x:o.x, y:o.y }; }
-    drawInternal(pos, boundingSize) {
-        if (!this.ctx || !this.image) {
-            console.error('@ ImageRect: Cannot draw image ', this.image, ' in context ', this.ctx);
+    drawInternal(ctx, pos, boundingSize) {
+        if (!ctx || !this.image) {
+            console.error('@ ImageRect: Cannot draw image ', this.image, ' in context ', ctx);
             return;
         }
-        this.ctx.drawImage(Resource.getImage(this.image), pos.x + this._offset.x, pos.y + this._offset.y, boundingSize.w, boundingSize.h);
+        ctx.drawImage(Resource.getImage(this.image), pos.x + this._offset.x, pos.y + this._offset.y, boundingSize.w, boundingSize.h);
     }
 }
 
 class PatternRect extends ImageRect {
-    drawInternal(pos, boundingSize) {
-        if (!this.ctx || !this.image) return;
-        this.ctx.save();
-        var ptrn = this.ctx.createPattern( Resource.getImage(this.image), 'repeat' );
-        this.ctx.fillStyle = ptrn;
-        this.ctx.fillRect(pos.x + this._offset.x, pos.y + this._offset.y, boundingSize.w, boundingSize.h);
-        this.ctx.restore();
+    drawInternal(ctx, pos, boundingSize) {
+        if (!ctx || !this.image) return;
+        ctx.save();
+        var ptrn = ctx.createPattern( Resource.getImage(this.image), 'repeat' );
+        ctx.fillStyle = ptrn;
+        ctx.fillRect(pos.x + this._offset.x, pos.y + this._offset.y, boundingSize.w, boundingSize.h);
+        ctx.restore();
     }
 }
 

@@ -1,12 +1,12 @@
 /**
  * Special function expressions inside the game, like map, fold, etc.
  */
- 
- 
- 
- 
- 
- 
+
+
+
+
+
+
 
 class MapFunc extends FuncExpr {
     constructor(oneParamFunc, bag) {
@@ -428,7 +428,7 @@ class FunnelMapFunc extends MapFunc {
         this.func.onmouseleave(pos);
     }
     updateArrowPaths() { }
-    drawInternal(pos, boundingSize) { }
+    drawInternal(ctx, pos, boundingSize) { }
     hits(pos, options) {
         var b = this.bag.hits(pos, options);
         if (b) return b;

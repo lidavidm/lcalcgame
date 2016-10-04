@@ -2,7 +2,7 @@
  * Contains ArrowPath.
  * @module arrowpath
  */
- 
+
 
 class ArrowPath extends Node {
     constructor(points=[], stroke={color:'black', lineWidth:1}, arrowWidth=8) {
@@ -73,14 +73,13 @@ class ArrowPath extends Node {
         return this.lastPoint;
     }
 
-    draw(offset) {
-        this.drawInternal(this.absolutePos);
+    draw(ctx, offset) {
+        this.drawInternal(ctx, this.absolutePos);
     }
 
     // Draw path.
-    drawInternal(pos) {
+    drawInternal(ctx, pos) {
         if (!this.points || this.points.length === 0) return;
-        let ctx = this.ctx;
         let abs_scale = this.parent.absoluteScale;
         let lastpt = this.lastPoint; //addPos( pos, this.lastPoint );
 

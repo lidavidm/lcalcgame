@@ -68,17 +68,16 @@ var ArrowPath = function (_Node) {
         }
     }, {
         key: 'draw',
-        value: function draw(offset) {
-            this.drawInternal(this.absolutePos);
+        value: function draw(ctx, offset) {
+            this.drawInternal(ctx, this.absolutePos);
         }
 
         // Draw path.
 
     }, {
         key: 'drawInternal',
-        value: function drawInternal(pos) {
+        value: function drawInternal(ctx, pos) {
             if (!this.points || this.points.length === 0) return;
-            var ctx = this.ctx;
             var abs_scale = this.parent.absoluteScale;
             var lastpt = this.lastPoint; //addPos( pos, this.lastPoint );
 

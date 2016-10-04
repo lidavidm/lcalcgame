@@ -1,12 +1,12 @@
- 
- 
- 
- 
- 
- 
- 
- 
- 
+
+
+
+
+
+
+
+
+
 
 class MissingExpression extends Expression {
     constructor(expr_to_miss) {
@@ -86,15 +86,14 @@ class MissingTypedExpression extends MissingExpression {
             super.ondropped(node, pos);
     }
 
-    drawInternal(pos, boundingSize) {
+    drawInternal(ctx, pos, boundingSize) {
         pos.x -= boundingSize.w / 1.2 - boundingSize.w;
         pos.y -= boundingSize.h / 1.14 - boundingSize.h; // aesthetic resizing
         boundingSize.w /= 1.2;
-        this.graphicNode.ctx = this.ctx;
         this.graphicNode.stroke = this.stroke;
         this.graphicNode.color = this.color;
         this.graphicNode.shadowOffset = this.shadowOffset;
-        this.graphicNode.drawInternal(pos, boundingSize);
+        this.graphicNode.drawInternal(ctx, pos, boundingSize);
     }
 
     toString() { return '_'; }
@@ -144,16 +143,15 @@ class MissingBracketExpression extends MissingBagExpression {
             super.ondropped(node, pos);
         }
     }
-    drawInternal(pos, boundingSize) {
+    drawInternal(ctx, pos, boundingSize) {
         pos.x -= boundingSize.w / 1.1 - boundingSize.w;
         pos.y -= boundingSize.h / 1.05 - boundingSize.h;
         boundingSize.w /= 1.1;
         boundingSize.h /= 1.1;
-        this.graphicNode.ctx = this.ctx;
         this.graphicNode.stroke = this.stroke;
         this.graphicNode.color = this.color;
         this.graphicNode.shadowOffset = this.shadowOffset;
-        this.graphicNode.drawInternal(pos, boundingSize);
+        this.graphicNode.drawInternal(ctx, pos, boundingSize);
     }
 }
 
@@ -169,12 +167,11 @@ class MissingBooleanExpression extends MissingTypedExpression {
     }
     getClass() { return MissingBooleanExpression; }
 
-    drawInternal(pos, boundingSize) {
-        this.graphicNode.ctx = this.ctx;
+    drawInternal(ctx, pos, boundingSize) {
         this.graphicNode.stroke = this.stroke;
         this.graphicNode.color = this.color;
         this.graphicNode.shadowOffset = this.shadowOffset;
-        this.graphicNode.drawInternal(pos, boundingSize);
+        this.graphicNode.drawInternal(ctx, pos, boundingSize);
     }
 
     toString() { return '_b'; }
@@ -187,11 +184,11 @@ class MissingKeyExpression extends MissingBooleanExpression {
         this.graphicNode.addChild(keyhole);
 
     }
-    drawInternal(pos, boundingSize) {
-        super.drawInternal(pos, boundingSize);
+    drawInternal(ctx, pos, boundingSize) {
+        super.drawInternal(ctx, pos, boundingSize);
 
         // Draw keyhole.
         let sz = this.graphicNode.children[0].size;
-        this.graphicNode.children[0].drawInternal( addPos(pos, { x:boundingSize.w/2.0-sz.w/2, y:boundingSize.h/2.0-sz.h/2 }), sz);
+        this.graphicNode.children[0].drawInternal( ctx, addPos(pos, { x:boundingSize.w/2.0-sz.w/2, y:boundingSize.h/2.0-sz.h/2 }), sz);
     }
 }

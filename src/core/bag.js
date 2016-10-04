@@ -1,4 +1,4 @@
- 
+
 
 class Bag extends Circle {
     constructor(x, y, rad, includeInner=true) {
@@ -32,8 +32,7 @@ class Bag extends Circle {
     topSize(rad) {
         return { w:Math.round(rad) * 1.5, h:rad / 2.2 };
     }
-    drawInternal(pos, boundingSize) {
-        var ctx = this.ctx;
+    drawInternal(ctx, pos, boundingSize) {
         var rad = boundingSize.w / 2.0;
         var topSize = this.topSize(rad);
         rad -= topSize.h / 2.0;

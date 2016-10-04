@@ -3,14 +3,14 @@
  * The LambdaHoleExpr performs substitution on LambdaVar subexpressions in its parent expression context.
  * -----------------------------------------------
  * */
- 
- 
- 
- 
- 
- 
-//  
- 
+
+
+
+
+
+
+//
+
 
 class LambdaHoleExpr extends MissingExpression {
     get openImage() { return this.name === 'x' ? 'lambda-hole' : 'lambda-hole-red'; }
@@ -57,14 +57,13 @@ class LambdaHoleExpr extends MissingExpression {
     colorForVarName() { return LambdaHoleExpr.colorForVarName(this.name); }
 
     // Draw special circle representing a hole.
-    drawInternal(pos, boundingSize) {
-        var ctx = this.ctx;
+    drawInternal(ctx, pos, boundingSize) {
         var rad = boundingSize.w / 2.0;
         setStrokeStyle(ctx, this.stroke);
         ctx.fillStyle = this.color;
         ctx.beginPath();
         ctx.arc(pos.x+rad,pos.y+rad,rad,0,2*Math.PI);
-        this.ctx.drawImage(Resource.getImage(this.image), pos.x, pos.y, boundingSize.w, boundingSize.h);
+        ctx.drawImage(Resource.getImage(this.image), pos.x, pos.y, boundingSize.w, boundingSize.h);
         if(this.stroke) ctx.stroke();
     }
 
@@ -361,12 +360,12 @@ class LambdaVarExpr extends ImageExpr {
     }
 
     //onmousedrag() {}
-    drawInternal(pos, boundingSize) {
-        super.drawInternal(pos, boundingSize);
-        if (this.ctx && !this.parent) {
+    drawInternal(ctx, pos, boundingSize) {
+        super.drawInternal(ctx, pos, boundingSize);
+        if (ctx && !this.parent) {
             this.scale = { x:0.8, y:0.8 };
-            drawCircle(this.ctx, pos.x, pos.y+this.handleOffset+this.shadowOffset, boundingSize.w / 2.0, 'black', this.graphicNode.stroke);
-            drawCircle(this.ctx, pos.x, pos.y+this.handleOffset, boundingSize.w / 2.0, 'lightgray', this.graphicNode.stroke);
+            drawCircle(ctx, pos.x, pos.y+this.handleOffset+this.shadowOffset, boundingSize.w / 2.0, 'black', this.graphicNode.stroke);
+            drawCircle(ctx, pos.x, pos.y+this.handleOffset, boundingSize.w / 2.0, 'lightgray', this.graphicNode.stroke);
         }
     }
 
@@ -538,8 +537,7 @@ class FadedPythonLambdaHoleExpr extends LambdaHoleExpr {
     }
 
     // Draw special round rect around term.
-    drawInternal(pos, boundingSize) {
-        var ctx = this.ctx;
+    drawInternal(ctx, pos, boundingSize) {
         setStrokeStyle(ctx, this.stroke);
         ctx.fillStyle = this.color;
         ctx.drawImage(Resource.getImage(this.image), pos.x, pos.y, boundingSize.w, boundingSize.h);
@@ -575,8 +573,7 @@ class FadedES6LambdaHoleExpr extends FadedPythonLambdaHoleExpr {
     }
 
     // Draw special round rect around just x term.
-    drawInternal(pos, boundingSize) {
-        var ctx = this.ctx;
+    drawInternal(ctx, pos, boundingSize) {
         setStrokeStyle(ctx, this.stroke);
         ctx.fillStyle = this.color;
         ctx.drawImage(Resource.getImage(this.image), pos.x, pos.y, boundingSize.w, boundingSize.h);

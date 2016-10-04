@@ -21,7 +21,6 @@ class Stage {
         }
     }
     add(node) {
-        node.ctx = this.ctx;
         node.stage = this;
         if(node.locked) node.unlock();
         this.nodes.push(node);
@@ -33,7 +32,6 @@ class Stage {
     remove(node) {
         var i = this.nodes.indexOf(node);
         if (i > -1) {
-            this.nodes[i].ctx = null;
             this.nodes[i].stage = null;
             this.nodes.splice(i, 1);
         }
@@ -48,7 +46,6 @@ class Stage {
                 return;
             }
 
-            this.nodes[i].ctx = null;
             this.nodes[i].stage = null;
             var origpos = this.nodes[i].upperLeftPos(this.nodes[i].absolutePos, this.nodes[i].absoluteSize);
             var pos;
@@ -68,7 +65,6 @@ class Stage {
                 var an = anotherNode[j];
                 an.unlock();
                 an.pos = pos;
-                an.ctx = this.ctx;
                 an.parent = null;
                 an.stage = this;
                 an.scale = this.nodes[i].scale;
@@ -161,7 +157,7 @@ class Stage {
         this.ctx.save();
         this.ctx.scale(1,1);
         this.clear();
-        this.nodes.forEach((n) => n.draw()); // TODO: You should pass the ctx!!!!!!
+        this.nodes.forEach((n) => n.draw(this.ctx)); // TODO: You should pass the ctx!!!!!!
         this.ctx.restore();
     }
 

@@ -1,5 +1,5 @@
- 
- 
+
+
 
 // Integers
 class NumberExpr extends Expression {
@@ -54,11 +54,10 @@ class DiceNumber extends Rect {
         return [ this.number, this.radius ];
     }
     hits(pos, options) { return false; }
-    drawInternal(pos, boundingSize) {
+    drawInternal(ctx, pos, boundingSize) {
 
         if (this.circlePos && this.circlePos.length > 0) {
 
-            let ctx = this.ctx;
             let rad = this.radius * boundingSize.w / this.size.w;
             let fill = this.color;
             let stroke = this.stroke;

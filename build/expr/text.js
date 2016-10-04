@@ -28,8 +28,7 @@ var TextExpr = function (_Expression) {
 
     _createClass(TextExpr, [{
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
-            var ctx = this.ctx;
+        value: function drawInternal(ctx, pos, boundingSize) {
             var abs_scale = this.absoluteScale;
             ctx.save();
             ctx.font = this.contextFont;

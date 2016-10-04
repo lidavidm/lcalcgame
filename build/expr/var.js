@@ -68,10 +68,10 @@ var GraphicVarExpr = function (_VarExpr) {
         }
     }, {
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {
+        value: function drawInternal(ctx, pos, boundingSize) {
             if (!this.delegateToInner) {
                 this._color = '#777';
-                _get(GraphicVarExpr.prototype.__proto__ || Object.getPrototypeOf(GraphicVarExpr.prototype), 'drawInternal', this).call(this, pos, boundingSize);
+                _get(GraphicVarExpr.prototype.__proto__ || Object.getPrototypeOf(GraphicVarExpr.prototype), 'drawInternal', this).call(this, ctx, pos, boundingSize);
             }
         }
     }, {
@@ -257,7 +257,7 @@ var FunnelExpr = function (_ImageExpr) {
         }
     }, {
         key: 'drawInternal',
-        value: function drawInternal(pos, boundingSize) {}
+        value: function drawInternal(ctx, pos, boundingSize) {}
     }, {
         key: 'size',
         get: function get() {
@@ -335,18 +335,15 @@ var MirrorExpr = function (_ImageExpr3) {
 
     _createClass(MirrorExpr, [{
         key: 'drawInternalAfterChildren',
-        value: function drawInternalAfterChildren(pos, boundingSize) {
+        value: function drawInternalAfterChildren(ctx, pos, boundingSize) {
             if (!this.innerExpr) return;
-
-            var ctx = this.ctx;
 
             ctx.save();
             ctx.globalCompositeOperation = "overlay";
             this.innerExpr.parent = this.graphicNode;
             this.innerExpr.pos = { x: this.graphicNode.size.w / 2.0, y: this.graphicNode.size.h / 2.0 };
             this.innerExpr.anchor = { x: 0.5, y: 0.8 };
-            this.innerExpr.ctx = ctx;
-            this.innerExpr.draw();
+            this.innerExpr.draw(ctx);
             ctx.restore();
         }
     }, {

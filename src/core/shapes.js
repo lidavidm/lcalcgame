@@ -3,8 +3,8 @@
  * @module shapes
  */
 
- 
-// 
+
+//
 
 class Rect extends Node {
     constructor(x, y, w, h) {
@@ -66,43 +66,43 @@ class Rect extends Node {
         let offset = { x:unitPos.x * sz.w, y:unitPos.y * sz.h };
         return addPos(pt, offset);
     }
-    draw() {
-        if (!this.ctx) return;
-        this.ctx.save();
+    draw(ctx) {
+        if (!ctx) return;
+        ctx.save();
         if (this.opacity !== undefined && this.opacity < 1.0) {
-            this.ctx.globalAlpha = this.opacity;
+            ctx.globalAlpha = this.opacity;
         }
         var boundingSize = this.absoluteSize;
         var upperLeftPos = this.upperLeftPos(this.absolutePos, boundingSize);
-        if (this._color || this.stroke) this.drawInternal(upperLeftPos, boundingSize);
+        if (this._color || this.stroke) this.drawInternal(ctx, upperLeftPos, boundingSize);
         this.children.forEach((child) => {
             child.parent = this;
-            child.draw();
+            child.draw(ctx);
         });
-        if (this._color || this.stroke) this.drawInternalAfterChildren(upperLeftPos, boundingSize);
-        this.ctx.restore();
+        if (this._color || this.stroke) this.drawInternalAfterChildren(ctx, upperLeftPos, boundingSize);
+        ctx.restore();
     }
-    strokeRect(x, y, w, h) {
+    strokeRect(ctx, x, y, w, h) {
         if(this.stroke) {
             if (this.stroke.opacity && this.stroke.opacity < 1.0) {
-                this.ctx.save();
-                this.ctx.globalAlpha *= this.stroke.opacity;
-                this.ctx.strokeRect(x, y, w, h);
-                this.ctx.restore();
+                ctx.save();
+                ctx.globalAlpha *= this.stroke.opacity;
+                ctx.strokeRect(x, y, w, h);
+                ctx.restore();
             }
-            else this.ctx.strokeRect(x, y, w, h);
+            else ctx.strokeRect(x, y, w, h);
         }
     }
-    drawInternal(pos, boundingSize) {
-        setStrokeStyle(this.ctx, this.stroke);
-        this.ctx.fillStyle = 'black';
-        this.ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h+this.shadowOffset);
-        this.strokeRect(pos.x, pos.y, boundingSize.w, boundingSize.h+this.shadowOffset);
-        this.ctx.fillStyle = this.color;
-        this.ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
-        this.strokeRect(pos.x, pos.y, boundingSize.w, boundingSize.h)
+    drawInternal(ctx, pos, boundingSize) {
+        setStrokeStyle(ctx, this.stroke);
+        ctx.fillStyle = 'black';
+        ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h+this.shadowOffset);
+        this.strokeRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h+this.shadowOffset);
+        ctx.fillStyle = this.color;
+        ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+        this.strokeRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h)
     }
-    drawInternalAfterChildren(pos, boundingSize) { }
+    drawInternalAfterChildren(ctx, pos, boundingSize) { }
 
     // Events
     hits(pos, options) {
@@ -153,19 +153,18 @@ class RoundedRect extends Rect {
         super(x, y, w, h);
         this.radius = rad;
     }
-    drawInternal(pos, boundingSize) {
-        //console.log('drawing with color: ', this.color, boundingSize);
-        this.ctx.fillStyle = 'black';
-        setStrokeStyle(this.ctx, this.stroke);
+    drawInternal(ctx, pos, boundingSize) {
+        ctx.fillStyle = 'black';
+        setStrokeStyle(ctx, this.stroke);
         if (this.shadowOffset !== 0) {
-            roundRect(this.ctx,
+            roundRect(ctx,
                       pos.x, pos.y+this.shadowOffset,
                       boundingSize.w, boundingSize.h,
                       this.radius*this.absoluteScale.x, true, this.stroke ? true : false,
                       this.stroke ? this.stroke.opacity : null); // just fill for now
         }
-        this.ctx.fillStyle = this.color;
-        roundRect(this.ctx,
+        ctx.fillStyle = this.color;
+        roundRect(ctx,
                   pos.x, pos.y,
                   boundingSize.w, boundingSize.h,
                   this.radius*this.absoluteScale.x, true, this.stroke ? true : false,
@@ -177,17 +176,17 @@ class HexaRect extends Rect {
     constructor(x, y, w, h) {
         super(x, y, w, h);
     }
-    drawInternal(pos, boundingSize) {
-        this.ctx.fillStyle = 'black';
-        setStrokeStyle(this.ctx, this.stroke);
+    drawInternal(ctx, pos, boundingSize) {
+        ctx.fillStyle = 'black';
+        setStrokeStyle(ctx, this.stroke);
         if (this.shadowOffset !== 0) {
-            hexaRect(this.ctx,
+            hexaRect(ctx,
                       pos.x, pos.y+this.shadowOffset,
                       boundingSize.w, boundingSize.h,
                       true, this.stroke ? true : false); // just fill for now
         }
-        this.ctx.fillStyle = this.color;
-        hexaRect(this.ctx,
+        ctx.fillStyle = this.color;
+        hexaRect(ctx,
                   pos.x, pos.y,
                   boundingSize.w, boundingSize.h,
                   true, this.stroke ? true : false); // just fill for now
@@ -199,19 +198,18 @@ class Star extends Rect {
         super(x, y, rad*2, rad*2);
         this.starPoints = points;
     }
-    drawInternal(pos, boundingSize) {
-        drawStar(this.ctx, pos.x+boundingSize.w/2, pos.y+boundingSize.h/2+this.shadowOffset,
+    drawInternal(ctx, pos, boundingSize) {
+        drawStar(ctx, pos.x+boundingSize.w/2, pos.y+boundingSize.h/2+this.shadowOffset,
                  this.starPoints, boundingSize.w / 2, boundingSize.w / 4,
                  this.stroke, 'black');
-        drawStar(this.ctx, pos.x+boundingSize.w/2, pos.y+boundingSize.h/2,
+        drawStar(ctx, pos.x+boundingSize.w/2, pos.y+boundingSize.h/2,
                  this.starPoints, boundingSize.w / 2, boundingSize.w / 4,
                  this.stroke, this.color);
     }
 }
 
 class Triangle extends Rect {
-    drawInternal(pos, boundingSize) {
-        var ctx = this.ctx;
+    drawInternal(ctx, pos, boundingSize) {
         setStrokeStyle(ctx, this.stroke);
         ctx.fillStyle = 'black';
         ctx.beginPath();
@@ -248,17 +246,15 @@ class Circle extends Rect {
         this._radius = r;
         this._size = { w:r*2, h:r*2 };
     }
-    drawInternalAfterChildren(pos, boundingSize) {
+    drawInternalAfterChildren(ctx, pos, boundingSize) {
         if (this.clipChildren) {
-            this.ctx.restore();
+            ctx.restore();
 
-            var ctx = this.ctx;
             var rad = boundingSize.w / 2.0;
             drawCircle(ctx, pos.x, pos.y, rad, null, {color:'black', lineWidth:1});
         }
     }
-    drawInternal(pos, boundingSize) {
-        var ctx = this.ctx;
+    drawInternal(ctx, pos, boundingSize) {
         var rad = boundingSize.w / 2.0;
         if (this.shadowOffset !== 0)
             drawCircle(ctx, pos.x, pos.y + this.shadowOffset, rad, 'black',    this.stroke);
@@ -284,8 +280,7 @@ class Pipe extends Rect {
         this.sideColor = sideColor;
         this.cylStroke = { color:'blue', lineWidth:1 };
     }
-    drawInternal(pos, boundingSize) {
-        var ctx = this.ctx;
+    drawInternal(ctx, pos, boundingSize) {
         var l = boundingSize.h / 4;
         var w = boundingSize.w / 2;
         var yoffset = -20;

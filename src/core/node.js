@@ -8,7 +8,6 @@ class Node {
         this.children = [];
         this.parent = null;
         this._stage = null;
-        this._ctx = null;
         this.ignoreEvents = false;
     }
     get stage() { if(!this._stage && this.parent) return this.parent.stage; else return this._stage; }
@@ -18,7 +17,6 @@ class Node {
         else if (this._stage) return this;
         else return null;
     }
-    get ctx() { return this._ctx; }
     get pos() { return { x:this._pos.x, y:this._pos.y }; }
     get absolutePos() {
         var pos = this.pos;
@@ -26,16 +24,10 @@ class Node {
         else             return pos;
     }
     set pos(p) { this._pos = p; }
-    set ctx(c) {
-        this._ctx = c;
-        for (let child of this.children)
-            child.ctx = c;
-    }
     addChild(child) {
         this.children.push(child);
         if (child) {
             child.parent = this;
-            child.ctx = this.ctx;
         }
     }
     addChildAt(idx, child) {
@@ -45,12 +37,10 @@ class Node {
         }
         this.children.splice(idx, 0, child);
         child.parent = this;
-        child.ctx = this.ctx;
     }
     removeChild(node) {
         var i = this.children.indexOf(node);
         if (i > -1) {
-            this.children[i].ctx = null;
             this.children[i].stage = null;
             this.children.splice(i, 1);
         }
@@ -68,12 +58,12 @@ class Node {
     update() {
         this.children.forEach((c) => c.update());
     }
-    draw(offset) {
+    draw(ctx, offset) {
         var pos = this.posWithOffset(offset);
-        this.drawInternal(pos);
-        this.children.forEach((child) => child.draw(pos));
+        this.drawInternal(ctx, pos);
+        this.children.forEach((child) => child.draw(ctx, pos));
     }
-    drawInternal(pos) { }
+    drawInternal(ctx, pos) { }
 
     // Events
     hits(pos, options={}) { return null; } // Whether the given position lies 'inside' this node. Returns the node that it hits (could be child).

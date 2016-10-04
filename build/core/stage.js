@@ -28,7 +28,6 @@ var Stage = function () {
     _createClass(Stage, [{
         key: 'add',
         value: function add(node) {
-            node.ctx = this.ctx;
             node.stage = this;
             if (node.locked) node.unlock();
             this.nodes.push(node);
@@ -46,7 +45,6 @@ var Stage = function () {
         value: function remove(node) {
             var i = this.nodes.indexOf(node);
             if (i > -1) {
-                this.nodes[i].ctx = null;
                 this.nodes[i].stage = null;
                 this.nodes.splice(i, 1);
             }
@@ -63,7 +61,6 @@ var Stage = function () {
                     return;
                 }
 
-                this.nodes[i].ctx = null;
                 this.nodes[i].stage = null;
                 var origpos = this.nodes[i].upperLeftPos(this.nodes[i].absolutePos, this.nodes[i].absoluteSize);
                 var pos;
@@ -83,7 +80,6 @@ var Stage = function () {
                     var an = anotherNode[j];
                     an.unlock();
                     an.pos = pos;
-                    an.ctx = this.ctx;
                     an.parent = null;
                     an.stage = this;
                     an.scale = this.nodes[i].scale;
@@ -184,12 +180,14 @@ var Stage = function () {
     }, {
         key: 'draw',
         value: function draw() {
+            var _this3 = this;
+
             if (this.invalidated) return; // don't draw invalidated stages.
             this.ctx.save();
             this.ctx.scale(1, 1);
             this.clear();
             this.nodes.forEach(function (n) {
-                return n.draw();
+                return n.draw(_this3.ctx);
             }); // TODO: You should pass the ctx!!!!!!
             this.ctx.restore();
         }
@@ -356,7 +354,7 @@ var Stage = function () {
         value: function getNodesWithClass(Class) {
             var excludedNodes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
-            var _this3 = this;
+            var _this4 = this;
 
             var recursive = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
             var nodes = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
@@ -370,7 +368,7 @@ var Stage = function () {
                 });
                 if (excluded) return;else if (n instanceof Class) rt.push(n);
                 if (recursive && n.children.length > 0) {
-                    var childs = _this3.getNodesWithClass(Class, excludedNodes, true, n.children);
+                    var childs = _this4.getNodesWithClass(Class, excludedNodes, true, n.children);
                     childs.forEach(function (c) {
                         return rt.push(c);
                     });
