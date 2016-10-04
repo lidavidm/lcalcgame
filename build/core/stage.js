@@ -4,7 +4,10 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/// TODO: Remove these dependencies.
+/**
+ * A core drawing 'layer'.
+ * You can add Nodes to this layer to display them and update them.
+ */
 
 var Stage = function () {
     function Stage() {
@@ -20,7 +23,6 @@ var Stage = function () {
         };
         this.nodes = [];
         this.hoverNode = null;
-        this.stateStack = [];
     }
 
     _createClass(Stage, [{
@@ -38,30 +40,6 @@ var Stage = function () {
             nodes.forEach(function (n) {
                 return _this.add(n);
             });
-        }
-    }, {
-        key: 'getRootNodesThatIncludeClass',
-        value: function getRootNodesThatIncludeClass(Class) {
-            var excludedNodes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-
-            console.log(Class);
-            var ns = this.getNodesWithClass(Class, excludedNodes);
-            var topns = ns.map(function (n) {
-                return n.rootParent;
-            });
-            return topns.filter(function (n) {
-                return !n.parent && n._stage !== undefined;
-            });
-        }
-    }, {
-        key: 'getNodesWithClass',
-        value: function getNodesWithClass(Class) {
-            var excludedNodes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-            var recursive = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-            var nodes = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-
-            if (!nodes) nodes = this.nodes;
-            return Stage.getNodesWithClass(Class, excludedNodes, recursive, nodes);
         }
     }, {
         key: 'remove',
@@ -136,9 +114,6 @@ var Stage = function () {
                         });
                     })();
                 }
-
-                //console.warn('nodes = ', this.nodes, this);
-                //this.draw();
             }
         }
     }, {
@@ -152,85 +127,48 @@ var Stage = function () {
                 this.draw();
             }
         }
+
+        /** Update all nodes on the stage. */
+
     }, {
         key: 'update',
         value: function update() {
-            var _this3 = this;
-
             this.nodes.forEach(function (n) {
                 return n.update();
             });
+        }
 
-            if (this.isCompleted) {
-                var level_complete = this.isCompleted();
+        // Recursive functions that grab nodes on this stage with the specified class.
 
-                if (level_complete) {
+    }, {
+        key: 'getRootNodesThatIncludeClass',
+        value: function getRootNodesThatIncludeClass(Class) {
+            var excludedNodes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
-                    // DEBUG TEST FLYTO ANIMATION.
-                    if (!this.ranCompletionAnim) {
-                        (function () {
+            var ns = this.getNodesWithClass(Class, excludedNodes);
+            var topns = ns.map(function (n) {
+                return n.rootParent;
+            });
+            return topns.filter(function (n) {
+                return !n.parent && n._stage !== undefined;
+            });
+        }
+    }, {
+        key: 'getNodesWithClass',
+        value: function getNodesWithClass(Class) {
+            var excludedNodes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+            var recursive = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+            var nodes = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
-                            Logger.log('victory', { 'final_state': _this3.toString(), 'num_of_moves': undefined });
-
-                            var you_win = function you_win() {
-
-                                var cmp = new ImageRect(GLOBAL_DEFAULT_SCREENSIZE.width / 2, GLOBAL_DEFAULT_SCREENSIZE.height / 2, 740 / 2, 146 / 2, 'victory');
-                                cmp.anchor = { x: 0.5, y: 0.5 };
-                                _this3.add(cmp);
-                                _this3.draw();
-
-                                Resource.play('victory');
-                                Animate.wait(1080).after(function () {
-                                    next();
-                                });
-                            };
-
-                            var pairs = level_complete;
-                            var num_exploded = 0;
-                            var playedSplosionAudio = false;
-
-                            pairs.forEach(function (pair, idx) {
-                                var node = pair[0];
-                                var goalNode = pair[1];
-                                node.ignoreEvents = true;
-
-                                Resource.play('matching-goal');
-
-                                var blinkCount = level_idx === 0 ? 2 : 1;
-                                Animate.blink([node, goalNode], 2500 / 2.0 * blinkCount, [0, 1, 1], blinkCount).after(function () {
-                                    //Resource.play('shootwee');
-
-                                    _this3.playerWon = true;
-
-                                    //Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x:200, y:300 }, () => {
-                                    SplosionEffect.run(node);
-                                    SplosionEffect.run(goalNode);
-
-                                    if (!playedSplosionAudio) {
-                                        // Play sFx.
-                                        Resource.play('splosion');
-                                        playedSplosionAudio = true;
-                                    }
-
-                                    goalNode.parent.removeChild(goalNode);
-                                    num_exploded++;
-                                    if (num_exploded === pairs.length) {
-                                        Animate.wait(500).after(you_win);
-                                    }
-                                    //});
-                                });
-                            });
-
-                            _this3.ranCompletionAnim = true;
-                        })();
-                    }
-                }
-
-                //console.warn('LEVEL IS COMPLETE? ', level_complete);
-            }
+            if (!nodes) nodes = this.nodes;
+            return Stage.getNodesWithClass(Class, excludedNodes, recursive, nodes);
         }
     }, {
         key: 'invalidate',
+
+
+        /** Invalidates a collection of nodes (or all the nodes on this stage)
+            and invalidates this stage, so that it won't draw to canvas anymore. */
         value: function invalidate(nodes) {
             if (typeof nodes === 'undefined') nodes = this.nodes;else if (nodes && nodes.length === 0) return;
             var _this = this;
@@ -240,6 +178,9 @@ var Stage = function () {
             });
             this.invalidated = true;
         }
+
+        /** Draw this stage to the canvas. */
+
     }, {
         key: 'draw',
         value: function draw() {
@@ -249,61 +190,8 @@ var Stage = function () {
             this.clear();
             this.nodes.forEach(function (n) {
                 return n.draw();
-            });
+            }); // TODO: You should pass the ctx!!!!!!
             this.ctx.restore();
-        }
-
-        // State.
-
-    }, {
-        key: 'saveState',
-        value: function saveState() {
-            var board = this.expressionNodes().map(function (n) {
-                return n.clone();
-            });
-            board = board.filter(function (n) {
-                return !(n instanceof ExpressionEffect);
-            });
-            var toolbox = this.toolboxNodes().map(function (n) {
-                return n.clone();
-            });
-            this.stateStack.push({ 'board': board, 'toolbox': toolbox });
-        }
-    }, {
-        key: 'restoreState',
-        value: function restoreState() {
-            var _this4 = this;
-
-            if (this.stateStack.length > 0) {
-                //this.nodes = this.stateStack.pop();
-
-                this.expressionNodes().forEach(function (n) {
-                    return _this4.remove(n);
-                });
-                this.toolboxNodes().forEach(function (n) {
-                    return _this4.remove(n);
-                });
-                var restored_state = this.stateStack.pop();
-                restored_state.board.forEach(function (n) {
-                    return _this4.add(n);
-                });
-                restored_state.toolbox.forEach(function (n) {
-                    n.toolbox = _this4.toolbox;
-                    _this4.add(n);
-                });
-
-                this.update();
-                this.draw();
-
-                Logger.log('state-restore', this.toString());
-            }
-        }
-    }, {
-        key: 'dumpState',
-        value: function dumpState() {
-            if (this.stateStack.length > 0) {
-                this.stateStack.pop();
-            }
         }
 
         // Event handlers.
@@ -332,7 +220,7 @@ var Stage = function () {
                 //console.log('Clicked node: ', hit_nodes[hit_nodes.length-1].color, hit_nodes[0]);
 
                 if (this.lastHeldNode != this.heldNode) {
-                    var holes = this.getNodesWithClass(MissingExpression, [this.heldNode]);
+                    var holes = this.getNodesWithClass(MissingExpression, [this.heldNode]); // TODO: Move this.
                     //Animate.blink(holes);
                     this.lastHeldNode = this.heldNode;
                 }
@@ -386,7 +274,6 @@ var Stage = function () {
                     return;
                 } else {
                     this.hoverNode.onmouseleave(pos);
-                    //console.log('left ', this.hoverNode.color);
                     if (hit) {
                         hit.onmouseenter(pos);
                         this.hoverNode = hit;
@@ -407,13 +294,6 @@ var Stage = function () {
     }, {
         key: 'onmouseclick',
         value: function onmouseclick(pos) {
-
-            // Let player click to continue.
-            if (this.playerWon) {
-                Logger.log('clicked-to-continue', '');
-                next();
-            }
-
             if (this.heldNode) {
                 this.heldNode.onmouseclick(pos);
             }
@@ -455,23 +335,7 @@ var Stage = function () {
     }, {
         key: 'toString',
         value: function toString() {
-
-            var stringify = function stringify(nodes) {
-                return nodes.reduce(function (prev, curr) {
-                    var s = curr.toString();
-                    if (s === '()') return prev; // Skip empty expressions.
-                    else return prev + curr.toString() + ' ';
-                }, '').trim();
-            };
-
-            var board = this.expressionNodes();
-            var toolbox = this.toolboxNodes();
-            var exp = {
-                'board': stringify(board),
-                'toolbox': stringify(toolbox)
-            };
-
-            return JSON.stringify(exp);
+            return "[Stage toString method is undefined]";
         }
     }, {
         key: 'canvas',
@@ -492,7 +356,7 @@ var Stage = function () {
         value: function getNodesWithClass(Class) {
             var excludedNodes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
-            var _this5 = this;
+            var _this3 = this;
 
             var recursive = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
             var nodes = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
@@ -504,12 +368,9 @@ var Stage = function () {
                 excludedNodes.forEach(function (excn) {
                     excluded |= n == excn || n.ignoreGetClassInstance;
                 });
-                if (excluded) {
-                    //console.log('excluded: ', excludedNodes);
-                    return;
-                } else if (n instanceof Class) rt.push(n);
+                if (excluded) return;else if (n instanceof Class) rt.push(n);
                 if (recursive && n.children.length > 0) {
-                    var childs = _this5.getNodesWithClass(Class, excludedNodes, true, n.children);
+                    var childs = _this3.getNodesWithClass(Class, excludedNodes, true, n.children);
                     childs.forEach(function (c) {
                         return rt.push(c);
                     });

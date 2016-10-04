@@ -1,16 +1,3 @@
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-
 /**
  * A Level is a complete description of a single scenario in this programming game.
  * Given a set of "expressions", a player must manipulate those expressions to
@@ -31,7 +18,7 @@ class Level {
     // * written in code, for instance -- and generate the entire game on-the-fly.
     build(canvas) {
 
-        var stage = new Stage(canvas);
+        var stage = new ReductStage(canvas);
 
         // Seed the random number generator so that while randomly generated,
         // levels appear the same each time you play.

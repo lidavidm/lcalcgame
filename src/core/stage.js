@@ -1,3 +1,7 @@
+/**
+ * A core drawing 'layer'.
+ * You can add Nodes to this layer to display them and update them.
+ */
 class Stage {
     constructor(canvas=null) {
         if (canvas) this.canvas = canvas;
@@ -5,7 +9,6 @@ class Stage {
         this.clear = () => this.ctx.clearRect(0, 0, canvas.width, canvas.height);
         this.nodes = [];
         this.hoverNode = null;
-        this.stateStack = [];
     }
     get canvas() { return this._canvas; }
     set canvas(c) {
@@ -26,34 +29,6 @@ class Stage {
     addAll(nodes) {
         var _this = this;
         nodes.forEach((n) => _this.add(n));
-    }
-    getRootNodesThatIncludeClass(Class, excludedNodes=[]) {
-        console.log(Class);
-        let ns = this.getNodesWithClass(Class, excludedNodes);
-        let topns = ns.map((n) => n.rootParent);
-        return topns.filter((n) => !n.parent && n._stage !== undefined);
-    }
-    getNodesWithClass(Class, excludedNodes=[], recursive=true, nodes=null) {
-        if (!nodes) nodes = this.nodes;
-        return Stage.getNodesWithClass(Class, excludedNodes, recursive, nodes);
-    }
-    static getNodesWithClass(Class, excludedNodes=[], recursive=true, nodes=null) {
-        if (!nodes) return null;
-        var rt = [];
-        nodes.forEach((n) => {
-            var excluded = false;
-            excludedNodes.forEach((excn) => {excluded |= n == excn || n.ignoreGetClassInstance;});
-            if (excluded) {
-                //console.log('excluded: ', excludedNodes);
-                return;
-            }
-            else if (n instanceof Class) rt.push(n);
-            if (recursive && n.children.length > 0) {
-                let childs = this.getNodesWithClass(Class, excludedNodes, true, n.children);
-                childs.forEach((c) => rt.push(c));
-            }
-        });
-        return rt;
     }
     remove(node) {
         var i = this.nodes.indexOf(node);
@@ -124,9 +99,6 @@ class Stage {
                     n.pos = { x:p.x - offset, y:p.y };
                 });
             }
-
-            //console.warn('nodes = ', this.nodes, this);
-            //this.draw();
         }
     }
     bringToFront(node) {
@@ -138,78 +110,40 @@ class Stage {
             this.draw();
         }
     }
+
+    /** Update all nodes on the stage. */
     update() {
         this.nodes.forEach((n) => n.update());
-
-        if (this.isCompleted) {
-            let level_complete = this.isCompleted();
-
-            if (level_complete) {
-
-                // DEBUG TEST FLYTO ANIMATION.
-                if (!this.ranCompletionAnim) {
-
-                    Logger.log( 'victory', { 'final_state':this.toString(), 'num_of_moves':undefined } );
-
-                    let you_win = () => {
-
-                        var cmp = new ImageRect(GLOBAL_DEFAULT_SCREENSIZE.width / 2, GLOBAL_DEFAULT_SCREENSIZE.height / 2, 740 / 2, 146 / 2, 'victory');
-                        cmp.anchor = { x:0.5, y:0.5 };
-                        this.add(cmp);
-                        this.draw();
-
-                        Resource.play('victory');
-                        Animate.wait(1080).after(function () {
-                            next();
-                        });
-                    };
-
-                    let pairs = level_complete;
-                    let num_exploded = 0;
-                    let playedSplosionAudio = false;
-
-                    pairs.forEach((pair, idx) => {
-                        var node = pair[0];
-                        var goalNode = pair[1];
-                        node.ignoreEvents = true;
-
-                        Resource.play('matching-goal');
-
-                        var blinkCount = level_idx === 0 ? 2 : 1;
-                        Animate.blink([node, goalNode], 2500 / 2.0 * blinkCount, [0, 1, 1], blinkCount).after(() => {
-                            //Resource.play('shootwee');
-
-                            this.playerWon = true;
-
-                            //Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x:200, y:300 }, () => {
-                                SplosionEffect.run(node);
-                                SplosionEffect.run(goalNode);
-
-                                if (!playedSplosionAudio) {
-                                    // Play sFx.
-                                    Resource.play('splosion');
-                                    playedSplosionAudio = true;
-                                }
-
-                                goalNode.parent.removeChild(goalNode);
-                                num_exploded++;
-                                if (num_exploded === pairs.length) {
-                                    Animate.wait(500).after(you_win);
-                                }
-                            //});
-
-                        });
-
-
-                    });
-
-                    this.ranCompletionAnim = true;
-                }
-            }
-
-            //console.warn('LEVEL IS COMPLETE? ', level_complete);
-        }
     }
+
+    // Recursive functions that grab nodes on this stage with the specified class.
+    getRootNodesThatIncludeClass(Class, excludedNodes=[]) {
+        let ns = this.getNodesWithClass(Class, excludedNodes);
+        let topns = ns.map((n) => n.rootParent);
+        return topns.filter((n) => !n.parent && n._stage !== undefined);
+    }
+    getNodesWithClass(Class, excludedNodes=[], recursive=true, nodes=null) {
+        if (!nodes) nodes = this.nodes;
+        return Stage.getNodesWithClass(Class, excludedNodes, recursive, nodes);
+    }
+    static getNodesWithClass(Class, excludedNodes=[], recursive=true, nodes=null) {
+        if (!nodes) return null;
+        var rt = [];
+        nodes.forEach((n) => {
+            var excluded = false;
+            excludedNodes.forEach((excn) => {excluded |= n == excn || n.ignoreGetClassInstance;});
+            if (excluded) return;
+            else if (n instanceof Class) rt.push(n);
+            if (recursive && n.children.length > 0) {
+                let childs = this.getNodesWithClass(Class, excludedNodes, true, n.children);
+                childs.forEach((c) => rt.push(c));
+            }
+        });
+        return rt;
+    }
+
+    /** Invalidates a collection of nodes (or all the nodes on this stage)
+        and invalidates this stage, so that it won't draw to canvas anymore. */
     invalidate(nodes) {
         if (typeof nodes === 'undefined') nodes = this.nodes;
         else if (nodes && nodes.length === 0) return;
@@ -220,46 +154,17 @@ class Stage {
         });
         this.invalidated = true;
     }
+
+    /** Draw this stage to the canvas. */
     draw() {
         if (this.invalidated) return; // don't draw invalidated stages.
         this.ctx.save();
         this.ctx.scale(1,1);
         this.clear();
-        this.nodes.forEach((n) => n.draw());
+        this.nodes.forEach((n) => n.draw()); // TODO: You should pass the ctx!!!!!!
         this.ctx.restore();
     }
 
-    // State.
-    saveState() {
-        var board = this.expressionNodes().map((n) => n.clone());
-        board = board.filter((n) => !(n instanceof ExpressionEffect));
-        var toolbox = this.toolboxNodes().map((n) => n.clone());
-        this.stateStack.push( { 'board':board, 'toolbox':toolbox } );
-    }
-    restoreState() {
-        if (this.stateStack.length > 0) {
-            //this.nodes = this.stateStack.pop();
-
-            this.expressionNodes().forEach((n) => this.remove(n));
-            this.toolboxNodes().forEach((n) => this.remove(n));
-            let restored_state = this.stateStack.pop();
-            restored_state.board.forEach((n) => this.add(n));
-            restored_state.toolbox.forEach((n) => {
-                n.toolbox = this.toolbox;
-                this.add(n);
-            });
-
-            this.update();
-            this.draw();
-
-            Logger.log('state-restore', this.toString());
-        }
-    }
-    dumpState() {
-        if (this.stateStack.length > 0) {
-            this.stateStack.pop();
-        }
-    }
 
     // Event handlers.
     getNodeUnder(node, pos) {
@@ -282,7 +187,7 @@ class Stage {
             //console.log('Clicked node: ', hit_nodes[hit_nodes.length-1].color, hit_nodes[0]);
 
             if (this.lastHeldNode != this.heldNode) {
-                var holes = this.getNodesWithClass(MissingExpression, [this.heldNode]);
+                var holes = this.getNodesWithClass(MissingExpression, [this.heldNode]); // TODO: Move this.
                 //Animate.blink(holes);
                 this.lastHeldNode = this.heldNode;
             }
@@ -330,7 +235,6 @@ class Stage {
             }
             else {
                 this.hoverNode.onmouseleave(pos);
-                //console.log('left ', this.hoverNode.color);
                 if (hit) {
                     hit.onmouseenter(pos);
                     this.hoverNode = hit;
@@ -349,13 +253,6 @@ class Stage {
         }
     }
     onmouseclick(pos) {
-
-        // Let player click to continue.
-        if (this.playerWon) {
-            Logger.log('clicked-to-continue', '');
-            next();
-        }
-
         if (this.heldNode) {
             this.heldNode.onmouseclick(pos);
         }
@@ -387,23 +284,8 @@ class Stage {
         return hits;
     }
 
-
     toString() {
-
-        let stringify = (nodes) => nodes.reduce((prev, curr) => {
-            let s = curr.toString();
-            if (s === '()') return prev; // Skip empty expressions.
-            else            return (prev + curr.toString() + ' ');
-        }, '').trim();
-
-        let board = this.expressionNodes();
-        let toolbox = this.toolboxNodes();
-        let exp = {
-            'board': stringify(board),
-            'toolbox': stringify(toolbox)
-        };
-
-        return JSON.stringify(exp);
+        return "[Stage toString method is undefined]";
     }
 }
 
@@ -522,7 +404,6 @@ function delegateMouse(canvas, stage) {
         canvas.addEventListener('touchmove', ontouchmove, false);
         canvas.addEventListener('touchend', ontouchend, false);
         canvas.addEventListener('touchcancel', ontouchcancel, false);
-
 
     } else {
         canvas.onmousedown = null;

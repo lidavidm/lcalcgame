@@ -24,7 +24,7 @@ function init() {
     //     }
     // });
 
-    Resource.initAudio();
+    LOAD_REDUCT_RESOURCES(Resource);
 
     if (!__SHOW_DEV_INFO)
         $('#devinfo').hide();

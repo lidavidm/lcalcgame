@@ -34,7 +34,7 @@ var Level = function () {
         key: 'build',
         value: function build(canvas) {
 
-            var stage = new Stage(canvas);
+            var stage = new ReductStage(canvas);
 
             // Seed the random number generator so that while randomly generated,
             // levels appear the same each time you play.
