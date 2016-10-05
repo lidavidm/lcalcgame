@@ -9,6 +9,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * You can add Nodes to this layer to display them and update them.
  */
 var mag = function (_) {
+
+    var _canvas_scale = __IS_MOBILE ? 1.8 : 1;
+
     var Stage = function () {
         function Stage() {
             var canvas = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -185,7 +188,7 @@ var mag = function (_) {
 
                 if (this.invalidated) return; // don't draw invalidated stages.
                 this.ctx.save();
-                this.ctx.scale(1, 1);
+                this.ctx.scale(_canvas_scale, _canvas_scale);
                 this.clear();
                 this.nodes.forEach(function (n) {
                     return n.draw(_this3.ctx);
@@ -331,6 +334,12 @@ var mag = function (_) {
                 return "[Stage toString method is undefined]";
             }
         }, {
+            key: 'boundingSize',
+            get: function get() {
+                var r = this._canvas.getBoundingClientRect();
+                return { w: r.width / _canvas_scale, h: r.height / _canvas_scale };
+            }
+        }, {
             key: 'canvas',
             get: function get() {
                 return this._canvas;
@@ -343,6 +352,7 @@ var mag = function (_) {
                     delegateMouse(canvas, null);
                     this.ctx = null;
                 }
+                this._canvas = c;
             }
         }], [{
             key: 'getNodesWithClass',
@@ -388,8 +398,8 @@ var mag = function (_) {
         function getMousePos(evt) {
             var rect = canvas.getBoundingClientRect();
             return {
-                x: evt.clientX - rect.left,
-                y: evt.clientY - rect.top
+                x: (evt.clientX - rect.left) / _canvas_scale,
+                y: (evt.clientY - rect.top) / _canvas_scale
             };
         }
         function getTouch(evt) {
@@ -401,33 +411,28 @@ var mag = function (_) {
         if (stage) {
 
             // MOUSE EVENTS
-            canvas.onmousedown = function (e) {
-                if (e.button === RIGHT_BTN) return;
+            var onmousedown = function onmousedown(pos) {
 
-                stage.onmousedown(getMousePos(e));
+                stage.onmousedown(pos);
 
                 mouseIsDown = true;
                 mouseDragged = false;
                 mouseDownTime = Date.now();
                 missedDragCalls = [];
             };
-            canvas.onmouseup = function (e) {
-                if (e.button === RIGHT_BTN) return;
+            var onmouseup = function onmouseup(pos) {
 
-                var mousepos = getMousePos(e);
+                if (!mouseDragged) stage.onmouseclick(pos);
 
-                if (!mouseDragged) stage.onmouseclick(mousepos);
-
-                stage.onmouseup(mousepos);
+                stage.onmouseup(pos);
 
                 mouseIsDown = false;
                 mouseDragged = false;
             };
-            canvas.onmousemove = function (e) {
-                if (e.button === RIGHT_BTN) return;
+            var onmousemove = function onmousemove(pos) {
 
                 if (!mouseIsDown) {
-                    stage.onmousehover(getMousePos(e));
+                    stage.onmousehover(pos);
                 } else if (mouseDragged || Date.now() - mouseDownTime > CLICK_DEBOUNCE_TIME) {
                     // debounce clicks
                     if (missedDragCalls.length > 0) {
@@ -436,52 +441,51 @@ var mag = function (_) {
                         });
                         missedDragCalls = [];
                     }
-                    stage.onmousedrag(getMousePos(e));
+                    stage.onmousedrag(pos);
                     mouseDragged = true;
                 } else {
-                    (function () {
-                        var pos = getMousePos(e);
-                        missedDragCalls.push(function () {
-                            stage.onmousedrag(pos);
-                        });
-                    })();
+                    missedDragCalls.push(function () {
+                        stage.onmousedrag(pos);
+                    });
                 }
                 return false;
+            };
+            canvas.onmousedown = function (e) {
+                if (e.button === RIGHT_BTN) return;
+                onmousedown(getMousePos(e));
+            };
+            canvas.onmousemove = function (e) {
+                if (e.button === RIGHT_BTN) return;
+                onmousemove(getMousePos(e));
+            };
+            canvas.onmouseup = function (e) {
+                if (e.button === RIGHT_BTN) return;
+                onmouseup(getMousePos(e));
             };
 
             var ontouchstart = function ontouchstart(e) {
 
-                console.log(e);
                 var pos = getMousePos(getTouch(e));
 
                 stage.onmousehover(pos);
-                stage.onmousedown(pos);
-
-                mouseIsDown = true;
-                mouseDragged = false;
+                onmousedown(pos);
 
                 e.preventDefault();
             };
             var ontouchmove = function ontouchmove(e) {
-                if (!mouseIsDown) {
-                    console.error('This shouldn\'t be reachable. How did you get here?');
-                } else {
-                    stage.onmousedrag(getMousePos(getTouch(e)));
-                    mouseDragged = true;
-                }
+
+                var pos = getMousePos(getTouch(e));
+
+                onmousemove(pos);
 
                 e.preventDefault();
             };
             var ontouchend = function ontouchend(e) {
 
-                var mousepos = getMousePos(getTouch(e));
+                var pos = getMousePos(getTouch(e));
 
-                if (!mouseDragged) stage.onmouseclick(mousepos);
-
-                stage.onmouseup(mousepos);
-
-                mouseIsDown = false;
-                mouseDragged = false;
+                onmouseup(pos);
+                stage.onmousehover({ x: -10000, y: -10000 });
 
                 e.preventDefault();
             };

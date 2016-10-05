@@ -24,8 +24,9 @@ class Level {
         // levels appear the same each time you play.
         Math.seed = 12045;
 
-        var canvas_screen = canvas.getBoundingClientRect();
-        var screen = { height:canvas_screen.height/1.4, width:canvas_screen.width/1.4, y:canvas_screen.height*(1-1/1.4) / 2.0, x:(canvas_screen.width*(1-1/1.4) / 2.0) };
+        GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
+        var canvas_screen = stage.boundingSize;
+        var screen = { height:canvas_screen.h/1.4, width:canvas_screen.w/1.4, y:canvas_screen.h*(1-1/1.4) / 2.0, x:(canvas_screen.w*(1-1/1.4) / 2.0) };
         var board_packing = this.findBestPacking(this.exprs, screen);
         stage.addAll(board_packing); // add expressions to the stage
 
@@ -49,7 +50,7 @@ class Level {
 
         // UI Buttons
         var ui_padding = 10;
-        var btn_back = new mag.Button(canvas_screen.width - 64*3 - ui_padding, ui_padding, 64, 64,
+        var btn_back = new mag.Button(canvas_screen.w - 64*3 - ui_padding, ui_padding, 64, 64,
             { default:'btn-back-default', hover:'btn-back-hover', down:'btn-back-down' },
             () => {
             prev(); // go back to previous level; see index.html.

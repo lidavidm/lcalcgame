@@ -4,12 +4,18 @@
  */
 var mag = (function(_) {
 
+    var _canvas_scale = __IS_MOBILE ? 1.8 : 1;
+
     class Stage {
         constructor(canvas=null) {
             if (canvas) this.canvas = canvas;
             else        this.ctx = null;
             this.nodes = [];
             this.hoverNode = null;
+        }
+        get boundingSize() {
+            let r = this._canvas.getBoundingClientRect();
+            return { w:r.width / _canvas_scale, h:r.height / _canvas_scale };
         }
         get canvas() { return this._canvas; }
         set canvas(c) {
@@ -20,6 +26,7 @@ var mag = (function(_) {
                 delegateMouse(canvas, null);
                 this.ctx = null;
             }
+            this._canvas = c;
         }
         clear() {
             this.ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -158,7 +165,7 @@ var mag = (function(_) {
         draw() {
             if (this.invalidated) return; // don't draw invalidated stages.
             this.ctx.save();
-            this.ctx.scale(1,1);
+            this.ctx.scale(_canvas_scale, _canvas_scale);
             this.clear();
             this.nodes.forEach((n) => n.draw(this.ctx)); // TODO: You should pass the ctx!!!!!!
             this.ctx.restore();
@@ -295,8 +302,8 @@ var mag = (function(_) {
         function getMousePos(evt) {
             var rect = canvas.getBoundingClientRect();
             return {
-              x: evt.clientX - rect.left,
-              y: evt.clientY - rect.top
+              x: (evt.clientX - rect.left) / _canvas_scale,
+              y: (evt.clientY - rect.top) / _canvas_scale
             };
         }
         function getTouch(evt, idx=0) {
@@ -309,82 +316,78 @@ var mag = (function(_) {
         if (stage) {
 
             // MOUSE EVENTS
-            canvas.onmousedown = function(e){
-                if (e.button === RIGHT_BTN) return;
+            var onmousedown = function(pos){
 
-                stage.onmousedown( getMousePos(e) );
+                stage.onmousedown( pos );
 
                 mouseIsDown = true;
                 mouseDragged = false;
                 mouseDownTime = Date.now();
                 missedDragCalls = [];
             };
-            canvas.onmouseup = function(e){
-                if (e.button === RIGHT_BTN) return;
+            var onmouseup = function(pos){
 
-                var mousepos = getMousePos(e);
+                if (!mouseDragged) stage.onmouseclick( pos );
 
-                if (!mouseDragged) stage.onmouseclick( mousepos );
-
-                stage.onmouseup( mousepos );
+                stage.onmouseup( pos );
 
                 mouseIsDown = false;
                 mouseDragged = false;
             };
-            canvas.onmousemove = function(e){
-                if (e.button === RIGHT_BTN) return;
+            var onmousemove = function(pos){
 
                 if(!mouseIsDown) {
-                    stage.onmousehover( getMousePos(e) );
+                    stage.onmousehover( pos );
                 } else if (mouseDragged || Date.now() - mouseDownTime > CLICK_DEBOUNCE_TIME) { // debounce clicks
                     if (missedDragCalls.length > 0) {
                         missedDragCalls.forEach((call) => call());
                         missedDragCalls = [];
                     }
-                    stage.onmousedrag( getMousePos(e) );
+                    stage.onmousedrag( pos );
                     mouseDragged = true;
                 } else {
-                    let pos = getMousePos(e);
                     missedDragCalls.push(function() {
                         stage.onmousedrag( pos );
                     });
                 }
                 return false;
             };
+            canvas.onmousedown = (e) => {
+                if (e.button === RIGHT_BTN) return;
+                onmousedown( getMousePos(e) );
+            };
+            canvas.onmousemove = (e) => {
+                if (e.button === RIGHT_BTN) return;
+                onmousemove( getMousePos(e) );
+            };
+            canvas.onmouseup   = (e) => {
+                if (e.button === RIGHT_BTN) return;
+                onmouseup( getMousePos(e) );
+            };
 
             var ontouchstart = function(e) {
 
-                console.log(e);
                 var pos = getMousePos( getTouch(e) );
 
-                stage.onmousehover( pos );
-                stage.onmousedown( pos );
-
-                mouseIsDown = true;
-                mouseDragged = false;
+                stage.onmousehover(pos);
+                onmousedown(pos);
 
                 e.preventDefault();
             };
             var ontouchmove = function(e) {
-                if(!mouseIsDown) {
-                    console.error('This shouldn\'t be reachable. How did you get here?');
-                } else {
-                    stage.onmousedrag( getMousePos( getTouch(e) ) );
-                    mouseDragged = true;
-                }
+
+                var pos = getMousePos( getTouch(e) );
+
+                onmousemove(pos);
 
                 e.preventDefault();
             };
             var ontouchend = function(e) {
 
-                var mousepos = getMousePos( getTouch(e) );
+                var pos = getMousePos( getTouch(e) );
 
-                if (!mouseDragged) stage.onmouseclick( mousepos );
-
-                stage.onmouseup( mousepos );
-
-                mouseIsDown = false;
-                mouseDragged = false;
+                onmouseup(pos);
+                stage.onmousehover( { x:-10000, y:-10000 } );
 
                 e.preventDefault();
             };

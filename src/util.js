@@ -1,6 +1,7 @@
 /**
  * Internal utils (author, me)
  */
+var __IS_MOBILE = /Mobi/.test(navigator.userAgent);
  var CONST = {
      POS: {
          UNITSQUARE: {

@@ -89,9 +89,25 @@ function clearStage() {
 function initBoard() {
 
     canvas = document.getElementById('canvas');
+
     if (canvas.getContext) {
 
         clearStage();
+
+        if (__IS_MOBILE) {
+
+            // Width 100% and height 100%
+            var resizeCanvas = function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
+            };
+
+            // Resize canvas during a mobile phone orientation change.
+            window.addEventListener('resize', resizeCanvas, false);
+            window.addEventListener('orientationchange', resizeCanvas, false);
+            resizeCanvas();
+        }
 
         hideHelpText();
         hideEndGame();
