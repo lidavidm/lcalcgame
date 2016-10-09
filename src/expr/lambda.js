@@ -97,23 +97,24 @@ class LambdaHoleExpr extends MissingExpression {
         }
 
         var parent = this.parent;
-        var subvarexprs = mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [parent]);
-        subvarexprs.forEach((expr) => {
-            if (expr.name === this.name) {
-                let c = node.clone();
-                //c.bindSubexpressions();
-                c.stage = null;
-                expr.parent.swap(expr, c); // Swap the expression for a clone of the dropped node.
-                c.parent.bindSubexpressions();
+        parent.getEnvironment().update(this.name, node);
+        // var subvarexprs = mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [parent]);
+        // subvarexprs.forEach((expr) => {
+        //     if (expr.name === this.name) {
+        //         let c = node.clone();
+        //         //c.bindSubexpressions();
+        //         c.stage = null;
+        //         expr.parent.swap(expr, c); // Swap the expression for a clone of the dropped node.
+        //         c.parent.bindSubexpressions();
 
-                // TODO: Move this somewhere more stable.
-                // Top-level if statements should unlock
-                // reducable boolean expressions.
-                if (c.parent instanceof IfStatement && c.parent.cond instanceof CompareExpr) {
-                    c.parent.cond.unlock();
-                }
-            }
-        });
+        //         // TODO: Move this somewhere more stable.
+        //         // Top-level if statements should unlock
+        //         // reducable boolean expressions.
+        //         if (c.parent instanceof IfStatement && c.parent.cond instanceof CompareExpr) {
+        //             c.parent.cond.unlock();
+        //         }
+        //     }
+        // });
 
         // Now remove this hole from its parent expression.
         parent.removeArg(this);
@@ -350,6 +351,18 @@ class LambdaVarExpr extends ImageExpr {
         }
     }
 
+    reduce() {
+        let environment = this.getEnvironment();
+        let value = environment.lookup(this.name);
+
+        if (value) {
+            let clone = value.clone();
+            clone.stage = null;
+            clone.bindSubexpressions();
+        }
+        return this;
+    }
+
     //onmousedrag() {}
     drawInternal(ctx, pos, boundingSize) {
         super.drawInternal(ctx, pos, boundingSize);
@@ -367,6 +380,8 @@ class LambdaVarExpr extends ImageExpr {
 class LambdaExpr extends Expression {
     constructor(exprs) {
         super(exprs);
+        // TODO: DML take into consideration parent environment
+        this.environment = new Environment();
 
         /*let txt = new TextExpr('→');
         txt.color = 'gray'
@@ -449,7 +464,10 @@ class LambdaExpr extends Expression {
     }
     performReduction() {
 
-        var reduced_expr = this.reduce();
+        // TODO: DML Where should we do the recursive reduce?
+        // TODO: DML Need to actually swap
+        // TODO: DML need to replicate IfStatement check of original LambdaHoleExpr#applyExpr
+        var reduced_expr = this.reduce().map((e) => e.reduce());
         if (reduced_expr && reduced_expr != this) { // Only swap if reduction returns something > null.
 
             if (this.stage) this.stage.saveState();
