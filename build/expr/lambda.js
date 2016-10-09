@@ -604,7 +604,12 @@ var LambdaExpr = function (_Expression) {
             // TODO: DML Need to actually swap
             // TODO: DML need to replicate IfStatement check of original LambdaHoleExpr#applyExpr
             var reduced_expr = this.reduce().map(function (e) {
-                return e.reduce();
+                var result = e.reduce();
+                // TODO: need to recurse down into the expression, but not into children of lambdas
+                if (result instanceof LambdaExpr) {
+                    result.environment.parent = _this11.environment;
+                }
+                return result;
             });
             if (reduced_expr && reduced_expr != this) {
                 // Only swap if reduction returns something > null.

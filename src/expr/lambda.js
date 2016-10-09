@@ -468,7 +468,14 @@ class LambdaExpr extends Expression {
         // TODO: DML Where should we do the recursive reduce?
         // TODO: DML Need to actually swap
         // TODO: DML need to replicate IfStatement check of original LambdaHoleExpr#applyExpr
-        var reduced_expr = this.reduce().map((e) => e.reduce());
+        var reduced_expr = this.reduce().map((e) => {
+            let result = e.reduce();
+            // TODO: need to recurse down into the expression, but not into children of lambdas
+            if (result instanceof LambdaExpr) {
+                result.environment.parent = this.environment;
+            }
+            return result;
+        });
         if (reduced_expr && reduced_expr != this) { // Only swap if reduction returns something > null.
 
             if (this.stage) this.stage.saveState();
