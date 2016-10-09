@@ -145,7 +145,27 @@ class LambdaHoleExpr extends MissingExpression {
         node.opacity = 0.4;
 
         if (this.parent) {
-            var subvarexprs = mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [this.parent]);
+            // Ignore variables that are shadowed when previewing
+            let subvarexprs = [];
+            let queue = [this.parent];
+            while (queue.length > 0) {
+                let node = queue.pop();
+                if (node instanceof LambdaVarExpr) {
+                    subvarexprs.push(node);
+                }
+                else if (node !== this.parent &&
+                         node instanceof LambdaExpr &&
+                         node.takesArgument &&
+                         node.holes[0].name === this.name) {
+                    // Capture-avoiding substitution
+                    continue;
+                }
+
+                if (node.children) {
+                    queue = queue.concat(node.children);
+                }
+            }
+
             subvarexprs.forEach((e) => {
                 if (e.name === this.name) {
                     let preview_node = node.clone();

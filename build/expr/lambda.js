@@ -185,7 +185,23 @@ var LambdaHoleExpr = function (_MissingExpression) {
             node.opacity = 0.4;
 
             if (this.parent) {
-                var subvarexprs = mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [this.parent]);
+                // Ignore variables that are shadowed when previewing
+                var subvarexprs = [];
+                var queue = [this.parent];
+                while (queue.length > 0) {
+                    var _node = queue.pop();
+                    if (_node instanceof LambdaVarExpr) {
+                        subvarexprs.push(_node);
+                    } else if (_node !== this.parent && _node instanceof LambdaExpr && _node.takesArgument && _node.holes[0].name === this.name) {
+                        // Capture-avoiding substitution
+                        continue;
+                    }
+
+                    if (_node.children) {
+                        queue = queue.concat(_node.children);
+                    }
+                }
+
                 subvarexprs.forEach(function (e) {
                     if (e.name === _this5.name) {
                         var preview_node = node.clone();
