@@ -359,6 +359,7 @@ class LambdaVarExpr extends ImageExpr {
             let clone = value.clone();
             clone.stage = null;
             clone.bindSubexpressions();
+            return clone;
         }
         return this;
     }

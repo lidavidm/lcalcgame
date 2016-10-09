@@ -409,6 +409,7 @@ var LambdaVarExpr = function (_ImageExpr) {
                 var clone = value.clone();
                 clone.stage = null;
                 clone.bindSubexpressions();
+                return clone;
             }
             return this;
         }
