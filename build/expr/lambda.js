@@ -186,21 +186,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
 
             if (this.parent) {
                 // Ignore variables that are shadowed when previewing
-                var subvarexprs = [];
-                var queue = [this.parent];
-                while (queue.length > 0) {
-                    var _node = queue.pop();
-                    if (_node instanceof LambdaVarExpr) {
-                        subvarexprs.push(_node);
-                    } else if (_node !== this.parent && _node instanceof LambdaExpr && _node.takesArgument && _node.holes[0].name === this.name) {
-                        // Capture-avoiding substitution
-                        continue;
-                    }
-
-                    if (_node.children) {
-                        queue = queue.concat(_node.children);
-                    }
-                }
+                var subvarexprs = findNoncapturingVarExpr(this.parent, this.name);
 
                 subvarexprs.forEach(function (e) {
                     if (e.name === _this5.name) {
@@ -981,3 +967,23 @@ var FadedLambdaVarExpr = function (_LambdaVarExpr2) {
 
     return FadedLambdaVarExpr;
 }(LambdaVarExpr);
+
+function findNoncapturingVarExpr(lambda, name) {
+    var subvarexprs = [];
+    var queue = [lambda];
+    while (queue.length > 0) {
+        var node = queue.pop();
+        if (node instanceof LambdaVarExpr) {
+            subvarexprs.push(node);
+        } else if (node !== lambda && node instanceof LambdaExpr && node.takesArgument && node.holes[0].name === name) {
+            // Capture-avoiding substitution
+            continue;
+        }
+
+        if (node.children) {
+            queue = queue.concat(node.children);
+        }
+    }
+
+    return subvarexprs;
+}
