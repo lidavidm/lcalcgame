@@ -72,7 +72,7 @@ class Level {
 
         // Toolbox
         const TOOLBOX_HEIGHT = 90;
-        var toolbox = new Toolbox(0, canvas_screen.height - TOOLBOX_HEIGHT, canvas_screen.width, TOOLBOX_HEIGHT);
+        var toolbox = new Toolbox(0, canvas_screen.h - TOOLBOX_HEIGHT, canvas_screen.w, TOOLBOX_HEIGHT);
         stage.add(toolbox);
         if (this.toolbox) {
             this.toolbox.forEach((item) => {
