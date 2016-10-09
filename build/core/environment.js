@@ -17,7 +17,7 @@ var Environment = function () {
     _createClass(Environment, [{
         key: "lookup",
         value: function lookup(key) {
-            return this.bindings[key];
+            return this.bindings[key] || (this.parent ? this.parent.lookup(key) : null);
         }
     }, {
         key: "update",

@@ -5,7 +5,7 @@ class Environment {
     }
 
     lookup(key) {
-        return this.bindings[key];
+        return this.bindings[key] || (this.parent ? this.parent.lookup(key) : null);
     }
 
     update(key, value) {
