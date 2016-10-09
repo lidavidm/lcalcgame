@@ -17,6 +17,7 @@ class Expression extends mag.RoundedRect {
         this.holes = holes;
         this.padding = { left:10, inner:10, right:10 };
         this._size = { w:EMPTY_EXPR_WIDTH, h:DEFAULT_EXPR_HEIGHT };
+        this.environment = null;
 
         if (this.holes) {
             var _this = this;
@@ -160,6 +161,17 @@ class Expression extends mag.RoundedRect {
     // Apply a single argument at specified arg index
     applyAtIndex(idx, arg) {
         // ... //
+    }
+
+    // Get the containing environment for this expression
+    getEnvironment() {
+        if (this.environment) return this.environment;
+
+        if (this.parent) return this.parent.getEnvironment();
+
+        if (this.stage) return this.stage.environment;
+
+        return null;
     }
 
     // Reduce this expression to another.

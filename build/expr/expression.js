@@ -35,6 +35,7 @@ var Expression = function (_mag$RoundedRect) {
         _this2.holes = holes;
         _this2.padding = { left: 10, inner: 10, right: 10 };
         _this2._size = { w: EMPTY_EXPR_WIDTH, h: DEFAULT_EXPR_HEIGHT };
+        _this2.environment = null;
 
         if (_this2.holes) {
             var _this = _this2;
@@ -180,6 +181,20 @@ var Expression = function (_mag$RoundedRect) {
         value: function applyAtIndex(idx, arg) {}
         // ... //
 
+
+        // Get the containing environment for this expression
+
+    }, {
+        key: 'getEnvironment',
+        value: function getEnvironment() {
+            if (this.environment) return this.environment;
+
+            if (this.parent) return this.parent.getEnvironment();
+
+            if (this.stage) return this.stage.environment;
+
+            return null;
+        }
 
         // Reduce this expression to another.
         // * Returns the newly built expression. Leaves this expression unchanged.
