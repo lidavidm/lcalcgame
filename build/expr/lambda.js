@@ -508,7 +508,6 @@ var LambdaExpr = function (_Expression) {
     function LambdaExpr(exprs) {
         _classCallCheck(this, LambdaExpr);
 
-        // TODO: DML take into consideration parent environment
         var _this10 = _possibleConstructorReturn(this, (LambdaExpr.__proto__ || Object.getPrototypeOf(LambdaExpr)).call(this, exprs));
 
         _this10.environment = new Environment();
@@ -603,16 +602,73 @@ var LambdaExpr = function (_Expression) {
             var _this11 = this;
 
             // TODO: DML Where should we do the recursive reduce?
-            // TODO: DML Need to actually swap
-            // TODO: DML need to replicate IfStatement check of original LambdaHoleExpr#applyExpr
-            var reduced_expr = this.reduce().map(function (e) {
-                var result = e.reduce();
-                // TODO: need to recurse down into the expression, but not into children of lambdas
-                if (result instanceof LambdaExpr) {
-                    result.environment.parent = _this11.environment;
+
+            // Perform substitution, but stop at the 'boundary' of another lambda.
+            var varExprs = findNoncapturingVarExpr(this, null, true);
+            var environment = this.getEnvironment();
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = varExprs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var expr = _step.value;
+
+                    var value = environment.lookup(expr.name);
+                    if (value) {
+                        var c = value.clone();
+                        c.stage = null;
+                        expr.parent.swap(expr, c);
+                        c.parent.bindSubexpressions();
+                        if (c.parent instanceof IfStatement && c.parent.cond instanceof CompareExpr) {
+                            c.parent.cond.unlock();
+                        }
+                    }
                 }
-                return result;
-            });
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+                for (var _iterator2 = this.holes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var child = _step2.value;
+
+                    if (child instanceof LambdaExpr) {
+                        // TODO: need to recurse down into children, but not children of lambdas
+                        child.environment.parent = this.environment;
+                    }
+                }
+            } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
+                    }
+                } finally {
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
+                    }
+                }
+            }
+
+            var reduced_expr = this.reduce();
             if (reduced_expr && reduced_expr != this) {
                 // Only swap if reduction returns something > null.
 
@@ -815,27 +871,27 @@ var FadedES6LambdaHoleExpr = function (_FadedPythonLambdaHol) {
             else if (!this.isOpen) return null;
 
             if (typeof options !== 'undefined' && options.hasOwnProperty('exclude')) {
-                var _iteratorNormalCompletion = true;
-                var _didIteratorError = false;
-                var _iteratorError = undefined;
+                var _iteratorNormalCompletion3 = true;
+                var _didIteratorError3 = false;
+                var _iteratorError3 = undefined;
 
                 try {
-                    for (var _iterator = options.exclude[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                        var e = _step.value;
+                    for (var _iterator3 = options.exclude[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                        var e = _step3.value;
 
                         if (e == this) return null;
                     }
                 } catch (err) {
-                    _didIteratorError = true;
-                    _iteratorError = err;
+                    _didIteratorError3 = true;
+                    _iteratorError3 = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion && _iterator.return) {
-                            _iterator.return();
+                        if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                            _iterator3.return();
                         }
                     } finally {
-                        if (_didIteratorError) {
-                            throw _iteratorError;
+                        if (_didIteratorError3) {
+                            throw _iteratorError3;
                         }
                     }
                 }
@@ -969,13 +1025,15 @@ var FadedLambdaVarExpr = function (_LambdaVarExpr2) {
 }(LambdaVarExpr);
 
 function findNoncapturingVarExpr(lambda, name) {
+    var skipLambda = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
     var subvarexprs = [];
     var queue = [lambda];
     while (queue.length > 0) {
         var node = queue.pop();
         if (node instanceof LambdaVarExpr) {
             subvarexprs.push(node);
-        } else if (node !== lambda && node instanceof LambdaExpr && node.takesArgument && node.holes[0].name === name) {
+        } else if (node !== lambda && node instanceof LambdaExpr && (node.takesArgument && node.holes[0].name === name || skipLambda)) {
             // Capture-avoiding substitution
             continue;
         }

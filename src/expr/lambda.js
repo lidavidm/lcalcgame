@@ -383,7 +383,6 @@ class LambdaVarExpr extends ImageExpr {
 class LambdaExpr extends Expression {
     constructor(exprs) {
         super(exprs);
-        // TODO: DML take into consideration parent environment
         this.environment = new Environment();
 
         /*let txt = new TextExpr('→');
@@ -466,18 +465,31 @@ class LambdaExpr extends Expression {
         } else return super.reduce();
     }
     performReduction() {
-
         // TODO: DML Where should we do the recursive reduce?
-        // TODO: DML Need to actually swap
-        // TODO: DML need to replicate IfStatement check of original LambdaHoleExpr#applyExpr
-        var reduced_expr = this.reduce().map((e) => {
-            let result = e.reduce();
-            // TODO: need to recurse down into the expression, but not into children of lambdas
-            if (result instanceof LambdaExpr) {
-                result.environment.parent = this.environment;
+
+        // Perform substitution, but stop at the 'boundary' of another lambda.
+        let varExprs = findNoncapturingVarExpr(this, null, true);
+        let environment = this.getEnvironment();
+        for (let expr of varExprs) {
+            let value = environment.lookup(expr.name);
+            if (value) {
+                let c = value.clone();
+                c.stage = null;
+                expr.parent.swap(expr, c);
+                c.parent.bindSubexpressions();
+                if (c.parent instanceof IfStatement && c.parent.cond instanceof CompareExpr) {
+                    c.parent.cond.unlock();
+                }
             }
-            return result;
-        });
+        }
+        for (let child of this.holes) {
+            if (child instanceof LambdaExpr) {
+                // TODO: need to recurse down into children, but not children of lambdas
+                child.environment.parent = this.environment;
+            }
+        }
+
+        var reduced_expr = this.reduce();
         if (reduced_expr && reduced_expr != this) { // Only swap if reduction returns something > null.
 
             if (this.stage) this.stage.saveState();
@@ -649,7 +661,7 @@ class FadedLambdaVarExpr extends LambdaVarExpr {
 }
 
 
-function findNoncapturingVarExpr(lambda, name) {
+function findNoncapturingVarExpr(lambda, name, skipLambda=false) {
     let subvarexprs = [];
     let queue = [lambda];
     while (queue.length > 0) {
@@ -659,8 +671,8 @@ function findNoncapturingVarExpr(lambda, name) {
         }
         else if (node !== lambda &&
                  node instanceof LambdaExpr &&
-                 node.takesArgument &&
-                 node.holes[0].name === name) {
+                 ((node.takesArgument &&
+                   node.holes[0].name === name) || skipLambda)) {
             // Capture-avoiding substitution
             continue;
         }
