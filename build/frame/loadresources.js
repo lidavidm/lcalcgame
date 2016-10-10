@@ -1,6 +1,6 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function LOAD_REDUCT_RESOURCES(Resource) {
     var __RESOURCE_PATH = Resource.path;
@@ -145,14 +145,18 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             }
         }
 
+        if (!level_desc["globals"]) {
+            level_desc.globals = {};
+        }
+
         var fadedBorders = ExprManager.fadeBordersAt(level_idx);
         if (fadedBorders.length > 0) {
             var _ret = function () {
 
                 ExprManager.fadesAtBorder = false;
-                var unfaded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+                var unfaded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
                 ExprManager.fadesAtBorder = true;
-                var faded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+                var faded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
 
                 var unfaded_exprs = unfaded.nodes;
                 var faded_exprs = faded.nodes;
@@ -254,7 +258,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
 
             if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
         } else {
-            return Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+            return Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
         }
     };
     Resource.level = levels;

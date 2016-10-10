@@ -136,13 +136,17 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             }
         }
 
+        if (!level_desc["globals"]) {
+            level_desc.globals = {};
+        }
+
         let fadedBorders = ExprManager.fadeBordersAt(level_idx);
         if (fadedBorders.length > 0) {
 
             ExprManager.fadesAtBorder = false;
-            let unfaded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+            let unfaded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
             ExprManager.fadesAtBorder = true;
-            let faded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+            let faded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
 
             let unfaded_exprs = unfaded.nodes;
             let faded_exprs   = faded.nodes;
@@ -212,7 +216,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             return faded;
         }
         else {
-            return Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+            return Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
         }
     };
     Resource.level = levels;

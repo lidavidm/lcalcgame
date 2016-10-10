@@ -5,10 +5,11 @@
  * (*This may change in time.*) */
 class Level {
 
-    constructor(expressions, goal, toolbox=null) {
+    constructor(expressions, goal, toolbox=null, globals=null) {
         this.exprs = expressions;
         this.goal = goal;
         this.toolbox = toolbox;
+        this.globals = globals;
     }
 
     // Builds a single Stage from the level description,
@@ -83,11 +84,11 @@ class Level {
         stage.toolbox = toolbox;
 
         // Environment
-
         const ENV_HEIGHT = 90;
-        var env = new EnvironmentDisplay(0, canvas_screen.h - ENV_HEIGHT - TOOLBOX_HEIGHT, canvas_screen.w, ENV_HEIGHT);
+        var env = new EnvironmentDisplay(0, canvas_screen.h - ENV_HEIGHT - TOOLBOX_HEIGHT, canvas_screen.w, ENV_HEIGHT, this.globals);
         stage.add(env);
         stage.environmentDisplay = env;
+        env.showGlobals();
 
         stage.uiNodes = [ btn_back, btn_reset, btn_next, env, toolbox ];
 
@@ -132,9 +133,9 @@ class Level {
     // * In Scheme-esque format, with _ for holes:
     // * '(if _ triangle star) (== triangle _) (rect)'
     // NOTE: This does not do error checking! Make sure your desc is correct.
-    static make(expr_descs, goal_descs, toolbox_descs) {
+    static make(expr_descs, goal_descs, toolbox_descs, globals_descs) {
         var lvl = new Level(Level.parse(expr_descs), new Goal(new ExpressionPattern(Level.parse(goal_descs))),
-            toolbox_descs ? Level.parse(toolbox_descs) : null );
+            toolbox_descs ? Level.parse(toolbox_descs) : null, Environment.parse(globals_descs));
         return lvl;
     }
     static parse(desc) {

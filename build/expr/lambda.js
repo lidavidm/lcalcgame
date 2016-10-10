@@ -595,7 +595,7 @@ var LambdaExpr = function (_Expression) {
         value: function onmouseleave() {
             _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'onmouseleave', this).call(this);
             if (this.stage) {
-                this.stage.environmentDisplay.clear();
+                this.stage.environmentDisplay.showGlobals();
             }
         }
     }, {

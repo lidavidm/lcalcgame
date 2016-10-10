@@ -13,14 +13,16 @@ var EnvironmentDisplay = function (_mag$ImageRect) {
     _inherits(EnvironmentDisplay, _mag$ImageRect);
 
     function EnvironmentDisplay(x, y, w, h) {
+        var globals = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+
         _classCallCheck(this, EnvironmentDisplay);
 
         var _this = _possibleConstructorReturn(this, (EnvironmentDisplay.__proto__ || Object.getPrototypeOf(EnvironmentDisplay)).call(this, x, y, w, h, 'toolbox-bg'));
 
         _this.padding = 20;
         _this.env = null;
+        _this.globals = globals ? globals : new Environment();
         _this.contents = [];
-        _this.opacity = 0.1;
         return _this;
     }
 
@@ -30,7 +32,7 @@ var EnvironmentDisplay = function (_mag$ImageRect) {
             var _this2 = this;
 
             if (!env) return;
-            this.opacity = 0.8;
+            this.clear();
             this.env = env;
             var pos = this.leftEdgePos;
             var setup = function setup(e, padding) {
@@ -43,6 +45,7 @@ var EnvironmentDisplay = function (_mag$ImageRect) {
             };
             env.names().forEach(function (name) {
                 var label = new TextExpr(name + "=");
+                label.color = "white";
                 setup(label, 0);
 
                 var e = env.lookup(name).clone();
@@ -50,35 +53,39 @@ var EnvironmentDisplay = function (_mag$ImageRect) {
             });
         }
     }, {
+        key: "showGlobals",
+        value: function showGlobals() {
+            this.clear();
+            this.showEnvironment(this.globals);
+        }
+    }, {
         key: "clear",
         value: function clear() {
-            this.opacity = 0.1;
-            if (this.env) {
-                var _iteratorNormalCompletion = true;
-                var _didIteratorError = false;
-                var _iteratorError = undefined;
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
 
+            try {
+                for (var _iterator = this.contents[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var child = _step.value;
+
+                    this.stage.remove(child);
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
                 try {
-                    for (var _iterator = this.contents[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                        var child = _step.value;
-
-                        this.stage.remove(child);
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
                     }
-                } catch (err) {
-                    _didIteratorError = true;
-                    _iteratorError = err;
                 } finally {
-                    try {
-                        if (!_iteratorNormalCompletion && _iterator.return) {
-                            _iterator.return();
-                        }
-                    } finally {
-                        if (_didIteratorError) {
-                            throw _iteratorError;
-                        }
+                    if (_didIteratorError) {
+                        throw _iteratorError;
                     }
                 }
             }
+
             this.contents = [];
             this.env = null;
         }

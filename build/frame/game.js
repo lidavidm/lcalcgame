@@ -14,12 +14,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Level = function () {
     function Level(expressions, goal) {
         var toolbox = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+        var globals = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
         _classCallCheck(this, Level);
 
         this.exprs = expressions;
         this.goal = goal;
         this.toolbox = toolbox;
+        this.globals = globals;
     }
 
     // Builds a single Stage from the level description,
@@ -92,11 +94,11 @@ var Level = function () {
             stage.toolbox = toolbox;
 
             // Environment
-
             var ENV_HEIGHT = 90;
-            var env = new EnvironmentDisplay(0, canvas_screen.h - ENV_HEIGHT - TOOLBOX_HEIGHT, canvas_screen.w, ENV_HEIGHT);
+            var env = new EnvironmentDisplay(0, canvas_screen.h - ENV_HEIGHT - TOOLBOX_HEIGHT, canvas_screen.w, ENV_HEIGHT, this.globals);
             stage.add(env);
             stage.environmentDisplay = env;
+            env.showGlobals();
 
             stage.uiNodes = [btn_back, btn_reset, btn_next, env, toolbox];
 
@@ -382,8 +384,8 @@ var Level = function () {
         }
     }], [{
         key: 'make',
-        value: function make(expr_descs, goal_descs, toolbox_descs) {
-            var lvl = new Level(Level.parse(expr_descs), new Goal(new ExpressionPattern(Level.parse(goal_descs))), toolbox_descs ? Level.parse(toolbox_descs) : null);
+        value: function make(expr_descs, goal_descs, toolbox_descs, globals_descs) {
+            var lvl = new Level(Level.parse(expr_descs), new Goal(new ExpressionPattern(Level.parse(goal_descs))), toolbox_descs ? Level.parse(toolbox_descs) : null, Environment.parse(globals_descs));
             return lvl;
         }
     }, {

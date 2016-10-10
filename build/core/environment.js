@@ -32,6 +32,44 @@ var Environment = function () {
             var set = new Set([].concat(_toConsumableArray(Object.keys(this.bindings)), _toConsumableArray(this.parent ? this.parent.names() : [])));
             return Array.from(set);
         }
+    }], [{
+        key: "parse",
+        value: function parse(desc) {
+            console.log(desc);
+            var bindings = {};
+            var env = new Environment();
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = Object.keys(desc)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var name = _step.value;
+
+                    var expr = Level.parse(desc[name]);
+                    if (expr.length !== 1) {
+                        throw "Invalid description of global value: " + name + "=" + desc[name];
+                    }
+                    env.update(name, expr[0]);
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+
+            console.log(env);
+            return env;
+        }
     }]);
 
     return Environment;

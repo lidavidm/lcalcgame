@@ -465,7 +465,7 @@ class LambdaExpr extends Expression {
     onmouseleave() {
         super.onmouseleave();
         if (this.stage) {
-            this.stage.environmentDisplay.clear();
+            this.stage.environmentDisplay.showGlobals();
         }
     }
 
