@@ -478,6 +478,7 @@ class LambdaExpr extends Expression {
         if (this.isParentheses) {
             return this.holes;
         } else return super.reduce();
+        // TODO: DML manually reducing lambda does incorrect substitutions
     }
     performReduction() {
         // TODO: DML Where should we do the recursive reduce?
@@ -487,6 +488,9 @@ class LambdaExpr extends Expression {
         let environment = this.getEnvironment();
         for (let expr of varExprs) {
             let value = environment.lookup(expr.name);
+            if (!value && this.stage) {
+                value = this.stage.environment.lookup(expr.name);
+            }
             if (value) {
                 let c = value.clone();
                 c.stage = null;

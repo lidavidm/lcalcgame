@@ -35,7 +35,6 @@ var Environment = function () {
     }], [{
         key: "parse",
         value: function parse(desc) {
-            console.log(desc);
             var bindings = {};
             var env = new Environment();
             var _iteratorNormalCompletion = true;
@@ -67,7 +66,6 @@ var Environment = function () {
                 }
             }
 
-            console.log(env);
             return env;
         }
     }]);

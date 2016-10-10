@@ -21,7 +21,6 @@ class Environment {
     }
 
     static parse(desc) {
-        console.log(desc);
         let bindings = {};
         let env = new Environment();
         for (let name of Object.keys(desc)) {
@@ -31,7 +30,6 @@ class Environment {
             }
             env.update(name, expr[0]);
         }
-        console.log(env);
         return env;
     }
 }

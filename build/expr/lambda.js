@@ -611,6 +611,7 @@ var LambdaExpr = function (_Expression) {
             if (this.isParentheses) {
                 return this.holes;
             } else return _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'reduce', this).call(this);
+            // TODO: DML manually reducing lambda does incorrect substitutions
         }
     }, {
         key: 'performReduction',
@@ -631,6 +632,9 @@ var LambdaExpr = function (_Expression) {
                     var expr = _step.value;
 
                     var value = environment.lookup(expr.name);
+                    if (!value && this.stage) {
+                        value = this.stage.environment.lookup(expr.name);
+                    }
                     if (value) {
                         var c = value.clone();
                         c.stage = null;
