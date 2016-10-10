@@ -454,6 +454,21 @@ class LambdaExpr extends Expression {
     onmouseclick(pos) {
         this.performReduction();
     }
+
+    onmouseenter(pos) {
+        super.onmouseleave(pos);
+        if (this.stage) {
+            this.stage.environmentDisplay.showEnvironment(this.getEnvironment());
+        }
+    }
+
+    onmouseleave() {
+        super.onmouseleave();
+        if (this.stage) {
+            this.stage.environmentDisplay.clear();
+        }
+    }
+
     hitsChild(pos) {
         if (this.isParentheses) return null;
         return super.hitsChild(pos);

@@ -583,6 +583,22 @@ var LambdaExpr = function (_Expression) {
             this.performReduction();
         }
     }, {
+        key: 'onmouseenter',
+        value: function onmouseenter(pos) {
+            _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'onmouseleave', this).call(this, pos);
+            if (this.stage) {
+                this.stage.environmentDisplay.showEnvironment(this.getEnvironment());
+            }
+        }
+    }, {
+        key: 'onmouseleave',
+        value: function onmouseleave() {
+            _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'onmouseleave', this).call(this);
+            if (this.stage) {
+                this.stage.environmentDisplay.clear();
+            }
+        }
+    }, {
         key: 'hitsChild',
         value: function hitsChild(pos) {
             if (this.isParentheses) return null;

@@ -41,7 +41,7 @@ var Level = function () {
 
             GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
             var canvas_screen = stage.boundingSize;
-            var screen = { height: canvas_screen.h / 1.4, width: canvas_screen.w / 1.4, y: canvas_screen.h * (1 - 1 / 1.4) / 2.0, x: canvas_screen.w * (1 - 1 / 1.4) / 2.0 };
+            var screen = { height: canvas_screen.h / 1.4 - 90, width: canvas_screen.w / 1.4, y: canvas_screen.h * (1 - 1 / 1.4) / 2.0, x: canvas_screen.w * (1 - 1 / 1.4) / 2.0 };
             var board_packing = this.findBestPacking(this.exprs, screen);
             stage.addAll(board_packing); // add expressions to the stage
 
@@ -91,7 +91,14 @@ var Level = function () {
             }
             stage.toolbox = toolbox;
 
-            stage.uiNodes = [btn_back, btn_reset, btn_next, toolbox];
+            // Environment
+
+            var ENV_HEIGHT = 90;
+            var env = new EnvironmentDisplay(0, canvas_screen.h - ENV_HEIGHT - TOOLBOX_HEIGHT, canvas_screen.w, ENV_HEIGHT);
+            stage.add(env);
+            stage.environmentDisplay = env;
+
+            stage.uiNodes = [btn_back, btn_reset, btn_next, env, toolbox];
 
             // Checks if the player has completed the level.
             var goal = this.goal;
