@@ -478,10 +478,12 @@ class LambdaExpr extends Expression {
         if (this.isParentheses) {
             return this.holes;
         } else return super.reduce();
-        // TODO: DML manually reducing lambda does incorrect substitutions
     }
     performReduction() {
-        // TODO: DML Where should we do the recursive reduce?
+        // If we don't have all our arguments, refuse to evaluate.
+        if (this.takesArgument) {
+            return this;
+        }
 
         // Perform substitution, but stop at the 'boundary' of another lambda.
         let varExprs = findNoncapturingVarExpr(this, null, true);

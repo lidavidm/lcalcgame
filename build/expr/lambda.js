@@ -611,14 +611,16 @@ var LambdaExpr = function (_Expression) {
             if (this.isParentheses) {
                 return this.holes;
             } else return _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'reduce', this).call(this);
-            // TODO: DML manually reducing lambda does incorrect substitutions
         }
     }, {
         key: 'performReduction',
         value: function performReduction() {
             var _this11 = this;
 
-            // TODO: DML Where should we do the recursive reduce?
+            // If we don't have all our arguments, refuse to evaluate.
+            if (this.takesArgument) {
+                return this;
+            }
 
             // Perform substitution, but stop at the 'boundary' of another lambda.
             var varExprs = findNoncapturingVarExpr(this, null, true);
