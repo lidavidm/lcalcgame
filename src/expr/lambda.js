@@ -456,7 +456,7 @@ class LambdaExpr extends Expression {
     }
 
     onmouseenter(pos) {
-        super.onmouseleave(pos);
+        super.onmouseenter(pos);
         if (this.stage) {
             this.stage.environmentDisplay.showEnvironment(this.getEnvironment());
         }

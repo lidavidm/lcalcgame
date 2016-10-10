@@ -585,7 +585,7 @@ var LambdaExpr = function (_Expression) {
     }, {
         key: 'onmouseenter',
         value: function onmouseenter(pos) {
-            _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'onmouseleave', this).call(this, pos);
+            _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'onmouseenter', this).call(this, pos);
             if (this.stage) {
                 this.stage.environmentDisplay.showEnvironment(this.getEnvironment());
             }
