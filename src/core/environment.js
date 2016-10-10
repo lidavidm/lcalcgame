@@ -11,4 +11,12 @@ class Environment {
     update(key, value) {
         this.bindings[key] = value;
     }
+
+    names() {
+        let set = new Set([
+            ...Object.keys(this.bindings),
+            ...(this.parent ? this.parent.names() : []),
+        ]);
+        return Array.from(set);
+    }
 }
