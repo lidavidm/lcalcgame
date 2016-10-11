@@ -444,6 +444,17 @@ var LambdaVarExpr = function (_ImageExpr) {
                 var clone = value.clone();
                 clone.stage = null;
                 clone.bindSubexpressions();
+                var parent = this.parent || this.stage;
+                if (parent) {
+                    parent.swap(this, clone);
+                    if (this.parent) {
+                        this.parent.bindSubexpressions();
+
+                        if (this.parent instanceof IfStatement && this.parent.cond instanceof CompareExpr) {
+                            this.parent.cond.unlock();
+                        }
+                    }
+                }
                 return clone;
             }
             return this;
@@ -675,19 +686,7 @@ var LambdaExpr = function (_Expression) {
                 for (var _iterator = varExprs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                     var expr = _step.value;
 
-                    var value = environment.lookup(expr.name);
-                    if (!value && this.stage) {
-                        value = this.stage.environment.lookup(expr.name);
-                    }
-                    if (value) {
-                        var c = value.clone();
-                        c.stage = null;
-                        expr.parent.swap(expr, c);
-                        c.parent.bindSubexpressions();
-                        if (c.parent instanceof IfStatement && c.parent.cond instanceof CompareExpr) {
-                            c.parent.cond.unlock();
-                        }
-                    }
+                    expr.reduce();
                 }
             } catch (err) {
                 _didIteratorError = true;

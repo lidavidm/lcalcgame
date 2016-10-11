@@ -389,6 +389,17 @@ class LambdaVarExpr extends ImageExpr {
             let clone = value.clone();
             clone.stage = null;
             clone.bindSubexpressions();
+            let parent = this.parent || this.stage;
+            if (parent) {
+                parent.swap(this, clone);
+                if (this.parent) {
+                    this.parent.bindSubexpressions();
+
+                    if (this.parent instanceof IfStatement && this.parent.cond instanceof CompareExpr) {
+                        this.parent.cond.unlock();
+                    }
+                }
+            }
             return clone;
         }
         return this;
@@ -524,19 +535,7 @@ class LambdaExpr extends Expression {
         let varExprs = findNoncapturingVarExpr(this, null, true);
         let environment = this.getEnvironment();
         for (let expr of varExprs) {
-            let value = environment.lookup(expr.name);
-            if (!value && this.stage) {
-                value = this.stage.environment.lookup(expr.name);
-            }
-            if (value) {
-                let c = value.clone();
-                c.stage = null;
-                expr.parent.swap(expr, c);
-                c.parent.bindSubexpressions();
-                if (c.parent instanceof IfStatement && c.parent.cond instanceof CompareExpr) {
-                    c.parent.cond.unlock();
-                }
-            }
+            expr.reduce();
         }
         for (let child of this.holes) {
             if (child instanceof LambdaExpr) {
