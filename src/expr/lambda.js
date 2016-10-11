@@ -276,8 +276,7 @@ class LambdaVarExpr extends ImageExpr {
         super(0, 0, 54*1.2, 70*1.2, 'lambda-pipe');
         this.graphicNode.offset = { x:0, y:-8 };
         this.name = varname ? varname.replace('_', '') : undefined;
-        // Don't want to ignore events, for highlighting
-        this.delegateInner = true;
+        this.ignoreEvents = true;
         this.handleOffset = -8;
 
         // Graphic animation.
@@ -333,6 +332,11 @@ class LambdaVarExpr extends ImageExpr {
         c._stateGraph = null;
         c.stateGraph.enter('closed');
         return c;
+    }
+
+    hits(pos, options) {
+        if(this.holes[0].hits(pos, options)) return this;
+        else return null;
     }
 
     onmouseenter(pos) {
