@@ -375,6 +375,22 @@ var LambdaVarExpr = function (_ImageExpr) {
             return c;
         }
     }, {
+        key: 'onmouseenter',
+        value: function onmouseenter(pos) {
+            if (this.stage) {
+                this.stage.environmentDisplay.showEnvironment(this.getEnvironment());
+                this.stage.environmentDisplay.highlightName(this.name);
+            }
+        }
+    }, {
+        key: 'onmouseleave',
+        value: function onmouseleave(pos) {
+            if (this.stage) {
+                this.stage.environmentDisplay.clearHighlight();
+                this.stage.environmentDisplay.showGlobals();
+            }
+        }
+    }, {
         key: 'open',
         value: function open() {
             var _this8 = this;
@@ -541,6 +557,7 @@ var LambdaExpr = function (_Expression) {
             if (!env.parent && this.stage) {
                 env.parent = this.stage.environment;
             }
+            return env;
         }
     }, {
         key: 'applyExpr',

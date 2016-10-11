@@ -6,6 +6,7 @@ class EnvironmentDisplay extends mag.ImageRect {
         this.env = null;
         this.globals = globals ? globals : new Environment();
         this.contents = [];
+        this.highlighted = null;
     }
 
     get leftEdgePos() { return { x:this.padding * 2 + this.pos.x, y:this.size.h / 2.0 + this.pos.y }; }
@@ -44,5 +45,27 @@ class EnvironmentDisplay extends mag.ImageRect {
         }
         this.contents = [];
         this.env = null;
+        this.highlighted = null;
+    }
+
+    highlightName(name) {
+        let next = false;
+        for (let expr of this.contents) {
+            if (expr instanceof TextExpr && expr.text === name + "=") {
+                this.highlighted = expr;
+                expr.color = 'green';
+                next = true;
+            }
+            else if (next) {
+                expr.onmouseenter();
+            }
+        }
+    }
+
+    clearHighlight() {
+        if (this.highlighted) {
+            this.highlighted.color = 'white';
+            this.highlighted = null;
+        }
     }
 }

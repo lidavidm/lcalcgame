@@ -334,6 +334,20 @@ class LambdaVarExpr extends ImageExpr {
         return c;
     }
 
+    onmouseenter(pos) {
+        if (this.stage) {
+            this.stage.environmentDisplay.showEnvironment(this.getEnvironment());
+            this.stage.environmentDisplay.highlightName(this.name);
+        }
+    }
+
+    onmouseleave(pos) {
+        if (this.stage) {
+            this.stage.environmentDisplay.clearHighlight();
+            this.stage.environmentDisplay.showGlobals();
+        }
+    }
+
     open(preview_expr=null) {
         if (this.stateGraph.currentState !== 'open') {
             this.stateGraph.enter('opening');
@@ -407,6 +421,7 @@ class LambdaExpr extends Expression {
         if (!env.parent && this.stage) {
             env.parent = this.stage.environment;
         }
+        return env;
     }
     applyExpr(node) {
         if (this.takesArgument) {
