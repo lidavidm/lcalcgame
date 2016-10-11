@@ -58,6 +58,7 @@ class EnvironmentDisplay extends mag.ImageRect {
             }
             else if (next) {
                 expr.onmouseenter();
+                break;
             }
         }
     }

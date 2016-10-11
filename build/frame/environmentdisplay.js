@@ -109,6 +109,7 @@ var EnvironmentDisplay = function (_mag$ImageRect) {
                         next = true;
                     } else if (next) {
                         expr.onmouseenter();
+                        break;
                     }
                 }
             } catch (err) {
