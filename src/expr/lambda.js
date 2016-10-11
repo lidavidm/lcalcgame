@@ -353,6 +353,14 @@ class LambdaVarExpr extends ImageExpr {
         }
     }
 
+    onmouseclick(pos) {
+        // TODO: DML enable reduction, but make sure we are not bound
+        // by a lambda
+        if (!this.parent) {
+            this.performReduction();
+        }
+    }
+
     open(preview_expr=null) {
         if (this.stateGraph.currentState !== 'open') {
             this.stateGraph.enter('opening');

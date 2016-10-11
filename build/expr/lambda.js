@@ -396,6 +396,15 @@ var LambdaVarExpr = function (_ImageExpr) {
             }
         }
     }, {
+        key: 'onmouseclick',
+        value: function onmouseclick(pos) {
+            // TODO: DML enable reduction, but make sure we are not bound
+            // by a lambda
+            if (!this.parent) {
+                this.performReduction();
+            }
+        }
+    }, {
         key: 'open',
         value: function open() {
             var _this8 = this;
