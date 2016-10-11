@@ -276,7 +276,8 @@ class LambdaVarExpr extends ImageExpr {
         super(0, 0, 54*1.2, 70*1.2, 'lambda-pipe');
         this.graphicNode.offset = { x:0, y:-8 };
         this.name = varname ? varname.replace('_', '') : undefined;
-        this.ignoreEvents = true;
+        // Don't want to ignore events, for highlighting
+        this.delegateInner = true;
         this.handleOffset = -8;
 
         // Graphic animation.

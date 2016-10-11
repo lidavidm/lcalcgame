@@ -90,7 +90,7 @@ var GraphicVarExpr = function (_VarExpr) {
     }, {
         key: 'delegateToInner',
         get: function get() {
-            return this.ignoreEvents || !this.parent || !(this.parent instanceof Expression);
+            return this.ignoreEvents || !this.parent || !(this.parent instanceof Expression) || this.delegateInner;
         }
     }, {
         key: 'graphicNode',

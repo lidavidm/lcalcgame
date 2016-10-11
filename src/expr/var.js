@@ -16,7 +16,7 @@ class GraphicVarExpr extends VarExpr {
         this.holes[0].color = clr;
     }
     get delegateToInner() {
-        return this.ignoreEvents || (!this.parent) || !(this.parent instanceof Expression);
+        return this.ignoreEvents || (!this.parent) || !(this.parent instanceof Expression) || this.delegateInner;
     }
     get graphicNode() { return this.holes[0]; }
     reduceCompletely() { return this; }

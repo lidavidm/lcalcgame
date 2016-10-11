@@ -358,7 +358,8 @@ var LambdaVarExpr = function (_ImageExpr) {
 
         _this7.graphicNode.offset = { x: 0, y: -8 };
         _this7.name = varname ? varname.replace('_', '') : undefined;
-        _this7.ignoreEvents = true;
+        // Don't want to ignore events, for highlighting
+        _this7.delegateInner = true;
         _this7.handleOffset = -8;
 
         // Graphic animation.
