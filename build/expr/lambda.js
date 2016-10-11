@@ -169,6 +169,22 @@ var LambdaHoleExpr = function (_MissingExpression) {
             }
         }
     }, {
+        key: 'onmouseenter',
+        value: function onmouseenter(pos) {
+            _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'onmouseenter', this).call(this, pos);
+            if (this.stage) {
+                this.stage.environmentDisplay.showEnvironment(this.getEnvironment());
+            }
+        }
+    }, {
+        key: 'onmouseleave',
+        value: function onmouseleave() {
+            _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'onmouseleave', this).call(this);
+            if (this.stage) {
+                this.stage.environmentDisplay.showGlobals();
+            }
+        }
+    }, {
         key: 'ondropenter',
         value: function ondropenter(node, pos) {
             var _this5 = this;
@@ -519,6 +535,14 @@ var LambdaExpr = function (_Expression) {
     }
 
     _createClass(LambdaExpr, [{
+        key: 'getEnvironment',
+        value: function getEnvironment() {
+            var env = _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'getEnvironment', this).call(this);
+            if (!env.parent && this.stage) {
+                env.parent = this.stage.environment;
+            }
+        }
+    }, {
         key: 'applyExpr',
         value: function applyExpr(node) {
             if (this.takesArgument) {

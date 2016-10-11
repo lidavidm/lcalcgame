@@ -132,6 +132,19 @@ class LambdaHoleExpr extends MissingExpression {
             this.parent.onmousedrag(pos);
         }
     }
+    onmouseenter(pos) {
+        super.onmouseenter(pos);
+        if (this.stage) {
+            this.stage.environmentDisplay.showEnvironment(this.getEnvironment());
+        }
+    }
+
+    onmouseleave() {
+        super.onmouseleave();
+        if (this.stage) {
+            this.stage.environmentDisplay.showGlobals();
+        }
+    }
     ondropenter(node, pos) {
         if (node instanceof LambdaHoleExpr) node = node.parent;
         super.ondropenter(node, pos);
@@ -388,6 +401,12 @@ class LambdaExpr extends Expression {
         /*let txt = new TextExpr('→');
         txt.color = 'gray'
         this.addArg(txt);*/
+    }
+    getEnvironment() {
+        let env = super.getEnvironment();
+        if (!env.parent && this.stage) {
+            env.parent = this.stage.environment;
+        }
     }
     applyExpr(node) {
         if (this.takesArgument) {
