@@ -91,7 +91,9 @@ class Level {
         // stage.add(env);
         stage.environmentDisplay = env;
         if (this.globals) {
-            stage.environment = this.globals;
+            for (let name of this.globals.names()) {
+                stage.environment.update(name, this.globals.lookup(name).clone());
+            }
         }
         env.showGlobals();
 
