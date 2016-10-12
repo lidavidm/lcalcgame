@@ -4,8 +4,8 @@
 
 
 // Wrapper class to make arbitrary nodes into draggable expressions.
-class VarExpr extends Expression { }
-class GraphicVarExpr extends VarExpr {
+class ValueExpr extends Expression { }
+class GraphicValueExpr extends ValueExpr {
     constructor(graphic_node) {
         super([graphic_node]);
         this.color = 'gold';
@@ -44,37 +44,37 @@ class GraphicVarExpr extends VarExpr {
     }
     value() { return this.holes[0].value(); }
 }
-class StarExpr extends GraphicVarExpr {
+class StarExpr extends GraphicValueExpr {
     constructor(x, y, rad, pts=5) {
         super(new mag.Star(x, y, rad, pts));
     }
     toString() { return 'star'; }
 }
-class CircleExpr extends GraphicVarExpr {
+class CircleExpr extends GraphicValueExpr {
     constructor(x, y, rad) {
         super(new mag.Circle(x, y, rad));
     }
     toString() { return 'circle'; }
 }
-class PipeExpr extends GraphicVarExpr {
+class PipeExpr extends GraphicValueExpr {
     constructor(x, y, w, h) {
         super(new mag.Pipe(x, y, w, h-12));
     }
     toString() { return 'pipe'; }
 }
-class TriangleExpr extends GraphicVarExpr {
+class TriangleExpr extends GraphicValueExpr {
     constructor(x, y, w, h) {
         super(new mag.Triangle(x, y, w, h));
     }
     toString() { return 'triangle'; }
 }
-class RectExpr extends GraphicVarExpr {
+class RectExpr extends GraphicValueExpr {
     constructor(x, y, w, h) {
         super(new mag.Rect(x, y, w, h));
     }
     toString() { return 'diamond'; }
 }
-class ImageExpr extends GraphicVarExpr {
+class ImageExpr extends GraphicValueExpr {
     constructor(x, y, w, h, resource_key) {
         super(new mag.ImageRect(x, y, w, h, resource_key));
         this._image = resource_key;
@@ -170,7 +170,7 @@ class MirrorExpr extends ImageExpr {
 }
 
 /** Faded variants. */
-class FadedVarExpr extends Expression {
+class FadedValueExpr extends Expression {
     constructor(name) {
         let txt = new TextExpr(name);
         super([txt]);
@@ -186,15 +186,15 @@ class FadedVarExpr extends Expression {
     }
     value() { return this.toString(); }
 }
-class FadedStarExpr extends FadedVarExpr {
+class FadedStarExpr extends FadedValueExpr {
     constructor() { super('star'); }
 }
-class FadedRectExpr extends FadedVarExpr {
+class FadedRectExpr extends FadedValueExpr {
     constructor() { super('rect'); }
 }
-class FadedTriangleExpr extends FadedVarExpr {
+class FadedTriangleExpr extends FadedValueExpr {
     constructor() { super('tri'); }
 }
-class FadedCircleExpr extends FadedVarExpr {
+class FadedCircleExpr extends FadedValueExpr {
     constructor() { super('dot'); }
 }

@@ -11,32 +11,31 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 // Wrapper class to make arbitrary nodes into draggable expressions.
+var ValueExpr = function (_Expression) {
+    _inherits(ValueExpr, _Expression);
 
-var VarExpr = function (_Expression) {
-    _inherits(VarExpr, _Expression);
+    function ValueExpr() {
+        _classCallCheck(this, ValueExpr);
 
-    function VarExpr() {
-        _classCallCheck(this, VarExpr);
-
-        return _possibleConstructorReturn(this, (VarExpr.__proto__ || Object.getPrototypeOf(VarExpr)).apply(this, arguments));
+        return _possibleConstructorReturn(this, (ValueExpr.__proto__ || Object.getPrototypeOf(ValueExpr)).apply(this, arguments));
     }
 
-    return VarExpr;
+    return ValueExpr;
 }(Expression);
 
-var GraphicVarExpr = function (_VarExpr) {
-    _inherits(GraphicVarExpr, _VarExpr);
+var GraphicValueExpr = function (_ValueExpr) {
+    _inherits(GraphicValueExpr, _ValueExpr);
 
-    function GraphicVarExpr(graphic_node) {
-        _classCallCheck(this, GraphicVarExpr);
+    function GraphicValueExpr(graphic_node) {
+        _classCallCheck(this, GraphicValueExpr);
 
-        var _this2 = _possibleConstructorReturn(this, (GraphicVarExpr.__proto__ || Object.getPrototypeOf(GraphicVarExpr)).call(this, [graphic_node]));
+        var _this2 = _possibleConstructorReturn(this, (GraphicValueExpr.__proto__ || Object.getPrototypeOf(GraphicValueExpr)).call(this, [graphic_node]));
 
         _this2.color = 'gold';
         return _this2;
     }
 
-    _createClass(GraphicVarExpr, [{
+    _createClass(GraphicValueExpr, [{
         key: 'reduceCompletely',
         value: function reduceCompletely() {
             return this;
@@ -58,12 +57,12 @@ var GraphicVarExpr = function (_VarExpr) {
     }, {
         key: 'onmouseenter',
         value: function onmouseenter(pos) {
-            if (this.delegateToInner) this.holes[0].onmouseenter(pos);else _get(GraphicVarExpr.prototype.__proto__ || Object.getPrototypeOf(GraphicVarExpr.prototype), 'onmouseenter', this).call(this, pos);
+            if (this.delegateToInner) this.holes[0].onmouseenter(pos);else _get(GraphicValueExpr.prototype.__proto__ || Object.getPrototypeOf(GraphicValueExpr.prototype), 'onmouseenter', this).call(this, pos);
         }
     }, {
         key: 'onmouseleave',
         value: function onmouseleave(pos) {
-            if (!this.delegateToInner) _get(GraphicVarExpr.prototype.__proto__ || Object.getPrototypeOf(GraphicVarExpr.prototype), 'onmouseleave', this).call(this, pos);
+            if (!this.delegateToInner) _get(GraphicValueExpr.prototype.__proto__ || Object.getPrototypeOf(GraphicValueExpr.prototype), 'onmouseleave', this).call(this, pos);
             this.holes[0].onmouseleave(pos);
         }
     }, {
@@ -71,7 +70,7 @@ var GraphicVarExpr = function (_VarExpr) {
         value: function drawInternal(ctx, pos, boundingSize) {
             if (!this.delegateToInner) {
                 this._color = '#777';
-                _get(GraphicVarExpr.prototype.__proto__ || Object.getPrototypeOf(GraphicVarExpr.prototype), 'drawInternal', this).call(this, ctx, pos, boundingSize);
+                _get(GraphicValueExpr.prototype.__proto__ || Object.getPrototypeOf(GraphicValueExpr.prototype), 'drawInternal', this).call(this, ctx, pos, boundingSize);
             }
         }
     }, {
@@ -82,7 +81,7 @@ var GraphicVarExpr = function (_VarExpr) {
     }, {
         key: 'color',
         get: function get() {
-            return _get(GraphicVarExpr.prototype.__proto__ || Object.getPrototypeOf(GraphicVarExpr.prototype), 'color', this);
+            return _get(GraphicValueExpr.prototype.__proto__ || Object.getPrototypeOf(GraphicValueExpr.prototype), 'color', this);
         },
         set: function set(clr) {
             this.holes[0].color = clr;
@@ -99,11 +98,11 @@ var GraphicVarExpr = function (_VarExpr) {
         }
     }]);
 
-    return GraphicVarExpr;
-}(VarExpr);
+    return GraphicValueExpr;
+}(ValueExpr);
 
-var StarExpr = function (_GraphicVarExpr) {
-    _inherits(StarExpr, _GraphicVarExpr);
+var StarExpr = function (_GraphicValueExpr) {
+    _inherits(StarExpr, _GraphicValueExpr);
 
     function StarExpr(x, y, rad) {
         var pts = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 5;
@@ -121,10 +120,10 @@ var StarExpr = function (_GraphicVarExpr) {
     }]);
 
     return StarExpr;
-}(GraphicVarExpr);
+}(GraphicValueExpr);
 
-var CircleExpr = function (_GraphicVarExpr2) {
-    _inherits(CircleExpr, _GraphicVarExpr2);
+var CircleExpr = function (_GraphicValueExpr2) {
+    _inherits(CircleExpr, _GraphicValueExpr2);
 
     function CircleExpr(x, y, rad) {
         _classCallCheck(this, CircleExpr);
@@ -140,10 +139,10 @@ var CircleExpr = function (_GraphicVarExpr2) {
     }]);
 
     return CircleExpr;
-}(GraphicVarExpr);
+}(GraphicValueExpr);
 
-var PipeExpr = function (_GraphicVarExpr3) {
-    _inherits(PipeExpr, _GraphicVarExpr3);
+var PipeExpr = function (_GraphicValueExpr3) {
+    _inherits(PipeExpr, _GraphicValueExpr3);
 
     function PipeExpr(x, y, w, h) {
         _classCallCheck(this, PipeExpr);
@@ -159,10 +158,10 @@ var PipeExpr = function (_GraphicVarExpr3) {
     }]);
 
     return PipeExpr;
-}(GraphicVarExpr);
+}(GraphicValueExpr);
 
-var TriangleExpr = function (_GraphicVarExpr4) {
-    _inherits(TriangleExpr, _GraphicVarExpr4);
+var TriangleExpr = function (_GraphicValueExpr4) {
+    _inherits(TriangleExpr, _GraphicValueExpr4);
 
     function TriangleExpr(x, y, w, h) {
         _classCallCheck(this, TriangleExpr);
@@ -178,10 +177,10 @@ var TriangleExpr = function (_GraphicVarExpr4) {
     }]);
 
     return TriangleExpr;
-}(GraphicVarExpr);
+}(GraphicValueExpr);
 
-var RectExpr = function (_GraphicVarExpr5) {
-    _inherits(RectExpr, _GraphicVarExpr5);
+var RectExpr = function (_GraphicValueExpr5) {
+    _inherits(RectExpr, _GraphicValueExpr5);
 
     function RectExpr(x, y, w, h) {
         _classCallCheck(this, RectExpr);
@@ -197,10 +196,10 @@ var RectExpr = function (_GraphicVarExpr5) {
     }]);
 
     return RectExpr;
-}(GraphicVarExpr);
+}(GraphicValueExpr);
 
-var ImageExpr = function (_GraphicVarExpr6) {
-    _inherits(ImageExpr, _GraphicVarExpr6);
+var ImageExpr = function (_GraphicValueExpr6) {
+    _inherits(ImageExpr, _GraphicValueExpr6);
 
     function ImageExpr(x, y, w, h, resource_key) {
         _classCallCheck(this, ImageExpr);
@@ -228,7 +227,7 @@ var ImageExpr = function (_GraphicVarExpr6) {
     }]);
 
     return ImageExpr;
-}(GraphicVarExpr);
+}(GraphicValueExpr);
 
 var FunnelExpr = function (_ImageExpr) {
     _inherits(FunnelExpr, _ImageExpr);
@@ -377,15 +376,15 @@ var MirrorExpr = function (_ImageExpr3) {
 /** Faded variants. */
 
 
-var FadedVarExpr = function (_Expression2) {
-    _inherits(FadedVarExpr, _Expression2);
+var FadedValueExpr = function (_Expression2) {
+    _inherits(FadedValueExpr, _Expression2);
 
-    function FadedVarExpr(name) {
-        _classCallCheck(this, FadedVarExpr);
+    function FadedValueExpr(name) {
+        _classCallCheck(this, FadedValueExpr);
 
         var txt = new TextExpr(name);
 
-        var _this12 = _possibleConstructorReturn(this, (FadedVarExpr.__proto__ || Object.getPrototypeOf(FadedVarExpr)).call(this, [txt]));
+        var _this12 = _possibleConstructorReturn(this, (FadedValueExpr.__proto__ || Object.getPrototypeOf(FadedValueExpr)).call(this, [txt]));
 
         txt.color = "OrangeRed";
         _this12.color = "gold";
@@ -393,7 +392,7 @@ var FadedVarExpr = function (_Expression2) {
         return _this12;
     }
 
-    _createClass(FadedVarExpr, [{
+    _createClass(FadedValueExpr, [{
         key: 'reduceCompletely',
         value: function reduceCompletely() {
             return this;
@@ -420,11 +419,11 @@ var FadedVarExpr = function (_Expression2) {
         }
     }]);
 
-    return FadedVarExpr;
+    return FadedValueExpr;
 }(Expression);
 
-var FadedStarExpr = function (_FadedVarExpr) {
-    _inherits(FadedStarExpr, _FadedVarExpr);
+var FadedStarExpr = function (_FadedValueExpr) {
+    _inherits(FadedStarExpr, _FadedValueExpr);
 
     function FadedStarExpr() {
         _classCallCheck(this, FadedStarExpr);
@@ -433,10 +432,10 @@ var FadedStarExpr = function (_FadedVarExpr) {
     }
 
     return FadedStarExpr;
-}(FadedVarExpr);
+}(FadedValueExpr);
 
-var FadedRectExpr = function (_FadedVarExpr2) {
-    _inherits(FadedRectExpr, _FadedVarExpr2);
+var FadedRectExpr = function (_FadedValueExpr2) {
+    _inherits(FadedRectExpr, _FadedValueExpr2);
 
     function FadedRectExpr() {
         _classCallCheck(this, FadedRectExpr);
@@ -445,10 +444,10 @@ var FadedRectExpr = function (_FadedVarExpr2) {
     }
 
     return FadedRectExpr;
-}(FadedVarExpr);
+}(FadedValueExpr);
 
-var FadedTriangleExpr = function (_FadedVarExpr3) {
-    _inherits(FadedTriangleExpr, _FadedVarExpr3);
+var FadedTriangleExpr = function (_FadedValueExpr3) {
+    _inherits(FadedTriangleExpr, _FadedValueExpr3);
 
     function FadedTriangleExpr() {
         _classCallCheck(this, FadedTriangleExpr);
@@ -457,10 +456,10 @@ var FadedTriangleExpr = function (_FadedVarExpr3) {
     }
 
     return FadedTriangleExpr;
-}(FadedVarExpr);
+}(FadedValueExpr);
 
-var FadedCircleExpr = function (_FadedVarExpr4) {
-    _inherits(FadedCircleExpr, _FadedVarExpr4);
+var FadedCircleExpr = function (_FadedValueExpr4) {
+    _inherits(FadedCircleExpr, _FadedValueExpr4);
 
     function FadedCircleExpr() {
         _classCallCheck(this, FadedCircleExpr);
@@ -469,4 +468,4 @@ var FadedCircleExpr = function (_FadedVarExpr4) {
     }
 
     return FadedCircleExpr;
-}(FadedVarExpr);
+}(FadedValueExpr);

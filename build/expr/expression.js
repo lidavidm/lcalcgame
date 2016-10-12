@@ -83,7 +83,7 @@ var Expression = function (_mag$RoundedRect) {
         value: function bindSubexpressions() {
             this.holes.forEach(function (hole) {
                 if (hole instanceof Expression && !(hole instanceof MissingExpression)) {
-                    if (hole instanceof VarExpr || hole instanceof BooleanPrimitive) hole.lock();
+                    if (hole instanceof ValueExpr || hole instanceof BooleanPrimitive) hole.lock();
                     hole.bindSubexpressions();
                 }
             });

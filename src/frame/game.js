@@ -359,7 +359,7 @@ class Level {
             return lambdavar;
         } else {
             console.error('Unknown argument: ', arg);
-            return new FadedVarExpr(arg);
+            return new FadedValueExpr(arg);
             //return new Expression();
         }
 

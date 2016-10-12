@@ -54,7 +54,7 @@ class Expression extends mag.RoundedRect {
     bindSubexpressions() {
         this.holes.forEach((hole) => {
             if (hole instanceof Expression && !(hole instanceof MissingExpression)) {
-                if (hole instanceof VarExpr || hole instanceof BooleanPrimitive)
+                if (hole instanceof ValueExpr || hole instanceof BooleanPrimitive)
                     hole.lock();
                 hole.bindSubexpressions();
             }

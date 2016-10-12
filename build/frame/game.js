@@ -626,8 +626,11 @@ var Level = function () {
                 return lambdavar;
             } else {
                 console.error('Unknown argument: ', arg);
-                return new FadedVarExpr(arg);
+                return new FadedValueExpr(arg);
+                //return new Expression();
             }
+
+            // Unreachable....
         }
     }]);
 
@@ -773,21 +776,21 @@ var ExpressionPattern = function () {
                     //console.log(' > Constructors don\'t match.');
                     return false; // expressions don't match
                 } else {
-                        // Check whether the expressions at this level have the same # of children. If so, do one-to-one comparison.
-                        var e_children = e.children;
-                        var f_children = f.children;
-                        if (e_children.length !== f_children.length) {
-                            //console.log(' > Length of child array doesn\'t match.');
-                            return false;
-                        } else {
-                            for (var i = 0; i < e_children.length; i++) {
-                                if (!compare(e_children[i], f_children[i])) {
-                                    //console.log(' > Children don\'t match.');
-                                    return false;
-                                }
+                    // Check whether the expressions at this level have the same # of children. If so, do one-to-one comparison.
+                    var e_children = e.children;
+                    var f_children = f.children;
+                    if (e_children.length !== f_children.length) {
+                        //console.log(' > Length of child array doesn\'t match.');
+                        return false;
+                    } else {
+                        for (var i = 0; i < e_children.length; i++) {
+                            if (!compare(e_children[i], f_children[i])) {
+                                //console.log(' > Children don\'t match.');
+                                return false;
                             }
                         }
                     }
+                }
 
                 //console.log(' > Expressions are equal.');
                 return true;

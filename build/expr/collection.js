@@ -10,8 +10,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var CollectionExpr = function (_GraphicVarExpr) {
-    _inherits(CollectionExpr, _GraphicVarExpr);
+var CollectionExpr = function (_GraphicValueExpr) {
+    _inherits(CollectionExpr, _GraphicValueExpr);
 
     function CollectionExpr() {
         _classCallCheck(this, CollectionExpr);
@@ -20,7 +20,7 @@ var CollectionExpr = function (_GraphicVarExpr) {
     }
 
     return CollectionExpr;
-}(GraphicVarExpr);
+}(GraphicValueExpr);
 
 var BagExpr = function (_CollectionExpr) {
     _inherits(BagExpr, _CollectionExpr);
@@ -159,7 +159,7 @@ var BagExpr = function (_CollectionExpr) {
                         new_func.pos = pos;
                         new_func.unlockSubexpressions();
                         new_func.lockSubexpressions(function (expr) {
-                            return expr instanceof VarExpr || expr instanceof FadedVarExpr || expr instanceof BooleanPrimitive;
+                            return expr instanceof ValueExpr || expr instanceof FadedValueExpr || expr instanceof BooleanPrimitive;
                         }); // lock primitives
                         bag.addItem(new_func);
                     }

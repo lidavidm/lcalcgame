@@ -26,7 +26,7 @@ var mag = (function(_) {
         static blink(nodes, dur=1000, colorWeights=[1,1,1], blinkCount=2) {
             if (!Array.isArray(nodes)) nodes = [nodes];
             nodes = nodes.map((n) => {
-                return n instanceof VarExpr ? n.graphicNode : n;
+                return n instanceof ValueExpr ? n.graphicNode : n;
             });
             nodes.forEach((n) => {
                 var last_color = null;
