@@ -646,7 +646,8 @@ var Level = function () {
                     lambdavar.ignoreEvents = false; // makes draggable
                     lambdavar.name = _varname;
                 }
-                return lambdavar;
+                // return lambdavar;
+                return new VarExpr(_varname);
             } else {
                 console.error('Unknown argument: ', arg);
                 return new FadedValueExpr(arg);

@@ -358,7 +358,8 @@ class Level {
                 lambdavar.ignoreEvents = false; // makes draggable
                 lambdavar.name = varname;
             }
-            return lambdavar;
+            // return lambdavar;
+            return new VarExpr(varname);
         } else {
             console.error('Unknown argument: ', arg);
             return new FadedValueExpr(arg);
