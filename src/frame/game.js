@@ -86,7 +86,9 @@ class Level {
         // Environment
         const ENV_HEIGHT = 90;
         var env = new EnvironmentDisplay(0, canvas_screen.h - ENV_HEIGHT - TOOLBOX_HEIGHT, canvas_screen.w, ENV_HEIGHT, this.globals);
-        stage.add(env);
+        // Hide for now.
+        // TODO: re-enable shelf as part of fading?
+        // stage.add(env);
         stage.environmentDisplay = env;
         if (this.globals) {
             stage.environment = this.globals;

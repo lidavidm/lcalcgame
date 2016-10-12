@@ -13,6 +13,7 @@ class EnvironmentDisplay extends mag.ImageRect {
 
     showEnvironment(env) {
         if (!env) return;
+        if (!this.stage) return;
         this.clear();
         this.env = env;
         let pos = this.leftEdgePos;
@@ -40,6 +41,7 @@ class EnvironmentDisplay extends mag.ImageRect {
     }
 
     clear() {
+        if (!this.stage) return;
         for (let child of this.contents) {
             this.stage.remove(child);
         }

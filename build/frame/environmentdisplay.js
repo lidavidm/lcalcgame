@@ -33,6 +33,7 @@ var EnvironmentDisplay = function (_mag$ImageRect) {
             var _this2 = this;
 
             if (!env) return;
+            if (!this.stage) return;
             this.clear();
             this.env = env;
             var pos = this.leftEdgePos;
@@ -62,6 +63,7 @@ var EnvironmentDisplay = function (_mag$ImageRect) {
     }, {
         key: "clear",
         value: function clear() {
+            if (!this.stage) return;
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
             var _iteratorError = undefined;
