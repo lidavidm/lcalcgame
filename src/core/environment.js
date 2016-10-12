@@ -2,6 +2,7 @@ class Environment {
     constructor(parent=null) {
         this.parent = parent;
         this.bindings = {};
+        this.observers = [];
     }
 
     lookup(key) {
@@ -10,6 +11,9 @@ class Environment {
 
     update(key, value) {
         this.bindings[key] = value;
+        for (let observer of this.observers) {
+            observer(key, value);
+        }
     }
 
     names() {
@@ -18,6 +22,10 @@ class Environment {
             ...(this.parent ? this.parent.names() : []),
         ]);
         return Array.from(set);
+    }
+
+    observe(func) {
+        this.observers.push(func);
     }
 
     static parse(desc) {
