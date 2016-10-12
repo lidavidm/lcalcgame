@@ -33,6 +33,8 @@ var mag = (function(_) {
         }
         add(node) {
             node.stage = this;
+            // TODO: document this and make sure it is used wherever possible
+            if (node.onadded) node.onadded();
             if(node.locked) node.unlock();
             this.nodes.push(node);
         }
