@@ -147,9 +147,14 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'update',
         value: function update() {
+            var _this3 = this;
+
             var padding = this.padding.inner;
             var x = this.padding.left;
             var y = this.size.h / 2.0 + (this.exprOffsetY ? this.exprOffsetY : 0);
+            if (this._stackVertically) {
+                y = 2 * this.padding.inner;
+            }
             var _this = this;
             this.children = [];
             this.holes.forEach(function (expr) {
@@ -161,7 +166,11 @@ var Expression = function (_mag$RoundedRect) {
                 expr.pos = { x: x, y: y };
                 expr.scale = { x: 0.85, y: 0.85 };
                 expr.update();
-                x += expr.size.w * expr.scale.x + padding;
+                if (_this3._stackVertically) {
+                    y += expr.size.h * expr.scale.y + padding;
+                } else {
+                    x += expr.size.w * expr.scale.x + padding;
+                }
             });
             this.children = this.holes; // for rendering
         }
@@ -427,20 +436,36 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'size',
         get: function get() {
+            var _this4 = this;
 
             var padding = this.padding;
             var width = 0;
+            var height = DEFAULT_EXPR_HEIGHT;
             var sizes = this.getHoleSizes();
             var scale_x = this.scale.x;
+
+            if (this._stackVertically) {
+                width = EMPTY_EXPR_WIDTH;
+                height = 0;
+            }
 
             if (sizes.length === 0) return { w: this._size.w, h: this._size.h };
 
             sizes.forEach(function (s) {
-                width += s.w + padding.inner;
+                if (_this4._stackVertically) {
+                    height += s.h + padding.inner;
+                    width = Math.max(width, s.w);
+                } else {
+                    width += s.w + padding.inner;
+                }
             });
-            width += padding.right; // the end
+            if (this._stackVertically) {
+                width += padding.right + padding.left;
+            } else {
+                width += padding.right; // the end
+            }
 
-            return { w: width, h: DEFAULT_EXPR_HEIGHT };
+            return { w: width, h: height };
         }
     }]);
 
