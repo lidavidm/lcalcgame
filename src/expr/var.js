@@ -5,6 +5,8 @@ class VarExpr extends Expression {
         super([new TextExpr(name), new ExpressionView(null)]);
         this.name = name;
         this._stackVertically = true;
+        // See MissingTypedExpression#constructor
+        this.equivalentClasses = [VarExpr];
     }
 
     onadded() {
@@ -43,11 +45,13 @@ class VarExpr extends Expression {
 class AssignExpr extends Expression {
     constructor(variable=null, value=null) {
         super([]);
-        if (variable) {
+        if (variable && !(variable instanceof MissingExpression)) {
             this.holes.push(variable);
         }
         else {
-            this.holes.push(new MissingExpression(new VarExpr("_")));
+            let missing = new MissingTypedExpression(new VarExpr("_"));
+            missing.acceptedClasses = [VarExpr];
+            this.holes.push(missing);
         }
 
         this.holes.push(new TextExpr("←"));

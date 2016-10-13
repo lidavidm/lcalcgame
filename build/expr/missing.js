@@ -96,10 +96,16 @@ var MissingExpression = function (_Expression) {
 var MissingTypedExpression = function (_MissingExpression) {
     _inherits(MissingTypedExpression, _MissingExpression);
 
-    function MissingTypedExpression() {
+    function MissingTypedExpression(expr_to_miss) {
         _classCallCheck(this, MissingTypedExpression);
 
-        return _possibleConstructorReturn(this, (MissingTypedExpression.__proto__ || Object.getPrototypeOf(MissingTypedExpression)).apply(this, arguments));
+        var _this2 = _possibleConstructorReturn(this, (MissingTypedExpression.__proto__ || Object.getPrototypeOf(MissingTypedExpression)).call(this, expr_to_miss));
+
+        _this2.acceptedClasses = [];
+        if (expr_to_miss.equivalentClasses) {
+            _this2.acceptedClasses = expr_to_miss.equivalentClasses;
+        }
+        return _this2;
     }
 
     _createClass(MissingTypedExpression, [{
@@ -153,17 +159,18 @@ var MissingTypedExpression = function (_MissingExpression) {
         value: function ondropped(node, pos) {
             if (this.accepts(node)) _get(MissingTypedExpression.prototype.__proto__ || Object.getPrototypeOf(MissingTypedExpression.prototype), 'ondropped', this).call(this, node, pos);
         }
-    }, {
-        key: 'drawInternal',
-        value: function drawInternal(ctx, pos, boundingSize) {
-            pos.x -= boundingSize.w / 1.2 - boundingSize.w;
-            pos.y -= boundingSize.h / 1.14 - boundingSize.h; // aesthetic resizing
-            boundingSize.w /= 1.2;
-            this.graphicNode.stroke = this.stroke;
-            this.graphicNode.color = this.color;
-            this.graphicNode.shadowOffset = this.shadowOffset;
-            this.graphicNode.drawInternal(ctx, pos, boundingSize);
-        }
+
+        // graphicNode is undefined, don't use this
+        // drawInternal(ctx, pos, boundingSize) {
+        //     pos.x -= boundingSize.w / 1.2 - boundingSize.w;
+        //     pos.y -= boundingSize.h / 1.14 - boundingSize.h; // aesthetic resizing
+        //     boundingSize.w /= 1.2;
+        //     this.graphicNode.stroke = this.stroke;
+        //     this.graphicNode.color = this.color;
+        //     this.graphicNode.shadowOffset = this.shadowOffset;
+        //     this.graphicNode.drawInternal(ctx, pos, boundingSize);
+        // }
+
     }, {
         key: 'toString',
         value: function toString() {

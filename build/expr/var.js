@@ -22,6 +22,8 @@ var VarExpr = function (_Expression) {
 
         _this.name = name;
         _this._stackVertically = true;
+        // See MissingTypedExpression#constructor
+        _this.equivalentClasses = [VarExpr];
         return _this;
     }
 
@@ -78,10 +80,12 @@ var AssignExpr = function (_Expression2) {
 
         var _this3 = _possibleConstructorReturn(this, (AssignExpr.__proto__ || Object.getPrototypeOf(AssignExpr)).call(this, []));
 
-        if (variable) {
+        if (variable && !(variable instanceof MissingExpression)) {
             _this3.holes.push(variable);
         } else {
-            _this3.holes.push(new MissingExpression(new VarExpr("_")));
+            var missing = new MissingTypedExpression(new VarExpr("_"));
+            missing.acceptedClasses = [VarExpr];
+            _this3.holes.push(missing);
         }
 
         _this3.holes.push(new TextExpr("←"));

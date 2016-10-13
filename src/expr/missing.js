@@ -66,6 +66,14 @@ class MissingExpression extends Expression {
 }
 
 class MissingTypedExpression extends MissingExpression {
+    constructor(expr_to_miss) {
+        super(expr_to_miss);
+        this.acceptedClasses = [];
+        if (expr_to_miss.equivalentClasses) {
+            this.acceptedClasses = expr_to_miss.equivalentClasses;
+        }
+    }
+
     getClass() { return MissingTypedExpression; }
 
     // Returns TRUE if this hole accepts the given expression.
@@ -86,15 +94,16 @@ class MissingTypedExpression extends MissingExpression {
             super.ondropped(node, pos);
     }
 
-    drawInternal(ctx, pos, boundingSize) {
-        pos.x -= boundingSize.w / 1.2 - boundingSize.w;
-        pos.y -= boundingSize.h / 1.14 - boundingSize.h; // aesthetic resizing
-        boundingSize.w /= 1.2;
-        this.graphicNode.stroke = this.stroke;
-        this.graphicNode.color = this.color;
-        this.graphicNode.shadowOffset = this.shadowOffset;
-        this.graphicNode.drawInternal(ctx, pos, boundingSize);
-    }
+    // graphicNode is undefined, don't use this
+    // drawInternal(ctx, pos, boundingSize) {
+    //     pos.x -= boundingSize.w / 1.2 - boundingSize.w;
+    //     pos.y -= boundingSize.h / 1.14 - boundingSize.h; // aesthetic resizing
+    //     boundingSize.w /= 1.2;
+    //     this.graphicNode.stroke = this.stroke;
+    //     this.graphicNode.color = this.color;
+    //     this.graphicNode.shadowOffset = this.shadowOffset;
+    //     this.graphicNode.drawInternal(ctx, pos, boundingSize);
+    // }
 
     toString() { return '_'; }
 }
