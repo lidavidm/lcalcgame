@@ -167,7 +167,7 @@ var Expression = function (_mag$RoundedRect) {
                 expr.scale = { x: 0.85, y: 0.85 };
                 expr.update();
                 if (_this3._stackVertically) {
-                    y += expr.size.h * expr.scale.y + padding;
+                    y += expr.size.h * expr.scale.y;
                 } else {
                     x += expr.size.w * expr.scale.x + padding;
                 }
@@ -453,7 +453,7 @@ var Expression = function (_mag$RoundedRect) {
 
             sizes.forEach(function (s) {
                 if (_this4._stackVertically) {
-                    height += s.h + padding.inner;
+                    height += s.h;
                     width = Math.max(width, s.w);
                 } else {
                     width += s.w + padding.inner;

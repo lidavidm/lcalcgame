@@ -124,7 +124,7 @@ class Expression extends mag.RoundedRect {
 
         sizes.forEach((s) => {
             if (this._stackVertically) {
-                height += s.h + padding.inner;
+                height += s.h;
                 width = Math.max(width, s.w);
             }
             else {
@@ -168,7 +168,7 @@ class Expression extends mag.RoundedRect {
             expr.scale = { x:0.85, y:0.85 };
             expr.update();
             if (this._stackVertically) {
-                y += expr.size.h * expr.scale.y + padding;
+                y += expr.size.h * expr.scale.y;
             }
             else {
                 x += expr.size.w * expr.scale.x + padding;
