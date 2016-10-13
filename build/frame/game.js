@@ -616,6 +616,7 @@ var Level = function () {
                 'pop': ExprManager.getClass('pop'),
                 'define': ExprManager.getClass('define'),
                 'null': new NullExpr(0, 0, 64, 64),
+                'assign': ExprManager.getClass('assign'),
                 'dot': function () {
                     var circ = new CircleExpr(0, 0, 18);
                     circ.color = 'gold';

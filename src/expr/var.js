@@ -15,6 +15,7 @@ class VarExpr extends Expression {
                 this.holes[1] = value.clone();
                 this.holes[1].lock();
                 this.holes[1].bindSubexpressions();
+                this.update();
             }
         });
     }
@@ -36,6 +37,88 @@ class VarExpr extends Expression {
 
     onmouseclick() {
         this.reduce();
+    }
+}
+
+class AssignExpr extends Expression {
+    constructor(variable=null, value=null) {
+        super([]);
+        if (variable) {
+            this.holes.push(variable);
+        }
+        else {
+            this.holes.push(new MissingExpression(new VarExpr("_")));
+        }
+
+        this.holes.push(new TextExpr("←"));
+
+        if (value) {
+            this.holes.push(value);
+        }
+        else {
+            this.holes.push(new MissingExpression());
+        }
+    }
+
+    get variable() {
+        return this.holes[0] instanceof MissingExpression ? null : this.holes[0];
+    }
+
+    get value() {
+        return this.holes[2] instanceof MissingExpression ? null : this.holes[2];
+    }
+
+    onmouseclick() {
+        this.performReduction();
+    }
+
+    reduce() {
+        if (this.variable && this.value) {
+            return null;
+        }
+        else {
+            return this;
+        }
+    }
+
+    performReduction(animated=true) {
+        // The side-effect actually happens here. reduce() is called
+        // multiple times as a 'canReduce', and we don't want any
+        // update to happen multiple times.
+        if (this.reduce() != this) {
+            if (animated) {
+                let v1 = this.variable.holes[1].absolutePos;
+                let v2 = this.value.absolutePos;
+                Animate.tween(this.value, {
+                    pos: {
+                        x: v1.x - v2.x + this.value.pos.x,
+                        y: v1.y - v2.y + this.value.pos.y,
+                    }
+                }, 300).after(() => {
+                    this.getEnvironment().update(this.variable.name, this.value);
+                    super.performReduction();
+                });
+            }
+            else {
+                super.performReduction();
+            }
+        }
+    }
+
+    reduceCompletely() {
+        if (this.value) {
+            this.value.reduceCompletely();
+        }
+
+        if (this.variable && this.value) {
+            // Return non-undefined non-this value so that when the
+            // user drops everything in, MissingExpression#ondropped
+            // will make this expr blink
+            return null;
+        }
+        else {
+            return this;
+        }
     }
 }
 

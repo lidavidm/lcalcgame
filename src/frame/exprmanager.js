@@ -26,7 +26,8 @@ var ExprManager = (function() {
         'define':   [DefineExpr],
         'var':      [LambdaVarExpr, HalfFadedLambdaVarExpr, FadedLambdaVarExpr, FadedLambdaVarExpr],
         'hole':     [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedLambdaHoleExpr, FadedES6LambdaHoleExpr],
-        'lambda':   [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr]
+        'lambda':   [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr],
+        'assign':   [AssignExpr],
     };
     var fade_level = {};
     var DEFAULT_FADE_LEVEL = 0;
