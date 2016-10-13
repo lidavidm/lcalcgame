@@ -33,6 +33,8 @@ var VarExpr = function (_Expression) {
             this.getEnvironment().observe(function (name, value) {
                 if (name === _this2.name) {
                     _this2.holes[1] = value.clone();
+                    _this2.holes[1].lock();
+                    _this2.holes[1].bindSubexpressions();
                 }
             });
         }
@@ -56,25 +58,6 @@ var VarExpr = function (_Expression) {
         key: "onmouseclick",
         value: function onmouseclick() {
             this.reduce();
-        }
-    }, {
-        key: "size",
-        get: function get() {
-            var padding = this.padding;
-            var width = 50; // TODO: should be DEFAULT_EXPR_WIDTH
-            var height = 0;
-            var sizes = this.getHoleSizes();
-            var scale_x = this.scale.x;
-
-            if (sizes.length === 0) return { w: this._size.w, h: this._size.h };
-
-            sizes.forEach(function (s) {
-                height += s.h + padding.inner;
-                width = Math.max(width, s.w);
-            });
-            width += padding.right + padding.left; // the end
-
-            return { w: width, h: height };
         }
     }]);
 

@@ -7,30 +7,14 @@ class VarExpr extends Expression {
         this._stackVertically = true;
     }
 
-    get size() {
-        var padding = this.padding;
-        var width = 50;  // TODO: should be DEFAULT_EXPR_WIDTH
-        var height = 0;
-        var sizes = this.getHoleSizes();
-        var scale_x = this.scale.x;
-
-        if (sizes.length === 0) return { w:this._size.w, h:this._size.h };
-
-        sizes.forEach((s) => {
-            height += s.h + padding.inner;
-            width = Math.max(width, s.w);
-        });
-        width += padding.right + padding.left; // the end
-
-        return { w:width, h: height };
-    }
-
     onadded() {
         // TODO: show the expr
         // TODO: keep up-to-date with changes in the environment
         this.getEnvironment().observe((name, value) => {
             if (name === this.name) {
                 this.holes[1] = value.clone();
+                this.holes[1].lock();
+                this.holes[1].bindSubexpressions();
             }
         });
     }
