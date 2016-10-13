@@ -4,6 +4,25 @@ class VarExpr extends Expression {
     constructor(name) {
         super([new TextExpr(name), new ExpressionView(null)]);
         this.name = name;
+        this._stackVertically = true;
+    }
+
+    get size() {
+        var padding = this.padding;
+        var width = 50;  // TODO: should be DEFAULT_EXPR_WIDTH
+        var height = 0;
+        var sizes = this.getHoleSizes();
+        var scale_x = this.scale.x;
+
+        if (sizes.length === 0) return { w:this._size.w, h:this._size.h };
+
+        sizes.forEach((s) => {
+            height += s.h + padding.inner;
+            width = Math.max(width, s.w);
+        });
+        width += padding.right + padding.left; // the end
+
+        return { w:width, h: height };
     }
 
     onadded() {

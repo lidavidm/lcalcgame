@@ -19,6 +19,7 @@ var VarExpr = function (_Expression) {
         var _this = _possibleConstructorReturn(this, (VarExpr.__proto__ || Object.getPrototypeOf(VarExpr)).call(this, [new TextExpr(name), new ExpressionView(null)]));
 
         _this.name = name;
+        _this._stackVertically = true;
         return _this;
     }
 
@@ -55,6 +56,25 @@ var VarExpr = function (_Expression) {
         key: "onmouseclick",
         value: function onmouseclick() {
             this.reduce();
+        }
+    }, {
+        key: "size",
+        get: function get() {
+            var padding = this.padding;
+            var width = 50; // TODO: should be DEFAULT_EXPR_WIDTH
+            var height = 0;
+            var sizes = this.getHoleSizes();
+            var scale_x = this.scale.x;
+
+            if (sizes.length === 0) return { w: this._size.w, h: this._size.h };
+
+            sizes.forEach(function (s) {
+                height += s.h + padding.inner;
+                width = Math.max(width, s.w);
+            });
+            width += padding.right + padding.left; // the end
+
+            return { w: width, h: height };
         }
     }]);
 
