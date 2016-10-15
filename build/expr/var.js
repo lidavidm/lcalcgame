@@ -1,8 +1,8 @@
 "use strict";
 
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -28,20 +28,20 @@ var VarExpr = function (_Expression) {
     }
 
     _createClass(VarExpr, [{
-        key: "onadded",
-        value: function onadded() {
-            var _this2 = this;
-
-            // TODO: show the expr
-            // TODO: keep up-to-date with changes in the environment
-            this.getEnvironment().observe(function (name, value) {
-                if (name === _this2.name) {
-                    _this2.holes[1] = value.clone();
-                    _this2.holes[1].lock();
-                    _this2.holes[1].bindSubexpressions();
-                    _this2.update();
-                }
-            });
+        key: "update",
+        value: function update() {
+            var env = this.getEnvironment();
+            if (!env) {
+                _get(VarExpr.prototype.__proto__ || Object.getPrototypeOf(VarExpr.prototype), "update", this).call(this);
+                return;
+            }
+            if (env.lookup(this.name)) {
+                var value = env.lookup(this.name);
+                this.holes[1] = value.clone();
+                this.holes[1].lock();
+                this.holes[1].bindSubexpressions();
+            }
+            _get(VarExpr.prototype.__proto__ || Object.getPrototypeOf(VarExpr.prototype), "update", this).call(this);
         }
     }, {
         key: "reduce",
@@ -115,7 +115,7 @@ var AssignExpr = function (_Expression2) {
     }, {
         key: "performReduction",
         value: function performReduction() {
-            var _this4 = this;
+            var _this3 = this;
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
@@ -132,8 +132,13 @@ var AssignExpr = function (_Expression2) {
                             y: v1.y - v2.y + this.value.pos.y
                         }
                     }, 300).after(function () {
-                        _this4.getEnvironment().update(_this4.variable.name, _this4.value);
-                        _get(AssignExpr.prototype.__proto__ || Object.getPrototypeOf(AssignExpr.prototype), "performReduction", _this4).call(_this4);
+                        _this3.getEnvironment().update(_this3.variable.name, _this3.value);
+                        var parent = _this3.parent || _this3.stage;
+                        parent.swap(_this3, null);
+                        _this3.stage.getNodesWithClass(VarExpr, [], true, null).forEach(function (node) {
+                            // Make sure the change is reflected
+                            node.update();
+                        });
                     });
                 } else {
                     _get(AssignExpr.prototype.__proto__ || Object.getPrototypeOf(AssignExpr.prototype), "performReduction", this).call(this);

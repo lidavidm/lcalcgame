@@ -9,17 +9,19 @@ class VarExpr extends Expression {
         this.equivalentClasses = [VarExpr];
     }
 
-    onadded() {
-        // TODO: show the expr
-        // TODO: keep up-to-date with changes in the environment
-        this.getEnvironment().observe((name, value) => {
-            if (name === this.name) {
-                this.holes[1] = value.clone();
-                this.holes[1].lock();
-                this.holes[1].bindSubexpressions();
-                this.update();
-            }
-        });
+    update() {
+        let env = this.getEnvironment();
+        if (!env) {
+            super.update();
+            return;
+        }
+        if (env.lookup(this.name)) {
+            let value = env.lookup(this.name);
+            this.holes[1] = value.clone();
+            this.holes[1].lock();
+            this.holes[1].bindSubexpressions();
+        }
+        super.update();
     }
 
     reduce() {
@@ -100,7 +102,12 @@ class AssignExpr extends Expression {
                     }
                 }, 300).after(() => {
                     this.getEnvironment().update(this.variable.name, this.value);
-                    super.performReduction();
+                    let parent = this.parent || this.stage;
+                    parent.swap(this, null);
+                    this.stage.getNodesWithClass(VarExpr, [], true, null).forEach((node) => {
+                        // Make sure the change is reflected
+                        node.update();
+                    });
                 });
             }
             else {
