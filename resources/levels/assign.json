@@ -1,0 +1,72 @@
+{
+    "chapterName":"Chapter 0",
+    "description":"Variables",
+    "levels": [
+        {
+            "description": "Reducing a variable.",
+            "board": "(#_x)",
+            "goal": "(diamond)",
+            "globals": {
+                "x": "(diamond)"
+            }
+        },
+        {
+            "description": "Variables can be reduced multiple times.",
+            "board": "(#_x) (#_x)",
+            "goal": "(diamond) (diamond)",
+            "globals": {
+                "x": "(diamond)"
+            }
+        },
+        {
+            "description": "Multiple variables can be reduced.",
+            "board": "(#_x) (#_y)",
+            "goal": "(diamond) (star)",
+            "globals": {
+                "x": "(diamond)",
+                "y": "(star)"
+            }
+        },
+        {
+            "description": "Assign to a variable.",
+            "board": "(assign /#x /star) (#_x)",
+            "goal": "(star)",
+            "globals": {
+                "x": "(diamond)"
+            }
+        },
+        {
+            "description": "Choose what to assign.",
+            "board": "(assign /#_x _) (#_x)",
+            "goal": "(star)",
+            "toolbox": "(triangle) (star)",
+            "globals": {
+                "x": "(diamond)"
+            }
+        },
+        {
+            "description": "Assign to an undefined variable.",
+            "board": "(assign /#y _) (#_y)",
+            "goal": "(star)",
+            "toolbox": "(diamond) (star)"
+        },
+        {
+            "description": "Multiple assignment.",
+            "board": "(assign /#x _) (#_x) (assign /#y _) (#_y)",
+            "goal": "(star) (triangle)",
+            "toolbox": "(triangle) (star)",
+            "globals": {
+                "x": "(diamond)"
+            }
+        },
+        {
+            "description": "Assignment order matters.",
+            "board": "(assign /#x /#y) (assign /#y /star) (#_x)",
+            "goal": "(star)",
+            "toolbox": "(diamond) (star)",
+            "globals": {
+                "x": "(diamond)"
+            }
+        }
+    ]
+}
