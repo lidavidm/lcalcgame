@@ -418,6 +418,9 @@ class LambdaExpr extends Expression {
     constructor(exprs) {
         super(exprs);
         this.environment = new Environment();
+        if (this.takesArgument) {
+            this.environment.bound[exprs[0].name] = true;
+        }
 
         /*let txt = new TextExpr('→');
         txt.color = 'gray'

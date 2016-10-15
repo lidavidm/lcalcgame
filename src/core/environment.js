@@ -3,10 +3,20 @@ class Environment {
         this.parent = parent;
         this.bindings = {};
         this.observers = [];
+        this.bound = {};
     }
 
     lookup(key) {
-        return this.bindings[key] || (this.parent ? this.parent.lookup(key) : null);
+        let value = this.bindings[key];
+        if (value) return value;
+
+        if (this.bound[key]) return null;
+
+        if (this.parent) {
+            return this.parent.lookup(key);
+        }
+
+        return null;
     }
 
     update(key, value) {

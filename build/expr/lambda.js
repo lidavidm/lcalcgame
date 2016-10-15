@@ -551,6 +551,9 @@ var LambdaExpr = function (_Expression) {
         var _this10 = _possibleConstructorReturn(this, (LambdaExpr.__proto__ || Object.getPrototypeOf(LambdaExpr)).call(this, exprs));
 
         _this10.environment = new Environment();
+        if (_this10.takesArgument) {
+            _this10.environment.bound[exprs[0].name] = true;
+        }
 
         /*let txt = new TextExpr('→');
         txt.color = 'gray'

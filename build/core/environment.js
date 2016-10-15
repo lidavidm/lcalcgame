@@ -15,12 +15,22 @@ var Environment = function () {
         this.parent = parent;
         this.bindings = {};
         this.observers = [];
+        this.bound = {};
     }
 
     _createClass(Environment, [{
         key: "lookup",
         value: function lookup(key) {
-            return this.bindings[key] || (this.parent ? this.parent.lookup(key) : null);
+            var value = this.bindings[key];
+            if (value) return value;
+
+            if (this.bound[key]) return null;
+
+            if (this.parent) {
+                return this.parent.lookup(key);
+            }
+
+            return null;
         }
     }, {
         key: "update",
