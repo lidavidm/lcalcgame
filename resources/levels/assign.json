@@ -67,6 +67,16 @@
             "globals": {
                 "x": "(diamond)"
             }
+        },
+        {
+            "description": "Assignment order still matters.",
+            "board": "(assign /#x /#y) (assign /#y /star) (#_x) (assign /#y /#x) (#_y)",
+            "goal": "(star) (star)",
+            "toolbox": "(diamond) (star)",
+            "globals": {
+                "x": "(diamond)",
+                "y": "(triangle)"
+            }
         }
     ]
 }
