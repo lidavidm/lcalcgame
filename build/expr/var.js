@@ -24,12 +24,33 @@ var VarExpr = function (_Expression) {
         _this._stackVertically = true;
         // See MissingTypedExpression#constructor
         _this.equivalentClasses = [VarExpr];
+        _this.preview = null;
         return _this;
     }
 
     _createClass(VarExpr, [{
+        key: "open",
+        value: function open(preview) {
+            this.preview = preview;
+            this.update();
+        }
+    }, {
+        key: "close",
+        value: function close() {
+            this.preview = null;
+            this.update();
+        }
+    }, {
         key: "update",
         value: function update() {
+            if (this.preview) {
+                this.holes[1] = this.preview;
+                this.holes[1].lock();
+                this.holes[1].bindSubexpressions();
+                _get(VarExpr.prototype.__proto__ || Object.getPrototypeOf(VarExpr.prototype), "update", this).call(this);
+                return;
+            }
+
             var env = this.getEnvironment();
             if (!env) {
                 _get(VarExpr.prototype.__proto__ || Object.getPrototypeOf(VarExpr.prototype), "update", this).call(this);
@@ -40,6 +61,8 @@ var VarExpr = function (_Expression) {
                 this.holes[1] = value.clone();
                 this.holes[1].lock();
                 this.holes[1].bindSubexpressions();
+            } else {
+                this.holes[1] = new ExpressionView(null);
             }
             _get(VarExpr.prototype.__proto__ || Object.getPrototypeOf(VarExpr.prototype), "update", this).call(this);
         }

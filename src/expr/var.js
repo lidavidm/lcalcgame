@@ -7,9 +7,28 @@ class VarExpr extends Expression {
         this._stackVertically = true;
         // See MissingTypedExpression#constructor
         this.equivalentClasses = [VarExpr];
+        this.preview = null;
+    }
+
+    open(preview) {
+        this.preview = preview;
+        this.update();
+    }
+
+    close() {
+        this.preview = null;
+        this.update();
     }
 
     update() {
+        if (this.preview) {
+            this.holes[1] = this.preview;
+            this.holes[1].lock();
+            this.holes[1].bindSubexpressions();
+            super.update();
+            return;
+        }
+
         let env = this.getEnvironment();
         if (!env) {
             super.update();
@@ -20,6 +39,9 @@ class VarExpr extends Expression {
             this.holes[1] = value.clone();
             this.holes[1].lock();
             this.holes[1].bindSubexpressions();
+        }
+        else {
+            this.holes[1] = new ExpressionView(null);
         }
         super.update();
     }
