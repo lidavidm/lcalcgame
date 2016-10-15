@@ -360,7 +360,7 @@ class Level {
                 lambdavar.name = varname;
             }
             // return lambdavar;
-            return new VarExpr(varname);
+            return lock(new VarExpr(varname), locked);
         } else {
             console.error('Unknown argument: ', arg);
             return new FadedValueExpr(arg);

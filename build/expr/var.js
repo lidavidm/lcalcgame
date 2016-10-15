@@ -72,30 +72,27 @@ var VarExpr = function (_Expression) {
 var AssignExpr = function (_Expression2) {
     _inherits(AssignExpr, _Expression2);
 
-    function AssignExpr() {
-        var variable = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-        var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
+    function AssignExpr(variable, value) {
         _classCallCheck(this, AssignExpr);
 
-        var _this3 = _possibleConstructorReturn(this, (AssignExpr.__proto__ || Object.getPrototypeOf(AssignExpr)).call(this, []));
+        var _this2 = _possibleConstructorReturn(this, (AssignExpr.__proto__ || Object.getPrototypeOf(AssignExpr)).call(this, []));
 
         if (variable && !(variable instanceof MissingExpression)) {
-            _this3.holes.push(variable);
+            _this2.holes.push(variable);
         } else {
             var missing = new MissingTypedExpression(new VarExpr("_"));
             missing.acceptedClasses = [VarExpr];
-            _this3.holes.push(missing);
+            _this2.holes.push(missing);
         }
 
-        _this3.holes.push(new TextExpr("←"));
+        _this2.holes.push(new TextExpr("←"));
 
         if (value) {
-            _this3.holes.push(value);
+            _this2.holes.push(value);
         } else {
-            _this3.holes.push(new MissingExpression());
+            _this2.holes.push(new MissingExpression());
         }
-        return _this3;
+        return _this2;
     }
 
     _createClass(AssignExpr, [{

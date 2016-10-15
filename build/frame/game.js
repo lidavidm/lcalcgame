@@ -648,7 +648,7 @@ var Level = function () {
                     lambdavar.name = _varname;
                 }
                 // return lambdavar;
-                return new VarExpr(_varname);
+                return lock(new VarExpr(_varname), locked);
             } else {
                 console.error('Unknown argument: ', arg);
                 return new FadedValueExpr(arg);

@@ -45,7 +45,7 @@ class VarExpr extends Expression {
 }
 
 class AssignExpr extends Expression {
-    constructor(variable=null, value=null) {
+    constructor(variable, value) {
         super([]);
         if (variable && !(variable instanceof MissingExpression)) {
             this.holes.push(variable);

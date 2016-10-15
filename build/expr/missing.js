@@ -102,7 +102,7 @@ var MissingTypedExpression = function (_MissingExpression) {
         var _this2 = _possibleConstructorReturn(this, (MissingTypedExpression.__proto__ || Object.getPrototypeOf(MissingTypedExpression)).call(this, expr_to_miss));
 
         _this2.acceptedClasses = [];
-        if (expr_to_miss.equivalentClasses) {
+        if (expr_to_miss && expr_to_miss.equivalentClasses) {
             _this2.acceptedClasses = expr_to_miss.equivalentClasses;
         }
         return _this2;

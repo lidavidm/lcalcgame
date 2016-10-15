@@ -69,7 +69,7 @@ class MissingTypedExpression extends MissingExpression {
     constructor(expr_to_miss) {
         super(expr_to_miss);
         this.acceptedClasses = [];
-        if (expr_to_miss.equivalentClasses) {
+        if (expr_to_miss && expr_to_miss.equivalentClasses) {
             this.acceptedClasses = expr_to_miss.equivalentClasses;
         }
     }
