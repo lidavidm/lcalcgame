@@ -162,6 +162,7 @@ var AssignExpr = function (_Expression2) {
                             // Make sure the change is reflected
                             node.update();
                         });
+                        _this3.stage.draw();
                     });
                 } else {
                     _get(AssignExpr.prototype.__proto__ || Object.getPrototypeOf(AssignExpr.prototype), "performReduction", this).call(this);

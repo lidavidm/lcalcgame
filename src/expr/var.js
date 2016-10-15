@@ -133,6 +133,7 @@ class AssignExpr extends Expression {
                         // Make sure the change is reflected
                         node.update();
                     });
+                    this.stage.draw();
                 });
             }
             else {
