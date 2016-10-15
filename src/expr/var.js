@@ -113,6 +113,9 @@ class AssignExpr extends Expression {
         // The side-effect actually happens here. reduce() is called
         // multiple times as a 'canReduce', and we don't want any
         // update to happen multiple times.
+        if (this.value) {
+            this.value.performReduction();
+        }
         if (this.reduce() != this) {
             if (animated) {
                 let v1 = this.variable.holes[1].absolutePos;
