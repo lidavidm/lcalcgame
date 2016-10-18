@@ -123,7 +123,7 @@
         },
         {
             "description": "Lambda variables shadow outer ones",
-            "board": "(λx (λx /#x)) (#x)",
+            "board": "(λx /(λx /#x)) (#x)",
             "goal": "(star) (triangle)",
             "toolbox": "(diamond) (star) (triangle)",
             "globals": {
