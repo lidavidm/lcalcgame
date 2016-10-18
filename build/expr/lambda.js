@@ -594,7 +594,7 @@ var LambdaExpr = function (_Expression) {
                 this.updateHole();
 
                 var hole = this.holes[0];
-                var lvars = mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [this]);
+                var lvars = mag.Stage.getNodesWithClass(VarExpr, [], true, [this]);
                 lvars.forEach(function (v) {
                     if (v.name === hole.name) {
                         v.color = hole.colorForVarName();
@@ -807,7 +807,7 @@ var LambdaExpr = function (_Expression) {
     }, {
         key: 'isConstantFunction',
         get: function get() {
-            return this.takesArgument && mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [this]).length === 0;
+            return this.takesArgument && mag.Stage.getNodesWithClass(VarExpr, [], true, [this]).length === 0;
         }
     }, {
         key: 'body',

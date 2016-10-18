@@ -453,7 +453,7 @@ class LambdaExpr extends Expression {
             this.updateHole();
 
             var hole = this.holes[0];
-            var lvars = mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [this]);
+            var lvars = mag.Stage.getNodesWithClass(VarExpr, [], true, [this]);
             lvars.forEach((v) => {
                 if (v.name === hole.name) {
                     v.color = hole.colorForVarName();
@@ -469,7 +469,7 @@ class LambdaExpr extends Expression {
         return this.holes.slice(1).reduce(((prev,arg) => (prev && !(arg instanceof MissingExpression))), true);
     }
     get isConstantFunction() {
-        return this.takesArgument && mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [this]).length === 0;
+        return this.takesArgument && mag.Stage.getNodesWithClass(VarExpr, [], true, [this]).length === 0;
     }
     get body() { return this.takesArgument ? this.holes[1] : null; }
     updateHole() {
