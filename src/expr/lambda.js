@@ -96,6 +96,13 @@ class LambdaHoleExpr extends MissingExpression {
             return false;
         }
 
+
+        let vars = mag.Stage.getNodesWithClass(VarExpr, [], true, [node]);
+        for (let variable of vars) {
+            // If the variable can't be reduced, don't allow this to be reduced.
+            if (variable.reduce() === variable) return null;
+        }
+
         var parent = this.parent;
         parent.getEnvironment().update(this.name, node);
 
@@ -216,7 +223,13 @@ class LambdaHoleExpr extends MissingExpression {
                     let orig_exp_str = this.parent.toString();
                     let dropped_exp_str = node.toString();
 
-                    this.applyExpr(node);
+                    let result = this.applyExpr(node);
+                    if (result === null) {
+                        // The application failed.
+                        stage.add(node);
+                        stage.update();
+                        return;
+                    }
 
                     // Log the reduction.
                     Logger.log('reduction-lambda', { 'before':orig_exp_str, 'applied':dropped_exp_str, 'after':parent.toString() });
@@ -533,7 +546,7 @@ class LambdaExpr extends Expression {
         let varExprs = findNoncapturingVarExpr(this, null, true);
         let environment = this.getEnvironment();
         for (let expr of varExprs) {
-            expr.reduce();
+            expr.performReduction();
         }
         for (let child of this.holes) {
             if (child instanceof LambdaExpr) {

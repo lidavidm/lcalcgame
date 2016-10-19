@@ -78,14 +78,22 @@ var VarExpr = function (_Expression) {
             var value = env.lookup(this.name);
             if (!value) return this;
 
-            value = value.clone();
-            parent.swap(this, value);
             return value;
+        }
+    }, {
+        key: "performReduction",
+        value: function performReduction() {
+            var value = this.reduce();
+            if (value != this) {
+                value = value.clone();
+                var parent = this.parent ? this.parent : this.stage;
+                parent.swap(this, value);
+            }
         }
     }, {
         key: "onmouseclick",
         value: function onmouseclick() {
-            this.reduce();
+            this.performReduction();
         }
     }]);
 
