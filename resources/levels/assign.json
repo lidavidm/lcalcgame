@@ -125,7 +125,7 @@
             "description": "Lambda variables shadow outer ones",
             "board": "(λx /(λx /#x)) (#x)",
             "goal": "(star) (triangle)",
-            "toolbox": "(diamond) (star) (triangle)",
+            "toolbox": "(diamond) (triangle)",
             "globals": {
                 "x": "(star)"
             }
