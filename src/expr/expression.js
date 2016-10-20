@@ -128,6 +128,7 @@ class Expression extends mag.RoundedRect {
                 width = Math.max(width, s.w);
             }
             else {
+                height = Math.max(height, s.h);
                 width += s.w + padding.inner;
             }
         });

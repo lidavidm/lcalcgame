@@ -486,6 +486,7 @@ var Expression = function (_mag$RoundedRect) {
                     height += s.h;
                     width = Math.max(width, s.w);
                 } else {
+                    height = Math.max(height, s.h);
                     width += s.w + padding.inner;
                 }
             });
