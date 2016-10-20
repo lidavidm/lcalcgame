@@ -194,7 +194,15 @@ class AssignExpr extends Expression {
             this.value.performReduction();
         }
         if (this.canReduce()) {
-            let otherVars = this.stage.getNodesWithClass(VarExpr, [this.variable], true, null);
+            let initial = [];
+            if (this.parent) {
+                initial.push(this.parent);
+            }
+            else {
+                initial = initial.concat(this.stage.nodes);
+            }
+            let otherVars = findAliasingVarExpr(initial, this.variable.name, [this.variable], false, true);
+            console.log(otherVars);
             let afterAnimate = () => {
                 this.getEnvironment().update(this.variable.name, this.value);
                 let parent = this.parent || this.stage;
@@ -202,7 +210,7 @@ class AssignExpr extends Expression {
                 window.setTimeout(() => {
                     parent.swap(this, null);
                 }, 100);
-                otherVars.forEach((node) => {
+                this.stage.getNodesWithClass(VarExpr, [this.variable], true, null).forEach((node) => {
                     // Make sure the change is reflected
                     node.close();
                     node.update();
@@ -259,4 +267,52 @@ class ExpressionView extends MissingExpression {
     ondropenter() {}
     ondropexit() {}
     ondropped() {}
+    onmouseenter() {}
+    drawInternal(ctx, pos, boundingSize) {
+        // TODO: draw "closed" thing much like lambda
+        ctx.fillStyle = 'black';
+        setStrokeStyle(ctx, this.stroke);
+        if (this.shadowOffset !== 0) {
+            roundRect(ctx,
+                      pos.x, pos.y+this.shadowOffset,
+                      boundingSize.w, boundingSize.h,
+                      this.radius*this.absoluteScale.x, true, this.stroke ? true : false,
+                      this.stroke ? this.stroke.opacity : null); // just fill for now
+        }
+        ctx.fillStyle = this.color;
+        roundRect(ctx,
+                  pos.x, pos.y,
+                  boundingSize.w, boundingSize.h,
+                  this.radius*this.absoluteScale.x, true, this.stroke ? true : false,
+                  this.stroke ? this.stroke.opacity : null); // just fill for now
+    }
+}
+
+function findAliasingVarExpr(initial, name) {
+    // TODO: needs to account for whether the variable we are looking
+    // for is in an outer scope. Example:
+    // x = 3
+    // def test():
+    //     global x
+    //     x = 5
+    let subvarexprs = [];
+    let queue = initial;
+    while (queue.length > 0) {
+        let node = queue.pop();
+        if (node instanceof VarExpr && node.name === name) {
+            subvarexprs.push(node);
+        }
+        else if (node instanceof LambdaExpr &&
+                 (node.takesArgument &&
+                   node.holes[0].name === name)) {
+            // Capture-avoiding substitution
+            continue;
+        }
+
+        if (node.children) {
+            queue = queue.concat(node.children);
+        }
+    }
+
+    return subvarexprs;
 }
