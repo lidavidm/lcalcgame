@@ -46,6 +46,10 @@ class VarExpr extends Expression {
         super.update();
     }
 
+    canReduce() {
+        return this.getEnvironment() && (this.parent | this.stage) && this.getEnvironment().lookup(this.name);
+    }
+
     reduce() {
         let env = this.getEnvironment();
         if (!env) return this;
@@ -107,9 +111,13 @@ class AssignExpr extends Expression {
         this.performReduction();
     }
 
+    canReduce() {
+        return this.value && this.variable && this.value.canReduce();
+    }
+
     reduce() {
         if (this.variable && this.value) {
-            return null;
+            return this.value;
         }
         else {
             return this;
@@ -123,7 +131,7 @@ class AssignExpr extends Expression {
         if (this.value) {
             this.value.performReduction();
         }
-        if (this.reduce() != this) {
+        if (this.canReduce()) {
             if (animated) {
                 let v1 = this.variable.holes[1].absolutePos;
                 let v2 = this.value.absolutePos;

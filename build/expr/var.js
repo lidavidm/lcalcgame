@@ -67,6 +67,11 @@ var VarExpr = function (_Expression) {
             _get(VarExpr.prototype.__proto__ || Object.getPrototypeOf(VarExpr.prototype), "update", this).call(this);
         }
     }, {
+        key: "canReduce",
+        value: function canReduce() {
+            return this.getEnvironment() && this.parent | this.stage && this.getEnvironment().lookup(this.name);
+        }
+    }, {
         key: "reduce",
         value: function reduce() {
             var env = this.getEnvironment();
@@ -132,10 +137,15 @@ var AssignExpr = function (_Expression2) {
             this.performReduction();
         }
     }, {
+        key: "canReduce",
+        value: function canReduce() {
+            return this.value && this.variable && this.value.canReduce();
+        }
+    }, {
         key: "reduce",
         value: function reduce() {
             if (this.variable && this.value) {
-                return null;
+                return this.value;
             } else {
                 return this;
             }
@@ -153,7 +163,7 @@ var AssignExpr = function (_Expression2) {
             if (this.value) {
                 this.value.performReduction();
             }
-            if (this.reduce() != this) {
+            if (this.canReduce()) {
                 if (animated) {
                     var v1 = this.variable.holes[1].absolutePos;
                     var v2 = this.value.absolutePos;
