@@ -162,7 +162,19 @@ class Expression extends mag.RoundedRect {
         }
         var _this = this;
         this.children = [];
+
         this.holes.forEach((expr) => _this.addChild(expr));
+        // In the centering calculation below, we need this expr's
+        // size to be stable. So we first set the scale on our
+        // children, then compute our size once to lay out the
+        // children.
+        this.holes.forEach((expr) => {
+            expr.anchor = { x:0, y:0.5 };
+            expr.scale = { x:0.85, y:0.85 };
+            expr.update();
+        });
+        var size = this.size;
+
         this.holes.forEach((expr) => { // Update hole expression positions.
             expr.anchor = { x:0, y:0.5 };
             expr.pos = { x:x, y:y };
@@ -170,11 +182,19 @@ class Expression extends mag.RoundedRect {
             expr.update();
             if (this._stackVertically) {
                 y += expr.size.h * expr.scale.y;
+                // Centering
+                var offset = x;
+                var innerWidth = size.w;
+                var scale = expr.scale.x;
+                offset = (innerWidth - scale * expr.size.w) / 2;
+
+                expr.pos = { x:offset, y:expr.pos.y };
             }
             else {
                 x += expr.size.w * expr.scale.x + padding;
             }
         });
+
         this.children = this.holes; // for rendering
     }
 

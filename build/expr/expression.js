@@ -157,9 +157,21 @@ var Expression = function (_mag$RoundedRect) {
             }
             var _this = this;
             this.children = [];
+
             this.holes.forEach(function (expr) {
                 return _this.addChild(expr);
             });
+            // In the centering calculation below, we need this expr's
+            // size to be stable. So we first set the scale on our
+            // children, then compute our size once to lay out the
+            // children.
+            this.holes.forEach(function (expr) {
+                expr.anchor = { x: 0, y: 0.5 };
+                expr.scale = { x: 0.85, y: 0.85 };
+                expr.update();
+            });
+            var size = this.size;
+
             this.holes.forEach(function (expr) {
                 // Update hole expression positions.
                 expr.anchor = { x: 0, y: 0.5 };
@@ -168,10 +180,18 @@ var Expression = function (_mag$RoundedRect) {
                 expr.update();
                 if (_this3._stackVertically) {
                     y += expr.size.h * expr.scale.y;
+                    // Centering
+                    var offset = x;
+                    var innerWidth = size.w;
+                    var scale = expr.scale.x;
+                    offset = (innerWidth - scale * expr.size.w) / 2;
+
+                    expr.pos = { x: offset, y: expr.pos.y };
                 } else {
                     x += expr.size.w * expr.scale.x + padding;
                 }
             });
+
             this.children = this.holes; // for rendering
         }
 
