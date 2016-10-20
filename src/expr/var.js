@@ -47,7 +47,7 @@ class VarExpr extends Expression {
     }
 
     canReduce() {
-        return this.getEnvironment() && (this.parent | this.stage) && this.getEnvironment().lookup(this.name);
+        return this.getEnvironment() && (this.parent || this.stage) && this.getEnvironment().lookup(this.name);
     }
 
     reduce() {

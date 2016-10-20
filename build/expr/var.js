@@ -69,7 +69,7 @@ var VarExpr = function (_Expression) {
     }, {
         key: "canReduce",
         value: function canReduce() {
-            return this.getEnvironment() && this.parent | this.stage && this.getEnvironment().lookup(this.name);
+            return this.getEnvironment() && (this.parent || this.stage) && this.getEnvironment().lookup(this.name);
         }
     }, {
         key: "reduce",
