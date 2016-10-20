@@ -1,3 +1,5 @@
+const SHRINK_DURATION = 500;
+const EXPAND_DURATION = 800;
 /// Variable nodes - separate from lambda variable expressions, for
 /// now.
 class VarExpr extends Expression {
@@ -8,10 +10,17 @@ class VarExpr extends Expression {
         // See MissingTypedExpression#constructor
         this.equivalentClasses = [VarExpr];
         this.preview = null;
+        this.animating = false;
     }
 
-    open(preview) {
-        Animate.tween(this.holes[1], {
+    open(preview, animate=true) {
+        if (!animate) {
+            this.preview = preview;
+            this.update();
+            return null;
+        }
+        this.animating = true;
+        let target = {
             scale: {
                 x: 0.0,
                 y: 0.0,
@@ -20,7 +29,9 @@ class VarExpr extends Expression {
                 x: this.holes[1].pos.x + 0.5 * this.holes[1].size.w,
                 y: this.holes[1].pos.y,
             },
-        }, 200).after(() => {
+        };
+        return Animate.tween(this.holes[1], target, 300).after(() => {
+            this.animating = false;
             this.preview = preview;
             this.update();
         });
@@ -31,7 +42,45 @@ class VarExpr extends Expression {
         this.update();
     }
 
+    animateChangeTo(value) {
+        this.animating = true;
+        let target = {
+            scale: {
+                x: 0.0,
+                y: 0.0,
+            },
+            pos: {
+                x: this.holes[1].pos.x + 0.5 * this.holes[1].size.w,
+                y: this.holes[1].pos.y,
+            },
+        };
+        Animate.tween(this.holes[1], target, SHRINK_DURATION).after(() => {
+            this.holes[1] = value;
+            super.update();
+            let target = {
+                scale: value.scale,
+                pos: value.pos,
+            };
+            value.pos = {
+                x: value.pos.x + 0.5 * value.size.w,
+                y: value.pos.y,
+            };
+            value.scale = {
+                x: 0,
+                y: 0,
+            };
+            Animate.tween(value, target, 300).after(() => {
+                this.animating = false;
+            });
+        });
+    }
+
     update() {
+        if (this.animating) {
+            super.update();
+            return;
+        }
+
         if (this.preview) {
             this.holes[1] = this.preview;
             this.holes[1].lock();
@@ -145,27 +194,41 @@ class AssignExpr extends Expression {
             this.value.performReduction();
         }
         if (this.canReduce()) {
+            let otherVars = this.stage.getNodesWithClass(VarExpr, [this.variable], true, null);
+            let afterAnimate = () => {
+                this.getEnvironment().update(this.variable.name, this.value);
+                let parent = this.parent || this.stage;
+                Animate.poof(this);
+                window.setTimeout(() => {
+                    parent.swap(this, null);
+                }, 100);
+                otherVars.forEach((node) => {
+                    // Make sure the change is reflected
+                    node.close();
+                    node.update();
+                });
+                this.stage.draw();
+            };
             if (animated) {
                 let v1 = this.variable.holes[1].absolutePos;
                 let v2 = this.value.absolutePos;
-                Animate.tween(this.value, {
+                let target = {
                     pos: {
                         x: v1.x - v2.x + this.value.pos.x,
                         y: v1.y - v2.y + this.value.pos.y,
-                    }
-                }, 300).after(() => {
-                    this.getEnvironment().update(this.variable.name, this.value);
-                    let parent = this.parent || this.stage;
-                    parent.swap(this, null);
-                    this.stage.getNodesWithClass(VarExpr, [], true, null).forEach((node) => {
-                        // Make sure the change is reflected
-                        node.update();
-                    });
-                    this.stage.draw();
+                    },
+                };
+                otherVars.forEach((v) => v.animateChangeTo(this.value.clone()));
+                this.variable.open(new MissingExpression());
+                Animate.tween(this.value, target, SHRINK_DURATION).after(() => {
+                    this.value.scale = { x: 0, y: 0 };
+                    this.variable.open(this.value.clone(), false);
+                    window.setTimeout(afterAnimate, EXPAND_DURATION);
                 });
             }
             else {
                 super.performReduction();
+                afterAnimate();
             }
         }
     }
