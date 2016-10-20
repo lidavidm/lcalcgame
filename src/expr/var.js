@@ -11,8 +11,19 @@ class VarExpr extends Expression {
     }
 
     open(preview) {
-        this.preview = preview;
-        this.update();
+        Animate.tween(this.holes[1], {
+            scale: {
+                x: 0.0,
+                y: 0.0,
+            },
+            pos: {
+                x: this.holes[1].pos.x + 0.5 * this.holes[1].size.w,
+                y: this.holes[1].pos.y,
+            },
+        }, 200).after(() => {
+            this.preview = preview;
+            this.update();
+        });
     }
 
     close() {
@@ -26,6 +37,7 @@ class VarExpr extends Expression {
             this.holes[1].lock();
             this.holes[1].bindSubexpressions();
             super.update();
+            if (this.stage) this.stage.draw();
             return;
         }
 
@@ -44,6 +56,7 @@ class VarExpr extends Expression {
             this.holes[1] = new ExpressionView(null);
         }
         super.update();
+        if (this.stage) this.stage.draw();
     }
 
     canReduce() {
