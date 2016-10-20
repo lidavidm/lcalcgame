@@ -606,6 +606,21 @@ class LambdaExpr extends Expression {
         else return super.reduceCompletely();
     }
 
+    drawInternal(ctx, pos, boundingSize) {
+        super.drawInternal(ctx, pos, boundingSize);
+        if (this.shadowOffset == 0 && this.parent) {
+            setStrokeStyle(ctx, {
+                color: 'gray',
+                lineWidth: 1,
+            });
+            roundRect(ctx,
+                      pos.x - 1, pos.y - 1,
+                      boundingSize.w + 1, boundingSize.h + 1,
+                      this.radius*this.absoluteScale.x, false, true, 0.5);
+            setStrokeStyle(ctx, this.stroke);
+        }
+    }
+
     toString() {
         if (this.holes.length === 1 && this.holes[0] instanceof LambdaHoleExpr)
             return '(' + super.toString() + ')';

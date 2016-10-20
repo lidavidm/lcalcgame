@@ -814,6 +814,19 @@ var LambdaExpr = function (_Expression) {
             } else return _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'reduceCompletely', this).call(this);
         }
     }, {
+        key: 'drawInternal',
+        value: function drawInternal(ctx, pos, boundingSize) {
+            _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'drawInternal', this).call(this, ctx, pos, boundingSize);
+            if (this.shadowOffset == 0 && this.parent) {
+                setStrokeStyle(ctx, {
+                    color: 'gray',
+                    lineWidth: 1
+                });
+                roundRect(ctx, pos.x - 1, pos.y - 1, boundingSize.w + 1, boundingSize.h + 1, this.radius * this.absoluteScale.x, false, true, 0.5);
+                setStrokeStyle(ctx, this.stroke);
+            }
+        }
+    }, {
         key: 'toString',
         value: function toString() {
             if (this.holes.length === 1 && this.holes[0] instanceof LambdaHoleExpr) return '(' + _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'toString', this).call(this) + ')';else return _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'toString', this).call(this);
