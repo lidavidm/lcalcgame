@@ -68,8 +68,8 @@ var VarExpr = function (_Expression) {
             this.update();
         }
     }, {
-        key: "animateChangeTo",
-        value: function animateChangeTo(value) {
+        key: "animateShrink",
+        value: function animateShrink() {
             var _this3 = this;
 
             this.animating = true;
@@ -84,8 +84,28 @@ var VarExpr = function (_Expression) {
                 }
             };
             Animate.tween(this.holes[1], target, SHRINK_DURATION).after(function () {
-                _this3.holes[1] = value;
-                _get(VarExpr.prototype.__proto__ || Object.getPrototypeOf(VarExpr.prototype), "update", _this3).call(_this3);
+                _this3.animating = false;
+            });
+        }
+    }, {
+        key: "animateChangeTo",
+        value: function animateChangeTo(value) {
+            var _this4 = this;
+
+            this.animating = true;
+            var target = {
+                scale: {
+                    x: 0.0,
+                    y: 0.0
+                },
+                pos: {
+                    x: this.holes[1].pos.x + 0.5 * this.holes[1].size.w,
+                    y: this.holes[1].pos.y
+                }
+            };
+            Animate.tween(this.holes[1], target, SHRINK_DURATION).after(function () {
+                _this4.holes[1] = value;
+                _get(VarExpr.prototype.__proto__ || Object.getPrototypeOf(VarExpr.prototype), "update", _this4).call(_this4);
                 var target = {
                     scale: value.scale,
                     pos: value.pos
@@ -99,7 +119,7 @@ var VarExpr = function (_Expression) {
                     y: 0
                 };
                 Animate.tween(value, target, 300).after(function () {
-                    _this3.animating = false;
+                    _this4.animating = false;
                 });
             });
         }
@@ -181,24 +201,24 @@ var AssignExpr = function (_Expression2) {
     function AssignExpr(variable, value) {
         _classCallCheck(this, AssignExpr);
 
-        var _this4 = _possibleConstructorReturn(this, (AssignExpr.__proto__ || Object.getPrototypeOf(AssignExpr)).call(this, []));
+        var _this5 = _possibleConstructorReturn(this, (AssignExpr.__proto__ || Object.getPrototypeOf(AssignExpr)).call(this, []));
 
         if (variable && !(variable instanceof MissingExpression)) {
-            _this4.holes.push(variable);
+            _this5.holes.push(variable);
         } else {
             var missing = new MissingTypedExpression(new VarExpr("_"));
             missing.acceptedClasses = [VarExpr];
-            _this4.holes.push(missing);
+            _this5.holes.push(missing);
         }
 
-        _this4.holes.push(new TextExpr("←"));
+        _this5.holes.push(new TextExpr("←"));
 
         if (value) {
-            _this4.holes.push(value);
+            _this5.holes.push(value);
         } else {
-            _this4.holes.push(new MissingExpression());
+            _this5.holes.push(new MissingExpression());
         }
-        return _this4;
+        return _this5;
     }
 
     _createClass(AssignExpr, [{
@@ -223,7 +243,7 @@ var AssignExpr = function (_Expression2) {
     }, {
         key: "performReduction",
         value: function performReduction() {
-            var _this5 = this;
+            var _this6 = this;
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
@@ -235,41 +255,48 @@ var AssignExpr = function (_Expression2) {
             }
             if (this.canReduce()) {
                 (function () {
-                    var otherVars = _this5.stage.getNodesWithClass(VarExpr, [_this5.variable], true, null);
+                    var initial = [];
+                    if (_this6.parent) {
+                        initial.push(_this6.parent);
+                    } else {
+                        initial = initial.concat(_this6.stage.nodes);
+                    }
+                    var otherVars = findAliasingVarExpr(initial, _this6.variable.name, [_this6.variable], false, true);
+                    console.log(otherVars);
                     var afterAnimate = function afterAnimate() {
-                        _this5.getEnvironment().update(_this5.variable.name, _this5.value);
-                        var parent = _this5.parent || _this5.stage;
-                        Animate.poof(_this5);
+                        _this6.getEnvironment().update(_this6.variable.name, _this6.value);
+                        var parent = _this6.parent || _this6.stage;
+                        Animate.poof(_this6);
                         window.setTimeout(function () {
-                            parent.swap(_this5, null);
+                            parent.swap(_this6, null);
                         }, 100);
-                        otherVars.forEach(function (node) {
+                        _this6.stage.getNodesWithClass(VarExpr, [_this6.variable], true, null).forEach(function (node) {
                             // Make sure the change is reflected
                             node.close();
                             node.update();
                         });
-                        _this5.stage.draw();
+                        _this6.stage.draw();
                     };
                     if (animated) {
-                        var v1 = _this5.variable.holes[1].absolutePos;
-                        var v2 = _this5.value.absolutePos;
+                        var v1 = _this6.variable.holes[1].absolutePos;
+                        var v2 = _this6.value.absolutePos;
                         var target = {
                             pos: {
-                                x: v1.x - v2.x + _this5.value.pos.x,
-                                y: v1.y - v2.y + _this5.value.pos.y
+                                x: v1.x - v2.x + _this6.value.pos.x,
+                                y: v1.y - v2.y + _this6.value.pos.y
                             }
                         };
                         otherVars.forEach(function (v) {
-                            return v.animateChangeTo(_this5.value.clone());
+                            return v.animateChangeTo(_this6.value.clone());
                         });
-                        _this5.variable.open(new MissingExpression());
-                        Animate.tween(_this5.value, target, SHRINK_DURATION).after(function () {
-                            _this5.value.scale = { x: 0, y: 0 };
-                            _this5.variable.open(_this5.value.clone(), false);
+                        _this6.variable.animateShrink();
+                        Animate.tween(_this6.value, target, SHRINK_DURATION).after(function () {
+                            _this6.value.scale = { x: 0, y: 0 };
+                            _this6.variable.open(_this6.value.clone(), false);
                             window.setTimeout(afterAnimate, EXPAND_DURATION);
                         });
                     } else {
-                        _get(AssignExpr.prototype.__proto__ || Object.getPrototypeOf(AssignExpr.prototype), "performReduction", _this5).call(_this5);
+                        _get(AssignExpr.prototype.__proto__ || Object.getPrototypeOf(AssignExpr.prototype), "performReduction", _this6).call(_this6);
                         afterAnimate();
                     }
                 })();
@@ -327,7 +354,48 @@ var ExpressionView = function (_MissingExpression) {
     }, {
         key: "ondropped",
         value: function ondropped() {}
+    }, {
+        key: "onmouseenter",
+        value: function onmouseenter() {}
+    }, {
+        key: "drawInternal",
+        value: function drawInternal(ctx, pos, boundingSize) {
+            // TODO: draw "closed" thing much like lambda
+            ctx.fillStyle = 'black';
+            setStrokeStyle(ctx, this.stroke);
+            if (this.shadowOffset !== 0) {
+                roundRect(ctx, pos.x, pos.y + this.shadowOffset, boundingSize.w, boundingSize.h, this.radius * this.absoluteScale.x, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null); // just fill for now
+            }
+            ctx.fillStyle = this.color;
+            roundRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, this.radius * this.absoluteScale.x, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null); // just fill for now
+        }
     }]);
 
     return ExpressionView;
 }(MissingExpression);
+
+function findAliasingVarExpr(initial, name) {
+    // TODO: needs to account for whether the variable we are looking
+    // for is in an outer scope. Example:
+    // x = 3
+    // def test():
+    //     global x
+    //     x = 5
+    var subvarexprs = [];
+    var queue = initial;
+    while (queue.length > 0) {
+        var node = queue.pop();
+        if (node instanceof VarExpr && node.name === name) {
+            subvarexprs.push(node);
+        } else if (node instanceof LambdaExpr && node.takesArgument && node.holes[0].name === name) {
+            // Capture-avoiding substitution
+            continue;
+        }
+
+        if (node.children) {
+            queue = queue.concat(node.children);
+        }
+    }
+
+    return subvarexprs;
+}

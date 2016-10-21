@@ -42,6 +42,23 @@ class VarExpr extends Expression {
         this.update();
     }
 
+    animateShrink() {
+        this.animating = true;
+        let target = {
+            scale: {
+                x: 0.0,
+                y: 0.0,
+            },
+            pos: {
+                x: this.holes[1].pos.x + 0.5 * this.holes[1].size.w,
+                y: this.holes[1].pos.y,
+            },
+        };
+        Animate.tween(this.holes[1], target, SHRINK_DURATION).after(() => {
+            this.animating = false;
+        });
+    }
+
     animateChangeTo(value) {
         this.animating = true;
         let target = {
@@ -227,7 +244,7 @@ class AssignExpr extends Expression {
                     },
                 };
                 otherVars.forEach((v) => v.animateChangeTo(this.value.clone()));
-                this.variable.open(new MissingExpression());
+                this.variable.animateShrink();
                 Animate.tween(this.value, target, SHRINK_DURATION).after(() => {
                     this.value.scale = { x: 0, y: 0 };
                     this.variable.open(this.value.clone(), false);
