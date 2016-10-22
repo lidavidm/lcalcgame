@@ -35,11 +35,11 @@ var LambdaHoleExpr = function (_MissingExpression) {
         value: function colorForVarName() {
             return LambdaHoleExpr.colorForVarName(this.name);
         }
-
-        // Draw special circle representing a hole.
-
     }, {
         key: 'drawInternal',
+
+
+        // Draw special circle representing a hole.
         value: function drawInternal(ctx, pos, boundingSize) {
             var rad = boundingSize.w / 2.0;
             ctx.beginPath();
@@ -350,6 +350,14 @@ var LambdaHoleExpr = function (_MissingExpression) {
         },
         set: function set(n) {
             this._name = n;
+        }
+    }, {
+        key: 'size',
+        get: function get() {
+            var size = _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'size', this);
+            size.w = Math.max(size.w, size.h);
+            size.h = Math.max(size.w, size.h);
+            return size;
         }
     }], [{
         key: 'colorForVarName',
@@ -906,12 +914,6 @@ var FadedLambdaHoleExpr = function (_LambdaHoleExpr) {
 var HalfFadedLambdaHoleExpr = function (_LambdaHoleExpr2) {
     _inherits(HalfFadedLambdaHoleExpr, _LambdaHoleExpr2);
 
-    function HalfFadedLambdaHoleExpr() {
-        _classCallCheck(this, HalfFadedLambdaHoleExpr);
-
-        return _possibleConstructorReturn(this, (HalfFadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr)).apply(this, arguments));
-    }
-
     _createClass(HalfFadedLambdaHoleExpr, [{
         key: 'openImage',
         get: function get() {
@@ -923,6 +925,17 @@ var HalfFadedLambdaHoleExpr = function (_LambdaHoleExpr2) {
             return this.name === 'x' ? 'lambda-hole-xside-closed' : 'lambda-hole-y-closed';
         }
     }]);
+
+    function HalfFadedLambdaHoleExpr(varname) {
+        _classCallCheck(this, HalfFadedLambdaHoleExpr);
+
+        var _this13 = _possibleConstructorReturn(this, (HalfFadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr)).call(this, varname));
+
+        _this13.label = new TextExpr("λ" + varname);
+        _this13.holes.push(_this13.label);
+        _this13.label.color = "#FFF";
+        return _this13;
+    }
 
     return HalfFadedLambdaHoleExpr;
 }(LambdaHoleExpr);

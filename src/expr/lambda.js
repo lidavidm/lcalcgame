@@ -30,6 +30,13 @@ class LambdaHoleExpr extends MissingExpression {
     }
     colorForVarName() { return LambdaHoleExpr.colorForVarName(this.name); }
 
+    get size() {
+        let size = super.size;
+        size.w = Math.max(size.w, size.h);
+        size.h = Math.max(size.w, size.h);
+        return size;
+    }
+
     // Draw special circle representing a hole.
     drawInternal(ctx, pos, boundingSize) {
         var rad = boundingSize.w / 2.0;
@@ -664,6 +671,12 @@ class FadedLambdaHoleExpr extends LambdaHoleExpr {
 class HalfFadedLambdaHoleExpr extends LambdaHoleExpr {
     get openImage() { return this.name === 'x' ? 'lambda-hole-xside' : 'lambda-hole-y'; }
     get closedImage() { return this.name === 'x' ? 'lambda-hole-xside-closed' : 'lambda-hole-y-closed'; }
+    constructor(varname) {
+        super(varname);
+        this.label = new TextExpr("λ" + varname);
+        this.holes.push(this.label);
+        this.label.color = "#FFF";
+    }
 }
 class FadedPythonLambdaHoleExpr extends LambdaHoleExpr {
     get openImage() { return this.name === 'x' ? 'lambda-hole-x-python' : 'lambda-hole-y'; }
