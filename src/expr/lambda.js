@@ -677,6 +677,20 @@ class HalfFadedLambdaHoleExpr extends LambdaHoleExpr {
         this.holes.push(this.label);
         this.label.color = "#FFF";
     }
+
+    open() {
+        if (!this.isOpen) {
+            this.label.color = "#FFF";
+        }
+        super.open();
+    }
+
+    close() {
+        if (this.isOpen) {
+            this.label.color = "#565656";
+        }
+        super.close();
+    }
 }
 class FadedPythonLambdaHoleExpr extends LambdaHoleExpr {
     get openImage() { return this.name === 'x' ? 'lambda-hole-x-python' : 'lambda-hole-y'; }

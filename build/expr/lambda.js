@@ -937,6 +937,24 @@ var HalfFadedLambdaHoleExpr = function (_LambdaHoleExpr2) {
         return _this13;
     }
 
+    _createClass(HalfFadedLambdaHoleExpr, [{
+        key: 'open',
+        value: function open() {
+            if (!this.isOpen) {
+                this.label.color = "#FFF";
+            }
+            _get(HalfFadedLambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr.prototype), 'open', this).call(this);
+        }
+    }, {
+        key: 'close',
+        value: function close() {
+            if (this.isOpen) {
+                this.label.color = "#565656";
+            }
+            _get(HalfFadedLambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr.prototype), 'close', this).call(this);
+        }
+    }]);
+
     return HalfFadedLambdaHoleExpr;
 }(LambdaHoleExpr);
 
