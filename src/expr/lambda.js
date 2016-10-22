@@ -30,13 +30,6 @@ class LambdaHoleExpr extends MissingExpression {
     }
     colorForVarName() { return LambdaHoleExpr.colorForVarName(this.name); }
 
-    get size() {
-        let size = super.size;
-        size.w = Math.max(size.w, size.h);
-        size.h = Math.max(size.w, size.h);
-        return size;
-    }
-
     // Draw special circle representing a hole.
     drawInternal(ctx, pos, boundingSize) {
         var rad = boundingSize.w / 2.0;
@@ -48,7 +41,6 @@ class LambdaHoleExpr extends MissingExpression {
         gradient.addColorStop(1.0, "#191919");
         ctx.fillStyle = gradient;
         ctx.fill();
-
 
         if (this._openOffset < Math.PI / 2) {
             ctx.fillStyle = '#A4A4A4';
@@ -667,10 +659,51 @@ class LambdaExpr extends Expression {
 class FadedLambdaHoleExpr extends LambdaHoleExpr {
     get openImage() { return this.name === 'x' ? 'lambda-hole-x' : 'lambda-hole-y'; }
     get closedImage() { return this.name === 'x' ? 'lambda-hole-x-closed' : 'lambda-hole-y-closed'; }
+
+    constructor(varname) {
+        super(varname);
+        this.label = new TextExpr("λ" + varname + ".");
+        this.holes.push(this.label);
+        this.label.color = "#000";
+    }
+
+    open() {
+        if (!this.isOpen) {
+            this.label.color = "#000";
+            this.label.shadow = null;
+        }
+        super.open();
+    }
+
+    close() {
+        if (this.isOpen) {
+            this.label.color = "#565656";
+            this.label.shadow = {
+                color: "#777",
+                x: 1,
+                y: 0,
+                blur: 0,
+            };
+        }
+        super.close();
+    }
+
+    drawInternal(ctx, pos, boundingSize) {
+        var rad = boundingSize.w / 2.0;
+        ctx.beginPath();
+        ctx.arc(pos.x+rad,pos.y+rad,rad,0,2*Math.PI);
+        setStrokeStyle(ctx, this.stroke);
+        if(this.stroke) ctx.stroke();
+    }
+
+    get size() {
+        let size = super.size;
+        size.w = Math.max(size.w, size.h);
+        size.h = Math.max(size.w, size.h);
+        return size;
+    }
 }
 class HalfFadedLambdaHoleExpr extends LambdaHoleExpr {
-    get openImage() { return this.name === 'x' ? 'lambda-hole-xside' : 'lambda-hole-y'; }
-    get closedImage() { return this.name === 'x' ? 'lambda-hole-xside-closed' : 'lambda-hole-y-closed'; }
     constructor(varname) {
         super(varname);
         this.label = new TextExpr("λ" + varname);
@@ -690,6 +723,13 @@ class HalfFadedLambdaHoleExpr extends LambdaHoleExpr {
             this.label.color = "#565656";
         }
         super.close();
+    }
+
+    get size() {
+        let size = super.size;
+        size.w = Math.max(size.w, size.h);
+        size.h = Math.max(size.w, size.h);
+        return size;
     }
 }
 class FadedPythonLambdaHoleExpr extends LambdaHoleExpr {

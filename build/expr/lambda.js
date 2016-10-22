@@ -35,11 +35,11 @@ var LambdaHoleExpr = function (_MissingExpression) {
         value: function colorForVarName() {
             return LambdaHoleExpr.colorForVarName(this.name);
         }
-    }, {
-        key: 'drawInternal',
-
 
         // Draw special circle representing a hole.
+
+    }, {
+        key: 'drawInternal',
         value: function drawInternal(ctx, pos, boundingSize) {
             var rad = boundingSize.w / 2.0;
             ctx.beginPath();
@@ -350,14 +350,6 @@ var LambdaHoleExpr = function (_MissingExpression) {
         },
         set: function set(n) {
             this._name = n;
-        }
-    }, {
-        key: 'size',
-        get: function get() {
-            var size = _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'size', this);
-            size.w = Math.max(size.w, size.h);
-            size.h = Math.max(size.w, size.h);
-            return size;
         }
     }], [{
         key: 'colorForVarName',
@@ -890,12 +882,6 @@ var LambdaExpr = function (_Expression) {
 var FadedLambdaHoleExpr = function (_LambdaHoleExpr) {
     _inherits(FadedLambdaHoleExpr, _LambdaHoleExpr);
 
-    function FadedLambdaHoleExpr() {
-        _classCallCheck(this, FadedLambdaHoleExpr);
-
-        return _possibleConstructorReturn(this, (FadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedLambdaHoleExpr)).apply(this, arguments));
-    }
-
     _createClass(FadedLambdaHoleExpr, [{
         key: 'openImage',
         get: function get() {
@@ -908,23 +894,64 @@ var FadedLambdaHoleExpr = function (_LambdaHoleExpr) {
         }
     }]);
 
+    function FadedLambdaHoleExpr(varname) {
+        _classCallCheck(this, FadedLambdaHoleExpr);
+
+        var _this12 = _possibleConstructorReturn(this, (FadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedLambdaHoleExpr)).call(this, varname));
+
+        _this12.label = new TextExpr("λ" + varname + ".");
+        _this12.holes.push(_this12.label);
+        _this12.label.color = "#000";
+        return _this12;
+    }
+
+    _createClass(FadedLambdaHoleExpr, [{
+        key: 'open',
+        value: function open() {
+            if (!this.isOpen) {
+                this.label.color = "#000";
+                this.label.shadow = null;
+            }
+            _get(FadedLambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(FadedLambdaHoleExpr.prototype), 'open', this).call(this);
+        }
+    }, {
+        key: 'close',
+        value: function close() {
+            if (this.isOpen) {
+                this.label.color = "#565656";
+                this.label.shadow = {
+                    color: "#777",
+                    x: 1,
+                    y: 0,
+                    blur: 0
+                };
+            }
+            _get(FadedLambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(FadedLambdaHoleExpr.prototype), 'close', this).call(this);
+        }
+    }, {
+        key: 'drawInternal',
+        value: function drawInternal(ctx, pos, boundingSize) {
+            var rad = boundingSize.w / 2.0;
+            ctx.beginPath();
+            ctx.arc(pos.x + rad, pos.y + rad, rad, 0, 2 * Math.PI);
+            setStrokeStyle(ctx, this.stroke);
+            if (this.stroke) ctx.stroke();
+        }
+    }, {
+        key: 'size',
+        get: function get() {
+            var size = _get(FadedLambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(FadedLambdaHoleExpr.prototype), 'size', this);
+            size.w = Math.max(size.w, size.h);
+            size.h = Math.max(size.w, size.h);
+            return size;
+        }
+    }]);
+
     return FadedLambdaHoleExpr;
 }(LambdaHoleExpr);
 
 var HalfFadedLambdaHoleExpr = function (_LambdaHoleExpr2) {
     _inherits(HalfFadedLambdaHoleExpr, _LambdaHoleExpr2);
-
-    _createClass(HalfFadedLambdaHoleExpr, [{
-        key: 'openImage',
-        get: function get() {
-            return this.name === 'x' ? 'lambda-hole-xside' : 'lambda-hole-y';
-        }
-    }, {
-        key: 'closedImage',
-        get: function get() {
-            return this.name === 'x' ? 'lambda-hole-xside-closed' : 'lambda-hole-y-closed';
-        }
-    }]);
 
     function HalfFadedLambdaHoleExpr(varname) {
         _classCallCheck(this, HalfFadedLambdaHoleExpr);
@@ -952,6 +979,14 @@ var HalfFadedLambdaHoleExpr = function (_LambdaHoleExpr2) {
                 this.label.color = "#565656";
             }
             _get(HalfFadedLambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr.prototype), 'close', this).call(this);
+        }
+    }, {
+        key: 'size',
+        get: function get() {
+            var size = _get(HalfFadedLambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr.prototype), 'size', this);
+            size.w = Math.max(size.w, size.h);
+            size.h = Math.max(size.w, size.h);
+            return size;
         }
     }]);
 
