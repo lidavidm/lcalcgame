@@ -1037,13 +1037,21 @@ var FadedPythonLambdaHoleExpr = function (_LambdaHoleExpr3) {
     return FadedPythonLambdaHoleExpr;
 }(LambdaHoleExpr);
 
-var FadedES6LambdaHoleExpr = function (_FadedPythonLambdaHol) {
-    _inherits(FadedES6LambdaHoleExpr, _FadedPythonLambdaHol);
+var FadedES6LambdaHoleExpr = function (_LambdaHoleExpr4) {
+    _inherits(FadedES6LambdaHoleExpr, _LambdaHoleExpr4);
 
-    function FadedES6LambdaHoleExpr() {
+    function FadedES6LambdaHoleExpr(varname) {
         _classCallCheck(this, FadedES6LambdaHoleExpr);
 
-        return _possibleConstructorReturn(this, (FadedES6LambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedES6LambdaHoleExpr)).apply(this, arguments));
+        var _this15 = _possibleConstructorReturn(this, (FadedES6LambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedES6LambdaHoleExpr)).call(this, varname));
+
+        _this15.label = new TextExpr("(" + varname + ")");
+        _this15.arrow = new TextExpr("=>");
+        _this15.holes.push(_this15.label);
+        _this15.holes.push(_this15.arrow);
+        _this15.label.color = "#000";
+        _this15.arrow.color = "#000";
+        return _this15;
     }
 
     _createClass(FadedES6LambdaHoleExpr, [{
@@ -1055,40 +1063,8 @@ var FadedES6LambdaHoleExpr = function (_FadedPythonLambdaHol) {
             if (this.ignoreEvents) return null; // All children are ignored as well.
             else if (!this.isOpen) return null;
 
-            if (typeof options !== 'undefined' && options.hasOwnProperty('exclude')) {
-                var _iteratorNormalCompletion4 = true;
-                var _didIteratorError4 = false;
-                var _iteratorError4 = undefined;
-
-                try {
-                    for (var _iterator4 = options.exclude[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                        var e = _step4.value;
-
-                        if (e == this) return null;
-                    }
-                } catch (err) {
-                    _didIteratorError4 = true;
-                    _iteratorError4 = err;
-                } finally {
-                    try {
-                        if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                            _iterator4.return();
-                        }
-                    } finally {
-                        if (_didIteratorError4) {
-                            throw _iteratorError4;
-                        }
-                    }
-                }
-            }
-
-            var hitChild = this.hitsChild(pos, options);
-            if (hitChild) return hitChild;
-
-            // Hasn't hit any children, so test if the point lies on this node.
-            var boundingSize = this.absoluteSize;
-            boundingSize.w /= 2.0;
-            var upperLeftPos = this.upperLeftPos(this.absolutePos, boundingSize);
+            var boundingSize = this.label.absoluteSize;
+            var upperLeftPos = this.label.upperLeftPos(this.absolutePos, boundingSize);
             if (pointInRect(pos, rectFromPosAndSize(upperLeftPos, boundingSize))) return this;else return null;
         }
 
@@ -1099,9 +1075,8 @@ var FadedES6LambdaHoleExpr = function (_FadedPythonLambdaHol) {
         value: function drawInternal(ctx, pos, boundingSize) {
             setStrokeStyle(ctx, this.stroke);
             ctx.fillStyle = this.color;
-            ctx.drawImage(Resource.getImage(this.image), pos.x, pos.y, boundingSize.w, boundingSize.h);
             if (this.stroke) {
-                roundRect(ctx, pos.x, pos.y, boundingSize.w / 2.0, boundingSize.h, 6, false, true, this.stroke.opacity);
+                roundRect(ctx, pos.x, pos.y, this.arrow.absolutePos.x - pos.x, boundingSize.h, 6, false, true, this.stroke.opacity);
             }
         }
     }, {
@@ -1117,7 +1092,7 @@ var FadedES6LambdaHoleExpr = function (_FadedPythonLambdaHol) {
     }]);
 
     return FadedES6LambdaHoleExpr;
-}(FadedPythonLambdaHoleExpr);
+}(LambdaHoleExpr);
 
 var HalfFadedLambdaVarExpr = function (_LambdaVarExpr) {
     _inherits(HalfFadedLambdaVarExpr, _LambdaVarExpr);

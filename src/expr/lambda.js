@@ -751,7 +751,17 @@ class FadedPythonLambdaHoleExpr extends LambdaHoleExpr {
         }
     }
 }
-class FadedES6LambdaHoleExpr extends FadedPythonLambdaHoleExpr {
+class FadedES6LambdaHoleExpr extends LambdaHoleExpr {
+    constructor(varname) {
+        super(varname);
+        this.label = new TextExpr("(" + varname + ")");
+        this.arrow = new TextExpr("=>");
+        this.holes.push(this.label);
+        this.holes.push(this.arrow);
+        this.label.color = "#000";
+        this.arrow.color = "#000";
+    }
+
     get openImage() { return this.name === 'x' ? 'lambda-hole-x-es6' : 'lambda-hole-y'; }
     get closedImage() { return this.name === 'x' ? 'lambda-hole-x-closed-es6' : 'lambda-hole-y-closed'; }
 
@@ -760,19 +770,8 @@ class FadedES6LambdaHoleExpr extends FadedPythonLambdaHoleExpr {
         if (this.ignoreEvents) return null; // All children are ignored as well.
         else if (!this.isOpen) return null;
 
-        if (typeof options !== 'undefined' && options.hasOwnProperty('exclude')) {
-            for(let e of options.exclude) {
-                if (e == this) return null;
-            }
-        }
-
-        var hitChild = this.hitsChild(pos, options);
-        if (hitChild) return hitChild;
-
-        // Hasn't hit any children, so test if the point lies on this node.
-        var boundingSize = this.absoluteSize;
-        boundingSize.w /= 2.0;
-        var upperLeftPos = this.upperLeftPos(this.absolutePos, boundingSize);
+        var boundingSize = this.label.absoluteSize;
+        var upperLeftPos = this.label.upperLeftPos(this.absolutePos, boundingSize);
         if (pointInRect(pos, rectFromPosAndSize(upperLeftPos, boundingSize) )) return this;
         else return null;
     }
@@ -781,9 +780,8 @@ class FadedES6LambdaHoleExpr extends FadedPythonLambdaHoleExpr {
     drawInternal(ctx, pos, boundingSize) {
         setStrokeStyle(ctx, this.stroke);
         ctx.fillStyle = this.color;
-        ctx.drawImage(Resource.getImage(this.image), pos.x, pos.y, boundingSize.w, boundingSize.h);
-        if(this.stroke) {
-            roundRect(ctx, pos.x, pos.y, boundingSize.w / 2.0, boundingSize.h, 6, false, true, this.stroke.opacity);
+        if (this.stroke) {
+            roundRect(ctx, pos.x, pos.y, this.arrow.absolutePos.x - pos.x, boundingSize.h, 6, false, true, this.stroke.opacity);
         }
     }
 }
