@@ -4,29 +4,12 @@
  * -----------------------------------------------
  * */
 class LambdaHoleExpr extends MissingExpression {
-    get openImage() { return this.name === 'x' ? 'lambda-hole' : 'lambda-hole-red'; }
-    get closedImage() { return this.name === 'x' ? 'lambda-hole-closed' : 'lambda-hole-red-closed'; }
-    get openingAnimation() {
-        var anim = new mag.Animation();
-        anim.addFrame('lambda-hole-opening0', 50);
-        anim.addFrame('lambda-hole-opening1', 50);
-        anim.addFrame('lambda-hole',          50);
-        return anim;
-    }
-    get closingAnimation() {
-        var anim = new mag.Animation();
-        anim.addFrame('lambda-hole-opening1', 50);
-        anim.addFrame('lambda-hole-opening0', 50);
-        anim.addFrame('lambda-hole-closed',   50);
-        return anim;
-    }
-
     constructor(varname) {
         super(null);
         this._name = varname;
         this.color = this.colorForVarName();
-        this.image = this.openImage;
         this.isOpen = true;
+        this._openOffset = Math.PI / 2;
     }
     get name() { return this._name; }
     set name(n) { this._name = n; }
@@ -50,11 +33,45 @@ class LambdaHoleExpr extends MissingExpression {
     // Draw special circle representing a hole.
     drawInternal(ctx, pos, boundingSize) {
         var rad = boundingSize.w / 2.0;
-        setStrokeStyle(ctx, this.stroke);
-        ctx.fillStyle = this.color;
         ctx.beginPath();
         ctx.arc(pos.x+rad,pos.y+rad,rad,0,2*Math.PI);
-        ctx.drawImage(Resource.getImage(this.image), pos.x, pos.y, boundingSize.w, boundingSize.h);
+        var gradient = ctx.createLinearGradient(pos.x + rad, pos.y, pos.x + rad, pos.y + 2 * rad);
+        gradient.addColorStop(0.0, "#AAAAAA");
+        gradient.addColorStop(0.7, "#191919");
+        gradient.addColorStop(1.0, "#191919");
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+
+        if (this._openOffset < Math.PI / 2) {
+            ctx.fillStyle = '#A4A4A4';
+            setStrokeStyle(ctx, {
+                color: '#C8C8C8',
+                lineWidth: 1.5,
+            });
+
+            ctx.beginPath();
+            ctx.arc(pos.x+rad, pos.y+rad, rad, -0.25*Math.PI + this._openOffset, 0.75*Math.PI - this._openOffset);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(pos.x+rad, pos.y+rad, rad, -0.25*Math.PI - this._openOffset, 0.75*Math.PI + this._openOffset, true);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        ctx.beginPath();
+        ctx.arc(pos.x+rad,pos.y+rad,rad,0,2*Math.PI);
+        var gradient = ctx.createRadialGradient(pos.x + rad, pos.y + rad, 0.67 * rad, pos.x + rad, pos.y + rad, rad);
+        gradient.addColorStop(0,"rgba(0, 0, 0, 0.0)");
+        gradient.addColorStop(1,"rgba(0, 0, 0, 0.4)");
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        setStrokeStyle(ctx, this.stroke);
         if(this.stroke) ctx.stroke();
     }
 
@@ -63,11 +80,14 @@ class LambdaHoleExpr extends MissingExpression {
         if (!this.isOpen) {
             if (this.stage) {
                 if (this._runningAnim) this._runningAnim.cancel();
-                this._runningAnim = Animate.play(this.openingAnimation, this, () => {
-                    this.image = this.openImage;
-                    if (this.stage) this.stage.draw();
+                this._runningAnim = Animate.tween(this, { _openOffset: Math.PI / 2 }, 300).after(() => {
+                    this._openOffset = Math.PI / 2;
+                    this._runningAnim = null;
                 });
-            } else this.image = this.openImage;
+            }
+            else {
+                this._openOffset = Math.PI / 2;
+            }
             this.isOpen = true;
         }
     }
@@ -75,11 +95,14 @@ class LambdaHoleExpr extends MissingExpression {
         if (this.isOpen) {
             if (this.stage) {
                 if (this._runningAnim) this._runningAnim.cancel();
-                this._runningAnim = Animate.play(this.closingAnimation, this, () => {
-                    this.image = this.closedImage;
-                    if (this.stage) this.stage.draw();
+                this._runningAnim = Animate.tween(this, { _openOffset: 0 }, 300).after(() => {
+                    this._openOffset = 0;
+                    this._runningAnim = null;
                 });
-            } else this.image = this.closedImage;
+            }
+            else {
+                this._openOffset = 0;
+            }
             this.isOpen = false;
         }
     }
@@ -490,10 +513,13 @@ class LambdaExpr extends Expression {
         if (this.holes[0].name !== 'x')
             this.color = this.holes[0].color;
         let missing = !this.fullyDefined;
-        if (missing || (this.parent && ((this.parent instanceof FuncExpr && !this.parent.isAnimating)))) // ||
+        if (missing || (this.parent && ((this.parent instanceof FuncExpr && !this.parent.isAnimating)))) { // ||
             //this.parent instanceof LambdaExpr && this.parent.takesArgument)))
-                     this.holes[0].close();
-        else         this.holes[0].open();
+            this.holes[0].close();
+        }
+        else {
+            this.holes[0].open();
+        }
     }
 
     // Close lambda holes appropriately.

@@ -1,8 +1,8 @@
 'use strict';
 
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -18,36 +18,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var LambdaHoleExpr = function (_MissingExpression) {
     _inherits(LambdaHoleExpr, _MissingExpression);
 
-    _createClass(LambdaHoleExpr, [{
-        key: 'openImage',
-        get: function get() {
-            return this.name === 'x' ? 'lambda-hole' : 'lambda-hole-red';
-        }
-    }, {
-        key: 'closedImage',
-        get: function get() {
-            return this.name === 'x' ? 'lambda-hole-closed' : 'lambda-hole-red-closed';
-        }
-    }, {
-        key: 'openingAnimation',
-        get: function get() {
-            var anim = new mag.Animation();
-            anim.addFrame('lambda-hole-opening0', 50);
-            anim.addFrame('lambda-hole-opening1', 50);
-            anim.addFrame('lambda-hole', 50);
-            return anim;
-        }
-    }, {
-        key: 'closingAnimation',
-        get: function get() {
-            var anim = new mag.Animation();
-            anim.addFrame('lambda-hole-opening1', 50);
-            anim.addFrame('lambda-hole-opening0', 50);
-            anim.addFrame('lambda-hole-closed', 50);
-            return anim;
-        }
-    }]);
-
     function LambdaHoleExpr(varname) {
         _classCallCheck(this, LambdaHoleExpr);
 
@@ -55,8 +25,8 @@ var LambdaHoleExpr = function (_MissingExpression) {
 
         _this2._name = varname;
         _this2.color = _this2.colorForVarName();
-        _this2.image = _this2.openImage;
         _this2.isOpen = true;
+        _this2._openOffset = Math.PI / 2;
         return _this2;
     }
 
@@ -72,11 +42,44 @@ var LambdaHoleExpr = function (_MissingExpression) {
         key: 'drawInternal',
         value: function drawInternal(ctx, pos, boundingSize) {
             var rad = boundingSize.w / 2.0;
-            setStrokeStyle(ctx, this.stroke);
-            ctx.fillStyle = this.color;
             ctx.beginPath();
             ctx.arc(pos.x + rad, pos.y + rad, rad, 0, 2 * Math.PI);
-            ctx.drawImage(Resource.getImage(this.image), pos.x, pos.y, boundingSize.w, boundingSize.h);
+            var gradient = ctx.createLinearGradient(pos.x + rad, pos.y, pos.x + rad, pos.y + 2 * rad);
+            gradient.addColorStop(0.0, "#AAAAAA");
+            gradient.addColorStop(0.7, "#191919");
+            gradient.addColorStop(1.0, "#191919");
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            if (this._openOffset < Math.PI / 2) {
+                ctx.fillStyle = '#A4A4A4';
+                setStrokeStyle(ctx, {
+                    color: '#C8C8C8',
+                    lineWidth: 1.5
+                });
+
+                ctx.beginPath();
+                ctx.arc(pos.x + rad, pos.y + rad, rad, -0.25 * Math.PI + this._openOffset, 0.75 * Math.PI - this._openOffset);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(pos.x + rad, pos.y + rad, rad, -0.25 * Math.PI - this._openOffset, 0.75 * Math.PI + this._openOffset, true);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            ctx.beginPath();
+            ctx.arc(pos.x + rad, pos.y + rad, rad, 0, 2 * Math.PI);
+            var gradient = ctx.createRadialGradient(pos.x + rad, pos.y + rad, 0.67 * rad, pos.x + rad, pos.y + rad, rad);
+            gradient.addColorStop(0, "rgba(0, 0, 0, 0.0)");
+            gradient.addColorStop(1, "rgba(0, 0, 0, 0.4)");
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            setStrokeStyle(ctx, this.stroke);
             if (this.stroke) ctx.stroke();
         }
 
@@ -90,11 +93,13 @@ var LambdaHoleExpr = function (_MissingExpression) {
             if (!this.isOpen) {
                 if (this.stage) {
                     if (this._runningAnim) this._runningAnim.cancel();
-                    this._runningAnim = Animate.play(this.openingAnimation, this, function () {
-                        _this3.image = _this3.openImage;
-                        if (_this3.stage) _this3.stage.draw();
+                    this._runningAnim = Animate.tween(this, { _openOffset: Math.PI / 2 }, 300).after(function () {
+                        _this3._openOffset = Math.PI / 2;
+                        _this3._runningAnim = null;
                     });
-                } else this.image = this.openImage;
+                } else {
+                    this._openOffset = Math.PI / 2;
+                }
                 this.isOpen = true;
             }
         }
@@ -106,11 +111,13 @@ var LambdaHoleExpr = function (_MissingExpression) {
             if (this.isOpen) {
                 if (this.stage) {
                     if (this._runningAnim) this._runningAnim.cancel();
-                    this._runningAnim = Animate.play(this.closingAnimation, this, function () {
-                        _this4.image = _this4.closedImage;
-                        if (_this4.stage) _this4.stage.draw();
+                    this._runningAnim = Animate.tween(this, { _openOffset: 0 }, 300).after(function () {
+                        _this4._openOffset = 0;
+                        _this4._runningAnim = null;
                     });
-                } else this.image = this.closedImage;
+                } else {
+                    this._openOffset = 0;
+                }
                 this.isOpen = false;
             }
         }
@@ -641,9 +648,13 @@ var LambdaExpr = function (_Expression) {
             // Determine whether this LambdaExpr has any MissingExpressions:
             if (this.holes[0].name !== 'x') this.color = this.holes[0].color;
             var missing = !this.fullyDefined;
-            if (missing || this.parent && this.parent instanceof FuncExpr && !this.parent.isAnimating) // ||
+            if (missing || this.parent && this.parent instanceof FuncExpr && !this.parent.isAnimating) {
+                // ||
                 //this.parent instanceof LambdaExpr && this.parent.takesArgument)))
-                this.holes[0].close();else this.holes[0].open();
+                this.holes[0].close();
+            } else {
+                this.holes[0].open();
+            }
         }
 
         // Close lambda holes appropriately.
