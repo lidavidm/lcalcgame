@@ -20,11 +20,11 @@
         },
         {
             "description": "Multiple variables can be reduced.",
-            "board": "(#_x) (#_y)",
+            "board": "(#_x) (#_apple)",
             "goal": "(diamond) (star)",
             "globals": {
                 "x": "(diamond)",
-                "y": "(star)"
+                "apple": "(star)"
             }
         },
         {
@@ -133,6 +133,12 @@
         {
             "description": "Outer variables are still visible",
             "board": "(λy /(λx /#y))",
+            "goal": "(triangle)",
+            "toolbox": "(diamond) (star) (triangle)"
+        },
+        {
+            "description": "Outer variables are still visible",
+            "board": "(λy _) (#_y) (λapple #x)",
             "goal": "(triangle)",
             "toolbox": "(diamond) (star) (triangle)"
         }
