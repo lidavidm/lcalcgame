@@ -245,7 +245,7 @@ class AssignExpr extends Expression {
                 };
                 otherVars.forEach((v) => v.animateChangeTo(this.value.clone()));
                 this.variable.animateShrink();
-                Animate.tween(this.value, target, SHRINK_DURATION).after(() => {
+                Animate.tween(this.value, target, SHRINK_DURATION, (t) => -t * t * (t - 2)).after(() => {
                     this.value.scale = { x: 0, y: 0 };
                     this.variable.open(this.value.clone(), false);
                     window.setTimeout(afterAnimate, EXPAND_DURATION);

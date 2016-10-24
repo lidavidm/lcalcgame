@@ -290,7 +290,9 @@ var AssignExpr = function (_Expression2) {
                             return v.animateChangeTo(_this6.value.clone());
                         });
                         _this6.variable.animateShrink();
-                        Animate.tween(_this6.value, target, SHRINK_DURATION).after(function () {
+                        Animate.tween(_this6.value, target, SHRINK_DURATION, function (t) {
+                            return -t * t * (t - 2);
+                        }).after(function () {
                             _this6.value.scale = { x: 0, y: 0 };
                             _this6.variable.open(_this6.value.clone(), false);
                             window.setTimeout(afterAnimate, EXPAND_DURATION);
