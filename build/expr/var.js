@@ -10,8 +10,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var SHRINK_DURATION = 500;
-var EXPAND_DURATION = 800;
+var SHRINK_DURATION = 800;
+var EXPAND_DURATION = 400;
 /// Variable nodes - separate from lambda variable expressions, for
 /// now.
 
@@ -73,17 +73,24 @@ var VarExpr = function (_Expression) {
             var _this3 = this;
 
             this.animating = true;
-            var target = {
-                scale: {
-                    x: 0.0,
-                    y: 0.0
-                },
-                pos: {
-                    x: this.holes[1].pos.x + 0.5 * this.holes[1].size.w,
-                    y: this.holes[1].pos.y
-                }
-            };
-            Animate.tween(this.holes[1], target, SHRINK_DURATION).after(function () {
+            var target = null;
+            if (this.holes[1] instanceof ExpressionView) {
+                target = {
+                    _openOffset: Math.PI / 2
+                };
+            } else {
+                target = {
+                    scale: {
+                        x: 0.0,
+                        y: 0.0
+                    },
+                    pos: {
+                        x: this.holes[1].pos.x + 0.5 * this.holes[1].size.w,
+                        y: this.holes[1].pos.y
+                    }
+                };
+            }
+            return Animate.tween(this.holes[1], target, SHRINK_DURATION).after(function () {
                 _this3.animating = false;
             });
         }
@@ -92,18 +99,8 @@ var VarExpr = function (_Expression) {
         value: function animateChangeTo(value) {
             var _this4 = this;
 
-            this.animating = true;
-            var target = {
-                scale: {
-                    x: 0.0,
-                    y: 0.0
-                },
-                pos: {
-                    x: this.holes[1].pos.x + 0.5 * this.holes[1].size.w,
-                    y: this.holes[1].pos.y
-                }
-            };
-            Animate.tween(this.holes[1], target, SHRINK_DURATION).after(function () {
+            this.animateShrink().after(function () {
+                _this4.animating = true;
                 _this4.holes[1] = value;
                 _get(VarExpr.prototype.__proto__ || Object.getPrototypeOf(VarExpr.prototype), "update", _this4).call(_this4);
                 var target = {
@@ -341,7 +338,10 @@ var ExpressionView = function (_MissingExpression) {
     function ExpressionView(expr_to_miss) {
         _classCallCheck(this, ExpressionView);
 
-        return _possibleConstructorReturn(this, (ExpressionView.__proto__ || Object.getPrototypeOf(ExpressionView)).call(this, expr_to_miss));
+        var _this7 = _possibleConstructorReturn(this, (ExpressionView.__proto__ || Object.getPrototypeOf(ExpressionView)).call(this, expr_to_miss));
+
+        _this7._openOffset = 0;
+        return _this7;
     }
 
     // Disable interactivity
@@ -362,14 +362,43 @@ var ExpressionView = function (_MissingExpression) {
     }, {
         key: "drawInternal",
         value: function drawInternal(ctx, pos, boundingSize) {
-            // TODO: draw "closed" thing much like lambda
-            ctx.fillStyle = 'black';
-            setStrokeStyle(ctx, this.stroke);
-            if (this.shadowOffset !== 0) {
-                roundRect(ctx, pos.x, pos.y + this.shadowOffset, boundingSize.w, boundingSize.h, this.radius * this.absoluteScale.x, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null); // just fill for now
+            var rad = boundingSize.w / 2.0;
+            ctx.beginPath();
+            ctx.arc(pos.x + rad, pos.y + rad, rad, 0, 2 * Math.PI);
+            var gradient = ctx.createLinearGradient(pos.x + rad, pos.y, pos.x + rad, pos.y + 2 * rad);
+            gradient.addColorStop(0.0, "#AAAAAA");
+            gradient.addColorStop(0.7, "#191919");
+            gradient.addColorStop(1.0, "#191919");
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            if (this._openOffset < Math.PI / 2) {
+                ctx.fillStyle = '#A4A4A4';
+                setStrokeStyle(ctx, {
+                    color: '#C8C8C8',
+                    lineWidth: 1.5
+                });
+
+                ctx.beginPath();
+                ctx.arc(pos.x + rad, pos.y + rad, rad, -0.25 * Math.PI + this._openOffset, 0.75 * Math.PI - this._openOffset);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(pos.x + rad, pos.y + rad, rad, -0.25 * Math.PI - this._openOffset, 0.75 * Math.PI + this._openOffset, true);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
             }
-            ctx.fillStyle = this.color;
-            roundRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, this.radius * this.absoluteScale.x, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null); // just fill for now
+
+            ctx.beginPath();
+            ctx.arc(pos.x + rad, pos.y + rad, rad, 0, 2 * Math.PI);
+            var gradient = ctx.createRadialGradient(pos.x + rad, pos.y + rad, 0.67 * rad, pos.x + rad, pos.y + rad, rad);
+            gradient.addColorStop(0, "rgba(0, 0, 0, 0.0)");
+            gradient.addColorStop(1, "rgba(0, 0, 0, 0.4)");
+            ctx.fillStyle = gradient;
+            ctx.fill();
         }
     }]);
 
