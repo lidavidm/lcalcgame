@@ -79,6 +79,16 @@
             }
         },
         {
+            "description": "Choose where to assign.",
+            "board": "(assign _ /star)",
+            "goal": "(star) (triangle)",
+            "toolbox": "(#_x) (#_x) (#_y) (#_y)",
+            "globals": {
+                "x": "(diamond)",
+                "y": "(triangle)"
+            }
+        },
+        {
             "description": "Basic lambdas work.",
             "board": "(λx /#x)",
             "goal": "(star)",
