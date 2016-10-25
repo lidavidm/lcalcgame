@@ -19,19 +19,7 @@ class VarExpr extends Expression {
             this.update();
             return null;
         }
-        this.animating = true;
-        let target = {
-            scale: {
-                x: 0.0,
-                y: 0.0,
-            },
-            pos: {
-                x: this.holes[1].pos.x + 0.5 * this.holes[1].size.w,
-                y: this.holes[1].pos.y,
-            },
-        };
-        return Animate.tween(this.holes[1], target, 300).after(() => {
-            this.animating = false;
+        return this.animateShrink(200).after(() => {
             this.preview = preview;
             this.update();
         });
@@ -42,7 +30,7 @@ class VarExpr extends Expression {
         this.update();
     }
 
-    animateShrink() {
+    animateShrink(duration) {
         this.animating = true;
         let target = null;
         if (this.holes[1] instanceof ExpressionView) {
@@ -62,13 +50,13 @@ class VarExpr extends Expression {
                 },
             };
         }
-        return Animate.tween(this.holes[1], target, SHRINK_DURATION).after(() => {
+        return Animate.tween(this.holes[1], target, duration).after(() => {
             this.animating = false;
         });
     }
 
     animateChangeTo(value) {
-        this.animateShrink().after(() => {
+        this.animateShrink(SHRINK_DURATION).after(() => {
             this.animating = true;
             this.holes[1] = value;
             super.update();
@@ -217,7 +205,6 @@ class AssignExpr extends Expression {
                 initial = initial.concat(this.stage.nodes);
             }
             let otherVars = findAliasingVarExpr(initial, this.variable.name, [this.variable], false, true);
-            console.log(otherVars);
             let afterAnimate = () => {
                 this.getEnvironment().update(this.variable.name, this.value);
                 let parent = this.parent || this.stage;
@@ -242,7 +229,7 @@ class AssignExpr extends Expression {
                     },
                 };
                 otherVars.forEach((v) => v.animateChangeTo(this.value.clone()));
-                this.variable.animateShrink();
+                this.variable.animateShrink(SHRINK_DURATION);
                 Animate.tween(this.value, target, SHRINK_DURATION, (t) => -t * t * (t - 2)).after(() => {
                     this.value.scale = { x: 0, y: 0 };
                     this.variable.open(this.value.clone(), false);

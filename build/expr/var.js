@@ -44,19 +44,7 @@ var VarExpr = function (_Expression) {
                 this.update();
                 return null;
             }
-            this.animating = true;
-            var target = {
-                scale: {
-                    x: 0.0,
-                    y: 0.0
-                },
-                pos: {
-                    x: this.holes[1].pos.x + 0.5 * this.holes[1].size.w,
-                    y: this.holes[1].pos.y
-                }
-            };
-            return Animate.tween(this.holes[1], target, 300).after(function () {
-                _this2.animating = false;
+            return this.animateShrink(200).after(function () {
                 _this2.preview = preview;
                 _this2.update();
             });
@@ -69,7 +57,7 @@ var VarExpr = function (_Expression) {
         }
     }, {
         key: "animateShrink",
-        value: function animateShrink() {
+        value: function animateShrink(duration) {
             var _this3 = this;
 
             this.animating = true;
@@ -90,7 +78,7 @@ var VarExpr = function (_Expression) {
                     }
                 };
             }
-            return Animate.tween(this.holes[1], target, SHRINK_DURATION).after(function () {
+            return Animate.tween(this.holes[1], target, duration).after(function () {
                 _this3.animating = false;
             });
         }
@@ -99,7 +87,7 @@ var VarExpr = function (_Expression) {
         value: function animateChangeTo(value) {
             var _this4 = this;
 
-            this.animateShrink().after(function () {
+            this.animateShrink(SHRINK_DURATION).after(function () {
                 _this4.animating = true;
                 _this4.holes[1] = value;
                 _get(VarExpr.prototype.__proto__ || Object.getPrototypeOf(VarExpr.prototype), "update", _this4).call(_this4);
@@ -259,7 +247,6 @@ var AssignExpr = function (_Expression2) {
                         initial = initial.concat(_this6.stage.nodes);
                     }
                     var otherVars = findAliasingVarExpr(initial, _this6.variable.name, [_this6.variable], false, true);
-                    console.log(otherVars);
                     var afterAnimate = function afterAnimate() {
                         _this6.getEnvironment().update(_this6.variable.name, _this6.value);
                         var parent = _this6.parent || _this6.stage;
@@ -286,7 +273,7 @@ var AssignExpr = function (_Expression2) {
                         otherVars.forEach(function (v) {
                             return v.animateChangeTo(_this6.value.clone());
                         });
-                        _this6.variable.animateShrink();
+                        _this6.variable.animateShrink(SHRINK_DURATION);
                         Animate.tween(_this6.value, target, SHRINK_DURATION, function (t) {
                             return -t * t * (t - 2);
                         }).after(function () {
