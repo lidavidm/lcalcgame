@@ -273,6 +273,7 @@ var AssignExpr = function (_Expression2) {
                         otherVars.forEach(function (v) {
                             return v.animateChangeTo(_this6.value.clone());
                         });
+                        Resource.play('swoop');
                         _this6.variable.animateShrink(SHRINK_DURATION);
                         Animate.tween(_this6.value, target, SHRINK_DURATION, function (t) {
                             return -t * t * (t - 2);

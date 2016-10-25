@@ -46,6 +46,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAudio('mirror-shatter', 'shatter2.wav');
     loadAudio('splosion', 'firework1.wav');
     loadAudio('shootwee', 'firework-shooting.wav');
+    loadAudio('swoop', 'swoop.wav');
     loadAudio('key-jiggle', 'key-jiggle.wav');
     loadAudio('key-unlock', 'key-unlock-fast.wav');
     loadAudio('victory', '325805__wagna__collect.wav');
