@@ -207,6 +207,8 @@ var LambdaHoleExpr = function (_MissingExpression) {
             var _this5 = this;
 
             if (node instanceof LambdaHoleExpr) node = node.parent;
+            // Variables must be reduced before application
+            if (node instanceof VarExpr) return;
             _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'ondropenter', this).call(this, node, pos);
 
             // Special case: Funnel representation of 'map' hovered over hole.
@@ -243,6 +245,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
         key: 'ondropexit',
         value: function ondropexit(node, pos) {
             if (node instanceof LambdaHoleExpr) node = node.parent;
+            if (node instanceof VarExpr) return;
 
             _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'ondropexit', this).call(this, node, pos);
 
