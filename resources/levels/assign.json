@@ -4,7 +4,7 @@
     "levels": [
         {
             "description": "Reducing a variable.",
-            "board": "(#_x)",
+            "board": "($_x)",
             "goal": "(diamond)",
             "globals": {
                 "x": "(diamond)"
@@ -12,7 +12,7 @@
         },
         {
             "description": "Variables can be reduced multiple times.",
-            "board": "(#_x) (#_x)",
+            "board": "($_x) ($_x)",
             "goal": "(diamond) (diamond)",
             "globals": {
                 "x": "(diamond)"
@@ -20,7 +20,7 @@
         },
         {
             "description": "Multiple variables can be reduced.",
-            "board": "(#_x) (#_apple)",
+            "board": "($_x) ($_apple)",
             "goal": "(diamond) (star)",
             "globals": {
                 "x": "(diamond)",
@@ -29,7 +29,7 @@
         },
         {
             "description": "Assign to a variable.",
-            "board": "(assign /#x /star) (#_x)",
+            "board": "(assign /$x /star) ($_x)",
             "goal": "(star)",
             "globals": {
                 "x": "(diamond)"
@@ -37,7 +37,7 @@
         },
         {
             "description": "Choose what to assign.",
-            "board": "(assign /#_x _) (#_x)",
+            "board": "(assign /$_x _) ($_x)",
             "goal": "(star)",
             "toolbox": "(triangle) (star)",
             "globals": {
@@ -46,13 +46,13 @@
         },
         {
             "description": "Assign to an undefined variable.",
-            "board": "(assign /#y _) (#_y)",
+            "board": "(assign /$y _) ($_y)",
             "goal": "(star)",
             "toolbox": "(diamond) (star)"
         },
         {
             "description": "Multiple assignment.",
-            "board": "(assign /#x _) (#_x) (assign /#y _) (#_y)",
+            "board": "(assign /$x _) ($_x) (assign /$y _) ($_y)",
             "goal": "(star) (triangle)",
             "toolbox": "(triangle) (star)",
             "globals": {
@@ -61,7 +61,7 @@
         },
         {
             "description": "Assignment order matters.",
-            "board": "(assign /#x /#y) (assign /#y /star) (#_x)",
+            "board": "(assign /$x /$y) (assign /$y /star) ($_x)",
             "goal": "(star)",
             "toolbox": "(diamond) (star)",
             "globals": {
@@ -70,7 +70,7 @@
         },
         {
             "description": "Assignment order still matters.",
-            "board": "(assign /#x /#y) (assign /#y /star) (#_x) (assign /#y /#x) (#_y)",
+            "board": "(assign /$x /$y) (assign /$y /star) ($_x) (assign /$y /$x) ($_y)",
             "goal": "(star) (star)",
             "toolbox": "(diamond) (star)",
             "globals": {
@@ -82,7 +82,7 @@
             "description": "Choose where to assign.",
             "board": "(assign _ /star)",
             "goal": "(star) (triangle)",
-            "toolbox": "(#_x) (#_x) (#_y) (#_y)",
+            "toolbox": "($_x) ($_x) ($_y) ($_y)",
             "globals": {
                 "x": "(diamond)",
                 "y": "(triangle)"
@@ -90,7 +90,7 @@
         },
         {
             "description": "Basic lambdas work.",
-            "board": "(λx /#x)",
+            "board": "(λx /$x)",
             "goal": "(star)",
             "toolbox": "(diamond) (star)",
             "globals": {
@@ -99,7 +99,7 @@
         },
         {
             "description": "Lambdas can read outside their environment.",
-            "board": "(λx /#y) (#y)",
+            "board": "(λx /$y) ($y)",
             "goal": "(star) (star)",
             "toolbox": "(diamond)",
             "globals": {
@@ -108,7 +108,7 @@
         },
         {
             "description": "Outside changes are reflected in the lambda.",
-            "board": "(λx /#y) (assign /#y _)",
+            "board": "(λx /$y) (assign /$y _)",
             "goal": "(triangle)",
             "toolbox": "(diamond) (star) (triangle)",
             "globals": {
@@ -117,7 +117,7 @@
         },
         {
             "description": "Lambda variables shadow external ones",
-            "board": "(λx /#x) (#x)",
+            "board": "(λx /$x) ($x)",
             "goal": "(star) (triangle)",
             "toolbox": "(diamond) (star) (triangle)",
             "globals": {
@@ -126,14 +126,14 @@
         },
         {
             "description": "Build a lambda with variables",
-            "board": "(λx _) (#x) (triangle)",
+            "board": "(λx _) ($x) (triangle)",
             "goal": "(triangle)",
             "globals": {
             }
         },
         {
             "description": "Lambda variables shadow outer ones",
-            "board": "(λx /(λx /#x)) (#x)",
+            "board": "(λx /(λx /$x)) ($x)",
             "goal": "(star) (triangle)",
             "toolbox": "(diamond) (triangle)",
             "globals": {
@@ -142,13 +142,13 @@
         },
         {
             "description": "Outer variables are still visible",
-            "board": "(λy /(λx /#y))",
+            "board": "(λy /(λx /$y))",
             "goal": "(triangle)",
             "toolbox": "(diamond) (star) (triangle)"
         },
         {
             "description": "Outer variables are still visible",
-            "board": "(λy _) (#_y) (λapple #x)",
+            "board": "(λy _) ($_y) (λapple $x)",
             "goal": "(triangle)",
             "toolbox": "(diamond) (star) (triangle)"
         }
