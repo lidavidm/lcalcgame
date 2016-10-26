@@ -386,13 +386,21 @@ class Level {
         if (!Array.isArray(es))
             es = [es];
 
+        // Bounds cache seems to greatly destroy performance
+        var sizeCache = {};
+        var getSize = function(e) {
+            // TODO: a lot of time spent in toString
+            if (!sizeCache[e]) sizeCache[e] = e.absoluteSize;
+            return sizeCache[e];
+        };
+
         var candidates = [];
         var CANDIDATE_THRESHOLD = 10;
         while (candidates.length < CANDIDATE_THRESHOLD) {
 
             // 1. Put the expressions in random places.
             for (let e of es) {
-                let size = e.absoluteSize;
+                let size = getSize(e);
 
                 let y = 0;
                 while (y < 50) {

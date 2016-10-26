@@ -1,5 +1,3 @@
-
-
 class TextExpr extends Expression {
     constructor(txt, font='Consolas', fontSize=35) {
         super();
@@ -8,6 +6,7 @@ class TextExpr extends Expression {
         this.fontSize = fontSize; // in pixels
         this.color = 'black';
         this.shadow = null;
+        this._sizeCache = null;
     }
     get size() {
         var ctx = this.ctx || GLOBAL_DEFAULT_CTX;
@@ -15,10 +14,19 @@ class TextExpr extends Expression {
             console.error('Cannot size text: No context.');
             return { w:4, h:this.fontSize };
         }
-        else if (this.manualWidth)
+        else if (this.manualWidth) {
             return { w:this.manualWidth, h:DEFAULT_EXPR_HEIGHT };
+        }
+        else if (this._sizeCache) {
+            // Return a copy because callers may mutate this
+            return { w: this._sizeCache.size.w, h: this._sizeCache.size.h };
+        }
+
         ctx.font = this.contextFont;
         var measure = ctx.measureText(this.text);
+        this._sizeCache = {
+            size: { w: measure.width, h: DEFAULT_EXPR_HEIGHT },
+        };
         return { w:measure.width, h:DEFAULT_EXPR_HEIGHT };
     }
     get contextFont() {

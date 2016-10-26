@@ -219,6 +219,14 @@ var Level = function () {
             var _this = this;
             if (!Array.isArray(es)) es = [es];
 
+            // Bounds cache seems to greatly destroy performance
+            var sizeCache = {};
+            var getSize = function getSize(e) {
+                // TODO: a lot of time spent in toString
+                if (!sizeCache[e]) sizeCache[e] = e.absoluteSize;
+                return sizeCache[e];
+            };
+
             var candidates = [];
             var CANDIDATE_THRESHOLD = 10;
             while (candidates.length < CANDIDATE_THRESHOLD) {
@@ -232,7 +240,7 @@ var Level = function () {
                     for (var _iterator3 = es[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
                         var e = _step3.value;
 
-                        var size = e.absoluteSize;
+                        var size = getSize(e);
 
                         var y = 0;
                         while (y < 50) {

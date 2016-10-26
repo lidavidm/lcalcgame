@@ -24,6 +24,7 @@ var TextExpr = function (_Expression) {
         _this.fontSize = fontSize; // in pixels
         _this.color = 'black';
         _this.shadow = null;
+        _this._sizeCache = null;
         return _this;
     }
 
@@ -65,9 +66,18 @@ var TextExpr = function (_Expression) {
             if (!ctx || !this.text || this.text.length === 0) {
                 console.error('Cannot size text: No context.');
                 return { w: 4, h: this.fontSize };
-            } else if (this.manualWidth) return { w: this.manualWidth, h: DEFAULT_EXPR_HEIGHT };
+            } else if (this.manualWidth) {
+                return { w: this.manualWidth, h: DEFAULT_EXPR_HEIGHT };
+            } else if (this._sizeCache) {
+                // Return a copy because callers may mutate this
+                return { w: this._sizeCache.size.w, h: this._sizeCache.size.h };
+            }
+
             ctx.font = this.contextFont;
             var measure = ctx.measureText(this.text);
+            this._sizeCache = {
+                size: { w: measure.width, h: DEFAULT_EXPR_HEIGHT }
+            };
             return { w: measure.width, h: DEFAULT_EXPR_HEIGHT };
         }
     }, {
