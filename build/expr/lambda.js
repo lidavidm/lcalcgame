@@ -1194,7 +1194,7 @@ function findNoncapturingVarExpr(lambda, name) {
     var queue = [lambda];
     while (queue.length > 0) {
         var node = queue.pop();
-        if (node instanceof VarExpr) {
+        if (node instanceof VarExpr || node instanceof LambdaVarExpr) {
             subvarexprs.push(node);
         } else if (node !== lambda && node instanceof LambdaExpr && (node.takesArgument && node.holes[0].name === name || skipLambda)) {
             // Capture-avoiding substitution

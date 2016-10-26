@@ -841,7 +841,7 @@ function findNoncapturingVarExpr(lambda, name, skipLambda=false) {
     let queue = [lambda];
     while (queue.length > 0) {
         let node = queue.pop();
-        if (node instanceof VarExpr) {
+        if (node instanceof VarExpr || node instanceof LambdaVarExpr) {
             subvarexprs.push(node);
         }
         else if (node !== lambda &&
