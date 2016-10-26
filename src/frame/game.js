@@ -359,7 +359,9 @@ class Level {
                 lambdavar.ignoreEvents = false; // makes draggable
                 lambdavar.name = varname;
             }
-            // return lambdavar;
+            return lambdavar;
+        } else if (arg.indexOf('$') > -1) {
+            let varname = arg.replace('$', '').replace('_', '');
             return lock(new VarExpr(varname), locked);
         } else {
             console.error('Unknown argument: ', arg);
