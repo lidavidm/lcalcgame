@@ -355,42 +355,21 @@ var ExpressionView = function (_MissingExpression) {
         key: "drawInternal",
         value: function drawInternal(ctx, pos, boundingSize) {
             var rad = boundingSize.w / 2.0;
+            setStrokeStyle(ctx, {
+                color: '#AAAAAA',
+                lineWidth: 3
+            });
             ctx.beginPath();
             ctx.arc(pos.x + rad, pos.y + rad, rad, 0, 2 * Math.PI);
-            var gradient = ctx.createLinearGradient(pos.x + rad, pos.y, pos.x + rad, pos.y + 2 * rad);
-            gradient.addColorStop(0.0, "#AAAAAA");
-            gradient.addColorStop(0.7, "#191919");
-            gradient.addColorStop(1.0, "#191919");
-            ctx.fillStyle = gradient;
-            ctx.fill();
 
-            if (this._openOffset < Math.PI / 2) {
-                ctx.fillStyle = '#A4A4A4';
-                setStrokeStyle(ctx, {
-                    color: '#C8C8C8',
-                    lineWidth: 1.5
-                });
-
-                ctx.beginPath();
-                ctx.arc(pos.x + rad, pos.y + rad, rad, -0.25 * Math.PI + this._openOffset, 0.75 * Math.PI - this._openOffset);
-                ctx.closePath();
-                ctx.fill();
-                ctx.stroke();
-
-                ctx.beginPath();
-                ctx.arc(pos.x + rad, pos.y + rad, rad, -0.25 * Math.PI - this._openOffset, 0.75 * Math.PI + this._openOffset, true);
-                ctx.closePath();
-                ctx.fill();
-                ctx.stroke();
-            }
-
-            ctx.beginPath();
-            ctx.arc(pos.x + rad, pos.y + rad, rad, 0, 2 * Math.PI);
-            var gradient = ctx.createRadialGradient(pos.x + rad, pos.y + rad, 0.67 * rad, pos.x + rad, pos.y + rad, rad);
-            gradient.addColorStop(0, "rgba(0, 0, 0, 0.0)");
-            gradient.addColorStop(1, "rgba(0, 0, 0, 0.4)");
-            ctx.fillStyle = gradient;
-            ctx.fill();
+            // ctx.globalCompositeOperation = 'multiply';
+            ctx.clip();
+            var alpha = 0.5 * ((Math.PI / 2 - this._openOffset) / (Math.PI / 2));
+            ctx.shadowColor = "rgba(0,0,0," + alpha + ")";
+            ctx.shadowBlur = 3;
+            ctx.shadowOffsetX = 1;
+            ctx.shadowOffsetY = 1;
+            ctx.stroke();
         }
     }]);
 
