@@ -247,6 +247,9 @@ var AssignExpr = function (_Expression2) {
                     } else {
                         initial = initial.concat(_this6.stage.nodes);
                     }
+
+                    // Prevent background on GraphicValueExpr from being drawn
+                    _this6.value.ignoreEvents = true;
                     var otherVars = findAliasingVarExpr(initial, _this6.variable.name, [_this6.variable]);
                     var afterAnimate = function afterAnimate() {
                         _this6.getEnvironment().update(_this6.variable.name, _this6.value);

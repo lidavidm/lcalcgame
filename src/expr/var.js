@@ -205,6 +205,9 @@ class AssignExpr extends Expression {
             else {
                 initial = initial.concat(this.stage.nodes);
             }
+
+            // Prevent background on GraphicValueExpr from being drawn
+            this.value.ignoreEvents = true;
             let otherVars = findAliasingVarExpr(initial, this.variable.name, [this.variable]);
             let afterAnimate = () => {
                 this.getEnvironment().update(this.variable.name, this.value);
