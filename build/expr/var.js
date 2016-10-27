@@ -40,6 +40,7 @@ var VarExpr = function (_Expression) {
             var animate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
             if (!animate) {
+                this.animating = false;
                 this.preview = preview;
                 this.update();
                 return null;
@@ -246,7 +247,7 @@ var AssignExpr = function (_Expression2) {
                     } else {
                         initial = initial.concat(_this6.stage.nodes);
                     }
-                    var otherVars = findAliasingVarExpr(initial, _this6.variable.name, [_this6.variable], false, true);
+                    var otherVars = findAliasingVarExpr(initial, _this6.variable.name, [_this6.variable]);
                     var afterAnimate = function afterAnimate() {
                         _this6.getEnvironment().update(_this6.variable.name, _this6.value);
                         var parent = _this6.parent || _this6.stage;
@@ -393,7 +394,7 @@ var ExpressionView = function (_MissingExpression) {
     return ExpressionView;
 }(MissingExpression);
 
-function findAliasingVarExpr(initial, name) {
+function findAliasingVarExpr(initial, name, ignore) {
     // TODO: needs to account for whether the variable we are looking
     // for is in an outer scope. Example:
     // x = 3
@@ -404,7 +405,7 @@ function findAliasingVarExpr(initial, name) {
     var queue = initial;
     while (queue.length > 0) {
         var node = queue.pop();
-        if (node instanceof VarExpr && node.name === name) {
+        if (node instanceof VarExpr && node.name === name && ignore.indexOf(node) == -1) {
             subvarexprs.push(node);
         } else if (node instanceof LambdaExpr && node.takesArgument && node.holes[0].name === name) {
             // Capture-avoiding substitution

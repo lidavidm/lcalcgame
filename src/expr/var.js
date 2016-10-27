@@ -15,6 +15,7 @@ class VarExpr extends Expression {
 
     open(preview, animate=true) {
         if (!animate) {
+            this.animating = false;
             this.preview = preview;
             this.update();
             return null;
@@ -204,7 +205,7 @@ class AssignExpr extends Expression {
             else {
                 initial = initial.concat(this.stage.nodes);
             }
-            let otherVars = findAliasingVarExpr(initial, this.variable.name, [this.variable], false, true);
+            let otherVars = findAliasingVarExpr(initial, this.variable.name, [this.variable]);
             let afterAnimate = () => {
                 this.getEnvironment().update(this.variable.name, this.value);
                 let parent = this.parent || this.stage;
@@ -313,7 +314,7 @@ class ExpressionView extends MissingExpression {
     }
 }
 
-function findAliasingVarExpr(initial, name) {
+function findAliasingVarExpr(initial, name, ignore) {
     // TODO: needs to account for whether the variable we are looking
     // for is in an outer scope. Example:
     // x = 3
@@ -324,7 +325,7 @@ function findAliasingVarExpr(initial, name) {
     let queue = initial;
     while (queue.length > 0) {
         let node = queue.pop();
-        if (node instanceof VarExpr && node.name === name) {
+        if (node instanceof VarExpr && node.name === name && ignore.indexOf(node) == -1) {
             subvarexprs.push(node);
         }
         else if (node instanceof LambdaExpr &&
