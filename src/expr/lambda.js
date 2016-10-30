@@ -118,7 +118,6 @@ class LambdaHoleExpr extends MissingExpression {
             return false;
         }
 
-
         let vars = mag.Stage.getNodesWithClass(VarExpr, [], true, [node]);
         for (let variable of vars) {
             // If the variable can't be reduced, don't allow this to be reduced.
@@ -224,7 +223,7 @@ class LambdaHoleExpr extends MissingExpression {
             var afterDrop = () => {
                 // Cleanup
                 node.opacity = 1.0;
-                this.close_opened_subexprs();
+                if (this.close_opened_subexprs) this.close_opened_subexprs();
 
                 // User dropped an expression into the lambda hole.
                 Resource.play('pop');

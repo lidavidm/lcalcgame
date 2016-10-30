@@ -279,7 +279,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
                 var afterDrop = function afterDrop() {
                     // Cleanup
                     node.opacity = 1.0;
-                    _this6.close_opened_subexprs();
+                    if (_this6.close_opened_subexprs) _this6.close_opened_subexprs();
 
                     // User dropped an expression into the lambda hole.
                     Resource.play('pop');
