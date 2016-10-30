@@ -285,7 +285,6 @@ class ExpressionView extends MissingExpression {
         ctx.beginPath();
         ctx.arc(pos.x+rad,pos.y+rad,rad,0,2*Math.PI);
 
-        // ctx.globalCompositeOperation = 'multiply';
         ctx.clip();
         let alpha = 0.5 * (((Math.PI / 2) - this._openOffset) / (Math.PI / 2));
         ctx.shadowColor = `rgba(0,0,0,${alpha})`;

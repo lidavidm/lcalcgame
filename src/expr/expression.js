@@ -132,6 +132,7 @@ class Expression extends mag.RoundedRect {
                 width += s.w + padding.inner;
             }
         });
+
         if (this._stackVertically) {
             width += padding.right + padding.left;
         }
@@ -154,12 +155,6 @@ class Expression extends mag.RoundedRect {
     }
 
     update() {
-        var padding = this.padding.inner;
-        var x = this.padding.left;
-        var y = this.size.h / 2.0 + (this.exprOffsetY ? this.exprOffsetY : 0);
-        if (this._stackVertically) {
-            y = 2 * this.padding.inner;
-        }
         var _this = this;
         this.children = [];
 
@@ -174,6 +169,12 @@ class Expression extends mag.RoundedRect {
             expr.update();
         });
         var size = this.size;
+        var padding = this.padding.inner;
+        var x = this.padding.left;
+        var y = this.size.h / 2.0 + (this.exprOffsetY ? this.exprOffsetY : 0);
+        if (this._stackVertically) {
+            y = 2 * this.padding.inner;
+        }
 
         this.holes.forEach((expr) => { // Update hole expression positions.
             expr.anchor = { x:0, y:0.5 };

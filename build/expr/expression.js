@@ -149,12 +149,6 @@ var Expression = function (_mag$RoundedRect) {
         value: function update() {
             var _this3 = this;
 
-            var padding = this.padding.inner;
-            var x = this.padding.left;
-            var y = this.size.h / 2.0 + (this.exprOffsetY ? this.exprOffsetY : 0);
-            if (this._stackVertically) {
-                y = 2 * this.padding.inner;
-            }
             var _this = this;
             this.children = [];
 
@@ -171,6 +165,12 @@ var Expression = function (_mag$RoundedRect) {
                 expr.update();
             });
             var size = this.size;
+            var padding = this.padding.inner;
+            var x = this.padding.left;
+            var y = this.size.h / 2.0 + (this.exprOffsetY ? this.exprOffsetY : 0);
+            if (this._stackVertically) {
+                y = 2 * this.padding.inner;
+            }
 
             this.holes.forEach(function (expr) {
                 // Update hole expression positions.
@@ -510,6 +510,7 @@ var Expression = function (_mag$RoundedRect) {
                     width += s.w + padding.inner;
                 }
             });
+
             if (this._stackVertically) {
                 width += padding.right + padding.left;
             } else {
