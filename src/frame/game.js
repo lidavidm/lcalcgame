@@ -372,6 +372,55 @@ class Level {
         // Unreachable....
     }
 
+    // David's rather terrible packing algorithm. Used if there are a
+    // large amount of expressions to pack.
+    findFastPacking(exprs, screen) {
+        let y = screen.y;
+        let dy = 0;
+        let x = screen.x;
+        let rows = [];
+        let row = [];
+        for (let e of exprs) {
+            let size = e.size;
+            if (x + size.w < screen.width) {
+                dy = Math.max(size.h, dy);
+            }
+            else {
+                y += dy;
+                dy = size.h;
+                x = screen.x;
+                rows.push(row);
+                row = [];
+            }
+            e.pos = { x: x, y: y };
+            x += size.w;
+            row.push(e);
+        }
+        if (row.length) rows.push(row);
+        let result = [];
+
+        let hPadding = (screen.height - y) / rows.length;
+        y = screen.y;
+        for (let row of rows) {
+            let dy = 0;
+            let width = 0;
+            for (let e of row) {
+                width += e.size.w;
+            }
+            let padding = (screen.width - width) / row.length;
+            let x = screen.x;
+            for (let e of row) {
+                let size = e.size;
+                e.pos = { x: x, y: y };
+                result.push(e);
+                x += padding + size.w;
+                dy = Math.max(dy, size.h);
+            }
+            y += hPadding + dy;
+        }
+        return result;
+    }
+
     // Ian's really inefficient packing algorithm:
     // * 1. Put the expressions in random places.
     // * 2. Check if they overlap.
@@ -385,6 +434,10 @@ class Level {
         var _this = this;
         if (!Array.isArray(es))
             es = [es];
+
+        if (es.length >= 5) {
+            return this.findFastPacking(es, screen);
+        }
 
         // Bounds cache seems to greatly destroy performance
         var sizeCache = {};
