@@ -202,13 +202,16 @@ var Level = function () {
 
 
         // David's rather terrible packing algorithm. Used if there are a
-        // large amount of expressions to pack.
+        // large amount of expressions to pack. It greedily splits the
+        // expressions into rows, then lays out the rows with some random
+        // deviation to hide that fact.
         value: function findFastPacking(exprs, screen) {
             var y = screen.y;
             var dy = 0;
             var x = screen.x;
             var rows = [];
             var row = [];
+            // Greedily distribute the expressions into rows.
             var _iteratorNormalCompletion3 = true;
             var _didIteratorError3 = false;
             var _iteratorError3 = undefined;
@@ -249,8 +252,10 @@ var Level = function () {
             if (row.length) rows.push(row);
             var result = [];
 
-            var hPadding = (screen.height - y) / rows.length;
-            y = screen.y;
+            // Lay out the rows evenly, with randomness to hide the
+            // grid-based nature of the algorithm.
+            var hPadding = (screen.height - y) / (rows.length + 1);
+            y = screen.y + hPadding;
             var _iteratorNormalCompletion4 = true;
             var _didIteratorError4 = false;
             var _iteratorError4 = undefined;
@@ -286,8 +291,9 @@ var Level = function () {
                         }
                     }
 
-                    var padding = (screen.width - width) / _row.length;
-                    var _x3 = screen.x;
+                    var wPadding = (screen.width - width) / (_row.length + 1);
+
+                    var _x3 = screen.x + wPadding;
                     var _iteratorNormalCompletion6 = true;
                     var _didIteratorError6 = false;
                     var _iteratorError6 = undefined;
@@ -297,9 +303,17 @@ var Level = function () {
                             var _e2 = _step6.value;
 
                             var _size = _e2.size;
-                            _e2.pos = { x: _x3, y: y };
+                            // random() call allows the x and y-position to vary
+                            // by up to +/- 0.4 of the between-row/between-expr
+                            // padding. This helps make it look a little less
+                            // grid-based.
+                            _e2.pos = {
+                                x: _x3 + (Math.seededRandom() - 0.5) * 0.8 * wPadding,
+                                y: y + (Math.seededRandom() - 0.5) * 0.8 * hPadding
+                            };
                             result.push(_e2);
-                            _x3 += padding + _size.w;
+
+                            _x3 += wPadding + _size.w;
                             _dy = Math.max(_dy, _size.h);
                         }
                     } catch (err) {

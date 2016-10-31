@@ -373,13 +373,16 @@ class Level {
     }
 
     // David's rather terrible packing algorithm. Used if there are a
-    // large amount of expressions to pack.
+    // large amount of expressions to pack. It greedily splits the
+    // expressions into rows, then lays out the rows with some random
+    // deviation to hide that fact.
     findFastPacking(exprs, screen) {
         let y = screen.y;
         let dy = 0;
         let x = screen.x;
         let rows = [];
         let row = [];
+        // Greedily distribute the expressions into rows.
         for (let e of exprs) {
             let size = e.size;
             if (x + size.w < screen.width) {
@@ -399,21 +402,32 @@ class Level {
         if (row.length) rows.push(row);
         let result = [];
 
-        let hPadding = (screen.height - y) / rows.length;
-        y = screen.y;
+        // Lay out the rows evenly, with randomness to hide the
+        // grid-based nature of the algorithm.
+        let hPadding = (screen.height - y) / (rows.length + 1);
+        y = screen.y + hPadding;
         for (let row of rows) {
             let dy = 0;
             let width = 0;
             for (let e of row) {
                 width += e.size.w;
             }
-            let padding = (screen.width - width) / row.length;
-            let x = screen.x;
+            let wPadding = (screen.width - width) / (row.length + 1);
+
+            let x = screen.x + wPadding;
             for (let e of row) {
                 let size = e.size;
-                e.pos = { x: x, y: y };
+                // random() call allows the x and y-position to vary
+                // by up to +/- 0.4 of the between-row/between-expr
+                // padding. This helps make it look a little less
+                // grid-based.
+                e.pos = {
+                    x: x + ((Math.seededRandom() - 0.5) * 0.8 * wPadding),
+                    y: y + ((Math.seededRandom() - 0.5) * 0.8 * hPadding),
+                };
                 result.push(e);
-                x += padding + size.w;
+
+                x += wPadding + size.w;
                 dy = Math.max(dy, size.h);
             }
             y += hPadding + dy;
