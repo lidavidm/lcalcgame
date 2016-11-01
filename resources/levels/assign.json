@@ -63,16 +63,14 @@
             "description": "Assignment order matters.",
             "board": "(assign /$x /$y) (assign /$y /star) ($_x)",
             "goal": "(star)",
-            "toolbox": "(diamond) (star)",
             "globals": {
                 "x": "(diamond)"
             }
         },
         {
             "description": "Assignment order still matters.",
-            "board": "(assign /$x /$y) (assign /$y /star) ($_x) (assign /$y /$x) ($_y)",
+            "board": "(assign /$x /$y) (assign /$y /star) ($_x) (assign /$y /triangle) ($_y)",
             "goal": "(star) (star)",
-            "toolbox": "(diamond) (star)",
             "globals": {
                 "x": "(diamond)",
                 "y": "(triangle)"
@@ -147,10 +145,10 @@
             "toolbox": "(diamond) (star) (triangle)"
         },
         {
-            "description": "Outer variables are still visible",
-            "board": "(λy _) ($_y) (λapple $x)",
-            "goal": "(triangle)",
-            "toolbox": "(diamond) (star) (triangle)"
+            "description": "Long variable names are OK",
+            "board": "(λapple /$apple)",
+            "goal": "(diamond)",
+            "toolbox": "(diamond) (triangle)"
         }
     ]
 }
