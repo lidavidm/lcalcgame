@@ -250,9 +250,12 @@ var AssignExpr = function (_Expression2) {
 
                     // Prevent background on GraphicValueExpr from being drawn
                     _this6.value.ignoreEvents = true;
+                    // Keep a copy of the original value before we start
+                    // messing with it, to update the environment afterwards
+                    var value = _this6.value.clone();
                     var otherVars = findAliasingVarExpr(initial, _this6.variable.name, [_this6.variable]);
                     var afterAnimate = function afterAnimate() {
-                        _this6.getEnvironment().update(_this6.variable.name, _this6.value);
+                        _this6.getEnvironment().update(_this6.variable.name, value);
                         var parent = _this6.parent || _this6.stage;
                         Animate.poof(_this6);
                         window.setTimeout(function () {

@@ -1,15 +1,21 @@
 // The panel at the bottom of the screen.
-class EnvironmentDisplay extends mag.ImageRect {
-    constructor(x, y, w, h, globals=null) {
-        super(x, y, w, h, 'toolbox-bg');
+class EnvironmentDisplay extends mag.Rect {
+    constructor(x, y, w, h, stage) {
+        super(x, y, w, h);
+        this.color = "#444";
         this.padding = 20;
         this.env = null;
-        this.globals = globals ? globals : new Environment();
+        this.stage = stage;
         this.contents = [];
         this.highlighted = null;
     }
 
-    get leftEdgePos() { return { x:this.padding * 2 + this.pos.x, y:this.size.h / 2.0 + this.pos.y }; }
+    get leftEdgePos() { return { x:this.padding + this.pos.x, y: 2 * this.padding + this.pos.y }; }
+
+    update() {
+        if (this.env) this.showEnvironment(this.env);
+        else this.showGlobals;
+    }
 
     showEnvironment(env) {
         if (!env) return;
@@ -17,27 +23,34 @@ class EnvironmentDisplay extends mag.ImageRect {
         this.clear();
         this.env = env;
         let pos = this.leftEdgePos;
-        let setup = (e, padding) => {
+        let setup = (e, padding, newRow) => {
             e.update();
+            e.ignoreEvents = true;
             this.stage.add(e);
             this.contents.push(e);
             e.anchor = { x:0, y:0.5 };
             e.pos = pos;
-            pos = addPos(pos, { x:e.size.w, y:0 } );
+            if (newRow) {
+                pos = addPos(pos, { x: 0, y: e.size.h } );
+                pos.x = this.leftEdgePos.x;
+            }
+            else {
+                pos = addPos(pos, { x: e.size.w, y: 0 } );
+            }
         };
         env.names().forEach((name) => {
             let label = new TextExpr(name + "=");
-            label.color = "white";
-            setup(label, 0);
+            label.color = "#EEE";
+            setup(label, 0, false);
 
             let e = env.lookup(name).clone();
-            setup(e, this.padding);
+            setup(e, this.padding, true);
         });
     }
 
     showGlobals() {
         this.clear();
-        this.showEnvironment(this.globals);
+        this.showEnvironment(this.stage.environment);
     }
 
     clear() {
@@ -71,4 +84,8 @@ class EnvironmentDisplay extends mag.ImageRect {
             this.highlighted = null;
         }
     }
+
+    // Disable highlighting on hover
+    onmouseenter(pos) {}
+    onmouseleave(pos) {}
 }

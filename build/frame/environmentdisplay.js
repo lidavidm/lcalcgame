@@ -9,25 +9,29 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 // The panel at the bottom of the screen.
-var EnvironmentDisplay = function (_mag$ImageRect) {
-    _inherits(EnvironmentDisplay, _mag$ImageRect);
+var EnvironmentDisplay = function (_mag$Rect) {
+    _inherits(EnvironmentDisplay, _mag$Rect);
 
-    function EnvironmentDisplay(x, y, w, h) {
-        var globals = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
-
+    function EnvironmentDisplay(x, y, w, h, stage) {
         _classCallCheck(this, EnvironmentDisplay);
 
-        var _this = _possibleConstructorReturn(this, (EnvironmentDisplay.__proto__ || Object.getPrototypeOf(EnvironmentDisplay)).call(this, x, y, w, h, 'toolbox-bg'));
+        var _this = _possibleConstructorReturn(this, (EnvironmentDisplay.__proto__ || Object.getPrototypeOf(EnvironmentDisplay)).call(this, x, y, w, h));
 
+        _this.color = "#444";
         _this.padding = 20;
         _this.env = null;
-        _this.globals = globals ? globals : new Environment();
+        _this.stage = stage;
         _this.contents = [];
         _this.highlighted = null;
         return _this;
     }
 
     _createClass(EnvironmentDisplay, [{
+        key: "update",
+        value: function update() {
+            if (this.env) this.showEnvironment(this.env);else this.showGlobals;
+        }
+    }, {
         key: "showEnvironment",
         value: function showEnvironment(env) {
             var _this2 = this;
@@ -37,28 +41,34 @@ var EnvironmentDisplay = function (_mag$ImageRect) {
             this.clear();
             this.env = env;
             var pos = this.leftEdgePos;
-            var setup = function setup(e, padding) {
+            var setup = function setup(e, padding, newRow) {
                 e.update();
+                e.ignoreEvents = true;
                 _this2.stage.add(e);
                 _this2.contents.push(e);
                 e.anchor = { x: 0, y: 0.5 };
                 e.pos = pos;
-                pos = addPos(pos, { x: e.size.w, y: 0 });
+                if (newRow) {
+                    pos = addPos(pos, { x: 0, y: e.size.h });
+                    pos.x = _this2.leftEdgePos.x;
+                } else {
+                    pos = addPos(pos, { x: e.size.w, y: 0 });
+                }
             };
             env.names().forEach(function (name) {
                 var label = new TextExpr(name + "=");
-                label.color = "white";
-                setup(label, 0);
+                label.color = "#EEE";
+                setup(label, 0, false);
 
                 var e = env.lookup(name).clone();
-                setup(e, _this2.padding);
+                setup(e, _this2.padding, true);
             });
         }
     }, {
         key: "showGlobals",
         value: function showGlobals() {
             this.clear();
-            this.showEnvironment(this.globals);
+            this.showEnvironment(this.stage.environment);
         }
     }, {
         key: "clear",
@@ -137,12 +147,21 @@ var EnvironmentDisplay = function (_mag$ImageRect) {
                 this.highlighted = null;
             }
         }
+
+        // Disable highlighting on hover
+
+    }, {
+        key: "onmouseenter",
+        value: function onmouseenter(pos) {}
+    }, {
+        key: "onmouseleave",
+        value: function onmouseleave(pos) {}
     }, {
         key: "leftEdgePos",
         get: function get() {
-            return { x: this.padding * 2 + this.pos.x, y: this.size.h / 2.0 + this.pos.y };
+            return { x: this.padding + this.pos.x, y: 2 * this.padding + this.pos.y };
         }
     }]);
 
     return EnvironmentDisplay;
-}(mag.ImageRect);
+}(mag.Rect);

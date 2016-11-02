@@ -208,9 +208,12 @@ class AssignExpr extends Expression {
 
             // Prevent background on GraphicValueExpr from being drawn
             this.value.ignoreEvents = true;
+            // Keep a copy of the original value before we start
+            // messing with it, to update the environment afterwards
+            let value = this.value.clone();
             let otherVars = findAliasingVarExpr(initial, this.variable.name, [this.variable]);
             let afterAnimate = () => {
-                this.getEnvironment().update(this.variable.name, this.value);
+                this.getEnvironment().update(this.variable.name, value);
                 let parent = this.parent || this.stage;
                 Animate.poof(this);
                 window.setTimeout(() => {

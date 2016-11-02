@@ -25,9 +25,21 @@ class Level {
         // levels appear the same each time you play.
         Math.seed = 12045;
 
-        GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
+        const showEnvironment = Object.keys(this.globals.bindings).length > 0 ||
+              mag.Stage.getNodesWithClass(VarExpr, [], true, this.exprs).length > 0;
+
         var canvas_screen = stage.boundingSize;
-        var screen = { height:canvas_screen.h/1.4 - 90, width:canvas_screen.w/1.4, y:canvas_screen.h*(1-1/1.4) / 2.0, x:(canvas_screen.w*(1-1/1.4) / 2.0) };
+
+        const envDisplayWidth = showEnvironment ? 0.25 * canvas_screen.w : 0;
+
+        GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
+        const usableWidth = canvas_screen.w - envDisplayWidth;
+        var screen = {
+            height: canvas_screen.h/1.4 - 90,
+            width: usableWidth/(showEnvironment ? 1.0 : 1.4),
+            y: canvas_screen.h*(1-1/1.4) / 2.0,
+            x: ((envDisplayWidth + usableWidth*(1-1/1.4)) / 2.0),
+        };
         var board_packing = this.findBestPacking(this.exprs, screen);
         stage.addAll(board_packing); // add expressions to the stage
 
@@ -84,11 +96,11 @@ class Level {
         stage.toolbox = toolbox;
 
         // Environment
-        const ENV_HEIGHT = 90;
-        var env = new EnvironmentDisplay(0, canvas_screen.h - ENV_HEIGHT - TOOLBOX_HEIGHT, canvas_screen.w, ENV_HEIGHT, this.globals);
-        // Hide for now.
-        // TODO: re-enable shelf as part of fading?
-        // stage.add(env);
+        let yOffset = goal_node[0].absoluteSize.h + goal_node[0].absolutePos.y + 10;
+        var env = new EnvironmentDisplay(0, yOffset, 0.25 * canvas_screen.w, canvas_screen.h - TOOLBOX_HEIGHT - yOffset, stage);
+        if (showEnvironment) {
+            stage.add(env);
+        }
         stage.environmentDisplay = env;
         if (this.globals) {
             for (let name of this.globals.names()) {
