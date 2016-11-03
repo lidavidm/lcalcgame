@@ -53,7 +53,7 @@ var Level = function () {
                 height: canvas_screen.h / 1.4 - 90,
                 width: usableWidth / (showEnvironment ? 1.0 : 1.4),
                 y: canvas_screen.h * (1 - 1 / 1.4) / 2.0,
-                x: (envDisplayWidth + usableWidth * (1 - 1 / 1.4)) / 2.0
+                x: showEnvironment ? envDisplayWidth : usableWidth * (1 - 1 / 1.4) / 2.0
             };
             var board_packing = this.findBestPacking(this.exprs, screen);
             stage.addAll(board_packing); // add expressions to the stage
