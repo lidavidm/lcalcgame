@@ -173,26 +173,38 @@ var ChestVarExpr = function (_VarExpr) {
             if (this._opened) return;
             var value = this.reduce();
             if (value != this) {
-                value = value.clone();
-                // let parent = this.parent ? this.parent : this.stage;
-                // parent.swap(this, value);
-                value.scale = { x: 0.4, y: 0.4 };
-                value.pos = {
-                    x: this.pos.x + 0.5 * this.size.w - 0.5 * value.absoluteSize.w,
-                    y: this.pos.y + 0.3 * this.size.h
-                };
-                this.stage.add(value);
-                this._opened = true;
-                Animate.tween(value, {
-                    scale: { x: 1.0, y: 1.0 },
-                    pos: {
-                        x: this.pos.x,
-                        y: this.pos.y - 30
-                    }
-                }, 700).after(function () {});
-                Animate.tween(this, { opacity: 0.0 }, 1000).after(function () {
-                    _this4.stage.remove(_this4);
-                });
+                (function () {
+                    value = value.clone();
+                    value.scale = { x: 0.1, y: 0.1 };
+                    value.pos = {
+                        x: _this4.pos.x + 0.5 * _this4.size.w - 0.5 * value.absoluteSize.w,
+                        y: _this4.pos.y + 0.3 * _this4.size.h
+                    };
+                    value.opacity = 0.0;
+
+                    var stage = _this4.stage;
+                    stage.add(value);
+                    _this4._opened = true;
+
+                    _this4.opacity = 1.0;
+                    Animate.tween(_this4, { opacity: 0.0 }, 300);
+                    Animate.tween(value, {
+                        scale: { x: 1.0, y: 1.0 },
+                        pos: {
+                            x: _this4.pos.x,
+                            y: _this4.pos.y - 30
+                        },
+                        opacity: 1.0
+                    }, 500).after(function () {
+                        window.setTimeout(function () {
+                            stage.remove(value);
+                            var parent = _this4.parent ? _this4.parent : _this4.stage;
+                            parent.swap(_this4, value);
+                            stage.draw();
+                            stage.update();
+                        }, 200);
+                    });
+                })();
             }
         }
     }]);

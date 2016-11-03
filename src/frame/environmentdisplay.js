@@ -8,13 +8,14 @@ class EnvironmentDisplay extends mag.Rect {
         this.stage = stage;
         this.contents = [];
         this.highlighted = null;
+        this.toolbox = true;
     }
 
     get leftEdgePos() { return { x:this.padding + this.pos.x, y: 2 * this.padding + this.pos.y }; }
 
     update() {
         if (this.env) this.showEnvironment(this.env);
-        else this.showGlobals;
+        else this.showGlobals();
     }
 
     showEnvironment(env) {
@@ -26,6 +27,7 @@ class EnvironmentDisplay extends mag.Rect {
         let setup = (e, padding, newRow) => {
             e.update();
             e.ignoreEvents = true;
+            e.toolbox = true;
             this.stage.add(e);
             this.contents.push(e);
             e.anchor = { x:0, y:0.5 };

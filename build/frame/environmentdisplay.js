@@ -23,13 +23,14 @@ var EnvironmentDisplay = function (_mag$Rect) {
         _this.stage = stage;
         _this.contents = [];
         _this.highlighted = null;
+        _this.toolbox = true;
         return _this;
     }
 
     _createClass(EnvironmentDisplay, [{
         key: "update",
         value: function update() {
-            if (this.env) this.showEnvironment(this.env);else this.showGlobals;
+            if (this.env) this.showEnvironment(this.env);else this.showGlobals();
         }
     }, {
         key: "showEnvironment",
@@ -44,6 +45,7 @@ var EnvironmentDisplay = function (_mag$Rect) {
             var setup = function setup(e, padding, newRow) {
                 e.update();
                 e.ignoreEvents = true;
+                e.toolbox = true;
                 _this2.stage.add(e);
                 _this2.contents.push(e);
                 e.anchor = { x: 0, y: 0.5 };

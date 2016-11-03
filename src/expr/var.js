@@ -133,25 +133,34 @@ class ChestVarExpr extends VarExpr {
         let value = this.reduce();
         if (value != this) {
             value = value.clone();
-            // let parent = this.parent ? this.parent : this.stage;
-            // parent.swap(this, value);
-            value.scale = { x: 0.4, y: 0.4 };
+            value.scale = { x: 0.1, y: 0.1 };
             value.pos = {
                 x: this.pos.x + 0.5 * this.size.w - 0.5 * value.absoluteSize.w,
                 y: this.pos.y + 0.3 * this.size.h,
             };
-            this.stage.add(value);
+            value.opacity = 0.0;
+
+            let stage = this.stage;
+            stage.add(value);
             this._opened = true;
+
+            this.opacity = 1.0;
+            Animate.tween(this, { opacity: 0.0 }, 300);
             Animate.tween(value, {
                 scale: { x: 1.0, y: 1.0 },
                 pos: {
                     x: this.pos.x,
                     y: this.pos.y - 30,
-                }
-            }, 700).after(() => {
-            });
-            Animate.tween(this, { opacity: 0.0 }, 1000).after(() => {
-                this.stage.remove(this);
+                },
+                opacity: 1.0,
+            }, 500).after(() => {
+                window.setTimeout(() => {
+                    stage.remove(value);
+                    let parent = this.parent ? this.parent : this.stage;
+                    parent.swap(this, value);
+                    stage.draw();
+                    stage.update();
+                }, 200);
             });
         }
     }
