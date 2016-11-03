@@ -59,6 +59,104 @@ class VarExpr extends Expression {
     }
 }
 
+class ChestVarExpr extends VarExpr {
+    constructor(name) {
+        super(name);
+        // See MissingTypedExpression#constructor
+        this.equivalentClasses = [ChestVarExpr];
+
+        this._cacheBase = null;
+        this._cacheLid = null;
+        this._opened = false;
+    }
+
+    drawInternal(ctx, pos, boundingSize) {
+        let baseHeight = 0.5 * boundingSize.h;
+        let remainingHeight = 0.8 * (boundingSize.h - baseHeight);
+        let offset = 0.2 * (boundingSize.h - baseHeight);
+
+        if (!this._cacheBase) {
+            let cacheBase = document.createElement("canvas");
+            cacheBase.width = boundingSize.w;
+            cacheBase.height = boundingSize.h;
+            let ctx = cacheBase.getContext("2d");
+            // Base of chest
+            ctx.fillStyle = '#cd853f';
+            setStrokeStyle(ctx, {
+                lineWidth: 2,
+                color: '#ffa500',
+            });
+            ctx.fillRect(0, remainingHeight, boundingSize.w, baseHeight);
+            ctx.strokeRect(0 + 2, remainingHeight + 2, boundingSize.w - 4, baseHeight - 4);
+            setStrokeStyle(ctx, {
+                lineWidth: 1.5,
+                color: '#8b4513',
+            });
+            ctx.strokeRect(0, remainingHeight, boundingSize.w, baseHeight);
+            ctx.strokeRect(0 + 3.5, remainingHeight + 3.5, boundingSize.w - 7, baseHeight - 7);
+
+            let cacheLid = document.createElement("canvas");
+            cacheLid.width = boundingSize.w;
+            cacheLid.height = boundingSize.h;
+            ctx = cacheLid.getContext("2d");
+            // Lid of chest
+            ctx.fillStyle = '#cd853f';
+            setStrokeStyle(ctx, {
+                lineWidth: 2,
+                color: '#ffa500',
+            });
+            ctx.strokeRect(0 + 2, offset, boundingSize.w - 4, baseHeight - 2);
+            setStrokeStyle(ctx, {
+                lineWidth: 1.5,
+                color: '#8b4513',
+            });
+            ctx.strokeRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
+
+            ctx.fillRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
+            ctx.strokeRect(0, offset, boundingSize.w, baseHeight);
+
+            this._cacheBase = cacheBase;
+            this._cacheLid = cacheLid;
+        }
+
+        if (!this._opened) {
+            ctx.drawImage(this._cacheBase, pos.x, pos.y);
+            ctx.drawImage(this._cacheLid, pos.x, pos.y);
+        }
+        else {
+            ctx.drawImage(this._cacheBase, pos.x, pos.y);
+        }
+    }
+
+    performReduction() {
+        if (this._opened) return;
+        let value = this.reduce();
+        if (value != this) {
+            value = value.clone();
+            // let parent = this.parent ? this.parent : this.stage;
+            // parent.swap(this, value);
+            value.scale = { x: 0.4, y: 0.4 };
+            value.pos = {
+                x: this.pos.x + 0.5 * this.size.w - 0.5 * value.absoluteSize.w,
+                y: this.pos.y + 0.3 * this.size.h,
+            };
+            this.stage.add(value);
+            this._opened = true;
+            Animate.tween(value, {
+                scale: { x: 1.0, y: 1.0 },
+                pos: {
+                    x: this.pos.x,
+                    y: this.pos.y - 30,
+                }
+            }, 700).after(() => {
+            });
+            Animate.tween(this, { opacity: 0.0 }, 1000).after(() => {
+                this.stage.remove(this);
+            });
+        }
+    }
+}
+
 class AssignExpr extends Expression {
     constructor(variable, value) {
         super([]);

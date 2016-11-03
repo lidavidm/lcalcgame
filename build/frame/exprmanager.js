@@ -27,6 +27,7 @@ var ExprManager = function () {
         'pop': [PopExpr],
         'define': [DefineExpr],
         'var': [LambdaVarExpr, HalfFadedLambdaVarExpr, FadedLambdaVarExpr, FadedLambdaVarExpr],
+        'reference': [ChestVarExpr],
         'hole': [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedLambdaHoleExpr, FadedES6LambdaHoleExpr],
         'lambda': [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr],
         'assign': [AssignExpr]

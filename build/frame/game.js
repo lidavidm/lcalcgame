@@ -821,7 +821,7 @@ var Level = function () {
                 return lambdavar;
             } else if (arg.indexOf('$') > -1) {
                 var _varname2 = arg.replace('$', '').replace('_', '');
-                return lock(new VarExpr(_varname2), locked);
+                return lock(new (ExprManager.getClass('reference'))(_varname2), locked);
             } else {
                 console.error('Unknown argument: ', arg);
                 return new FadedValueExpr(arg);

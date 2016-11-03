@@ -374,7 +374,7 @@ class Level {
             return lambdavar;
         } else if (arg.indexOf('$') > -1) {
             let varname = arg.replace('$', '').replace('_', '');
-            return lock(new VarExpr(varname), locked);
+            return lock(new (ExprManager.getClass('reference'))(varname), locked);
         } else {
             console.error('Unknown argument: ', arg);
             return new FadedValueExpr(arg);

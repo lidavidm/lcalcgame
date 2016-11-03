@@ -362,13 +362,11 @@ class LambdaVarExpr extends ImageExpr {
     onmouseenter(pos) {
         if (this.stage) {
             this.stage.environmentDisplay.showEnvironment(this.getEnvironment());
-            this.stage.environmentDisplay.highlightName(this.name);
         }
     }
 
     onmouseleave(pos) {
         if (this.stage) {
-            this.stage.environmentDisplay.clearHighlight();
             this.stage.environmentDisplay.showGlobals();
         }
     }
