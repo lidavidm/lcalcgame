@@ -1,5 +1,7 @@
 "use strict";
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -170,15 +172,24 @@ var ChestVarExpr = function (_VarExpr) {
         value: function performReduction() {
             var _this4 = this;
 
+            var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
             if (this._opened) return;
             var value = this.reduce();
             if (value != this) {
-                (function () {
+                var _ret = function () {
+                    if (!animated) {
+                        var parent = _this4.parent ? _this4.parent : _this4.stage;
+                        parent.swap(_this4, value);
+                        return {
+                            v: void 0
+                        };
+                    }
                     value = value.clone();
                     value.scale = { x: 0.1, y: 0.1 };
                     value.pos = {
                         x: _this4.pos.x + 0.5 * _this4.size.w - 0.5 * value.absoluteSize.w,
-                        y: _this4.pos.y + 0.3 * _this4.size.h
+                        y: _this4.pos.y
                     };
                     value.opacity = 0.0;
 
@@ -191,20 +202,25 @@ var ChestVarExpr = function (_VarExpr) {
                     Animate.tween(value, {
                         scale: { x: 1.0, y: 1.0 },
                         pos: {
-                            x: _this4.pos.x,
-                            y: _this4.pos.y - 30
+                            x: _this4.pos.x + 0.5 * _this4.size.w - 0.5 * value.size.w,
+                            y: _this4.pos.y - value.size.h
                         },
                         opacity: 1.0
                     }, 500).after(function () {
                         window.setTimeout(function () {
-                            stage.remove(value);
-                            var parent = _this4.parent ? _this4.parent : _this4.stage;
-                            parent.swap(_this4, value);
+                            if (_this4.parent) {
+                                stage.remove(value);
+                                _this4.parent.swap(_this4, value);
+                            } else {
+                                _this4.stage.remove(_this4);
+                            }
                             stage.draw();
                             stage.update();
                         }, 200);
                     });
-                })();
+                }();
+
+                if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
             }
         }
     }]);
@@ -268,7 +284,7 @@ var AssignExpr = function (_Expression2) {
             // multiple times as a 'canReduce', and we don't want any
             // update to happen multiple times.
             if (this.value) {
-                this.value.performReduction();
+                this.value.performReduction(false);
             }
             if (this.canReduce()) {
                 (function () {

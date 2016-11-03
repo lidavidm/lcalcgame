@@ -128,15 +128,20 @@ class ChestVarExpr extends VarExpr {
         }
     }
 
-    performReduction() {
+    performReduction(animated=true) {
         if (this._opened) return;
         let value = this.reduce();
         if (value != this) {
+            if (!animated) {
+                let parent = this.parent ? this.parent : this.stage;
+                parent.swap(this, value);
+                return;
+            }
             value = value.clone();
             value.scale = { x: 0.1, y: 0.1 };
             value.pos = {
                 x: this.pos.x + 0.5 * this.size.w - 0.5 * value.absoluteSize.w,
-                y: this.pos.y + 0.3 * this.size.h,
+                y: this.pos.y,
             };
             value.opacity = 0.0;
 
@@ -149,15 +154,19 @@ class ChestVarExpr extends VarExpr {
             Animate.tween(value, {
                 scale: { x: 1.0, y: 1.0 },
                 pos: {
-                    x: this.pos.x,
-                    y: this.pos.y - 30,
+                    x: this.pos.x + 0.5 * this.size.w - 0.5 * value.size.w,
+                    y: this.pos.y - value.size.h,
                 },
                 opacity: 1.0,
             }, 500).after(() => {
                 window.setTimeout(() => {
-                    stage.remove(value);
-                    let parent = this.parent ? this.parent : this.stage;
-                    parent.swap(this, value);
+                    if (this.parent) {
+                        stage.remove(value);
+                        this.parent.swap(this, value);
+                    }
+                    else {
+                        this.stage.remove(this);
+                    }
                     stage.draw();
                     stage.update();
                 }, 200);
@@ -218,7 +227,7 @@ class AssignExpr extends Expression {
         // multiple times as a 'canReduce', and we don't want any
         // update to happen multiple times.
         if (this.value) {
-            this.value.performReduction();
+            this.value.performReduction(false);
         }
         if (this.canReduce()) {
             let initial = [];
