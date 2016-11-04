@@ -105,6 +105,7 @@ var ChestVarExpr = function (_VarExpr) {
 
         _this3._cacheBase = null;
         _this3._cacheLid = null;
+        _this3._cacheOpenLid = null;
         _this3._opened = false;
         return _this3;
     }
@@ -155,9 +156,45 @@ var ChestVarExpr = function (_VarExpr) {
 
                 _ctx.fillRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
                 _ctx.strokeRect(0, offset, boundingSize.w, baseHeight);
+                _ctx.fillStyle = '#ffa500';
+                _ctx.fillRect(boundingSize.w / 2 - 7.5, boundingSize.h / 2 - 3, 15, 10);
+                _ctx.strokeRect(boundingSize.w / 2 - 7.5, boundingSize.h / 2 - 3, 15, 10);
+
+                var cacheOpenLid = document.createElement("canvas");
+                cacheOpenLid.width = boundingSize.w;
+                cacheOpenLid.height = boundingSize.h;
+                _ctx = cacheOpenLid.getContext("2d");
+
+                offset += 0.1 * boundingSize.h;
+
+                // Lid of chest (opened)
+                _ctx.fillStyle = '#cd853f';
+                setStrokeStyle(_ctx, {
+                    lineWidth: 2,
+                    color: '#ffa500'
+                });
+                _ctx.strokeRect(0 + 2, offset, boundingSize.w - 4, baseHeight - 2);
+                setStrokeStyle(_ctx, {
+                    lineWidth: 1.5,
+                    color: '#8b4513'
+                });
+                _ctx.strokeRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
+
+                _ctx.fillRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
+                _ctx.strokeRect(0, offset, boundingSize.w, baseHeight);
+
+                _ctx.fillStyle = '#ffa500';
+                _ctx.fillRect(boundingSize.w / 2 - 5, 0.1 * boundingSize.h, 10, 6);
+                _ctx.strokeRect(boundingSize.w / 2 - 5, 0.1 * boundingSize.h, 10, 6);
+
+                _ctx.globalCompositeOperation = 'multiply';
+                _ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                _ctx.fillRect(0, offset, boundingSize.w, baseHeight - 3.5);
+                _ctx.fillRect(boundingSize.w / 2 - 5, 0.1 * boundingSize.h, 10, 6);
 
                 this._cacheBase = cacheBase;
                 this._cacheLid = cacheLid;
+                this._cacheOpenLid = cacheOpenLid;
             }
 
             var size = this.absoluteSize;
@@ -165,6 +202,7 @@ var ChestVarExpr = function (_VarExpr) {
                 ctx.drawImage(this._cacheBase, pos.x, pos.y, size.w, size.h);
                 ctx.drawImage(this._cacheLid, pos.x, pos.y, size.w, size.h);
             } else {
+                ctx.drawImage(this._cacheOpenLid, pos.x, pos.y, size.w, size.h);
                 ctx.drawImage(this._cacheBase, pos.x, pos.y, size.w, size.h);
             }
         }

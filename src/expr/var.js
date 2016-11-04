@@ -67,6 +67,7 @@ class ChestVarExpr extends VarExpr {
 
         this._cacheBase = null;
         this._cacheLid = null;
+        this._cacheOpenLid = null;
         this._opened = false;
     }
 
@@ -114,9 +115,45 @@ class ChestVarExpr extends VarExpr {
 
             ctx.fillRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
             ctx.strokeRect(0, offset, boundingSize.w, baseHeight);
+            ctx.fillStyle = '#ffa500';
+            ctx.fillRect(boundingSize.w / 2 - 7.5, boundingSize.h / 2 - 3, 15, 10);
+            ctx.strokeRect(boundingSize.w / 2 - 7.5, boundingSize.h / 2 - 3, 15, 10);
+
+            let cacheOpenLid = document.createElement("canvas");
+            cacheOpenLid.width = boundingSize.w;
+            cacheOpenLid.height = boundingSize.h;
+            ctx = cacheOpenLid.getContext("2d");
+
+            offset += 0.1 * boundingSize.h;
+
+            // Lid of chest (opened)
+            ctx.fillStyle = '#cd853f';
+            setStrokeStyle(ctx, {
+                lineWidth: 2,
+                color: '#ffa500',
+            });
+            ctx.strokeRect(0 + 2, offset, boundingSize.w - 4, baseHeight - 2);
+            setStrokeStyle(ctx, {
+                lineWidth: 1.5,
+                color: '#8b4513',
+            });
+            ctx.strokeRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
+
+            ctx.fillRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
+            ctx.strokeRect(0, offset, boundingSize.w, baseHeight);
+
+            ctx.fillStyle = '#ffa500';
+            ctx.fillRect(boundingSize.w / 2 - 5, 0.1 * boundingSize.h, 10, 6);
+            ctx.strokeRect(boundingSize.w / 2 - 5, 0.1 * boundingSize.h, 10, 6);
+
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillRect(0, offset, boundingSize.w, baseHeight - 3.5);
+            ctx.fillRect(boundingSize.w / 2 - 5, 0.1 * boundingSize.h, 10, 6);
 
             this._cacheBase = cacheBase;
             this._cacheLid = cacheLid;
+            this._cacheOpenLid = cacheOpenLid;
         }
 
         let size = this.absoluteSize;
@@ -125,6 +162,7 @@ class ChestVarExpr extends VarExpr {
             ctx.drawImage(this._cacheLid, pos.x, pos.y, size.w, size.h);
         }
         else {
+            ctx.drawImage(this._cacheOpenLid, pos.x, pos.y, size.w, size.h);
             ctx.drawImage(this._cacheBase, pos.x, pos.y, size.w, size.h);
         }
     }
