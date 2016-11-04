@@ -12,7 +12,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 /** A subclass of Stage that assumes Nodes are Expressions
     and allows for saving state. */
-
 var ReductStage = function (_mag$Stage) {
     _inherits(ReductStage, _mag$Stage);
 
@@ -24,6 +23,7 @@ var ReductStage = function (_mag$Stage) {
         var _this = _possibleConstructorReturn(this, (ReductStage.__proto__ || Object.getPrototypeOf(ReductStage)).call(this, canvas));
 
         _this.stateStack = [];
+        _this.environment = new Environment();
         return _this;
     }
 
@@ -33,6 +33,7 @@ var ReductStage = function (_mag$Stage) {
     _createClass(ReductStage, [{
         key: 'saveState',
         value: function saveState() {
+            // TODO: DML save and restore the environment as well.
             var board = this.expressionNodes().map(function (n) {
                 return n.clone();
             });

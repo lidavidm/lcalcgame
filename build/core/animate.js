@@ -156,6 +156,7 @@ var mag = function (_) {
                     return elapsed;
                 };
                 var autodraw = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
+                var lerpFunc = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
 
 
                 var deepCloneProperties = function deepCloneProperties(obj, srcobj) {
@@ -170,15 +171,20 @@ var mag = function (_) {
                 var sourceValue = deepCloneProperties(targetValue, node);
                 var finalValue = deepCloneProperties(targetValue, targetValue);
 
-                var lerpVals = function lerpVals(src, tgt, elapsed) {
+                var lerpVals = lerpFunc ? lerpFunc : function (src, tgt, elapsed, chain) {
                     return (1.0 - elapsed) * src + elapsed * tgt;
                 };
+                // chain is passed to lerpVals so that a custom lerp
+                // function can do different things based on what property
+                // is actually being interpolated
                 var lerpProps = function lerpProps(sourceObj, targetObj, elapsed) {
+                    var chain = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : [];
+
                     var rt = {};
                     for (var prop in targetObj) {
                         if (targetObj.hasOwnProperty(prop)) {
-                            if (_typeof(targetObj[prop]) === 'object') rt[prop] = lerpProps(sourceObj[prop], targetObj[prop], elapsed); // recursion into inner properties
-                            else rt[prop] = lerpVals(sourceObj[prop], targetObj[prop], elapsed);
+                            if (_typeof(targetObj[prop]) === 'object') rt[prop] = lerpProps(sourceObj[prop], targetObj[prop], elapsed, chain.concat([prop])); // recursion into inner properties
+                            else rt[prop] = lerpVals(sourceObj[prop], targetObj[prop], elapsed, chain.concat([prop]));
                         }
                     }
                     return rt;

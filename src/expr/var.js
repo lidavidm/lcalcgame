@@ -141,7 +141,7 @@ class ChestVarExpr extends VarExpr {
             value.scale = { x: 0.1, y: 0.1 };
             value.pos = {
                 x: this.pos.x + 0.5 * this.size.w - 0.5 * value.absoluteSize.w,
-                y: this.pos.y,
+                y: this.pos.y + 30,
             };
             value.opacity = 0.0;
 
@@ -243,13 +243,34 @@ class AssignExpr extends Expression {
             // Keep a copy of the original value before we start
             // messing with it, to update the environment afterwards
             let value = this.value.clone();
-            this.getEnvironment().update(this.variable.name, value);
-            let parent = this.parent || this.stage;
-            Animate.poof(this);
-            window.setTimeout(() => {
-                parent.swap(this, null);
-            }, 100);
-            this.stage.draw();
+
+            this.variable._opened = true;
+            let target = {
+                scale: { x: 0.3, y: 0.3 },
+                pos: { x: this.variable.pos.x, y: this.variable.pos.y },
+            };
+
+            // quadratic lerp for pos.y - makes it "arc" towards the variable
+            let b = 4 * (Math.min(this.value.pos.y, this.variable.pos.y) - 120) - this.variable.pos.y;
+            let c = this.value.pos.y;
+            let a = this.variable.pos.y - b;
+            let lerp = (src, tgt, elapsed, chain) => {
+                if (chain.length == 2 && chain[0] == "pos" && chain[1] == "y") {
+                    return a*elapsed*elapsed + b*elapsed + c;
+                }
+                else {
+                    return (1.0 - elapsed) * src + elapsed * tgt;
+                }
+            };
+            Animate.tween(this.value, target, 500, (x) => x, true, lerp).after(() => {
+                this.getEnvironment().update(this.variable.name, value);
+                let parent = this.parent || this.stage;
+                Animate.poof(this);
+                window.setTimeout(() => {
+                    parent.swap(this, null);
+                }, 100);
+                this.stage.draw();
+            });
         }
     }
 

@@ -112,7 +112,7 @@ var mag = (function(_) {
             return twn;
         }
 
-        static tween(node, targetValue, dur=1000, smoothFunc=((elapsed) => elapsed), autodraw=true) {
+        static tween(node, targetValue, dur=1000, smoothFunc=((elapsed) => elapsed), autodraw=true, lerpFunc=null) {
 
             let deepCloneProperties = (obj, srcobj) => {
                 let sourceValue = {};
@@ -129,17 +129,20 @@ var mag = (function(_) {
             let sourceValue = deepCloneProperties(targetValue, node);
             let finalValue = deepCloneProperties(targetValue, targetValue);
 
-            let lerpVals = (src, tgt, elapsed) => {
+            let lerpVals = lerpFunc ? lerpFunc : (src, tgt, elapsed, chain) => {
                 return (1.0 - elapsed) * src + elapsed * tgt;
             };
-            let lerpProps = (sourceObj, targetObj, elapsed) => {
+            // chain is passed to lerpVals so that a custom lerp
+            // function can do different things based on what property
+            // is actually being interpolated
+            let lerpProps = (sourceObj, targetObj, elapsed, chain=[]) => {
                 let rt = {};
                 for (let prop in targetObj) {
                     if (targetObj.hasOwnProperty(prop)) {
                         if (typeof targetObj[prop] === 'object')
-                            rt[prop] = lerpProps(sourceObj[prop], targetObj[prop], elapsed); // recursion into inner properties
+                            rt[prop] = lerpProps(sourceObj[prop], targetObj[prop], elapsed, chain.concat([prop])); // recursion into inner properties
                         else
-                            rt[prop] = lerpVals(sourceObj[prop], targetObj[prop], elapsed);
+                            rt[prop] = lerpVals(sourceObj[prop], targetObj[prop], elapsed, chain.concat([prop]));
                     }
                 }
                 return rt;

@@ -189,7 +189,7 @@ var ChestVarExpr = function (_VarExpr) {
                     value.scale = { x: 0.1, y: 0.1 };
                     value.pos = {
                         x: _this4.pos.x + 0.5 * _this4.size.w - 0.5 * value.absoluteSize.w,
-                        y: _this4.pos.y
+                        y: _this4.pos.y + 30
                     };
                     value.opacity = 0.0;
 
@@ -300,13 +300,35 @@ var AssignExpr = function (_Expression2) {
                     // Keep a copy of the original value before we start
                     // messing with it, to update the environment afterwards
                     var value = _this6.value.clone();
-                    _this6.getEnvironment().update(_this6.variable.name, value);
-                    var parent = _this6.parent || _this6.stage;
-                    Animate.poof(_this6);
-                    window.setTimeout(function () {
-                        parent.swap(_this6, null);
-                    }, 100);
-                    _this6.stage.draw();
+
+                    _this6.variable._opened = true;
+                    var target = {
+                        scale: { x: 0.3, y: 0.3 },
+                        pos: { x: _this6.variable.pos.x, y: _this6.variable.pos.y }
+                    };
+
+                    // quadratic lerp for pos.y - makes it "arc" towards the variable
+                    var b = 4 * (Math.min(_this6.value.pos.y, _this6.variable.pos.y) - 120) - _this6.variable.pos.y;
+                    var c = _this6.value.pos.y;
+                    var a = _this6.variable.pos.y - b;
+                    var lerp = function lerp(src, tgt, elapsed, chain) {
+                        if (chain.length == 2 && chain[0] == "pos" && chain[1] == "y") {
+                            return a * elapsed * elapsed + b * elapsed + c;
+                        } else {
+                            return (1.0 - elapsed) * src + elapsed * tgt;
+                        }
+                    };
+                    Animate.tween(_this6.value, target, 500, function (x) {
+                        return x;
+                    }, true, lerp).after(function () {
+                        _this6.getEnvironment().update(_this6.variable.name, value);
+                        var parent = _this6.parent || _this6.stage;
+                        Animate.poof(_this6);
+                        window.setTimeout(function () {
+                            parent.swap(_this6, null);
+                        }, 100);
+                        _this6.stage.draw();
+                    });
                 })();
             }
         }

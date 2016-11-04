@@ -866,7 +866,6 @@ var Goal = function () {
             var _iteratorError12 = undefined;
 
             try {
-
                 for (var _iterator12 = this.patterns[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
                     var pattern = _step12.value;
 

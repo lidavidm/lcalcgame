@@ -50,6 +50,7 @@ var EnvironmentDisplay = function (_mag$Rect) {
                 _this2.contents.push(e);
                 e.anchor = { x: 0, y: 0.5 };
                 e.pos = pos;
+                e.scale = { x: 1, y: 1 };
                 if (newRow) {
                     pos = addPos(pos, { x: 0, y: e.size.h });
                     pos.x = _this2.leftEdgePos.x;

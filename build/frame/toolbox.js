@@ -42,11 +42,6 @@ var Toolbox = function (_mag$ImageRect) {
             //    toolbox.removeExpression(e); // remove this expression from the toolbox
             //};
 
-            // These things are really tall. TODO: actually check the size
-            if (e instanceof VarExpr) {
-                e.scale = { x: 0.75, y: 0.75 };
-            }
-
             // Animate new expression to toolbox position.
             this.setLayout(animated);
         }
