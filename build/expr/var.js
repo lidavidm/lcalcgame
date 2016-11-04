@@ -160,11 +160,12 @@ var ChestVarExpr = function (_VarExpr) {
                 this._cacheLid = cacheLid;
             }
 
+            var size = this.absoluteSize;
             if (!this._opened) {
-                ctx.drawImage(this._cacheBase, pos.x, pos.y);
-                ctx.drawImage(this._cacheLid, pos.x, pos.y);
+                ctx.drawImage(this._cacheBase, pos.x, pos.y, size.w, size.h);
+                ctx.drawImage(this._cacheLid, pos.x, pos.y, size.w, size.h);
             } else {
-                ctx.drawImage(this._cacheBase, pos.x, pos.y);
+                ctx.drawImage(this._cacheBase, pos.x, pos.y, size.w, size.h);
             }
         }
     }, {
