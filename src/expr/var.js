@@ -52,12 +52,6 @@ class ChestVarExpr extends VarExpr {
         super(name);
         // See MissingTypedExpression#constructor
         this.equivalentClasses = [ChestVarExpr];
-
-        // TODO: these should probably be images.
-        this._cacheBase = null;
-        this._cacheLid = null;
-        this._cacheOpenLid = null;
-        this._opened = false;
     }
 
     open(preview, animate=true) {
@@ -65,104 +59,15 @@ class ChestVarExpr extends VarExpr {
 
     close() {
     }
-
-    _cacheImages(_, pos, boundingSize) {
-        let baseHeight = 0.5 * boundingSize.h;
-        let remainingHeight = 0.8 * (boundingSize.h - baseHeight);
-        let offset = 0.2 * (boundingSize.h - baseHeight);
-
-        let cacheBase = document.createElement("canvas");
-        cacheBase.width = boundingSize.w;
-        cacheBase.height = boundingSize.h;
-        let ctx = cacheBase.getContext("2d");
-        // Base of chest
-        ctx.fillStyle = '#cd853f';
-        setStrokeStyle(ctx, {
-            lineWidth: 2,
-            color: '#ffa500',
-        });
-        ctx.fillRect(0, remainingHeight, boundingSize.w, baseHeight);
-        ctx.strokeRect(0 + 2, remainingHeight + 2, boundingSize.w - 4, baseHeight - 4);
-        setStrokeStyle(ctx, {
-            lineWidth: 1.5,
-            color: '#8b4513',
-        });
-        ctx.strokeRect(0, remainingHeight, boundingSize.w, baseHeight);
-        ctx.strokeRect(0 + 3.5, remainingHeight + 3.5, boundingSize.w - 7, baseHeight - 7);
-
-        let cacheLid = document.createElement("canvas");
-        cacheLid.width = boundingSize.w;
-        cacheLid.height = boundingSize.h;
-        ctx = cacheLid.getContext("2d");
-        // Lid of chest
-        ctx.fillStyle = '#cd853f';
-        setStrokeStyle(ctx, {
-            lineWidth: 2,
-            color: '#ffa500',
-        });
-        ctx.strokeRect(0 + 2, offset, boundingSize.w - 4, baseHeight - 2);
-        setStrokeStyle(ctx, {
-            lineWidth: 1.5,
-            color: '#8b4513',
-        });
-        ctx.strokeRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
-
-        ctx.fillRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
-        ctx.strokeRect(0, offset, boundingSize.w, baseHeight);
-        ctx.fillStyle = '#ffa500';
-        ctx.fillRect(boundingSize.w / 2 - 7.5, boundingSize.h / 2 - 3, 15, 10);
-        ctx.strokeRect(boundingSize.w / 2 - 7.5, boundingSize.h / 2 - 3, 15, 10);
-
-        let cacheOpenLid = document.createElement("canvas");
-        cacheOpenLid.width = boundingSize.w;
-        cacheOpenLid.height = boundingSize.h;
-        ctx = cacheOpenLid.getContext("2d");
-
-        offset += 0.1 * boundingSize.h;
-
-        // Lid of chest (opened)
-        ctx.fillStyle = '#cd853f';
-        setStrokeStyle(ctx, {
-            lineWidth: 2,
-            color: '#ffa500',
-        });
-        ctx.strokeRect(0 + 2, offset, boundingSize.w - 4, baseHeight - 2);
-        setStrokeStyle(ctx, {
-            lineWidth: 1.5,
-            color: '#8b4513',
-        });
-        ctx.strokeRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
-
-        ctx.fillRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
-        ctx.strokeRect(0, offset, boundingSize.w, baseHeight);
-
-        ctx.fillStyle = '#ffa500';
-        ctx.fillRect(boundingSize.w / 2 - 5, 0.1 * boundingSize.h, 10, 6);
-        ctx.strokeRect(boundingSize.w / 2 - 5, 0.1 * boundingSize.h, 10, 6);
-
-        ctx.globalCompositeOperation = 'multiply';
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-        ctx.fillRect(0, offset, boundingSize.w, baseHeight - 3.5);
-        ctx.fillRect(boundingSize.w / 2 - 5, 0.1 * boundingSize.h, 10, 6);
-
-        this._cacheBase = cacheBase;
-        this._cacheLid = cacheLid;
-        this._cacheOpenLid = cacheOpenLid;
-    }
-
     drawInternal(ctx, pos, boundingSize) {
-        if (!this._cacheBase) {
-            this._cacheImages(ctx, pos, boundingSize);
-        }
-
         let size = this.absoluteSize;
         if (!this._opened) {
-            ctx.drawImage(this._cacheBase, pos.x, pos.y, size.w, size.h);
-            ctx.drawImage(this._cacheLid, pos.x, pos.y, size.w, size.h);
+            ctx.drawImage(Resource.getImage('chest-wood-base'), pos.x, pos.y, size.w, size.h);
+            ctx.drawImage(Resource.getImage('chest-wood-lid-closed'), pos.x, pos.y, size.w, size.h);
         }
         else {
-            ctx.drawImage(this._cacheOpenLid, pos.x, pos.y, size.w, size.h);
-            ctx.drawImage(this._cacheBase, pos.x, pos.y, size.w, size.h);
+            ctx.drawImage(Resource.getImage('chest-wood-base'), pos.x, pos.y, size.w, size.h);
+            ctx.drawImage(Resource.getImage('chest-wood-lid-open'), pos.x, pos.y, size.w, size.h);
         }
     }
 
@@ -187,8 +92,6 @@ class ChestVarExpr extends VarExpr {
             stage.add(value);
             this._opened = true;
 
-            this.opacity = 1.0;
-            Animate.tween(this, { opacity: 0.0 }, 300);
             Animate.tween(value, {
                 scale: { x: 1.0, y: 1.0 },
                 pos: {
@@ -198,6 +101,7 @@ class ChestVarExpr extends VarExpr {
                 opacity: 1.0,
             }, 500).after(() => {
                 window.setTimeout(() => {
+                    Animate.poof(this);
                     if (this.parent) {
                         stage.remove(value);
                         this.parent.swap(this, value);
@@ -237,27 +141,18 @@ class DisplayChest extends ChestVarExpr {
     }
 
     drawInternal(ctx, pos, boundingSize) {
-        if (!this._cacheBase) {
-            this._cacheImages(ctx, pos, boundingSize);
-        }
-
         this.holes[0].pos = {
             x: this.childPos.x,
             y: this.childPos.y,
         };
 
         let size = this.absoluteSize;
-        ctx.drawImage(this._cacheOpenLid, pos.x, pos.y, size.w, size.h);
-        ctx.drawImage(this._cacheBase, pos.x, pos.y, size.w, size.h);
+        ctx.drawImage(Resource.getImage('chest-wood-lid-open'), pos.x, pos.y, size.w, size.h);
     }
 
     drawInternalAfterChildren(ctx, pos, boundingSize) {
-        if (!this._cacheBase) {
-            this._cacheImages(ctx, pos, boundingSize);
-        }
-
         let size = this.absoluteSize;
-        ctx.drawImage(this._cacheBase, pos.x, pos.y, size.w, size.h);
+        ctx.drawImage(Resource.getImage('chest-wood-base'), pos.x, pos.y, size.w, size.h);
     }
 }
 

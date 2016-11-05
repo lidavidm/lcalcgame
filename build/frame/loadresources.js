@@ -95,6 +95,9 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadImage('mirror-icon-fade-false-righthalf', 'mirror-fade-false-righthalf.png');
     loadImage('funnel', 'funnel.png');
     loadImage('funnel-selected', 'funnel-selected.png');
+    loadImage('chest-wood-base', 'chest-wood-base.png');
+    loadImage('chest-wood-lid-open', 'chest-wood-lid-open.png');
+    loadImage('chest-wood-lid-closed', 'chest-wood-lid-closed.png');
 
     // UI Images.
     loadImage('btn-next-default', 'next-button.png');

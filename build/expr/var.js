@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -30,20 +30,20 @@ var VarExpr = function (_Expression) {
     }
 
     _createClass(VarExpr, [{
-        key: "open",
+        key: 'open',
         value: function open(preview) {
             var animate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
         }
     }, {
-        key: "close",
+        key: 'close',
         value: function close() {}
     }, {
-        key: "canReduce",
+        key: 'canReduce',
         value: function canReduce() {
             return this.getEnvironment() && (this.parent || this.stage) && this.getEnvironment().lookup(this.name);
         }
     }, {
-        key: "reduce",
+        key: 'reduce',
         value: function reduce() {
             var env = this.getEnvironment();
             if (!env) return this;
@@ -57,7 +57,7 @@ var VarExpr = function (_Expression) {
             return value;
         }
     }, {
-        key: "performReduction",
+        key: 'performReduction',
         value: function performReduction() {
             var value = this.reduce();
             if (value != this) {
@@ -67,7 +67,7 @@ var VarExpr = function (_Expression) {
             }
         }
     }, {
-        key: "onmouseclick",
+        key: 'onmouseclick',
         value: function onmouseclick() {
             this.performReduction();
         }
@@ -86,126 +86,31 @@ var ChestVarExpr = function (_VarExpr) {
         var _this2 = _possibleConstructorReturn(this, (ChestVarExpr.__proto__ || Object.getPrototypeOf(ChestVarExpr)).call(this, name));
 
         _this2.equivalentClasses = [ChestVarExpr];
-
-        // TODO: these should probably be images.
-        _this2._cacheBase = null;
-        _this2._cacheLid = null;
-        _this2._cacheOpenLid = null;
-        _this2._opened = false;
         return _this2;
     }
 
     _createClass(ChestVarExpr, [{
-        key: "open",
+        key: 'open',
         value: function open(preview) {
             var animate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
         }
     }, {
-        key: "close",
+        key: 'close',
         value: function close() {}
     }, {
-        key: "_cacheImages",
-        value: function _cacheImages(_, pos, boundingSize) {
-            var baseHeight = 0.5 * boundingSize.h;
-            var remainingHeight = 0.8 * (boundingSize.h - baseHeight);
-            var offset = 0.2 * (boundingSize.h - baseHeight);
-
-            var cacheBase = document.createElement("canvas");
-            cacheBase.width = boundingSize.w;
-            cacheBase.height = boundingSize.h;
-            var ctx = cacheBase.getContext("2d");
-            // Base of chest
-            ctx.fillStyle = '#cd853f';
-            setStrokeStyle(ctx, {
-                lineWidth: 2,
-                color: '#ffa500'
-            });
-            ctx.fillRect(0, remainingHeight, boundingSize.w, baseHeight);
-            ctx.strokeRect(0 + 2, remainingHeight + 2, boundingSize.w - 4, baseHeight - 4);
-            setStrokeStyle(ctx, {
-                lineWidth: 1.5,
-                color: '#8b4513'
-            });
-            ctx.strokeRect(0, remainingHeight, boundingSize.w, baseHeight);
-            ctx.strokeRect(0 + 3.5, remainingHeight + 3.5, boundingSize.w - 7, baseHeight - 7);
-
-            var cacheLid = document.createElement("canvas");
-            cacheLid.width = boundingSize.w;
-            cacheLid.height = boundingSize.h;
-            ctx = cacheLid.getContext("2d");
-            // Lid of chest
-            ctx.fillStyle = '#cd853f';
-            setStrokeStyle(ctx, {
-                lineWidth: 2,
-                color: '#ffa500'
-            });
-            ctx.strokeRect(0 + 2, offset, boundingSize.w - 4, baseHeight - 2);
-            setStrokeStyle(ctx, {
-                lineWidth: 1.5,
-                color: '#8b4513'
-            });
-            ctx.strokeRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
-
-            ctx.fillRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
-            ctx.strokeRect(0, offset, boundingSize.w, baseHeight);
-            ctx.fillStyle = '#ffa500';
-            ctx.fillRect(boundingSize.w / 2 - 7.5, boundingSize.h / 2 - 3, 15, 10);
-            ctx.strokeRect(boundingSize.w / 2 - 7.5, boundingSize.h / 2 - 3, 15, 10);
-
-            var cacheOpenLid = document.createElement("canvas");
-            cacheOpenLid.width = boundingSize.w;
-            cacheOpenLid.height = boundingSize.h;
-            ctx = cacheOpenLid.getContext("2d");
-
-            offset += 0.1 * boundingSize.h;
-
-            // Lid of chest (opened)
-            ctx.fillStyle = '#cd853f';
-            setStrokeStyle(ctx, {
-                lineWidth: 2,
-                color: '#ffa500'
-            });
-            ctx.strokeRect(0 + 2, offset, boundingSize.w - 4, baseHeight - 2);
-            setStrokeStyle(ctx, {
-                lineWidth: 1.5,
-                color: '#8b4513'
-            });
-            ctx.strokeRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
-
-            ctx.fillRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
-            ctx.strokeRect(0, offset, boundingSize.w, baseHeight);
-
-            ctx.fillStyle = '#ffa500';
-            ctx.fillRect(boundingSize.w / 2 - 5, 0.1 * boundingSize.h, 10, 6);
-            ctx.strokeRect(boundingSize.w / 2 - 5, 0.1 * boundingSize.h, 10, 6);
-
-            ctx.globalCompositeOperation = 'multiply';
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-            ctx.fillRect(0, offset, boundingSize.w, baseHeight - 3.5);
-            ctx.fillRect(boundingSize.w / 2 - 5, 0.1 * boundingSize.h, 10, 6);
-
-            this._cacheBase = cacheBase;
-            this._cacheLid = cacheLid;
-            this._cacheOpenLid = cacheOpenLid;
-        }
-    }, {
-        key: "drawInternal",
+        key: 'drawInternal',
         value: function drawInternal(ctx, pos, boundingSize) {
-            if (!this._cacheBase) {
-                this._cacheImages(ctx, pos, boundingSize);
-            }
-
             var size = this.absoluteSize;
             if (!this._opened) {
-                ctx.drawImage(this._cacheBase, pos.x, pos.y, size.w, size.h);
-                ctx.drawImage(this._cacheLid, pos.x, pos.y, size.w, size.h);
+                ctx.drawImage(Resource.getImage('chest-wood-base'), pos.x, pos.y, size.w, size.h);
+                ctx.drawImage(Resource.getImage('chest-wood-lid-closed'), pos.x, pos.y, size.w, size.h);
             } else {
-                ctx.drawImage(this._cacheOpenLid, pos.x, pos.y, size.w, size.h);
-                ctx.drawImage(this._cacheBase, pos.x, pos.y, size.w, size.h);
+                ctx.drawImage(Resource.getImage('chest-wood-base'), pos.x, pos.y, size.w, size.h);
+                ctx.drawImage(Resource.getImage('chest-wood-lid-open'), pos.x, pos.y, size.w, size.h);
             }
         }
     }, {
-        key: "performReduction",
+        key: 'performReduction',
         value: function performReduction() {
             var _this3 = this;
 
@@ -234,8 +139,6 @@ var ChestVarExpr = function (_VarExpr) {
                     stage.add(value);
                     _this3._opened = true;
 
-                    _this3.opacity = 1.0;
-                    Animate.tween(_this3, { opacity: 0.0 }, 300);
                     Animate.tween(value, {
                         scale: { x: 1.0, y: 1.0 },
                         pos: {
@@ -245,6 +148,7 @@ var ChestVarExpr = function (_VarExpr) {
                         opacity: 1.0
                     }, 500).after(function () {
                         window.setTimeout(function () {
+                            Animate.poof(_this3);
                             if (_this3.parent) {
                                 stage.remove(value);
                                 _this3.parent.swap(_this3, value);
@@ -257,7 +161,7 @@ var ChestVarExpr = function (_VarExpr) {
                     });
                 }();
 
-                if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
+                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
             }
         }
     }]);
@@ -281,10 +185,10 @@ var DisplayChest = function (_ChestVarExpr) {
     }
 
     _createClass(DisplayChest, [{
-        key: "performReduction",
+        key: 'performReduction',
         value: function performReduction() {}
     }, {
-        key: "prepareAssign",
+        key: 'prepareAssign',
         value: function prepareAssign() {
             var _this5 = this;
 
@@ -299,30 +203,21 @@ var DisplayChest = function (_ChestVarExpr) {
             });
         }
     }, {
-        key: "drawInternal",
+        key: 'drawInternal',
         value: function drawInternal(ctx, pos, boundingSize) {
-            if (!this._cacheBase) {
-                this._cacheImages(ctx, pos, boundingSize);
-            }
-
             this.holes[0].pos = {
                 x: this.childPos.x,
                 y: this.childPos.y
             };
 
             var size = this.absoluteSize;
-            ctx.drawImage(this._cacheOpenLid, pos.x, pos.y, size.w, size.h);
-            ctx.drawImage(this._cacheBase, pos.x, pos.y, size.w, size.h);
+            ctx.drawImage(Resource.getImage('chest-wood-lid-open'), pos.x, pos.y, size.w, size.h);
         }
     }, {
-        key: "drawInternalAfterChildren",
+        key: 'drawInternalAfterChildren',
         value: function drawInternalAfterChildren(ctx, pos, boundingSize) {
-            if (!this._cacheBase) {
-                this._cacheImages(ctx, pos, boundingSize);
-            }
-
             var size = this.absoluteSize;
-            ctx.drawImage(this._cacheBase, pos.x, pos.y, size.w, size.h);
+            ctx.drawImage(Resource.getImage('chest-wood-base'), pos.x, pos.y, size.w, size.h);
         }
     }]);
 
@@ -356,17 +251,17 @@ var AssignExpr = function (_Expression2) {
     }
 
     _createClass(AssignExpr, [{
-        key: "onmouseclick",
+        key: 'onmouseclick',
         value: function onmouseclick() {
             this.performReduction();
         }
     }, {
-        key: "canReduce",
+        key: 'canReduce',
         value: function canReduce() {
             return this.value && this.variable && this.value.canReduce();
         }
     }, {
-        key: "reduce",
+        key: 'reduce',
         value: function reduce() {
             if (this.variable && this.value) {
                 return this.value;
@@ -375,7 +270,7 @@ var AssignExpr = function (_Expression2) {
             }
         }
     }, {
-        key: "performReduction",
+        key: 'performReduction',
         value: function performReduction() {
             var _this7 = this;
 
@@ -449,7 +344,7 @@ var AssignExpr = function (_Expression2) {
             }
         }
     }, {
-        key: "reduceCompletely",
+        key: 'reduceCompletely',
         value: function reduceCompletely() {
             if (this.value) {
                 this.value.reduceCompletely();
@@ -465,12 +360,12 @@ var AssignExpr = function (_Expression2) {
             }
         }
     }, {
-        key: "variable",
+        key: 'variable',
         get: function get() {
             return this.holes[0] instanceof MissingExpression ? null : this.holes[0];
         }
     }, {
-        key: "value",
+        key: 'value',
         get: function get() {
             return this.holes[2] instanceof MissingExpression ? null : this.holes[2];
         }
@@ -495,19 +390,19 @@ var ExpressionView = function (_MissingExpression) {
 
 
     _createClass(ExpressionView, [{
-        key: "ondropenter",
+        key: 'ondropenter',
         value: function ondropenter() {}
     }, {
-        key: "ondropexit",
+        key: 'ondropexit',
         value: function ondropexit() {}
     }, {
-        key: "ondropped",
+        key: 'ondropped',
         value: function ondropped() {}
     }, {
-        key: "onmouseenter",
+        key: 'onmouseenter',
         value: function onmouseenter() {}
     }, {
-        key: "drawInternal",
+        key: 'drawInternal',
         value: function drawInternal(ctx, pos, boundingSize) {
             var rad = boundingSize.w / 2.0;
             setStrokeStyle(ctx, {
@@ -519,7 +414,7 @@ var ExpressionView = function (_MissingExpression) {
 
             ctx.clip();
             var alpha = 0.5 * ((Math.PI / 2 - this._openOffset) / (Math.PI / 2));
-            ctx.shadowColor = "rgba(0,0,0," + alpha + ")";
+            ctx.shadowColor = 'rgba(0,0,0,' + alpha + ')';
             ctx.shadowBlur = 3;
             ctx.shadowOffsetX = 1;
             ctx.shadowOffsetY = 1;
