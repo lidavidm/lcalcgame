@@ -29,11 +29,6 @@ var EnvironmentDisplay = function (_mag$Rect) {
     }
 
     _createClass(EnvironmentDisplay, [{
-        key: "update",
-        value: function update() {
-            if (this.env) this.showEnvironment(this.env);else this.showGlobals();
-        }
-    }, {
         key: "showEnvironment",
         value: function showEnvironment(env) {
             var _this2 = this;

@@ -421,31 +421,29 @@ var AssignExpr = function (_Expression2) {
                             return (1.0 - elapsed) * src + elapsed * tgt;
                         }
                     };
+
+                    var parent = _this7.parent || _this7.stage;
+                    var afterCallback = function afterCallback() {
+                        _this7.getEnvironment().update(_this7.variable.name, value);
+                        _this7.stage.environmentDisplay.showGlobals();
+                        _this7.stage.draw();
+                    };
+
+                    var callback = null;
+                    if (environment == _this7.stage.environment && _this7.stage.environmentDisplay) {
+                        callback = _this7.stage.environmentDisplay.prepareAssign(_this7.variable.name);
+                    }
+                    if (callback) {
+                        callback.after(afterCallback);
+                    } else {
+                        afterCallback();
+                    }
+
                     Animate.tween(_this7.value, target, 500, function (x) {
                         return x;
                     }, true, lerp).after(function () {
-                        var callback = null;
-
-                        var parent = _this7.parent || _this7.stage;
-                        var afterCallback = function afterCallback() {
-                            _this7.getEnvironment().update(_this7.variable.name, value);
-                            _this7.stage.environmentDisplay.update();
-                        };
-
                         Animate.poof(_this7);
-                        window.setTimeout(function () {
-                            parent.swap(_this7, null);
-                            if (environment == _this7.stage.environment && _this7.stage.environmentDisplay) {
-                                callback = _this7.stage.environmentDisplay.prepareAssign(_this7.variable.name);
-                            }
-                            if (callback) {
-                                callback.after(afterCallback);
-                            } else {
-                                afterCallback();
-                            }
-                        });
-
-                        _this7.stage.draw();
+                        parent.swap(_this7, null);
                     });
                 })();
             }

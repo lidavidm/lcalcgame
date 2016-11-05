@@ -350,30 +350,28 @@ class AssignExpr extends Expression {
                     return (1.0 - elapsed) * src + elapsed * tgt;
                 }
             };
-            Animate.tween(this.value, target, 500, (x) => x, true, lerp).after(() => {
-                let callback = null;
 
-                let parent = this.parent || this.stage;
-                let afterCallback = () => {
-                    this.getEnvironment().update(this.variable.name, value);
-                    this.stage.environmentDisplay.update();
-                };
-
-                Animate.poof(this);
-                window.setTimeout(() => {
-                    parent.swap(this, null);
-                    if (environment == this.stage.environment && this.stage.environmentDisplay) {
-                        callback = this.stage.environmentDisplay.prepareAssign(this.variable.name);
-                    }
-                    if (callback) {
-                        callback.after(afterCallback);
-                    }
-                    else {
-                        afterCallback();
-                    }
-                });
-
+            let parent = this.parent || this.stage;
+            let afterCallback = () => {
+                this.getEnvironment().update(this.variable.name, value);
+                this.stage.environmentDisplay.showGlobals();
                 this.stage.draw();
+            };
+
+            let callback = null;
+            if (environment == this.stage.environment && this.stage.environmentDisplay) {
+                callback = this.stage.environmentDisplay.prepareAssign(this.variable.name);
+            }
+            if (callback) {
+                callback.after(afterCallback);
+            }
+            else {
+                afterCallback();
+            }
+
+            Animate.tween(this.value, target, 500, (x) => x, true, lerp).after(() => {
+                Animate.poof(this);
+                parent.swap(this, null);
             });
         }
     }
