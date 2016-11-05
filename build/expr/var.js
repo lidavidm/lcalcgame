@@ -291,10 +291,10 @@ var DisplayChest = function (_ChestVarExpr) {
             var target = {
                 childPos: {
                     x: 10,
-                    y: -100
+                    y: -200
                 }
             };
-            return Animate.tween(this, target, 400).after(function () {
+            return Animate.tween(this, target, 600).after(function () {
                 _this5.childPos = { x: 10, y: 5 };
             });
         }
@@ -446,7 +446,7 @@ var AssignExpr = function (_Expression2) {
                         });
 
                         _this7.stage.draw();
-                    }, 400);
+                    });
                 })();
             }
         }

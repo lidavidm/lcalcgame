@@ -228,10 +228,10 @@ class DisplayChest extends ChestVarExpr {
         let target = {
             childPos: {
                 x: 10,
-                y: -100,
+                y: -200,
             },
         };
-        return Animate.tween(this, target, 400).after(() => {
+        return Animate.tween(this, target, 600).after(() => {
             this.childPos = { x: 10, y: 5 };
         });
     }
@@ -374,7 +374,7 @@ class AssignExpr extends Expression {
                 });
 
                 this.stage.draw();
-            }, 400);
+            });
         }
     }
 
