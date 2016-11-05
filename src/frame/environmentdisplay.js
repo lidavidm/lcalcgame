@@ -7,6 +7,7 @@ class EnvironmentDisplay extends mag.Rect {
         this.env = null;
         this.stage = stage;
         this.contents = [];
+        this.bindings = {};
         this.highlighted = null;
         this.toolbox = true;
     }
@@ -48,7 +49,13 @@ class EnvironmentDisplay extends mag.Rect {
 
             let e = env.lookup(name).clone();
             // setup(e, this.padding, true);
-            setup(new DisplayChest(name, e), this.padding, true);
+            let display = new DisplayChest(name, e);
+            if (this.bindings[name]) {
+                display = this.bindings[name];
+                this.bindings[name].holes[0] = e;
+            }
+            this.bindings[name] = display;
+            setup(display, this.padding, true);
         });
     }
 
@@ -57,11 +64,20 @@ class EnvironmentDisplay extends mag.Rect {
         this.showEnvironment(this.stage.environment);
     }
 
+    // Show an animation in preparation for updating a binding
+    prepareAssign(name) {
+        if (this.bindings[name] && this.bindings[name].prepareAssign) {
+            return this.bindings[name].prepareAssign();
+        }
+        return null;
+    }
+
     clear() {
         if (!this.stage) return;
         for (let child of this.contents) {
             this.stage.remove(child);
         }
+        this.bindings = {};
         this.contents = [];
         this.env = null;
         this.highlighted = null;

@@ -219,17 +219,32 @@ class DisplayChest extends ChestVarExpr {
         this._opened = true;
         expr.ignoreEvents = true;
         this.holes.push(expr);
-        // expr.pos = { x: expr.pos.x, y: expr.pos.y - 50 };
+        this.childPos = { x: 10, y: 5 };
     }
 
     performReduction() {}
+
+    prepareAssign() {
+        let target = {
+            childPos: {
+                x: 10,
+                y: -100,
+            },
+        };
+        return Animate.tween(this, target, 400).after(() => {
+            this.childPos = { x: 10, y: 5 };
+        });
+    }
 
     drawInternal(ctx, pos, boundingSize) {
         if (!this._cacheBase) {
             this._cacheImages(ctx, pos, boundingSize);
         }
 
-        this.holes[0].pos = { x: 10, y: 5 };
+        this.holes[0].pos = {
+            x: this.childPos.x,
+            y: this.childPos.y,
+        };
 
         let size = this.absoluteSize;
         ctx.drawImage(this._cacheOpenLid, pos.x, pos.y, size.w, size.h);
@@ -321,6 +336,8 @@ class AssignExpr extends Expression {
                 pos: { x: this.variable.pos.x, y: this.variable.pos.y },
             };
 
+            let environment = this.getEnvironment();
+
             // quadratic lerp for pos.y - makes it "arc" towards the variable
             let b = 4 * (Math.min(this.value.pos.y, this.variable.pos.y) - 120) - this.variable.pos.y;
             let c = this.value.pos.y;
@@ -334,14 +351,30 @@ class AssignExpr extends Expression {
                 }
             };
             Animate.tween(this.value, target, 500, (x) => x, true, lerp).after(() => {
-                this.getEnvironment().update(this.variable.name, value);
+                let callback = null;
+
                 let parent = this.parent || this.stage;
+                let afterCallback = () => {
+                    this.getEnvironment().update(this.variable.name, value);
+                    this.stage.environmentDisplay.update();
+                };
+
                 Animate.poof(this);
                 window.setTimeout(() => {
                     parent.swap(this, null);
-                }, 100);
+                    if (environment == this.stage.environment && this.stage.environmentDisplay) {
+                        callback = this.stage.environmentDisplay.prepareAssign(this.variable.name);
+                    }
+                    if (callback) {
+                        callback.after(afterCallback);
+                    }
+                    else {
+                        afterCallback();
+                    }
+                });
+
                 this.stage.draw();
-            });
+            }, 400);
         }
     }
 

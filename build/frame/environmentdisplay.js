@@ -22,6 +22,7 @@ var EnvironmentDisplay = function (_mag$Rect) {
         _this.env = null;
         _this.stage = stage;
         _this.contents = [];
+        _this.bindings = {};
         _this.highlighted = null;
         _this.toolbox = true;
         return _this;
@@ -65,7 +66,13 @@ var EnvironmentDisplay = function (_mag$Rect) {
 
                 var e = env.lookup(name).clone();
                 // setup(e, this.padding, true);
-                setup(new DisplayChest(name, e), _this2.padding, true);
+                var display = new DisplayChest(name, e);
+                if (_this2.bindings[name]) {
+                    display = _this2.bindings[name];
+                    _this2.bindings[name].holes[0] = e;
+                }
+                _this2.bindings[name] = display;
+                setup(display, _this2.padding, true);
             });
         }
     }, {
@@ -73,6 +80,17 @@ var EnvironmentDisplay = function (_mag$Rect) {
         value: function showGlobals() {
             this.clear();
             this.showEnvironment(this.stage.environment);
+        }
+
+        // Show an animation in preparation for updating a binding
+
+    }, {
+        key: "prepareAssign",
+        value: function prepareAssign(name) {
+            if (this.bindings[name] && this.bindings[name].prepareAssign) {
+                return this.bindings[name].prepareAssign();
+            }
+            return null;
         }
     }, {
         key: "clear",
@@ -103,6 +121,7 @@ var EnvironmentDisplay = function (_mag$Rect) {
                 }
             }
 
+            this.bindings = {};
             this.contents = [];
             this.env = null;
             this.highlighted = null;
