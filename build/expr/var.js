@@ -436,7 +436,7 @@ var AssignExpr = function (_Expression2) {
                     if (callback) {
                         callback.after(afterCallback);
                     } else {
-                        afterCallback();
+                        window.setTimeout(afterCallback, 500);
                     }
 
                     Animate.tween(_this7.value, target, 500, function (x) {

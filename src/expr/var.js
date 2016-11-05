@@ -366,7 +366,7 @@ class AssignExpr extends Expression {
                 callback.after(afterCallback);
             }
             else {
-                afterCallback();
+                window.setTimeout(afterCallback, 500);
             }
 
             Animate.tween(this.value, target, 500, (x) => x, true, lerp).after(() => {
