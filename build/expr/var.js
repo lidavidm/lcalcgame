@@ -21,7 +21,7 @@ var VarExpr = function (_Expression) {
     function VarExpr(name) {
         _classCallCheck(this, VarExpr);
 
-        var _this = _possibleConstructorReturn(this, (VarExpr.__proto__ || Object.getPrototypeOf(VarExpr)).call(this, [new TextExpr(name)]));
+        var _this = _possibleConstructorReturn(this, (VarExpr.__proto__ || Object.getPrototypeOf(VarExpr)).call(this, []));
 
         _this.name = name;
         // See MissingTypedExpression#constructor
@@ -32,27 +32,11 @@ var VarExpr = function (_Expression) {
     _createClass(VarExpr, [{
         key: "open",
         value: function open(preview) {
-            var _this2 = this;
-
             var animate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-
-            if (!animate) {
-                this.animating = false;
-                this.preview = preview;
-                this.update();
-                return null;
-            }
-            return this.animateShrink(200).after(function () {
-                _this2.preview = preview;
-                _this2.update();
-            });
         }
     }, {
         key: "close",
-        value: function close() {
-            this.preview = null;
-            this.update();
-        }
+        value: function close() {}
     }, {
         key: "canReduce",
         value: function canReduce() {
@@ -99,102 +83,116 @@ var ChestVarExpr = function (_VarExpr) {
         _classCallCheck(this, ChestVarExpr);
 
         // See MissingTypedExpression#constructor
-        var _this3 = _possibleConstructorReturn(this, (ChestVarExpr.__proto__ || Object.getPrototypeOf(ChestVarExpr)).call(this, name));
+        var _this2 = _possibleConstructorReturn(this, (ChestVarExpr.__proto__ || Object.getPrototypeOf(ChestVarExpr)).call(this, name));
 
-        _this3.equivalentClasses = [ChestVarExpr];
+        _this2.equivalentClasses = [ChestVarExpr];
 
-        _this3._cacheBase = null;
-        _this3._cacheLid = null;
-        _this3._cacheOpenLid = null;
-        _this3._opened = false;
-        return _this3;
+        // TODO: these should probably be images.
+        _this2._cacheBase = null;
+        _this2._cacheLid = null;
+        _this2._cacheOpenLid = null;
+        _this2._opened = false;
+        return _this2;
     }
 
     _createClass(ChestVarExpr, [{
-        key: "drawInternal",
-        value: function drawInternal(ctx, pos, boundingSize) {
+        key: "open",
+        value: function open(preview) {
+            var animate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+        }
+    }, {
+        key: "close",
+        value: function close() {}
+    }, {
+        key: "_cacheImages",
+        value: function _cacheImages(_, pos, boundingSize) {
             var baseHeight = 0.5 * boundingSize.h;
             var remainingHeight = 0.8 * (boundingSize.h - baseHeight);
             var offset = 0.2 * (boundingSize.h - baseHeight);
 
+            var cacheBase = document.createElement("canvas");
+            cacheBase.width = boundingSize.w;
+            cacheBase.height = boundingSize.h;
+            var ctx = cacheBase.getContext("2d");
+            // Base of chest
+            ctx.fillStyle = '#cd853f';
+            setStrokeStyle(ctx, {
+                lineWidth: 2,
+                color: '#ffa500'
+            });
+            ctx.fillRect(0, remainingHeight, boundingSize.w, baseHeight);
+            ctx.strokeRect(0 + 2, remainingHeight + 2, boundingSize.w - 4, baseHeight - 4);
+            setStrokeStyle(ctx, {
+                lineWidth: 1.5,
+                color: '#8b4513'
+            });
+            ctx.strokeRect(0, remainingHeight, boundingSize.w, baseHeight);
+            ctx.strokeRect(0 + 3.5, remainingHeight + 3.5, boundingSize.w - 7, baseHeight - 7);
+
+            var cacheLid = document.createElement("canvas");
+            cacheLid.width = boundingSize.w;
+            cacheLid.height = boundingSize.h;
+            ctx = cacheLid.getContext("2d");
+            // Lid of chest
+            ctx.fillStyle = '#cd853f';
+            setStrokeStyle(ctx, {
+                lineWidth: 2,
+                color: '#ffa500'
+            });
+            ctx.strokeRect(0 + 2, offset, boundingSize.w - 4, baseHeight - 2);
+            setStrokeStyle(ctx, {
+                lineWidth: 1.5,
+                color: '#8b4513'
+            });
+            ctx.strokeRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
+
+            ctx.fillRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
+            ctx.strokeRect(0, offset, boundingSize.w, baseHeight);
+            ctx.fillStyle = '#ffa500';
+            ctx.fillRect(boundingSize.w / 2 - 7.5, boundingSize.h / 2 - 3, 15, 10);
+            ctx.strokeRect(boundingSize.w / 2 - 7.5, boundingSize.h / 2 - 3, 15, 10);
+
+            var cacheOpenLid = document.createElement("canvas");
+            cacheOpenLid.width = boundingSize.w;
+            cacheOpenLid.height = boundingSize.h;
+            ctx = cacheOpenLid.getContext("2d");
+
+            offset += 0.1 * boundingSize.h;
+
+            // Lid of chest (opened)
+            ctx.fillStyle = '#cd853f';
+            setStrokeStyle(ctx, {
+                lineWidth: 2,
+                color: '#ffa500'
+            });
+            ctx.strokeRect(0 + 2, offset, boundingSize.w - 4, baseHeight - 2);
+            setStrokeStyle(ctx, {
+                lineWidth: 1.5,
+                color: '#8b4513'
+            });
+            ctx.strokeRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
+
+            ctx.fillRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
+            ctx.strokeRect(0, offset, boundingSize.w, baseHeight);
+
+            ctx.fillStyle = '#ffa500';
+            ctx.fillRect(boundingSize.w / 2 - 5, 0.1 * boundingSize.h, 10, 6);
+            ctx.strokeRect(boundingSize.w / 2 - 5, 0.1 * boundingSize.h, 10, 6);
+
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillRect(0, offset, boundingSize.w, baseHeight - 3.5);
+            ctx.fillRect(boundingSize.w / 2 - 5, 0.1 * boundingSize.h, 10, 6);
+
+            this._cacheBase = cacheBase;
+            this._cacheLid = cacheLid;
+            this._cacheOpenLid = cacheOpenLid;
+        }
+    }, {
+        key: "drawInternal",
+        value: function drawInternal(ctx, pos, boundingSize) {
             if (!this._cacheBase) {
-                var cacheBase = document.createElement("canvas");
-                cacheBase.width = boundingSize.w;
-                cacheBase.height = boundingSize.h;
-                var _ctx = cacheBase.getContext("2d");
-                // Base of chest
-                _ctx.fillStyle = '#cd853f';
-                setStrokeStyle(_ctx, {
-                    lineWidth: 2,
-                    color: '#ffa500'
-                });
-                _ctx.fillRect(0, remainingHeight, boundingSize.w, baseHeight);
-                _ctx.strokeRect(0 + 2, remainingHeight + 2, boundingSize.w - 4, baseHeight - 4);
-                setStrokeStyle(_ctx, {
-                    lineWidth: 1.5,
-                    color: '#8b4513'
-                });
-                _ctx.strokeRect(0, remainingHeight, boundingSize.w, baseHeight);
-                _ctx.strokeRect(0 + 3.5, remainingHeight + 3.5, boundingSize.w - 7, baseHeight - 7);
-
-                var cacheLid = document.createElement("canvas");
-                cacheLid.width = boundingSize.w;
-                cacheLid.height = boundingSize.h;
-                _ctx = cacheLid.getContext("2d");
-                // Lid of chest
-                _ctx.fillStyle = '#cd853f';
-                setStrokeStyle(_ctx, {
-                    lineWidth: 2,
-                    color: '#ffa500'
-                });
-                _ctx.strokeRect(0 + 2, offset, boundingSize.w - 4, baseHeight - 2);
-                setStrokeStyle(_ctx, {
-                    lineWidth: 1.5,
-                    color: '#8b4513'
-                });
-                _ctx.strokeRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
-
-                _ctx.fillRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
-                _ctx.strokeRect(0, offset, boundingSize.w, baseHeight);
-                _ctx.fillStyle = '#ffa500';
-                _ctx.fillRect(boundingSize.w / 2 - 7.5, boundingSize.h / 2 - 3, 15, 10);
-                _ctx.strokeRect(boundingSize.w / 2 - 7.5, boundingSize.h / 2 - 3, 15, 10);
-
-                var cacheOpenLid = document.createElement("canvas");
-                cacheOpenLid.width = boundingSize.w;
-                cacheOpenLid.height = boundingSize.h;
-                _ctx = cacheOpenLid.getContext("2d");
-
-                offset += 0.1 * boundingSize.h;
-
-                // Lid of chest (opened)
-                _ctx.fillStyle = '#cd853f';
-                setStrokeStyle(_ctx, {
-                    lineWidth: 2,
-                    color: '#ffa500'
-                });
-                _ctx.strokeRect(0 + 2, offset, boundingSize.w - 4, baseHeight - 2);
-                setStrokeStyle(_ctx, {
-                    lineWidth: 1.5,
-                    color: '#8b4513'
-                });
-                _ctx.strokeRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
-
-                _ctx.fillRect(0 + 3.5, offset, boundingSize.w - 7, baseHeight - 3.5);
-                _ctx.strokeRect(0, offset, boundingSize.w, baseHeight);
-
-                _ctx.fillStyle = '#ffa500';
-                _ctx.fillRect(boundingSize.w / 2 - 5, 0.1 * boundingSize.h, 10, 6);
-                _ctx.strokeRect(boundingSize.w / 2 - 5, 0.1 * boundingSize.h, 10, 6);
-
-                _ctx.globalCompositeOperation = 'multiply';
-                _ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-                _ctx.fillRect(0, offset, boundingSize.w, baseHeight - 3.5);
-                _ctx.fillRect(boundingSize.w / 2 - 5, 0.1 * boundingSize.h, 10, 6);
-
-                this._cacheBase = cacheBase;
-                this._cacheLid = cacheLid;
-                this._cacheOpenLid = cacheOpenLid;
+                this._cacheImages(ctx, pos, boundingSize);
             }
 
             var size = this.absoluteSize;
@@ -209,7 +207,7 @@ var ChestVarExpr = function (_VarExpr) {
     }, {
         key: "performReduction",
         value: function performReduction() {
-            var _this4 = this;
+            var _this3 = this;
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
@@ -218,8 +216,8 @@ var ChestVarExpr = function (_VarExpr) {
             if (value != this) {
                 var _ret = function () {
                     if (!animated) {
-                        var parent = _this4.parent ? _this4.parent : _this4.stage;
-                        parent.swap(_this4, value);
+                        var parent = _this3.parent ? _this3.parent : _this3.stage;
+                        parent.swap(_this3, value);
                         return {
                             v: void 0
                         };
@@ -227,31 +225,31 @@ var ChestVarExpr = function (_VarExpr) {
                     value = value.clone();
                     value.scale = { x: 0.1, y: 0.1 };
                     value.pos = {
-                        x: _this4.pos.x + 0.5 * _this4.size.w - 0.5 * value.absoluteSize.w,
-                        y: _this4.pos.y + 30
+                        x: _this3.absolutePos.x + 0.5 * _this3.size.w - 0.5 * value.absoluteSize.w,
+                        y: _this3.absolutePos.y + 30
                     };
                     value.opacity = 0.0;
 
-                    var stage = _this4.stage;
+                    var stage = _this3.stage;
                     stage.add(value);
-                    _this4._opened = true;
+                    _this3._opened = true;
 
-                    _this4.opacity = 1.0;
-                    Animate.tween(_this4, { opacity: 0.0 }, 300);
+                    _this3.opacity = 1.0;
+                    Animate.tween(_this3, { opacity: 0.0 }, 300);
                     Animate.tween(value, {
                         scale: { x: 1.0, y: 1.0 },
                         pos: {
-                            x: _this4.pos.x + 0.5 * _this4.size.w - 0.5 * value.size.w,
-                            y: _this4.pos.y - value.size.h
+                            x: _this3.absolutePos.x + 0.5 * _this3.size.w - 0.5 * value.size.w,
+                            y: _this3.absolutePos.y - value.size.h
                         },
                         opacity: 1.0
                     }, 500).after(function () {
                         window.setTimeout(function () {
-                            if (_this4.parent) {
+                            if (_this3.parent) {
                                 stage.remove(value);
-                                _this4.parent.swap(_this4, value);
+                                _this3.parent.swap(_this3, value);
                             } else {
-                                _this4.stage.remove(_this4);
+                                _this3.stage.remove(_this3);
                             }
                             stage.draw();
                             stage.update();
@@ -266,6 +264,52 @@ var ChestVarExpr = function (_VarExpr) {
 
     return ChestVarExpr;
 }(VarExpr);
+
+var DisplayChest = function (_ChestVarExpr) {
+    _inherits(DisplayChest, _ChestVarExpr);
+
+    function DisplayChest(name, expr) {
+        _classCallCheck(this, DisplayChest);
+
+        var _this4 = _possibleConstructorReturn(this, (DisplayChest.__proto__ || Object.getPrototypeOf(DisplayChest)).call(this, name));
+
+        _this4._opened = true;
+        expr.ignoreEvents = true;
+        _this4.holes.push(expr);
+        // expr.pos = { x: expr.pos.x, y: expr.pos.y - 50 };
+        return _this4;
+    }
+
+    _createClass(DisplayChest, [{
+        key: "performReduction",
+        value: function performReduction() {}
+    }, {
+        key: "drawInternal",
+        value: function drawInternal(ctx, pos, boundingSize) {
+            if (!this._cacheBase) {
+                this._cacheImages(ctx, pos, boundingSize);
+            }
+
+            this.holes[0].pos = { x: 10, y: 5 };
+
+            var size = this.absoluteSize;
+            ctx.drawImage(this._cacheOpenLid, pos.x, pos.y, size.w, size.h);
+            ctx.drawImage(this._cacheBase, pos.x, pos.y, size.w, size.h);
+        }
+    }, {
+        key: "drawInternalAfterChildren",
+        value: function drawInternalAfterChildren(ctx, pos, boundingSize) {
+            if (!this._cacheBase) {
+                this._cacheImages(ctx, pos, boundingSize);
+            }
+
+            var size = this.absoluteSize;
+            ctx.drawImage(this._cacheBase, pos.x, pos.y, size.w, size.h);
+        }
+    }]);
+
+    return DisplayChest;
+}(ChestVarExpr);
 
 var AssignExpr = function (_Expression2) {
     _inherits(AssignExpr, _Expression2);

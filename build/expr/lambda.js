@@ -189,17 +189,11 @@ var LambdaHoleExpr = function (_MissingExpression) {
         key: 'onmouseenter',
         value: function onmouseenter(pos) {
             _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'onmouseenter', this).call(this, pos);
-            if (this.stage) {
-                this.stage.environmentDisplay.showEnvironment(this.getEnvironment());
-            }
         }
     }, {
         key: 'onmouseleave',
         value: function onmouseleave() {
             _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'onmouseleave', this).call(this);
-            if (this.stage) {
-                this.stage.environmentDisplay.showGlobals();
-            }
         }
     }, {
         key: 'ondropenter',

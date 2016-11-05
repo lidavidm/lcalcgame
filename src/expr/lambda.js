@@ -145,16 +145,10 @@ class LambdaHoleExpr extends MissingExpression {
     }
     onmouseenter(pos) {
         super.onmouseenter(pos);
-        if (this.stage) {
-            this.stage.environmentDisplay.showEnvironment(this.getEnvironment());
-        }
     }
 
     onmouseleave() {
         super.onmouseleave();
-        if (this.stage) {
-            this.stage.environmentDisplay.showGlobals();
-        }
     }
     ondropenter(node, pos) {
         if (node instanceof LambdaHoleExpr) node = node.parent;

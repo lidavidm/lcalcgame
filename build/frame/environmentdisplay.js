@@ -59,12 +59,13 @@ var EnvironmentDisplay = function (_mag$Rect) {
                 }
             };
             env.names().forEach(function (name) {
-                var label = new TextExpr(name + "=");
-                label.color = "#EEE";
-                setup(label, 0, false);
+                // let label = new TextExpr(name + "=");
+                // label.color = "#EEE";
+                // setup(label, 0, false);
 
                 var e = env.lookup(name).clone();
-                setup(e, _this2.padding, true);
+                // setup(e, this.padding, true);
+                setup(new DisplayChest(name, e), _this2.padding, true);
             });
         }
     }, {

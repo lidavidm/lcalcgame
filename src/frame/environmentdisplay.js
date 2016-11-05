@@ -42,12 +42,13 @@ class EnvironmentDisplay extends mag.Rect {
             }
         };
         env.names().forEach((name) => {
-            let label = new TextExpr(name + "=");
-            label.color = "#EEE";
-            setup(label, 0, false);
+            // let label = new TextExpr(name + "=");
+            // label.color = "#EEE";
+            // setup(label, 0, false);
 
             let e = env.lookup(name).clone();
-            setup(e, this.padding, true);
+            // setup(e, this.padding, true);
+            setup(new DisplayChest(name, e), this.padding, true);
         });
     }
 
