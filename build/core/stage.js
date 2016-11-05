@@ -21,6 +21,7 @@ var mag = function (_) {
             if (canvas) this.canvas = canvas;else this.ctx = null;
             this.nodes = [];
             this.hoverNode = null;
+            this.requested = false;
         }
 
         _createClass(Stage, [{
@@ -186,12 +187,31 @@ var mag = function (_) {
             value: function draw() {
                 var _this3 = this;
 
+                // To avoid redundant draws, when someone calls draw, we
+                // instead try to schedule an actual redraw. Another
+                // redraw cannot be scheduled until the previous one
+                // completes. The scheduling is done using
+                // requestAnimationFrame so that the browser has control
+                // over the framerate.
+                if (!this.requested) {
+                    this.requested = true;
+                    window.requestAnimationFrame(function () {
+                        _this3.drawImpl();
+                        _this3.requested = false;
+                    });
+                }
+            }
+        }, {
+            key: 'drawImpl',
+            value: function drawImpl() {
+                var _this4 = this;
+
                 if (this.invalidated) return; // don't draw invalidated stages.
                 this.ctx.save();
                 this.ctx.scale(_canvas_scale, _canvas_scale);
                 this.clear();
                 this.nodes.forEach(function (n) {
-                    return n.draw(_this3.ctx);
+                    return n.draw(_this4.ctx);
                 }); // TODO: You should pass the ctx!!!!!!
                 this.ctx.restore();
             }
@@ -359,7 +379,7 @@ var mag = function (_) {
             value: function getNodesWithClass(Class) {
                 var excludedNodes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
-                var _this4 = this;
+                var _this5 = this;
 
                 var recursive = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
                 var nodes = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
@@ -373,7 +393,7 @@ var mag = function (_) {
                     });
                     if (excluded) return;else if (n instanceof Class) rt.push(n);
                     if (recursive && n.children.length > 0) {
-                        var childs = _this4.getNodesWithClass(Class, excludedNodes, true, n.children);
+                        var childs = _this5.getNodesWithClass(Class, excludedNodes, true, n.children);
                         childs.forEach(function (c) {
                             return rt.push(c);
                         });

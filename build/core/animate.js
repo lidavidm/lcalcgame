@@ -16,25 +16,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  */
 var Animate = null;
 var mag = function (_) {
-
-    // This function helps avoid redundant redraws when animations are
-    // being played. When a redraw is requested, it only calls requestAnimationFrame if the previous redraw has completed. This also lets the browser limit the frame rate.
-    var requestRedraw = function () {
-        var requested = false;
-
-        function requestRedraw(stage) {
-            window.requestAnimationFrame(function () {
-                stage.draw();
-                requested = false;
-            });
-        }
-
-        return function (stage) {
-            if (!requested) requestRedraw(stage);
-            requested = true;
-        };
-    }();
-
     var _Animate = function () {
         function _Animate() {
             _classCallCheck(this, _Animate);
@@ -54,7 +35,7 @@ var mag = function (_) {
             value: function drawUntil(stage, condition) {
                 if (!stage) return null;
                 var twn = new IndefiniteTween(function () {
-                    requestRedraw(stage);
+                    stage.draw();
 
                     if (condition()) twn.cancel();
                 });
@@ -80,10 +61,10 @@ var mag = function (_) {
                         n.stroke = { color: clr,
                             lineWidth: 4,
                             opacity: gray / 255 };
-                        if (n.stage) requestRedraw(n.stage);
+                        if (n.stage) n.stage.draw();
                     }, dur).after(function () {
                         n.stroke = null;
-                        if (n.stage) requestRedraw(n.stage);
+                        if (n.stage) n.stage.draw();
                     });
                     twn.run();
                 });
@@ -103,7 +84,7 @@ var mag = function (_) {
                 var twn = new Tween(function (elapsed) {
                     var nextpos = addPos(path.absolutePos, path.posAlongPath(smoothFunc(elapsed)));
                     node.pos = addPos(scalarMultiply(node.pos, 0.5), scalarMultiply(nextpos, 0.5));
-                    if (node.stage) requestRedraw(node.stage);
+                    if (node.stage) node.stage.draw();
                 }, dur);
                 twn.run();
                 return twn;
@@ -143,7 +124,7 @@ var mag = function (_) {
                         twn.cancel();
                     }
 
-                    if (node.stage) requestRedraw(node.stage);
+                    if (node.stage) node.stage.draw();
                 }).after(onReachingTarget);
                 twn.run();
                 return twn;
@@ -200,7 +181,7 @@ var mag = function (_) {
                         }
                     }
 
-                    if (autodraw && node.stage) requestRedraw(node.stage);
+                    if (autodraw && node.stage) node.stage.draw();
                 }, dur);
                 twn.run();
                 return twn;
@@ -217,7 +198,7 @@ var mag = function (_) {
                     if (currentImage !== imageRect.image) {
                         imageRect.image = currentImage;
                         //console.error('changed img to ' + currentImage + ', ' + (elapsed * dur));
-                        requestRedraw(stage);
+                        stage.draw();
                     }
                 }, animation.totalDuration).after(onComplete);
                 twn.run();
@@ -244,7 +225,7 @@ var mag = function (_) {
                         Animate.play(anim, img, function () {
                             stg.remove(img); // remove self from stage on animation end.
                             stg.update();
-                            requestRedraw(stg);
+                            stg.draw();
                         });
 
                         if (sfx) Resource.play(sfx, 0.4);
