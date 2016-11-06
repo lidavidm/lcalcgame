@@ -47,7 +47,7 @@ class EnvironmentDisplay extends mag.Rect {
             let display = new DisplayChest(name, e);
             if (this.bindings[name]) {
                 display = this.bindings[name];
-                this.bindings[name].holes[0] = e;
+                display.setExpr(e);
             }
             this.bindings[name] = display;
             setup(display, this.padding, true);

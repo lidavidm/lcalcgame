@@ -2,6 +2,8 @@
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -93,21 +95,52 @@ var ChestVarExpr = function (_VarExpr) {
         key: "open",
         value: function open(preview) {
             var animate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+            preview = preview.clone();
+            preview.ignoreEvents = true;
+            preview.scale = { x: 0.6, y: 0.6 };
+            preview.anchor = { x: -0.1, y: 0.5 };
+            if (this.holes.length > 0) {
+                this.holes[0] = preview;
+            } else {
+                this.holes.push(preview);
+            }
+            this._opened = true;
         }
     }, {
         key: "close",
-        value: function close() {}
+        value: function close() {
+            this._opened = false;
+            this.removeChild(this.holes[0]);
+        }
     }, {
         key: "drawInternal",
         value: function drawInternal(ctx, pos, boundingSize) {
-            var size = this.absoluteSize;
-            if (!this._opened) {
-                ctx.drawImage(this._baseImage, pos.x, pos.y, size.w, size.h);
-                ctx.drawImage(this._lidClosedImage, pos.x, pos.y, size.w, size.h);
-            } else {
-                ctx.drawImage(this._baseImage, pos.x, pos.y, size.w, size.h);
-                ctx.drawImage(this._lidOpenImage, pos.x, pos.y, size.w, size.h);
+            if (this.holes.length > 0) {
+                this.holes[0].pos = {
+                    x: 0,
+                    y: 5
+                };
             }
+
+            var size = this._size;
+            var scale = this.absoluteScale;
+            var adjustedSize = this.absoluteSize;
+            var offsetX = (adjustedSize.w - size.w) / 2;
+            if (this._opened) {
+                ctx.drawImage(this._lidOpenImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
+            } else {
+                ctx.drawImage(this._lidClosedImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
+            }
+        }
+    }, {
+        key: "drawInternalAfterChildren",
+        value: function drawInternalAfterChildren(ctx, pos, boundingSize) {
+            var size = this._size;
+            var scale = this.absoluteScale;
+            var adjustedSize = this.absoluteSize;
+            var offsetX = (adjustedSize.w - size.w) / 2;
+            ctx.drawImage(this._baseImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
         }
     }, {
         key: "performReduction",
@@ -165,6 +198,16 @@ var ChestVarExpr = function (_VarExpr) {
             }
         }
     }, {
+        key: "_superSize",
+        get: function get() {
+            return _get(ChestVarExpr.prototype.__proto__ || Object.getPrototypeOf(ChestVarExpr.prototype), "size", this);
+        }
+    }, {
+        key: "size",
+        get: function get() {
+            return { w: this._size.w, h: this._size.h };
+        }
+    }, {
         key: "_baseImage",
         get: function get() {
             if (this.name == "x") {
@@ -202,13 +245,23 @@ var DisplayChest = function (_ChestVarExpr) {
         var _this4 = _possibleConstructorReturn(this, (DisplayChest.__proto__ || Object.getPrototypeOf(DisplayChest)).call(this, name));
 
         _this4._opened = true;
-        expr.ignoreEvents = true;
         _this4.holes.push(expr);
+        expr.ignoreEvents = true;
+        expr.scale = { x: 0.6, y: 0.6 };
+        expr.anchor = { x: -0.1, y: 0.5 };
         _this4.childPos = { x: 10, y: 5 };
         return _this4;
     }
 
     _createClass(DisplayChest, [{
+        key: "setExpr",
+        value: function setExpr(expr) {
+            this.holes[0] = expr;
+            expr.ignoreEvents = true;
+            expr.scale = { x: 0.6, y: 0.6 };
+            // expr.anchor = { x: -0.1, y: 0.5 };
+        }
+    }, {
         key: "performReduction",
         value: function performReduction() {}
     }, {
@@ -229,23 +282,16 @@ var DisplayChest = function (_ChestVarExpr) {
     }, {
         key: "drawInternal",
         value: function drawInternal(ctx, pos, boundingSize) {
+            _get(DisplayChest.prototype.__proto__ || Object.getPrototypeOf(DisplayChest.prototype), "drawInternal", this).call(this, ctx, pos, boundingSize);
             this.holes[0].pos = {
                 x: this.childPos.x,
                 y: this.childPos.y
             };
-
-            var size = this._size;
-            var adjustedSize = this.absoluteSize;
-            var offsetX = (adjustedSize.w - size.w) / 2;
-            ctx.drawImage(this._lidOpenImage, pos.x + offsetX, pos.y, size.w, size.h);
         }
     }, {
-        key: "drawInternalAfterChildren",
-        value: function drawInternalAfterChildren(ctx, pos, boundingSize) {
-            var size = this._size;
-            var adjustedSize = this.absoluteSize;
-            var offsetX = (adjustedSize.w - size.w) / 2;
-            ctx.drawImage(this._baseImage, pos.x + offsetX, pos.y, size.w, size.h);
+        key: "size",
+        get: function get() {
+            return this._superSize;
         }
     }]);
 

@@ -353,18 +353,6 @@ class LambdaVarExpr extends ImageExpr {
         else return null;
     }
 
-    onmouseenter(pos) {
-        if (this.stage) {
-            this.stage.environmentDisplay.showEnvironment(this.getEnvironment());
-        }
-    }
-
-    onmouseleave(pos) {
-        if (this.stage) {
-            this.stage.environmentDisplay.showGlobals();
-        }
-    }
-
     onmouseclick(pos) {
         // TODO: DML enable reduction, but make sure we are not bound
         // by a lambda
@@ -529,20 +517,6 @@ class LambdaExpr extends Expression {
 
     onmouseclick(pos) {
         this.performReduction();
-    }
-
-    onmouseenter(pos) {
-        super.onmouseenter(pos);
-        if (this.stage) {
-            this.stage.environmentDisplay.showEnvironment(this.getEnvironment());
-        }
-    }
-
-    onmouseleave() {
-        super.onmouseleave();
-        if (this.stage) {
-            this.stage.environmentDisplay.showGlobals();
-        }
     }
 
     hitsChild(pos) {

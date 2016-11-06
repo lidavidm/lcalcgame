@@ -64,7 +64,7 @@ var EnvironmentDisplay = function (_mag$Rect) {
                 var display = new DisplayChest(name, e);
                 if (_this2.bindings[name]) {
                     display = _this2.bindings[name];
-                    _this2.bindings[name].holes[0] = e;
+                    display.setExpr(e);
                 }
                 _this2.bindings[name] = display;
                 setup(display, _this2.padding, true);

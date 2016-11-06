@@ -400,20 +400,6 @@ var LambdaVarExpr = function (_ImageExpr) {
             if (this.holes[0].hits(pos, options)) return this;else return null;
         }
     }, {
-        key: 'onmouseenter',
-        value: function onmouseenter(pos) {
-            if (this.stage) {
-                this.stage.environmentDisplay.showEnvironment(this.getEnvironment());
-            }
-        }
-    }, {
-        key: 'onmouseleave',
-        value: function onmouseleave(pos) {
-            if (this.stage) {
-                this.stage.environmentDisplay.showGlobals();
-            }
-        }
-    }, {
         key: 'onmouseclick',
         value: function onmouseclick(pos) {
             // TODO: DML enable reduction, but make sure we are not bound
@@ -672,22 +658,6 @@ var LambdaExpr = function (_Expression) {
         key: 'onmouseclick',
         value: function onmouseclick(pos) {
             this.performReduction();
-        }
-    }, {
-        key: 'onmouseenter',
-        value: function onmouseenter(pos) {
-            _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'onmouseenter', this).call(this, pos);
-            if (this.stage) {
-                this.stage.environmentDisplay.showEnvironment(this.getEnvironment());
-            }
-        }
-    }, {
-        key: 'onmouseleave',
-        value: function onmouseleave() {
-            _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'onmouseleave', this).call(this);
-            if (this.stage) {
-                this.stage.environmentDisplay.showGlobals();
-            }
         }
     }, {
         key: 'hitsChild',

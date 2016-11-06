@@ -54,6 +54,14 @@ class ChestVarExpr extends VarExpr {
         this.equivalentClasses = [ChestVarExpr];
     }
 
+    get _superSize() {
+        return super.size;
+    }
+
+    get size() {
+        return { w:this._size.w, h:this._size.h };
+    }
+
     get _baseImage() {
         if (this.name == "x") {
             return Resource.getImage("chest-wood-base");
@@ -76,21 +84,50 @@ class ChestVarExpr extends VarExpr {
     }
 
     open(preview, animate=true) {
+        preview = preview.clone();
+        preview.ignoreEvents = true;
+        preview.scale = { x: 0.6, y: 0.6 };
+        preview.anchor = { x: -0.1, y: 0.5 };
+        if (this.holes.length > 0) {
+            this.holes[0] = preview;
+        }
+        else {
+            this.holes.push(preview);
+        }
+        this._opened = true;
     }
 
     close() {
+        this._opened = false;
+        this.removeChild(this.holes[0]);
     }
 
     drawInternal(ctx, pos, boundingSize) {
-        let size = this.absoluteSize;
-        if (!this._opened) {
-            ctx.drawImage(this._baseImage, pos.x, pos.y, size.w, size.h);
-            ctx.drawImage(this._lidClosedImage, pos.x, pos.y, size.w, size.h);
+        if (this.holes.length > 0) {
+            this.holes[0].pos = {
+                x: 0,
+                y: 5,
+            };
+        }
+
+        let size = this._size;
+        let scale = this.absoluteScale;
+        let adjustedSize = this.absoluteSize;
+        let offsetX = (adjustedSize.w - size.w) / 2;
+        if (this._opened) {
+            ctx.drawImage(this._lidOpenImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
         }
         else {
-            ctx.drawImage(this._baseImage, pos.x, pos.y, size.w, size.h);
-            ctx.drawImage(this._lidOpenImage, pos.x, pos.y, size.w, size.h);
+            ctx.drawImage(this._lidClosedImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
         }
+    }
+
+    drawInternalAfterChildren(ctx, pos, boundingSize) {
+        let size = this._size;
+        let scale = this.absoluteScale;
+        let adjustedSize = this.absoluteSize;
+        let offsetX = (adjustedSize.w - size.w) / 2;
+        ctx.drawImage(this._baseImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
     }
 
     performReduction(animated=true) {
@@ -143,9 +180,22 @@ class DisplayChest extends ChestVarExpr {
     constructor(name, expr) {
         super(name);
         this._opened = true;
-        expr.ignoreEvents = true;
         this.holes.push(expr);
+        expr.ignoreEvents = true;
+        expr.scale = { x: 0.6, y: 0.6 };
+        expr.anchor = { x: -0.1, y: 0.5 };
         this.childPos = { x: 10, y: 5 };
+    }
+
+    get size() {
+        return this._superSize;
+    }
+
+    setExpr(expr) {
+        this.holes[0] = expr;
+        expr.ignoreEvents = true;
+        expr.scale = { x: 0.6, y: 0.6 };
+        // expr.anchor = { x: -0.1, y: 0.5 };
     }
 
     performReduction() {}
@@ -163,22 +213,11 @@ class DisplayChest extends ChestVarExpr {
     }
 
     drawInternal(ctx, pos, boundingSize) {
+        super.drawInternal(ctx, pos, boundingSize);
         this.holes[0].pos = {
             x: this.childPos.x,
             y: this.childPos.y,
         };
-
-        let size = this._size;
-        let adjustedSize = this.absoluteSize;
-        let offsetX = (adjustedSize.w - size.w) / 2;
-        ctx.drawImage(this._lidOpenImage, pos.x + offsetX, pos.y, size.w, size.h);
-    }
-
-    drawInternalAfterChildren(ctx, pos, boundingSize) {
-        let size = this._size;
-        let adjustedSize = this.absoluteSize;
-        let offsetX = (adjustedSize.w - size.w) / 2;
-        ctx.drawImage(this._baseImage, pos.x + offsetX, pos.y, size.w, size.h);
     }
 }
 
