@@ -127,20 +127,12 @@ var ChestVarExpr = function (_VarExpr) {
             var scale = this.absoluteScale;
             var adjustedSize = this.absoluteSize;
             var offsetX = (adjustedSize.w - size.w) / 2;
+            ctx.drawImage(this._baseImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
             if (this._opened) {
                 ctx.drawImage(this._lidOpenImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
             } else {
                 ctx.drawImage(this._lidClosedImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
             }
-        }
-    }, {
-        key: "drawInternalAfterChildren",
-        value: function drawInternalAfterChildren(ctx, pos, boundingSize) {
-            var size = this._size;
-            var scale = this.absoluteScale;
-            var adjustedSize = this.absoluteSize;
-            var offsetX = (adjustedSize.w - size.w) / 2;
-            ctx.drawImage(this._baseImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
         }
     }, {
         key: "performReduction",
@@ -287,6 +279,15 @@ var DisplayChest = function (_ChestVarExpr) {
                 x: this.childPos.x,
                 y: this.childPos.y
             };
+        }
+    }, {
+        key: "drawInternalAfterChildren",
+        value: function drawInternalAfterChildren(ctx, pos, boundingSize) {
+            var size = this._size;
+            var scale = this.absoluteScale;
+            var adjustedSize = this.absoluteSize;
+            var offsetX = (adjustedSize.w - size.w) / 2;
+            ctx.drawImage(this._baseImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
         }
     }, {
         key: "size",

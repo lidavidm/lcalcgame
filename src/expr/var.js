@@ -114,20 +114,13 @@ class ChestVarExpr extends VarExpr {
         let scale = this.absoluteScale;
         let adjustedSize = this.absoluteSize;
         let offsetX = (adjustedSize.w - size.w) / 2;
+        ctx.drawImage(this._baseImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
         if (this._opened) {
             ctx.drawImage(this._lidOpenImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
         }
         else {
             ctx.drawImage(this._lidClosedImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
         }
-    }
-
-    drawInternalAfterChildren(ctx, pos, boundingSize) {
-        let size = this._size;
-        let scale = this.absoluteScale;
-        let adjustedSize = this.absoluteSize;
-        let offsetX = (adjustedSize.w - size.w) / 2;
-        ctx.drawImage(this._baseImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
     }
 
     performReduction(animated=true) {
@@ -218,6 +211,14 @@ class DisplayChest extends ChestVarExpr {
             x: this.childPos.x,
             y: this.childPos.y,
         };
+    }
+
+    drawInternalAfterChildren(ctx, pos, boundingSize) {
+        let size = this._size;
+        let scale = this.absoluteScale;
+        let adjustedSize = this.absoluteSize;
+        let offsetX = (adjustedSize.w - size.w) / 2;
+        ctx.drawImage(this._baseImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
     }
 }
 
