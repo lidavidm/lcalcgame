@@ -30,7 +30,7 @@ class EnvironmentDisplay extends mag.Rect {
             e.pos = pos;
             e.scale = { x: 1, y: 1 };
             if (newRow) {
-                pos = addPos(pos, { x: 0, y: e.size.h } );
+                pos = addPos(pos, { x: 0, y: e.size.h + 20 } );
                 pos.x = this.leftEdgePos.x;
             }
             else {

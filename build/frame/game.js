@@ -106,7 +106,7 @@ var Level = function () {
 
             // Environment
             var yOffset = goal_node[0].absoluteSize.h + goal_node[0].absolutePos.y + 10;
-            var env = new EnvironmentDisplay(0, yOffset, 0.25 * canvas_screen.w, canvas_screen.h - TOOLBOX_HEIGHT - yOffset, stage);
+            var env = new EnvironmentDisplay(0, yOffset, 0.15 * canvas_screen.w, canvas_screen.h - TOOLBOX_HEIGHT - yOffset, stage);
             if (showEnvironment) {
                 stage.add(env);
             }

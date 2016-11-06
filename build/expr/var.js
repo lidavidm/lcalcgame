@@ -234,14 +234,18 @@ var DisplayChest = function (_ChestVarExpr) {
                 y: this.childPos.y
             };
 
-            var size = this.absoluteSize;
-            ctx.drawImage(this._lidOpenImage, pos.x, pos.y, size.w, size.h);
+            var size = this._size;
+            var adjustedSize = this.absoluteSize;
+            var offsetX = (adjustedSize.w - size.w) / 2;
+            ctx.drawImage(this._lidOpenImage, pos.x + offsetX, pos.y, size.w, size.h);
         }
     }, {
         key: "drawInternalAfterChildren",
         value: function drawInternalAfterChildren(ctx, pos, boundingSize) {
-            var size = this.absoluteSize;
-            ctx.drawImage(this._baseImage, pos.x, pos.y, size.w, size.h);
+            var size = this._size;
+            var adjustedSize = this.absoluteSize;
+            var offsetX = (adjustedSize.w - size.w) / 2;
+            ctx.drawImage(this._baseImage, pos.x + offsetX, pos.y, size.w, size.h);
         }
     }]);
 

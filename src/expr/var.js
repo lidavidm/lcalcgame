@@ -168,13 +168,17 @@ class DisplayChest extends ChestVarExpr {
             y: this.childPos.y,
         };
 
-        let size = this.absoluteSize;
-        ctx.drawImage(this._lidOpenImage, pos.x, pos.y, size.w, size.h);
+        let size = this._size;
+        let adjustedSize = this.absoluteSize;
+        let offsetX = (adjustedSize.w - size.w) / 2;
+        ctx.drawImage(this._lidOpenImage, pos.x + offsetX, pos.y, size.w, size.h);
     }
 
     drawInternalAfterChildren(ctx, pos, boundingSize) {
-        let size = this.absoluteSize;
-        ctx.drawImage(this._baseImage, pos.x, pos.y, size.w, size.h);
+        let size = this._size;
+        let adjustedSize = this.absoluteSize;
+        let offsetX = (adjustedSize.w - size.w) / 2;
+        ctx.drawImage(this._baseImage, pos.x + offsetX, pos.y, size.w, size.h);
     }
 }
 
