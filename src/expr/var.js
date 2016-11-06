@@ -54,20 +54,42 @@ class ChestVarExpr extends VarExpr {
         this.equivalentClasses = [ChestVarExpr];
     }
 
+    get _baseImage() {
+        if (this.name == "x") {
+            return Resource.getImage("chest-wood-base");
+        }
+        return Resource.getImage("chest-metal-base");
+    }
+
+    get _lidClosedImage() {
+         if (this.name == "x") {
+            return Resource.getImage("chest-wood-lid-closed");
+        }
+        return Resource.getImage("chest-metal-lid-closed");
+    }
+
+    get _lidOpenImage() {
+         if (this.name == "x") {
+            return Resource.getImage("chest-wood-lid-open");
+        }
+        return Resource.getImage("chest-metal-lid-open");
+    }
+
     open(preview, animate=true) {
     }
 
     close() {
     }
+
     drawInternal(ctx, pos, boundingSize) {
         let size = this.absoluteSize;
         if (!this._opened) {
-            ctx.drawImage(Resource.getImage('chest-wood-base'), pos.x, pos.y, size.w, size.h);
-            ctx.drawImage(Resource.getImage('chest-wood-lid-closed'), pos.x, pos.y, size.w, size.h);
+            ctx.drawImage(this._baseImage, pos.x, pos.y, size.w, size.h);
+            ctx.drawImage(this._lidClosedImage, pos.x, pos.y, size.w, size.h);
         }
         else {
-            ctx.drawImage(Resource.getImage('chest-wood-base'), pos.x, pos.y, size.w, size.h);
-            ctx.drawImage(Resource.getImage('chest-wood-lid-open'), pos.x, pos.y, size.w, size.h);
+            ctx.drawImage(this._baseImage, pos.x, pos.y, size.w, size.h);
+            ctx.drawImage(this._lidOpenImage, pos.x, pos.y, size.w, size.h);
         }
     }
 
@@ -147,12 +169,12 @@ class DisplayChest extends ChestVarExpr {
         };
 
         let size = this.absoluteSize;
-        ctx.drawImage(Resource.getImage('chest-wood-lid-open'), pos.x, pos.y, size.w, size.h);
+        ctx.drawImage(this._lidOpenImage, pos.x, pos.y, size.w, size.h);
     }
 
     drawInternalAfterChildren(ctx, pos, boundingSize) {
         let size = this.absoluteSize;
-        ctx.drawImage(Resource.getImage('chest-wood-base'), pos.x, pos.y, size.w, size.h);
+        ctx.drawImage(this._baseImage, pos.x, pos.y, size.w, size.h);
     }
 }
 

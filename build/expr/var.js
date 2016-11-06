@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -30,20 +30,20 @@ var VarExpr = function (_Expression) {
     }
 
     _createClass(VarExpr, [{
-        key: 'open',
+        key: "open",
         value: function open(preview) {
             var animate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
         }
     }, {
-        key: 'close',
+        key: "close",
         value: function close() {}
     }, {
-        key: 'canReduce',
+        key: "canReduce",
         value: function canReduce() {
             return this.getEnvironment() && (this.parent || this.stage) && this.getEnvironment().lookup(this.name);
         }
     }, {
-        key: 'reduce',
+        key: "reduce",
         value: function reduce() {
             var env = this.getEnvironment();
             if (!env) return this;
@@ -57,7 +57,7 @@ var VarExpr = function (_Expression) {
             return value;
         }
     }, {
-        key: 'performReduction',
+        key: "performReduction",
         value: function performReduction() {
             var value = this.reduce();
             if (value != this) {
@@ -67,7 +67,7 @@ var VarExpr = function (_Expression) {
             }
         }
     }, {
-        key: 'onmouseclick',
+        key: "onmouseclick",
         value: function onmouseclick() {
             this.performReduction();
         }
@@ -90,27 +90,27 @@ var ChestVarExpr = function (_VarExpr) {
     }
 
     _createClass(ChestVarExpr, [{
-        key: 'open',
+        key: "open",
         value: function open(preview) {
             var animate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
         }
     }, {
-        key: 'close',
+        key: "close",
         value: function close() {}
     }, {
-        key: 'drawInternal',
+        key: "drawInternal",
         value: function drawInternal(ctx, pos, boundingSize) {
             var size = this.absoluteSize;
             if (!this._opened) {
-                ctx.drawImage(Resource.getImage('chest-wood-base'), pos.x, pos.y, size.w, size.h);
-                ctx.drawImage(Resource.getImage('chest-wood-lid-closed'), pos.x, pos.y, size.w, size.h);
+                ctx.drawImage(this._baseImage, pos.x, pos.y, size.w, size.h);
+                ctx.drawImage(this._lidClosedImage, pos.x, pos.y, size.w, size.h);
             } else {
-                ctx.drawImage(Resource.getImage('chest-wood-base'), pos.x, pos.y, size.w, size.h);
-                ctx.drawImage(Resource.getImage('chest-wood-lid-open'), pos.x, pos.y, size.w, size.h);
+                ctx.drawImage(this._baseImage, pos.x, pos.y, size.w, size.h);
+                ctx.drawImage(this._lidOpenImage, pos.x, pos.y, size.w, size.h);
             }
         }
     }, {
-        key: 'performReduction',
+        key: "performReduction",
         value: function performReduction() {
             var _this3 = this;
 
@@ -161,8 +161,32 @@ var ChestVarExpr = function (_VarExpr) {
                     });
                 }();
 
-                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+                if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
             }
+        }
+    }, {
+        key: "_baseImage",
+        get: function get() {
+            if (this.name == "x") {
+                return Resource.getImage("chest-wood-base");
+            }
+            return Resource.getImage("chest-metal-base");
+        }
+    }, {
+        key: "_lidClosedImage",
+        get: function get() {
+            if (this.name == "x") {
+                return Resource.getImage("chest-wood-lid-closed");
+            }
+            return Resource.getImage("chest-metal-lid-closed");
+        }
+    }, {
+        key: "_lidOpenImage",
+        get: function get() {
+            if (this.name == "x") {
+                return Resource.getImage("chest-wood-lid-open");
+            }
+            return Resource.getImage("chest-metal-lid-open");
         }
     }]);
 
@@ -185,10 +209,10 @@ var DisplayChest = function (_ChestVarExpr) {
     }
 
     _createClass(DisplayChest, [{
-        key: 'performReduction',
+        key: "performReduction",
         value: function performReduction() {}
     }, {
-        key: 'prepareAssign',
+        key: "prepareAssign",
         value: function prepareAssign() {
             var _this5 = this;
 
@@ -203,7 +227,7 @@ var DisplayChest = function (_ChestVarExpr) {
             });
         }
     }, {
-        key: 'drawInternal',
+        key: "drawInternal",
         value: function drawInternal(ctx, pos, boundingSize) {
             this.holes[0].pos = {
                 x: this.childPos.x,
@@ -211,13 +235,13 @@ var DisplayChest = function (_ChestVarExpr) {
             };
 
             var size = this.absoluteSize;
-            ctx.drawImage(Resource.getImage('chest-wood-lid-open'), pos.x, pos.y, size.w, size.h);
+            ctx.drawImage(this._lidOpenImage, pos.x, pos.y, size.w, size.h);
         }
     }, {
-        key: 'drawInternalAfterChildren',
+        key: "drawInternalAfterChildren",
         value: function drawInternalAfterChildren(ctx, pos, boundingSize) {
             var size = this.absoluteSize;
-            ctx.drawImage(Resource.getImage('chest-wood-base'), pos.x, pos.y, size.w, size.h);
+            ctx.drawImage(this._baseImage, pos.x, pos.y, size.w, size.h);
         }
     }]);
 
@@ -251,17 +275,17 @@ var AssignExpr = function (_Expression2) {
     }
 
     _createClass(AssignExpr, [{
-        key: 'onmouseclick',
+        key: "onmouseclick",
         value: function onmouseclick() {
             this.performReduction();
         }
     }, {
-        key: 'canReduce',
+        key: "canReduce",
         value: function canReduce() {
             return this.value && this.variable && this.value.canReduce();
         }
     }, {
-        key: 'reduce',
+        key: "reduce",
         value: function reduce() {
             if (this.variable && this.value) {
                 return this.value;
@@ -270,7 +294,7 @@ var AssignExpr = function (_Expression2) {
             }
         }
     }, {
-        key: 'performReduction',
+        key: "performReduction",
         value: function performReduction() {
             var _this7 = this;
 
@@ -344,7 +368,7 @@ var AssignExpr = function (_Expression2) {
             }
         }
     }, {
-        key: 'reduceCompletely',
+        key: "reduceCompletely",
         value: function reduceCompletely() {
             if (this.value) {
                 this.value.reduceCompletely();
@@ -360,12 +384,12 @@ var AssignExpr = function (_Expression2) {
             }
         }
     }, {
-        key: 'variable',
+        key: "variable",
         get: function get() {
             return this.holes[0] instanceof MissingExpression ? null : this.holes[0];
         }
     }, {
-        key: 'value',
+        key: "value",
         get: function get() {
             return this.holes[2] instanceof MissingExpression ? null : this.holes[2];
         }
@@ -390,19 +414,19 @@ var ExpressionView = function (_MissingExpression) {
 
 
     _createClass(ExpressionView, [{
-        key: 'ondropenter',
+        key: "ondropenter",
         value: function ondropenter() {}
     }, {
-        key: 'ondropexit',
+        key: "ondropexit",
         value: function ondropexit() {}
     }, {
-        key: 'ondropped',
+        key: "ondropped",
         value: function ondropped() {}
     }, {
-        key: 'onmouseenter',
+        key: "onmouseenter",
         value: function onmouseenter() {}
     }, {
-        key: 'drawInternal',
+        key: "drawInternal",
         value: function drawInternal(ctx, pos, boundingSize) {
             var rad = boundingSize.w / 2.0;
             setStrokeStyle(ctx, {
@@ -414,7 +438,7 @@ var ExpressionView = function (_MissingExpression) {
 
             ctx.clip();
             var alpha = 0.5 * ((Math.PI / 2 - this._openOffset) / (Math.PI / 2));
-            ctx.shadowColor = 'rgba(0,0,0,' + alpha + ')';
+            ctx.shadowColor = "rgba(0,0,0," + alpha + ")";
             ctx.shadowBlur = 3;
             ctx.shadowOffsetX = 1;
             ctx.shadowOffsetY = 1;

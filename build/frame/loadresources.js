@@ -98,6 +98,9 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadImage('chest-wood-base', 'chest-wood-base.png');
     loadImage('chest-wood-lid-open', 'chest-wood-lid-open.png');
     loadImage('chest-wood-lid-closed', 'chest-wood-lid-closed.png');
+    loadImage('chest-metal-base', 'chest-metal-base.png');
+    loadImage('chest-metal-lid-open', 'chest-metal-lid-open.png');
+    loadImage('chest-metal-lid-closed', 'chest-metal-lid-closed.png');
 
     // UI Images.
     loadImage('btn-next-default', 'next-button.png');
