@@ -133,6 +133,11 @@ var ChestVarExpr = function (_VarExpr) {
             } else {
                 ctx.drawImage(this._lidClosedImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
             }
+            if (this.stroke) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.globalCompositeOperation = 'screen';
+                ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+            }
         }
     }, {
         key: "performReduction",
@@ -188,6 +193,18 @@ var ChestVarExpr = function (_VarExpr) {
 
                 if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
             }
+        }
+    }, {
+        key: "onmouseenter",
+        value: function onmouseenter() {
+            _get(ChestVarExpr.prototype.__proto__ || Object.getPrototypeOf(ChestVarExpr.prototype), "onmouseenter", this).call(this);
+            document.querySelector('canvas').style.cursor = 'pointer';
+        }
+    }, {
+        key: "onmouseleave",
+        value: function onmouseleave() {
+            _get(ChestVarExpr.prototype.__proto__ || Object.getPrototypeOf(ChestVarExpr.prototype), "onmouseleave", this).call(this);
+            document.querySelector('canvas').style.cursor = 'auto';
         }
     }, {
         key: "_superSize",

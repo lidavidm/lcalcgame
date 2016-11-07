@@ -121,6 +121,11 @@ class ChestVarExpr extends VarExpr {
         else {
             ctx.drawImage(this._lidClosedImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
         }
+        if (this.stroke) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.globalCompositeOperation = 'screen';
+            ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+        }
     }
 
     performReduction(animated=true) {
@@ -166,6 +171,16 @@ class ChestVarExpr extends VarExpr {
                 }, 200);
             });
         }
+    }
+
+    onmouseenter() {
+        super.onmouseenter();
+        document.querySelector('canvas').style.cursor = 'pointer';
+    }
+
+    onmouseleave() {
+        super.onmouseleave();
+        document.querySelector('canvas').style.cursor = 'auto';
     }
 }
 
