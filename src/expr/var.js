@@ -52,6 +52,7 @@ class ChestVarExpr extends VarExpr {
         super(name);
         // See MissingTypedExpression#constructor
         this.equivalentClasses = [ChestVarExpr];
+        this._preview = null;
     }
 
     get _superSize() {
@@ -88,6 +89,7 @@ class ChestVarExpr extends VarExpr {
         preview.ignoreEvents = true;
         preview.scale = { x: 0.6, y: 0.6 };
         preview.anchor = { x: -0.1, y: 0.5 };
+        this._preview = preview;
         if (this.holes.length > 0) {
             this.holes[0] = preview;
         }
@@ -100,11 +102,12 @@ class ChestVarExpr extends VarExpr {
     close() {
         this._opened = false;
         this.removeChild(this.holes[0]);
+        this._preview = null;
     }
 
     drawInternal(ctx, pos, boundingSize) {
-        if (this.holes.length > 0) {
-            this.holes[0].pos = {
+        if (this._preview) {
+            this._preview.pos = {
                 x: 0,
                 y: 5,
             };
@@ -131,9 +134,11 @@ class ChestVarExpr extends VarExpr {
             ctx.drawImage(this._lidClosedImage, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
         }
         if (this.stroke) {
+            ctx.save();
             ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
             ctx.globalCompositeOperation = 'screen';
             ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+            ctx.restore();
         }
     }
 
@@ -190,6 +195,32 @@ class ChestVarExpr extends VarExpr {
     onmouseleave() {
         super.onmouseleave();
         document.querySelector('canvas').style.cursor = 'auto';
+    }
+}
+
+class LabeledChestVarExpr extends ChestVarExpr {
+    constructor(name) {
+        super(name);
+        // See MissingTypedExpression#constructor
+        this.equivalentClasses = [LabeledChestVarExpr];
+        this.label = new TextExpr(name);
+        this.label.color = 'white';
+        this.holes.push(this.label);
+    }
+
+    open(preview, animate=true) {
+    }
+
+    close() {
+    }
+
+    drawInternal(ctx, pos, boundingSize) {
+        this.holes[0].pos = {
+            x: this.size.w / 2 - this.holes[0].absoluteSize.w / 2,
+            y: this.size.h / 2,
+        };
+
+        super.drawInternal(ctx, pos, boundingSize);
     }
 }
 
