@@ -110,16 +110,25 @@ class ChestVarExpr extends VarExpr {
             };
         }
 
+        if (this.parent && !this.ignoreEvents) {
+            // Draw gray background analogous to other values
+            ctx.fillStyle = "#777";
+            roundRect(ctx,
+                      pos.x, pos.y,
+                      boundingSize.w, boundingSize.h,
+                      6*this.absoluteScale.x, true, false, null);
+        }
+
         let size = this._size;
         let scale = this.absoluteScale;
         let adjustedSize = this.absoluteSize;
-        let offsetX = (adjustedSize.w - size.w) / 2;
-        ctx.drawImage(this._baseImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
+        let offset = Math.max(2, (adjustedSize.w - size.w) / 2);
+        ctx.drawImage(this._baseImage, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
         if (this._opened) {
-            ctx.drawImage(this._lidOpenImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
+            ctx.drawImage(this._lidOpenImage, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
         }
         else {
-            ctx.drawImage(this._lidClosedImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
+            ctx.drawImage(this._lidClosedImage, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
         }
         if (this.stroke) {
             ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
@@ -221,7 +230,11 @@ class DisplayChest extends ChestVarExpr {
     }
 
     drawInternal(ctx, pos, boundingSize) {
-        super.drawInternal(ctx, pos, boundingSize);
+        let size = this._size;
+        let scale = this.absoluteScale;
+        let adjustedSize = this.absoluteSize;
+        let offsetX = (adjustedSize.w - size.w) / 2;
+        ctx.drawImage(this._lidOpenImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
         this.holes[0].pos = {
             x: this.childPos.x,
             y: this.childPos.y,

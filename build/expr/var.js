@@ -123,15 +123,21 @@ var ChestVarExpr = function (_VarExpr) {
                 };
             }
 
+            if (this.parent && !this.ignoreEvents) {
+                // Draw gray background analogous to other values
+                ctx.fillStyle = "#777";
+                roundRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, 6 * this.absoluteScale.x, true, false, null);
+            }
+
             var size = this._size;
             var scale = this.absoluteScale;
             var adjustedSize = this.absoluteSize;
-            var offsetX = (adjustedSize.w - size.w) / 2;
-            ctx.drawImage(this._baseImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
+            var offset = Math.max(2, (adjustedSize.w - size.w) / 2);
+            ctx.drawImage(this._baseImage, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
             if (this._opened) {
-                ctx.drawImage(this._lidOpenImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
+                ctx.drawImage(this._lidOpenImage, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
             } else {
-                ctx.drawImage(this._lidClosedImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
+                ctx.drawImage(this._lidClosedImage, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
             }
             if (this.stroke) {
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
@@ -291,7 +297,11 @@ var DisplayChest = function (_ChestVarExpr) {
     }, {
         key: "drawInternal",
         value: function drawInternal(ctx, pos, boundingSize) {
-            _get(DisplayChest.prototype.__proto__ || Object.getPrototypeOf(DisplayChest.prototype), "drawInternal", this).call(this, ctx, pos, boundingSize);
+            var size = this._size;
+            var scale = this.absoluteScale;
+            var adjustedSize = this.absoluteSize;
+            var offsetX = (adjustedSize.w - size.w) / 2;
+            ctx.drawImage(this._lidOpenImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
             this.holes[0].pos = {
                 x: this.childPos.x,
                 y: this.childPos.y
