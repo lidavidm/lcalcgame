@@ -1,6 +1,6 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function LOAD_REDUCT_RESOURCES(Resource) {
     var __RESOURCE_PATH = Resource.path;
@@ -55,6 +55,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAudio('mirror-shatter', 'shatter2.wav');
     loadAudio('splosion', 'firework1.wav');
     loadAudio('shootwee', 'firework-shooting.wav');
+    loadAudio('swoop', 'swoop.wav');
     loadAudio('key-jiggle', 'key-jiggle.wav');
     loadAudio('key-unlock', 'key-unlock-fast.wav');
     loadAudio('victory', '325805__wagna__collect.wav');
@@ -94,6 +95,12 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadImage('mirror-icon-fade-false-righthalf', 'mirror-fade-false-righthalf.png');
     loadImage('funnel', 'funnel.png');
     loadImage('funnel-selected', 'funnel-selected.png');
+    loadImage('chest-wood-base', 'chest-wood-base.png');
+    loadImage('chest-wood-lid-open', 'chest-wood-lid-open.png');
+    loadImage('chest-wood-lid-closed', 'chest-wood-lid-closed.png');
+    loadImage('chest-metal-base', 'chest-metal-base.png');
+    loadImage('chest-metal-lid-open', 'chest-metal-lid-open.png');
+    loadImage('chest-metal-lid-closed', 'chest-metal-lid-closed.png');
 
     // UI Images.
     loadImage('btn-next-default', 'next-button.png');
@@ -134,7 +141,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
 
     // Add levels here: (for now)
     // * The '/' character makes the following expression ignore mouse events (can't be drag n dropped). *
-    var chapter_load_prom = loadChaptersFromFiles(['intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map']); //,     'posttest_v1', 'experimental'] );
+    var chapter_load_prom = loadChaptersFromFiles(['assign', 'intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map']); //,     'posttest_v1', 'experimental'] );
 
     Resource.buildLevel = function (level_desc, canvas) {
         ExprManager.clearFadeLevels();
@@ -145,14 +152,18 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             }
         }
 
+        if (!level_desc["globals"]) {
+            level_desc.globals = {};
+        }
+
         var fadedBorders = ExprManager.fadeBordersAt(level_idx);
         if (fadedBorders.length > 0) {
             var _ret = function () {
 
                 ExprManager.fadesAtBorder = false;
-                var unfaded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+                var unfaded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
                 ExprManager.fadesAtBorder = true;
-                var faded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+                var faded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
 
                 var unfaded_exprs = unfaded.nodes;
                 var faded_exprs = faded.nodes;
@@ -254,7 +265,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
 
             if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
         } else {
-            return Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+            return Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
         }
     };
     Resource.level = levels;

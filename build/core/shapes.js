@@ -30,6 +30,7 @@ var mag = function (_) {
             _this._scale = { x: 1, y: 1 };
             _this._color = "lightgray";
             _this._highlightColor = 'yellow';
+            _this._stackVertically = false;
             _this.stroke = null;
             _this.shadowOffset = 2;
             return _this;
@@ -217,6 +218,7 @@ var mag = function (_) {
                 var pos = this.pos;
                 if (this.parent) {
                     var abs_scale = this.parent.absoluteScale;
+
                     return addPos({ x: pos.x * abs_scale.x,
                         y: pos.y * abs_scale.y }, this.parent.upperLeftPos(this.parent.absolutePos, this.parent.absoluteSize));
                 } else return pos;

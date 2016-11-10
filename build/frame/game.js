@@ -1,6 +1,6 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -11,16 +11,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * Given a set of "expressions", a player must manipulate those expressions to
  * reach a "goal" state, with optional support from a "toolbox" of primitive expressions.
  * (*This may change in time.*) */
-
 var Level = function () {
     function Level(expressions, goal) {
         var toolbox = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+        var globals = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
         _classCallCheck(this, Level);
 
         this.exprs = expressions;
         this.goal = goal;
         this.toolbox = toolbox;
+        this.globals = globals;
     }
 
     // Builds a single Stage from the level description,
@@ -46,9 +47,20 @@ var Level = function () {
             // levels appear the same each time you play.
             Math.seed = 12045;
 
-            GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
+            var showEnvironment = Object.keys(this.globals.bindings).length > 0 || mag.Stage.getNodesWithClass(VarExpr, [], true, this.exprs).length > 0;
+
             var canvas_screen = stage.boundingSize;
-            var screen = { height: canvas_screen.h / 1.4, width: canvas_screen.w / 1.4, y: canvas_screen.h * (1 - 1 / 1.4) / 2.0, x: canvas_screen.w * (1 - 1 / 1.4) / 2.0 };
+
+            var envDisplayWidth = showEnvironment ? 0.25 * canvas_screen.w : 0;
+
+            GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
+            var usableWidth = canvas_screen.w - envDisplayWidth;
+            var screen = {
+                height: canvas_screen.h / 1.4 - 90,
+                width: usableWidth / (showEnvironment ? 1.0 : 1.4),
+                y: canvas_screen.h * (1 - 1 / 1.4) / 2.0,
+                x: showEnvironment ? envDisplayWidth : usableWidth * (1 - 1 / 1.4) / 2.0
+            };
             var board_packing = this.findBestPacking(this.exprs, screen);
             stage.addAll(board_packing); // add expressions to the stage
 
@@ -98,24 +110,23 @@ var Level = function () {
             }
             stage.toolbox = toolbox;
 
-            stage.uiNodes = [btn_back, btn_reset, btn_next, toolbox];
-
-            // Checks if the player has completed the level.
-            var goal = this.goal;
-            stage.expressionNodes = function () {
-                // TODO: Offshore the goal nodes onto some other stage.
-                var nodes = [];
-                var expr;
+            // Environment
+            var yOffset = goal_node[0].absoluteSize.h + goal_node[0].absolutePos.y + 10;
+            var env = new EnvironmentDisplay(0, yOffset, 0.15 * canvas_screen.w, canvas_screen.h - TOOLBOX_HEIGHT - yOffset, stage);
+            if (showEnvironment) {
+                stage.add(env);
+            }
+            stage.environmentDisplay = env;
+            if (this.globals) {
                 var _iteratorNormalCompletion = true;
                 var _didIteratorError = false;
                 var _iteratorError = undefined;
 
                 try {
-                    for (var _iterator = this.nodes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                        var n = _step.value;
+                    for (var _iterator = this.globals.names()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        var name = _step.value;
 
-                        if (n in this.uiGoalNodes || this.uiNodes.indexOf(n) > -1 || n.constructor.name === 'Rect' || n.constructor.name === 'ImageRect' || !(n instanceof Expression) || n.fadingOut || n.toolbox) continue;
-                        nodes.push(n);
+                        stage.environment.update(name, this.globals.lookup(name).clone());
                     }
                 } catch (err) {
                     _didIteratorError = true;
@@ -128,6 +139,42 @@ var Level = function () {
                     } finally {
                         if (_didIteratorError) {
                             throw _iteratorError;
+                        }
+                    }
+                }
+            }
+            env.showGlobals();
+
+            stage.uiNodes = [btn_back, btn_reset, btn_next, env, toolbox];
+
+            // Checks if the player has completed the level.
+            var goal = this.goal;
+            stage.expressionNodes = function () {
+                // TODO: Offshore the goal nodes onto some other stage.
+                var nodes = [];
+                var expr;
+                var _iteratorNormalCompletion2 = true;
+                var _didIteratorError2 = false;
+                var _iteratorError2 = undefined;
+
+                try {
+                    for (var _iterator2 = this.nodes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                        var n = _step2.value;
+
+                        if (n in this.uiGoalNodes || this.uiNodes.indexOf(n) > -1 || n.constructor.name === 'Rect' || n.constructor.name === 'ImageRect' || !(n instanceof Expression) || n.fadingOut || n.toolbox) continue;
+                        nodes.push(n);
+                    }
+                } catch (err) {
+                    _didIteratorError2 = true;
+                    _iteratorError2 = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                            _iterator2.return();
+                        }
+                    } finally {
+                        if (_didIteratorError2) {
+                            throw _iteratorError2;
                         }
                     }
                 }
@@ -168,13 +215,158 @@ var Level = function () {
         // NOTE: This does not do error checking! Make sure your desc is correct.
 
     }, {
-        key: 'findBestPacking',
-
-        //return new Expression();
+        key: 'findFastPacking',
 
 
-        // Unreachable....
+        // David's rather terrible packing algorithm. Used if there are a
+        // large amount of expressions to pack. It greedily splits the
+        // expressions into rows, then lays out the rows with some random
+        // deviation to hide that fact.
+        value: function findFastPacking(exprs, screen) {
+            var y = screen.y;
+            var dy = 0;
+            var x = screen.x;
+            var rows = [];
+            var row = [];
+            // Greedily distribute the expressions into rows.
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
 
+            try {
+                for (var _iterator3 = exprs[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                    var e = _step3.value;
+
+                    var size = e.size;
+                    if (x + size.w < screen.width) {
+                        dy = Math.max(size.h, dy);
+                    } else {
+                        y += dy;
+                        dy = size.h;
+                        x = screen.x;
+                        rows.push(row);
+                        row = [];
+                    }
+                    e.pos = { x: x, y: y };
+                    x += size.w;
+                    row.push(e);
+                }
+            } catch (err) {
+                _didIteratorError3 = true;
+                _iteratorError3 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                        _iterator3.return();
+                    }
+                } finally {
+                    if (_didIteratorError3) {
+                        throw _iteratorError3;
+                    }
+                }
+            }
+
+            if (row.length) rows.push(row);
+            var result = [];
+
+            // Lay out the rows evenly, with randomness to hide the
+            // grid-based nature of the algorithm.
+            var hPadding = (screen.height - y) / (rows.length + 1);
+            y = screen.y + hPadding;
+            var _iteratorNormalCompletion4 = true;
+            var _didIteratorError4 = false;
+            var _iteratorError4 = undefined;
+
+            try {
+                for (var _iterator4 = rows[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                    var _row = _step4.value;
+
+                    var _dy = 0;
+                    var width = 0;
+                    var _iteratorNormalCompletion5 = true;
+                    var _didIteratorError5 = false;
+                    var _iteratorError5 = undefined;
+
+                    try {
+                        for (var _iterator5 = _row[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                            var _e = _step5.value;
+
+                            width += _e.size.w;
+                        }
+                    } catch (err) {
+                        _didIteratorError5 = true;
+                        _iteratorError5 = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                                _iterator5.return();
+                            }
+                        } finally {
+                            if (_didIteratorError5) {
+                                throw _iteratorError5;
+                            }
+                        }
+                    }
+
+                    var wPadding = (screen.width - width) / (_row.length + 1);
+
+                    var _x3 = screen.x + wPadding;
+                    var _iteratorNormalCompletion6 = true;
+                    var _didIteratorError6 = false;
+                    var _iteratorError6 = undefined;
+
+                    try {
+                        for (var _iterator6 = _row[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                            var _e2 = _step6.value;
+
+                            var _size = _e2.size;
+                            // random() call allows the x and y-position to vary
+                            // by up to +/- 0.4 of the between-row/between-expr
+                            // padding. This helps make it look a little less
+                            // grid-based.
+                            _e2.pos = {
+                                x: _x3 + (Math.seededRandom() - 0.5) * 0.8 * wPadding,
+                                y: y + (Math.seededRandom() - 0.5) * 0.8 * hPadding
+                            };
+                            result.push(_e2);
+
+                            _x3 += wPadding + _size.w;
+                            _dy = Math.max(_dy, _size.h);
+                        }
+                    } catch (err) {
+                        _didIteratorError6 = true;
+                        _iteratorError6 = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                                _iterator6.return();
+                            }
+                        } finally {
+                            if (_didIteratorError6) {
+                                throw _iteratorError6;
+                            }
+                        }
+                    }
+
+                    y += hPadding + _dy;
+                }
+            } catch (err) {
+                _didIteratorError4 = true;
+                _iteratorError4 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                        _iterator4.return();
+                    }
+                } finally {
+                    if (_didIteratorError4) {
+                        throw _iteratorError4;
+                    }
+                }
+            }
+
+            return result;
+        }
 
         // Ian's really inefficient packing algorithm:
         // * 1. Put the expressions in random places.
@@ -183,26 +375,41 @@ var Level = function () {
         // * --> Otherwise, add to a list.
         // * 3. When the list of candidates reaches a threshold #, quit.
         // * 4. Select the candidate with the greatest pairwise distance between expressions.
+
+    }, {
+        key: 'findBestPacking',
         value: function findBestPacking(exprs, screen) {
 
             var es = exprs; // clones of the initial expressions to place on the board
             var _this = this;
             if (!Array.isArray(es)) es = [es];
 
+            if (es.length >= 5) {
+                return this.findFastPacking(es, screen);
+            }
+
+            // Bounds cache seems to greatly destroy performance
+            var sizeCache = {};
+            var getSize = function getSize(e) {
+                // TODO: a lot of time spent in toString
+                if (!sizeCache[e]) sizeCache[e] = e.absoluteSize;
+                return sizeCache[e];
+            };
+
             var candidates = [];
             var CANDIDATE_THRESHOLD = 10;
             while (candidates.length < CANDIDATE_THRESHOLD) {
 
                 // 1. Put the expressions in random places.
-                var _iteratorNormalCompletion2 = true;
-                var _didIteratorError2 = false;
-                var _iteratorError2 = undefined;
+                var _iteratorNormalCompletion7 = true;
+                var _didIteratorError7 = false;
+                var _iteratorError7 = undefined;
 
                 try {
-                    for (var _iterator2 = es[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                        var e = _step2.value;
+                    for (var _iterator7 = es[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                        var e = _step7.value;
 
-                        var size = e.absoluteSize;
+                        var size = getSize(e);
 
                         var y = 0;
                         while (y < 50) {
@@ -215,53 +422,53 @@ var Level = function () {
 
                     // 2. Check if they overlap.
                 } catch (err) {
-                    _didIteratorError2 = true;
-                    _iteratorError2 = err;
+                    _didIteratorError7 = true;
+                    _iteratorError7 = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                            _iterator2.return();
+                        if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                            _iterator7.return();
                         }
                     } finally {
-                        if (_didIteratorError2) {
-                            throw _iteratorError2;
+                        if (_didIteratorError7) {
+                            throw _iteratorError7;
                         }
                     }
                 }
 
                 var overlap = false;
-                var _iteratorNormalCompletion3 = true;
-                var _didIteratorError3 = false;
-                var _iteratorError3 = undefined;
+                var _iteratorNormalCompletion8 = true;
+                var _didIteratorError8 = false;
+                var _iteratorError8 = undefined;
 
                 try {
-                    for (var _iterator3 = es[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                        var _e = _step3.value;
-                        var _iteratorNormalCompletion4 = true;
-                        var _didIteratorError4 = false;
-                        var _iteratorError4 = undefined;
+                    for (var _iterator8 = es[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+                        var _e3 = _step8.value;
+                        var _iteratorNormalCompletion9 = true;
+                        var _didIteratorError9 = false;
+                        var _iteratorError9 = undefined;
 
                         try {
-                            for (var _iterator4 = es[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                                var f = _step4.value;
+                            for (var _iterator9 = es[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+                                var f = _step9.value;
 
-                                if (_e == f) continue;
-                                if (intersects(_e.absoluteBounds, f.absoluteBounds)) {
+                                if (_e3 == f) continue;
+                                if (intersects(_e3.absoluteBounds, f.absoluteBounds)) {
                                     overlap = true;
                                     break;
                                 }
                             }
                         } catch (err) {
-                            _didIteratorError4 = true;
-                            _iteratorError4 = err;
+                            _didIteratorError9 = true;
+                            _iteratorError9 = err;
                         } finally {
                             try {
-                                if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                                    _iterator4.return();
+                                if (!_iteratorNormalCompletion9 && _iterator9.return) {
+                                    _iterator9.return();
                                 }
                             } finally {
-                                if (_didIteratorError4) {
-                                    throw _iteratorError4;
+                                if (_didIteratorError9) {
+                                    throw _iteratorError9;
                                 }
                             }
                         }
@@ -271,16 +478,16 @@ var Level = function () {
 
                     // --> Otherwise, add to the list of candidates.
                 } catch (err) {
-                    _didIteratorError3 = true;
-                    _iteratorError3 = err;
+                    _didIteratorError8 = true;
+                    _iteratorError8 = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                            _iterator3.return();
+                        if (!_iteratorNormalCompletion8 && _iterator8.return) {
+                            _iterator8.return();
                         }
                     } finally {
-                        if (_didIteratorError3) {
-                            throw _iteratorError3;
+                        if (_didIteratorError8) {
+                            throw _iteratorError8;
                         }
                     }
                 }
@@ -301,50 +508,50 @@ var Level = function () {
             };
             var computePairwiseDist = function computePairwiseDist(a, b) {
                 var sum = 0;
-                var _iteratorNormalCompletion5 = true;
-                var _didIteratorError5 = false;
-                var _iteratorError5 = undefined;
+                var _iteratorNormalCompletion10 = true;
+                var _didIteratorError10 = false;
+                var _iteratorError10 = undefined;
 
                 try {
-                    for (var _iterator5 = a[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                        var _e2 = _step5.value;
+                    for (var _iterator10 = a[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+                        var _e4 = _step10.value;
                         // f is an expression.
-                        var _iteratorNormalCompletion6 = true;
-                        var _didIteratorError6 = false;
-                        var _iteratorError6 = undefined;
+                        var _iteratorNormalCompletion11 = true;
+                        var _didIteratorError11 = false;
+                        var _iteratorError11 = undefined;
 
                         try {
-                            for (var _iterator6 = b[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                                var _f = _step6.value;
+                            for (var _iterator11 = b[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+                                var _f = _step11.value;
                                 // e is an expression.
-                                sum += Math.sqrt(Math.pow(_e2.pos.x - _f.pos.x, 2) + Math.pow(_e2.pos.y - _f.pos.y, 2));
+                                sum += Math.sqrt(Math.pow(_e4.pos.x - _f.pos.x, 2) + Math.pow(_e4.pos.y - _f.pos.y, 2));
                             }
                         } catch (err) {
-                            _didIteratorError6 = true;
-                            _iteratorError6 = err;
+                            _didIteratorError11 = true;
+                            _iteratorError11 = err;
                         } finally {
                             try {
-                                if (!_iteratorNormalCompletion6 && _iterator6.return) {
-                                    _iterator6.return();
+                                if (!_iteratorNormalCompletion11 && _iterator11.return) {
+                                    _iterator11.return();
                                 }
                             } finally {
-                                if (_didIteratorError6) {
-                                    throw _iteratorError6;
+                                if (_didIteratorError11) {
+                                    throw _iteratorError11;
                                 }
                             }
                         }
                     }
                 } catch (err) {
-                    _didIteratorError5 = true;
-                    _iteratorError5 = err;
+                    _didIteratorError10 = true;
+                    _iteratorError10 = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                            _iterator5.return();
+                        if (!_iteratorNormalCompletion10 && _iterator10.return) {
+                            _iterator10.return();
                         }
                     } finally {
-                        if (_didIteratorError5) {
-                            throw _iteratorError5;
+                        if (_didIteratorError10) {
+                            throw _iteratorError10;
                         }
                     }
                 }
@@ -382,8 +589,8 @@ var Level = function () {
         }
     }], [{
         key: 'make',
-        value: function make(expr_descs, goal_descs, toolbox_descs) {
-            var lvl = new Level(Level.parse(expr_descs), new Goal(new ExpressionPattern(Level.parse(goal_descs))), toolbox_descs ? Level.parse(toolbox_descs) : null);
+        value: function make(expr_descs, goal_descs, toolbox_descs, globals_descs) {
+            var lvl = new Level(Level.parse(expr_descs), new Goal(new ExpressionPattern(Level.parse(goal_descs))), toolbox_descs ? Level.parse(toolbox_descs) : null, Environment.parse(globals_descs));
             return lvl;
         }
     }, {
@@ -548,9 +755,9 @@ var Level = function () {
                         var es = exprs.slice(1);es.push(args[0]);
                         return lock(constructClassInstance(op_class, es), toplevel_lock); // pass the operator name to the comparator
                     } else {
-                            //console.log(exprs);
-                            return lock(constructClassInstance(op_class, exprs.slice(1)), toplevel_lock); // (this is really generic, man)
-                        }
+                        //console.log(exprs);
+                        return lock(constructClassInstance(op_class, exprs.slice(1)), toplevel_lock); // (this is really generic, man)
+                    }
                 }
             }
 
@@ -586,6 +793,7 @@ var Level = function () {
                 'pop': ExprManager.getClass('pop'),
                 'define': ExprManager.getClass('define'),
                 'null': new NullExpr(0, 0, 64, 64),
+                'assign': ExprManager.getClass('assign'),
                 'dot': function () {
                     var circ = new CircleExpr(0, 0, 18);
                     circ.color = 'gold';
@@ -617,10 +825,16 @@ var Level = function () {
                     lambdavar.name = _varname;
                 }
                 return lambdavar;
+            } else if (arg.indexOf('$') > -1) {
+                var _varname2 = arg.replace('$', '').replace('_', '');
+                return lock(new (ExprManager.getClass('reference'))(_varname2), locked);
             } else {
                 console.error('Unknown argument: ', arg);
-                return new FadedVarExpr(arg);
+                return new FadedValueExpr(arg);
+                //return new Expression();
             }
+
+            // Unreachable....
         }
     }]);
 
@@ -653,29 +867,28 @@ var Goal = function () {
         // MAYBE? TODO: Use reduction stack.
         value: function test(exprs) {
             var reduction_stack = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-            var _iteratorNormalCompletion7 = true;
-            var _didIteratorError7 = false;
-            var _iteratorError7 = undefined;
+            var _iteratorNormalCompletion12 = true;
+            var _didIteratorError12 = false;
+            var _iteratorError12 = undefined;
 
             try {
-
-                for (var _iterator7 = this.patterns[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-                    var pattern = _step7.value;
+                for (var _iterator12 = this.patterns[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+                    var pattern = _step12.value;
 
                     var paired_matching = pattern.test(exprs);
                     if (paired_matching) return paired_matching;
                 }
             } catch (err) {
-                _didIteratorError7 = true;
-                _iteratorError7 = err;
+                _didIteratorError12 = true;
+                _iteratorError12 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion7 && _iterator7.return) {
-                        _iterator7.return();
+                    if (!_iteratorNormalCompletion12 && _iterator12.return) {
+                        _iterator12.return();
                     }
                 } finally {
-                    if (_didIteratorError7) {
-                        throw _iteratorError7;
+                    if (_didIteratorError12) {
+                        throw _iteratorError12;
                     }
                 }
             }
@@ -766,33 +979,33 @@ var ExpressionPattern = function () {
                     //console.log(' > Constructors don\'t match.');
                     return false; // expressions don't match
                 } else {
-                        // Check whether the expressions at this level have the same # of children. If so, do one-to-one comparison.
-                        var e_children = e.children;
-                        var f_children = f.children;
-                        if (e_children.length !== f_children.length) {
-                            //console.log(' > Length of child array doesn\'t match.');
-                            return false;
-                        } else {
-                            for (var i = 0; i < e_children.length; i++) {
-                                if (!compare(e_children[i], f_children[i])) {
-                                    //console.log(' > Children don\'t match.');
-                                    return false;
-                                }
+                    // Check whether the expressions at this level have the same # of children. If so, do one-to-one comparison.
+                    var e_children = e.children;
+                    var f_children = f.children;
+                    if (e_children.length !== f_children.length) {
+                        //console.log(' > Length of child array doesn\'t match.');
+                        return false;
+                    } else {
+                        for (var i = 0; i < e_children.length; i++) {
+                            if (!compare(e_children[i], f_children[i])) {
+                                //console.log(' > Children don\'t match.');
+                                return false;
                             }
                         }
                     }
+                }
 
                 //console.log(' > Expressions are equal.');
                 return true;
             };
 
-            var _iteratorNormalCompletion8 = true;
-            var _didIteratorError8 = false;
-            var _iteratorError8 = undefined;
+            var _iteratorNormalCompletion13 = true;
+            var _didIteratorError13 = false;
+            var _iteratorError13 = undefined;
 
             try {
-                for (var _iterator8 = lvl_exprs[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-                    var lvl_e = _step8.value;
+                for (var _iterator13 = lvl_exprs[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
+                    var lvl_e = _step13.value;
 
                     var valid = -1;
                     for (var i = 0; i < es.length; i++) {
@@ -811,16 +1024,16 @@ var ExpressionPattern = function () {
                     } else return false;
                 }
             } catch (err) {
-                _didIteratorError8 = true;
-                _iteratorError8 = err;
+                _didIteratorError13 = true;
+                _iteratorError13 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion8 && _iterator8.return) {
-                        _iterator8.return();
+                    if (!_iteratorNormalCompletion13 && _iterator13.return) {
+                        _iterator13.return();
                     }
                 } finally {
-                    if (_didIteratorError8) {
-                        throw _iteratorError8;
+                    if (_didIteratorError13) {
+                        throw _iteratorError13;
                     }
                 }
             }

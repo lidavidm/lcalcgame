@@ -11,6 +11,7 @@ var mag = (function(_) {
             this.nodes = [];
             this.hoverNode = null;
             this._scale = 1;
+            this.requested = false;
         }
         get scale() { return this._scale; }
         set scale(s) {
@@ -167,6 +168,22 @@ var mag = (function(_) {
 
         /** Draw this stage to the canvas. */
         draw() {
+            // To avoid redundant draws, when someone calls draw, we
+            // instead try to schedule an actual redraw. Another
+            // redraw cannot be scheduled until the previous one
+            // completes. The scheduling is done using
+            // requestAnimationFrame so that the browser has control
+            // over the framerate.
+            if (!this.requested) {
+                this.requested = true;
+                window.requestAnimationFrame(() => {
+                    this.drawImpl();
+                    this.requested = false;
+                });
+            }
+        }
+
+        drawImpl() {
             if (this.invalidated) return; // don't draw invalidated stages.
             this.ctx.save();
             this.ctx.scale(this._scale, this._scale);

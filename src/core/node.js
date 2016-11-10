@@ -2,7 +2,7 @@
  *  @module core/node
  */
 var mag = (function(_) {
-    
+
     class Node {
         constructor(x, y) {
             this._pos = { x:x, y:y };

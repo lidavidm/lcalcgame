@@ -12,6 +12,7 @@
              this._scale = { x:1, y:1 };
              this._color = "lightgray";
              this._highlightColor = 'yellow';
+             this._stackVertically = false;
              this.stroke = null;
              this.shadowOffset = 2;
          }
@@ -21,6 +22,7 @@
              var pos = this.pos;
              if (this.parent) {
                  let abs_scale = this.parent.absoluteScale;
+
                  return addPos( {x:pos.x*abs_scale.x,
                                  y:pos.y*abs_scale.y},
                                  this.parent.upperLeftPos( this.parent.absolutePos , this.parent.absoluteSize ));

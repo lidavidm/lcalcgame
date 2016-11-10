@@ -32,7 +32,7 @@ class NullExpr extends ImageExpr {
     value() { return null; }
 }
 
-class FadedNullExpr extends FadedVarExpr {
+class FadedNullExpr extends FadedValueExpr {
     constructor() {
         super('null');
         this.color = "lightgray";

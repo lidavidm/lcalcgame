@@ -4,10 +4,12 @@ class ReductStage extends mag.Stage {
     constructor(canvas=null) {
         super(canvas);
         this.stateStack = [];
+        this.environment = new Environment();
     }
 
     // Save state of game board and push onto undo stack.
     saveState() {
+        // TODO: DML save and restore the environment as well.
         var board = this.expressionNodes().map((n) => n.clone());
         board = board.filter((n) => !(n instanceof ExpressionEffect));
         var toolbox = this.toolboxNodes().map((n) => n.clone());
