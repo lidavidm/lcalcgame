@@ -36,6 +36,12 @@ var Level = function () {
 
             var stage = new ReductStage(canvas);
 
+            // Scaling for mobile devices:
+            if (__IS_MOBILE) {
+                var md = new MobileDetect(window.navigator.userAgent);
+                if (md.phone()) stage.scale = 2.4;else if (md.tablet()) stage.scale = 1.8;else if (md.mobile()) stage.scale = 2.0;else stage.scale = 1.0;
+            }
+
             // Seed the random number generator so that while randomly generated,
             // levels appear the same each time you play.
             Math.seed = 12045;
@@ -82,7 +88,7 @@ var Level = function () {
 
             // Toolbox
             var TOOLBOX_HEIGHT = 90;
-            var toolbox = new Toolbox(0, canvas_screen.height - TOOLBOX_HEIGHT, canvas_screen.width, TOOLBOX_HEIGHT);
+            var toolbox = new Toolbox(0, canvas_screen.h - TOOLBOX_HEIGHT, canvas_screen.w, TOOLBOX_HEIGHT);
             stage.add(toolbox);
             if (this.toolbox) {
                 this.toolbox.forEach(function (item) {

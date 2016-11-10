@@ -9,9 +9,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * You can add Nodes to this layer to display them and update them.
  */
 var mag = function (_) {
-
-    var _canvas_scale = __IS_MOBILE ? 1.8 : 1;
-
     var Stage = function () {
         function Stage() {
             var canvas = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -21,6 +18,7 @@ var mag = function (_) {
             if (canvas) this.canvas = canvas;else this.ctx = null;
             this.nodes = [];
             this.hoverNode = null;
+            this._scale = 1;
         }
 
         _createClass(Stage, [{
@@ -188,7 +186,7 @@ var mag = function (_) {
 
                 if (this.invalidated) return; // don't draw invalidated stages.
                 this.ctx.save();
-                this.ctx.scale(_canvas_scale, _canvas_scale);
+                this.ctx.scale(this._scale, this._scale);
                 this.clear();
                 this.nodes.forEach(function (n) {
                     return n.draw(_this3.ctx);
@@ -334,10 +332,19 @@ var mag = function (_) {
                 return "[Stage toString method is undefined]";
             }
         }, {
+            key: 'scale',
+            get: function get() {
+                return this._scale;
+            },
+            set: function set(s) {
+                if (s === 0) return;
+                this._scale = s;
+            }
+        }, {
             key: 'boundingSize',
             get: function get() {
                 var r = this._canvas.getBoundingClientRect();
-                return { w: r.width / _canvas_scale, h: r.height / _canvas_scale };
+                return { w: r.width / this.scale, h: r.height / this.scale };
             }
         }, {
             key: 'canvas',
@@ -398,8 +405,8 @@ var mag = function (_) {
         function getMousePos(evt) {
             var rect = canvas.getBoundingClientRect();
             return {
-                x: (evt.clientX - rect.left) / _canvas_scale,
-                y: (evt.clientY - rect.top) / _canvas_scale
+                x: (evt.clientX - rect.left) / stage._scale,
+                y: (evt.clientY - rect.top) / stage._scale
             };
         }
         function getTouch(evt) {

@@ -4,18 +4,22 @@
  */
 var mag = (function(_) {
 
-    var _canvas_scale = __IS_MOBILE ? 1.8 : 1;
-
     class Stage {
         constructor(canvas=null) {
             if (canvas) this.canvas = canvas;
             else        this.ctx = null;
             this.nodes = [];
             this.hoverNode = null;
+            this._scale = 1;
+        }
+        get scale() { return this._scale; }
+        set scale(s) {
+            if (s === 0) return;
+            this._scale = s;
         }
         get boundingSize() {
             let r = this._canvas.getBoundingClientRect();
-            return { w:r.width / _canvas_scale, h:r.height / _canvas_scale };
+            return { w:r.width / this.scale, h:r.height / this.scale };
         }
         get canvas() { return this._canvas; }
         set canvas(c) {
@@ -165,7 +169,7 @@ var mag = (function(_) {
         draw() {
             if (this.invalidated) return; // don't draw invalidated stages.
             this.ctx.save();
-            this.ctx.scale(_canvas_scale, _canvas_scale);
+            this.ctx.scale(this._scale, this._scale);
             this.clear();
             this.nodes.forEach((n) => n.draw(this.ctx)); // TODO: You should pass the ctx!!!!!!
             this.ctx.restore();
@@ -302,8 +306,8 @@ var mag = (function(_) {
         function getMousePos(evt) {
             var rect = canvas.getBoundingClientRect();
             return {
-              x: (evt.clientX - rect.left) / _canvas_scale,
-              y: (evt.clientY - rect.top) / _canvas_scale
+              x: (evt.clientX - rect.left) / stage._scale,
+              y: (evt.clientY - rect.top) / stage._scale
             };
         }
         function getTouch(evt, idx=0) {

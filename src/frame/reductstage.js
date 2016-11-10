@@ -56,7 +56,7 @@ class ReductStage extends mag.Stage {
 
                     let you_win = () => {
 
-                        var cmp = new mag.ImageRect(GLOBAL_DEFAULT_SCREENSIZE.width / 2, GLOBAL_DEFAULT_SCREENSIZE.height / 2, 740 / 2, 146 / 2, 'victory');
+                        var cmp = new mag.ImageRect(GLOBAL_DEFAULT_SCREENSIZE.w / 2, GLOBAL_DEFAULT_SCREENSIZE.h / 2, 740 / 2, 146 / 2, 'victory');
                         cmp.anchor = { x:0.5, y:0.5 };
                         this.add(cmp);
                         this.draw();
@@ -115,7 +115,7 @@ class ReductStage extends mag.Stage {
     onmouseclick(pos) {
 
         // Let player click to continue.
-        if (this.playerWon) {
+        if (!__IS_MOBILE && this.playerWon) {
             Logger.log('clicked-to-continue', '');
             next();
         }
