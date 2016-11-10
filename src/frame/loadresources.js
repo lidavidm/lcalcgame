@@ -46,6 +46,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAudio('mirror-shatter', 'shatter2.wav');
     loadAudio('splosion', 'firework1.wav');
     loadAudio('shootwee', 'firework-shooting.wav');
+    loadAudio('swoop', 'swoop.wav');
     loadAudio('key-jiggle', 'key-jiggle.wav');
     loadAudio('key-unlock', 'key-unlock-fast.wav');
     loadAudio('victory', '325805__wagna__collect.wav');
@@ -85,6 +86,12 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadImage('mirror-icon-fade-false-righthalf', 'mirror-fade-false-righthalf.png');
     loadImage('funnel', 'funnel.png');
     loadImage('funnel-selected', 'funnel-selected.png');
+    loadImage('chest-wood-base', 'chest-wood-base.png');
+    loadImage('chest-wood-lid-open', 'chest-wood-lid-open.png');
+    loadImage('chest-wood-lid-closed', 'chest-wood-lid-closed.png');
+    loadImage('chest-metal-base', 'chest-metal-base.png');
+    loadImage('chest-metal-lid-open', 'chest-metal-lid-open.png');
+    loadImage('chest-metal-lid-closed', 'chest-metal-lid-closed.png');
 
     // UI Images.
     loadImage('btn-next-default', 'next-button.png');
@@ -125,7 +132,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
 
     // Add levels here: (for now)
     // * The '/' character makes the following expression ignore mouse events (can't be drag n dropped). *
-    var chapter_load_prom = loadChaptersFromFiles( ['intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map'] ); //,     'posttest_v1', 'experimental'] );
+    var chapter_load_prom = loadChaptersFromFiles( ['assign', 'intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map'] ); //,     'posttest_v1', 'experimental'] );
 
     Resource.buildLevel = (level_desc, canvas) => {
         ExprManager.clearFadeLevels();
@@ -136,13 +143,17 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             }
         }
 
+        if (!level_desc["globals"]) {
+            level_desc.globals = {};
+        }
+
         let fadedBorders = ExprManager.fadeBordersAt(level_idx);
         if (fadedBorders.length > 0) {
 
             ExprManager.fadesAtBorder = false;
-            let unfaded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+            let unfaded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
             ExprManager.fadesAtBorder = true;
-            let faded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+            let faded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
 
             let unfaded_exprs = unfaded.nodes;
             let faded_exprs   = faded.nodes;
@@ -212,7 +223,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             return faded;
         }
         else {
-            return Level.make(level_desc.board, level_desc.goal, level_desc.toolbox).build(canvas);
+            return Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
         }
     };
     Resource.level = levels;

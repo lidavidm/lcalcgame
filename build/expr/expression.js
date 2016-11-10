@@ -35,6 +35,7 @@ var Expression = function (_mag$RoundedRect) {
         _this2.holes = holes;
         _this2.padding = { left: 10, inner: 10, right: 10 };
         _this2._size = { w: EMPTY_EXPR_WIDTH, h: DEFAULT_EXPR_HEIGHT };
+        _this2.environment = null;
 
         if (_this2.holes) {
             var _this = _this2;
@@ -82,7 +83,7 @@ var Expression = function (_mag$RoundedRect) {
         value: function bindSubexpressions() {
             this.holes.forEach(function (hole) {
                 if (hole instanceof Expression && !(hole instanceof MissingExpression)) {
-                    if (hole instanceof VarExpr || hole instanceof BooleanPrimitive) hole.lock();
+                    if (hole instanceof ValueExpr || hole instanceof BooleanPrimitive) hole.lock();
                     hole.bindSubexpressions();
                 }
             });
@@ -146,22 +147,51 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'update',
         value: function update() {
-            var padding = this.padding.inner;
-            var x = this.padding.left;
-            var y = this.size.h / 2.0 + (this.exprOffsetY ? this.exprOffsetY : 0);
+            var _this3 = this;
+
             var _this = this;
             this.children = [];
+
             this.holes.forEach(function (expr) {
                 return _this.addChild(expr);
             });
+            // In the centering calculation below, we need this expr's
+            // size to be stable. So we first set the scale on our
+            // children, then compute our size once to lay out the
+            // children.
+            this.holes.forEach(function (expr) {
+                expr.anchor = { x: 0, y: 0.5 };
+                expr.scale = { x: 0.85, y: 0.85 };
+                expr.update();
+            });
+            var size = this.size;
+            var padding = this.padding.inner;
+            var x = this.padding.left;
+            var y = this.size.h / 2.0 + (this.exprOffsetY ? this.exprOffsetY : 0);
+            if (this._stackVertically) {
+                y = 2 * this.padding.inner;
+            }
+
             this.holes.forEach(function (expr) {
                 // Update hole expression positions.
                 expr.anchor = { x: 0, y: 0.5 };
                 expr.pos = { x: x, y: y };
                 expr.scale = { x: 0.85, y: 0.85 };
                 expr.update();
-                x += expr.size.w * expr.scale.x + padding;
+                if (_this3._stackVertically) {
+                    y += expr.size.h * expr.scale.y;
+                    // Centering
+                    var offset = x;
+                    var innerWidth = size.w;
+                    var scale = expr.scale.x;
+                    offset = (innerWidth - scale * expr.size.w) / 2;
+
+                    expr.pos = { x: offset, y: expr.pos.y };
+                } else {
+                    x += expr.size.w * expr.scale.x + padding;
+                }
             });
+
             this.children = this.holes; // for rendering
         }
 
@@ -180,6 +210,50 @@ var Expression = function (_mag$RoundedRect) {
         value: function applyAtIndex(idx, arg) {}
         // ... //
 
+
+        // Get the containing environment for this expression
+
+    }, {
+        key: 'getEnvironment',
+        value: function getEnvironment() {
+            if (this.environment) return this.environment;
+
+            if (this.parent) return this.parent.getEnvironment();
+
+            if (this.stage) return this.stage.environment;
+
+            return null;
+        }
+    }, {
+        key: 'canReduce',
+        value: function canReduce() {
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = this.holes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var child = _step.value;
+
+                    if (child.canReduce && !child.canReduce()) return false;
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+
+            return true;
+        }
 
         // Reduce this expression to another.
         // * Returns the newly built expression. Leaves this expression unchanged.
@@ -412,20 +486,38 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'size',
         get: function get() {
+            var _this4 = this;
 
             var padding = this.padding;
             var width = 0;
+            var height = DEFAULT_EXPR_HEIGHT;
             var sizes = this.getHoleSizes();
             var scale_x = this.scale.x;
+
+            if (this._stackVertically) {
+                width = EMPTY_EXPR_WIDTH;
+                height = 0;
+            }
 
             if (sizes.length === 0) return { w: this._size.w, h: this._size.h };
 
             sizes.forEach(function (s) {
-                width += s.w + padding.inner;
+                if (_this4._stackVertically) {
+                    height += s.h;
+                    width = Math.max(width, s.w);
+                } else {
+                    height = Math.max(height, s.h);
+                    width += s.w + padding.inner;
+                }
             });
-            width += padding.right; // the end
 
-            return { w: width, h: DEFAULT_EXPR_HEIGHT };
+            if (this._stackVertically) {
+                width += padding.right + padding.left;
+            } else {
+                width += padding.right; // the end
+            }
+
+            return { w: width, h: height };
         }
     }]);
 

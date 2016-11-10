@@ -57,8 +57,9 @@ var mag = (function(_) {
         };
         var loadAnimation = (imageSeqAlias, range, duration) => {
             try {
-                animPresets[imageSeqAlias] = Animation.forImageSequence(imageSeqAlias, range, duration);
+                animPresets[imageSeqAlias] = _.Animation.forImageSequence(imageSeqAlias, range, duration);
             } catch (e) {
+                console.log(e);
                 //
             }
         };

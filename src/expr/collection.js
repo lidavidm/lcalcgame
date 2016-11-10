@@ -1,14 +1,14 @@
- 
- 
- 
- 
- 
- 
- 
- 
- 
 
-class CollectionExpr extends GraphicVarExpr { }
+
+
+
+
+
+
+
+
+
+class CollectionExpr extends GraphicValueExpr { }
 class BagExpr extends CollectionExpr {
     constructor(x, y, w, h, holding=[]) {
         //super(new Bag(x, y, w, h));
@@ -113,7 +113,7 @@ class BagExpr extends CollectionExpr {
                 this.stage.remove(new_func);
                 new_func.pos = pos;
                 new_func.unlockSubexpressions();
-                new_func.lockSubexpressions((expr) => (expr instanceof VarExpr || expr instanceof FadedVarExpr || expr instanceof BooleanPrimitive)); // lock primitives
+                new_func.lockSubexpressions((expr) => (expr instanceof ValueExpr || expr instanceof FadedValueExpr || expr instanceof BooleanPrimitive)); // lock primitives
                 bag.addItem(new_func);
             }
         });

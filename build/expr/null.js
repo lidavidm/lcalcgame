@@ -79,8 +79,8 @@ var NullExpr = function (_ImageExpr) {
     return NullExpr;
 }(ImageExpr);
 
-var FadedNullExpr = function (_FadedVarExpr) {
-    _inherits(FadedNullExpr, _FadedVarExpr);
+var FadedNullExpr = function (_FadedValueExpr) {
+    _inherits(FadedNullExpr, _FadedValueExpr);
 
     function FadedNullExpr() {
         _classCallCheck(this, FadedNullExpr);
@@ -103,4 +103,4 @@ var FadedNullExpr = function (_FadedVarExpr) {
     }]);
 
     return FadedNullExpr;
-}(FadedVarExpr);
+}(FadedValueExpr);

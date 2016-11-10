@@ -25,14 +25,17 @@ var ExprManager = (function() {
         'pop':      [PopExpr],
         'define':   [DefineExpr],
         'var':      [LambdaVarExpr, HalfFadedLambdaVarExpr, FadedLambdaVarExpr, FadedLambdaVarExpr],
+        'reference':[ChestVarExpr, LabeledChestVarExpr],
         'hole':     [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedLambdaHoleExpr, FadedES6LambdaHoleExpr],
-        'lambda':   [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr]
+        'lambda':   [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr],
+        'assign':   [AssignExpr],
     };
     var fade_level = {};
     var DEFAULT_FADE_LEVEL = 0;
 
     var DEFAULT_FADE_PROGRESSION = {
         'var'   : [[9, 30], 30, 42],
+        'reference': [10],
         'hole'  : [[9, 30], 30, 42],
         'if'    : [26, 45],
         '_b'    : [34],

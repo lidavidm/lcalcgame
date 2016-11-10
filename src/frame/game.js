@@ -5,10 +5,11 @@
  * (*This may change in time.*) */
 class Level {
 
-    constructor(expressions, goal, toolbox=null) {
+    constructor(expressions, goal, toolbox=null, globals=null) {
         this.exprs = expressions;
         this.goal = goal;
         this.toolbox = toolbox;
+        this.globals = globals;
     }
 
     // Builds a single Stage from the level description,
@@ -24,9 +25,21 @@ class Level {
         // levels appear the same each time you play.
         Math.seed = 12045;
 
-        GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
+        const showEnvironment = Object.keys(this.globals.bindings).length > 0 ||
+              mag.Stage.getNodesWithClass(VarExpr, [], true, this.exprs).length > 0;
+
         var canvas_screen = stage.boundingSize;
-        var screen = { height:canvas_screen.h/1.4, width:canvas_screen.w/1.4, y:canvas_screen.h*(1-1/1.4) / 2.0, x:(canvas_screen.w*(1-1/1.4) / 2.0) };
+
+        const envDisplayWidth = showEnvironment ? 0.25 * canvas_screen.w : 0;
+
+        GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
+        const usableWidth = canvas_screen.w - envDisplayWidth;
+        var screen = {
+            height: canvas_screen.h/1.4 - 90,
+            width: usableWidth/(showEnvironment ? 1.0 : 1.4),
+            y: canvas_screen.h*(1-1/1.4) / 2.0,
+            x: showEnvironment ? envDisplayWidth : ((usableWidth*(1-1/1.4)) / 2.0),
+        };
         var board_packing = this.findBestPacking(this.exprs, screen);
         stage.addAll(board_packing); // add expressions to the stage
 
@@ -72,7 +85,7 @@ class Level {
 
         // Toolbox
         const TOOLBOX_HEIGHT = 90;
-        var toolbox = new Toolbox(0, canvas_screen.height - TOOLBOX_HEIGHT, canvas_screen.width, TOOLBOX_HEIGHT);
+        var toolbox = new Toolbox(0, canvas_screen.h - TOOLBOX_HEIGHT, canvas_screen.w, TOOLBOX_HEIGHT);
         stage.add(toolbox);
         if (this.toolbox) {
             this.toolbox.forEach((item) => {
@@ -82,7 +95,21 @@ class Level {
         }
         stage.toolbox = toolbox;
 
-        stage.uiNodes = [ btn_back, btn_reset, btn_next, toolbox ];
+        // Environment
+        let yOffset = goal_node[0].absoluteSize.h + goal_node[0].absolutePos.y + 10;
+        var env = new EnvironmentDisplay(0, yOffset, 0.15 * canvas_screen.w, canvas_screen.h - TOOLBOX_HEIGHT - yOffset, stage);
+        if (showEnvironment) {
+            stage.add(env);
+        }
+        stage.environmentDisplay = env;
+        if (this.globals) {
+            for (let name of this.globals.names()) {
+                stage.environment.update(name, this.globals.lookup(name).clone());
+            }
+        }
+        env.showGlobals();
+
+        stage.uiNodes = [ btn_back, btn_reset, btn_next, env, toolbox ];
 
         // Checks if the player has completed the level.
         var goal = this.goal;
@@ -125,9 +152,9 @@ class Level {
     // * In Scheme-esque format, with _ for holes:
     // * '(if _ triangle star) (== triangle _) (rect)'
     // NOTE: This does not do error checking! Make sure your desc is correct.
-    static make(expr_descs, goal_descs, toolbox_descs) {
+    static make(expr_descs, goal_descs, toolbox_descs, globals_descs) {
         var lvl = new Level(Level.parse(expr_descs), new Goal(new ExpressionPattern(Level.parse(goal_descs))),
-            toolbox_descs ? Level.parse(toolbox_descs) : null );
+            toolbox_descs ? Level.parse(toolbox_descs) : null, Environment.parse(globals_descs));
         return lvl;
     }
     static parse(desc) {
@@ -311,6 +338,7 @@ class Level {
             'pop':ExprManager.getClass('pop'),
             'define':ExprManager.getClass('define'),
             'null':new NullExpr(0,0,64,64),
+            'assign':ExprManager.getClass('assign'),
             'dot':(() => {
                 let circ = new CircleExpr(0,0,18);
                 circ.color = 'gold';
@@ -344,13 +372,79 @@ class Level {
                 lambdavar.name = varname;
             }
             return lambdavar;
+        } else if (arg.indexOf('$') > -1) {
+            let varname = arg.replace('$', '').replace('_', '');
+            return lock(new (ExprManager.getClass('reference'))(varname), locked);
         } else {
             console.error('Unknown argument: ', arg);
-            return new FadedVarExpr(arg);
+            return new FadedValueExpr(arg);
             //return new Expression();
         }
 
         // Unreachable....
+    }
+
+    // David's rather terrible packing algorithm. Used if there are a
+    // large amount of expressions to pack. It greedily splits the
+    // expressions into rows, then lays out the rows with some random
+    // deviation to hide that fact.
+    findFastPacking(exprs, screen) {
+        let y = screen.y;
+        let dy = 0;
+        let x = screen.x;
+        let rows = [];
+        let row = [];
+        // Greedily distribute the expressions into rows.
+        for (let e of exprs) {
+            let size = e.size;
+            if (x + size.w < screen.width) {
+                dy = Math.max(size.h, dy);
+            }
+            else {
+                y += dy;
+                dy = size.h;
+                x = screen.x;
+                rows.push(row);
+                row = [];
+            }
+            e.pos = { x: x, y: y };
+            x += size.w;
+            row.push(e);
+        }
+        if (row.length) rows.push(row);
+        let result = [];
+
+        // Lay out the rows evenly, with randomness to hide the
+        // grid-based nature of the algorithm.
+        let hPadding = (screen.height - y) / (rows.length + 1);
+        y = screen.y + hPadding;
+        for (let row of rows) {
+            let dy = 0;
+            let width = 0;
+            for (let e of row) {
+                width += e.size.w;
+            }
+            let wPadding = (screen.width - width) / (row.length + 1);
+
+            let x = screen.x + wPadding;
+            for (let e of row) {
+                let size = e.size;
+                // random() call allows the x and y-position to vary
+                // by up to +/- 0.4 of the between-row/between-expr
+                // padding. This helps make it look a little less
+                // grid-based.
+                e.pos = {
+                    x: x + ((Math.seededRandom() - 0.5) * 0.8 * wPadding),
+                    y: y + ((Math.seededRandom() - 0.5) * 0.8 * hPadding),
+                };
+                result.push(e);
+
+                x += wPadding + size.w;
+                dy = Math.max(dy, size.h);
+            }
+            y += hPadding + dy;
+        }
+        return result;
     }
 
     // Ian's really inefficient packing algorithm:
@@ -367,13 +461,25 @@ class Level {
         if (!Array.isArray(es))
             es = [es];
 
+        if (es.length >= 5) {
+            return this.findFastPacking(es, screen);
+        }
+
+        // Bounds cache seems to greatly destroy performance
+        var sizeCache = {};
+        var getSize = function(e) {
+            // TODO: a lot of time spent in toString
+            if (!sizeCache[e]) sizeCache[e] = e.absoluteSize;
+            return sizeCache[e];
+        };
+
         var candidates = [];
         var CANDIDATE_THRESHOLD = 10;
         while (candidates.length < CANDIDATE_THRESHOLD) {
 
             // 1. Put the expressions in random places.
             for (let e of es) {
-                let size = e.absoluteSize;
+                let size = getSize(e);
 
                 let y = 0;
                 while (y < 50) {

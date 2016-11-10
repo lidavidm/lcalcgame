@@ -4,29 +4,12 @@
  * -----------------------------------------------
  * */
 class LambdaHoleExpr extends MissingExpression {
-    get openImage() { return this.name === 'x' ? 'lambda-hole' : 'lambda-hole-red'; }
-    get closedImage() { return this.name === 'x' ? 'lambda-hole-closed' : 'lambda-hole-red-closed'; }
-    get openingAnimation() {
-        var anim = new mag.Animation();
-        anim.addFrame('lambda-hole-opening0', 50);
-        anim.addFrame('lambda-hole-opening1', 50);
-        anim.addFrame('lambda-hole',          50);
-        return anim;
-    }
-    get closingAnimation() {
-        var anim = new mag.Animation();
-        anim.addFrame('lambda-hole-opening1', 50);
-        anim.addFrame('lambda-hole-opening0', 50);
-        anim.addFrame('lambda-hole-closed',   50);
-        return anim;
-    }
-
     constructor(varname) {
         super(null);
         this._name = varname;
         this.color = this.colorForVarName();
-        this.image = this.openImage;
         this.isOpen = true;
+        this._openOffset = Math.PI / 2;
     }
     get name() { return this._name; }
     set name(n) { this._name = n; }
@@ -50,11 +33,44 @@ class LambdaHoleExpr extends MissingExpression {
     // Draw special circle representing a hole.
     drawInternal(ctx, pos, boundingSize) {
         var rad = boundingSize.w / 2.0;
-        setStrokeStyle(ctx, this.stroke);
-        ctx.fillStyle = this.color;
         ctx.beginPath();
         ctx.arc(pos.x+rad,pos.y+rad,rad,0,2*Math.PI);
-        ctx.drawImage(Resource.getImage(this.image), pos.x, pos.y, boundingSize.w, boundingSize.h);
+        var gradient = ctx.createLinearGradient(pos.x + rad, pos.y, pos.x + rad, pos.y + 2 * rad);
+        gradient.addColorStop(0.0, "#AAAAAA");
+        gradient.addColorStop(0.7, "#191919");
+        gradient.addColorStop(1.0, "#191919");
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        if (this._openOffset < Math.PI / 2) {
+            ctx.fillStyle = '#A4A4A4';
+            setStrokeStyle(ctx, {
+                color: '#C8C8C8',
+                lineWidth: 1.5,
+            });
+
+            ctx.beginPath();
+            ctx.arc(pos.x+rad, pos.y+rad, rad, -0.25*Math.PI + this._openOffset, 0.75*Math.PI - this._openOffset);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(pos.x+rad, pos.y+rad, rad, -0.25*Math.PI - this._openOffset, 0.75*Math.PI + this._openOffset, true);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        ctx.beginPath();
+        ctx.arc(pos.x+rad,pos.y+rad,rad,0,2*Math.PI);
+        var gradient = ctx.createRadialGradient(pos.x + rad, pos.y + rad, 0.67 * rad, pos.x + rad, pos.y + rad, rad);
+        gradient.addColorStop(0,"rgba(0, 0, 0, 0.0)");
+        gradient.addColorStop(1,"rgba(0, 0, 0, 0.4)");
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        setStrokeStyle(ctx, this.stroke);
         if(this.stroke) ctx.stroke();
     }
 
@@ -63,11 +79,14 @@ class LambdaHoleExpr extends MissingExpression {
         if (!this.isOpen) {
             if (this.stage) {
                 if (this._runningAnim) this._runningAnim.cancel();
-                this._runningAnim = Animate.play(this.openingAnimation, this, () => {
-                    this.image = this.openImage;
-                    if (this.stage) this.stage.draw();
+                this._runningAnim = Animate.tween(this, { _openOffset: Math.PI / 2 }, 300).after(() => {
+                    this._openOffset = Math.PI / 2;
+                    this._runningAnim = null;
                 });
-            } else this.image = this.openImage;
+            }
+            else {
+                this._openOffset = Math.PI / 2;
+            }
             this.isOpen = true;
         }
     }
@@ -75,11 +94,14 @@ class LambdaHoleExpr extends MissingExpression {
         if (this.isOpen) {
             if (this.stage) {
                 if (this._runningAnim) this._runningAnim.cancel();
-                this._runningAnim = Animate.play(this.closingAnimation, this, () => {
-                    this.image = this.closedImage;
-                    if (this.stage) this.stage.draw();
+                this._runningAnim = Animate.tween(this, { _openOffset: 0 }, 300).after(() => {
+                    this._openOffset = 0;
+                    this._runningAnim = null;
                 });
-            } else this.image = this.closedImage;
+            }
+            else {
+                this._openOffset = 0;
+            }
             this.isOpen = false;
         }
     }
@@ -96,24 +118,14 @@ class LambdaHoleExpr extends MissingExpression {
             return false;
         }
 
-        var parent = this.parent;
-        var subvarexprs = mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [parent]);
-        subvarexprs.forEach((expr) => {
-            if (expr.name === this.name) {
-                let c = node.clone();
-                //c.bindSubexpressions();
-                c.stage = null;
-                expr.parent.swap(expr, c); // Swap the expression for a clone of the dropped node.
-                c.parent.bindSubexpressions();
+        let vars = mag.Stage.getNodesWithClass(VarExpr, [], true, [node]);
+        for (let variable of vars) {
+            // If the variable can't be reduced, don't allow this to be reduced.
+            if (variable.reduce() === variable) return null;
+        }
 
-                // TODO: Move this somewhere more stable.
-                // Top-level if statements should unlock
-                // reducable boolean expressions.
-                if (c.parent instanceof IfStatement && c.parent.cond instanceof CompareExpr) {
-                    c.parent.cond.unlock();
-                }
-            }
-        });
+        var parent = this.parent;
+        parent.getEnvironment().update(this.name, node);
 
         // Now remove this hole from its parent expression.
         parent.removeArg(this);
@@ -131,8 +143,17 @@ class LambdaHoleExpr extends MissingExpression {
             this.parent.onmousedrag(pos);
         }
     }
+    onmouseenter(pos) {
+        super.onmouseenter(pos);
+    }
+
+    onmouseleave() {
+        super.onmouseleave();
+    }
     ondropenter(node, pos) {
         if (node instanceof LambdaHoleExpr) node = node.parent;
+        // Variables must be reduced before application
+        if (node instanceof VarExpr) return;
         super.ondropenter(node, pos);
 
         // Special case: Funnel representation of 'map' hovered over hole.
@@ -144,7 +165,9 @@ class LambdaHoleExpr extends MissingExpression {
         node.opacity = 0.4;
 
         if (this.parent) {
-            var subvarexprs = mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [this.parent]);
+            // Ignore variables that are shadowed when previewing
+            let subvarexprs = findNoncapturingVarExpr(this.parent, this.name);
+
             subvarexprs.forEach((e) => {
                 if (e.name === this.name) {
                     let preview_node = node.clone();
@@ -165,6 +188,7 @@ class LambdaHoleExpr extends MissingExpression {
     }
     ondropexit(node, pos) {
         if (node instanceof LambdaHoleExpr) node = node.parent;
+        if (node instanceof VarExpr) return;
 
         super.ondropexit(node, pos);
 
@@ -193,7 +217,7 @@ class LambdaHoleExpr extends MissingExpression {
             var afterDrop = () => {
                 // Cleanup
                 node.opacity = 1.0;
-                this.close_opened_subexprs();
+                if (this.close_opened_subexprs) this.close_opened_subexprs();
 
                 // User dropped an expression into the lambda hole.
                 Resource.play('pop');
@@ -217,7 +241,13 @@ class LambdaHoleExpr extends MissingExpression {
                     let orig_exp_str = this.parent.toString();
                     let dropped_exp_str = node.toString();
 
-                    this.applyExpr(node);
+                    let result = this.applyExpr(node);
+                    if (result === null) {
+                        // The application failed.
+                        stage.add(node);
+                        stage.update();
+                        return;
+                    }
 
                     // Log the reduction.
                     Logger.log('reduction-lambda', { 'before':orig_exp_str, 'applied':dropped_exp_str, 'after':parent.toString() });
@@ -318,6 +348,19 @@ class LambdaVarExpr extends ImageExpr {
         return c;
     }
 
+    hits(pos, options) {
+        if(this.holes[0].hits(pos, options)) return this;
+        else return null;
+    }
+
+    onmouseclick(pos) {
+        // TODO: DML enable reduction, but make sure we are not bound
+        // by a lambda
+        if (!this.parent) {
+            this.performReduction();
+        }
+    }
+
     open(preview_expr=null) {
         if (this.stateGraph.currentState !== 'open') {
             this.stateGraph.enter('opening');
@@ -350,6 +393,30 @@ class LambdaVarExpr extends ImageExpr {
         }
     }
 
+    reduce() {
+        let environment = this.getEnvironment();
+        let value = environment.lookup(this.name);
+
+        if (value) {
+            let clone = value.clone();
+            clone.stage = null;
+            clone.bindSubexpressions();
+            let parent = this.parent || this.stage;
+            if (parent) {
+                parent.swap(this, clone);
+                if (this.parent) {
+                    this.parent.bindSubexpressions();
+
+                    if (this.parent instanceof IfStatement && this.parent.cond instanceof CompareExpr) {
+                        this.parent.cond.unlock();
+                    }
+                }
+            }
+            return clone;
+        }
+        return this;
+    }
+
     //onmousedrag() {}
     drawInternal(ctx, pos, boundingSize) {
         super.drawInternal(ctx, pos, boundingSize);
@@ -367,10 +434,21 @@ class LambdaVarExpr extends ImageExpr {
 class LambdaExpr extends Expression {
     constructor(exprs) {
         super(exprs);
+        this.environment = new Environment();
+        if (this.takesArgument) {
+            this.environment.bound[exprs[0].name] = true;
+        }
 
         /*let txt = new TextExpr('→');
         txt.color = 'gray'
         this.addArg(txt);*/
+    }
+    getEnvironment() {
+        let env = super.getEnvironment();
+        if (!env.parent && this.stage) {
+            env.parent = this.stage.environment;
+        }
+        return env;
     }
     applyExpr(node) {
         if (this.takesArgument) {
@@ -392,7 +470,7 @@ class LambdaExpr extends Expression {
             this.updateHole();
 
             var hole = this.holes[0];
-            var lvars = mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [this]);
+            var lvars = mag.Stage.getNodesWithClass(VarExpr, [], true, [this]);
             lvars.forEach((v) => {
                 if (v.name === hole.name) {
                     v.color = hole.colorForVarName();
@@ -408,7 +486,7 @@ class LambdaExpr extends Expression {
         return this.holes.slice(1).reduce(((prev,arg) => (prev && !(arg instanceof MissingExpression))), true);
     }
     get isConstantFunction() {
-        return this.takesArgument && mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [this]).length === 0;
+        return this.takesArgument && mag.Stage.getNodesWithClass(VarExpr, [], true, [this]).length === 0;
     }
     get body() { return this.takesArgument ? this.holes[1] : null; }
     updateHole() {
@@ -416,10 +494,13 @@ class LambdaExpr extends Expression {
         if (this.holes[0].name !== 'x')
             this.color = this.holes[0].color;
         let missing = !this.fullyDefined;
-        if (missing || (this.parent && ((this.parent instanceof FuncExpr && !this.parent.isAnimating)))) // ||
+        if (missing || (this.parent && ((this.parent instanceof FuncExpr && !this.parent.isAnimating)))) { // ||
             //this.parent instanceof LambdaExpr && this.parent.takesArgument)))
-                     this.holes[0].close();
-        else         this.holes[0].open();
+            this.holes[0].close();
+        }
+        else {
+            this.holes[0].open();
+        }
     }
 
     // Close lambda holes appropriately.
@@ -437,6 +518,7 @@ class LambdaExpr extends Expression {
     onmouseclick(pos) {
         this.performReduction();
     }
+
     hitsChild(pos) {
         if (this.isParentheses) return null;
         return super.hitsChild(pos);
@@ -448,6 +530,23 @@ class LambdaExpr extends Expression {
         } else return super.reduce();
     }
     performReduction() {
+        // If we don't have all our arguments, refuse to evaluate.
+        if (this.takesArgument) {
+            return this;
+        }
+
+        // Perform substitution, but stop at the 'boundary' of another lambda.
+        let varExprs = findNoncapturingVarExpr(this, null, true);
+        let environment = this.getEnvironment();
+        for (let expr of varExprs) {
+            expr.performReduction();
+        }
+        for (let child of this.holes) {
+            if (child instanceof LambdaExpr) {
+                // TODO: need to recurse down into children, but not children of lambdas
+                child.environment.parent = this.environment;
+            }
+        }
 
         var reduced_expr = this.reduce();
         if (reduced_expr && reduced_expr != this) { // Only swap if reduction returns something > null.
@@ -500,6 +599,21 @@ class LambdaExpr extends Expression {
         else return super.reduceCompletely();
     }
 
+    drawInternal(ctx, pos, boundingSize) {
+        super.drawInternal(ctx, pos, boundingSize);
+        if (this.shadowOffset == 0 && this.parent) {
+            setStrokeStyle(ctx, {
+                color: 'gray',
+                lineWidth: 1,
+            });
+            roundRect(ctx,
+                      pos.x - 1, pos.y - 1,
+                      boundingSize.w + 1, boundingSize.h + 1,
+                      this.radius*this.absoluteScale.x, false, true, 0.5);
+            setStrokeStyle(ctx, this.stroke);
+        }
+    }
+
     toString() {
         if (this.holes.length === 1 && this.holes[0] instanceof LambdaHoleExpr)
             return '(' + super.toString() + ')';
@@ -513,10 +627,78 @@ class LambdaExpr extends Expression {
 class FadedLambdaHoleExpr extends LambdaHoleExpr {
     get openImage() { return this.name === 'x' ? 'lambda-hole-x' : 'lambda-hole-y'; }
     get closedImage() { return this.name === 'x' ? 'lambda-hole-x-closed' : 'lambda-hole-y-closed'; }
+
+    constructor(varname) {
+        super(varname);
+        this.label = new TextExpr("λ" + varname + ".");
+        this.holes.push(this.label);
+        this.label.color = "#000";
+    }
+
+    open() {
+        if (!this.isOpen) {
+            this.label.color = "#000";
+            this.label.shadow = null;
+        }
+        super.open();
+    }
+
+    close() {
+        if (this.isOpen) {
+            this.label.color = "#565656";
+            this.label.shadow = {
+                color: "#777",
+                x: 1,
+                y: 0,
+                blur: 0,
+            };
+        }
+        super.close();
+    }
+
+    drawInternal(ctx, pos, boundingSize) {
+        var rad = boundingSize.w / 2.0;
+        ctx.beginPath();
+        ctx.arc(pos.x+rad,pos.y+rad,rad,0,2*Math.PI);
+        setStrokeStyle(ctx, this.stroke);
+        if(this.stroke) ctx.stroke();
+    }
+
+    get size() {
+        let size = super.size;
+        size.w = Math.max(size.w, size.h);
+        size.h = Math.max(size.w, size.h);
+        return size;
+    }
 }
 class HalfFadedLambdaHoleExpr extends LambdaHoleExpr {
-    get openImage() { return this.name === 'x' ? 'lambda-hole-xside' : 'lambda-hole-y'; }
-    get closedImage() { return this.name === 'x' ? 'lambda-hole-xside-closed' : 'lambda-hole-y-closed'; }
+    constructor(varname) {
+        super(varname);
+        this.label = new TextExpr("λ" + varname);
+        this.holes.push(this.label);
+        this.label.color = "#FFF";
+    }
+
+    open() {
+        if (!this.isOpen) {
+            this.label.color = "#FFF";
+        }
+        super.open();
+    }
+
+    close() {
+        if (this.isOpen) {
+            this.label.color = "#565656";
+        }
+        super.close();
+    }
+
+    get size() {
+        let size = super.size;
+        size.w = Math.max(size.w, size.h);
+        size.h = Math.max(size.w, size.h);
+        return size;
+    }
 }
 class FadedPythonLambdaHoleExpr extends LambdaHoleExpr {
     get openImage() { return this.name === 'x' ? 'lambda-hole-x-python' : 'lambda-hole-y'; }
@@ -537,7 +719,17 @@ class FadedPythonLambdaHoleExpr extends LambdaHoleExpr {
         }
     }
 }
-class FadedES6LambdaHoleExpr extends FadedPythonLambdaHoleExpr {
+class FadedES6LambdaHoleExpr extends LambdaHoleExpr {
+    constructor(varname) {
+        super(varname);
+        this.label = new TextExpr("(" + varname + ")");
+        this.arrow = new TextExpr("=>");
+        this.holes.push(this.label);
+        this.holes.push(this.arrow);
+        this.label.color = "#000";
+        this.arrow.color = "#000";
+    }
+
     get openImage() { return this.name === 'x' ? 'lambda-hole-x-es6' : 'lambda-hole-y'; }
     get closedImage() { return this.name === 'x' ? 'lambda-hole-x-closed-es6' : 'lambda-hole-y-closed'; }
 
@@ -546,19 +738,8 @@ class FadedES6LambdaHoleExpr extends FadedPythonLambdaHoleExpr {
         if (this.ignoreEvents) return null; // All children are ignored as well.
         else if (!this.isOpen) return null;
 
-        if (typeof options !== 'undefined' && options.hasOwnProperty('exclude')) {
-            for(let e of options.exclude) {
-                if (e == this) return null;
-            }
-        }
-
-        var hitChild = this.hitsChild(pos, options);
-        if (hitChild) return hitChild;
-
-        // Hasn't hit any children, so test if the point lies on this node.
-        var boundingSize = this.absoluteSize;
-        boundingSize.w /= 2.0;
-        var upperLeftPos = this.upperLeftPos(this.absolutePos, boundingSize);
+        var boundingSize = this.label.absoluteSize;
+        var upperLeftPos = this.label.upperLeftPos(this.absolutePos, boundingSize);
         if (pointInRect(pos, rectFromPosAndSize(upperLeftPos, boundingSize) )) return this;
         else return null;
     }
@@ -567,9 +748,8 @@ class FadedES6LambdaHoleExpr extends FadedPythonLambdaHoleExpr {
     drawInternal(ctx, pos, boundingSize) {
         setStrokeStyle(ctx, this.stroke);
         ctx.fillStyle = this.color;
-        ctx.drawImage(Resource.getImage(this.image), pos.x, pos.y, boundingSize.w, boundingSize.h);
-        if(this.stroke) {
-            roundRect(ctx, pos.x, pos.y, boundingSize.w / 2.0, boundingSize.h, 6, false, true, this.stroke.opacity);
+        if (this.stroke) {
+            roundRect(ctx, pos.x, pos.y, this.arrow.absolutePos.x - pos.x, boundingSize.h, 6, false, true, this.stroke.opacity);
         }
     }
 }
@@ -618,4 +798,29 @@ class FadedLambdaVarExpr extends LambdaVarExpr {
             }
         }
     }
+}
+
+
+function findNoncapturingVarExpr(lambda, name, skipLambda=false) {
+    let subvarexprs = [];
+    let queue = [lambda];
+    while (queue.length > 0) {
+        let node = queue.pop();
+        if (node instanceof VarExpr || node instanceof LambdaVarExpr) {
+            subvarexprs.push(node);
+        }
+        else if (node !== lambda &&
+                 node instanceof LambdaExpr &&
+                 ((node.takesArgument &&
+                   node.holes[0].name === name) || skipLambda)) {
+            // Capture-avoiding substitution
+            continue;
+        }
+
+        if (node.children) {
+            queue = queue.concat(node.children);
+        }
+    }
+
+    return subvarexprs;
 }

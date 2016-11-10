@@ -31,6 +31,7 @@ class Toolbox extends mag.ImageRect {
         if (idx > -1) {
             this.items.splice(idx, 1);
             this.setLayout(animated); // rearrange remaining items
+            e.scale = { x: 1, y: 1 };
         }
     }
 
