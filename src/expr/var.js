@@ -219,6 +219,20 @@ class ChestVarExpr extends VarExpr {
     }
 }
 
+class JumpingChestVarExpr extends ChestVarExpr {
+    performReduction(animated=true) {
+        if (!animated || !this.stage) {
+            return super.performReduction(animated);
+        }
+        let chest = this.stage.environmentDisplay.getBinding(this.name);
+        if (!chest) {
+            return super.performReduction(animated);
+        }
+
+        console.log(chest);
+    }
+}
+
 class LabeledChestVarExpr extends ChestVarExpr {
     constructor(name) {
         super(name);

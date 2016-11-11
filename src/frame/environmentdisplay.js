@@ -73,6 +73,10 @@ class EnvironmentDisplay extends mag.Rect {
         return null;
     }
 
+    getBinding(name) {
+        return this.bindings[name];
+    }
+
     clear() {
         if (!this.stage) return;
         for (let child of this.contents) {
@@ -82,28 +86,6 @@ class EnvironmentDisplay extends mag.Rect {
         this.contents = [];
         this.env = null;
         this.highlighted = null;
-    }
-
-    highlightName(name) {
-        let next = false;
-        for (let expr of this.contents) {
-            if (expr instanceof TextExpr && expr.text === name + "=") {
-                this.highlighted = expr;
-                expr.color = 'green';
-                next = true;
-            }
-            else if (next) {
-                expr.onmouseenter();
-                break;
-            }
-        }
-    }
-
-    clearHighlight() {
-        if (this.highlighted) {
-            this.highlighted.color = 'white';
-            this.highlighted = null;
-        }
     }
 
     // Disable highlighting on hover

@@ -56,7 +56,7 @@ var Level = function () {
             var screenOffsetX = usableWidth * (1 - 1 / 1.4) / 2.0;
             var screen = {
                 height: canvas_screen.h / 1.4 - 90,
-                width: usableWidth - screenOffsetX,
+                width: usableWidth - 2 * screenOffsetX,
                 y: canvas_screen.h * (1 - 1 / 1.4) / 2.0,
                 x: screenOffsetX
             };

@@ -94,6 +94,11 @@ var EnvironmentDisplay = function (_mag$Rect) {
             return null;
         }
     }, {
+        key: "getBinding",
+        value: function getBinding(name) {
+            return this.bindings[name];
+        }
+    }, {
         key: "clear",
         value: function clear() {
             if (!this.stage) return;
@@ -126,50 +131,6 @@ var EnvironmentDisplay = function (_mag$Rect) {
             this.contents = [];
             this.env = null;
             this.highlighted = null;
-        }
-    }, {
-        key: "highlightName",
-        value: function highlightName(name) {
-            var next = false;
-            var _iteratorNormalCompletion2 = true;
-            var _didIteratorError2 = false;
-            var _iteratorError2 = undefined;
-
-            try {
-                for (var _iterator2 = this.contents[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    var expr = _step2.value;
-
-                    if (expr instanceof TextExpr && expr.text === name + "=") {
-                        this.highlighted = expr;
-                        expr.color = 'green';
-                        next = true;
-                    } else if (next) {
-                        expr.onmouseenter();
-                        break;
-                    }
-                }
-            } catch (err) {
-                _didIteratorError2 = true;
-                _iteratorError2 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                        _iterator2.return();
-                    }
-                } finally {
-                    if (_didIteratorError2) {
-                        throw _iteratorError2;
-                    }
-                }
-            }
-        }
-    }, {
-        key: "clearHighlight",
-        value: function clearHighlight() {
-            if (this.highlighted) {
-                this.highlighted.color = 'white';
-                this.highlighted = null;
-            }
         }
 
         // Disable highlighting on hover
