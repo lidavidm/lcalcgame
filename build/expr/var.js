@@ -49,6 +49,23 @@ var _ChestImages = function () {
 
 var ChestImages = new _ChestImages();
 
+// parabolic lerp for y - makes it "arc" towards the final position
+var arcLerp = function arcLerp(y0, y1) {
+    var arc = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 120;
+
+    var b = 4 * (Math.min(y0, y1) - arc) - y1 - 3 * y0;
+    var c = y0;
+    var a = y1 - b - c;
+    var lerp = function lerp(src, tgt, elapsed, chain) {
+        if (chain.length == 2 && chain[0] == "pos" && chain[1] == "y") {
+            return a * elapsed * elapsed + b * elapsed + c;
+        } else {
+            return (1.0 - elapsed) * src + elapsed * tgt;
+        }
+    };
+    return lerp;
+};
+
 /// Variable nodes - separate from lambda variable expressions, for
 /// now.
 
@@ -207,13 +224,13 @@ var ChestVarExpr = function (_VarExpr2) {
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
-            if (this._opened) return;
+            if (this._opened) return null;
             var value = this.reduce();
             if (value != this) {
                 if (!animated) {
                     var parent = this.parent ? this.parent : this.stage;
                     parent.swap(this, value);
-                    return;
+                    return null;
                 }
                 return this.animateReduction(value, true);
             } else if (animated) {
@@ -228,6 +245,7 @@ var ChestVarExpr = function (_VarExpr2) {
                 });
                 return null;
             }
+            return null;
         }
     }, {
         key: "animateReduction",
@@ -321,7 +339,17 @@ var JumpingChestVarExpr = function (_ChestVarExpr) {
                 return _get(JumpingChestVarExpr.prototype.__proto__ || Object.getPrototypeOf(JumpingChestVarExpr.prototype), "performReduction", this).call(this, animated);
             }
 
-            console.log(chest);
+            var value = chest.holes[0].clone();
+            value.pos = chest.holes[0].absolutePos;
+            this.stage.add(value);
+
+            var target = {
+                pos: this.absolutePos
+            };
+            var lerp = arcLerp(value.absolutePos.y, this.absolutePos.y);
+            Animate.tween(value, target, 500, function (x) {
+                return x;
+            }, true, lerp).after(function () {});
         }
     }]);
 
@@ -378,6 +406,7 @@ var DisplayChest = function (_Expression2) {
 
         var _this8 = _possibleConstructorReturn(this, (DisplayChest.__proto__ || Object.getPrototypeOf(DisplayChest)).call(this, []));
 
+        _this8.name = name;
         _this8._opened = true;
         _this8.holes.push(expr);
         expr.ignoreEvents = true;
@@ -605,17 +634,7 @@ var AssignExpr = function (_Expression4) {
                     var environment = _this13.getEnvironment();
 
                     // quadratic lerp for pos.y - makes it "arc" towards the variable
-                    var b = 4 * (Math.min(_this13.value.pos.y, _this13.variable.pos.y) - 120) - _this13.variable.pos.y;
-                    var c = _this13.value.pos.y;
-                    var a = _this13.variable.pos.y - b;
-                    var lerp = function lerp(src, tgt, elapsed, chain) {
-                        if (chain.length == 2 && chain[0] == "pos" && chain[1] == "y") {
-                            return a * elapsed * elapsed + b * elapsed + c;
-                        } else {
-                            return (1.0 - elapsed) * src + elapsed * tgt;
-                        }
-                    };
-
+                    var lerp = arcLerp(_this13.value.pos.y, _this13.variable.pos.y);
                     var parent = _this13.parent || _this13.stage;
                     var afterCallback = function afterCallback() {
                         _this13.getEnvironment().update(_this13.variable.name, value);

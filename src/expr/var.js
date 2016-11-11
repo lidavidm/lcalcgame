@@ -28,9 +28,9 @@ const ChestImages = new _ChestImages();
 
 // parabolic lerp for y - makes it "arc" towards the final position
 const arcLerp = (y0, y1, arc=120) => {
-    let b = 4 * (Math.min(y0, y1) - arc) - y1;
+    let b = 4 * (Math.min(y0, y1) - arc) - y1 - 3 * y0;
     let c = y0;
-    let a = y1 - b;
+    let a = y1 - b - c;
     let lerp = (src, tgt, elapsed, chain) => {
         if (chain.length == 2 && chain[0] == "pos" && chain[1] == "y") {
             return a*elapsed*elapsed + b*elapsed + c;
@@ -171,13 +171,13 @@ class ChestVarExpr extends VarExpr {
     }
 
     performReduction(animated=true) {
-        if (this._opened) return;
+        if (this._opened) return null;
         let value = this.reduce();
         if (value != this) {
             if (!animated) {
                 let parent = this.parent ? this.parent : this.stage;
                 parent.swap(this, value);
-                return;
+                return null;
             }
             return this.animateReduction(value, true);
         }
@@ -193,6 +193,7 @@ class ChestVarExpr extends VarExpr {
             });
             return null;
         }
+        return null;
     }
 
     animateReduction(value, destroy) {
