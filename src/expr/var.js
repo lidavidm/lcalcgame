@@ -10,14 +10,14 @@ class _ChestImages {
     }
 
     lidClosed(name) {
-         if (name == "x") {
+        if (name == "x") {
             return Resource.getImage("chest-wood-lid-closed");
         }
         return Resource.getImage("chest-metal-lid-closed");
     }
 
     lidOpen(name) {
-         if (name == "x") {
+        if (name == "x") {
             return Resource.getImage("chest-wood-lid-open");
         }
         return Resource.getImage("chest-metal-lid-open");
@@ -25,6 +25,22 @@ class _ChestImages {
 }
 
 const ChestImages = new _ChestImages();
+
+// parabolic lerp for y - makes it "arc" towards the final position
+const arcLerp = (y0, y1, arc=120) => {
+    let b = 4 * (Math.min(y0, y1) - arc) - y1;
+    let c = y0;
+    let a = y1 - b;
+    let lerp = (src, tgt, elapsed, chain) => {
+        if (chain.length == 2 && chain[0] == "pos" && chain[1] == "y") {
+            return a*elapsed*elapsed + b*elapsed + c;
+        }
+        else {
+            return (1.0 - elapsed) * src + elapsed * tgt;
+        }
+    };
+    return lerp;
+};
 
 /// Variable nodes - separate from lambda variable expressions, for
 /// now.
@@ -241,7 +257,17 @@ class JumpingChestVarExpr extends ChestVarExpr {
             return super.performReduction(animated);
         }
 
-        console.log(chest);
+        let value = chest.holes[0].clone();
+        value.pos = chest.holes[0].absolutePos;
+        this.stage.add(value);
+
+        let target = {
+            pos: this.absolutePos,
+        };
+        let lerp = arcLerp(value.absolutePos.y, this.absolutePos.y);
+        Animate.tween(value, target, 500, (x) => x, true, lerp).after(() => {
+
+        });
     }
 }
 
@@ -275,6 +301,7 @@ class LabeledChestVarExpr extends ChestVarExpr {
 class DisplayChest extends Expression {
     constructor(name, expr) {
         super([]);
+        this.name = name;
         this._opened = true;
         this.holes.push(expr);
         expr.ignoreEvents = true;
@@ -340,7 +367,6 @@ class LabeledDisplayChest extends DisplayChest {
             x: this.size.w / 2 - this.label.absoluteSize.w / 2,
             y: this.size.h / 2,
         };
-
     }
 
     draw(ctx) {
@@ -463,18 +489,7 @@ class AssignExpr extends Expression {
             let environment = this.getEnvironment();
 
             // quadratic lerp for pos.y - makes it "arc" towards the variable
-            let b = 4 * (Math.min(this.value.pos.y, this.variable.pos.y) - 120) - this.variable.pos.y;
-            let c = this.value.pos.y;
-            let a = this.variable.pos.y - b;
-            let lerp = (src, tgt, elapsed, chain) => {
-                if (chain.length == 2 && chain[0] == "pos" && chain[1] == "y") {
-                    return a*elapsed*elapsed + b*elapsed + c;
-                }
-                else {
-                    return (1.0 - elapsed) * src + elapsed * tgt;
-                }
-            };
-
+            let lerp = arcLerp(this.value.pos.y, this.variable.pos.y);
             let parent = this.parent || this.stage;
             let afterCallback = () => {
                 this.getEnvironment().update(this.variable.name, value);
