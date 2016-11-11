@@ -180,26 +180,31 @@ var ChestVarExpr = function (_VarExpr) {
                     stage.add(value);
                     _this3._opened = true;
 
-                    Animate.tween(value, {
-                        scale: { x: 1.0, y: 1.0 },
-                        pos: {
-                            x: _this3.absolutePos.x + 0.5 * _this3.size.w - 0.5 * value.size.w,
-                            y: _this3.absolutePos.y - value.size.h
-                        },
-                        opacity: 1.0
-                    }, 500).after(function () {
-                        window.setTimeout(function () {
-                            Animate.poof(_this3);
-                            if (_this3.parent) {
-                                stage.remove(value);
-                                _this3.parent.swap(_this3, value);
-                            } else {
-                                _this3.stage.remove(_this3);
-                            }
-                            stage.draw();
-                            stage.update();
-                        }, 200);
-                    });
+                    return {
+                        v: new Promise(function (resolve, _reject) {
+                            Animate.tween(value, {
+                                scale: { x: 1.0, y: 1.0 },
+                                pos: {
+                                    x: _this3.absolutePos.x + 0.5 * _this3.size.w - 0.5 * value.size.w,
+                                    y: _this3.absolutePos.y - value.size.h
+                                },
+                                opacity: 1.0
+                            }, 500).after(function () {
+                                window.setTimeout(function () {
+                                    Animate.poof(_this3);
+                                    if (_this3.parent) {
+                                        stage.remove(value);
+                                        _this3.parent.swap(_this3, value);
+                                    } else {
+                                        _this3.stage.remove(_this3);
+                                    }
+                                    stage.draw();
+                                    stage.update();
+                                    resolve();
+                                }, 200);
+                            });
+                        })
+                    };
                 }();
 
                 if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
@@ -426,7 +431,15 @@ var AssignExpr = function (_Expression2) {
             // multiple times as a 'canReduce', and we don't want any
             // update to happen multiple times.
             if (this.value) {
-                this.value.performReduction(false);
+                var result = this.value.performReduction(animated);
+                if (result instanceof Promise) {
+                    result.then(function () {
+                        window.setTimeout(function () {
+                            return _this8.performReduction(animated);
+                        }, 600);
+                    });
+                    return;
+                }
             }
             if (this.canReduce()) {
                 (function () {

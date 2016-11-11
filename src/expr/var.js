@@ -163,26 +163,29 @@ class ChestVarExpr extends VarExpr {
             stage.add(value);
             this._opened = true;
 
-            Animate.tween(value, {
-                scale: { x: 1.0, y: 1.0 },
-                pos: {
-                    x: this.absolutePos.x + 0.5 * this.size.w - 0.5 * value.size.w,
-                    y: this.absolutePos.y - value.size.h,
-                },
-                opacity: 1.0,
-            }, 500).after(() => {
-                window.setTimeout(() => {
-                    Animate.poof(this);
-                    if (this.parent) {
-                        stage.remove(value);
-                        this.parent.swap(this, value);
-                    }
-                    else {
-                        this.stage.remove(this);
-                    }
-                    stage.draw();
-                    stage.update();
-                }, 200);
+            return new Promise((resolve, _reject) => {
+                Animate.tween(value, {
+                    scale: { x: 1.0, y: 1.0 },
+                    pos: {
+                        x: this.absolutePos.x + 0.5 * this.size.w - 0.5 * value.size.w,
+                        y: this.absolutePos.y - value.size.h,
+                    },
+                    opacity: 1.0,
+                }, 500).after(() => {
+                    window.setTimeout(() => {
+                        Animate.poof(this);
+                        if (this.parent) {
+                            stage.remove(value);
+                            this.parent.swap(this, value);
+                        }
+                        else {
+                            this.stage.remove(this);
+                        }
+                        stage.draw();
+                        stage.update();
+                        resolve();
+                    }, 200);
+                });
             });
         }
     }
@@ -333,7 +336,13 @@ class AssignExpr extends Expression {
         // multiple times as a 'canReduce', and we don't want any
         // update to happen multiple times.
         if (this.value) {
-            this.value.performReduction(false);
+            let result = this.value.performReduction(animated);
+            if (result instanceof Promise) {
+                result.then(() => {
+                    window.setTimeout(() => this.performReduction(animated), 600);
+                });
+                return;
+            }
         }
         if (this.canReduce()) {
             let initial = [];
