@@ -38,20 +38,18 @@ class Level {
         // levels appear the same each time you play.
         Math.seed = 12045;
 
-        const showEnvironment = Object.keys(this.globals.bindings).length > 0 ||
-              mag.Stage.getNodesWithClass(VarExpr, [], true, this.exprs).length > 0;
-
         var canvas_screen = stage.boundingSize;
 
-        const envDisplayWidth = showEnvironment ? 0.25 * canvas_screen.w : 0;
+        const envDisplayWidth = 0.15 * canvas_screen.w;
 
         GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
         const usableWidth = canvas_screen.w - envDisplayWidth;
+        const screenOffsetX = usableWidth * (1 - 1/1.4) / 2.0;
         var screen = {
             height: canvas_screen.h/1.4 - 90,
-            width: usableWidth/(showEnvironment ? 1.0 : 1.4),
+            width: usableWidth - screenOffsetX,
             y: canvas_screen.h*(1-1/1.4) / 2.0,
-            x: showEnvironment ? envDisplayWidth : ((usableWidth*(1-1/1.4)) / 2.0),
+            x: screenOffsetX,
         };
         var board_packing = this.findBestPacking(this.exprs, screen);
         stage.addAll(board_packing); // add expressions to the stage
@@ -109,11 +107,9 @@ class Level {
         stage.toolbox = toolbox;
 
         // Environment
-        let yOffset = goal_node[0].absoluteSize.h + goal_node[0].absolutePos.y + 10;
-        var env = new EnvironmentDisplay(0, yOffset, 0.15 * canvas_screen.w, canvas_screen.h - TOOLBOX_HEIGHT - yOffset, stage);
-        if (showEnvironment) {
-            stage.add(env);
-        }
+        let yOffset = goal_node[0].absoluteSize.h + goal_node[0].absolutePos.y + 20;
+        var env = new EnvironmentDisplay(0.85 * canvas_screen.w, yOffset, 0.15 * canvas_screen.w, canvas_screen.h - TOOLBOX_HEIGHT - yOffset, stage);
+        stage.add(env);
         stage.environmentDisplay = env;
         if (this.globals) {
             for (let name of this.globals.names()) {

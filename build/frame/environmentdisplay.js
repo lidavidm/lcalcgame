@@ -47,6 +47,10 @@ var EnvironmentDisplay = function (_mag$Rect) {
                 e.anchor = { x: 0, y: 0.5 };
                 e.pos = pos;
                 e.scale = { x: 1, y: 1 };
+                var width = e.absoluteSize.w;
+                var outerWidth = _this2.absoluteSize.w;
+                e.pos = { x: _this2.pos.x + outerWidth / 2 - width / 2, y: e.pos.y };
+
                 if (newRow) {
                     pos = addPos(pos, { x: 0, y: e.size.h + 20 });
                     pos.x = _this2.leftEdgePos.x;
@@ -61,6 +65,8 @@ var EnvironmentDisplay = function (_mag$Rect) {
 
                 var e = env.lookup(name).clone();
                 // setup(e, this.padding, true);
+                // TODO: use fading mechanism to get the correct class
+                // here
                 var display = new DisplayChest(name, e);
                 if (_this2.bindings[name]) {
                     display = _this2.bindings[name];
@@ -177,7 +183,7 @@ var EnvironmentDisplay = function (_mag$Rect) {
     }, {
         key: "leftEdgePos",
         get: function get() {
-            return { x: this.padding + this.pos.x, y: 2 * this.padding + this.pos.y };
+            return { x: this.padding + this.pos.x, y: 3 * this.padding + this.pos.y };
         }
     }]);
 

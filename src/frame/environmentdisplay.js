@@ -12,7 +12,7 @@ class EnvironmentDisplay extends mag.Rect {
         this.toolbox = true;
     }
 
-    get leftEdgePos() { return { x:this.padding + this.pos.x, y: 2 * this.padding + this.pos.y }; }
+    get leftEdgePos() { return { x:this.padding + this.pos.x, y: 3 * this.padding + this.pos.y }; }
 
     showEnvironment(env) {
         if (!env) return;
@@ -29,6 +29,10 @@ class EnvironmentDisplay extends mag.Rect {
             e.anchor = { x:0, y:0.5 };
             e.pos = pos;
             e.scale = { x: 1, y: 1 };
+            let width = e.absoluteSize.w;
+            let outerWidth = this.absoluteSize.w;
+            e.pos = { x: this.pos.x + outerWidth / 2 - width / 2, y: e.pos.y };
+
             if (newRow) {
                 pos = addPos(pos, { x: 0, y: e.size.h + 20 } );
                 pos.x = this.leftEdgePos.x;
@@ -44,6 +48,8 @@ class EnvironmentDisplay extends mag.Rect {
 
             let e = env.lookup(name).clone();
             // setup(e, this.padding, true);
+            // TODO: use fading mechanism to get the correct class
+            // here
             let display = new DisplayChest(name, e);
             if (this.bindings[name]) {
                 display = this.bindings[name];
