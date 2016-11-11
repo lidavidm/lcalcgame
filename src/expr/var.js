@@ -151,28 +151,46 @@ class ChestVarExpr extends VarExpr {
                 parent.swap(this, value);
                 return;
             }
-            value = value.clone();
-            value.scale = { x: 0.1, y: 0.1 };
-            value.pos = {
-                x: this.absolutePos.x + 0.5 * this.size.w - 0.5 * value.absoluteSize.w,
-                y: this.absolutePos.y + 30,
-            };
-            value.opacity = 0.0;
+            return this.animateReduction(value, true);
+        }
+        else if (animated) {
+            this.animateReduction(new TextExpr("?"), false).then((wat) => {
+                this._opened = false;
+                window.setTimeout(() => {
+                    Animate.poof(wat);
+                    this.stage.remove(wat);
+                    this.stage.draw();
+                    this.stage.update();
+                }, 500);
+            });
+            return null;
+        }
+    }
 
-            let stage = this.stage;
-            stage.add(value);
-            this._opened = true;
+    animateReduction(value, destroy) {
+        value = value.clone();
+        value.scale = { x: 0.1, y: 0.1 };
+        value.pos = {
+            x: this.absolutePos.x + 0.5 * this.size.w - 0.5 * value.absoluteSize.w,
+            y: this.absolutePos.y + 30,
+        };
+        value.opacity = 0.0;
 
-            return new Promise((resolve, _reject) => {
-                Animate.tween(value, {
-                    scale: { x: 1.0, y: 1.0 },
-                    pos: {
-                        x: this.absolutePos.x + 0.5 * this.size.w - 0.5 * value.size.w,
-                        y: this.absolutePos.y - value.size.h,
-                    },
-                    opacity: 1.0,
-                }, 500).after(() => {
-                    window.setTimeout(() => {
+        let stage = this.stage;
+        stage.add(value);
+        this._opened = true;
+
+        return new Promise((resolve, _reject) => {
+            Animate.tween(value, {
+                scale: { x: 1.0, y: 1.0 },
+                pos: {
+                    x: this.absolutePos.x + 0.5 * this.size.w - 0.5 * value.size.w,
+                    y: this.absolutePos.y - value.size.h,
+                },
+                opacity: 1.0,
+            }, 500).after(() => {
+                window.setTimeout(() => {
+                    if (destroy) {
                         Animate.poof(this);
                         if (this.parent) {
                             stage.remove(value);
@@ -181,13 +199,13 @@ class ChestVarExpr extends VarExpr {
                         else {
                             this.stage.remove(this);
                         }
-                        stage.draw();
-                        stage.update();
-                        resolve();
-                    }, 200);
-                });
+                    }
+                    stage.draw();
+                    stage.update();
+                    resolve(value);
+                }, 200);
             });
-        }
+        });
     }
 
     onmouseenter() {
