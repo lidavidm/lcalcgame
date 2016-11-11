@@ -258,16 +258,27 @@ class JumpingChestVarExpr extends ChestVarExpr {
             return super.performReduction(animated);
         }
 
+        this._opened = true;
         let value = chest.holes[0].clone();
         value.pos = chest.holes[0].absolutePos;
         this.stage.add(value);
 
         let target = {
             pos: this.absolutePos,
+            scale: { x: 0.3, y: 0.3 },
         };
         let lerp = arcLerp(value.absolutePos.y, this.absolutePos.y);
-        Animate.tween(value, target, 500, (x) => x, true, lerp).after(() => {
-
+        return new Promise((resolve, _reject) => {
+            Animate.tween(value, target, 500, (x) => x, true, lerp).after(() => {
+                this.stage.remove(value);
+                this.stage.draw();
+                window.setTimeout(() => {
+                    this._opened = false;
+                    super.performReduction(true).then((value) => {
+                        resolve(value);
+                    });
+                }, 100);
+            });
         });
     }
 }
