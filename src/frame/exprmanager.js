@@ -25,7 +25,8 @@ var ExprManager = (function() {
         'pop':      [PopExpr],
         'define':   [DefineExpr],
         'var':      [LambdaVarExpr, HalfFadedLambdaVarExpr, FadedLambdaVarExpr, FadedLambdaVarExpr],
-        'reference':[JumpingChestVarExpr, ChestVarExpr, LabeledChestVarExpr],
+        'reference':[JumpingChestVarExpr, ChestVarExpr, LabeledChestVarExpr, LabeledVarExpr],
+        'reference_display':[DisplayChest, LabeledDisplayChest, LabeledDisplay],
         'hole':     [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedLambdaHoleExpr, FadedES6LambdaHoleExpr],
         'lambda':   [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr],
         'assign':   [AssignExpr],
@@ -35,7 +36,8 @@ var ExprManager = (function() {
 
     var DEFAULT_FADE_PROGRESSION = {
         'var'   : [[9, 30], 30, 42],
-        'reference': [10],
+        'reference': [4, 6, 8],
+        'reference_display': [6, 8],
         'hole'  : [[9, 30], 30, 42],
         'if'    : [26, 45],
         '_b'    : [34],

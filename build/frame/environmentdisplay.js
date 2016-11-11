@@ -67,7 +67,7 @@ var EnvironmentDisplay = function (_mag$Rect) {
                 // setup(e, this.padding, true);
                 // TODO: use fading mechanism to get the correct class
                 // here
-                var display = new DisplayChest(name, e);
+                var display = new (ExprManager.getClass('reference_display'))(name, e);
                 if (_this2.bindings[name]) {
                     display = _this2.bindings[name];
                     display.setExpr(e);

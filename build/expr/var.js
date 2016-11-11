@@ -4,14 +4,51 @@ var _get = function get(object, property, receiver) { if (object === null) objec
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var SHRINK_DURATION = 800;
 var EXPAND_DURATION = 400;
+
+var _ChestImages = function () {
+    function _ChestImages() {
+        _classCallCheck(this, _ChestImages);
+    }
+
+    _createClass(_ChestImages, [{
+        key: "base",
+        value: function base(name) {
+            if (name == "x") {
+                return Resource.getImage("chest-wood-base");
+            }
+            return Resource.getImage("chest-metal-base");
+        }
+    }, {
+        key: "lidClosed",
+        value: function lidClosed(name) {
+            if (name == "x") {
+                return Resource.getImage("chest-wood-lid-closed");
+            }
+            return Resource.getImage("chest-metal-lid-closed");
+        }
+    }, {
+        key: "lidOpen",
+        value: function lidOpen(name) {
+            if (name == "x") {
+                return Resource.getImage("chest-wood-lid-open");
+            }
+            return Resource.getImage("chest-metal-lid-open");
+        }
+    }]);
+
+    return _ChestImages;
+}();
+
+var ChestImages = new _ChestImages();
+
 /// Variable nodes - separate from lambda variable expressions, for
 /// now.
 
@@ -76,18 +113,33 @@ var VarExpr = function (_Expression) {
     return VarExpr;
 }(Expression);
 
-var ChestVarExpr = function (_VarExpr) {
-    _inherits(ChestVarExpr, _VarExpr);
+var LabeledVarExpr = function (_VarExpr) {
+    _inherits(LabeledVarExpr, _VarExpr);
+
+    function LabeledVarExpr(name) {
+        _classCallCheck(this, LabeledVarExpr);
+
+        var _this2 = _possibleConstructorReturn(this, (LabeledVarExpr.__proto__ || Object.getPrototypeOf(LabeledVarExpr)).call(this, name));
+
+        _this2.holes.push(new TextExpr(name));
+        return _this2;
+    }
+
+    return LabeledVarExpr;
+}(VarExpr);
+
+var ChestVarExpr = function (_VarExpr2) {
+    _inherits(ChestVarExpr, _VarExpr2);
 
     function ChestVarExpr(name) {
         _classCallCheck(this, ChestVarExpr);
 
         // See MissingTypedExpression#constructor
-        var _this2 = _possibleConstructorReturn(this, (ChestVarExpr.__proto__ || Object.getPrototypeOf(ChestVarExpr)).call(this, name));
+        var _this3 = _possibleConstructorReturn(this, (ChestVarExpr.__proto__ || Object.getPrototypeOf(ChestVarExpr)).call(this, name));
 
-        _this2.equivalentClasses = [ChestVarExpr];
-        _this2._preview = null;
-        return _this2;
+        _this3.equivalentClasses = [ChestVarExpr];
+        _this3._preview = null;
+        return _this3;
     }
 
     _createClass(ChestVarExpr, [{
@@ -134,11 +186,11 @@ var ChestVarExpr = function (_VarExpr) {
             var scale = this.absoluteScale;
             var adjustedSize = this.absoluteSize;
             var offset = Math.max(2, (adjustedSize.w - size.w) / 2);
-            ctx.drawImage(this._baseImage, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
+            ctx.drawImage(ChestImages.base(this.name), pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
             if (this._opened) {
-                ctx.drawImage(this._lidOpenImage, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
+                ctx.drawImage(ChestImages.lidOpen(this.name), pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
             } else {
-                ctx.drawImage(this._lidClosedImage, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
+                ctx.drawImage(ChestImages.lidClosed(this.name), pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
             }
             if (this.stroke) {
                 ctx.save();
@@ -151,7 +203,7 @@ var ChestVarExpr = function (_VarExpr) {
     }, {
         key: "performReduction",
         value: function performReduction() {
-            var _this3 = this;
+            var _this4 = this;
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
@@ -166,12 +218,12 @@ var ChestVarExpr = function (_VarExpr) {
                 return this.animateReduction(value, true);
             } else if (animated) {
                 this.animateReduction(new TextExpr("?"), false).then(function (wat) {
-                    _this3._opened = false;
+                    _this4._opened = false;
                     window.setTimeout(function () {
                         Animate.poof(wat);
-                        _this3.stage.remove(wat);
-                        _this3.stage.draw();
-                        _this3.stage.update();
+                        _this4.stage.remove(wat);
+                        _this4.stage.draw();
+                        _this4.stage.update();
                     }, 500);
                 });
                 return null;
@@ -180,7 +232,7 @@ var ChestVarExpr = function (_VarExpr) {
     }, {
         key: "animateReduction",
         value: function animateReduction(value, destroy) {
-            var _this4 = this;
+            var _this5 = this;
 
             value = value.clone();
             value.scale = { x: 0.1, y: 0.1 };
@@ -198,19 +250,19 @@ var ChestVarExpr = function (_VarExpr) {
                 Animate.tween(value, {
                     scale: { x: 1.0, y: 1.0 },
                     pos: {
-                        x: _this4.absolutePos.x + 0.5 * _this4.size.w - 0.5 * value.size.w,
-                        y: _this4.absolutePos.y - value.size.h
+                        x: _this5.absolutePos.x + 0.5 * _this5.size.w - 0.5 * value.size.w,
+                        y: _this5.absolutePos.y - value.size.h
                     },
                     opacity: 1.0
                 }, 500).after(function () {
                     window.setTimeout(function () {
                         if (destroy) {
-                            Animate.poof(_this4);
-                            if (_this4.parent) {
+                            Animate.poof(_this5);
+                            if (_this5.parent) {
                                 stage.remove(value);
-                                _this4.parent.swap(_this4, value);
+                                _this5.parent.swap(_this5, value);
                             } else {
-                                _this4.stage.remove(_this4);
+                                _this5.stage.remove(_this5);
                             }
                         }
                         stage.draw();
@@ -241,30 +293,6 @@ var ChestVarExpr = function (_VarExpr) {
         key: "size",
         get: function get() {
             return { w: this._size.w, h: this._size.h };
-        }
-    }, {
-        key: "_baseImage",
-        get: function get() {
-            if (this.name == "x") {
-                return Resource.getImage("chest-wood-base");
-            }
-            return Resource.getImage("chest-metal-base");
-        }
-    }, {
-        key: "_lidClosedImage",
-        get: function get() {
-            if (this.name == "x") {
-                return Resource.getImage("chest-wood-lid-closed");
-            }
-            return Resource.getImage("chest-metal-lid-closed");
-        }
-    }, {
-        key: "_lidOpenImage",
-        get: function get() {
-            if (this.name == "x") {
-                return Resource.getImage("chest-wood-lid-open");
-            }
-            return Resource.getImage("chest-metal-lid-open");
         }
     }]);
 
@@ -307,13 +335,13 @@ var LabeledChestVarExpr = function (_ChestVarExpr2) {
         _classCallCheck(this, LabeledChestVarExpr);
 
         // See MissingTypedExpression#constructor
-        var _this6 = _possibleConstructorReturn(this, (LabeledChestVarExpr.__proto__ || Object.getPrototypeOf(LabeledChestVarExpr)).call(this, name));
+        var _this7 = _possibleConstructorReturn(this, (LabeledChestVarExpr.__proto__ || Object.getPrototypeOf(LabeledChestVarExpr)).call(this, name));
 
-        _this6.equivalentClasses = [LabeledChestVarExpr];
-        _this6.label = new TextExpr(name);
-        _this6.label.color = 'white';
-        _this6.holes.push(_this6.label);
-        return _this6;
+        _this7.equivalentClasses = [LabeledChestVarExpr];
+        _this7.label = new TextExpr(name);
+        _this7.label.color = 'white';
+        _this7.holes.push(_this7.label);
+        return _this7;
     }
 
     _createClass(LabeledChestVarExpr, [{
@@ -339,21 +367,24 @@ var LabeledChestVarExpr = function (_ChestVarExpr2) {
     return LabeledChestVarExpr;
 }(ChestVarExpr);
 
-var DisplayChest = function (_ChestVarExpr3) {
-    _inherits(DisplayChest, _ChestVarExpr3);
+// Display variants need to not be subclasses to not confuse the fader
+
+
+var DisplayChest = function (_Expression2) {
+    _inherits(DisplayChest, _Expression2);
 
     function DisplayChest(name, expr) {
         _classCallCheck(this, DisplayChest);
 
-        var _this7 = _possibleConstructorReturn(this, (DisplayChest.__proto__ || Object.getPrototypeOf(DisplayChest)).call(this, name));
+        var _this8 = _possibleConstructorReturn(this, (DisplayChest.__proto__ || Object.getPrototypeOf(DisplayChest)).call(this, []));
 
-        _this7._opened = true;
-        _this7.holes.push(expr);
+        _this8._opened = true;
+        _this8.holes.push(expr);
         expr.ignoreEvents = true;
         expr.scale = { x: 0.6, y: 0.6 };
         expr.anchor = { x: -0.1, y: 0.5 };
-        _this7.childPos = { x: 10, y: 5 };
-        return _this7;
+        _this8.childPos = { x: 10, y: 5 };
+        return _this8;
     }
 
     _createClass(DisplayChest, [{
@@ -370,7 +401,7 @@ var DisplayChest = function (_ChestVarExpr3) {
     }, {
         key: "prepareAssign",
         value: function prepareAssign() {
-            var _this8 = this;
+            var _this9 = this;
 
             var target = {
                 childPos: {
@@ -379,7 +410,7 @@ var DisplayChest = function (_ChestVarExpr3) {
                 }
             };
             return Animate.tween(this, target, 600).after(function () {
-                _this8.childPos = { x: 10, y: 5 };
+                _this9.childPos = { x: 10, y: 5 };
             });
         }
     }, {
@@ -389,7 +420,7 @@ var DisplayChest = function (_ChestVarExpr3) {
             var scale = this.absoluteScale;
             var adjustedSize = this.absoluteSize;
             var offsetX = (adjustedSize.w - size.w) / 2;
-            ctx.drawImage(this._lidOpenImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
+            ctx.drawImage(ChestImages.lidOpen(this.name), pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
             this.holes[0].pos = {
                 x: this.childPos.x,
                 y: this.childPos.y
@@ -402,42 +433,112 @@ var DisplayChest = function (_ChestVarExpr3) {
             var scale = this.absoluteScale;
             var adjustedSize = this.absoluteSize;
             var offsetX = (adjustedSize.w - size.w) / 2;
-            ctx.drawImage(this._baseImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
-        }
-    }, {
-        key: "size",
-        get: function get() {
-            return this._superSize;
+            ctx.drawImage(ChestImages.base(this.name), pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
         }
     }]);
 
     return DisplayChest;
-}(ChestVarExpr);
+}(Expression);
 
-var AssignExpr = function (_Expression2) {
-    _inherits(AssignExpr, _Expression2);
+var LabeledDisplayChest = function (_DisplayChest) {
+    _inherits(LabeledDisplayChest, _DisplayChest);
+
+    function LabeledDisplayChest(name, expr) {
+        _classCallCheck(this, LabeledDisplayChest);
+
+        var _this10 = _possibleConstructorReturn(this, (LabeledDisplayChest.__proto__ || Object.getPrototypeOf(LabeledDisplayChest)).call(this, name, expr));
+
+        _this10.childPos = { x: 22.5, y: 5 };
+        _this10.label = new TextExpr(name);
+        _this10.label.color = 'white';
+        _this10.holes.push(_this10.label);
+        return _this10;
+    }
+
+    _createClass(LabeledDisplayChest, [{
+        key: "drawInternal",
+        value: function drawInternal(ctx, pos, boundingSize) {
+            _get(LabeledDisplayChest.prototype.__proto__ || Object.getPrototypeOf(LabeledDisplayChest.prototype), "drawInternal", this).call(this, ctx, pos, boundingSize);
+            this.label.pos = {
+                x: this.size.w / 2 - this.label.absoluteSize.w / 2,
+                y: this.size.h / 2
+            };
+        }
+    }, {
+        key: "draw",
+        value: function draw(ctx) {
+            if (!ctx) return;
+            ctx.save();
+            if (this.opacity !== undefined && this.opacity < 1.0) {
+                ctx.globalAlpha = this.opacity;
+            }
+            var boundingSize = this.absoluteSize;
+            var upperLeftPos = this.upperLeftPos(this.absolutePos, boundingSize);
+            this.drawInternal(ctx, upperLeftPos, boundingSize);
+            this.holes[0].parent = this;
+            this.holes[0].draw(ctx);
+            this.drawInternalAfterChildren(ctx, upperLeftPos, boundingSize);
+            this.label.parent = this;
+            this.label.draw(ctx);
+            ctx.restore();
+        }
+    }]);
+
+    return LabeledDisplayChest;
+}(DisplayChest);
+
+var LabeledDisplay = function (_Expression3) {
+    _inherits(LabeledDisplay, _Expression3);
+
+    function LabeledDisplay(name, expr) {
+        _classCallCheck(this, LabeledDisplay);
+
+        var _this11 = _possibleConstructorReturn(this, (LabeledDisplay.__proto__ || Object.getPrototypeOf(LabeledDisplay)).call(this, []));
+
+        _this11.nameLabel = new TextExpr(name);
+        _this11.nameLabel.color = 'white';
+        _this11.equals = new TextExpr("=");
+        _this11.equals.color = 'white';
+        _this11.value = expr;
+        _this11.value.ignoreEvents = true;
+        _this11.holes.push(_this11.nameLabel);
+        _this11.holes.push(_this11.equals);
+        _this11.holes.push(_this11.value);
+        return _this11;
+    }
+
+    _createClass(LabeledDisplay, [{
+        key: "drawInternal",
+        value: function drawInternal(ctx, pos, boundingSize) {}
+    }]);
+
+    return LabeledDisplay;
+}(Expression);
+
+var AssignExpr = function (_Expression4) {
+    _inherits(AssignExpr, _Expression4);
 
     function AssignExpr(variable, value) {
         _classCallCheck(this, AssignExpr);
 
-        var _this9 = _possibleConstructorReturn(this, (AssignExpr.__proto__ || Object.getPrototypeOf(AssignExpr)).call(this, []));
+        var _this12 = _possibleConstructorReturn(this, (AssignExpr.__proto__ || Object.getPrototypeOf(AssignExpr)).call(this, []));
 
         if (variable && !(variable instanceof MissingExpression)) {
-            _this9.holes.push(variable);
+            _this12.holes.push(variable);
         } else {
             var missing = new MissingTypedExpression(new VarExpr("_"));
             missing.acceptedClasses = [VarExpr];
-            _this9.holes.push(missing);
+            _this12.holes.push(missing);
         }
 
-        _this9.holes.push(new TextExpr("←"));
+        _this12.holes.push(new TextExpr("←"));
 
         if (value) {
-            _this9.holes.push(value);
+            _this12.holes.push(value);
         } else {
-            _this9.holes.push(new MissingExpression());
+            _this12.holes.push(new MissingExpression());
         }
-        return _this9;
+        return _this12;
     }
 
     _createClass(AssignExpr, [{
@@ -462,7 +563,7 @@ var AssignExpr = function (_Expression2) {
     }, {
         key: "performReduction",
         value: function performReduction() {
-            var _this10 = this;
+            var _this13 = this;
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
@@ -474,7 +575,7 @@ var AssignExpr = function (_Expression2) {
                 if (result instanceof Promise) {
                     result.then(function () {
                         window.setTimeout(function () {
-                            return _this10.performReduction(animated);
+                            return _this13.performReduction(animated);
                         }, 600);
                     });
                     return;
@@ -483,30 +584,30 @@ var AssignExpr = function (_Expression2) {
             if (this.canReduce()) {
                 (function () {
                     var initial = [];
-                    if (_this10.parent) {
-                        initial.push(_this10.parent);
+                    if (_this13.parent) {
+                        initial.push(_this13.parent);
                     } else {
-                        initial = initial.concat(_this10.stage.nodes);
+                        initial = initial.concat(_this13.stage.nodes);
                     }
 
                     // Prevent background on GraphicValueExpr from being drawn
-                    _this10.value.ignoreEvents = true;
+                    _this13.value.ignoreEvents = true;
                     // Keep a copy of the original value before we start
                     // messing with it, to update the environment afterwards
-                    var value = _this10.value.clone();
+                    var value = _this13.value.clone();
 
-                    _this10.variable._opened = true;
+                    _this13.variable._opened = true;
                     var target = {
                         scale: { x: 0.3, y: 0.3 },
-                        pos: { x: _this10.variable.pos.x, y: _this10.variable.pos.y }
+                        pos: { x: _this13.variable.pos.x, y: _this13.variable.pos.y }
                     };
 
-                    var environment = _this10.getEnvironment();
+                    var environment = _this13.getEnvironment();
 
                     // quadratic lerp for pos.y - makes it "arc" towards the variable
-                    var b = 4 * (Math.min(_this10.value.pos.y, _this10.variable.pos.y) - 120) - _this10.variable.pos.y;
-                    var c = _this10.value.pos.y;
-                    var a = _this10.variable.pos.y - b;
+                    var b = 4 * (Math.min(_this13.value.pos.y, _this13.variable.pos.y) - 120) - _this13.variable.pos.y;
+                    var c = _this13.value.pos.y;
+                    var a = _this13.variable.pos.y - b;
                     var lerp = function lerp(src, tgt, elapsed, chain) {
                         if (chain.length == 2 && chain[0] == "pos" && chain[1] == "y") {
                             return a * elapsed * elapsed + b * elapsed + c;
@@ -515,16 +616,16 @@ var AssignExpr = function (_Expression2) {
                         }
                     };
 
-                    var parent = _this10.parent || _this10.stage;
+                    var parent = _this13.parent || _this13.stage;
                     var afterCallback = function afterCallback() {
-                        _this10.getEnvironment().update(_this10.variable.name, value);
-                        _this10.stage.environmentDisplay.showGlobals();
-                        _this10.stage.draw();
+                        _this13.getEnvironment().update(_this13.variable.name, value);
+                        _this13.stage.environmentDisplay.showGlobals();
+                        _this13.stage.draw();
                     };
 
                     var callback = null;
-                    if (environment == _this10.stage.environment && _this10.stage.environmentDisplay) {
-                        callback = _this10.stage.environmentDisplay.prepareAssign(_this10.variable.name);
+                    if (environment == _this13.stage.environment && _this13.stage.environmentDisplay) {
+                        callback = _this13.stage.environmentDisplay.prepareAssign(_this13.variable.name);
                     }
                     if (callback) {
                         callback.after(afterCallback);
@@ -532,11 +633,11 @@ var AssignExpr = function (_Expression2) {
                         window.setTimeout(afterCallback, 500);
                     }
 
-                    Animate.tween(_this10.value, target, 500, function (x) {
+                    Animate.tween(_this13.value, target, 500, function (x) {
                         return x;
                     }, true, lerp).after(function () {
-                        Animate.poof(_this10);
-                        parent.swap(_this10, null);
+                        Animate.poof(_this13);
+                        parent.swap(_this13, null);
                     });
                 })();
             }
@@ -578,10 +679,10 @@ var ExpressionView = function (_MissingExpression) {
     function ExpressionView(expr_to_miss) {
         _classCallCheck(this, ExpressionView);
 
-        var _this11 = _possibleConstructorReturn(this, (ExpressionView.__proto__ || Object.getPrototypeOf(ExpressionView)).call(this, expr_to_miss));
+        var _this14 = _possibleConstructorReturn(this, (ExpressionView.__proto__ || Object.getPrototypeOf(ExpressionView)).call(this, expr_to_miss));
 
-        _this11._openOffset = 0;
-        return _this11;
+        _this14._openOffset = 0;
+        return _this14;
     }
 
     // Disable interactivity

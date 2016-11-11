@@ -1,5 +1,31 @@
 const SHRINK_DURATION = 800;
 const EXPAND_DURATION = 400;
+
+class _ChestImages {
+    base(name) {
+        if (name == "x") {
+            return Resource.getImage("chest-wood-base");
+        }
+        return Resource.getImage("chest-metal-base");
+    }
+
+    lidClosed(name) {
+         if (name == "x") {
+            return Resource.getImage("chest-wood-lid-closed");
+        }
+        return Resource.getImage("chest-metal-lid-closed");
+    }
+
+    lidOpen(name) {
+         if (name == "x") {
+            return Resource.getImage("chest-wood-lid-open");
+        }
+        return Resource.getImage("chest-metal-lid-open");
+    }
+}
+
+const ChestImages = new _ChestImages();
+
 /// Variable nodes - separate from lambda variable expressions, for
 /// now.
 class VarExpr extends Expression {
@@ -47,6 +73,13 @@ class VarExpr extends Expression {
     }
 }
 
+class LabeledVarExpr extends VarExpr {
+    constructor(name) {
+        super(name);
+        this.holes.push(new TextExpr(name));
+    }
+}
+
 class ChestVarExpr extends VarExpr {
     constructor(name) {
         super(name);
@@ -61,27 +94,6 @@ class ChestVarExpr extends VarExpr {
 
     get size() {
         return { w:this._size.w, h:this._size.h };
-    }
-
-    get _baseImage() {
-        if (this.name == "x") {
-            return Resource.getImage("chest-wood-base");
-        }
-        return Resource.getImage("chest-metal-base");
-    }
-
-    get _lidClosedImage() {
-         if (this.name == "x") {
-            return Resource.getImage("chest-wood-lid-closed");
-        }
-        return Resource.getImage("chest-metal-lid-closed");
-    }
-
-    get _lidOpenImage() {
-         if (this.name == "x") {
-            return Resource.getImage("chest-wood-lid-open");
-        }
-        return Resource.getImage("chest-metal-lid-open");
     }
 
     open(preview, animate=true) {
@@ -126,12 +138,12 @@ class ChestVarExpr extends VarExpr {
         let scale = this.absoluteScale;
         let adjustedSize = this.absoluteSize;
         let offset = Math.max(2, (adjustedSize.w - size.w) / 2);
-        ctx.drawImage(this._baseImage, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
+        ctx.drawImage(ChestImages.base(this.name), pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
         if (this._opened) {
-            ctx.drawImage(this._lidOpenImage, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
+            ctx.drawImage(ChestImages.lidOpen(this.name), pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
         }
         else {
-            ctx.drawImage(this._lidClosedImage, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
+            ctx.drawImage(ChestImages.lidClosed(this.name), pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
         }
         if (this.stroke) {
             ctx.save();
@@ -259,19 +271,16 @@ class LabeledChestVarExpr extends ChestVarExpr {
     }
 }
 
-class DisplayChest extends ChestVarExpr {
+// Display variants need to not be subclasses to not confuse the fader
+class DisplayChest extends Expression {
     constructor(name, expr) {
-        super(name);
+        super([]);
         this._opened = true;
         this.holes.push(expr);
         expr.ignoreEvents = true;
         expr.scale = { x: 0.6, y: 0.6 };
         expr.anchor = { x: -0.1, y: 0.5 };
         this.childPos = { x: 10, y: 5 };
-    }
-
-    get size() {
-        return this._superSize;
     }
 
     setExpr(expr) {
@@ -300,7 +309,7 @@ class DisplayChest extends ChestVarExpr {
         let scale = this.absoluteScale;
         let adjustedSize = this.absoluteSize;
         let offsetX = (adjustedSize.w - size.w) / 2;
-        ctx.drawImage(this._lidOpenImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
+        ctx.drawImage(ChestImages.lidOpen(this.name), pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
         this.holes[0].pos = {
             x: this.childPos.x,
             y: this.childPos.y,
@@ -312,7 +321,61 @@ class DisplayChest extends ChestVarExpr {
         let scale = this.absoluteScale;
         let adjustedSize = this.absoluteSize;
         let offsetX = (adjustedSize.w - size.w) / 2;
-        ctx.drawImage(this._baseImage, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
+        ctx.drawImage(ChestImages.base(this.name), pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
+    }
+}
+
+class LabeledDisplayChest extends DisplayChest {
+    constructor(name, expr) {
+        super(name, expr);
+        this.childPos = { x: 22.5, y: 5 };
+        this.label = new TextExpr(name);
+        this.label.color = 'white';
+        this.holes.push(this.label);
+    }
+
+    drawInternal(ctx, pos, boundingSize) {
+        super.drawInternal(ctx, pos, boundingSize);
+        this.label.pos = {
+            x: this.size.w / 2 - this.label.absoluteSize.w / 2,
+            y: this.size.h / 2,
+        };
+
+    }
+
+    draw(ctx) {
+        if (!ctx) return;
+        ctx.save();
+        if (this.opacity !== undefined && this.opacity < 1.0) {
+            ctx.globalAlpha = this.opacity;
+        }
+        var boundingSize = this.absoluteSize;
+        var upperLeftPos = this.upperLeftPos(this.absolutePos, boundingSize);
+        this.drawInternal(ctx, upperLeftPos, boundingSize);
+        this.holes[0].parent = this;
+        this.holes[0].draw(ctx);
+        this.drawInternalAfterChildren(ctx, upperLeftPos, boundingSize);
+        this.label.parent = this;
+        this.label.draw(ctx);
+        ctx.restore();
+    }
+}
+
+class LabeledDisplay extends Expression {
+    constructor(name, expr) {
+        super([]);
+        this.nameLabel = new TextExpr(name);
+        this.nameLabel.color = 'white';
+        this.equals = new TextExpr("=");
+        this.equals.color = 'white';
+        this.value = expr;
+        this.value.ignoreEvents = true;
+        this.holes.push(this.nameLabel);
+        this.holes.push(this.equals);
+        this.holes.push(this.value);
+    }
+
+    drawInternal(ctx, pos, boundingSize) {
     }
 }
 

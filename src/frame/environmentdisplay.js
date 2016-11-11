@@ -50,7 +50,7 @@ class EnvironmentDisplay extends mag.Rect {
             // setup(e, this.padding, true);
             // TODO: use fading mechanism to get the correct class
             // here
-            let display = new DisplayChest(name, e);
+            let display = new (ExprManager.getClass('reference_display'))(name, e);
             if (this.bindings[name]) {
                 display = this.bindings[name];
                 display.setExpr(e);
