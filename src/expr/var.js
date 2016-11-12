@@ -464,66 +464,87 @@ class AssignExpr extends Expression {
         }
     }
 
-    performReduction(animated=true) {
-        // The side-effect actually happens here. reduce() is called
-        // multiple times as a 'canReduce', and we don't want any
-        // update to happen multiple times.
-        if (this.value) {
-            let result = this.value.performReduction(animated);
-            if (result instanceof Promise) {
-                result.then(() => {
-                    window.setTimeout(() => this.performReduction(animated), 600);
-                });
-                return;
-            }
-        }
-        if (this.canReduce()) {
-            let initial = [];
-            if (this.parent) {
-                initial.push(this.parent);
-            }
-            else {
-                initial = initial.concat(this.stage.nodes);
-            }
-
-            // Prevent background on GraphicValueExpr from being drawn
-            this.value.ignoreEvents = true;
-            // Keep a copy of the original value before we start
-            // messing with it, to update the environment afterwards
-            let value = this.value.clone();
-
-            this.variable._opened = true;
+    animateJump() {
+        return new Promise((resolve, reject) => {
             let target = {
                 scale: { x: 0.3, y: 0.3 },
                 pos: { x: this.variable.pos.x, y: this.variable.pos.y },
             };
 
-            let environment = this.getEnvironment();
 
             // quadratic lerp for pos.y - makes it "arc" towards the variable
             let lerp = arcLerp(this.value.pos.y, this.variable.pos.y);
             let parent = this.parent || this.stage;
-            let afterCallback = () => {
-                this.getEnvironment().update(this.variable.name, value);
-                this.stage.environmentDisplay.showGlobals();
-                this.stage.draw();
-            };
 
-            let callback = null;
-            if (environment == this.stage.environment && this.stage.environmentDisplay) {
-                callback = this.stage.environmentDisplay.prepareAssign(this.variable.name);
-            }
-            if (callback) {
-                callback.after(afterCallback);
-            }
-            else {
-                window.setTimeout(afterCallback, 500);
-            }
 
             Animate.tween(this.value, target, 500, (x) => x, true, lerp).after(() => {
                 Animate.poof(this);
                 parent.swap(this, null);
+                resolve();
             });
+        });
+    }
+
+    setupAnimation() {
+        this.variable._opened = true;
+
+        // Prevent background on GraphicValueExpr from being drawn
+        this.value.ignoreEvents = true;
+
+        // Keep a copy of the original value before we start
+        // messing with it, to update the environment afterwards
+        this._actualValue = this.value.clone();
+    }
+
+    finishReduction() {
+        this.getEnvironment().update(this.variable.name, this._actualValue);
+        this.stage.environmentDisplay.showGlobals();
+        this.stage.draw();
+    }
+
+    animateReduction() {
+        this.setupAnimation();
+
+        let environment = this.getEnvironment();
+        let callback = null;
+        if (environment == this.stage.environment && this.stage.environmentDisplay) {
+            callback = this.stage.environmentDisplay.prepareAssign(this.variable.name);
+        }
+        if (callback) {
+            callback.after(() => this.finishReduction());
+        }
+        else {
+            window.setTimeout(() => this.finishReduction(), 500);
+        }
+
+        return this.animateJump();
+    }
+
+    performReduction(animated=true) {
+        // The side-effect actually happens here. reduce() is called
+        // multiple times as a 'canReduce', and we don't want any
+        // update to happen multiple times.
+        if (!this.canReduce()) return null;
+
+        if (!animated) {
+            this.value.performReduction(false);
+            let value = this.value.clone();
+            this.getEnvironment().update(this.variable.name, value);
+            this.stage.environmentDisplay.showGlobals();
+            this.stage.draw();
+            return null;
+        }
+
+        let result = this.value.performReduction(animated);
+        if (result instanceof Promise) {
+            return result.then(() => {
+                return new Promise((resolve, _reject) => {
+                    window.setTimeout(() => this.animateReduction(), 600);
+                });
+            });
+        }
+        else {
+            return this.animateReduction();
         }
     }
 
@@ -544,61 +565,45 @@ class AssignExpr extends Expression {
     }
 }
 
-class ExpressionView extends MissingExpression {
-    constructor(expr_to_miss) {
-        super(expr_to_miss);
-        this._openOffset = 0;
+class JumpingAssignExpr extends AssignExpr {
+    constructor(variable, value) {
+        super(variable, value);
     }
 
-    // Disable interactivity
-    ondropenter() {}
-    ondropexit() {}
-    ondropped() {}
-    onmouseenter() {}
-    drawInternal(ctx, pos, boundingSize) {
-        var rad = boundingSize.w / 2.0;
-        setStrokeStyle(ctx, {
-            color: '#AAAAAA',
-            lineWidth: 3,
+    animateReduction() {
+         this.setupAnimation();
+
+        let environment = this.getEnvironment();
+        return this.animateJump().then(() => {
+            return new Promise((resolve, _reject) => {
+                let chest = this.stage.environmentDisplay.getBinding(this.variable.name);
+                if (chest && environment == this.stage.environment) {
+                    let callback = this.stage.environmentDisplay.prepareAssign(this.variable.name);
+                    callback.after(() => this.finishReduction());
+
+                    this.value.scale = { x: 0, y: 0 };
+                    let value = this.value.clone();
+                    this.stage.add(value);
+                    value.pos = this.variable.absolutePos;
+                    value.scale = { x: 0.3, y: 0.3 };
+                    let target = {
+                        pos: chest.absolutePos,
+                        scale: { x: 1, y: 1 },
+                    };
+
+                    let lerp = arcLerp(value.absolutePos.y, chest.absolutePos.y, -150);
+                    Animate.tween(value, target, 500, (x) => x, true, lerp).after(() => {
+                        this.stage.remove(value);
+                        this.stage.draw();
+                    });
+                }
+                else {
+                    Animate.poof(this);
+                    parent.swap(this, null);
+                    this.finishReduction();
+                    resolve();
+                }
+            });
         });
-        ctx.beginPath();
-        ctx.arc(pos.x+rad,pos.y+rad,rad,0,2*Math.PI);
-
-        ctx.clip();
-        let alpha = 0.5 * (((Math.PI / 2) - this._openOffset) / (Math.PI / 2));
-        ctx.shadowColor = `rgba(0,0,0,${alpha})`;
-        ctx.shadowBlur = 3;
-        ctx.shadowOffsetX = 1;
-        ctx.shadowOffsetY = 1;
-        ctx.stroke();
     }
-}
-
-function findAliasingVarExpr(initial, name, ignore) {
-    // TODO: needs to account for whether the variable we are looking
-    // for is in an outer scope. Example:
-    // x = 3
-    // def test():
-    //     global x
-    //     x = 5
-    let subvarexprs = [];
-    let queue = initial;
-    while (queue.length > 0) {
-        let node = queue.pop();
-        if (node instanceof VarExpr && node.name === name && ignore.indexOf(node) == -1) {
-            subvarexprs.push(node);
-        }
-        else if (node instanceof LambdaExpr &&
-                 (node.takesArgument &&
-                   node.holes[0].name === name)) {
-            // Capture-avoiding substitution
-            continue;
-        }
-
-        if (node.children) {
-            queue = queue.concat(node.children);
-        }
-    }
-
-    return subvarexprs;
 }
