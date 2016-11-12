@@ -15,6 +15,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * The LambdaHoleExpr performs substitution on LambdaVar subexpressions in its parent expression context.
  * -----------------------------------------------
  * */
+
 var LambdaHoleExpr = function (_MissingExpression) {
     _inherits(LambdaHoleExpr, _MissingExpression);
 
@@ -32,6 +33,16 @@ var LambdaHoleExpr = function (_MissingExpression) {
 
     _createClass(LambdaHoleExpr, [{
         key: 'colorForVarName',
+        //'IndianRed';
+
+        // return {
+        //
+        //     'x':'orange',
+        //     'y':'IndianRed',
+        //     'z':'green',
+        //     'w':'blue'
+        //
+        // }[v];
         value: function colorForVarName() {
             return LambdaHoleExpr.colorForVarName(this.name);
         }
@@ -352,16 +363,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
         key: 'colorForVarName',
         value: function colorForVarName(v) {
 
-            if (v === 'x') return 'lightgray';else return 'white'; //'IndianRed';
-
-            // return {
-            //
-            //     'x':'orange',
-            //     'y':'IndianRed',
-            //     'z':'green',
-            //     'w':'blue'
-            //
-            // }[v];
+            if (v === 'x') return 'lightgray';else return 'white';
         }
     }]);
 
@@ -649,9 +651,9 @@ var LambdaExpr = function (_Expression) {
                     // if expression was removed...
                     this.holes[0].close(); // close the hole, undoubtedly
                 } else if (node instanceof MissingExpression) {
-                    // if expression was placed...
-                    this.updateHole();
-                }
+                        // if expression was placed...
+                        this.updateHole();
+                    }
             }
         }
     }, {

@@ -139,6 +139,13 @@ function colorFrom255(val) {
 
     return 'rgb(' + Math.round(val * colorWeights[0]) + ',' + Math.round(val * colorWeights[1]) + ',' + Math.round(val * colorWeights[2]) + ')';
 }
+function colorTween(val) {
+    var colorStartWeights = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [0, 0, 0];
+    var colorEndWeights = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [1, 1, 1];
+
+    val = val * 255;
+    return 'rgb(' + Math.round(val * colorEndWeights[0] + (255 - val) * colorStartWeights[0]) + ',' + Math.round(val * colorEndWeights[1] + (255 - val) * colorStartWeights[1]) + ',' + Math.round(val * colorEndWeights[2] + (255 - val) * colorStartWeights[2]) + ')';
+}
 function computeVariance(arr) {
     if (arr.length <= 1) return 0;
     var mean = arr.reduce(function (a, b) {

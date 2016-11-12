@@ -1,6 +1,6 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -11,6 +11,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * Given a set of "expressions", a player must manipulate those expressions to
  * reach a "goal" state, with optional support from a "toolbox" of primitive expressions.
  * (*This may change in time.*) */
+
 var Level = function () {
     function Level(expressions, goal) {
         var toolbox = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
@@ -216,6 +217,11 @@ var Level = function () {
 
     }, {
         key: 'findFastPacking',
+
+        //return new Expression();
+
+
+        // Unreachable....
 
 
         // David's rather terrible packing algorithm. Used if there are a
@@ -755,9 +761,9 @@ var Level = function () {
                         var es = exprs.slice(1);es.push(args[0]);
                         return lock(constructClassInstance(op_class, es), toplevel_lock); // pass the operator name to the comparator
                     } else {
-                        //console.log(exprs);
-                        return lock(constructClassInstance(op_class, exprs.slice(1)), toplevel_lock); // (this is really generic, man)
-                    }
+                            //console.log(exprs);
+                            return lock(constructClassInstance(op_class, exprs.slice(1)), toplevel_lock); // (this is really generic, man)
+                        }
                 }
             }
 
@@ -831,10 +837,7 @@ var Level = function () {
             } else {
                 console.error('Unknown argument: ', arg);
                 return new FadedValueExpr(arg);
-                //return new Expression();
             }
-
-            // Unreachable....
         }
     }]);
 
@@ -872,6 +875,7 @@ var Goal = function () {
             var _iteratorError12 = undefined;
 
             try {
+
                 for (var _iterator12 = this.patterns[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
                     var pattern = _step12.value;
 
@@ -979,21 +983,21 @@ var ExpressionPattern = function () {
                     //console.log(' > Constructors don\'t match.');
                     return false; // expressions don't match
                 } else {
-                    // Check whether the expressions at this level have the same # of children. If so, do one-to-one comparison.
-                    var e_children = e.children;
-                    var f_children = f.children;
-                    if (e_children.length !== f_children.length) {
-                        //console.log(' > Length of child array doesn\'t match.');
-                        return false;
-                    } else {
-                        for (var i = 0; i < e_children.length; i++) {
-                            if (!compare(e_children[i], f_children[i])) {
-                                //console.log(' > Children don\'t match.');
-                                return false;
+                        // Check whether the expressions at this level have the same # of children. If so, do one-to-one comparison.
+                        var e_children = e.children;
+                        var f_children = f.children;
+                        if (e_children.length !== f_children.length) {
+                            //console.log(' > Length of child array doesn\'t match.');
+                            return false;
+                        } else {
+                            for (var i = 0; i < e_children.length; i++) {
+                                if (!compare(e_children[i], f_children[i])) {
+                                    //console.log(' > Children don\'t match.');
+                                    return false;
+                                }
                             }
                         }
                     }
-                }
 
                 //console.log(' > Expressions are equal.');
                 return true;

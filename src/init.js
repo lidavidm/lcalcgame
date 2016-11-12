@@ -122,6 +122,22 @@ function initBoard() {
         $('#lvl_num_visible').text((level_idx+1) + '');
         //document.getElementById('lvl_desc').innerHTML = Resource.level[level_idx].description || '(No description.)';
 
+        let redraw = (stage) => {
+            stage.update();
+            stage.draw();
+            stage.draw();
+        };
+
+        stage = new MainMenu(canvas, () => {
+            // Clicks 'play' button. Transition to chapter select screen.
+            stage = new mag.Stage(canvas);
+            redraw(stage);
+        }, () => {
+            // Clicked 'settings' button. Transition to settings screen.
+        });
+        redraw(stage);
+        return;
+
         stage = Resource.buildLevel(Resource.level[level_idx], canvas);
 
         Logger.transitionToTask(level_idx, stage.toString()).then(function() {

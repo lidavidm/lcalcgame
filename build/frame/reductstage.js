@@ -12,6 +12,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 /** A subclass of Stage that assumes Nodes are Expressions
     and allows for saving state. */
+
 var ReductStage = function (_mag$Stage) {
     _inherits(ReductStage, _mag$Stage);
 

@@ -1,6 +1,6 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 function LOAD_REDUCT_RESOURCES(Resource) {
     var __RESOURCE_PATH = Resource.path;
@@ -140,8 +140,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAnimation('poof', [0, 4], 120); // Cloud 'poof' animation for destructor piece.
 
     // Add levels here: (for now)
-    // * The '/' character makes the following expression ignore mouse events (can't be drag n dropped). *
-    var chapter_load_prom = loadChaptersFromFiles(['assign', 'intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map']); //,     'posttest_v1', 'experimental'] );
+    var chapter_load_prom = loadChaptersFromFiles(['assign', 'intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map']);
 
     Resource.buildLevel = function (level_desc, canvas) {
         ExprManager.clearFadeLevels();

@@ -1,5 +1,7 @@
 'use strict';
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 var __SHOW_DEV_INFO = false;
 var __COND = 'unknown';
 
@@ -91,82 +93,112 @@ function initBoard() {
     canvas = document.getElementById('canvas');
 
     if (canvas.getContext) {
+        var holes;
+        var runCount;
 
-        clearStage();
+        var _waitBlink;
 
-        if (__IS_MOBILE) {
+        var _ret = function () {
 
-            // Width 100% and height 100%
-            var resizeCanvas = function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
+            clearStage();
+
+            if (__IS_MOBILE) {
+
+                // Width 100% and height 100%
+                var resizeCanvas = function resizeCanvas() {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                    GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
+                };
+
+                // Resize canvas during a mobile phone orientation change.
+                window.addEventListener('resize', resizeCanvas, false);
+                window.addEventListener('orientationchange', resizeCanvas, false);
+                resizeCanvas();
+            }
+
+            hideHelpText();
+            hideEndGame();
+            updateProgressBar();
+
+            // New: saves progress upon reload.
+            setCookie('level_idx', level_idx);
+
+            GLOBAL_DEFAULT_CTX = canvas.getContext('2d');
+            GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
+            $('#lvl_num_visible').text(level_idx + 1 + '');
+            //document.getElementById('lvl_desc').innerHTML = Resource.level[level_idx].description || '(No description.)';
+
+            var redraw = function redraw(stage) {
+                stage.update();
+                stage.draw();
+                stage.draw();
             };
 
-            // Resize canvas during a mobile phone orientation change.
-            window.addEventListener('resize', resizeCanvas, false);
-            window.addEventListener('orientationchange', resizeCanvas, false);
-            resizeCanvas();
-        }
+            stage = new MainMenu(canvas, function () {
+                // Clicks 'play' button. Transition to chapter select screen.
+                stage = new mag.Stage(canvas);
+                redraw(stage);
+            }, function () {
+                // Clicked 'settings' button. Transition to settings screen.
+            });
+            redraw(stage);
+            return {
+                v: void 0
+            };
 
-        hideHelpText();
-        hideEndGame();
-        updateProgressBar();
+            stage = Resource.buildLevel(Resource.level[level_idx], canvas);
 
-        // New: saves progress upon reload.
-        setCookie('level_idx', level_idx);
+            Logger.transitionToTask(level_idx, stage.toString()).then(function () {
 
-        GLOBAL_DEFAULT_CTX = canvas.getContext('2d');
-        GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
-        $('#lvl_num_visible').text(level_idx + 1 + '');
-        //document.getElementById('lvl_desc').innerHTML = Resource.level[level_idx].description || '(No description.)';
+                Logger.log('condition', __COND);
+            }).catch(function (err) {
+                //console.error(err);
+            });
 
-        stage = Resource.buildLevel(Resource.level[level_idx], canvas);
+            /*var es = stage.getNodesWithClass(Expression, [], true);
+            var tes = stage.getNodesWithClass(TextExpr, [], true);
+            es.forEach(function(e) {
+                e.color = "white";
+            });
+            tes.forEach(function(t) {
+                t.color = "black";
+            });*/
 
-        Logger.transitionToTask(level_idx, stage.toString()).then(function () {
+            // One-time only blink of lambda holes on first level.
+            if (level_idx === 0) {
+                holes = stage.getNodesWithClass(FadedES6LambdaHoleExpr, [], true);
 
-            Logger.log('condition', __COND);
-        }).catch(function (err) {
-            //console.error(err);
-        });
+                if (holes.length > 0) {
+                    // This is the 'faded' (completely abstract) version of the game.
+                    showHelpText();
+                    runCount = 0;
 
-        /*var es = stage.getNodesWithClass(Expression, [], true);
-        var tes = stage.getNodesWithClass(TextExpr, [], true);
-        es.forEach(function(e) {
-            e.color = "white";
-        });
-        tes.forEach(function(t) {
-            t.color = "black";
-        });*/
-
-        // One-time only blink of lambda holes on first level.
-        if (level_idx === 0) {
-            var holes = stage.getNodesWithClass(FadedES6LambdaHoleExpr, [], true);
-            if (holes.length > 0) {
-                // This is the 'faded' (completely abstract) version of the game.
-                showHelpText();
-                var runCount = 0;
-                var waitBlink = function waitBlink(waittime, blinktime, cancelCond) {
-                    Animate.wait(waittime).after(function () {
-                        if (cancelCond()) {
-                            return;
-                        } else Animate.blink(holes, blinktime, [1, 1, 0], 1).after(function () {
-                            runCount++;
-                            waitBlink(waittime, blinktime, cancelCond);
+                    _waitBlink = function waitBlink(waittime, blinktime, cancelCond) {
+                        Animate.wait(waittime).after(function () {
+                            if (cancelCond()) {
+                                return;
+                            } else Animate.blink(holes, blinktime, [1, 1, 0], 1).after(function () {
+                                runCount++;
+                                _waitBlink(waittime, blinktime, cancelCond);
+                            });
                         });
+                    };
+
+                    _waitBlink(3000, 1500, function () {
+                        return !holes[0].stage || !holes[0].parent || stage.ranCompletionAnim || runCount > 1;
                     });
-                };
-                waitBlink(3000, 1500, function () {
-                    return !holes[0].stage || !holes[0].parent || stage.ranCompletionAnim || runCount > 1;
-                });
+                }
             }
-        }
 
-        stage.update();
-        stage.draw();
+            stage.update();
+            stage.draw();
 
-        // This fixes some render bugs. Not exactly sure why.
-        stage.draw();
+            // This fixes some render bugs. Not exactly sure why.
+            stage.draw();
+        }();
+
+        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
     }
 }
 

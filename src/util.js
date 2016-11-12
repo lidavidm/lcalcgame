@@ -120,6 +120,12 @@ var __IS_MOBILE = /Mobi/.test(navigator.userAgent);
  function colorFrom255(val, colorWeights=[1,1,1]) {
      return 'rgb(' + Math.round(val*colorWeights[0]) + ',' + Math.round(val*colorWeights[1]) + ',' + Math.round(val*colorWeights[2]) + ')';
  }
+ function colorTween(val, colorStartWeights=[0,0,0], colorEndWeights=[1,1,1]) {
+     val = val * 255;
+     return 'rgb(' + Math.round(val * colorEndWeights[0] + (255 - val) * colorStartWeights[0]) + ',' +
+                     Math.round(val * colorEndWeights[1] + (255 - val) * colorStartWeights[1]) + ',' +
+                     Math.round(val * colorEndWeights[2] + (255 - val) * colorStartWeights[2]) + ')';
+ }
  function computeVariance(arr) {
      if (arr.length <= 1) return 0;
      let mean = arr.reduce((a,b) => a + b, 0) / arr.length;
