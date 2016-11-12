@@ -106,10 +106,13 @@ class LambdaHoleExpr extends MissingExpression {
         }
     }
     hits(pos, options=undefined) {
-        if (this.isOpen)
+        if (this.isOpen) {
+            if (this.parent && this.parent.parent) return null;
             return super.hits(pos, options);
-        else
+        }
+        else {
             return null;
+        }
     }
 
     applyExpr(node) {

@@ -126,7 +126,12 @@ var LambdaHoleExpr = function (_MissingExpression) {
         value: function hits(pos) {
             var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
 
-            if (this.isOpen) return _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'hits', this).call(this, pos, options);else return null;
+            if (this.isOpen) {
+                if (this.parent && this.parent.parent) return null;
+                return _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'hits', this).call(this, pos, options);
+            } else {
+                return null;
+            }
         }
     }, {
         key: 'applyExpr',
