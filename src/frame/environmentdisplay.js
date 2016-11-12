@@ -42,14 +42,7 @@ class EnvironmentDisplay extends mag.Rect {
             }
         };
         env.names().forEach((name) => {
-            // let label = new TextExpr(name + "=");
-            // label.color = "#EEE";
-            // setup(label, 0, false);
-
             let e = env.lookup(name).clone();
-            // setup(e, this.padding, true);
-            // TODO: use fading mechanism to get the correct class
-            // here
             let display = new (ExprManager.getClass('reference_display'))(name, e);
             if (this.bindings[name]) {
                 display = this.bindings[name];

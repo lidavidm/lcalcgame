@@ -312,14 +312,14 @@ class LabeledChestVarExpr extends ChestVarExpr {
 // Display variants need to not be subclasses to not confuse the fader
 class DisplayChest extends Expression {
     constructor(name, expr) {
-        super([]);
+        super([expr]);
         this.name = name;
-        this._opened = true;
-        this.holes.push(expr);
+        this.childPos = { x: 10, y: 5 };
+
+        if (!expr) return;
         expr.ignoreEvents = true;
         expr.scale = { x: 0.6, y: 0.6 };
         expr.anchor = { x: -0.1, y: 0.5 };
-        this.childPos = { x: 10, y: 5 };
     }
 
     setExpr(expr) {
@@ -571,38 +571,55 @@ class JumpingAssignExpr extends AssignExpr {
     }
 
     animateReduction() {
-         this.setupAnimation();
+        this.setupAnimation();
 
         let environment = this.getEnvironment();
         return this.animateJump().then(() => {
             return new Promise((resolve, _reject) => {
-                let chest = this.stage.environmentDisplay.getBinding(this.variable.name);
-                if (chest && environment == this.stage.environment) {
-                    let callback = this.stage.environmentDisplay.prepareAssign(this.variable.name);
-                    callback.after(() => this.finishReduction());
-
-                    this.value.scale = { x: 0, y: 0 };
-                    let value = this.value.clone();
-                    this.stage.add(value);
-                    value.pos = this.variable.absolutePos;
-                    value.scale = { x: 0.3, y: 0.3 };
-                    let target = {
-                        pos: chest.absolutePos,
-                        scale: { x: 1, y: 1 },
-                    };
-
-                    let lerp = arcLerp(value.absolutePos.y, chest.absolutePos.y, -150);
-                    Animate.tween(value, target, 500, (x) => x, true, lerp).after(() => {
-                        this.stage.remove(value);
-                        this.stage.draw();
-                    });
-                }
-                else {
+                if (environment != this.stage.environment) {
                     Animate.poof(this);
                     parent.swap(this, null);
                     this.finishReduction();
                     resolve();
+                    return;
                 }
+
+                let chest = this.stage.environmentDisplay.getBinding(this.variable.name);
+                let value = null;
+                let targetPos = null;
+                if (chest) {
+                    targetPos = chest.absolutePos;
+                    value = this.value.clone();
+                    this.stage.environmentDisplay
+                        .prepareAssign(this.variable.name);
+                }
+                else {
+                    if (this.stage.environmentDisplay.contents.length === 0) {
+                        targetPos = this.stage.environmentDisplay.leftEdgePos;
+                    }
+                    else {
+                        let contents = this.stage.environmentDisplay.contents;
+                        let last = contents[contents.length - 1];
+                        targetPos = addPos(last.absolutePos, { x: 0, y: last.absoluteSize.h + this.stage.environmentDisplay.padding });
+                    }
+
+                    value = new (ExprManager.getClass('reference_display'))(this.variable.name, this.value.clone());
+                }
+                this.value.scale = { x: 0, y: 0 };
+                this.stage.add(value);
+                value.pos = this.variable.absolutePos;
+                value.scale = { x: 0.3, y: 0.3 };
+                let target = {
+                    pos: targetPos,
+                    scale: { x: 1, y: 1 },
+                };
+
+                let lerp = arcLerp(value.absolutePos.y, targetPos.y, -150);
+                Animate.tween(value, target, 500, (x) => x, true, lerp).after(() => {
+                    this.stage.remove(value);
+                    this.finishReduction();
+                    this.stage.draw();
+                });
             });
         });
     }

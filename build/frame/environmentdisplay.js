@@ -59,14 +59,7 @@ var EnvironmentDisplay = function (_mag$Rect) {
                 }
             };
             env.names().forEach(function (name) {
-                // let label = new TextExpr(name + "=");
-                // label.color = "#EEE";
-                // setup(label, 0, false);
-
                 var e = env.lookup(name).clone();
-                // setup(e, this.padding, true);
-                // TODO: use fading mechanism to get the correct class
-                // here
                 var display = new (ExprManager.getClass('reference_display'))(name, e);
                 if (_this2.bindings[name]) {
                     display = _this2.bindings[name];

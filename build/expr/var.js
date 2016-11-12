@@ -116,8 +116,8 @@ var VarExpr = function (_Expression) {
             var value = this.reduce();
             if (value != this) {
                 value = value.clone();
-                var parent = this.parent ? this.parent : this.stage;
-                parent.swap(this, value);
+                var _parent = this.parent ? this.parent : this.stage;
+                _parent.swap(this, value);
             }
         }
     }, {
@@ -228,8 +228,8 @@ var ChestVarExpr = function (_VarExpr2) {
             var value = this.reduce();
             if (value != this) {
                 if (!animated) {
-                    var parent = this.parent ? this.parent : this.stage;
-                    parent.swap(this, value);
+                    var _parent2 = this.parent ? this.parent : this.stage;
+                    _parent2.swap(this, value);
                     return null;
                 }
                 return this.animateReduction(value, true);
@@ -419,15 +419,15 @@ var DisplayChest = function (_Expression2) {
     function DisplayChest(name, expr) {
         _classCallCheck(this, DisplayChest);
 
-        var _this9 = _possibleConstructorReturn(this, (DisplayChest.__proto__ || Object.getPrototypeOf(DisplayChest)).call(this, []));
+        var _this9 = _possibleConstructorReturn(this, (DisplayChest.__proto__ || Object.getPrototypeOf(DisplayChest)).call(this, [expr]));
 
         _this9.name = name;
-        _this9._opened = true;
-        _this9.holes.push(expr);
+        _this9.childPos = { x: 10, y: 5 };
+
+        if (!expr) return _possibleConstructorReturn(_this9);
         expr.ignoreEvents = true;
         expr.scale = { x: 0.6, y: 0.6 };
         expr.anchor = { x: -0.1, y: 0.5 };
-        _this9.childPos = { x: 10, y: 5 };
         return _this9;
     }
 
@@ -605,75 +605,104 @@ var AssignExpr = function (_Expression4) {
             }
         }
     }, {
+        key: "animateJump",
+        value: function animateJump() {
+            var _this14 = this;
+
+            return new Promise(function (resolve, reject) {
+                var target = {
+                    scale: { x: 0.3, y: 0.3 },
+                    pos: { x: _this14.variable.pos.x, y: _this14.variable.pos.y }
+                };
+
+                // quadratic lerp for pos.y - makes it "arc" towards the variable
+                var lerp = arcLerp(_this14.value.pos.y, _this14.variable.pos.y);
+                var parent = _this14.parent || _this14.stage;
+
+                Animate.tween(_this14.value, target, 500, function (x) {
+                    return x;
+                }, true, lerp).after(function () {
+                    Animate.poof(_this14);
+                    parent.swap(_this14, null);
+                    resolve();
+                });
+            });
+        }
+    }, {
+        key: "setupAnimation",
+        value: function setupAnimation() {
+            this.variable._opened = true;
+
+            // Prevent background on GraphicValueExpr from being drawn
+            this.value.ignoreEvents = true;
+
+            // Keep a copy of the original value before we start
+            // messing with it, to update the environment afterwards
+            this._actualValue = this.value.clone();
+        }
+    }, {
+        key: "finishReduction",
+        value: function finishReduction() {
+            this.getEnvironment().update(this.variable.name, this._actualValue);
+            this.stage.environmentDisplay.showGlobals();
+            this.stage.draw();
+        }
+    }, {
+        key: "animateReduction",
+        value: function animateReduction() {
+            var _this15 = this;
+
+            this.setupAnimation();
+
+            var environment = this.getEnvironment();
+            var callback = null;
+            if (environment == this.stage.environment && this.stage.environmentDisplay) {
+                callback = this.stage.environmentDisplay.prepareAssign(this.variable.name);
+            }
+            if (callback) {
+                callback.after(function () {
+                    return _this15.finishReduction();
+                });
+            } else {
+                window.setTimeout(function () {
+                    return _this15.finishReduction();
+                }, 500);
+            }
+
+            return this.animateJump();
+        }
+    }, {
         key: "performReduction",
         value: function performReduction() {
-            var _this14 = this;
+            var _this16 = this;
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
             // The side-effect actually happens here. reduce() is called
             // multiple times as a 'canReduce', and we don't want any
             // update to happen multiple times.
-            if (this.value) {
-                var result = this.value.performReduction(animated);
-                if (result instanceof Promise) {
-                    result.then(function () {
+            if (!this.canReduce()) return null;
+
+            if (!animated) {
+                this.value.performReduction(false);
+                var value = this.value.clone();
+                this.getEnvironment().update(this.variable.name, value);
+                this.stage.environmentDisplay.showGlobals();
+                this.stage.draw();
+                return null;
+            }
+
+            var result = this.value.performReduction(animated);
+            if (result instanceof Promise) {
+                return result.then(function () {
+                    return new Promise(function (resolve, _reject) {
                         window.setTimeout(function () {
-                            return _this14.performReduction(animated);
+                            return _this16.animateReduction();
                         }, 600);
                     });
-                    return;
-                }
-            }
-            if (this.canReduce()) {
-                (function () {
-                    var initial = [];
-                    if (_this14.parent) {
-                        initial.push(_this14.parent);
-                    } else {
-                        initial = initial.concat(_this14.stage.nodes);
-                    }
-
-                    // Prevent background on GraphicValueExpr from being drawn
-                    _this14.value.ignoreEvents = true;
-                    // Keep a copy of the original value before we start
-                    // messing with it, to update the environment afterwards
-                    var value = _this14.value.clone();
-
-                    _this14.variable._opened = true;
-                    var target = {
-                        scale: { x: 0.3, y: 0.3 },
-                        pos: { x: _this14.variable.pos.x, y: _this14.variable.pos.y }
-                    };
-
-                    var environment = _this14.getEnvironment();
-
-                    // quadratic lerp for pos.y - makes it "arc" towards the variable
-                    var lerp = arcLerp(_this14.value.pos.y, _this14.variable.pos.y);
-                    var parent = _this14.parent || _this14.stage;
-                    var afterCallback = function afterCallback() {
-                        _this14.getEnvironment().update(_this14.variable.name, value);
-                        _this14.stage.environmentDisplay.showGlobals();
-                        _this14.stage.draw();
-                    };
-
-                    var callback = null;
-                    if (environment == _this14.stage.environment && _this14.stage.environmentDisplay) {
-                        callback = _this14.stage.environmentDisplay.prepareAssign(_this14.variable.name);
-                    }
-                    if (callback) {
-                        callback.after(afterCallback);
-                    } else {
-                        window.setTimeout(afterCallback, 500);
-                    }
-
-                    Animate.tween(_this14.value, target, 500, function (x) {
-                        return x;
-                    }, true, lerp).after(function () {
-                        Animate.poof(_this14);
-                        parent.swap(_this14, null);
-                    });
-                })();
+                });
+            } else {
+                return this.animateReduction();
             }
         }
     }, {
@@ -707,79 +736,72 @@ var AssignExpr = function (_Expression4) {
     return AssignExpr;
 }(Expression);
 
-var ExpressionView = function (_MissingExpression) {
-    _inherits(ExpressionView, _MissingExpression);
+var JumpingAssignExpr = function (_AssignExpr) {
+    _inherits(JumpingAssignExpr, _AssignExpr);
 
-    function ExpressionView(expr_to_miss) {
-        _classCallCheck(this, ExpressionView);
+    function JumpingAssignExpr(variable, value) {
+        _classCallCheck(this, JumpingAssignExpr);
 
-        var _this15 = _possibleConstructorReturn(this, (ExpressionView.__proto__ || Object.getPrototypeOf(ExpressionView)).call(this, expr_to_miss));
-
-        _this15._openOffset = 0;
-        return _this15;
+        return _possibleConstructorReturn(this, (JumpingAssignExpr.__proto__ || Object.getPrototypeOf(JumpingAssignExpr)).call(this, variable, value));
     }
 
-    // Disable interactivity
+    _createClass(JumpingAssignExpr, [{
+        key: "animateReduction",
+        value: function animateReduction() {
+            var _this18 = this;
 
+            this.setupAnimation();
 
-    _createClass(ExpressionView, [{
-        key: "ondropenter",
-        value: function ondropenter() {}
-    }, {
-        key: "ondropexit",
-        value: function ondropexit() {}
-    }, {
-        key: "ondropped",
-        value: function ondropped() {}
-    }, {
-        key: "onmouseenter",
-        value: function onmouseenter() {}
-    }, {
-        key: "drawInternal",
-        value: function drawInternal(ctx, pos, boundingSize) {
-            var rad = boundingSize.w / 2.0;
-            setStrokeStyle(ctx, {
-                color: '#AAAAAA',
-                lineWidth: 3
+            var environment = this.getEnvironment();
+            return this.animateJump().then(function () {
+                return new Promise(function (resolve, _reject) {
+                    if (environment != _this18.stage.environment) {
+                        Animate.poof(_this18);
+                        parent.swap(_this18, null);
+                        _this18.finishReduction();
+                        resolve();
+                        return;
+                    }
+
+                    var chest = _this18.stage.environmentDisplay.getBinding(_this18.variable.name);
+                    var value = null;
+                    var targetPos = null;
+                    if (chest) {
+                        targetPos = chest.absolutePos;
+                        value = _this18.value.clone();
+                        _this18.stage.environmentDisplay.prepareAssign(_this18.variable.name);
+                    } else {
+                        if (_this18.stage.environmentDisplay.contents.length === 0) {
+                            targetPos = _this18.stage.environmentDisplay.leftEdgePos;
+                        } else {
+                            var contents = _this18.stage.environmentDisplay.contents;
+                            var last = contents[contents.length - 1];
+                            targetPos = addPos(last.absolutePos, { x: 0, y: last.absoluteSize.h + _this18.stage.environmentDisplay.padding });
+                        }
+
+                        value = new (ExprManager.getClass('reference_display'))(_this18.variable.name, _this18.value.clone());
+                    }
+                    _this18.value.scale = { x: 0, y: 0 };
+                    _this18.stage.add(value);
+                    value.pos = _this18.variable.absolutePos;
+                    value.scale = { x: 0.3, y: 0.3 };
+                    var target = {
+                        pos: targetPos,
+                        scale: { x: 1, y: 1 }
+                    };
+
+                    var lerp = arcLerp(value.absolutePos.y, targetPos.y, -150);
+                    Animate.tween(value, target, 500, function (x) {
+                        return x;
+                    }, true, lerp).after(function () {
+                        _this18.stage.remove(value);
+                        _this18.finishReduction();
+                        _this18.stage.draw();
+                    });
+                });
             });
-            ctx.beginPath();
-            ctx.arc(pos.x + rad, pos.y + rad, rad, 0, 2 * Math.PI);
-
-            ctx.clip();
-            var alpha = 0.5 * ((Math.PI / 2 - this._openOffset) / (Math.PI / 2));
-            ctx.shadowColor = "rgba(0,0,0," + alpha + ")";
-            ctx.shadowBlur = 3;
-            ctx.shadowOffsetX = 1;
-            ctx.shadowOffsetY = 1;
-            ctx.stroke();
         }
     }]);
 
-    return ExpressionView;
-}(MissingExpression);
-
-function findAliasingVarExpr(initial, name, ignore) {
-    // TODO: needs to account for whether the variable we are looking
-    // for is in an outer scope. Example:
-    // x = 3
-    // def test():
-    //     global x
-    //     x = 5
-    var subvarexprs = [];
-    var queue = initial;
-    while (queue.length > 0) {
-        var node = queue.pop();
-        if (node instanceof VarExpr && node.name === name && ignore.indexOf(node) == -1) {
-            subvarexprs.push(node);
-        } else if (node instanceof LambdaExpr && node.takesArgument && node.holes[0].name === name) {
-            // Capture-avoiding substitution
-            continue;
-        }
-
-        if (node.children) {
-            queue = queue.concat(node.children);
-        }
-    }
-
-    return subvarexprs;
-}
+    return JumpingAssignExpr;
+}(AssignExpr);
