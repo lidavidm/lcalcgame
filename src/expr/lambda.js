@@ -539,7 +539,7 @@ class LambdaExpr extends Expression {
         }
 
         // Perform substitution, but stop at the 'boundary' of another lambda.
-        let varExprs = findNoncapturingVarExpr(this, null, true);
+        let varExprs = findNoncapturingVarExpr(this, null, true, true);
         let environment = this.getEnvironment();
         for (let expr of varExprs) {
             expr.performReduction();
@@ -622,6 +622,102 @@ class LambdaExpr extends Expression {
             return '(' + super.toString() + ')';
         else
             return super.toString();
+    }
+}
+
+
+class EnvironmentLambdaExpr extends LambdaExpr {
+    constructor(exprs) {
+        super(exprs);
+        this.environmentDisplay = new InlineEnvironmentDisplay(this);
+        this.environmentDisplay.scale = { x: 0.85, y: 0.85 };
+    }
+
+    update() {
+        super.update();
+        this.environmentDisplay.update();
+    }
+
+    draw(ctx) {
+        this.environmentDisplay.parent = this;
+        this.environmentDisplay.draw(ctx);
+        super.draw(ctx);
+    }
+}
+
+
+class InlineEnvironmentDisplay extends Expression {
+    constructor(lambda) {
+        super([]);
+        this.lambda = lambda;
+        this.parent = lambda;
+
+        this._stackVertically = true;
+        this.displays = {};
+    }
+
+    update() {
+        super.update();
+        let env = this.lambda.getEnvironment();
+        for (let name of Object.keys(env.bound)) {
+            let display = this.displays[name];
+            if (!display) {
+                display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression());
+                // display.scale = { x: 0.6, y: 0.6 };
+                this.addArg(display);
+                this.displays[name] = display;
+            }
+        }
+        for (let name of env.names()) {
+            if (env.bound[name]) continue;
+            let display = this.displays[name];
+            if (!display) {
+                display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression());
+                // display.scale = { x: 0.6, y: 0.6 };
+                this.addArg(display);
+                this.displays[name] = display;
+            }
+            display.setExpr(env.lookup(name));
+        }
+    }
+
+    get pos() {
+        let pos = this.lambda.pos;
+        pos.y += this.lambda.size.h - 10;
+        return pos;
+    }
+
+    set pos(p) {
+        this._pos = p;
+    }
+
+    upperLeftPos(pos, boundingSize) {
+        return {
+            x: this.lambda.pos.x,
+            y: this.lambda.pos.y + this.lambda.size.h - 10,
+        };
+    }
+
+    draw(ctx) {
+        if (!ctx) return;
+        ctx.save();
+        if (this.opacity !== undefined && this.opacity < 1.0) {
+            ctx.globalAlpha = this.opacity;
+        }
+        var boundingSize = this.absoluteSize;
+        var upperLeftPos = this.upperLeftPos(this.absolutePos, boundingSize);
+        if (this._color || this.stroke) this.drawInternal(ctx, upperLeftPos, boundingSize);
+        this.children.forEach((child) => {
+            child.parent = this;
+            child.draw(ctx);
+        });
+        if (this._color || this.stroke) this.drawInternalAfterChildren(ctx, upperLeftPos, boundingSize);
+        ctx.restore();
+    }
+
+    drawInternal(ctx, pos, boundingSize) {
+        ctx.fillStyle = '#444';
+        ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
     }
 }
 
@@ -804,12 +900,15 @@ class FadedLambdaVarExpr extends LambdaVarExpr {
 }
 
 
-function findNoncapturingVarExpr(lambda, name, skipLambda=false) {
+function findNoncapturingVarExpr(lambda, name, skipLambda=false, skipLabel=false) {
     let subvarexprs = [];
     let queue = [lambda];
     while (queue.length > 0) {
         let node = queue.pop();
         if (node instanceof VarExpr || node instanceof LambdaVarExpr) {
+            subvarexprs.push(node);
+        }
+        else if (!skipLabel && (node instanceof DisplayChest || node instanceof LabeledDisplay)) {
             subvarexprs.push(node);
         }
         else if (node !== lambda &&
@@ -822,6 +921,10 @@ function findNoncapturingVarExpr(lambda, name, skipLambda=false) {
 
         if (node.children) {
             queue = queue.concat(node.children);
+        }
+
+        if (node instanceof EnvironmentLambdaExpr) {
+            queue = queue.concat(findNoncapturingVarExpr(node.environmentDisplay, name, skipLambda));
         }
     }
 

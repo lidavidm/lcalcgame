@@ -140,6 +140,7 @@ var Expression = function (_mag$RoundedRect) {
             this.holes.forEach(function (expr) {
                 var size = expr ? expr.size : { w: EMPTY_EXPR_WIDTH, h: DEFAULT_EXPR_HEIGHT };
                 size.w *= expr.scale.x;
+                size.h *= expr.scale.y;
                 sizes.push(size);
             });
             return sizes;
@@ -169,7 +170,7 @@ var Expression = function (_mag$RoundedRect) {
             var x = this.padding.left;
             var y = this.size.h / 2.0 + (this.exprOffsetY ? this.exprOffsetY : 0);
             if (this._stackVertically) {
-                y = 2 * this.padding.inner;
+                y = 0;
             }
 
             this.holes.forEach(function (expr) {
@@ -178,15 +179,16 @@ var Expression = function (_mag$RoundedRect) {
                 expr.pos = { x: x, y: y };
                 expr.scale = { x: 0.85, y: 0.85 };
                 expr.update();
+
                 if (_this3._stackVertically) {
-                    y += expr.size.h * expr.scale.y;
                     // Centering
                     var offset = x;
                     var innerWidth = size.w;
                     var scale = expr.scale.x;
                     offset = (innerWidth - scale * expr.size.w) / 2;
+                    expr.pos = { x: offset, y: y };
 
-                    expr.pos = { x: offset, y: expr.pos.y };
+                    y += expr.size.h * expr.scale.y;
                 } else {
                     x += expr.size.w * expr.scale.x + padding;
                 }
@@ -511,9 +513,7 @@ var Expression = function (_mag$RoundedRect) {
                 }
             });
 
-            if (this._stackVertically) {
-                width += padding.right + padding.left;
-            } else {
+            if (!this._stackVertically) {
                 width += padding.right; // the end
             }
 

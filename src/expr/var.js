@@ -408,13 +408,30 @@ class LabeledDisplay extends Expression {
         this.equals.color = 'white';
         this.value = expr;
         this.value.ignoreEvents = true;
-        this.holes.push(this.nameLabel);
-        this.holes.push(this.equals);
-        this.holes.push(this.value);
+        this.addArg(this.nameLabel);
+        this.addArg(this.equals);
+        this.addArg(this.value);
     }
 
-    drawInternal(ctx, pos, boundingSize) {
+    open(preview) {
+        this.origValue = this.value;
+        this.setExpr(preview);
     }
+
+    close() {
+        if (this.origValue) {
+            this.setExpr(this.origValue);
+        }
+    }
+
+    setExpr(expr) {
+        if (this.holes.length < 3) return;
+        this.holes[2] = expr;
+        expr.ignoreEvents = true;
+        this.value = expr;
+    }
+
+    drawInternal(ctx, pos, boundingSize) {}
 }
 
 class AssignExpr extends Expression {

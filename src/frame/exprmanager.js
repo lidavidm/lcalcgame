@@ -29,7 +29,7 @@ var ExprManager = (function() {
         'reference_display':[DisplayChest, LabeledDisplayChest, LabeledDisplay],
         'hole':     [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedLambdaHoleExpr, FadedES6LambdaHoleExpr],
         'lambda':   [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr],
-        'assign':   [AssignExpr],
+        'assign':   [JumpingAssignExpr, AssignExpr],
     };
     var fade_level = {};
     var DEFAULT_FADE_LEVEL = 0;
@@ -38,6 +38,7 @@ var ExprManager = (function() {
         'var'   : [[9, 30], 30, 42],
         'reference': [4, 6, 8],
         'reference_display': [6, 8],
+        'assign': [6],
         'hole'  : [[9, 30], 30, 42],
         'if'    : [26, 45],
         '_b'    : [34],

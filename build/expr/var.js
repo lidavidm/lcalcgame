@@ -545,13 +545,34 @@ var LabeledDisplay = function (_Expression3) {
         _this12.equals.color = 'white';
         _this12.value = expr;
         _this12.value.ignoreEvents = true;
-        _this12.holes.push(_this12.nameLabel);
-        _this12.holes.push(_this12.equals);
-        _this12.holes.push(_this12.value);
+        _this12.addArg(_this12.nameLabel);
+        _this12.addArg(_this12.equals);
+        _this12.addArg(_this12.value);
         return _this12;
     }
 
     _createClass(LabeledDisplay, [{
+        key: "open",
+        value: function open(preview) {
+            this.origValue = this.value;
+            this.setExpr(preview);
+        }
+    }, {
+        key: "close",
+        value: function close() {
+            if (this.origValue) {
+                this.setExpr(this.origValue);
+            }
+        }
+    }, {
+        key: "setExpr",
+        value: function setExpr(expr) {
+            if (this.holes.length < 3) return;
+            this.holes[2] = expr;
+            expr.ignoreEvents = true;
+            this.value = expr;
+        }
+    }, {
         key: "drawInternal",
         value: function drawInternal(ctx, pos, boundingSize) {}
     }]);
