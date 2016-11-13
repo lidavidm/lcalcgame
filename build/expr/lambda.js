@@ -896,7 +896,6 @@ var InlineEnvironmentDisplay = function (_Expression2) {
     _createClass(InlineEnvironmentDisplay, [{
         key: 'update',
         value: function update() {
-            _get(InlineEnvironmentDisplay.prototype.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay.prototype), 'update', this).call(this);
             var env = this.lambda.getEnvironment();
             var _iteratorNormalCompletion4 = true;
             var _didIteratorError4 = false;
@@ -961,13 +960,15 @@ var InlineEnvironmentDisplay = function (_Expression2) {
                     }
                 }
             }
+
+            _get(InlineEnvironmentDisplay.prototype.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay.prototype), 'update', this).call(this);
         }
     }, {
         key: 'upperLeftPos',
         value: function upperLeftPos(pos, boundingSize) {
             return {
                 x: this.lambda.pos.x,
-                y: this.lambda.pos.y + this.lambda.size.h - 10
+                y: this.lambda.pos.y + this.lambda.size.h
             };
         }
     }, {
@@ -1000,7 +1001,7 @@ var InlineEnvironmentDisplay = function (_Expression2) {
         key: 'pos',
         get: function get() {
             var pos = this.lambda.pos;
-            pos.y += this.lambda.size.h - 10;
+            pos.y += this.lambda.size.h;
             return pos;
         },
         set: function set(p) {

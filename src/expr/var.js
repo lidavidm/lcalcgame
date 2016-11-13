@@ -402,33 +402,44 @@ class LabeledDisplayChest extends DisplayChest {
 class LabeledDisplay extends Expression {
     constructor(name, expr) {
         super([]);
+        this.name = name;
         this.nameLabel = new TextExpr(name);
         this.nameLabel.color = 'white';
         this.equals = new TextExpr("=");
         this.equals.color = 'white';
         this.value = expr;
-        this.value.ignoreEvents = true;
         this.addArg(this.nameLabel);
         this.addArg(this.equals);
         this.addArg(this.value);
+        this.setExpr(expr);
+        this.origValue = null;
     }
 
     open(preview) {
-        this.origValue = this.value;
-        this.setExpr(preview);
+        if (!this.origValue) {
+            this.origValue = this.value;
+            this.setExpr(preview);
+        }
     }
 
     close() {
         if (this.origValue) {
             this.setExpr(this.origValue);
+            this.origValue = null;
         }
     }
 
     setExpr(expr) {
         if (this.holes.length < 3) return;
+        expr.pos = { x: 0, y: 0 };
         this.holes[2] = expr;
+        expr.scale = { x: 1.0, y: 1.0 };
+        expr.anchor = { x: 0, y: 0.5 };
+        expr.stroke = null;
         expr.ignoreEvents = true;
+        expr.parent = this;
         this.value = expr;
+        this.update();
     }
 
     drawInternal(ctx, pos, boundingSize) {}

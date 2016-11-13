@@ -539,38 +539,49 @@ var LabeledDisplay = function (_Expression3) {
 
         var _this12 = _possibleConstructorReturn(this, (LabeledDisplay.__proto__ || Object.getPrototypeOf(LabeledDisplay)).call(this, []));
 
+        _this12.name = name;
         _this12.nameLabel = new TextExpr(name);
         _this12.nameLabel.color = 'white';
         _this12.equals = new TextExpr("=");
         _this12.equals.color = 'white';
         _this12.value = expr;
-        _this12.value.ignoreEvents = true;
         _this12.addArg(_this12.nameLabel);
         _this12.addArg(_this12.equals);
         _this12.addArg(_this12.value);
+        _this12.setExpr(expr);
+        _this12.origValue = null;
         return _this12;
     }
 
     _createClass(LabeledDisplay, [{
         key: "open",
         value: function open(preview) {
-            this.origValue = this.value;
-            this.setExpr(preview);
+            if (!this.origValue) {
+                this.origValue = this.value;
+                this.setExpr(preview);
+            }
         }
     }, {
         key: "close",
         value: function close() {
             if (this.origValue) {
                 this.setExpr(this.origValue);
+                this.origValue = null;
             }
         }
     }, {
         key: "setExpr",
         value: function setExpr(expr) {
             if (this.holes.length < 3) return;
+            expr.pos = { x: 0, y: 0 };
             this.holes[2] = expr;
+            expr.scale = { x: 1.0, y: 1.0 };
+            expr.anchor = { x: 0, y: 0.5 };
+            expr.stroke = null;
             expr.ignoreEvents = true;
+            expr.parent = this;
             this.value = expr;
+            this.update();
         }
     }, {
         key: "drawInternal",

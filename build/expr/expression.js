@@ -170,7 +170,7 @@ var Expression = function (_mag$RoundedRect) {
             var x = this.padding.left;
             var y = this.size.h / 2.0 + (this.exprOffsetY ? this.exprOffsetY : 0);
             if (this._stackVertically) {
-                y = 0;
+                y = 2 * padding;
             }
 
             this.holes.forEach(function (expr) {

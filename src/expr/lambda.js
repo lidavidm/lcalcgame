@@ -657,7 +657,6 @@ class InlineEnvironmentDisplay extends Expression {
     }
 
     update() {
-        super.update();
         let env = this.lambda.getEnvironment();
         for (let name of Object.keys(env.bound)) {
             let display = this.displays[name];
@@ -679,11 +678,13 @@ class InlineEnvironmentDisplay extends Expression {
             }
             display.setExpr(env.lookup(name));
         }
+
+        super.update();
     }
 
     get pos() {
         let pos = this.lambda.pos;
-        pos.y += this.lambda.size.h - 10;
+        pos.y += this.lambda.size.h;
         return pos;
     }
 
@@ -694,7 +695,7 @@ class InlineEnvironmentDisplay extends Expression {
     upperLeftPos(pos, boundingSize) {
         return {
             x: this.lambda.pos.x,
-            y: this.lambda.pos.y + this.lambda.size.h - 10,
+            y: this.lambda.pos.y + this.lambda.size.h,
         };
     }
 
