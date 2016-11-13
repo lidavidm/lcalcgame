@@ -219,25 +219,37 @@ var LambdaHoleExpr = function (_MissingExpression) {
             node.opacity = 0.4;
 
             if (this.parent) {
-                // Ignore variables that are shadowed when previewing
-                var subvarexprs = findNoncapturingVarExpr(this.parent, this.name);
+                (function () {
+                    // Ignore variables that are shadowed when previewing
+                    var subvarexprs = findNoncapturingVarExpr(_this5.parent, _this5.name);
 
-                subvarexprs.forEach(function (e) {
-                    if (e.name === _this5.name) {
-                        var preview_node = node.clone();
-                        preview_node.opacity = 1.0;
-                        preview_node.bindSubexpressions();
-                        e.open(preview_node);
+                    var wasClosed = false;
+                    if (_this5.parent.environmentDisplay) {
+                        wasClosed = _this5.parent.environmentDisplay._state === 'closed' || _this5.parent.environmentDisplay._state === 'closing';
+                        _this5.parent.environmentDisplay.openDrawer({ force: true, speed: 100 });
                     }
-                });
-                this.opened_subexprs = subvarexprs;
-                this.close_opened_subexprs = function () {
-                    if (!_this5.opened_subexprs) return;
-                    _this5.opened_subexprs.forEach(function (e) {
-                        e.close();
+
+                    subvarexprs.forEach(function (e) {
+                        if (e.name === _this5.name) {
+                            var preview_node = node.clone();
+                            preview_node.opacity = 1.0;
+                            preview_node.bindSubexpressions();
+                            e.open(preview_node);
+                        }
                     });
-                    _this5.opened_subexprs = null;
-                };
+                    _this5.opened_subexprs = subvarexprs;
+                    _this5.close_opened_subexprs = function () {
+                        if (!_this5.opened_subexprs) return;
+                        _this5.opened_subexprs.forEach(function (e) {
+                            e.close();
+                        });
+                        _this5.opened_subexprs = null;
+
+                        if (_this5.parent.environmentDisplay && wasClosed) {
+                            _this5.parent.environmentDisplay.closeDrawer();
+                        }
+                    };
+                })();
             }
         }
     }, {
@@ -864,6 +876,8 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
         value: function hits(pos) {
             var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
 
+            if (this.parent) return _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'hits', this).call(this, pos, options);
+
             var result = _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'hits', this).call(this, pos, options) || this.environmentDisplay.hits(pos, options);
             if (result == this.environmentDisplay) {
                 return this;
@@ -873,6 +887,8 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
     }, {
         key: 'onmousedown',
         value: function onmousedown(pos) {
+            if (this.parent) _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmousedown', this).call(this, pos);
+
             if (_get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'hits', this).call(this, pos)) {
                 this._eventTarget = this;
                 _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmousedown', this).call(this, pos);
@@ -884,6 +900,8 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
     }, {
         key: 'onmousedrag',
         value: function onmousedrag(pos) {
+            if (this.parent) _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmousedrag', this).call(this, pos);
+
             if (!this._eventTarget) return;
             if (this._eventTarget == this) {
                 _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmousedrag', this).call(this, pos);
@@ -894,6 +912,8 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
     }, {
         key: 'onmouseup',
         value: function onmouseup(pos) {
+            if (this.parent) _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmouseup', this).call(this, pos);
+
             if (!this._eventTarget) return;
             if (this._eventTarget == this) {
                 _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmouseup', this).call(this, pos);
@@ -911,8 +931,10 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
     }, {
         key: 'draw',
         value: function draw(ctx) {
-            this.environmentDisplay.parent = this;
-            this.environmentDisplay.draw(ctx);
+            if (!this.parent) {
+                this.environmentDisplay.parent = this;
+                this.environmentDisplay.draw(ctx);
+            }
             _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'draw', this).call(this, ctx);
         }
     }]);
@@ -934,13 +956,56 @@ var InlineEnvironmentDisplay = function (_Expression2) {
 
         _this13._stackVertically = true;
         _this13.displays = {};
+        _this13._state = 'closed';
+        _this13._height = 0.0;
+        _this13._animation = null;
         return _this13;
     }
 
     _createClass(InlineEnvironmentDisplay, [{
+        key: 'openDrawer',
+        value: function openDrawer() {
+            var _this14 = this;
+
+            var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+            var force = options.force || false;
+            var speed = options.speed || 300;
+            if (this._state === 'closed' || force) {
+                if (this._animation) this._animation.cancelWithoutFiringCallbacks();
+                this._state = 'opening';
+                this._animation = Animate.tween(this, { _height: 1.0 }, 100).after(function () {
+                    _this14._state = 'open';
+                    _this14._animation = null;
+                });
+            }
+        }
+    }, {
+        key: 'closeDrawer',
+        value: function closeDrawer() {
+            var _this15 = this;
+
+            var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+            var force = options.force || false;
+            var speed = options.speed || 300;
+            if (this._state === 'open' || force) {
+                if (this._animation) this._animation.cancelWithoutFiringCallbacks();
+                this._state = 'closing';
+                this._animation = Animate.tween(this, { _height: 0.0 }, 100).after(function () {
+                    _this15._state = 'closed';
+                    _this15._animation = null;
+                });
+            }
+        }
+    }, {
         key: 'onmouseup',
         value: function onmouseup() {
-            Animate.tween(this, { scale: { x: 1, y: 0.2 } }, 300);
+            if (this._state === 'open') {
+                this.closeDrawer();
+            } else if (this._state === 'closed') {
+                this.openDrawer();
+            }
         }
     }, {
         key: 'onmousedrag',
@@ -961,10 +1026,10 @@ var InlineEnvironmentDisplay = function (_Expression2) {
                     var display = this.displays[name];
                     if (!display) {
                         display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression());
-                        // display.scale = { x: 0.6, y: 0.6 };
                         this.addArg(display);
                         this.displays[name] = display;
                     }
+                    display.ignoreEvents = true;
                 }
             } catch (err) {
                 _didIteratorError4 = true;
@@ -993,10 +1058,10 @@ var InlineEnvironmentDisplay = function (_Expression2) {
                     var _display = this.displays[_name];
                     if (!_display) {
                         _display = new (ExprManager.getClass('reference_display'))(_name, new MissingExpression());
-                        // display.scale = { x: 0.6, y: 0.6 };
                         this.addArg(_display);
                         this.displays[_name] = _display;
                     }
+                    _display.ignoreEvents = true;
                     _display.setExpr(env.lookup(_name));
                 }
             } catch (err) {
@@ -1027,7 +1092,7 @@ var InlineEnvironmentDisplay = function (_Expression2) {
     }, {
         key: 'draw',
         value: function draw(ctx) {
-            var _this14 = this;
+            var _this16 = this;
 
             if (!ctx) return;
             ctx.save();
@@ -1036,12 +1101,13 @@ var InlineEnvironmentDisplay = function (_Expression2) {
             }
             var boundingSize = this.absoluteSize;
             var upperLeftPos = this.upperLeftPos(this.absolutePos, boundingSize);
-            if (this._color || this.stroke) this.drawInternal(ctx, upperLeftPos, boundingSize);
-            this.children.forEach(function (child) {
-                child.parent = _this14;
-                child.draw(ctx);
-            });
-            if (this._color || this.stroke) this.drawInternalAfterChildren(ctx, upperLeftPos, boundingSize);
+            this.drawInternal(ctx, upperLeftPos, boundingSize);
+            if (this._state === 'open') {
+                this.children.forEach(function (child) {
+                    child.parent = _this16;
+                    child.draw(ctx);
+                });
+            }
             ctx.restore();
         }
     }, {
@@ -1062,6 +1128,13 @@ var InlineEnvironmentDisplay = function (_Expression2) {
         },
         set: function set(p) {
             this._pos = p;
+        }
+    }, {
+        key: 'absoluteSize',
+        get: function get() {
+            var size = _get(InlineEnvironmentDisplay.prototype.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay.prototype), 'absoluteSize', this);
+            size.h = Math.max(25, this._height * size.h);
+            return size;
         }
     }]);
 
@@ -1089,12 +1162,12 @@ var FadedLambdaHoleExpr = function (_LambdaHoleExpr) {
     function FadedLambdaHoleExpr(varname) {
         _classCallCheck(this, FadedLambdaHoleExpr);
 
-        var _this15 = _possibleConstructorReturn(this, (FadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedLambdaHoleExpr)).call(this, varname));
+        var _this17 = _possibleConstructorReturn(this, (FadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedLambdaHoleExpr)).call(this, varname));
 
-        _this15.label = new TextExpr("λ" + varname + ".");
-        _this15.holes.push(_this15.label);
-        _this15.label.color = "#000";
-        return _this15;
+        _this17.label = new TextExpr("λ" + varname + ".");
+        _this17.holes.push(_this17.label);
+        _this17.label.color = "#000";
+        return _this17;
     }
 
     _createClass(FadedLambdaHoleExpr, [{
@@ -1148,12 +1221,12 @@ var HalfFadedLambdaHoleExpr = function (_LambdaHoleExpr2) {
     function HalfFadedLambdaHoleExpr(varname) {
         _classCallCheck(this, HalfFadedLambdaHoleExpr);
 
-        var _this16 = _possibleConstructorReturn(this, (HalfFadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr)).call(this, varname));
+        var _this18 = _possibleConstructorReturn(this, (HalfFadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr)).call(this, varname));
 
-        _this16.label = new TextExpr("λ" + varname);
-        _this16.holes.push(_this16.label);
-        _this16.label.color = "#FFF";
-        return _this16;
+        _this18.label = new TextExpr("λ" + varname);
+        _this18.holes.push(_this18.label);
+        _this18.label.color = "#FFF";
+        return _this18;
     }
 
     _createClass(HalfFadedLambdaHoleExpr, [{
@@ -1235,15 +1308,15 @@ var FadedES6LambdaHoleExpr = function (_LambdaHoleExpr4) {
     function FadedES6LambdaHoleExpr(varname) {
         _classCallCheck(this, FadedES6LambdaHoleExpr);
 
-        var _this18 = _possibleConstructorReturn(this, (FadedES6LambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedES6LambdaHoleExpr)).call(this, varname));
+        var _this20 = _possibleConstructorReturn(this, (FadedES6LambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedES6LambdaHoleExpr)).call(this, varname));
 
-        _this18.label = new TextExpr("(" + varname + ")");
-        _this18.arrow = new TextExpr("=>");
-        _this18.holes.push(_this18.label);
-        _this18.holes.push(_this18.arrow);
-        _this18.label.color = "#000";
-        _this18.arrow.color = "#000";
-        return _this18;
+        _this20.label = new TextExpr("(" + varname + ")");
+        _this20.arrow = new TextExpr("=>");
+        _this20.holes.push(_this20.label);
+        _this20.holes.push(_this20.arrow);
+        _this20.label.color = "#000";
+        _this20.arrow.color = "#000";
+        return _this20;
     }
 
     _createClass(FadedES6LambdaHoleExpr, [{
@@ -1316,12 +1389,12 @@ var FadedLambdaVarExpr = function (_LambdaVarExpr2) {
     function FadedLambdaVarExpr(varname) {
         _classCallCheck(this, FadedLambdaVarExpr);
 
-        var _this20 = _possibleConstructorReturn(this, (FadedLambdaVarExpr.__proto__ || Object.getPrototypeOf(FadedLambdaVarExpr)).call(this, varname));
+        var _this22 = _possibleConstructorReturn(this, (FadedLambdaVarExpr.__proto__ || Object.getPrototypeOf(FadedLambdaVarExpr)).call(this, varname));
 
-        _this20.graphicNode.size = _this20.name === 'x' ? { w: 24, h: 24 } : { w: 24, h: 30 };
-        _this20.graphicNode.offset = _this20.name === 'x' ? { x: 0, y: 0 } : { x: 0, y: 2 };
-        _this20.handleOffset = 2;
-        return _this20;
+        _this22.graphicNode.size = _this22.name === 'x' ? { w: 24, h: 24 } : { w: 24, h: 30 };
+        _this22.graphicNode.offset = _this22.name === 'x' ? { x: 0, y: 0 } : { x: 0, y: 2 };
+        _this22.handleOffset = 2;
+        return _this22;
     }
 
     _createClass(FadedLambdaVarExpr, [{

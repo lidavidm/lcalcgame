@@ -171,6 +171,13 @@ class LambdaHoleExpr extends MissingExpression {
             // Ignore variables that are shadowed when previewing
             let subvarexprs = findNoncapturingVarExpr(this.parent, this.name);
 
+            let wasClosed = false;
+            if (this.parent.environmentDisplay) {
+                wasClosed = this.parent.environmentDisplay._state === 'closed' ||
+                    this.parent.environmentDisplay._state === 'closing';
+                this.parent.environmentDisplay.openDrawer({ force: true, speed: 100 });
+            }
+
             subvarexprs.forEach((e) => {
                 if (e.name === this.name) {
                     let preview_node = node.clone();
@@ -186,6 +193,10 @@ class LambdaHoleExpr extends MissingExpression {
                     e.close();
                 });
                 this.opened_subexprs = null;
+
+                if (this.parent.environmentDisplay && wasClosed) {
+                    this.parent.environmentDisplay.closeDrawer();
+                }
             };
         }
     }
@@ -634,6 +645,8 @@ class EnvironmentLambdaExpr extends LambdaExpr {
     }
 
     hits(pos, options=undefined) {
+        if (this.parent) return super.hits(pos, options);
+
         let result = super.hits(pos, options) || this.environmentDisplay.hits(pos, options);
         if (result == this.environmentDisplay) {
             return this;
@@ -642,6 +655,8 @@ class EnvironmentLambdaExpr extends LambdaExpr {
     }
 
     onmousedown(pos) {
+        if (this.parent) super.onmousedown(pos);
+
         if (super.hits(pos)) {
             this._eventTarget = this;
             super.onmousedown(pos);
@@ -653,6 +668,8 @@ class EnvironmentLambdaExpr extends LambdaExpr {
     }
 
     onmousedrag(pos) {
+        if (this.parent) super.onmousedrag(pos);
+
         if (!this._eventTarget) return;
         if (this._eventTarget == this) {
             super.onmousedrag(pos);
@@ -663,6 +680,8 @@ class EnvironmentLambdaExpr extends LambdaExpr {
     }
 
     onmouseup(pos) {
+        if (this.parent) super.onmouseup(pos);
+
         if (!this._eventTarget) return;
         if (this._eventTarget == this) {
             super.onmouseup(pos);
@@ -679,8 +698,10 @@ class EnvironmentLambdaExpr extends LambdaExpr {
     }
 
     draw(ctx) {
-        this.environmentDisplay.parent = this;
-        this.environmentDisplay.draw(ctx);
+        if (!this.parent) {
+            this.environmentDisplay.parent = this;
+            this.environmentDisplay.draw(ctx);
+        }
         super.draw(ctx);
     }
 }
@@ -695,10 +716,44 @@ class InlineEnvironmentDisplay extends Expression {
 
         this._stackVertically = true;
         this.displays = {};
+        this._state = 'closed';
+        this._height = 0.0;
+        this._animation = null;
+    }
+
+    openDrawer(options={}) {
+        let force = options.force || false;
+        let speed = options.speed || 300;
+        if (this._state === 'closed' || force) {
+            if (this._animation) this._animation.cancelWithoutFiringCallbacks();
+            this._state = 'opening';
+            this._animation = Animate.tween(this, { _height: 1.0 }, 100).after(() => {
+                this._state = 'open';
+                this._animation = null;
+            });
+        }
+    }
+
+    closeDrawer(options={}) {
+        let force = options.force || false;
+        let speed = options.speed || 300;
+        if (this._state === 'open' || force) {
+            if (this._animation) this._animation.cancelWithoutFiringCallbacks();
+            this._state = 'closing';
+            this._animation = Animate.tween(this, { _height: 0.0 }, 100).after(() => {
+                this._state = 'closed';
+                this._animation = null;
+            });
+        }
     }
 
     onmouseup() {
-        Animate.tween(this, { scale: { x: 1, y: 0.2 }}, 300);
+        if (this._state === 'open') {
+            this.closeDrawer();
+        }
+        else if (this._state === 'closed') {
+            this.openDrawer();
+        }
     }
 
     onmousedrag(pos) {
@@ -712,20 +767,20 @@ class InlineEnvironmentDisplay extends Expression {
             let display = this.displays[name];
             if (!display) {
                 display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression());
-                // display.scale = { x: 0.6, y: 0.6 };
                 this.addArg(display);
                 this.displays[name] = display;
             }
+            display.ignoreEvents = true;
         }
         for (let name of env.names()) {
             if (env.bound[name]) continue;
             let display = this.displays[name];
             if (!display) {
                 display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression());
-                // display.scale = { x: 0.6, y: 0.6 };
                 this.addArg(display);
                 this.displays[name] = display;
             }
+            display.ignoreEvents = true;
             display.setExpr(env.lookup(name));
         }
 
@@ -740,6 +795,12 @@ class InlineEnvironmentDisplay extends Expression {
 
     set pos(p) {
         this._pos = p;
+    }
+
+    get absoluteSize() {
+        var size = super.absoluteSize;
+        size.h = Math.max(25, this._height * size.h);
+        return size;
     }
 
     upperLeftPos(pos, boundingSize) {
@@ -757,12 +818,13 @@ class InlineEnvironmentDisplay extends Expression {
         }
         var boundingSize = this.absoluteSize;
         var upperLeftPos = this.upperLeftPos(this.absolutePos, boundingSize);
-        if (this._color || this.stroke) this.drawInternal(ctx, upperLeftPos, boundingSize);
-        this.children.forEach((child) => {
-            child.parent = this;
-            child.draw(ctx);
-        });
-        if (this._color || this.stroke) this.drawInternalAfterChildren(ctx, upperLeftPos, boundingSize);
+        this.drawInternal(ctx, upperLeftPos, boundingSize);
+        if (this._state === 'open') {
+            this.children.forEach((child) => {
+                child.parent = this;
+                child.draw(ctx);
+            });
+        }
         ctx.restore();
     }
 
