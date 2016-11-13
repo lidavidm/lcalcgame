@@ -137,7 +137,7 @@ var EnvironmentDisplay = function (_mag$Rect) {
     }, {
         key: "leftEdgePos",
         get: function get() {
-            return { x: this.padding + this.pos.x, y: 3 * this.padding + this.pos.y };
+            return { x: this.padding + this.pos.x, y: 2 * this.padding + this.pos.y };
         }
     }]);
 

@@ -513,7 +513,9 @@ var Expression = function (_mag$RoundedRect) {
                 }
             });
 
-            if (!this._stackVertically) {
+            if (this._stackVertically) {
+                height += 2 * padding.inner;
+            } else {
                 width += padding.right; // the end
             }
 

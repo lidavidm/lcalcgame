@@ -633,6 +633,46 @@ class EnvironmentLambdaExpr extends LambdaExpr {
         this.environmentDisplay.scale = { x: 0.85, y: 0.85 };
     }
 
+    hits(pos, options=undefined) {
+        let result = super.hits(pos, options) || this.environmentDisplay.hits(pos, options);
+        if (result == this.environmentDisplay) {
+            return this;
+        }
+        return result;
+    }
+
+    onmousedown(pos) {
+        if (super.hits(pos)) {
+            this._eventTarget = this;
+            super.onmousedown(pos);
+        }
+        else {
+            this._eventTarget = this.environmentDisplay;
+            this.environmentDisplay.onmousedown(pos);
+        }
+    }
+
+    onmousedrag(pos) {
+        if (!this._eventTarget) return;
+        if (this._eventTarget == this) {
+            super.onmousedrag(pos);
+        }
+        else {
+            this._eventTarget.onmousedrag(pos);
+        }
+    }
+
+    onmouseup(pos) {
+        if (!this._eventTarget) return;
+        if (this._eventTarget == this) {
+            super.onmouseup(pos);
+        }
+        else {
+            this._eventTarget.onmouseup(pos);
+        }
+        this._eventTarget = null;
+    }
+
     update() {
         super.update();
         this.environmentDisplay.update();
@@ -649,6 +689,7 @@ class EnvironmentLambdaExpr extends LambdaExpr {
 class InlineEnvironmentDisplay extends Expression {
     constructor(lambda) {
         super([]);
+        this.padding = { left: 10, inner: 20, right: 10 };
         this.lambda = lambda;
         this.parent = lambda;
 
@@ -656,7 +697,16 @@ class InlineEnvironmentDisplay extends Expression {
         this.displays = {};
     }
 
+    onmouseup() {
+        Animate.tween(this, { scale: { x: 1, y: 0.2 }}, 300);
+    }
+
+    onmousedrag(pos) {
+
+    }
+
     update() {
+        if (this.stage) window.stage = this.stage;
         let env = this.lambda.getEnvironment();
         for (let name of Object.keys(env.bound)) {
             let display = this.displays[name];
@@ -684,7 +734,7 @@ class InlineEnvironmentDisplay extends Expression {
 
     get pos() {
         let pos = this.lambda.pos;
-        pos.y += this.lambda.size.h;
+        pos.y += this.lambda.size.h - 10;
         return pos;
     }
 
@@ -695,7 +745,7 @@ class InlineEnvironmentDisplay extends Expression {
     upperLeftPos(pos, boundingSize) {
         return {
             x: this.lambda.pos.x,
-            y: this.lambda.pos.y + this.lambda.size.h,
+            y: this.lambda.pos.y + this.lambda.size.h - 10,
         };
     }
 
@@ -719,6 +769,9 @@ class InlineEnvironmentDisplay extends Expression {
     drawInternal(ctx, pos, boundingSize) {
         ctx.fillStyle = '#444';
         ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+
+        ctx.fillStyle = '#CCC';
+        ctx.fillRect(pos.x + (boundingSize.w / 2) - 10, pos.y + boundingSize.h - 7.5, 20, 5);
     }
 }
 
@@ -901,6 +954,9 @@ class FadedLambdaVarExpr extends LambdaVarExpr {
 }
 
 
+// This doesn't account for the case (lambda y. x) y, since we use
+// call-by-value (variables have to be evaluated before you can use
+// them)
 function findNoncapturingVarExpr(lambda, name, skipLambda=false, skipLabel=false) {
     let subvarexprs = [];
     let queue = [lambda];

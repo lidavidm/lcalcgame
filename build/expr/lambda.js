@@ -860,6 +860,49 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
     }
 
     _createClass(EnvironmentLambdaExpr, [{
+        key: 'hits',
+        value: function hits(pos) {
+            var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
+
+            var result = _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'hits', this).call(this, pos, options) || this.environmentDisplay.hits(pos, options);
+            if (result == this.environmentDisplay) {
+                return this;
+            }
+            return result;
+        }
+    }, {
+        key: 'onmousedown',
+        value: function onmousedown(pos) {
+            if (_get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'hits', this).call(this, pos)) {
+                this._eventTarget = this;
+                _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmousedown', this).call(this, pos);
+            } else {
+                this._eventTarget = this.environmentDisplay;
+                this.environmentDisplay.onmousedown(pos);
+            }
+        }
+    }, {
+        key: 'onmousedrag',
+        value: function onmousedrag(pos) {
+            if (!this._eventTarget) return;
+            if (this._eventTarget == this) {
+                _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmousedrag', this).call(this, pos);
+            } else {
+                this._eventTarget.onmousedrag(pos);
+            }
+        }
+    }, {
+        key: 'onmouseup',
+        value: function onmouseup(pos) {
+            if (!this._eventTarget) return;
+            if (this._eventTarget == this) {
+                _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmouseup', this).call(this, pos);
+            } else {
+                this._eventTarget.onmouseup(pos);
+            }
+            this._eventTarget = null;
+        }
+    }, {
         key: 'update',
         value: function update() {
             _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'update', this).call(this);
@@ -885,6 +928,7 @@ var InlineEnvironmentDisplay = function (_Expression2) {
 
         var _this13 = _possibleConstructorReturn(this, (InlineEnvironmentDisplay.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay)).call(this, []));
 
+        _this13.padding = { left: 10, inner: 20, right: 10 };
         _this13.lambda = lambda;
         _this13.parent = lambda;
 
@@ -894,8 +938,17 @@ var InlineEnvironmentDisplay = function (_Expression2) {
     }
 
     _createClass(InlineEnvironmentDisplay, [{
+        key: 'onmouseup',
+        value: function onmouseup() {
+            Animate.tween(this, { scale: { x: 1, y: 0.2 } }, 300);
+        }
+    }, {
+        key: 'onmousedrag',
+        value: function onmousedrag(pos) {}
+    }, {
         key: 'update',
         value: function update() {
+            if (this.stage) window.stage = this.stage;
             var env = this.lambda.getEnvironment();
             var _iteratorNormalCompletion4 = true;
             var _didIteratorError4 = false;
@@ -968,7 +1021,7 @@ var InlineEnvironmentDisplay = function (_Expression2) {
         value: function upperLeftPos(pos, boundingSize) {
             return {
                 x: this.lambda.pos.x,
-                y: this.lambda.pos.y + this.lambda.size.h
+                y: this.lambda.pos.y + this.lambda.size.h - 10
             };
         }
     }, {
@@ -996,12 +1049,15 @@ var InlineEnvironmentDisplay = function (_Expression2) {
         value: function drawInternal(ctx, pos, boundingSize) {
             ctx.fillStyle = '#444';
             ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+
+            ctx.fillStyle = '#CCC';
+            ctx.fillRect(pos.x + boundingSize.w / 2 - 10, pos.y + boundingSize.h - 7.5, 20, 5);
         }
     }, {
         key: 'pos',
         get: function get() {
             var pos = this.lambda.pos;
-            pos.y += this.lambda.size.h;
+            pos.y += this.lambda.size.h - 10;
             return pos;
         },
         set: function set(p) {
@@ -1319,6 +1375,11 @@ var FadedLambdaVarExpr = function (_LambdaVarExpr2) {
 
     return FadedLambdaVarExpr;
 }(LambdaVarExpr);
+
+// This doesn't account for the case (lambda y. x) y, since we use
+// call-by-value (variables have to be evaluated before you can use
+// them)
+
 
 function findNoncapturingVarExpr(lambda, name) {
     var skipLambda = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;

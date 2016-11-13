@@ -12,7 +12,7 @@ class EnvironmentDisplay extends mag.Rect {
         this.toolbox = true;
     }
 
-    get leftEdgePos() { return { x:this.padding + this.pos.x, y: 3 * this.padding + this.pos.y }; }
+    get leftEdgePos() { return { x:this.padding + this.pos.x, y: 2 * this.padding + this.pos.y }; }
 
     showEnvironment(env) {
         if (!env) return;
