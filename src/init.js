@@ -130,7 +130,10 @@ function initBoard() {
 
         stage = new MainMenu(canvas, () => {
             // Clicks 'play' button. Transition to chapter select screen.
-            stage = new ChapterSelectMenu(canvas);
+            stage = new ChapterSelectMenu(canvas, (chapterName) => {
+                stage = Resource.startChapter(chapterName, canvas);
+                redraw(stage);
+            });
             redraw(stage);
         }, () => {
             // Clicked 'settings' button. Transition to settings screen.

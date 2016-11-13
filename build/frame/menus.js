@@ -251,6 +251,7 @@ var ChapterCard = function (_mag$Rect2) {
         txt.anchor = { x: 0.5, y: 0 };
         _this5.addChild(txt);
 
+        _this5.name = name;
         _this5.onclick = onclick;
         return _this5;
     }
@@ -258,7 +259,7 @@ var ChapterCard = function (_mag$Rect2) {
     _createClass(ChapterCard, [{
         key: 'onmouseclick',
         value: function onmouseclick(pos) {
-            if (this.onclick) this.onclick();
+            if (this.onclick) this.onclick(this.name);
         }
     }]);
 
@@ -268,33 +269,31 @@ var ChapterCard = function (_mag$Rect2) {
 var ChapterSelectMenu = function (_mag$Stage2) {
     _inherits(ChapterSelectMenu, _mag$Stage2);
 
-    function ChapterSelectMenu() {
-        var canvas = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-        var onChapterSelect = arguments[1];
-
+    function ChapterSelectMenu(canvas, onChapterSelect) {
         _classCallCheck(this, ChapterSelectMenu);
 
         var _this6 = _possibleConstructorReturn(this, (ChapterSelectMenu.__proto__ || Object.getPrototypeOf(ChapterSelectMenu)).call(this, canvas));
 
-        _this6.showChapters();
-        _this6.onChapterSelect = onChapterSelect;
+        _this6.showChapters(onChapterSelect);
         return _this6;
     }
 
     _createClass(ChapterSelectMenu, [{
         key: 'showChapters',
-        value: function showChapters() {
+        value: function showChapters(onselect) {
 
             var W = 200;var P = 40;var X = 0;
-            var onChapterSelect = this.onChapterSelect;
-            var container = new DraggableRect(GLOBAL_DEFAULT_SCREENSIZE.width / 2.0 - W / 2.0, 100, 1000, 400);
+            var onChapterSelect = onselect;
+            console.log(onChapterSelect);
+            var container = new DraggableRect(GLOBAL_DEFAULT_SCREENSIZE.width / 2.0 - W / 2.0, 100, 1000, 300);
             container.constrainY();
-            container.color = 'blue';
+            container.color = 'lightgray';
+            container.shadowOffset = 0;
             container.snapEvery(W + P, W / 2.0 - P);
             this.add(container);
 
             Resource.getChapters().then(function (chapters) {
-                container.size = { w: (W + P) * chapters.length, h: 400 };
+                container.size = { w: (W + P) * chapters.length, h: 300 };
                 chapters.forEach(function (chap) {
 
                     var c = new ChapterCard(X, 0, W, 300, chap.name, chap.description, null, onChapterSelect);
@@ -303,6 +302,10 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                     c.onmousedrag = function (pos) {
                         pos.x -= c.pos.x;
                         container.onmousedrag(pos);
+                    };
+                    c.onmouseup = function (pos) {
+                        pos.x -= c.pos.x;
+                        container.onmouseup(pos);
                     };
                     container.addChild(c);
 

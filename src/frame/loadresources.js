@@ -133,6 +133,13 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     // Add levels here: (for now)
     var chapter_load_prom = loadChaptersFromFiles( ['intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map', 'assign'] );
 
+    Resource.startChapter = (chapterName, canvas) => {
+        for (let i = 0; i < chapters.length; i++) {
+            if (chapters[i].name === chapterName)
+                return Resource.buildLevel(levels[chapters[i].startIdx], canvas);
+        }
+        return null;
+    };
     Resource.buildLevel = (level_desc, canvas) => {
         ExprManager.clearFadeLevels();
         if ('fade' in level_desc) {
@@ -237,7 +244,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             resolve(chapters.slice());
         });
     };
-    Resource.getChapter =(name) => {
+    Resource.getChapter = (name) => {
         for (let c of chapters) {
             if (c.name === name) return c;
         }

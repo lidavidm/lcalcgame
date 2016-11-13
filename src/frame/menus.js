@@ -171,34 +171,36 @@ class ChapterCard extends mag.Rect {
         txt.anchor = { x:0.5, y:0 };
         this.addChild(txt);
 
+        this.name = name;
         this.onclick = onclick;
     }
 
     onmouseclick(pos) {
         if (this.onclick)
-            this.onclick();
+            this.onclick(this.name);
     }
 }
 
 class ChapterSelectMenu extends mag.Stage {
-    constructor(canvas=null, onChapterSelect) {
+    constructor(canvas, onChapterSelect) {
         super(canvas);
-        this.showChapters();
-        this.onChapterSelect = onChapterSelect;
+        this.showChapters(onChapterSelect);
     }
 
-    showChapters() {
+    showChapters(onselect) {
 
         let W = 200; let P = 40; let X = 0;
-        let onChapterSelect = this.onChapterSelect;
-        let container = new DraggableRect(GLOBAL_DEFAULT_SCREENSIZE.width / 2.0 - W / 2.0, 100, 1000, 400);
+        let onChapterSelect = onselect;
+        console.log(onChapterSelect);
+        let container = new DraggableRect(GLOBAL_DEFAULT_SCREENSIZE.width / 2.0 - W / 2.0, 100, 1000, 300);
         container.constrainY();
-        container.color = 'blue';
+        container.color = 'lightgray';
+        container.shadowOffset = 0;
         container.snapEvery(W + P, W / 2.0 - P);
         this.add(container);
 
         Resource.getChapters().then((chapters) => {
-            container.size = { w:(W + P) * chapters.length, h:400 };
+            container.size = { w:(W + P) * chapters.length, h:300 };
             chapters.forEach((chap) => {
 
                 let c = new ChapterCard(X, 0, W, 300, chap.name, chap.description, null, onChapterSelect);
@@ -207,6 +209,10 @@ class ChapterSelectMenu extends mag.Stage {
                 c.onmousedrag = (pos) => {
                     pos.x -= c.pos.x;
                     container.onmousedrag(pos);
+                };
+                c.onmouseup = (pos) => {
+                    pos.x -= c.pos.x;
+                    container.onmouseup(pos);
                 };
                 container.addChild(c);
 
