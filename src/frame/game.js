@@ -194,7 +194,8 @@ class Level {
 
         // Parse expressions recursively.
         let es = descs.map((expr_desc) => Level.parseExpr(expr_desc));
-        es = es.map((e) => e instanceof LambdaHoleExpr ? new LambdaExpr([e]) : e);
+        let LambdaClass = ExprManager.getClass('lambda_abstraction');
+        es = es.map((e) => e instanceof LambdaHoleExpr ? new LambdaClass([e]) : e);
         //console.log('exprs', es);
         return es;
     }
@@ -278,7 +279,8 @@ class Level {
                     }
                 }
                 if (op_class instanceof LambdaHoleExpr) {
-                    var lexp = new LambdaExpr([op_class]);
+                    let LambdaClass = ExprManager.getClass('lambda_abstraction');
+                    var lexp = new LambdaClass([op_class]);
                     for (let i = 1; i < exprs.length; i++) { lexp.addArg(exprs[i]); }
                     return lock(lexp, toplevel_lock);
                 }

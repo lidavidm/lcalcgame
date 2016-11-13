@@ -621,8 +621,9 @@ var Level = function () {
             var es = descs.map(function (expr_desc) {
                 return Level.parseExpr(expr_desc);
             });
+            var LambdaClass = ExprManager.getClass('lambda_abstraction');
             es = es.map(function (e) {
-                return e instanceof LambdaHoleExpr ? new LambdaExpr([e]) : e;
+                return e instanceof LambdaHoleExpr ? new LambdaClass([e]) : e;
             });
             //console.log('exprs', es);
             return es;
@@ -713,7 +714,8 @@ var Level = function () {
                                 }
                     }
                     if (op_class instanceof LambdaHoleExpr) {
-                        var lexp = new LambdaExpr([op_class]);
+                        var LambdaClass = ExprManager.getClass('lambda_abstraction');
+                        var lexp = new LambdaClass([op_class]);
                         for (var _i2 = 1; _i2 < exprs.length; _i2++) {
                             lexp.addArg(exprs[_i2]);
                         }
