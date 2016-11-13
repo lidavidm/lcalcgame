@@ -175,7 +175,7 @@ class LambdaHoleExpr extends MissingExpression {
             if (this.parent.environmentDisplay) {
                 wasClosed = this.parent.environmentDisplay._state === 'closed' ||
                     this.parent.environmentDisplay._state === 'closing';
-                this.parent.environmentDisplay.openDrawer({ force: true, speed: 100 });
+                this.parent.environmentDisplay.openDrawer({ force: true, speed: 50 });
             }
 
             subvarexprs.forEach((e) => {
@@ -195,7 +195,7 @@ class LambdaHoleExpr extends MissingExpression {
                 this.opened_subexprs = null;
 
                 if (this.parent.environmentDisplay && wasClosed) {
-                    this.parent.environmentDisplay.closeDrawer();
+                    this.parent.environmentDisplay.closeDrawer({ force: true, speed: 50 });
                 }
             };
         }
@@ -727,7 +727,7 @@ class InlineEnvironmentDisplay extends Expression {
         if (this._state === 'closed' || force) {
             if (this._animation) this._animation.cancelWithoutFiringCallbacks();
             this._state = 'opening';
-            this._animation = Animate.tween(this, { _height: 1.0 }, 100).after(() => {
+            this._animation = Animate.tween(this, { _height: 1.0 }, speed).after(() => {
                 this._state = 'open';
                 this._animation = null;
             });
@@ -740,7 +740,7 @@ class InlineEnvironmentDisplay extends Expression {
         if (this._state === 'open' || force) {
             if (this._animation) this._animation.cancelWithoutFiringCallbacks();
             this._state = 'closing';
-            this._animation = Animate.tween(this, { _height: 0.0 }, 100).after(() => {
+            this._animation = Animate.tween(this, { _height: 0.0 }, speed).after(() => {
                 this._state = 'closed';
                 this._animation = null;
             });
@@ -788,9 +788,7 @@ class InlineEnvironmentDisplay extends Expression {
     }
 
     get pos() {
-        let pos = this.lambda.pos;
-        pos.y += this.lambda.size.h - 10;
-        return pos;
+        return { x: 0, y: this.lambda.size.h - 10 };
     }
 
     set pos(p) {
@@ -801,13 +799,6 @@ class InlineEnvironmentDisplay extends Expression {
         var size = super.absoluteSize;
         size.h = Math.max(25, this._height * size.h);
         return size;
-    }
-
-    upperLeftPos(pos, boundingSize) {
-        return {
-            x: this.lambda.pos.x,
-            y: this.lambda.pos.y + this.lambda.size.h - 10,
-        };
     }
 
     draw(ctx) {

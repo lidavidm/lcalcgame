@@ -226,7 +226,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
                     var wasClosed = false;
                     if (_this5.parent.environmentDisplay) {
                         wasClosed = _this5.parent.environmentDisplay._state === 'closed' || _this5.parent.environmentDisplay._state === 'closing';
-                        _this5.parent.environmentDisplay.openDrawer({ force: true, speed: 100 });
+                        _this5.parent.environmentDisplay.openDrawer({ force: true, speed: 50 });
                     }
 
                     subvarexprs.forEach(function (e) {
@@ -246,7 +246,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
                         _this5.opened_subexprs = null;
 
                         if (_this5.parent.environmentDisplay && wasClosed) {
-                            _this5.parent.environmentDisplay.closeDrawer();
+                            _this5.parent.environmentDisplay.closeDrawer({ force: true, speed: 50 });
                         }
                     };
                 })();
@@ -974,7 +974,7 @@ var InlineEnvironmentDisplay = function (_Expression2) {
             if (this._state === 'closed' || force) {
                 if (this._animation) this._animation.cancelWithoutFiringCallbacks();
                 this._state = 'opening';
-                this._animation = Animate.tween(this, { _height: 1.0 }, 100).after(function () {
+                this._animation = Animate.tween(this, { _height: 1.0 }, speed).after(function () {
                     _this14._state = 'open';
                     _this14._animation = null;
                 });
@@ -992,7 +992,7 @@ var InlineEnvironmentDisplay = function (_Expression2) {
             if (this._state === 'open' || force) {
                 if (this._animation) this._animation.cancelWithoutFiringCallbacks();
                 this._state = 'closing';
-                this._animation = Animate.tween(this, { _height: 0.0 }, 100).after(function () {
+                this._animation = Animate.tween(this, { _height: 0.0 }, speed).after(function () {
                     _this15._state = 'closed';
                     _this15._animation = null;
                 });
@@ -1082,14 +1082,6 @@ var InlineEnvironmentDisplay = function (_Expression2) {
             _get(InlineEnvironmentDisplay.prototype.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay.prototype), 'update', this).call(this);
         }
     }, {
-        key: 'upperLeftPos',
-        value: function upperLeftPos(pos, boundingSize) {
-            return {
-                x: this.lambda.pos.x,
-                y: this.lambda.pos.y + this.lambda.size.h - 10
-            };
-        }
-    }, {
         key: 'draw',
         value: function draw(ctx) {
             var _this16 = this;
@@ -1122,9 +1114,7 @@ var InlineEnvironmentDisplay = function (_Expression2) {
     }, {
         key: 'pos',
         get: function get() {
-            var pos = this.lambda.pos;
-            pos.y += this.lambda.size.h - 10;
-            return pos;
+            return { x: 0, y: this.lambda.size.h - 10 };
         },
         set: function set(p) {
             this._pos = p;
