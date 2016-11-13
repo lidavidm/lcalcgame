@@ -140,7 +140,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAnimation('poof', [0, 4], 120); // Cloud 'poof' animation for destructor piece.
 
     // Add levels here: (for now)
-    var chapter_load_prom = loadChaptersFromFiles(['assign', 'intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map']);
+    var chapter_load_prom = loadChaptersFromFiles(['intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map', 'assign']);
 
     Resource.buildLevel = function (level_desc, canvas) {
         ExprManager.clearFadeLevels();

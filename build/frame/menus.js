@@ -1,5 +1,7 @@
 'use strict';
 
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _set = function set(object, property, value, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent !== null) { set(parent, property, value, receiver); } } else if ("value" in desc && desc.writable) { desc.value = value; } else { var setter = desc.set; if (setter !== undefined) { setter.call(receiver, value); } } return value; };
@@ -173,4 +175,142 @@ var MainMenu = function (_mag$Stage) {
     }]);
 
     return MainMenu;
+}(mag.Stage);
+
+var DraggableRect = function (_mag$Rect) {
+    _inherits(DraggableRect, _mag$Rect);
+
+    function DraggableRect() {
+        _classCallCheck(this, DraggableRect);
+
+        return _possibleConstructorReturn(this, (DraggableRect.__proto__ || Object.getPrototypeOf(DraggableRect)).apply(this, arguments));
+    }
+
+    _createClass(DraggableRect, [{
+        key: 'constrainX',
+        value: function constrainX() {
+            this.cX = true;
+        }
+    }, {
+        key: 'constrainY',
+        value: function constrainY() {
+            this.cY = true;
+        }
+    }, {
+        key: 'snapEvery',
+        value: function snapEvery(step, offset) {
+            this.snapStep = step;this.snapOffset = offset;
+        }
+    }, {
+        key: 'onmousedrag',
+        value: function onmousedrag(pos) {
+            if (this.cX) pos.x = this.pos.x;
+            if (this.cY) pos.y = this.pos.y;
+            this.pos = pos;
+        }
+    }, {
+        key: 'onmouseup',
+        value: function onmouseup(pos) {
+            if (!this.snapStep) {
+                _get(DraggableRect.prototype.__proto__ || Object.getPrototypeOf(DraggableRect.prototype), 'onmouseup', this).call(this, pos);
+                return;
+            }
+
+            var targetPos = { x: Math.round(this.pos.x / this.snapStep) * this.snapStep + this.snapOffset, y: this.pos.y };
+            Animate.tween(this, { pos: targetPos }, 200, function (elapsed) {
+                return Math.pow(elapsed, 0.5);
+            });
+        }
+    }]);
+
+    return DraggableRect;
+}(mag.Rect);
+
+var ChapterCard = function (_mag$Rect2) {
+    _inherits(ChapterCard, _mag$Rect2);
+
+    function ChapterCard(x, y, w, h, name, desc, icon, onclick) {
+        _classCallCheck(this, ChapterCard);
+
+        var TXTPAD = 50;
+
+
+        // Visual icon
+
+        var _this5 = _possibleConstructorReturn(this, (ChapterCard.__proto__ || Object.getPrototypeOf(ChapterCard)).call(this, x, y, w, h));
+
+        var img = new mag.ImageRect(0, 0, w, h - TXTPAD, icon);
+        img.ignoreEvents = true;
+        _this5.addChild(img);
+
+        // Chapter name
+        var txt = new TextExpr(name, 'Futura');
+        txt.color = 'white';
+        txt.pos = { x: img.pos.x + img.size.w / 2.0,
+            y: img.pos.y + img.size.h + txt.fontSize };
+        txt.anchor = { x: 0.5, y: 0 };
+        _this5.addChild(txt);
+
+        _this5.onclick = onclick;
+        return _this5;
+    }
+
+    _createClass(ChapterCard, [{
+        key: 'onmouseclick',
+        value: function onmouseclick(pos) {
+            if (this.onclick) this.onclick();
+        }
+    }]);
+
+    return ChapterCard;
+}(mag.Rect);
+
+var ChapterSelectMenu = function (_mag$Stage2) {
+    _inherits(ChapterSelectMenu, _mag$Stage2);
+
+    function ChapterSelectMenu() {
+        var canvas = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+        var onChapterSelect = arguments[1];
+
+        _classCallCheck(this, ChapterSelectMenu);
+
+        var _this6 = _possibleConstructorReturn(this, (ChapterSelectMenu.__proto__ || Object.getPrototypeOf(ChapterSelectMenu)).call(this, canvas));
+
+        _this6.showChapters();
+        _this6.onChapterSelect = onChapterSelect;
+        return _this6;
+    }
+
+    _createClass(ChapterSelectMenu, [{
+        key: 'showChapters',
+        value: function showChapters() {
+
+            var W = 200;var P = 40;var X = 0;
+            var onChapterSelect = this.onChapterSelect;
+            var container = new DraggableRect(GLOBAL_DEFAULT_SCREENSIZE.width / 2.0 - W / 2.0, 100, 1000, 400);
+            container.constrainY();
+            container.color = 'blue';
+            container.snapEvery(W + P, W / 2.0 - P);
+            this.add(container);
+
+            Resource.getChapters().then(function (chapters) {
+                container.size = { w: (W + P) * chapters.length, h: 400 };
+                chapters.forEach(function (chap) {
+
+                    var c = new ChapterCard(X, 0, W, 300, chap.name, chap.description, null, onChapterSelect);
+                    //c.ignoreEvents = true;
+                    c.color = 'HotPink';
+                    c.onmousedrag = function (pos) {
+                        pos.x -= c.pos.x;
+                        container.onmousedrag(pos);
+                    };
+                    container.addChild(c);
+
+                    X += W + P;
+                });
+            });
+        }
+    }]);
+
+    return ChapterSelectMenu;
 }(mag.Stage);

@@ -119,6 +119,9 @@
              if (hitChild) return hitChild;
 
              // Hasn't hit any children, so test if the point lies on this node.
+             return this.hitsWithin(pos);
+         }
+         hitsWithin(pos) {
              var boundingSize = this.absoluteSize;
              var upperLeftPos = this.upperLeftPos(this.absolutePos, boundingSize);
              if (pointInRect(pos, rectFromPosAndSize(upperLeftPos, boundingSize) )) return this;

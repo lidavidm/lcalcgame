@@ -137,7 +137,7 @@ function initBoard() {
 
             stage = new MainMenu(canvas, function () {
                 // Clicks 'play' button. Transition to chapter select screen.
-                stage = new mag.Stage(canvas);
+                stage = new ChapterSelectMenu(canvas);
                 redraw(stage);
             }, function () {
                 // Clicked 'settings' button. Transition to settings screen.

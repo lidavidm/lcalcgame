@@ -131,3 +131,89 @@ class MainMenu extends mag.Stage {
         this.add(b);
     }
 }
+
+class DraggableRect extends mag.Rect {
+    constrainX() { this.cX = true; }
+    constrainY() { this.cY = true; }
+    snapEvery(step, offset) { this.snapStep = step; this.snapOffset = offset; }
+    onmousedrag(pos) {
+        if (this.cX) pos.x = this.pos.x;
+        if (this.cY) pos.y = this.pos.y;
+        this.pos = pos;
+    }
+    onmouseup(pos) {
+        if (!this.snapStep) {
+            super.onmouseup(pos);
+            return;
+        }
+
+        let targetPos = { x:Math.round(this.pos.x / this.snapStep) * this.snapStep + this.snapOffset, y:this.pos.y };
+        Animate.tween(this, { pos:targetPos }, 200, (elapsed) => Math.pow(elapsed, 0.5));
+    }
+}
+
+class ChapterCard extends mag.Rect {
+    constructor(x, y, w, h, name, desc, icon, onclick) {
+
+        const TXTPAD = 50;
+        super(x, y, w, h);
+
+        // Visual icon
+        let img = new mag.ImageRect(0, 0, w, h - TXTPAD, icon);
+        img.ignoreEvents = true;
+        this.addChild(img);
+
+        // Chapter name
+        let txt = new TextExpr(name, 'Futura');
+        txt.color = 'white';
+        txt.pos = { x:img.pos.x+img.size.w/2.0,
+                    y:img.pos.y+img.size.h+txt.fontSize };
+        txt.anchor = { x:0.5, y:0 };
+        this.addChild(txt);
+
+        this.onclick = onclick;
+    }
+
+    onmouseclick(pos) {
+        if (this.onclick)
+            this.onclick();
+    }
+}
+
+class ChapterSelectMenu extends mag.Stage {
+    constructor(canvas=null, onChapterSelect) {
+        super(canvas);
+        this.showChapters();
+        this.onChapterSelect = onChapterSelect;
+    }
+
+    showChapters() {
+
+        let W = 200; let P = 40; let X = 0;
+        let onChapterSelect = this.onChapterSelect;
+        let container = new DraggableRect(GLOBAL_DEFAULT_SCREENSIZE.width / 2.0 - W / 2.0, 100, 1000, 400);
+        container.constrainY();
+        container.color = 'blue';
+        container.snapEvery(W + P, W / 2.0 - P);
+        this.add(container);
+
+        Resource.getChapters().then((chapters) => {
+            container.size = { w:(W + P) * chapters.length, h:400 };
+            chapters.forEach((chap) => {
+
+                let c = new ChapterCard(X, 0, W, 300, chap.name, chap.description, null, onChapterSelect);
+                //c.ignoreEvents = true;
+                c.color = 'HotPink';
+                c.onmousedrag = (pos) => {
+                    pos.x -= c.pos.x;
+                    container.onmousedrag(pos);
+                };
+                container.addChild(c);
+
+                X += W + P;
+
+            });
+        });
+
+    }
+}

@@ -9,7 +9,13 @@ var mag = (function(_) {
         get offset() { return { x:this._offset.x, y:this._offset.y }; }
         set offset(o) { this._offset = { x:o.x, y:o.y }; }
         drawInternal(ctx, pos, boundingSize) {
-            if (!ctx || !this.image) {
+            if (!this.image) {
+                //console.error('@ ImageRect: Cannot draw image ', this.image, ' in context ', ctx);
+                ctx.fillStyle = 'pink';
+                ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+                return;
+            }
+            else if (!ctx) {
                 console.error('@ ImageRect: Cannot draw image ', this.image, ' in context ', ctx);
                 return;
             }
