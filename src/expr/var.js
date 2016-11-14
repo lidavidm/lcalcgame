@@ -171,8 +171,6 @@ class ChestVarExpr extends VarExpr {
     }
 
     performReduction(animated=true) {
-        if (this.parent && this.parent instanceof AssignExpr) return null;
-
         let value = this.reduce();
         if (value != this) {
             if (!animated) {
@@ -558,7 +556,12 @@ class AssignExpr extends Expression {
         // The side-effect actually happens here. reduce() is called
         // multiple times as a 'canReduce', and we don't want any
         // update to happen multiple times.
-        if (!this.canReduce()) return null;
+        if (!this.canReduce()) {
+            if (this.value && this.variable && !this.value.canReduce()) {
+                this.value.performReduction();
+            }
+            return null;
+        }
 
         if (!animated) {
             this.value.performReduction(false);
