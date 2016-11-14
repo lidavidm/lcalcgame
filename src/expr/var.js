@@ -171,7 +171,8 @@ class ChestVarExpr extends VarExpr {
     }
 
     performReduction(animated=true) {
-        if (this._opened) return null;
+        if (this.parent && this.parent instanceof AssignExpr) return null;
+
         let value = this.reduce();
         if (value != this) {
             if (!animated) {
@@ -207,7 +208,11 @@ class ChestVarExpr extends VarExpr {
 
         let stage = this.stage;
         stage.add(value);
-        this._opened = true;
+
+        if (!this._opened) {
+            Resource.play('chest-open');
+            this._opened = true;
+        }
 
         return new Promise((resolve, _reject) => {
             Animate.tween(value, {
@@ -250,6 +255,7 @@ class ChestVarExpr extends VarExpr {
 
 class JumpingChestVarExpr extends ChestVarExpr {
     performReduction(animated=true) {
+        if (this.parent && this.parent instanceof AssignExpr) return null;
         if (!animated || !this.stage) {
             return super.performReduction(animated);
         }
@@ -258,6 +264,7 @@ class JumpingChestVarExpr extends ChestVarExpr {
             return super.performReduction(animated);
         }
 
+        Resource.play('chest-open');
         this._opened = true;
         let value = chest.holes[0].clone();
         value.pos = chest.holes[0].absolutePos;
@@ -273,7 +280,6 @@ class JumpingChestVarExpr extends ChestVarExpr {
                 this.stage.remove(value);
                 this.stage.draw();
                 window.setTimeout(() => {
-                    this._opened = false;
                     super.performReduction(true).then((value) => {
                         resolve(value);
                     });
