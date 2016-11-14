@@ -76,6 +76,8 @@ class VarExpr extends Expression {
     }
 
     performReduction() {
+        if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return;
+
         let value = this.reduce();
         if (value != this) {
             value = value.clone();
@@ -171,6 +173,8 @@ class ChestVarExpr extends VarExpr {
     }
 
     performReduction(animated=true) {
+        if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return null;
+
         let value = this.reduce();
         if (value != this) {
             if (!animated) {
@@ -253,7 +257,8 @@ class ChestVarExpr extends VarExpr {
 
 class JumpingChestVarExpr extends ChestVarExpr {
     performReduction(animated=true) {
-        if (this.parent && this.parent instanceof AssignExpr) return null;
+        if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return null;
+
         if (!animated || !this.stage) {
             return super.performReduction(animated);
         }
@@ -484,7 +489,7 @@ class AssignExpr extends Expression {
     }
 
     canReduce() {
-        return this.value && this.variable && this.value.canReduce();
+        return this.value && this.variable && this.value.canReduce() && this.variable instanceof VarExpr;
     }
 
     reduce() {

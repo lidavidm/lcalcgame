@@ -113,6 +113,8 @@ var VarExpr = function (_Expression) {
     }, {
         key: "performReduction",
         value: function performReduction() {
+            if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return;
+
             var value = this.reduce();
             if (value != this) {
                 value = value.clone();
@@ -223,6 +225,8 @@ var ChestVarExpr = function (_VarExpr2) {
             var _this4 = this;
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+            if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return null;
 
             var value = this.reduce();
             if (value != this) {
@@ -336,7 +340,8 @@ var JumpingChestVarExpr = function (_ChestVarExpr) {
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
-            if (this.parent && this.parent instanceof AssignExpr) return null;
+            if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return null;
+
             if (!animated || !this.stage) {
                 return _get(JumpingChestVarExpr.prototype.__proto__ || Object.getPrototypeOf(JumpingChestVarExpr.prototype), "performReduction", this).call(this, animated);
             }
@@ -629,7 +634,7 @@ var AssignExpr = function (_Expression4) {
     }, {
         key: "canReduce",
         value: function canReduce() {
-            return this.value && this.variable && this.value.canReduce();
+            return this.value && this.variable && this.value.canReduce() && this.variable instanceof VarExpr;
         }
     }, {
         key: "reduce",
