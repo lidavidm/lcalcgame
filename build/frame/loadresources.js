@@ -47,7 +47,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
 
     // Add resources here:
     loadAudio('pop', 'pop.wav');
-    loadAudio('poof', 'poof.wav');
+    loadAudio('poof', '208111__planman__poof-of-smoke.wav');
+    loadAudio('fly-to', '60012__qubodup__swing-25.wav');
     loadAudio('bag-spill', 'spill.wav');
     loadAudio('bag-addItem', 'putaway.wav');
     loadAudio('heatup', 'heatup.wav');
@@ -62,6 +63,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAudio('matching-goal', 'matching-the-goal2.wav');
     loadAudio('mutate', 'deflate.wav');
     loadAudio('game-complete', 'game-complete.wav');
+    loadAudio('chest-open', '202092__spookymodem__chest-opening.wav');
 
     loadImage('bag-background', 'bg-stars.png');
     loadImage('lambda-hole', 'lambda-hole.png');

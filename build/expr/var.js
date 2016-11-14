@@ -224,7 +224,6 @@ var ChestVarExpr = function (_VarExpr2) {
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
-            if (this._opened) return null;
             var value = this.reduce();
             if (value != this) {
                 if (!animated) {
@@ -262,7 +261,11 @@ var ChestVarExpr = function (_VarExpr2) {
 
             var stage = this.stage;
             stage.add(value);
-            this._opened = true;
+
+            if (!this._opened) {
+                Resource.play('chest-open');
+                this._opened = true;
+            }
 
             return new Promise(function (resolve, _reject) {
                 Animate.tween(value, {
@@ -333,6 +336,7 @@ var JumpingChestVarExpr = function (_ChestVarExpr) {
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
+            if (this.parent && this.parent instanceof AssignExpr) return null;
             if (!animated || !this.stage) {
                 return _get(JumpingChestVarExpr.prototype.__proto__ || Object.getPrototypeOf(JumpingChestVarExpr.prototype), "performReduction", this).call(this, animated);
             }
@@ -341,6 +345,7 @@ var JumpingChestVarExpr = function (_ChestVarExpr) {
                 return _get(JumpingChestVarExpr.prototype.__proto__ || Object.getPrototypeOf(JumpingChestVarExpr.prototype), "performReduction", this).call(this, animated);
             }
 
+            Resource.play('chest-open');
             this._opened = true;
             var value = chest.holes[0].clone();
             value.pos = chest.holes[0].absolutePos;
@@ -358,7 +363,6 @@ var JumpingChestVarExpr = function (_ChestVarExpr) {
                     _this7.stage.remove(value);
                     _this7.stage.draw();
                     window.setTimeout(function () {
-                        _this7._opened = false;
                         _get(JumpingChestVarExpr.prototype.__proto__ || Object.getPrototypeOf(JumpingChestVarExpr.prototype), "performReduction", _this7).call(_this7, true).then(function (value) {
                             resolve(value);
                         });
@@ -713,7 +717,12 @@ var AssignExpr = function (_Expression4) {
             // The side-effect actually happens here. reduce() is called
             // multiple times as a 'canReduce', and we don't want any
             // update to happen multiple times.
-            if (!this.canReduce()) return null;
+            if (!this.canReduce()) {
+                if (this.value && this.variable && !this.value.canReduce()) {
+                    this.value.performReduction();
+                }
+                return null;
+            }
 
             if (!animated) {
                 this.value.performReduction(false);
@@ -823,6 +832,7 @@ var JumpingAssignExpr = function (_AssignExpr) {
                     };
 
                     var lerp = arcLerp(value.absolutePos.y, targetPos.y, -150);
+                    Resource.play('fly-to');
                     Animate.tween(value, target, 500, function (x) {
                         return x;
                     }, true, lerp).after(function () {

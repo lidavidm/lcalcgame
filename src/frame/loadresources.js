@@ -39,6 +39,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     // Add resources here:
     loadAudio('pop', 'pop.wav');
     loadAudio('poof', '208111__planman__poof-of-smoke.wav');
+    loadAudio('fly-to', '60012__qubodup__swing-25.wav');
     loadAudio('bag-spill', 'spill.wav');
     loadAudio('bag-addItem', 'putaway.wav');
     loadAudio('heatup', 'heatup.wav');

@@ -652,6 +652,7 @@ class JumpingAssignExpr extends AssignExpr {
                 };
 
                 let lerp = arcLerp(value.absolutePos.y, targetPos.y, -150);
+                Resource.play('fly-to');
                 Animate.tween(value, target, 500, (x) => x, true, lerp).after(() => {
                     this.stage.remove(value);
                     this.finishReduction();
