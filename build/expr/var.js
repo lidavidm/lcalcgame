@@ -616,7 +616,8 @@ var AssignExpr = function (_Expression4) {
             _this13.holes.push(missing);
         }
 
-        _this13.holes.push(new TextExpr("←"));
+        _this13.arrowLabel = new TextExpr("←");
+        _this13.holes.push(_this13.arrowLabel);
 
         if (value) {
             _this13.holes.push(value);
@@ -851,4 +852,19 @@ var JumpingAssignExpr = function (_AssignExpr) {
     }]);
 
     return JumpingAssignExpr;
+}(AssignExpr);
+
+var EqualsAssignExpr = function (_AssignExpr2) {
+    _inherits(EqualsAssignExpr, _AssignExpr2);
+
+    function EqualsAssignExpr(variable, value) {
+        _classCallCheck(this, EqualsAssignExpr);
+
+        var _this19 = _possibleConstructorReturn(this, (EqualsAssignExpr.__proto__ || Object.getPrototypeOf(EqualsAssignExpr)).call(this, variable, value));
+
+        _this19.arrowLabel.text = "=";
+        return _this19;
+    }
+
+    return EqualsAssignExpr;
 }(AssignExpr);

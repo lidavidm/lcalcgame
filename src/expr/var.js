@@ -466,7 +466,8 @@ class AssignExpr extends Expression {
             this.holes.push(missing);
         }
 
-        this.holes.push(new TextExpr("←"));
+        this.arrowLabel = new TextExpr("←");
+        this.holes.push(this.arrowLabel);
 
         if (value) {
             this.holes.push(value);
@@ -665,5 +666,12 @@ class JumpingAssignExpr extends AssignExpr {
                 });
             });
         });
+    }
+}
+
+class EqualsAssignExpr extends AssignExpr {
+    constructor(variable, value) {
+        super(variable, value);
+        this.arrowLabel.text = "=";
     }
 }
