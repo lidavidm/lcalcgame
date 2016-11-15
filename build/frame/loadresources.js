@@ -49,6 +49,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAudio('pop', 'pop.wav');
     loadAudio('poof', '208111__planman__poof-of-smoke.wav');
     loadAudio('fly-to', '60012__qubodup__swing-25.wav');
+    loadAudio('fall-to', '202753__sheepfilms__slide-whistle-1.wav');
+    loadAudio('come-out', '202753__sheepfilms__slide-whistle-2.wav');
     loadAudio('bag-spill', 'spill.wav');
     loadAudio('bag-addItem', 'putaway.wav');
     loadAudio('heatup', 'heatup.wav');

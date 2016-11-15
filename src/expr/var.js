@@ -217,6 +217,7 @@ class ChestVarExpr extends VarExpr {
         }
 
         return new Promise((resolve, _reject) => {
+            Resource.play('come-out');
             Animate.tween(value, {
                 scale: { x: 1.0, y: 1.0 },
                 pos: {
@@ -278,6 +279,7 @@ class JumpingChestVarExpr extends ChestVarExpr {
             scale: { x: 0.3, y: 0.3 },
         };
         let lerp = arcLerp(value.absolutePos.y, this.absolutePos.y);
+        Resource.play('fall-to');
         return new Promise((resolve, _reject) => {
             Animate.tween(value, target, 500, (x) => x, true, lerp).after(() => {
                 this.stage.remove(value);

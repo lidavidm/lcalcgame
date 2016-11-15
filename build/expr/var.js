@@ -272,6 +272,7 @@ var ChestVarExpr = function (_VarExpr2) {
             }
 
             return new Promise(function (resolve, _reject) {
+                Resource.play('come-out');
                 Animate.tween(value, {
                     scale: { x: 1.0, y: 1.0 },
                     pos: {
@@ -361,6 +362,7 @@ var JumpingChestVarExpr = function (_ChestVarExpr) {
                 scale: { x: 0.3, y: 0.3 }
             };
             var lerp = arcLerp(value.absolutePos.y, this.absolutePos.y);
+            Resource.play('fall-to');
             return new Promise(function (resolve, _reject) {
                 Animate.tween(value, target, 500, function (x) {
                     return x;
