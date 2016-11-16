@@ -212,7 +212,8 @@ class ChapterSelectMenu extends mag.Stage {
                 };
                 c.onmouseup = (pos) => {
                     pos.x -= c.pos.x;
-                    container.onmouseup(pos);
+                    container.onmouseup(
+                        pos);
                 };
                 container.addChild(c);
 
@@ -223,3 +224,116 @@ class ChapterSelectMenu extends mag.Stage {
 
     }
 }
+
+class LevelCell extends mag.RoundedRect {
+    constructor(x, y, w, h, name, icon, onclick) {
+        super(x, y, w, h);
+
+        this.shadowOffset = 10;
+
+        // Visual icon
+        if (icon) {
+            let img = new mag.ImageRect(0, 0, w, h, icon);
+            img.ignoreEvents = true;
+            this.addChild(img);
+        } else { // Default to text displaying level index.
+            let txt = new TextExpr(name.toString(), 'Futura');
+            txt.color = 'white';
+            txt.anchor = { x:0.5, y:0.5 };
+            txt.pos = { x: w / 2.0, y: w / 2.0 };
+            this.addChild(txt);
+        }
+
+        this.name = name;
+        this.onclick = onclick;
+    }
+    onmouseclick(pos) {
+        if (this.onclick)
+            this.onclick();
+    }
+}
+
+class LevelSelectMenu extends mag.Stage {
+    constructor(canvas, chapterName, onLevelSelect) {
+        super(canvas);
+        this.showGrid(chapterName, onLevelSelect);
+    }
+
+    showGrid(chapterName, onselect) {
+
+        // Layout measurement
+        const levels = Resource.levelsForChapter(chapterName);
+        const NUM_CELLS = levels.length; // total number of cells to fit on the grid
+        const CELL_SIZE = 124; // width and height of each cell square, in pixels
+        const SCREEN_WIDTH = GLOBAL_DEFAULT_SCREENSIZE.width; // the width of the screen to work with
+        const PADDING = 20; // padding between cells
+        const GRID_MARGIN = 20; // margin bounding grid on top, left, and right sides
+        const NUM_COLS = Math.trunc((SCREEN_WIDTH - GRID_MARGIN*2) / (CELL_SIZE + PADDING)); // number of cells that fit horizontally on the screen
+        const NUM_ROWS = Math.trunc(NUM_CELLS / NUM_COLS + 1); // number of rows
+        const GRID_LEFTPAD = (SCREEN_WIDTH - ((CELL_SIZE + PADDING) * NUM_COLS + GRID_MARGIN*2)) / 2.0;
+
+        console.log(SCREEN_WIDTH - GRID_MARGIN*2, CELL_SIZE + PADDING, NUM_CELLS, NUM_COLS, NUM_ROWS);
+
+        const genClickCallback = (level_idx) => {
+            return () => onselect(levels[level_idx]);
+        };
+
+        const leftmost = GRID_LEFTPAD + GRID_MARGIN;
+        let x = leftmost;
+        let y = GRID_MARGIN;
+
+        for (let r = 0; r < NUM_ROWS; r++) {
+
+            let i = r * NUM_COLS;
+
+            for (let c = 0; c < NUM_COLS; c++) {
+
+                // Create a level cell and add it to the grid.
+                let cell = new LevelCell(x + CELL_SIZE / 2.0, y + CELL_SIZE / 2.0, CELL_SIZE, CELL_SIZE, i, null, genClickCallback(i));
+                cell.anchor = { x:0.5, y:0.5 };
+                cell.color = 'LightGreen';
+                cell.shadowColor = 'Green';
+                cell.highlightColor = 'green';
+                this.add(cell);
+
+                // Animate cell into position.
+                cell.scale = { x:0.2, y:0.2 };
+                Animate.wait(i * 50).after(() => {
+                    Animate.tween(cell, { scale: { x:1, y:1 } }, 300, (elapsed) => Math.pow(elapsed, 0.5));
+                });
+
+                // Increment x-position.
+                x += CELL_SIZE + PADDING;
+
+                // The level index, calculated from the row and column indices.
+                i++;
+                if (i >= NUM_CELLS) break;
+            }
+
+            if (i >= NUM_CELLS) break;
+
+            // Increment y-position and set x-position left.
+            y += CELL_SIZE + PADDING;
+            x = leftmost;
+        }
+
+
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{}

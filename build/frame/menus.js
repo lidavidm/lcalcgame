@@ -317,3 +317,132 @@ var ChapterSelectMenu = function (_mag$Stage2) {
 
     return ChapterSelectMenu;
 }(mag.Stage);
+
+var LevelCell = function (_mag$RoundedRect2) {
+    _inherits(LevelCell, _mag$RoundedRect2);
+
+    function LevelCell(x, y, w, h, name, icon, onclick) {
+        _classCallCheck(this, LevelCell);
+
+        var _this7 = _possibleConstructorReturn(this, (LevelCell.__proto__ || Object.getPrototypeOf(LevelCell)).call(this, x, y, w, h));
+
+        _this7.shadowOffset = 10;
+
+        // Visual icon
+        if (icon) {
+            var img = new mag.ImageRect(0, 0, w, h, icon);
+            img.ignoreEvents = true;
+            _this7.addChild(img);
+        } else {
+            // Default to text displaying level index.
+            var txt = new TextExpr(name.toString(), 'Futura');
+            txt.color = 'white';
+            txt.anchor = { x: 0.5, y: 0.5 };
+            txt.pos = { x: w / 2.0, y: w / 2.0 };
+            _this7.addChild(txt);
+        }
+
+        _this7.name = name;
+        _this7.onclick = onclick;
+        return _this7;
+    }
+
+    _createClass(LevelCell, [{
+        key: 'onmouseclick',
+        value: function onmouseclick(pos) {
+            if (this.onclick) this.onclick();
+        }
+    }]);
+
+    return LevelCell;
+}(mag.RoundedRect);
+
+var LevelSelectMenu = function (_mag$Stage3) {
+    _inherits(LevelSelectMenu, _mag$Stage3);
+
+    function LevelSelectMenu(canvas, chapterName, onLevelSelect) {
+        _classCallCheck(this, LevelSelectMenu);
+
+        var _this8 = _possibleConstructorReturn(this, (LevelSelectMenu.__proto__ || Object.getPrototypeOf(LevelSelectMenu)).call(this, canvas));
+
+        _this8.showGrid(chapterName, onLevelSelect);
+        return _this8;
+    }
+
+    _createClass(LevelSelectMenu, [{
+        key: 'showGrid',
+        value: function showGrid(chapterName, onselect) {
+            var _this9 = this;
+
+            // Layout measurement
+            var levels = Resource.levelsForChapter(chapterName);
+            var NUM_CELLS = levels.length; // total number of cells to fit on the grid
+            var CELL_SIZE = 124; // width and height of each cell square, in pixels
+            var SCREEN_WIDTH = GLOBAL_DEFAULT_SCREENSIZE.width; // the width of the screen to work with
+            var PADDING = 20; // padding between cells
+            var GRID_MARGIN = 20; // margin bounding grid on top, left, and right sides
+            var NUM_COLS = Math.trunc((SCREEN_WIDTH - GRID_MARGIN * 2) / (CELL_SIZE + PADDING)); // number of cells that fit horizontally on the screen
+            var NUM_ROWS = Math.trunc(NUM_CELLS / NUM_COLS + 1); // number of rows
+            var GRID_LEFTPAD = (SCREEN_WIDTH - ((CELL_SIZE + PADDING) * NUM_COLS + GRID_MARGIN * 2)) / 2.0;
+
+            console.log(SCREEN_WIDTH - GRID_MARGIN * 2, CELL_SIZE + PADDING, NUM_CELLS, NUM_COLS, NUM_ROWS);
+
+            var genClickCallback = function genClickCallback(level_idx) {
+                return function () {
+                    return onselect(levels[level_idx]);
+                };
+            };
+
+            var leftmost = GRID_LEFTPAD + GRID_MARGIN;
+            var x = leftmost;
+            var y = GRID_MARGIN;
+
+            for (var r = 0; r < NUM_ROWS; r++) {
+
+                var i = r * NUM_COLS;
+
+                var _loop = function _loop(c) {
+
+                    // Create a level cell and add it to the grid.
+                    var cell = new LevelCell(x + CELL_SIZE / 2.0, y + CELL_SIZE / 2.0, CELL_SIZE, CELL_SIZE, i, null, genClickCallback(i));
+                    cell.anchor = { x: 0.5, y: 0.5 };
+                    cell.color = 'LightGreen';
+                    cell.shadowColor = 'Green';
+                    cell.highlightColor = 'green';
+                    _this9.add(cell);
+
+                    // Animate cell into position.
+                    cell.scale = { x: 0.2, y: 0.2 };
+                    Animate.wait(i * 50).after(function () {
+                        Animate.tween(cell, { scale: { x: 1, y: 1 } }, 300, function (elapsed) {
+                            return Math.pow(elapsed, 0.5);
+                        });
+                    });
+
+                    // Increment x-position.
+                    x += CELL_SIZE + PADDING;
+
+                    // The level index, calculated from the row and column indices.
+                    i++;
+                    if (i >= NUM_CELLS) return 'break';
+                };
+
+                for (var c = 0; c < NUM_COLS; c++) {
+                    var _ret = _loop(c);
+
+                    if (_ret === 'break') break;
+                }
+
+                if (i >= NUM_CELLS) break;
+
+                // Increment y-position and set x-position left.
+                y += CELL_SIZE + PADDING;
+                x = leftmost;
+            }
+        }
+    }]);
+
+    return LevelSelectMenu;
+}(mag.Stage);
+
+{}

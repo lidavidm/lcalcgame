@@ -136,12 +136,19 @@ function initBoard() {
             };
 
             stage = new MainMenu(canvas, function () {
-                // Clicks 'play' button. Transition to chapter select screen.
-                stage = new ChapterSelectMenu(canvas, function (chapterName) {
-                    stage = Resource.startChapter(chapterName, canvas);
+
+                stage = new LevelSelectMenu(canvas, 'Basics', function (level) {
+                    stage = Resource.buildLevel(level, canvas);
                     redraw(stage);
                 });
                 redraw(stage);
+
+                // Clicks 'play' button. Transition to chapter select screen.
+                // stage = new ChapterSelectMenu(canvas, (chapterName) => {
+                //     stage = Resource.startChapter(chapterName, canvas);
+                //     redraw(stage);
+                // });
+                // redraw(stage);
             }, function () {
                 // Clicked 'settings' button. Transition to settings screen.
             });
