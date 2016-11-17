@@ -147,6 +147,9 @@ function initBoard() {
                 stage = new ChapterSelectMenu(canvas, function (chapterName) {
                     stage = Resource.startChapter(chapterName, canvas);
                     redraw(stage);
+                }, function (levelSelected) {
+                    stage = Resource.buildLevel(levelSelected, canvas);
+                    redraw(stage);
                 });
                 redraw(stage);
             }, function () {

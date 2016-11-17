@@ -80,6 +80,15 @@ class MenuButton extends mag.RoundedRect {
         this._pos.y = this._origpos.y;
         this.shadowOffset = this.origShadowOffset;
     }
+    onmousedrag(pos) {
+        let hits = this.hits(pos);
+        if (!hits && this.color !== this.onUpColor) {
+            this.onmouseleave(pos);
+        } else if (this.color === this.onUpColor && hits) {
+            this.onmouseenter(pos);
+            this.onmousedown(pos);
+        }
+    }
     onmousedown(pos) {
         this._prevy = this._pos.y;
         this._pos.y += this.shadowOffset - this.downIndent;
@@ -88,6 +97,7 @@ class MenuButton extends mag.RoundedRect {
         Resource.play('fatbtn-click');
     }
     onmouseup(pos) {
+        if (!this.hits(pos)) return;
         this._pos.y = this._origpos.y;
         this.shadowOffset = this.origShadowOffset;
         this.runButtonClickEffect();
@@ -255,9 +265,9 @@ class PlanetCard extends mag.Circle {
 }
 
 class ChapterSelectMenu extends mag.Stage {
-    constructor(canvas, onChapterSelect) {
+    constructor(canvas, onChapterSelect, onLevelSelect) {
         super(canvas);
-        this.showChapters(onChapterSelect);
+        this.showChapters(onChapterSelect, onLevelSelect);
     }
 
     getPlanetPos() {
@@ -290,11 +300,9 @@ class ChapterSelectMenu extends mag.Stage {
         this.ctx.restore();
     }
 
-    showLevelSelectGrid(chapterName) {
+    showLevelSelectGrid(chapterName, onLevelSelect) {
 
-        let grid = new LevelSelectGrid(chapterName, (levelSelected) => {
-            // TODO: transition to level here...
-        });
+        let grid = new LevelSelectGrid(chapterName, onLevelSelect);
         grid.pos = { x:0, y:40 };
 
         var btn_back = new mag.Button(10, 10, 50, 50, { default: 'btn-back-default', hover: 'btn-back-hover', down: 'btn-back-down' }, () => {
@@ -309,7 +317,7 @@ class ChapterSelectMenu extends mag.Stage {
         this.add(btn_back);
     }
 
-    showChapters(onselect) {
+    showChapters(onselect, onLevelSelect) {
 
         // For now, hardcore positions and radii per chapter:
         // TODO: Move to .json specs.
@@ -349,7 +357,7 @@ class ChapterSelectMenu extends mag.Stage {
                         else         expand(planets[k]);
                     }
                     Resource.play('zoomin');
-                    Animate.wait(500).after(() => this.showLevelSelectGrid(planet.name));
+                    Animate.wait(500).after(() => this.showLevelSelectGrid(planet.name, onLevelSelect));
                 };
                 this.add(planet);
                 planets.push(planet);

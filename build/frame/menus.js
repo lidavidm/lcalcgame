@@ -103,6 +103,17 @@ var MenuButton = function (_mag$RoundedRect) {
             this.shadowOffset = this.origShadowOffset;
         }
     }, {
+        key: 'onmousedrag',
+        value: function onmousedrag(pos) {
+            var hits = this.hits(pos);
+            if (!hits && this.color !== this.onUpColor) {
+                this.onmouseleave(pos);
+            } else if (this.color === this.onUpColor && hits) {
+                this.onmouseenter(pos);
+                this.onmousedown(pos);
+            }
+        }
+    }, {
         key: 'onmousedown',
         value: function onmousedown(pos) {
             this._prevy = this._pos.y;
@@ -114,6 +125,7 @@ var MenuButton = function (_mag$RoundedRect) {
     }, {
         key: 'onmouseup',
         value: function onmouseup(pos) {
+            if (!this.hits(pos)) return;
             this._pos.y = this._origpos.y;
             this.shadowOffset = this.origShadowOffset;
             this.runButtonClickEffect();
@@ -377,12 +389,12 @@ var PlanetCard = function (_mag$Circle) {
 var ChapterSelectMenu = function (_mag$Stage2) {
     _inherits(ChapterSelectMenu, _mag$Stage2);
 
-    function ChapterSelectMenu(canvas, onChapterSelect) {
+    function ChapterSelectMenu(canvas, onChapterSelect, onLevelSelect) {
         _classCallCheck(this, ChapterSelectMenu);
 
         var _this10 = _possibleConstructorReturn(this, (ChapterSelectMenu.__proto__ || Object.getPrototypeOf(ChapterSelectMenu)).call(this, canvas));
 
-        _this10.showChapters(onChapterSelect);
+        _this10.showChapters(onChapterSelect, onLevelSelect);
         return _this10;
     }
 
@@ -412,12 +424,10 @@ var ChapterSelectMenu = function (_mag$Stage2) {
         }
     }, {
         key: 'showLevelSelectGrid',
-        value: function showLevelSelectGrid(chapterName) {
+        value: function showLevelSelectGrid(chapterName, onLevelSelect) {
             var _this11 = this;
 
-            var grid = new LevelSelectGrid(chapterName, function (levelSelected) {
-                // TODO: transition to level here...
-            });
+            var grid = new LevelSelectGrid(chapterName, onLevelSelect);
             grid.pos = { x: 0, y: 40 };
 
             var btn_back = new mag.Button(10, 10, 50, 50, { default: 'btn-back-default', hover: 'btn-back-hover', down: 'btn-back-down' }, function () {
@@ -435,7 +445,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
         }
     }, {
         key: 'showChapters',
-        value: function showChapters(onselect) {
+        value: function showChapters(onselect, onLevelSelect) {
             var _this12 = this;
 
             // For now, hardcore positions and radii per chapter:
@@ -476,7 +486,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                         }
                         Resource.play('zoomin');
                         Animate.wait(500).after(function () {
-                            return _this12.showLevelSelectGrid(planet.name);
+                            return _this12.showLevelSelectGrid(planet.name, onLevelSelect);
                         });
                     };
                     _this12.add(planet);
