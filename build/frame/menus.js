@@ -37,6 +37,7 @@ var MenuButton = function (_mag$RoundedRect) {
         _this.hoverIndent = -4;
         _this.downIndent = 4;
         _this.shadowColor = shadowColor;
+        _this.onDownColor = shadowColor;
         _this.onDownShadowColor = onDownShadowColor;
         _this.onUpShadowColor = shadowColor;
         _this.onUpColor = color;
@@ -86,7 +87,7 @@ var MenuButton = function (_mag$RoundedRect) {
     }, {
         key: 'onmouseenter',
         value: function onmouseenter(pos) {
-            this.color = this.shadowColor;
+            this.color = this.onDownColor;
             this.shadowColor = this.onDownShadowColor;
             this.shadowOffset = this.origShadowOffset - this.hoverIndent;
             this.text.color = 'white';
@@ -108,6 +109,7 @@ var MenuButton = function (_mag$RoundedRect) {
             this._pos.y += this.shadowOffset - this.downIndent;
             this.shadowOffset = this.downIndent;
             //this.color = this.onUpColor;
+            Resource.play('fatbtn-click');
         }
     }, {
         key: 'onmouseup',
@@ -115,6 +117,9 @@ var MenuButton = function (_mag$RoundedRect) {
             this._pos.y = this._origpos.y;
             this.shadowOffset = this.origShadowOffset;
             this.runButtonClickEffect();
+            Animate.wait(50).after(function () {
+                return Resource.play('fatbtn-beep');
+            });
         }
     }, {
         key: 'pos',
@@ -226,165 +231,68 @@ var DraggableRect = function (_mag$Rect) {
     return DraggableRect;
 }(mag.Rect);
 
-var ChapterCard = function (_mag$Rect2) {
-    _inherits(ChapterCard, _mag$Rect2);
+var LevelCell = function (_MenuButton) {
+    _inherits(LevelCell, _MenuButton);
 
-    function ChapterCard(x, y, w, h, name, desc, icon, onclick) {
-        _classCallCheck(this, ChapterCard);
+    function LevelCell() {
+        _classCallCheck(this, LevelCell);
 
-        var TXTPAD = 50;
-
-
-        // Visual icon
-
-        var _this5 = _possibleConstructorReturn(this, (ChapterCard.__proto__ || Object.getPrototypeOf(ChapterCard)).call(this, x, y, w, h));
-
-        var img = new mag.ImageRect(0, 0, w, h - TXTPAD, icon);
-        img.ignoreEvents = true;
-        _this5.addChild(img);
-
-        // Chapter name
-        var txt = new TextExpr(name, 'Futura');
-        txt.color = 'white';
-        txt.pos = { x: img.pos.x + img.size.w / 2.0,
-            y: img.pos.y + img.size.h + txt.fontSize };
-        txt.anchor = { x: 0.5, y: 0 };
-        _this5.addChild(txt);
-
-        _this5.name = name;
-        _this5.onclick = onclick;
-        return _this5;
+        return _possibleConstructorReturn(this, (LevelCell.__proto__ || Object.getPrototypeOf(LevelCell)).apply(this, arguments));
     }
 
-    _createClass(ChapterCard, [{
-        key: 'onmouseclick',
-        value: function onmouseclick(pos) {
-            if (this.onclick) this.onclick(this.name);
-        }
-    }]);
+    return LevelCell;
+}(MenuButton);
 
-    return ChapterCard;
-}(mag.Rect);
+var LevelSelectGrid = function (_mag$Rect2) {
+    _inherits(LevelSelectGrid, _mag$Rect2);
 
-var ChapterSelectMenu = function (_mag$Stage2) {
-    _inherits(ChapterSelectMenu, _mag$Stage2);
+    function LevelSelectGrid(chapterName, onLevelSelect) {
+        _classCallCheck(this, LevelSelectGrid);
 
-    function ChapterSelectMenu(canvas, onChapterSelect) {
-        _classCallCheck(this, ChapterSelectMenu);
+        var _this6 = _possibleConstructorReturn(this, (LevelSelectGrid.__proto__ || Object.getPrototypeOf(LevelSelectGrid)).call(this, 0, 0, 0, 0));
 
-        var _this6 = _possibleConstructorReturn(this, (ChapterSelectMenu.__proto__ || Object.getPrototypeOf(ChapterSelectMenu)).call(this, canvas));
-
-        _this6.showChapters(onChapterSelect);
+        _this6.color = null;
+        _this6.showGrid(chapterName, onLevelSelect);
         return _this6;
     }
 
-    _createClass(ChapterSelectMenu, [{
-        key: 'showChapters',
-        value: function showChapters(onselect) {
+    _createClass(LevelSelectGrid, [{
+        key: 'hide',
+        value: function hide(dur) {
+            var _this7 = this;
 
-            var W = 200;var P = 40;var X = 0;
-            var onChapterSelect = onselect;
-            console.log(onChapterSelect);
-            var container = new DraggableRect(GLOBAL_DEFAULT_SCREENSIZE.width / 2.0 - W / 2.0, 100, 1000, 300);
-            container.constrainY();
-            container.color = 'lightgray';
-            container.shadowOffset = 0;
-            container.snapEvery(W + P, W / 2.0 - P);
-            this.add(container);
-
-            Resource.getChapters().then(function (chapters) {
-                container.size = { w: (W + P) * chapters.length, h: 300 };
-                chapters.forEach(function (chap) {
-
-                    var c = new ChapterCard(X, 0, W, 300, chap.name, chap.description, null, onChapterSelect);
-                    //c.ignoreEvents = true;
-                    c.color = 'HotPink';
-                    c.onmousedrag = function (pos) {
-                        pos.x -= c.pos.x;
-                        container.onmousedrag(pos);
-                    };
-                    c.onmouseup = function (pos) {
-                        pos.x -= c.pos.x;
-                        container.onmouseup(pos);
-                    };
-                    container.addChild(c);
-
-                    X += W + P;
+            var len = this.children.length;
+            this.children.forEach(function (c, i) {
+                c.opacity = 1;
+                Animate.tween(c, { scale: { x: 0, y: 0 }, opacity: 0 }, (len - i - 1) * 30).after(function () {
+                    _this7.removeChild(c);
                 });
             });
+            return Animate.wait((len - 1) * 30);
         }
-    }]);
-
-    return ChapterSelectMenu;
-}(mag.Stage);
-
-var LevelCell = function (_mag$RoundedRect2) {
-    _inherits(LevelCell, _mag$RoundedRect2);
-
-    function LevelCell(x, y, w, h, name, icon, onclick) {
-        _classCallCheck(this, LevelCell);
-
-        var _this7 = _possibleConstructorReturn(this, (LevelCell.__proto__ || Object.getPrototypeOf(LevelCell)).call(this, x, y, w, h));
-
-        _this7.shadowOffset = 10;
-
-        // Visual icon
-        if (icon) {
-            var img = new mag.ImageRect(0, 0, w, h, icon);
-            img.ignoreEvents = true;
-            _this7.addChild(img);
-        } else {
-            // Default to text displaying level index.
-            var txt = new TextExpr(name.toString(), 'Futura');
-            txt.color = 'white';
-            txt.anchor = { x: 0.5, y: 0.5 };
-            txt.pos = { x: w / 2.0, y: w / 2.0 };
-            _this7.addChild(txt);
+    }, {
+        key: 'gridSizeForLevelCount',
+        value: function gridSizeForLevelCount(n) {
+            if (n <= 8) return 124;else if (n <= 14) return 100;else return 84;
         }
-
-        _this7.name = name;
-        _this7.onclick = onclick;
-        return _this7;
-    }
-
-    _createClass(LevelCell, [{
-        key: 'onmouseclick',
-        value: function onmouseclick(pos) {
-            if (this.onclick) this.onclick();
-        }
-    }]);
-
-    return LevelCell;
-}(mag.RoundedRect);
-
-var LevelSelectMenu = function (_mag$Stage3) {
-    _inherits(LevelSelectMenu, _mag$Stage3);
-
-    function LevelSelectMenu(canvas, chapterName, onLevelSelect) {
-        _classCallCheck(this, LevelSelectMenu);
-
-        var _this8 = _possibleConstructorReturn(this, (LevelSelectMenu.__proto__ || Object.getPrototypeOf(LevelSelectMenu)).call(this, canvas));
-
-        _this8.showGrid(chapterName, onLevelSelect);
-        return _this8;
-    }
-
-    _createClass(LevelSelectMenu, [{
+    }, {
         key: 'showGrid',
         value: function showGrid(chapterName, onselect) {
-            var _this9 = this;
+            var _this8 = this;
 
             // Layout measurement
             var levels = Resource.levelsForChapter(chapterName);
             var NUM_CELLS = levels.length; // total number of cells to fit on the grid
-            var CELL_SIZE = 124; // width and height of each cell square, in pixels
+            var CELL_SIZE = this.gridSizeForLevelCount(NUM_CELLS); // width and height of each cell square, in pixels
             var SCREEN_WIDTH = GLOBAL_DEFAULT_SCREENSIZE.width; // the width of the screen to work with
             var PADDING = 20; // padding between cells
-            var GRID_MARGIN = 20; // margin bounding grid on top, left, and right sides
+            var TOP_MARGIN = 20;
+            var GRID_MARGIN = 80; // margin bounding grid on top, left, and right sides
             var NUM_COLS = Math.trunc((SCREEN_WIDTH - GRID_MARGIN * 2) / (CELL_SIZE + PADDING)); // number of cells that fit horizontally on the screen
             var NUM_ROWS = Math.trunc(NUM_CELLS / NUM_COLS + 1); // number of rows
             var GRID_LEFTPAD = (SCREEN_WIDTH - ((CELL_SIZE + PADDING) * NUM_COLS + GRID_MARGIN * 2)) / 2.0;
 
+            console.log(levels);
             console.log(SCREEN_WIDTH - GRID_MARGIN * 2, CELL_SIZE + PADDING, NUM_CELLS, NUM_COLS, NUM_ROWS);
 
             var genClickCallback = function genClickCallback(level_idx) {
@@ -395,7 +303,7 @@ var LevelSelectMenu = function (_mag$Stage3) {
 
             var leftmost = GRID_LEFTPAD + GRID_MARGIN;
             var x = leftmost;
-            var y = GRID_MARGIN;
+            var y = TOP_MARGIN;
 
             for (var r = 0; r < NUM_ROWS; r++) {
 
@@ -404,15 +312,13 @@ var LevelSelectMenu = function (_mag$Stage3) {
                 var _loop = function _loop(c) {
 
                     // Create a level cell and add it to the grid.
-                    var cell = new LevelCell(x + CELL_SIZE / 2.0, y + CELL_SIZE / 2.0, CELL_SIZE, CELL_SIZE, i, null, genClickCallback(i));
+                    var cell = new LevelCell(x + CELL_SIZE / 2.0, y + CELL_SIZE / 2.0, CELL_SIZE, CELL_SIZE, i.toString(), genClickCallback(i), r === 0 ? 'LightGreen' : 'Gold', 'white', r === 0 ? 'Green' : 'Teal', r === 0 ? 'DarkGreen' : 'DarkMagenta');
+                    cell.onDownColor = r === 0 ? 'YellowGreen' : 'Orange';
                     cell.anchor = { x: 0.5, y: 0.5 };
-                    cell.color = 'LightGreen';
-                    cell.shadowColor = 'Green';
-                    cell.highlightColor = 'green';
-                    _this9.add(cell);
+                    _this8.addChild(cell);
 
                     // Animate cell into position.
-                    cell.scale = { x: 0.2, y: 0.2 };
+                    cell.scale = { x: 0.0, y: 0 };
                     Animate.wait(i * 50).after(function () {
                         Animate.tween(cell, { scale: { x: 1, y: 1 } }, 300, function (elapsed) {
                             return Math.pow(elapsed, 0.5);
@@ -442,7 +348,245 @@ var LevelSelectMenu = function (_mag$Stage3) {
         }
     }]);
 
-    return LevelSelectMenu;
+    return LevelSelectGrid;
+}(mag.Rect);
+
+var PlanetCard = function (_mag$Circle) {
+    _inherits(PlanetCard, _mag$Circle);
+
+    function PlanetCard(x, y, r, name, onclick) {
+        _classCallCheck(this, PlanetCard);
+
+        var _this9 = _possibleConstructorReturn(this, (PlanetCard.__proto__ || Object.getPrototypeOf(PlanetCard)).call(this, x, y, r));
+
+        _this9.name = name;
+        _this9.onclick = onclick;
+        return _this9;
+    }
+
+    _createClass(PlanetCard, [{
+        key: 'onmouseclick',
+        value: function onmouseclick() {
+            if (this.onclick) this.onclick();
+        }
+    }]);
+
+    return PlanetCard;
+}(mag.Circle);
+
+var ChapterSelectMenu = function (_mag$Stage2) {
+    _inherits(ChapterSelectMenu, _mag$Stage2);
+
+    function ChapterSelectMenu(canvas, onChapterSelect) {
+        _classCallCheck(this, ChapterSelectMenu);
+
+        var _this10 = _possibleConstructorReturn(this, (ChapterSelectMenu.__proto__ || Object.getPrototypeOf(ChapterSelectMenu)).call(this, canvas));
+
+        _this10.showChapters(onChapterSelect);
+        return _this10;
+    }
+
+    _createClass(ChapterSelectMenu, [{
+        key: 'getPlanetPos',
+        value: function getPlanetPos() {
+            return [{ x: 144, y: 104, r: 120 }, { x: 426, y: 86, r: 55 }, { x: 690, y: 208, r: 44 }, { x: 456, y: 324, r: 60 }, { x: 138, y: 388, r: 80 }, { x: 316, y: 480, r: 40 }, { x: 530, y: 492, r: 70 }, { x: 760, y: 580, r: 30 }];
+        }
+    }, {
+        key: 'setPlanetsToDefaultPos',
+        value: function setPlanetsToDefaultPos(dur) {
+            var stage = this;
+            var POS_MAP = this.getPlanetPos();
+            stage.planets.forEach(function (p, i) {
+                p.ignoreEvents = false;
+                if (!stage.has(p)) stage.add(p);
+                Animate.tween(p, { pos: { x: POS_MAP[i].x + 15, y: POS_MAP[i].y + 40 }, radius: POS_MAP[i].r, opacity: 1.0 }, dur);
+            });
+        }
+    }, {
+        key: 'clear',
+        value: function clear() {
+            this.ctx.save();
+            this.ctx.fillStyle = '#222';
+            this.ctx.fillRect(0, 0, canvas.width, canvas.height);
+            this.ctx.restore();
+        }
+    }, {
+        key: 'showLevelSelectGrid',
+        value: function showLevelSelectGrid(chapterName) {
+            var _this11 = this;
+
+            var grid = new LevelSelectGrid(chapterName, function (levelSelected) {
+                // TODO: transition to level here...
+            });
+            grid.pos = { x: 0, y: 40 };
+
+            var btn_back = new mag.Button(10, 10, 50, 50, { default: 'btn-back-default', hover: 'btn-back-hover', down: 'btn-back-down' }, function () {
+                grid.hide().after(function () {
+                    return _this11.remove(grid);
+                });
+                _this11.remove(btn_back);
+                _this11.setPlanetsToDefaultPos(500);
+                Resource.play('goback');
+            });
+            btn_back.opacity = 0.5;
+
+            this.add(grid);
+            this.add(btn_back);
+        }
+    }, {
+        key: 'showChapters',
+        value: function showChapters(onselect) {
+            var _this12 = this;
+
+            // For now, hardcore positions and radii per chapter:
+            // TODO: Move to .json specs.
+            var POS_MAP = this.getPlanetPos();
+
+            // Expand and disappear animations.
+            var stage = this;
+            var expand = function expand(planet) {
+                var r = GLOBAL_DEFAULT_SCREENSIZE.width / 2.0 * Math.pow(planet.radius / 120, 0.5);
+                var centerBottom = { x: GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y: GLOBAL_DEFAULT_SCREENSIZE.height };
+                Animate.tween(planet, { radius: r, pos: addPos(centerBottom, { x: 0, y: r / 2.0 }) }, 1000, function (elapsed) {
+                    return Math.pow(elapsed, 3);
+                });
+            };
+            var hide = function hide(planet) {
+                planet.opacity = 1.0;
+                Animate.tween(planet, { opacity: 0 }, 500).after(function () {
+                    stage.remove(planet);
+                });
+            };
+
+            // Each chapter is a 'Planet' in Starboy's Universe:
+            Resource.getChapters().then(function (chapters) {
+
+                var planets = [];
+
+                chapters.forEach(function (chap, i) {
+                    var pos = i < POS_MAP.length ? POS_MAP[i] : { x: 0, y: 0, r: 10 };
+                    var planet = new PlanetCard(pos.x + 15, pos.y + 40, pos.r, chap.name);
+                    planet.color = 'white';
+                    planet.anchor = { x: 0.5, y: 0.5 };
+                    planet.shadowOffset = 0;
+                    planet.onclick = function () {
+                        for (var k = 0; k < planets.length; k++) {
+                            planets[k].ignoreEvents = true;
+                            if (k !== i) hide(planets[k]);else expand(planets[k]);
+                        }
+                        Resource.play('zoomin');
+                        Animate.wait(500).after(function () {
+                            return _this12.showLevelSelectGrid(planet.name);
+                        });
+                    };
+                    _this12.add(planet);
+                    planets.push(planet);
+                });
+
+                _this12.planets = planets;
+            });
+        }
+    }]);
+
+    return ChapterSelectMenu;
 }(mag.Stage);
 
-{}
+// -- OLD --
+// class LevelCell extends MenuButton {
+// constructor(x, y, w, h, name, icon, onclick) {
+//     super(x, y, w, h, name.toString(), onclick);
+//
+//     this.shadowOffset = 10;
+//
+//     // Visual icon
+//     if (icon) {
+//         let img = new mag.ImageRect(0, 0, w, h, icon);
+//         img.ignoreEvents = true;
+//         this.addChild(img);
+//     } else { // Default to text displaying level index.
+//         let txt = new TextExpr(name.toString(), 'Futura');
+//         txt.color = 'white';
+//         txt.anchor = { x:0.5, y:0.5 };
+//         txt.pos = { x: w / 2.0, y: w / 2.0 };
+//         this.addChild(txt);
+//     }
+//
+//     this.name = name;
+//     this.onclick = onclick;
+// }
+// onmouseclick(pos) {
+//     if (this.onclick)
+//         this.onclick();
+// }
+// }
+// class ChapterCard extends mag.Rect {
+//     constructor(x, y, w, h, name, desc, icon, onclick) {
+//
+//         const TXTPAD = 50;
+//         super(x, y, w, h);
+//
+//         // Visual icon
+//         let img = new mag.ImageRect(0, 0, w, h - TXTPAD, icon);
+//         img.ignoreEvents = true;
+//         this.addChild(img);
+//
+//         // Chapter name
+//         let txt = new TextExpr(name, 'Futura');
+//         txt.color = 'white';
+//         txt.pos = { x:img.pos.x+img.size.w/2.0,
+//                     y:img.pos.y+img.size.h+txt.fontSize };
+//         txt.anchor = { x:0.5, y:0 };
+//         this.addChild(txt);
+//
+//         this.name = name;
+//         this.onclick = onclick;
+//     }
+//
+//     onmouseclick(pos) {
+//         if (this.onclick)
+//             this.onclick(this.name);
+//     }
+// }
+//
+// class ChapterSelectMenu extends mag.Stage {
+//     constructor(canvas, onChapterSelect) {
+//         super(canvas);
+//         this.showChapters(onChapterSelect);
+//     }
+//
+//     showChapters(onselect) {
+//
+//         let W = 200; let P = 40; let X = 0;
+//         let onChapterSelect = onselect;
+//         console.log(onChapterSelect);
+//         let container = new DraggableRect(GLOBAL_DEFAULT_SCREENSIZE.width / 2.0 - W / 2.0, 100, 1000, 300);
+//         container.constrainY();
+//         container.color = 'lightgray';
+//         container.shadowOffset = 0;
+//         container.snapEvery(W + P, W / 2.0 - P);
+//         this.add(container);
+//
+//         Resource.getChapters().then((chapters) => {
+//             container.size = { w:(W + P) * chapters.length, h:300 };
+//             chapters.forEach((chap) => {
+//
+//                 let c = new ChapterCard(X, 0, W, 300, chap.name, chap.description, null, onChapterSelect);
+//                 //c.ignoreEvents = true;
+//                 c.color = 'HotPink';
+//                 c.onmousedrag = (pos) => {
+//                     pos.x -= c.pos.x;
+//                     container.onmousedrag(pos);
+//                 };
+//                 c.onmouseup = (pos) => {
+//                     pos.x -= c.pos.x;
+//                     container.onmouseup(
+//                         pos);
+//                 };
+//                 container.addChild(c);
+//
+//                 X += W + P;
+//
+//             });
+//         });
+//     }
+// }

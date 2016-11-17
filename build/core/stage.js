@@ -28,8 +28,14 @@ var mag = function (_) {
                 this.ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
         }, {
+            key: 'has',
+            value: function has(node) {
+                return node && node.stage == this && this.nodes.indexOf(node) > -1;
+            }
+        }, {
             key: 'add',
             value: function add(node) {
+                if (this.has(node)) return;
                 node.stage = this;
                 if (node.locked) node.unlock();
                 this.nodes.push(node);
@@ -210,7 +216,7 @@ var mag = function (_) {
                 this.clear();
                 this.nodes.forEach(function (n) {
                     return n.draw(_this4.ctx);
-                }); // TODO: You should pass the ctx!!!!!!
+                });
                 this.ctx.restore();
             }
 

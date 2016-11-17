@@ -36,7 +36,11 @@ var mag = (function(_) {
         clear() {
             this.ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
+        has(node) {
+            return node && node.stage == this && this.nodes.indexOf(node) > -1;
+        }
         add(node) {
+            if (this.has(node)) return;
             node.stage = this;
             if(node.locked) node.unlock();
             this.nodes.push(node);
@@ -188,7 +192,7 @@ var mag = (function(_) {
             this.ctx.save();
             this.ctx.scale(this._scale, this._scale);
             this.clear();
-            this.nodes.forEach((n) => n.draw(this.ctx)); // TODO: You should pass the ctx!!!!!!
+            this.nodes.forEach((n) => n.draw(this.ctx));
             this.ctx.restore();
         }
 

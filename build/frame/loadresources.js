@@ -62,6 +62,11 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAudio('matching-goal', 'matching-the-goal2.wav');
     loadAudio('mutate', 'deflate.wav');
     loadAudio('game-complete', 'game-complete.wav');
+    loadAudio('fatbtn-click', 'fatbtn_click.wav');
+    loadAudio('fatbtn-beep', 'fatbtn_space.wav');
+    loadAudio('fatbtn-beep2', 'fatbtn_space2.wav');
+    loadAudio('goback', 'ui_back.wav');
+    loadAudio('zoomin', 'zoom_planet.wav');
 
     loadImage('bag-background', 'bg-stars.png');
     loadImage('lambda-hole', 'lambda-hole.png');
@@ -102,7 +107,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadImage('chest-metal-lid-open', 'chest-metal-lid-open.png');
     loadImage('chest-metal-lid-closed', 'chest-metal-lid-closed.png');
 
-    // UI Images.
+    // UI.
     loadImage('btn-next-default', 'next-button.png');
     loadImage('btn-next-hover', 'next-button-hover.png');
     loadImage('btn-next-down', 'next-button-down.png');
