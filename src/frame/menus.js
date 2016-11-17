@@ -165,7 +165,16 @@ class DraggableRect extends mag.Rect {
     }
 }
 
-class LevelCell extends MenuButton { }
+class LevelCell extends MenuButton {
+    lock() {
+        this.text.text = '🔒';
+        this.color = '#666';
+        this.shadowColor = 'gray';
+        this.pos = { x:this.pos.x, y:this.pos.y+this.shadowOffset-8 };
+        this.shadowOffset = 8;
+        this.ignoreEvents = true;
+    }
+}
 class LevelSelectGrid extends mag.Rect {
     constructor(chapterName, onLevelSelect) {
         super(0, 0, 0, 0);
@@ -226,6 +235,7 @@ class LevelSelectGrid extends mag.Rect {
                                          r === 0 ? 'LightGreen' : 'Gold', 'white', r === 0 ? 'Green' : 'Teal', r === 0 ? 'DarkGreen' : 'DarkMagenta');
                 cell.onDownColor = r === 0 ? 'YellowGreen' : 'Orange' ;
                 cell.anchor = { x:0.5, y:0.5 };
+                if (i > 5) cell.lock();
                 this.addChild(cell);
 
                 // Animate cell into position.

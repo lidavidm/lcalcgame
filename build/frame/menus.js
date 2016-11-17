@@ -252,6 +252,18 @@ var LevelCell = function (_MenuButton) {
         return _possibleConstructorReturn(this, (LevelCell.__proto__ || Object.getPrototypeOf(LevelCell)).apply(this, arguments));
     }
 
+    _createClass(LevelCell, [{
+        key: 'lock',
+        value: function lock() {
+            this.text.text = '🔒';
+            this.color = '#666';
+            this.shadowColor = 'gray';
+            this.pos = { x: this.pos.x, y: this.pos.y + this.shadowOffset - 8 };
+            this.shadowOffset = 8;
+            this.ignoreEvents = true;
+        }
+    }]);
+
     return LevelCell;
 }(MenuButton);
 
@@ -327,6 +339,7 @@ var LevelSelectGrid = function (_mag$Rect2) {
                     var cell = new LevelCell(x + CELL_SIZE / 2.0, y + CELL_SIZE / 2.0, CELL_SIZE, CELL_SIZE, i.toString(), genClickCallback(i), r === 0 ? 'LightGreen' : 'Gold', 'white', r === 0 ? 'Green' : 'Teal', r === 0 ? 'DarkGreen' : 'DarkMagenta');
                     cell.onDownColor = r === 0 ? 'YellowGreen' : 'Orange';
                     cell.anchor = { x: 0.5, y: 0.5 };
+                    if (i > 5) cell.lock();
                     _this8.addChild(cell);
 
                     // Animate cell into position.
