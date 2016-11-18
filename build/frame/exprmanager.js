@@ -60,6 +60,38 @@ var ExprManager = function () {
     });
     DEFAULT_FADE_PROGRESSION.primitives = undefined;
 
+    // Classes that should not show the 'sparkle' when they are faded.
+    var FADE_EXCEPTIONS = [JumpingChestVarExpr];
+
+    pub.isExcludedFromFadingAnimation = function (expr) {
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+            for (var _iterator = FADE_EXCEPTIONS[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var klass = _step.value;
+
+                if (expr instanceof klass) return true;
+            }
+        } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+        } finally {
+            try {
+                if (!_iteratorNormalCompletion && _iterator.return) {
+                    _iterator.return();
+                }
+            } finally {
+                if (_didIteratorError) {
+                    throw _iteratorError;
+                }
+            }
+        }
+
+        return false;
+    };
+
     pub.fadeBordersAt = function (lvl) {
         if (DEFAULT_FADE_LEVEL >= 4) return [];
 

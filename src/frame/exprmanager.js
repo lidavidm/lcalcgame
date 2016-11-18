@@ -58,6 +58,16 @@ var ExprManager = (function() {
     });
     DEFAULT_FADE_PROGRESSION.primitives = undefined;
 
+    // Classes that should not show the 'sparkle' when they are faded.
+    const FADE_EXCEPTIONS = [JumpingChestVarExpr];
+
+    pub.isExcludedFromFadingAnimation = (expr) => {
+        for (let klass of FADE_EXCEPTIONS) {
+            if (expr instanceof klass) return true;
+        }
+        return false;
+    };
+
     pub.fadeBordersAt = (lvl) => {
         if (DEFAULT_FADE_LEVEL >= 4) return [];
 

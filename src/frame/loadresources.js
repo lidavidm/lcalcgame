@@ -199,6 +199,12 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                     faded.add(unfaded_root);
                     root.opacity = 0;
 
+                    if (ExprManager.isExcludedFromFadingAnimation(unfaded_root)) {
+                        faded.remove(unfaded_root);
+                        root.opacity = 1;
+                        continue;
+                    }
+
                     SparkleTrigger.run(unfaded_root, () => {
 
                         Logger.log('faded-expr', { 'expr':unfaded_root.toString(), 'state':faded.toString() } );
