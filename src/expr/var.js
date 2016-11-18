@@ -122,6 +122,7 @@ class ChestVarExpr extends VarExpr {
         // See MissingTypedExpression#constructor
         this.equivalentClasses = [ChestVarExpr];
         this._preview = null;
+        this._animating = false;
     }
 
     get _superSize() {
@@ -200,6 +201,7 @@ class ChestVarExpr extends VarExpr {
                 parent.swap(this, value);
                 return null;
             }
+            this._animating = true;
             return this.animateReduction(value, true);
         }
         else if (animated) {
@@ -272,6 +274,12 @@ class ChestVarExpr extends VarExpr {
         super.onmouseleave();
         document.querySelector('canvas').style.cursor = 'auto';
     }
+
+    onmouseclick() {
+        if (!this._animating) {
+            this.performReduction(true);
+        }
+    }
 }
 
 class JumpingChestVarExpr extends ChestVarExpr {
@@ -288,6 +296,7 @@ class JumpingChestVarExpr extends ChestVarExpr {
 
         Resource.play('chest-open');
         this._opened = true;
+        this._animating = true;
         let value = chest.holes[0].clone();
         value.pos = chest.holes[0].absolutePos;
         this.stage.add(value);
@@ -495,6 +504,8 @@ class AssignExpr extends Expression {
         else {
             this.holes.push(new MissingExpression());
         }
+
+        this._animating = false;
     }
 
     get variable() {
@@ -584,6 +595,8 @@ class AssignExpr extends Expression {
         // update to happen multiple times.
         if (!this.canReduce()) {
             if (this.value && this.variable && !this.value.canReduce()) {
+                // Try and play any animation anyways to hint at why
+                // the value can't reduce.
                 this.value.performReduction();
             }
             return null;
@@ -597,6 +610,8 @@ class AssignExpr extends Expression {
             this.stage.draw();
             return null;
         }
+
+        this._animating = true;
 
         let result = this.value.performReduction(animated);
         if (result instanceof Promise) {
@@ -624,6 +639,12 @@ class AssignExpr extends Expression {
         }
         else {
             return this;
+        }
+    }
+
+    onmouseclick() {
+        if (!this._animating) {
+            this.performReduction();
         }
     }
 }

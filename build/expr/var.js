@@ -181,6 +181,7 @@ var ChestVarExpr = function (_VarExpr2) {
 
         _this4.equivalentClasses = [ChestVarExpr];
         _this4._preview = null;
+        _this4._animating = false;
         return _this4;
     }
 
@@ -258,6 +259,7 @@ var ChestVarExpr = function (_VarExpr2) {
                     _parent2.swap(this, value);
                     return null;
                 }
+                this._animating = true;
                 return this.animateReduction(value, true);
             } else if (animated) {
                 this.animateReduction(new TextExpr("?"), false).then(function (wat) {
@@ -334,6 +336,13 @@ var ChestVarExpr = function (_VarExpr2) {
             document.querySelector('canvas').style.cursor = 'auto';
         }
     }, {
+        key: "onmouseclick",
+        value: function onmouseclick() {
+            if (!this._animating) {
+                this.performReduction(true);
+            }
+        }
+    }, {
         key: "_superSize",
         get: function get() {
             return _get(ChestVarExpr.prototype.__proto__ || Object.getPrototypeOf(ChestVarExpr.prototype), "size", this);
@@ -376,6 +385,7 @@ var JumpingChestVarExpr = function (_ChestVarExpr) {
 
             Resource.play('chest-open');
             this._opened = true;
+            this._animating = true;
             var value = chest.holes[0].clone();
             value.pos = chest.holes[0].absolutePos;
             this.stage.add(value);
@@ -649,6 +659,8 @@ var AssignExpr = function (_Expression4) {
         } else {
             _this14.holes.push(new MissingExpression());
         }
+
+        _this14._animating = false;
         return _this14;
     }
 
@@ -750,6 +762,8 @@ var AssignExpr = function (_Expression4) {
             // update to happen multiple times.
             if (!this.canReduce()) {
                 if (this.value && this.variable && !this.value.canReduce()) {
+                    // Try and play any animation anyways to hint at why
+                    // the value can't reduce.
                     this.value.performReduction();
                 }
                 return null;
@@ -763,6 +777,8 @@ var AssignExpr = function (_Expression4) {
                 this.stage.draw();
                 return null;
             }
+
+            this._animating = true;
 
             var result = this.value.performReduction(animated);
             if (result instanceof Promise) {
@@ -791,6 +807,13 @@ var AssignExpr = function (_Expression4) {
                 return null;
             } else {
                 return this;
+            }
+        }
+    }, {
+        key: "onmouseclick",
+        value: function onmouseclick() {
+            if (!this._animating) {
+                this.performReduction();
             }
         }
     }, {
