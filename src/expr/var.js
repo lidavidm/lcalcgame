@@ -568,6 +568,7 @@ class AssignExpr extends Expression {
     finishReduction() {
         this.getEnvironment().update(this.variable.name, this._actualValue);
         this.stage.environmentDisplay.showGlobals();
+        Animate.blink(this.stage.environmentDisplay.getBinding(this.variable.name).holes[0]);
         this.stage.draw();
     }
 

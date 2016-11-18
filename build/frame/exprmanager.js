@@ -59,7 +59,6 @@ var ExprManager = function () {
         DEFAULT_FADE_PROGRESSION[p] = DEFAULT_FADE_PROGRESSION.primitives;
         _FADE_MAP[p].push(_FADE_MAP[p][0]);
         _FADE_MAP[p].push(_FADE_MAP[p][1]);
-        console.log(_FADE_MAP[p]);
     });
     DEFAULT_FADE_PROGRESSION.primitives = undefined;
 
