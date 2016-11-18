@@ -367,6 +367,10 @@ class DisplayChest extends Expression {
         // expr.anchor = { x: -0.1, y: 0.5 };
     }
 
+    getExpr() {
+        return this.holes[0];
+    }
+
     performReduction() {}
 
     prepareAssign() {
@@ -467,6 +471,13 @@ class LabeledDisplay extends Expression {
         }
     }
 
+    getExpr() {
+        if (this.origValue) {
+            return this.origValue;
+        }
+        return this.holes[2];
+    }
+
     setExpr(expr) {
         if (this.holes.length < 3) return;
         expr.pos = { x: 0, y: 0 };
@@ -502,7 +513,7 @@ class AssignExpr extends Expression {
             this.holes.push(value);
         }
         else {
-            this.holes.push(new MissingExpression());
+            this.holes.push(new MissingExpression(new Expression()));
         }
 
         this._animating = false;
@@ -568,7 +579,8 @@ class AssignExpr extends Expression {
     finishReduction() {
         this.getEnvironment().update(this.variable.name, this._actualValue);
         this.stage.environmentDisplay.showGlobals();
-        Animate.blink(this.stage.environmentDisplay.getBinding(this.variable.name).holes[0]);
+        let binding = this.stage.environmentDisplay.getBinding(this.variable.name);
+        Animate.blink(binding.getExpr());
         this.stage.draw();
     }
 

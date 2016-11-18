@@ -484,6 +484,11 @@ var DisplayChest = function (_Expression2) {
             // expr.anchor = { x: -0.1, y: 0.5 };
         }
     }, {
+        key: "getExpr",
+        value: function getExpr() {
+            return this.holes[0];
+        }
+    }, {
         key: "performReduction",
         value: function performReduction() {}
     }, {
@@ -614,6 +619,14 @@ var LabeledDisplay = function (_Expression3) {
             }
         }
     }, {
+        key: "getExpr",
+        value: function getExpr() {
+            if (this.origValue) {
+                return this.origValue;
+            }
+            return this.holes[2];
+        }
+    }, {
         key: "setExpr",
         value: function setExpr(expr) {
             if (this.holes.length < 3) return;
@@ -657,7 +670,7 @@ var AssignExpr = function (_Expression4) {
         if (value) {
             _this14.holes.push(value);
         } else {
-            _this14.holes.push(new MissingExpression());
+            _this14.holes.push(new MissingExpression(new Expression()));
         }
 
         _this14._animating = false;
@@ -724,7 +737,8 @@ var AssignExpr = function (_Expression4) {
         value: function finishReduction() {
             this.getEnvironment().update(this.variable.name, this._actualValue);
             this.stage.environmentDisplay.showGlobals();
-            Animate.blink(this.stage.environmentDisplay.getBinding(this.variable.name).holes[0]);
+            var binding = this.stage.environmentDisplay.getBinding(this.variable.name);
+            Animate.blink(binding.getExpr());
             this.stage.draw();
         }
     }, {
