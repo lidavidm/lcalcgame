@@ -281,7 +281,7 @@ class JumpingChestVarExpr extends ChestVarExpr {
         let lerp = arcLerp(value.absolutePos.y, this.absolutePos.y);
         Resource.play('fall-to');
         return new Promise((resolve, _reject) => {
-            Animate.tween(value, target, 500, (x) => x, true, lerp).after(() => {
+            Animate.tween(value, target, 600, (x) => x, true, lerp).after(() => {
                 this.stage.remove(value);
                 this.stage.draw();
                 window.setTimeout(() => {
@@ -661,7 +661,7 @@ class JumpingAssignExpr extends AssignExpr {
 
                 let lerp = arcLerp(value.absolutePos.y, targetPos.y, -150);
                 Resource.play('fly-to');
-                Animate.tween(value, target, 500, (x) => x, true, lerp).after(() => {
+                Animate.tween(value, target, 600, (x) => x, true, lerp).after(() => {
                     this.stage.remove(value);
                     this.finishReduction();
                     this.stage.draw();

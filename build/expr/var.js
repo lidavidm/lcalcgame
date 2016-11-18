@@ -364,7 +364,7 @@ var JumpingChestVarExpr = function (_ChestVarExpr) {
             var lerp = arcLerp(value.absolutePos.y, this.absolutePos.y);
             Resource.play('fall-to');
             return new Promise(function (resolve, _reject) {
-                Animate.tween(value, target, 500, function (x) {
+                Animate.tween(value, target, 600, function (x) {
                     return x;
                 }, true, lerp).after(function () {
                     _this7.stage.remove(value);
@@ -841,7 +841,7 @@ var JumpingAssignExpr = function (_AssignExpr) {
 
                     var lerp = arcLerp(value.absolutePos.y, targetPos.y, -150);
                     Resource.play('fly-to');
-                    Animate.tween(value, target, 500, function (x) {
+                    Animate.tween(value, target, 600, function (x) {
                         return x;
                     }, true, lerp).after(function () {
                         _this18.stage.remove(value);
