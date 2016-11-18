@@ -145,7 +145,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
 
     // Add levels here: (for now)
     // * The '/' character makes the following expression ignore mouse events (can't be drag n dropped). *
-    var chapter_load_prom = loadChaptersFromFiles(['assign', 'intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map']); //,     'posttest_v1', 'experimental'] );
+    var chapter_load_prom = loadChaptersFromFiles(['intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map', 'assign']); //,     'posttest_v1', 'experimental'] );
 
     Resource.buildLevel = function (level_desc, canvas) {
         ExprManager.clearFadeLevels();

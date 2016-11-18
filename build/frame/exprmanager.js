@@ -31,7 +31,7 @@ var ExprManager = function () {
         'reference_display': [DisplayChest, LabeledDisplayChest, LabeledDisplay],
         'hole': [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedLambdaHoleExpr, FadedES6LambdaHoleExpr],
         'lambda': [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr],
-        'lambda_abstraction': [EnvironmentLambdaExpr, LambdaExpr],
+        'lambda_abstraction': [LambdaExpr, EnvironmentLambdaExpr],
         'assign': [JumpingAssignExpr, AssignExpr, EqualsAssignExpr]
     };
     var fade_level = {};
@@ -39,10 +39,10 @@ var ExprManager = function () {
 
     var DEFAULT_FADE_PROGRESSION = {
         'var': [[9, 30], 30, 42],
-        'reference': [4, 6, 8],
-        'reference_display': [6, 8],
-        'lambda_abstraction': [18],
-        'assign': [6, 8],
+        'reference': [77, 79, 81],
+        'reference_display': [79, 81],
+        'lambda_abstraction': [90],
+        'assign': [79, 81],
         'hole': [[9, 30], 30, 42],
         'if': [26, 45],
         '_b': [34],
@@ -51,12 +51,15 @@ var ExprManager = function () {
         'false': [46],
         'bag': [51],
         '__': [51],
-        'primitives': [66],
+        'primitives': [66, 72],
         'map': [61]
     };
     var primitives = ['triangle', 'rect', 'star', 'circle', 'diamond'];
     primitives.forEach(function (p) {
         DEFAULT_FADE_PROGRESSION[p] = DEFAULT_FADE_PROGRESSION.primitives;
+        _FADE_MAP[p].push(_FADE_MAP[p][0]);
+        _FADE_MAP[p].push(_FADE_MAP[p][1]);
+        console.log(_FADE_MAP[p]);
     });
     DEFAULT_FADE_PROGRESSION.primitives = undefined;
 
