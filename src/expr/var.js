@@ -75,6 +75,18 @@ class VarExpr extends Expression {
         return value;
     }
 
+    onmouseclick() {
+        this.performReduction();
+    }
+}
+
+class LabeledVarExpr extends VarExpr {
+    constructor(name) {
+        super(name);
+        this.label = new TextExpr(name);
+        this.holes.push(this.label);
+    }
+
     performReduction() {
         if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return;
 
@@ -84,17 +96,23 @@ class VarExpr extends Expression {
             let parent = this.parent ? this.parent : this.stage;
             parent.swap(this, value);
         }
-    }
-
-    onmouseclick() {
-        this.performReduction();
-    }
-}
-
-class LabeledVarExpr extends VarExpr {
-    constructor(name) {
-        super(name);
-        this.holes.push(new TextExpr(name));
+        else {
+            let wat = new TextExpr("?");
+            this.stage.add(wat);
+            wat.pos = this.label.absolutePos;
+            Animate.tween(wat, {
+                pos: {
+                    x: wat.pos.x,
+                    y: wat.pos.y - 50,
+                },
+            }, 250);
+            window.setTimeout(() => {
+                Animate.poof(wat);
+                this.stage.remove(wat);
+                this.stage.draw();
+                this.stage.update();
+            }, 500);
+        }
     }
 }
 
