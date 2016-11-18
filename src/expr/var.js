@@ -28,7 +28,7 @@ const ChestImages = new _ChestImages();
 
 // parabolic lerp for y - makes it "arc" towards the final position
 const arcLerp = (y0, y1, arc=120) => {
-    let b = 4 * Math.max(25, Math.min(y0, y1) - arc) - y1 - 3 * y0;
+    let b = 4 * (Math.min(y0, y1) - arc) - y1 - 3 * y0;
     let c = y0;
     let a = y1 - b - c;
     let lerp = (src, tgt, elapsed, chain) => {

@@ -53,7 +53,7 @@ var ChestImages = new _ChestImages();
 var arcLerp = function arcLerp(y0, y1) {
     var arc = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 120;
 
-    var b = 4 * Math.max(25, Math.min(y0, y1) - arc) - y1 - 3 * y0;
+    var b = 4 * (Math.min(y0, y1) - arc) - y1 - 3 * y0;
     var c = y0;
     var a = y1 - b - c;
     var lerp = function lerp(src, tgt, elapsed, chain) {
