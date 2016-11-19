@@ -280,16 +280,16 @@ var ChestVarExpr = function (_VarExpr2) {
         value: function animateReduction(value, destroy) {
             var _this6 = this;
 
+            var stage = this.stage;
+
             value = value.clone();
+            stage.add(value);
             value.scale = { x: 0.1, y: 0.1 };
+            value.update();
             value.pos = {
                 x: this.absolutePos.x + 0.5 * this.size.w - 0.5 * value.absoluteSize.w,
                 y: this.absolutePos.y + 30
             };
-            value.opacity = 0.0;
-
-            var stage = this.stage;
-            stage.add(value);
 
             if (!this._opened) {
                 Resource.play('chest-open');
@@ -303,8 +303,7 @@ var ChestVarExpr = function (_VarExpr2) {
                     pos: {
                         x: _this6.absolutePos.x + 0.5 * _this6.size.w - 0.5 * value.size.w,
                         y: _this6.absolutePos.y - value.size.h
-                    },
-                    opacity: 1.0
+                    }
                 }, 500).after(function () {
                     window.setTimeout(function () {
                         if (destroy) {

@@ -220,16 +220,16 @@ class ChestVarExpr extends VarExpr {
     }
 
     animateReduction(value, destroy) {
+        let stage = this.stage;
+
         value = value.clone();
+        stage.add(value);
         value.scale = { x: 0.1, y: 0.1 };
+        value.update();
         value.pos = {
             x: this.absolutePos.x + 0.5 * this.size.w - 0.5 * value.absoluteSize.w,
             y: this.absolutePos.y + 30,
         };
-        value.opacity = 0.0;
-
-        let stage = this.stage;
-        stage.add(value);
 
         if (!this._opened) {
             Resource.play('chest-open');
@@ -244,7 +244,6 @@ class ChestVarExpr extends VarExpr {
                     x: this.absolutePos.x + 0.5 * this.size.w - 0.5 * value.size.w,
                     y: this.absolutePos.y - value.size.h,
                 },
-                opacity: 1.0,
             }, 500).after(() => {
                 window.setTimeout(() => {
                     if (destroy) {
