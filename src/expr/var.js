@@ -366,6 +366,9 @@ class DisplayChest extends Expression {
         expr.anchor = { x: -0.1, y: 0.5 };
     }
 
+    open() {}
+    close() {}
+
     setExpr(expr) {
         this.holes[0] = expr;
         expr.ignoreEvents = true;

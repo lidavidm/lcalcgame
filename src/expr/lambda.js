@@ -121,13 +121,31 @@ class LambdaHoleExpr extends MissingExpression {
             return false;
         }
 
+        var parent = this.parent;
+        var subvarexprs = mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [parent]);
+        subvarexprs.forEach((expr) => {
+            if (expr.name === this.name) {
+                let c = node.clone();
+                //c.bindSubexpressions();
+                c.stage = null;
+                expr.parent.swap(expr, c); // Swap the expression for a clone of the dropped node.
+                c.parent.bindSubexpressions();
+
+                // TODO: Move this somewhere more stable.
+                // Top-level if statements should unlock
+                // reducable boolean expressions.
+                if (c.parent instanceof IfStatement && c.parent.cond instanceof CompareExpr) {
+                    c.parent.cond.unlock();
+                }
+            }
+        });
+
         let vars = mag.Stage.getNodesWithClass(VarExpr, [], true, [node]);
         for (let variable of vars) {
             // If the variable can't be reduced, don't allow this to be reduced.
             if (variable.reduce() === variable) return null;
         }
 
-        var parent = this.parent;
         parent.getEnvironment().update(this.name, node);
 
         // Now remove this hole from its parent expression.

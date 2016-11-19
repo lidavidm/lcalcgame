@@ -483,6 +483,12 @@ var DisplayChest = function (_Expression2) {
     }
 
     _createClass(DisplayChest, [{
+        key: "open",
+        value: function open() {}
+    }, {
+        key: "close",
+        value: function close() {}
+    }, {
         key: "setExpr",
         value: function setExpr(expr) {
             this.holes[0] = expr;
