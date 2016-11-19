@@ -37,10 +37,10 @@ var ExprManager = (function() {
 
     var DEFAULT_FADE_PROGRESSION = {
         'var'   : [[9, 30], 30, 42],
-        'reference': [77, 79, 81],
-        'reference_display': [79, 81],
+        'reference': [77, 79],
+        'reference_display': [79],
         'lambda_abstraction': [90],
-        'assign': [79, 81],
+        'assign': [77, 81],
         'hole'  : [[9, 30], 30, 42],
         'if'    : [26, 45],
         '_b'    : [34],
@@ -49,19 +49,17 @@ var ExprManager = (function() {
         'false' : [46],
         'bag'   : [51],
         '__'    : [51],
-        'primitives' : [66, 72],
+        'primitives' : [66],
         'map'   : [61]
     };
     const primitives = ['triangle', 'rect', 'star', 'circle', 'diamond'];
     primitives.forEach((p) => {
         DEFAULT_FADE_PROGRESSION[p] = DEFAULT_FADE_PROGRESSION.primitives;
-        _FADE_MAP[p].push(_FADE_MAP[p][0]);
-        _FADE_MAP[p].push(_FADE_MAP[p][1]);
     });
     DEFAULT_FADE_PROGRESSION.primitives = undefined;
 
     // Classes that should not show the 'sparkle' when they are faded.
-    const FADE_EXCEPTIONS = [JumpingChestVarExpr];
+    const FADE_EXCEPTIONS = [JumpingChestVarExpr, JumpingAssignExpr];
 
     pub.isExcludedFromFadingAnimation = (expr) => {
         for (let klass of FADE_EXCEPTIONS) {
