@@ -162,7 +162,8 @@ var LambdaHoleExpr = function (_MissingExpression) {
                 }
             });
 
-            var vars = mag.Stage.getNodesWithClass(VarExpr, [], true, [node]);
+            var vars = findNoncapturingVarExpr(this.parent, null, true, true);
+            var capturedVars = findNoncapturingVarExpr(this.parent, this.name, true, true);
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
             var _iteratorError = undefined;
@@ -172,7 +173,14 @@ var LambdaHoleExpr = function (_MissingExpression) {
                     var variable = _step.value;
 
                     // If the variable can't be reduced, don't allow this to be reduced.
-                    if (variable.reduce() === variable) return null;
+                    var idx = capturedVars.indexOf(variable);
+                    // Make sure that if the variable can't reduce, it's
+                    // because it's the one bound by this argument.
+                    if (!variable.canReduce() && (idx == -1 || capturedVars[idx].name != this.name)) {
+                        // Play the animation
+                        variable.performReduction();
+                        return null;
+                    }
                 }
             } catch (err) {
                 _didIteratorError = true;
@@ -982,6 +990,36 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
                 var varExprs = findNoncapturingVarExpr(_this14, null, true, true);
                 var environment = _this14.getEnvironment();
 
+                var _iteratorNormalCompletion4 = true;
+                var _didIteratorError4 = false;
+                var _iteratorError4 = undefined;
+
+                try {
+                    for (var _iterator4 = varExprs[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                        var v = _step4.value;
+
+                        if (!v.canReduce()) {
+                            // Play the animation
+                            v.performReduction();
+                            _reject();
+                            return;
+                        }
+                    }
+                } catch (err) {
+                    _didIteratorError4 = true;
+                    _iteratorError4 = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                            _iterator4.return();
+                        }
+                    } finally {
+                        if (_didIteratorError4) {
+                            throw _iteratorError4;
+                        }
+                    }
+                }
+
                 var stepReduction = function stepReduction() {
                     return new Promise(function (innerresolve, innerreject) {
                         if (varExprs.length === 0) {
@@ -1100,13 +1138,13 @@ var InlineEnvironmentDisplay = function (_Expression2) {
         value: function update() {
             if (this.stage) window.stage = this.stage;
             var env = this.lambda.getEnvironment();
-            var _iteratorNormalCompletion4 = true;
-            var _didIteratorError4 = false;
-            var _iteratorError4 = undefined;
+            var _iteratorNormalCompletion5 = true;
+            var _didIteratorError5 = false;
+            var _iteratorError5 = undefined;
 
             try {
-                for (var _iterator4 = Object.keys(env.bound)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                    var name = _step4.value;
+                for (var _iterator5 = Object.keys(env.bound)[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                    var name = _step5.value;
 
                     var display = this.displays[name];
                     if (!display) {
@@ -1121,27 +1159,27 @@ var InlineEnvironmentDisplay = function (_Expression2) {
                     }
                 }
             } catch (err) {
-                _didIteratorError4 = true;
-                _iteratorError4 = err;
+                _didIteratorError5 = true;
+                _iteratorError5 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                        _iterator4.return();
+                    if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                        _iterator5.return();
                     }
                 } finally {
-                    if (_didIteratorError4) {
-                        throw _iteratorError4;
+                    if (_didIteratorError5) {
+                        throw _iteratorError5;
                     }
                 }
             }
 
-            var _iteratorNormalCompletion5 = true;
-            var _didIteratorError5 = false;
-            var _iteratorError5 = undefined;
+            var _iteratorNormalCompletion6 = true;
+            var _didIteratorError6 = false;
+            var _iteratorError6 = undefined;
 
             try {
-                for (var _iterator5 = env.names()[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                    var _name = _step5.value;
+                for (var _iterator6 = env.names()[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                    var _name = _step6.value;
 
                     if (env.bound[_name]) continue;
                     var _display = this.displays[_name];
@@ -1154,16 +1192,16 @@ var InlineEnvironmentDisplay = function (_Expression2) {
                     _display.setExpr(env.lookup(_name));
                 }
             } catch (err) {
-                _didIteratorError5 = true;
-                _iteratorError5 = err;
+                _didIteratorError6 = true;
+                _iteratorError6 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                        _iterator5.return();
+                    if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                        _iterator6.return();
                     }
                 } finally {
-                    if (_didIteratorError5) {
-                        throw _iteratorError5;
+                    if (_didIteratorError6) {
+                        throw _iteratorError6;
                     }
                 }
             }

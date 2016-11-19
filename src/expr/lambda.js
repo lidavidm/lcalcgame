@@ -140,10 +140,18 @@ class LambdaHoleExpr extends MissingExpression {
             }
         });
 
-        let vars = mag.Stage.getNodesWithClass(VarExpr, [], true, [node]);
+        let vars = findNoncapturingVarExpr(this.parent, null, true, true);
+        let capturedVars = findNoncapturingVarExpr(this.parent, this.name, true, true);
         for (let variable of vars) {
             // If the variable can't be reduced, don't allow this to be reduced.
-            if (variable.reduce() === variable) return null;
+            let idx = capturedVars.indexOf(variable);
+            // Make sure that if the variable can't reduce, it's
+            // because it's the one bound by this argument.
+            if (!variable.canReduce() && (idx == -1 || capturedVars[idx].name != this.name)) {
+                // Play the animation
+                variable.performReduction();
+                return null;
+            }
         }
 
         parent.getEnvironment().update(this.name, node);
@@ -742,6 +750,15 @@ class EnvironmentLambdaExpr extends LambdaExpr {
             // Perform substitution, but stop at the 'boundary' of another lambda.
             let varExprs = findNoncapturingVarExpr(this, null, true, true);
             let environment = this.getEnvironment();
+
+            for (let v of varExprs) {
+                if (!v.canReduce()) {
+                    // Play the animation
+                    v.performReduction();
+                    _reject();
+                    return;
+                }
+            }
 
             let stepReduction = () => {
                 return new Promise((innerresolve, innerreject) => {
