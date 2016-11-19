@@ -40,7 +40,7 @@ class Level {
 
         var canvas_screen = stage.boundingSize;
 
-        const envDisplayWidth = 0.15 * canvas_screen.w;
+        const envDisplayWidth = 0.20 * canvas_screen.w;
 
         GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
         const usableWidth = canvas_screen.w - envDisplayWidth;
@@ -108,7 +108,7 @@ class Level {
 
         // Environment
         let yOffset = goal_node[0].absoluteSize.h + goal_node[0].absolutePos.y + 20;
-        var env = new EnvironmentDisplay(0.85 * canvas_screen.w, yOffset, 0.15 * canvas_screen.w, canvas_screen.h - TOOLBOX_HEIGHT - yOffset, stage);
+        var env = new EnvironmentDisplay(canvas_screen.w - envDisplayWidth, yOffset, envDisplayWidth, canvas_screen.h - TOOLBOX_HEIGHT - yOffset, stage);
         stage.add(env);
         stage.environmentDisplay = env;
         if (this.globals) {

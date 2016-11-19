@@ -49,7 +49,7 @@ var Level = function () {
 
             var canvas_screen = stage.boundingSize;
 
-            var envDisplayWidth = 0.15 * canvas_screen.w;
+            var envDisplayWidth = 0.20 * canvas_screen.w;
 
             GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
             var usableWidth = canvas_screen.w - envDisplayWidth;
@@ -111,7 +111,7 @@ var Level = function () {
 
             // Environment
             var yOffset = goal_node[0].absoluteSize.h + goal_node[0].absolutePos.y + 20;
-            var env = new EnvironmentDisplay(0.85 * canvas_screen.w, yOffset, 0.15 * canvas_screen.w, canvas_screen.h - TOOLBOX_HEIGHT - yOffset, stage);
+            var env = new EnvironmentDisplay(canvas_screen.w - envDisplayWidth, yOffset, envDisplayWidth, canvas_screen.h - TOOLBOX_HEIGHT - yOffset, stage);
             stage.add(env);
             stage.environmentDisplay = env;
             if (this.globals) {
