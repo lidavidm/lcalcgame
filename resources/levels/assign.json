@@ -87,6 +87,80 @@
             }
         },
         {
+            "description": "Equality with a variable",
+            "board": "(== /$x (diamond))",
+            "goal": "(true)",
+            "globals": {
+                "x": "(diamond)"
+            }
+        },
+        {
+            "description": "Equality with a variable II",
+            "board": "(== _ (diamond))",
+            "goal": "(true)",
+            "toolbox": "($x) ($y)",
+            "globals": {
+                "x": "(diamond)",
+                "y": "(triangle)"
+            }
+        },
+        {
+            "description": "Equality with variables",
+            "board": "(== /$x /$y)",
+            "goal": "(true)",
+            "globals": {
+                "x": "(diamond)",
+                "y": "(diamond)"
+            }
+        },
+        {
+            "description": "Make things equal first",
+            "board": "(== /$x /$y)",
+            "goal": "(true)",
+            "toolbox": "(assign _ _) ($x) ($y)",
+            "globals": {
+                "x": "(diamond)",
+                "y": "(triangle)"
+            }
+        },
+        {
+            "description": "Booleans can go in variables, too!",
+            "board": "(assign /$c _) ($_c)",
+            "goal": "(true)",
+            "toolbox": "(== _ /(diamond)) ($x)",
+            "globals": {
+                "x": "(diamond)"
+            }
+        },
+        {
+            "description": "Variable as value of conditional",
+            "board": "(if _b /$x)",
+            "goal": "(star)",
+            "toolbox": "(true) (false)",
+            "globals": {
+                "x": "(star)"
+            }
+        },
+        {
+            "description": "Variable as conditional of conditional",
+            "board": "(if _ /(diamond))",
+            "goal": "(diamond)",
+            "toolbox": "($c)",
+            "globals": {
+                "c": "(true)"
+            }
+        },
+        {
+            "description": "Variable as conditional of conditional",
+            "board": "(if /$c /(diamond))",
+            "goal": "(diamond)",
+            "toolbox": "(assign /$c _ ) (== _ _ ) ($x) (star) (triangle)",
+            "globals": {
+                "x": "(star)",
+                "c": "(true)"
+            }
+        },
+        {
             "description": "Basic lambdas work.",
             "board": "(λx /$x)",
             "goal": "(star)",
