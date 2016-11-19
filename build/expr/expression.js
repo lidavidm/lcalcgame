@@ -268,6 +268,27 @@ var Expression = function (_mag$RoundedRect) {
             return this;
         }
 
+        // Try and reduce the given child expression before continuing with our reduction
+
+    }, {
+        key: 'performSubReduction',
+        value: function performSubReduction(expr) {
+            var animated = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+            return new Promise(function (resolve, reject) {
+                var result = expr.performReduction(animated);
+                if (result instanceof Promise) {
+                    result.then(function () {
+                        window.setTimeout(function () {
+                            resolve();
+                        }, 600);
+                    });
+                } else {
+                    resolve();
+                }
+            });
+        }
+
         // * Swaps this expression for its reduction (if one exists) in the expression hierarchy.
 
     }, {

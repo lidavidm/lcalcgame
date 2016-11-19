@@ -38,6 +38,20 @@ class CompareExpr extends Expression {
         else                    return this;
     }
     performReduction(animated=true) {
+        if (this.leftExpr && this.leftExpr instanceof VarExpr) {
+            this.performSubReduction(this.leftExpr, true).then(() => {
+                return this.performReduction();
+            });
+            return;
+        }
+
+        if (this.rightExpr && this.rightExpr instanceof VarExpr) {
+            this.performSubReduction(this.rightExpr, true).then(() => {
+                return this.performReduction();
+            });
+            return;
+        }
+
         if (this.reduce() != this) {
             if (animated) {
                 var shatter = new ShatterExpressionEffect(this);

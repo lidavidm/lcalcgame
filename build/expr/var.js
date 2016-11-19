@@ -92,6 +92,14 @@ var VarExpr = function (_Expression) {
         key: "close",
         value: function close() {}
     }, {
+        key: "value",
+        value: function value() {
+            if (this.canReduce()) {
+                return this.getEnvironment().lookup(this.name).value();
+            }
+            return undefined;
+        }
+    }, {
         key: "canReduce",
         value: function canReduce() {
             return this.getEnvironment() && (this.parent || this.stage) && this.getEnvironment().lookup(this.name);
@@ -794,18 +802,9 @@ var AssignExpr = function (_Expression4) {
 
             this._animating = true;
 
-            var result = this.value.performReduction(animated);
-            if (result instanceof Promise) {
-                return result.then(function () {
-                    return new Promise(function (resolve, _reject) {
-                        window.setTimeout(function () {
-                            return _this17.animateReduction();
-                        }, 600);
-                    });
-                });
-            } else {
-                return this.animateReduction();
-            }
+            return this.performSubReduction(this.value, true).then(function () {
+                return _this17.animateReduction();
+            });
         }
     }, {
         key: "reduceCompletely",

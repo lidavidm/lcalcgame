@@ -235,6 +235,23 @@ class Expression extends mag.RoundedRect {
         return this;
     }
 
+    // Try and reduce the given child expression before continuing with our reduction
+    performSubReduction(expr, animated=true) {
+        return new Promise((resolve, reject) => {
+            let result = expr.performReduction(animated);
+            if (result instanceof Promise) {
+                result.then(() => {
+                    window.setTimeout(() => {
+                        resolve();
+                    }, 600);
+                });
+            }
+            else {
+                resolve();
+            }
+        });
+    }
+
     // * Swaps this expression for its reduction (if one exists) in the expression hierarchy.
     performReduction() {
         var reduced_expr = this.reduce();

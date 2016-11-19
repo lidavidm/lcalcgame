@@ -12,8 +12,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 //
 
-// A boolean compare function like ==, !=, >, >=, <=, <.
 
+// A boolean compare function like ==, !=, >, >=, <=, <.
 var CompareExpr = function (_Expression) {
     _inherits(CompareExpr, _Expression);
 
@@ -64,6 +64,20 @@ var CompareExpr = function (_Expression) {
             var _this2 = this;
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+            if (this.leftExpr && this.leftExpr instanceof VarExpr) {
+                this.performSubReduction(this.leftExpr, true).then(function () {
+                    return _this2.performReduction();
+                });
+                return;
+            }
+
+            if (this.rightExpr && this.rightExpr instanceof VarExpr) {
+                this.performSubReduction(this.rightExpr, true).then(function () {
+                    return _this2.performReduction();
+                });
+                return;
+            }
 
             if (this.reduce() != this) {
                 if (animated) {

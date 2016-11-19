@@ -58,6 +58,13 @@ class VarExpr extends Expression {
     close() {
     }
 
+    value() {
+        if (this.canReduce()) {
+            return this.getEnvironment().lookup(this.name).value();
+        }
+        return undefined;
+    }
+
     canReduce() {
         return this.getEnvironment() && (this.parent || this.stage) && this.getEnvironment().lookup(this.name);
     }
@@ -625,17 +632,9 @@ class AssignExpr extends Expression {
 
         this._animating = true;
 
-        let result = this.value.performReduction(animated);
-        if (result instanceof Promise) {
-            return result.then(() => {
-                return new Promise((resolve, _reject) => {
-                    window.setTimeout(() => this.animateReduction(), 600);
-                });
-            });
-        }
-        else {
+        return this.performSubReduction(this.value, true).then(() => {
             return this.animateReduction();
-        }
+        });
     }
 
     reduceCompletely() {
