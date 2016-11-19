@@ -722,6 +722,68 @@ class EnvironmentLambdaExpr extends LambdaExpr {
         }
         super.draw(ctx);
     }
+
+    onmouseclick() {
+        if (!this._animating) {
+            this.performReduction();
+        }
+    }
+
+    performReduction() {
+        // If we don't have all our arguments, refuse to evaluate.
+        if (this.takesArgument) {
+            return this;
+        }
+
+        return new Promise((resolve, _reject) => {
+            this._animating = true;
+            this.environmentDisplay.openDrawer({ force: true, speed: 100 });
+
+            // Perform substitution, but stop at the 'boundary' of another lambda.
+            let varExprs = findNoncapturingVarExpr(this, null, true, true);
+            let environment = this.getEnvironment();
+
+            let stepReduction = () => {
+                return new Promise((innerresolve, innerreject) => {
+                    if (varExprs.length === 0) {
+                        innerresolve();
+                    }
+                    else {
+                        let expr = varExprs.pop();
+                        let result;
+                        if (expr instanceof LabeledVarExpr) {
+                            result = expr.animateReduction(this.environmentDisplay.displays[expr.name]);
+                        }
+                        else {
+                            result = expr.performReduction();
+                        }
+
+                        if (result instanceof Promise) {
+                            // TODO: handle rejection
+                            result.then(() => {
+                                stepReduction().then(() => innerresolve());
+                            }, () => {
+                                innerreject();
+                                _reject();
+                                this._animating = false;
+                            });
+                        }
+                        else {
+                            return stepReduction();
+                        }
+                    }
+                });
+            };
+            stepReduction().then(() => {
+                Animate.blink(this);
+                window.setTimeout(() => {
+                    Animate.poof(this);
+                    super.performReduction();
+                    resolve();
+                }, 600);
+            });
+        });
+    }
 }
 
 
@@ -789,6 +851,10 @@ class InlineEnvironmentDisplay extends Expression {
                 this.displays[name] = display;
             }
             display.ignoreEvents = true;
+            let expr = env.lookupDirect(name);
+            if (expr) {
+                display.setExpr(expr);
+            }
         }
         for (let name of env.names()) {
             if (env.bound[name]) continue;

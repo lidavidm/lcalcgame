@@ -94,6 +94,37 @@ class LabeledVarExpr extends VarExpr {
         this.holes.push(this.label);
     }
 
+    // Used by EnvironmentLambdaExpr
+    // TODO: better name
+    animateReduction(display) {
+        if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return null;
+
+        return new Promise((resolve, reject) => {
+            let value = this.reduce();
+            if (this.reduce() != this) {
+                let dummy = display.getExpr().clone();
+                let stage = this.stage;
+                stage.add(dummy);
+                dummy.pos = display.getExpr().absolutePos;
+                dummy.scale = display.getExpr().absoluteScale;
+                dummy.opacity = 0.3;
+
+                Animate.tween(dummy, {
+                    pos: this.absolutePos,
+                    scale: { x: 1, y: 1 },
+                    opacity: 1.0,
+                }, 300).after(() => {
+                    (this.parent || this.stage).swap(this, display.getExpr().clone());
+                    stage.remove(dummy);
+                    resolve();
+                });
+            }
+            else {
+                reject();
+            }
+        });
+    }
+
     performReduction() {
         if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return;
 
