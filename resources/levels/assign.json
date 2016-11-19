@@ -151,13 +151,31 @@
             }
         },
         {
-            "description": "Variable as conditional of conditional",
+            "description": "Unlock the conditional",
             "board": "(if /$c /(diamond))",
             "goal": "(diamond)",
             "toolbox": "(assign /$c _ ) (== _ _ ) ($x) (star) (triangle)",
             "globals": {
                 "x": "(star)",
                 "c": "(true)"
+            }
+        },
+        {
+            "description": "Variables can't go in bags",
+            "board": "(bag) ($x)",
+            "goal": "(bag diamond)",
+            "globals": {
+                "x": "(diamond)"
+            }
+        },
+        {
+            "description": "But bags can go in variables",
+            "board": "",
+            "goal": "(bag star diamond)",
+            "toolbox": "($x) ($y)",
+            "globals": {
+                "x": "(bag star)",
+                "y": "(diamond)"
             }
         },
         {
