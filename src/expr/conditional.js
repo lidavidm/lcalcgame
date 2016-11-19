@@ -54,7 +54,14 @@ class IfStatement extends Expression {
         Animate.wait(150).after(onComplete);
     }
 
-    performReduction() {
+    performReduction(animated=true) {
+        if (this.cond && !(this.cond instanceof BooleanPrimitive)) {
+            this.performSubReduction(this.cond, animated).then(() => {
+                this.performReduction();
+            });
+            return;
+        }
+
         var reduction = this.reduce();
         if (reduction != this) {
 
