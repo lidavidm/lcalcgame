@@ -67,32 +67,34 @@ var CompareExpr = function (_Expression) {
 
             if (this.leftExpr && this.rightExpr && this.leftExpr instanceof VarExpr && !this._animating) {
                 this._animating = true;
-                this.performSubReduction(this.leftExpr, true).then(function () {
+                return this.performSubReduction(this.leftExpr, true).then(function () {
                     _this2._animating = false;
                     return _this2.performReduction();
                 });
-                return;
             }
 
             if (this.leftExpr && this.rightExpr && this.rightExpr instanceof VarExpr && !this._animating) {
                 this._animating = true;
-                this.performSubReduction(this.rightExpr, true).then(function () {
+                return this.performSubReduction(this.rightExpr, true).then(function () {
                     _this2._animating = false;
                     return _this2.performReduction();
                 });
-                return;
             }
 
             if (this.reduce() != this) {
                 if (animated) {
-                    var shatter = new ShatterExpressionEffect(this);
-                    shatter.run(stage, function () {
-                        _this2.ignoreEvents = false;
-                        _get(CompareExpr.prototype.__proto__ || Object.getPrototypeOf(CompareExpr.prototype), 'performReduction', _this2).call(_this2);
-                    }.bind(this));
-                    this.ignoreEvents = true;
+                    return new Promise(function (resolve, _reject) {
+                        var shatter = new ShatterExpressionEffect(_this2);
+                        shatter.run(stage, function () {
+                            _this2.ignoreEvents = false;
+                            _get(CompareExpr.prototype.__proto__ || Object.getPrototypeOf(CompareExpr.prototype), 'performReduction', _this2).call(_this2);
+                            resolve();
+                        }.bind(_this2));
+                        _this2.ignoreEvents = true;
+                    });
                 } else _get(CompareExpr.prototype.__proto__ || Object.getPrototypeOf(CompareExpr.prototype), 'performReduction', this).call(this);
             }
+            return null;
         }
     }, {
         key: 'compare',

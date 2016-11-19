@@ -40,33 +40,35 @@ class CompareExpr extends Expression {
     performReduction(animated=true) {
         if (this.leftExpr && this.rightExpr && this.leftExpr instanceof VarExpr && !this._animating) {
             this._animating = true;
-            this.performSubReduction(this.leftExpr, true).then(() => {
+            return this.performSubReduction(this.leftExpr, true).then(() => {
                 this._animating = false;
                 return this.performReduction();
             });
-            return;
         }
 
         if (this.leftExpr && this.rightExpr && this.rightExpr instanceof VarExpr && !this._animating) {
             this._animating = true;
-            this.performSubReduction(this.rightExpr, true).then(() => {
+            return this.performSubReduction(this.rightExpr, true).then(() => {
                 this._animating = false;
                 return this.performReduction();
             });
-            return;
         }
 
         if (this.reduce() != this) {
             if (animated) {
-                var shatter = new ShatterExpressionEffect(this);
-                shatter.run(stage, (() => {
-                    this.ignoreEvents = false;
-                    super.performReduction();
-                }).bind(this));
-                this.ignoreEvents = true;
+                return new Promise((resolve, _reject) => {
+                    var shatter = new ShatterExpressionEffect(this);
+                    shatter.run(stage, (() => {
+                        this.ignoreEvents = false;
+                        super.performReduction();
+                        resolve();
+                    }).bind(this));
+                    this.ignoreEvents = true;
+                });
             }
             else super.performReduction();
         }
+        return null;
     }
     compare() {
         if (this.funcName === '==') {
