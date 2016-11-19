@@ -65,15 +65,19 @@ var CompareExpr = function (_Expression) {
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
-            if (this.leftExpr && this.leftExpr instanceof VarExpr) {
+            if (this.leftExpr && this.rightExpr && this.leftExpr instanceof VarExpr && !this._animating) {
+                this._animating = true;
                 this.performSubReduction(this.leftExpr, true).then(function () {
+                    _this2._animating = false;
                     return _this2.performReduction();
                 });
                 return;
             }
 
-            if (this.rightExpr && this.rightExpr instanceof VarExpr) {
+            if (this.leftExpr && this.rightExpr && this.rightExpr instanceof VarExpr && !this._animating) {
+                this._animating = true;
                 this.performSubReduction(this.rightExpr, true).then(function () {
+                    _this2._animating = false;
                     return _this2.performReduction();
                 });
                 return;

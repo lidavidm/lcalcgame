@@ -38,15 +38,19 @@ class CompareExpr extends Expression {
         else                    return this;
     }
     performReduction(animated=true) {
-        if (this.leftExpr && this.leftExpr instanceof VarExpr) {
+        if (this.leftExpr && this.rightExpr && this.leftExpr instanceof VarExpr && !this._animating) {
+            this._animating = true;
             this.performSubReduction(this.leftExpr, true).then(() => {
+                this._animating = false;
                 return this.performReduction();
             });
             return;
         }
 
-        if (this.rightExpr && this.rightExpr instanceof VarExpr) {
+        if (this.leftExpr && this.rightExpr && this.rightExpr instanceof VarExpr && !this._animating) {
+            this._animating = true;
             this.performSubReduction(this.rightExpr, true).then(() => {
+                this._animating = false;
                 return this.performReduction();
             });
             return;
