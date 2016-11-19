@@ -324,7 +324,7 @@ var BagExpr = function (_CollectionExpr) {
             this.ondropexit(node, pos);
 
             if (this.parent) return;
-            if (node instanceof FunnelMapFunc) return;
+            if (node instanceof FunnelMapFunc || node instanceof VarExpr) return;
 
             if (!(node instanceof Expression)) {
                 console.error('@ BagExpr.ondropped: Dropped node is not an Expression.', node);
@@ -524,12 +524,14 @@ var BracketArrayExpr = function (_BagExpr) {
     }, {
         key: 'ondropenter',
         value: function ondropenter(node, pos) {
+            if (node instanceof VarExpr) return;
 
             this.onmouseenter(pos);
         }
     }, {
         key: 'ondropexit',
         value: function ondropexit(node, pos) {
+            if (node instanceof VarExpr) return;
 
             this.onmouseleave(pos);
         }
@@ -539,6 +541,7 @@ var BracketArrayExpr = function (_BagExpr) {
             this.ondropexit(node, pos);
 
             if (this.parent) return;
+            if (node instanceof VarExpr) return;
 
             if (!(node instanceof Expression)) {
                 console.error('@ BagExpr.ondropped: Dropped node is not an Expression.', node);

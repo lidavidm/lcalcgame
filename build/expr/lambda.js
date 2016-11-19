@@ -1045,7 +1045,7 @@ var InlineEnvironmentDisplay = function (_Expression2) {
 
                     var display = this.displays[name];
                     if (!display) {
-                        display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression());
+                        display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression(new Expression()));
                         this.addArg(display);
                         this.displays[name] = display;
                     }
@@ -1077,7 +1077,7 @@ var InlineEnvironmentDisplay = function (_Expression2) {
                     if (env.bound[_name]) continue;
                     var _display = this.displays[_name];
                     if (!_display) {
-                        _display = new (ExprManager.getClass('reference_display'))(_name, new MissingExpression());
+                        _display = new (ExprManager.getClass('reference_display'))(_name, new MissingExpression(new Expression()));
                         this.addArg(_display);
                         this.displays[_name] = _display;
                     }

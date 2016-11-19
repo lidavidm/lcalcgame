@@ -784,7 +784,7 @@ class InlineEnvironmentDisplay extends Expression {
         for (let name of Object.keys(env.bound)) {
             let display = this.displays[name];
             if (!display) {
-                display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression());
+                display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression(new Expression()));
                 this.addArg(display);
                 this.displays[name] = display;
             }
@@ -794,7 +794,7 @@ class InlineEnvironmentDisplay extends Expression {
             if (env.bound[name]) continue;
             let display = this.displays[name];
             if (!display) {
-                display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression());
+                display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression(new Expression()));
                 this.addArg(display);
                 this.displays[name] = display;
             }
