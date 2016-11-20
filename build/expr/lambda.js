@@ -1078,8 +1078,8 @@ var InlineEnvironmentDisplay = function (_Expression2) {
 
         _this15._stackVertically = true;
         _this15.displays = {};
-        _this15._state = 'closed';
-        _this15._height = 0.0;
+        _this15._state = 'open';
+        _this15._height = 1.0;
         _this15._animation = null;
         return _this15;
     }
@@ -1135,8 +1135,24 @@ var InlineEnvironmentDisplay = function (_Expression2) {
     }, {
         key: 'update',
         value: function update() {
+            var _this18 = this;
+
             if (this.stage) window.stage = this.stage;
             var env = this.lambda.getEnvironment();
+            var updateBinding = function updateBinding(name, expr) {
+                var display = _this18.displays[name];
+                if (!display) {
+                    display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression(new Expression()));
+                    _this18.addArg(display);
+                    _this18.displays[name] = display;
+                }
+                display.ignoreEvents = true;
+                var oldExpr = display.getExpr();
+                if (expr) {
+                    display.setExpr(expr);
+                }
+            };
+
             var _iteratorNormalCompletion5 = true;
             var _didIteratorError5 = false;
             var _iteratorError5 = undefined;
@@ -1145,17 +1161,7 @@ var InlineEnvironmentDisplay = function (_Expression2) {
                 for (var _iterator5 = Object.keys(env.bound)[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
                     var name = _step5.value;
 
-                    var display = this.displays[name];
-                    if (!display) {
-                        display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression(new Expression()));
-                        this.addArg(display);
-                        this.displays[name] = display;
-                    }
-                    display.ignoreEvents = true;
-                    var expr = env.lookupDirect(name);
-                    if (expr) {
-                        display.setExpr(expr);
-                    }
+                    updateBinding(name, env.lookupDirect(name));
                 }
             } catch (err) {
                 _didIteratorError5 = true;
@@ -1180,15 +1186,7 @@ var InlineEnvironmentDisplay = function (_Expression2) {
                 for (var _iterator6 = env.names()[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
                     var _name = _step6.value;
 
-                    if (env.bound[_name]) continue;
-                    var _display = this.displays[_name];
-                    if (!_display) {
-                        _display = new (ExprManager.getClass('reference_display'))(_name, new MissingExpression(new Expression()));
-                        this.addArg(_display);
-                        this.displays[_name] = _display;
-                    }
-                    _display.ignoreEvents = true;
-                    _display.setExpr(env.lookup(_name));
+                    updateBinding(_name, env.lookup(_name));
                 }
             } catch (err) {
                 _didIteratorError6 = true;
@@ -1208,9 +1206,17 @@ var InlineEnvironmentDisplay = function (_Expression2) {
             _get(InlineEnvironmentDisplay.prototype.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay.prototype), 'update', this).call(this);
         }
     }, {
+        key: 'highlight',
+        value: function highlight(name) {
+            var display = this.displays[name];
+            if (display) {
+                Animate.blink(display.getExpr());
+            }
+        }
+    }, {
         key: 'draw',
         value: function draw(ctx) {
-            var _this18 = this;
+            var _this19 = this;
 
             if (!ctx) return;
             ctx.save();
@@ -1222,7 +1228,7 @@ var InlineEnvironmentDisplay = function (_Expression2) {
             this.drawInternal(ctx, upperLeftPos, boundingSize);
             if (this._state === 'open') {
                 this.children.forEach(function (child) {
-                    child.parent = _this18;
+                    child.parent = _this19;
                     child.draw(ctx);
                 });
             }
@@ -1278,12 +1284,12 @@ var FadedLambdaHoleExpr = function (_LambdaHoleExpr) {
     function FadedLambdaHoleExpr(varname) {
         _classCallCheck(this, FadedLambdaHoleExpr);
 
-        var _this19 = _possibleConstructorReturn(this, (FadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedLambdaHoleExpr)).call(this, varname));
+        var _this20 = _possibleConstructorReturn(this, (FadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedLambdaHoleExpr)).call(this, varname));
 
-        _this19.label = new TextExpr("λ" + varname + ".");
-        _this19.holes.push(_this19.label);
-        _this19.label.color = "#000";
-        return _this19;
+        _this20.label = new TextExpr("λ" + varname + ".");
+        _this20.holes.push(_this20.label);
+        _this20.label.color = "#000";
+        return _this20;
     }
 
     _createClass(FadedLambdaHoleExpr, [{
@@ -1337,12 +1343,12 @@ var HalfFadedLambdaHoleExpr = function (_LambdaHoleExpr2) {
     function HalfFadedLambdaHoleExpr(varname) {
         _classCallCheck(this, HalfFadedLambdaHoleExpr);
 
-        var _this20 = _possibleConstructorReturn(this, (HalfFadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr)).call(this, varname));
+        var _this21 = _possibleConstructorReturn(this, (HalfFadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr)).call(this, varname));
 
-        _this20.label = new TextExpr("λ" + varname);
-        _this20.holes.push(_this20.label);
-        _this20.label.color = "#FFF";
-        return _this20;
+        _this21.label = new TextExpr("λ" + varname);
+        _this21.holes.push(_this21.label);
+        _this21.label.color = "#FFF";
+        return _this21;
     }
 
     _createClass(HalfFadedLambdaHoleExpr, [{
@@ -1424,15 +1430,15 @@ var FadedES6LambdaHoleExpr = function (_LambdaHoleExpr4) {
     function FadedES6LambdaHoleExpr(varname) {
         _classCallCheck(this, FadedES6LambdaHoleExpr);
 
-        var _this22 = _possibleConstructorReturn(this, (FadedES6LambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedES6LambdaHoleExpr)).call(this, varname));
+        var _this23 = _possibleConstructorReturn(this, (FadedES6LambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedES6LambdaHoleExpr)).call(this, varname));
 
-        _this22.label = new TextExpr("(" + varname + ")");
-        _this22.arrow = new TextExpr("=>");
-        _this22.holes.push(_this22.label);
-        _this22.holes.push(_this22.arrow);
-        _this22.label.color = "#000";
-        _this22.arrow.color = "#000";
-        return _this22;
+        _this23.label = new TextExpr("(" + varname + ")");
+        _this23.arrow = new TextExpr("=>");
+        _this23.holes.push(_this23.label);
+        _this23.holes.push(_this23.arrow);
+        _this23.label.color = "#000";
+        _this23.arrow.color = "#000";
+        return _this23;
     }
 
     _createClass(FadedES6LambdaHoleExpr, [{
@@ -1505,12 +1511,12 @@ var FadedLambdaVarExpr = function (_LambdaVarExpr2) {
     function FadedLambdaVarExpr(varname) {
         _classCallCheck(this, FadedLambdaVarExpr);
 
-        var _this24 = _possibleConstructorReturn(this, (FadedLambdaVarExpr.__proto__ || Object.getPrototypeOf(FadedLambdaVarExpr)).call(this, varname));
+        var _this25 = _possibleConstructorReturn(this, (FadedLambdaVarExpr.__proto__ || Object.getPrototypeOf(FadedLambdaVarExpr)).call(this, varname));
 
-        _this24.graphicNode.size = _this24.name === 'x' ? { w: 24, h: 24 } : { w: 24, h: 30 };
-        _this24.graphicNode.offset = _this24.name === 'x' ? { x: 0, y: 0 } : { x: 0, y: 2 };
-        _this24.handleOffset = 2;
-        return _this24;
+        _this25.graphicNode.size = _this25.name === 'x' ? { w: 24, h: 24 } : { w: 24, h: 30 };
+        _this25.graphicNode.offset = _this25.name === 'x' ? { x: 0, y: 0 } : { x: 0, y: 2 };
+        _this25.handleOffset = 2;
+        return _this25;
     }
 
     _createClass(FadedLambdaVarExpr, [{

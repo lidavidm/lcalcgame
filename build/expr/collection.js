@@ -80,10 +80,15 @@ var BagExpr = function (_CollectionExpr) {
             this.graphicNode.shadowOffset = this.shadowOffset;
         }
     }, {
-        key: 'addItem',
-
+        key: 'isValue',
+        value: function isValue() {
+            return true;
+        }
 
         // Adds an item to the bag.
+
+    }, {
+        key: 'addItem',
         value: function addItem(item) {
 
             if (item.toolbox) {

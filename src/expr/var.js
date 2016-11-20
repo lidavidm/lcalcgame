@@ -620,6 +620,10 @@ class AssignExpr extends Expression {
         this.stage.environmentDisplay.showGlobals();
         let binding = this.stage.environmentDisplay.getBinding(this.variable.name);
         Animate.blink(binding.getExpr());
+        this.stage.getNodesWithClass(EnvironmentLambdaExpr).forEach((lambda) => {
+            lambda.update();
+            lambda.environmentDisplay.highlight(this.variable.name);
+        });
         this.stage.draw();
     }
 

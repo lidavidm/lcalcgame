@@ -812,8 +812,8 @@ class InlineEnvironmentDisplay extends Expression {
 
         this._stackVertically = true;
         this.displays = {};
-        this._state = 'closed';
-        this._height = 0.0;
+        this._state = 'open';
+        this._height = 1.0;
         this._animation = null;
     }
 
@@ -859,7 +859,7 @@ class InlineEnvironmentDisplay extends Expression {
     update() {
         if (this.stage) window.stage = this.stage;
         let env = this.lambda.getEnvironment();
-        for (let name of Object.keys(env.bound)) {
+        let updateBinding = (name, expr) => {
             let display = this.displays[name];
             if (!display) {
                 display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression(new Expression()));
@@ -867,24 +867,27 @@ class InlineEnvironmentDisplay extends Expression {
                 this.displays[name] = display;
             }
             display.ignoreEvents = true;
-            let expr = env.lookupDirect(name);
+            let oldExpr = display.getExpr();
             if (expr) {
                 display.setExpr(expr);
             }
+        };
+
+        for (let name of Object.keys(env.bound)) {
+            updateBinding(name, env.lookupDirect(name));
         }
         for (let name of env.names()) {
-            if (env.bound[name]) continue;
-            let display = this.displays[name];
-            if (!display) {
-                display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression(new Expression()));
-                this.addArg(display);
-                this.displays[name] = display;
-            }
-            display.ignoreEvents = true;
-            display.setExpr(env.lookup(name));
+            updateBinding(name, env.lookup(name));
         }
 
         super.update();
+    }
+
+    highlight(name) {
+        let display = this.displays[name];
+        if (display) {
+            Animate.blink(display.getExpr());
+        }
     }
 
     get pos() {

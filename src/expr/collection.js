@@ -55,6 +55,8 @@ class BagExpr extends CollectionExpr {
     }
     get delegateToInner() { return true; }
 
+    isValue() { return true; }
+
     // Adds an item to the bag.
     addItem(item) {
 
