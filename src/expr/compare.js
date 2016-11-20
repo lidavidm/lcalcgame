@@ -73,8 +73,7 @@ class CompareExpr extends Expression {
                     var shatter = new ShatterExpressionEffect(this);
                     shatter.run(stage, (() => {
                         this.ignoreEvents = false;
-                        super.performReduction();
-                        resolve();
+                        resolve(super.performReduction());
                     }).bind(this));
                     this.ignoreEvents = true;
                 });

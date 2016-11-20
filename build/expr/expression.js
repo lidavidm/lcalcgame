@@ -264,7 +264,9 @@ var Expression = function (_mag$RoundedRect) {
             return new Promise(function (resolve, reject) {
                 var result = expr.performReduction(animated);
                 if (result instanceof Promise) {
-                    result.then(function () {
+                    result.then(function (result) {
+                        if (expr.locked) result.lock();
+
                         window.setTimeout(function () {
                             resolve();
                         }, 600);

@@ -127,13 +127,14 @@ class LabeledVarExpr extends VarExpr {
     }
 
     performReduction() {
-        if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return;
+        if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return null;
 
         let value = this.reduce();
         if (value != this) {
             value = value.clone();
             let parent = this.parent ? this.parent : this.stage;
             parent.swap(this, value);
+            return value;
         }
         else {
             let wat = new TextExpr("?");
@@ -151,6 +152,7 @@ class LabeledVarExpr extends VarExpr {
                 this.stage.draw();
                 this.stage.update();
             }, 500);
+            return null;
         }
     }
 }

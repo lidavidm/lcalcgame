@@ -243,7 +243,9 @@ class Expression extends mag.RoundedRect {
         return new Promise((resolve, reject) => {
             let result = expr.performReduction(animated);
             if (result instanceof Promise) {
-                result.then(() => {
+                result.then((result) => {
+                    if (expr.locked) result.lock();
+
                     window.setTimeout(() => {
                         resolve();
                     }, 600);

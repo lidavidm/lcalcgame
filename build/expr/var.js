@@ -2,6 +2,8 @@
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -184,15 +186,16 @@ var LabeledVarExpr = function (_VarExpr) {
         value: function performReduction() {
             var _this4 = this;
 
-            if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return;
+            if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return null;
 
             var value = this.reduce();
             if (value != this) {
                 value = value.clone();
                 var _parent = this.parent ? this.parent : this.stage;
                 _parent.swap(this, value);
+                return value;
             } else {
-                (function () {
+                var _ret2 = function () {
                     var wat = new TextExpr("?");
                     _this4.stage.add(wat);
                     wat.pos = _this4.label.absolutePos;
@@ -208,7 +211,12 @@ var LabeledVarExpr = function (_VarExpr) {
                         _this4.stage.draw();
                         _this4.stage.update();
                     }, 500);
-                })();
+                    return {
+                        v: null
+                    };
+                }();
+
+                if ((typeof _ret2 === "undefined" ? "undefined" : _typeof(_ret2)) === "object") return _ret2.v;
             }
         }
     }]);
