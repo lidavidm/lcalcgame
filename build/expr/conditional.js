@@ -69,8 +69,15 @@ var IfStatement = function (_Expression) {
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
-            if (this.cond && !(this.cond instanceof BooleanPrimitive)) {
+            if (this.cond && this.cond.canReduce()) {
                 this.performSubReduction(this.cond, animated).then(function () {
+                    _this2.performReduction();
+                });
+                return;
+            }
+
+            if (this.branch && this.branch.canReduce()) {
+                this.performSubReduction(this.branch, animated).then(function () {
                     _this2.performReduction();
                 });
                 return;

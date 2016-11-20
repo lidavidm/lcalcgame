@@ -23,6 +23,11 @@ var ValueExpr = function (_Expression) {
     _createClass(ValueExpr, [{
         key: 'canReduce',
         value: function canReduce() {
+            return false;
+        }
+    }, {
+        key: 'isValue',
+        value: function isValue() {
             return true;
         }
     }]);
@@ -412,6 +417,11 @@ var FadedValueExpr = function (_Expression2) {
     }, {
         key: 'canReduce',
         value: function canReduce() {
+            return false;
+        }
+    }, {
+        key: 'isValue',
+        value: function isValue() {
             return true;
         }
     }, {

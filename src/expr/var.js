@@ -568,12 +568,8 @@ class AssignExpr extends Expression {
         return this.holes[2] instanceof MissingExpression ? null : this.holes[2];
     }
 
-    onmouseclick() {
-        this.performReduction();
-    }
-
     canReduce() {
-        return this.value && this.variable && this.value.canReduce() && this.variable instanceof VarExpr;
+        return this.value && this.variable && (this.value.canReduce() || this.value.isValue()) && this.variable instanceof VarExpr;
     }
 
     reduce() {

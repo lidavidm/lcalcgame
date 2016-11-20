@@ -729,14 +729,9 @@ var AssignExpr = function (_Expression4) {
     }
 
     _createClass(AssignExpr, [{
-        key: "onmouseclick",
-        value: function onmouseclick() {
-            this.performReduction();
-        }
-    }, {
         key: "canReduce",
         value: function canReduce() {
-            return this.value && this.variable && this.value.canReduce() && this.variable instanceof VarExpr;
+            return this.value && this.variable && (this.value.canReduce() || this.value.isValue()) && this.variable instanceof VarExpr;
         }
     }, {
         key: "reduce",

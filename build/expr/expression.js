@@ -226,9 +226,20 @@ var Expression = function (_mag$RoundedRect) {
 
             return null;
         }
+
+        // Can this expression step to a value?
+
     }, {
         key: 'canReduce',
         value: function canReduce() {
+            return false;
+        }
+
+        // Is this expression already a value?
+
+    }, {
+        key: 'isValue',
+        value: function isValue() {
             return false;
         }
 

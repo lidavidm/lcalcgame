@@ -222,7 +222,13 @@ class Expression extends mag.RoundedRect {
         return null;
     }
 
+    // Can this expression step to a value?
     canReduce() {
+        return false;
+    }
+
+    // Is this expression already a value?
+    isValue() {
         return false;
     }
 

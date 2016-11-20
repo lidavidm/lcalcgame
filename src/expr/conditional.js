@@ -55,8 +55,15 @@ class IfStatement extends Expression {
     }
 
     performReduction(animated=true) {
-        if (this.cond && !(this.cond instanceof BooleanPrimitive)) {
+        if (this.cond && this.cond.canReduce()) {
             this.performSubReduction(this.cond, animated).then(() => {
+                this.performReduction();
+            });
+            return;
+        }
+
+        if (this.branch && this.branch.canReduce()) {
+            this.performSubReduction(this.branch, animated).then(() => {
                 this.performReduction();
             });
             return;

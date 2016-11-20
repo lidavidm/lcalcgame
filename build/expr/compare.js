@@ -63,7 +63,7 @@ var CompareExpr = function (_Expression) {
     }, {
         key: 'canReduce',
         value: function canReduce() {
-            return this.leftExpr && this.rightExpr && this.leftExpr.canReduce() && this.rightExpr.canReduce();
+            return this.leftExpr && this.rightExpr && (this.leftExpr.canReduce() || this.leftExpr.isValue()) && (this.rightExpr.canReduce() || this.rightExpr.isValue());
         }
     }, {
         key: 'performReduction',
