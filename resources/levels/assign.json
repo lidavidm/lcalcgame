@@ -195,6 +195,24 @@
             }
         },
         {
+            "description": "Fade out variables",
+            "board": "(assign /$x /$y) (assign /$y /(triangle))",
+            "goal": "(triangle)",
+            "toolbox": "($x)",
+            "globals": {
+                "y": "(star)"
+            }
+        },
+        {
+            "description": "Fade out variables II",
+            "board": "(if /$x /$y)",
+            "goal": "(diamond)",
+            "toolbox": "(assign _ _) ($x) ($y) (diamond) (star)",
+            "globals": {
+                "x": "(true)"
+            }
+        },
+        {
             "description": "Basic lambdas work.",
             "board": "(λx /$x)",
             "goal": "(star)",
