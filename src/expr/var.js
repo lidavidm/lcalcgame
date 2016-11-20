@@ -115,7 +115,9 @@ class LabeledVarExpr extends VarExpr {
                     scale: { x: 1, y: 1 },
                     opacity: 1.0,
                 }, 300).after(() => {
-                    (this.parent || this.stage).swap(this, display.getExpr().clone());
+                    let clone = display.getExpr().clone();
+                    (this.parent || this.stage).swap(this, clone);
+                    if (this.locked) clone.lock();
                     stage.remove(dummy);
                     resolve();
                 });

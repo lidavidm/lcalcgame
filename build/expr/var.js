@@ -171,7 +171,9 @@ var LabeledVarExpr = function (_VarExpr) {
                             scale: { x: 1, y: 1 },
                             opacity: 1.0
                         }, 300).after(function () {
-                            (_this3.parent || _this3.stage).swap(_this3, display.getExpr().clone());
+                            var clone = display.getExpr().clone();
+                            (_this3.parent || _this3.stage).swap(_this3, clone);
+                            if (_this3.locked) clone.lock();
                             stage.remove(dummy);
                             resolve();
                         });
