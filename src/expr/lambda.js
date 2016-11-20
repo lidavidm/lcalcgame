@@ -792,7 +792,6 @@ class EnvironmentLambdaExpr extends LambdaExpr {
                 });
             };
             stepReduction().then(() => {
-                Animate.blink(this);
                 window.setTimeout(() => {
                     Animate.poof(this);
                     super.performReduction();

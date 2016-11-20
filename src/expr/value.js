@@ -4,7 +4,11 @@
 
 
 // Wrapper class to make arbitrary nodes into draggable expressions.
-class ValueExpr extends Expression { }
+class ValueExpr extends Expression {
+    canReduce() {
+        return true;
+    }
+}
 class GraphicValueExpr extends ValueExpr {
     constructor(graphic_node) {
         super([graphic_node]);
@@ -181,6 +185,7 @@ class FadedValueExpr extends Expression {
     get graphicNode() { return this.holes[0]; }
     reduceCompletely() { return this; }
     reduce() { return this; }
+    canReduce() { return true; }
     toString() {
         return this.primitiveName;
     }

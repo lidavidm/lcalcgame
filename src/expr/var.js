@@ -96,6 +96,7 @@ class LabeledVarExpr extends VarExpr {
 
     // Used by EnvironmentLambdaExpr
     // TODO: better name
+    // TODO: tweak this animation (side arc?)
     animateReduction(display) {
         if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return null;
 

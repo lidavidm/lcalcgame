@@ -1,5 +1,7 @@
 'use strict';
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -59,6 +61,11 @@ var CompareExpr = function (_Expression) {
             if (cmp === true) return new (ExprManager.getClass('true'))();else if (cmp === false) return new (ExprManager.getClass('false'))();else return this;
         }
     }, {
+        key: 'canReduce',
+        value: function canReduce() {
+            return this.leftExpr && this.rightExpr && this.leftExpr.canReduce() && this.rightExpr.canReduce();
+        }
+    }, {
         key: 'performReduction',
         value: function performReduction() {
             var _this2 = this;
@@ -66,19 +73,37 @@ var CompareExpr = function (_Expression) {
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
             if (this.leftExpr && this.rightExpr && this.leftExpr instanceof VarExpr && !this._animating) {
-                this._animating = true;
-                return this.performSubReduction(this.leftExpr, true).then(function () {
-                    _this2._animating = false;
-                    return _this2.performReduction();
-                });
+                var _ret = function () {
+                    var before = _this2.leftExpr;
+                    _this2._animating = true;
+                    return {
+                        v: _this2.performSubReduction(_this2.leftExpr, true).then(function () {
+                            _this2._animating = false;
+                            if (_this2.leftExpr != before) {
+                                return _this2.performReduction();
+                            }
+                        })
+                    };
+                }();
+
+                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
             }
 
             if (this.leftExpr && this.rightExpr && this.rightExpr instanceof VarExpr && !this._animating) {
-                this._animating = true;
-                return this.performSubReduction(this.rightExpr, true).then(function () {
-                    _this2._animating = false;
-                    return _this2.performReduction();
-                });
+                var _ret2 = function () {
+                    _this2._animating = true;
+                    var before = _this2.rightExpr;
+                    return {
+                        v: _this2.performSubReduction(_this2.rightExpr, true).then(function () {
+                            _this2._animating = false;
+                            if (_this2.rightExpr != before) {
+                                return _this2.performReduction();
+                            }
+                        })
+                    };
+                }();
+
+                if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
             }
 
             if (this.reduce() != this) {

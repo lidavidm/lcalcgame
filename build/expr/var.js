@@ -143,6 +143,7 @@ var LabeledVarExpr = function (_VarExpr) {
 
     // Used by EnvironmentLambdaExpr
     // TODO: better name
+    // TODO: tweak this animation (side arc?)
 
 
     _createClass(LabeledVarExpr, [{

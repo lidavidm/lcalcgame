@@ -1051,7 +1051,6 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
                     });
                 };
                 stepReduction().then(function () {
-                    Animate.blink(_this14);
                     window.setTimeout(function () {
                         Animate.poof(_this14);
                         _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'performReduction', _this14).call(_this14);

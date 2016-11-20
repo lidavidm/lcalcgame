@@ -223,10 +223,7 @@ class Expression extends mag.RoundedRect {
     }
 
     canReduce() {
-        for (let child of this.holes) {
-            if (child.canReduce && !child.canReduce()) return false;
-        }
-        return true;
+        return false;
     }
 
     // Reduce this expression to another.
