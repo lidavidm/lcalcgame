@@ -125,9 +125,9 @@
         },
         {
             "description": "Booleans can go in variables, too!",
-            "board": "(assign /$c _) ($_c)",
+            "board": "(assign /$c /(== _ _)) ($_c)",
             "goal": "(true)",
-            "toolbox": "(== _ /(diamond)) ($x)",
+            "toolbox": "($x) (diamond)",
             "globals": {
                 "x": "(diamond)"
             }
@@ -154,10 +154,17 @@
             "description": "Unlock the conditional",
             "board": "(if /$c /(diamond))",
             "goal": "(diamond)",
-            "toolbox": "(assign /$c _ ) (== _ _ ) ($x) (star) (triangle)",
+            "toolbox": "(assign /$c _ ) (true)",
             "globals": {
-                "x": "(star)",
-                "c": "(true)"
+            }
+        },
+        {
+            "description": "Unlock the conditional",
+            "board": "(if /$c /(diamond))",
+            "goal": "(diamond)",
+            "toolbox": "(assign /$c /(== _ _)) ($x) (star) (triangle)",
+            "globals": {
+                "x": "(star)"
             }
         },
         {
@@ -176,6 +183,15 @@
             "globals": {
                 "x": "(bag star)",
                 "y": "(diamond)"
+            }
+        },
+        {
+            "description": "Comparing bags",
+            "board": "(== /$x /$y)",
+            "goal": "(true)",
+            "toolbox": "(assign _ _) ($x) ($y)",
+            "globals": {
+                "x": "(bag star)"
             }
         },
         {
@@ -209,6 +225,12 @@
             "description": "Outside changes are reflected in the lambda.",
             "board": "(λx /$y) (assign /$y _)",
             "goal": "(triangle)",
+            "toolbox": "(diamond) (star) (triangle)"
+        },
+        {
+            "description": "",
+            "board": "(λx /(bag /$x))",
+            "goal": "(bag triangle)",
             "toolbox": "(diamond) (star) (triangle)"
         },
         {
