@@ -815,17 +815,21 @@ var AssignExpr = function (_Expression4) {
             if (environment == this.stage.environment && this.stage.environmentDisplay) {
                 callback = this.stage.environmentDisplay.prepareAssign(this.variable.name);
             }
-            if (callback) {
-                callback.after(function () {
-                    return _this18.finishReduction();
-                });
-            } else {
-                window.setTimeout(function () {
-                    return _this18.finishReduction();
-                }, 500);
-            }
 
-            return this.animateJump();
+            var afterAssign = new Promise(function (resolve, _reject) {
+                var finish = function finish() {
+                    _this18.finishReduction();
+                    resolve();
+                };
+
+                if (callback) {
+                    callback.after(finish);
+                } else {
+                    window.setTimeout(finish, 500);
+                }
+            });
+
+            return Promise.all([afterAssign, this.animateJump()]);
         }
     }, {
         key: "performReduction",

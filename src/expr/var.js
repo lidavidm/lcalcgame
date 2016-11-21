@@ -637,14 +637,22 @@ class AssignExpr extends Expression {
         if (environment == this.stage.environment && this.stage.environmentDisplay) {
             callback = this.stage.environmentDisplay.prepareAssign(this.variable.name);
         }
-        if (callback) {
-            callback.after(() => this.finishReduction());
-        }
-        else {
-            window.setTimeout(() => this.finishReduction(), 500);
-        }
 
-        return this.animateJump();
+        let afterAssign = new Promise((resolve, _reject) => {
+            let finish = () => {
+                this.finishReduction();
+                resolve();
+            };
+
+            if (callback) {
+                callback.after(finish);
+            }
+            else {
+                window.setTimeout(finish, 500);
+            }
+        });
+
+        return Promise.all([afterAssign, this.animateJump()]);
     }
 
     performReduction(animated=true) {
