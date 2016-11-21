@@ -96,7 +96,7 @@
         },
         {
             "description": "Equality with a variable II",
-            "board": "(== _ (diamond))",
+            "board": "(== _ /(diamond))",
             "goal": "(true)",
             "toolbox": "($x) ($y)",
             "globals": {
@@ -106,8 +106,9 @@
         },
         {
             "description": "Equality with variables",
-            "board": "(== /$x /$y)",
+            "board": "(== _ _)",
             "goal": "(true)",
+            "toolbox": "(triangle) (star) ($x) ($y)",
             "globals": {
                 "x": "(diamond)",
                 "y": "(diamond)"
@@ -127,7 +128,7 @@
             "description": "Booleans can go in variables, too!",
             "board": "(assign /$c /(== _ _)) ($_c)",
             "goal": "(true)",
-            "toolbox": "($x) (diamond)",
+            "toolbox": "($x) (diamond) (star)",
             "globals": {
                 "x": "(diamond)"
             }
@@ -145,16 +146,17 @@
             "description": "Variable as conditional of conditional",
             "board": "(if _ /(diamond))",
             "goal": "(diamond)",
-            "toolbox": "($c)",
+            "toolbox": "($c) ($x)",
             "globals": {
-                "c": "(true)"
+                "c": "(true)",
+                "x": "(false)"
             }
         },
         {
             "description": "Unlock the conditional",
             "board": "(if /$c /(diamond))",
             "goal": "(diamond)",
-            "toolbox": "(assign /$c _ ) (true)",
+            "toolbox": "(assign /$c _ ) (true) (false)",
             "globals": {
             }
         },
@@ -246,10 +248,40 @@
             "toolbox": "(diamond) (star) (triangle)"
         },
         {
-            "description": "",
+            "description": "Lambdas can produce comparisons based on input",
+            "board": "(λx /(== /$x /(triangle)))",
+            "goal": "(false)",
+            "toolbox": "(diamond) (star) (triangle)"
+        },
+        {
+            "description": "Lambdas can produce conditionals based on input",
+            "board": "(λx /(if /$x /(triangle)))",
+            "goal": "(triangle)",
+            "toolbox": "(true) (false)"
+        },
+        {
+            "description": "Lambdas can produce bags based on input",
             "board": "(λx /(bag /$x))",
             "goal": "(bag triangle)",
             "toolbox": "(diamond) (star) (triangle)"
+        },
+        {
+            "description": "Lambdas can produce comparisons based on input II",
+            "board": "(λx /(λy /(== /$x /$y)))",
+            "goal": "(true)",
+            "toolbox": "(star) (star) (triangle)"
+        },
+        {
+            "description": "Lambdas can produce comparisons based on input III",
+            "board": "(λx /(λy /(== /$x /$y))) (λx /(if /$x /(diamond)))",
+            "goal": "(diamond)",
+            "toolbox": "(triangle) (star) (triangle)"
+        },
+        {
+            "description": "Sequence operator",
+            "board": "(sequence /(assign ($x) (star)) /(assign ($y) ($x)))",
+            "goal": "(diamond)",
+            "toolbox": "(star)"
         },
         {
             "description": "Lambda variables shadow external ones",
