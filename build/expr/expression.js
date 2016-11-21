@@ -170,7 +170,7 @@ var Expression = function (_mag$RoundedRect) {
             var x = this.padding.left;
             var y = this.size.h / 2.0 + (this.exprOffsetY ? this.exprOffsetY : 0);
             if (this._stackVertically) {
-                y = 2 * padding;
+                y = padding;
             }
 
             this.holes.forEach(function (expr) {
@@ -181,6 +181,7 @@ var Expression = function (_mag$RoundedRect) {
                 expr.update();
 
                 if (_this3._stackVertically) {
+                    y += expr.anchor.y * expr.size.h * expr.scale.y;
                     // Centering
                     var offset = x;
                     var innerWidth = size.w;
@@ -188,7 +189,7 @@ var Expression = function (_mag$RoundedRect) {
                     offset = (innerWidth - scale * expr.size.w) / 2;
                     expr.pos = { x: offset, y: y };
 
-                    y += expr.size.h * expr.scale.y;
+                    y += (1 - expr.anchor.y) * expr.size.h * expr.scale.y;
                 } else {
                     x += expr.size.w * expr.scale.x + padding;
                 }
