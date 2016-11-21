@@ -350,6 +350,7 @@ class Level {
             'define':ExprManager.getClass('define'),
             'null':new NullExpr(0,0,64,64),
             'assign':ExprManager.getClass('assign'),
+            'sequence':ExprManager.getClass('sequence'),
             'dot':(() => {
                 let circ = new CircleExpr(0,0,18);
                 circ.color = 'gold';
