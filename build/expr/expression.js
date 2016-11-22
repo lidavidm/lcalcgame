@@ -249,6 +249,41 @@ var Expression = function (_mag$RoundedRect) {
             return false;
         }
 
+        // Is this expression missing any subexpressions?
+
+    }, {
+        key: 'isComplete',
+        value: function isComplete() {
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = this.holes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var child = _step.value;
+
+                    if (child instanceof MissingExpression || !child.isComplete()) {
+                        return false;
+                    }
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         // Reduce this expression to another.
         // * Returns the newly built expression. Leaves this expression unchanged.
 

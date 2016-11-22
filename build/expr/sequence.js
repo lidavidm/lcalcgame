@@ -36,9 +36,8 @@ var Sequence = function (_Expression) {
                 for (var _iterator = this.holes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                     var expr = _step.value;
 
-                    // TODO: need some way to tell whether an expression is
-                    // 'complete'
                     if (expr instanceof MissingExpression) return false;
+                    if (!expr.isComplete()) return false;
                 }
             } catch (err) {
                 _didIteratorError = true;
@@ -62,34 +61,18 @@ var Sequence = function (_Expression) {
         value: function performReduction() {
             var _this2 = this;
 
-            if (!this.canReduce()) return null;
+            if (!this.canReduce()) {
+                mag.Stage.getNodesWithClass(MissingExpression, [], true, [this]).forEach(function (node) {
+                    Animate.blink(node);
+                });
+                return null;
+            }
 
             this._animating = true;
-            return new Promise(function (resolve, reject) {
-                var exprs = _this2.holes.slice();
-
-                var nextStep = function nextStep() {
-                    if (exprs.length === 0) {
-                        Animate.poof(_this2);
-                        (_this2.parent || _this2.stage).swap(_this2, null);
-                        resolve(null);
-                    } else {
-                        var expr = exprs.shift();
-                        var result = expr.performReduction();
-                        var delay = function delay() {
-                            window.setTimeout(function () {
-                                nextStep();
-                            }, 300);
-                        };
-                        if (result instanceof Promise) {
-                            result.then(delay);
-                        } else {
-                            delay();
-                        }
-                    }
-                };
-
-                nextStep();
+            return reduceExprs(this.holes).then(function () {
+                Animate.poof(_this2);
+                (_this2.parent || _this2.stage).swap(_this2, null);
+                return null;
             });
         }
     }, {

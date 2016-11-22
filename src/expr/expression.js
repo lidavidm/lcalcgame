@@ -239,6 +239,16 @@ class Expression extends mag.RoundedRect {
         return false;
     }
 
+    // Is this expression missing any subexpressions?
+    isComplete() {
+        for (let child of this.holes) {
+            if (child instanceof MissingExpression || !child.isComplete()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     // Reduce this expression to another.
     // * Returns the newly built expression. Leaves this expression unchanged.
     reduce(options=undefined) {
