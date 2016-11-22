@@ -638,8 +638,13 @@ class AssignExpr extends Expression {
             callback = this.stage.environmentDisplay.prepareAssign(this.variable.name);
         }
 
+        let stage = this.stage;
         let afterAssign = new Promise((resolve, _reject) => {
             let finish = () => {
+                // Need to save the stage sometimes - there's a race
+                // condition where sometimes the expr is removed from
+                // the stage before the assignment happens
+                this.stage = stage;
                 this.finishReduction();
                 resolve();
             };
@@ -720,8 +725,8 @@ class JumpingAssignExpr extends AssignExpr {
             return new Promise((resolve, _reject) => {
                 if (environment != this.stage.environment) {
                     Animate.poof(this);
-                    parent.swap(this, null);
                     this.finishReduction();
+                    parent.swap(this, null);
                     resolve();
                     return;
                 }

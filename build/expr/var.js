@@ -816,8 +816,13 @@ var AssignExpr = function (_Expression4) {
                 callback = this.stage.environmentDisplay.prepareAssign(this.variable.name);
             }
 
+            var stage = this.stage;
             var afterAssign = new Promise(function (resolve, _reject) {
                 var finish = function finish() {
+                    // Need to save the stage sometimes - there's a race
+                    // condition where sometimes the expr is removed from
+                    // the stage before the assignment happens
+                    _this18.stage = stage;
                     _this18.finishReduction();
                     resolve();
                 };
@@ -924,8 +929,8 @@ var JumpingAssignExpr = function (_AssignExpr) {
                 return new Promise(function (resolve, _reject) {
                     if (environment != _this21.stage.environment) {
                         Animate.poof(_this21);
-                        parent.swap(_this21, null);
                         _this21.finishReduction();
+                        parent.swap(_this21, null);
                         resolve();
                         return;
                     }
