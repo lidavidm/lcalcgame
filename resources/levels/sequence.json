@@ -10,15 +10,24 @@
         },
         {
             "description": "Bigger sequence",
-            "board": "(sequence /(assign /($x) _) /(assign /($y) _) /(assign /($z) /(array_constructor /($x) /($y)))) ($z)",
-            "goal": "(bag (star) (diamond))",
-            "toolbox": "(star) (diamond) (triangle)"
+            "board": "(sequence /(assign /($x) _) /(assign /($y) _) /(assign /($z) /(== /($x) /($y)))) ($z)",
+            "goal": "(true)",
+            "toolbox": "(star) (star) (triangle) (triangle)"
         },
         {
             "description": "Fill in the blank",
             "board": "(sequence /(assign /($z) _) _ /(assign /($y) /($x)))",
             "goal": "(star)",
             "toolbox": "(star) (assign _ _) ($x) ($y) ($z)"
+        },
+        {
+            "description": "Unlock the conditional",
+            "board": "(sequence /(assign /($y) _) /(assign /($c) /(== /($y) /(diamond))) /(assign /($y) /(if /$c /$x))) ($y)",
+            "goal": "(star)",
+            "toolbox": "(triangle) (diamond)",
+            "globals": {
+                "x": "(star)"
+            }
         }
     ]
 }

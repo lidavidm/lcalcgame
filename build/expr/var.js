@@ -850,7 +850,7 @@ var AssignExpr = function (_Expression4) {
                 if (this.value && this.variable && !this.value.canReduce()) {
                     // Try and play any animation anyways to hint at why
                     // the value can't reduce.
-                    this.value.performReduction();
+                    return this.value.performReduction();
                 }
                 return null;
             }
