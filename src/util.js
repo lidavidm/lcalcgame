@@ -567,3 +567,33 @@ function drawBag(ctx, x, y, w, h, bagRadius, fill, stroke) {
         ctx.fill();
     }
 }
+
+function reduceExprs(exprList, delay=300) {
+    let exprs = exprList.slice();
+    let reduced = [];
+    return new Promise((resolve, reject) => {
+        let nextStep = () => {
+            if (exprs.length === 0) {
+                resolve(reduced);
+            }
+            else {
+                let expr = exprs.shift();
+                let result = expr.performReduction();
+                let delay = (newExpr) => {
+                    reduced.push(newExpr);
+                    window.setTimeout(() => {
+                        nextStep();
+                    }, delay);
+                };
+                if (result instanceof Promise) {
+                    result.then(delay);
+                }
+                else {
+                    delay(result || expr);
+                }
+            }
+        };
+
+        nextStep();
+    });
+}

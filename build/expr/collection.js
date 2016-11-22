@@ -716,3 +716,55 @@ var PopExpr = function (_Expression2) {
 
     return PopExpr;
 }(Expression);
+
+// A bag-like object that is not a value, so it has to reduce -
+// i.e. it's a constructor for a new bag.
+
+
+var BracketArrayConstructor = function (_BracketArrayExpr) {
+    _inherits(BracketArrayConstructor, _BracketArrayExpr);
+
+    function BracketArrayConstructor(x, y, w, h) {
+        var holding = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : [];
+
+        _classCallCheck(this, BracketArrayConstructor);
+
+        return _possibleConstructorReturn(this, (BracketArrayConstructor.__proto__ || Object.getPrototypeOf(BracketArrayConstructor)).call(this, x, y, w, h, holding));
+    }
+
+    _createClass(BracketArrayConstructor, [{
+        key: 'isValue',
+        value: function isValue() {
+            return this._items.reduce(function (a, b) {
+                return a && b.isValue();
+            }, true);
+        }
+    }, {
+        key: 'canReduce',
+        value: function canReduce() {
+            return this._items.reduce(function (a, b) {
+                return a && b.canReduce();
+            }, true);
+        }
+    }, {
+        key: 'onmouseclick',
+        value: function onmouseclick() {
+            this.performReduction();
+        }
+    }, {
+        key: 'performReduction',
+        value: function performReduction() {
+            var _this14 = this;
+
+            return reduceExprs(this._items).then(function (newExprs) {
+                Animate.poof(_this14);
+                var result = new BracketArrayExpr(0, 0, 0, 0, []);
+                newExprs.forEach(result.addItem.bind(result));
+                (_this14.parent || _this14.stage).swap(_this14, result);
+                return result;
+            });
+        }
+    }]);
+
+    return BracketArrayConstructor;
+}(BracketArrayExpr);

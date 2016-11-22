@@ -33,7 +33,8 @@ var ExprManager = function () {
         'lambda': [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr],
         'lambda_abstraction': [LambdaExpr, EnvironmentLambdaExpr],
         'assign': [JumpingAssignExpr, AssignExpr, EqualsAssignExpr],
-        'sequence': [Sequence]
+        'sequence': [Sequence],
+        'array_constructor': [BracketArrayConstructor]
     };
     var fade_level = {};
     var DEFAULT_FADE_LEVEL = 0;

@@ -32,6 +32,7 @@ var ExprManager = (function() {
         'lambda_abstraction':   [LambdaExpr, EnvironmentLambdaExpr],
         'assign':   [JumpingAssignExpr, AssignExpr, EqualsAssignExpr],
         'sequence': [Sequence],
+        'array_constructor': [BracketArrayConstructor],
     };
     var fade_level = {};
     var DEFAULT_FADE_LEVEL = 0;

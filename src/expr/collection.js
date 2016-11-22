@@ -1,13 +1,3 @@
-
-
-
-
-
-
-
-
-
-
 class CollectionExpr extends GraphicValueExpr { }
 class BagExpr extends CollectionExpr {
     constructor(x, y, w, h, holding=[]) {
@@ -505,4 +495,34 @@ class PopExpr extends Expression {
         }
     }
     toString() { return '(pop ' + this.collection.toString() + ')'; }
+}
+
+// A bag-like object that is not a value, so it has to reduce -
+// i.e. it's a constructor for a new bag.
+class BracketArrayConstructor extends BracketArrayExpr {
+    constructor(x, y, w, h, holding=[]) {
+        super(x, y, w, h, holding);
+    }
+
+    isValue() {
+        return this._items.reduce((a, b) => a && b.isValue(), true);
+    }
+
+    canReduce() {
+        return this._items.reduce((a, b) => a && b.canReduce(), true);
+    }
+
+    onmouseclick() {
+        this.performReduction();
+    }
+
+    performReduction() {
+        return reduceExprs(this._items).then((newExprs) => {
+            Animate.poof(this);
+            let result = new BracketArrayExpr(0, 0, 0, 0, []);
+            newExprs.forEach(result.addItem.bind(result));
+            (this.parent || this.stage).swap(this, result);
+            return result;
+        });
+    }
 }
