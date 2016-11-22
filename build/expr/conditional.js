@@ -63,6 +63,11 @@ var IfStatement = function (_Expression) {
             Animate.wait(150).after(onComplete);
         }
     }, {
+        key: 'canReduce',
+        value: function canReduce() {
+            return this.cond && (this.cond.canReduce() || this.cond.isValue()) && this.branch && (this.branch.canReduce() || this.branch.isValue());
+        }
+    }, {
         key: 'performReduction',
         value: function performReduction() {
             var _this2 = this;
@@ -70,51 +75,62 @@ var IfStatement = function (_Expression) {
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
             if (this.cond && this.cond.canReduce()) {
-                this.performSubReduction(this.cond, animated).then(function () {
-                    _this2.performReduction();
+                return this.performSubReduction(this.cond, animated).then(function () {
+                    return _this2.performReduction();
                 });
-                return;
             }
 
             if (this.branch && this.branch.canReduce()) {
-                this.performSubReduction(this.branch, animated).then(function () {
-                    _this2.performReduction();
+                return this.performSubReduction(this.branch, animated).then(function () {
+                    return _this2.performReduction();
                 });
-                return;
             }
 
-            var reduction = this.reduce();
-            if (reduction != this) {
-                (function () {
+            return new Promise(function (resolve, reject) {
+                var reduction = _this2.reduce();
+                if (reduction != _this2) {
+                    (function () {
 
-                    var stage = _this2.stage;
-                    var afterEffects = function afterEffects() {
-                        _this2.ignoreEvents = false;
-                        var rtn = _get(IfStatement.prototype.__proto__ || Object.getPrototypeOf(IfStatement.prototype), 'performReduction', _this2).call(_this2);
-                        stage.update();
-                        stage.draw();
-                        return rtn;
-                    };
+                        var stage = _this2.stage;
+                        var afterEffects = function afterEffects() {
+                            _this2.ignoreEvents = false;
+                            var rtn = _get(IfStatement.prototype.__proto__ || Object.getPrototypeOf(IfStatement.prototype), 'performReduction', _this2).call(_this2);
+                            stage.update();
+                            stage.draw();
+                            if (reduction instanceof FadedNullExpr) {
+                                resolve(null);
+                            } else {
+                                resolve(rtn);
+                            }
+                            return rtn;
+                        };
 
-                    if (reduction === null) _this2.playJimmyAnimation(afterEffects);else if (reduction instanceof FadedNullExpr) {
-                        (function () {
-                            var red = afterEffects();
-                            red.ignoreEvents = true; // don't let them move a null.
-                            Resource.play('pop');
-                            Animate.blink(red, 1000, [1, 1, 1], 0.4).after(function () {
-                                red.poof();
-                            });
-                            //this.playJimmyAnimation(afterEffects);
-                        })();
-                    } else _this2.playUnlockAnimation(afterEffects);
+                        if (reduction === null) {
+                            _this2.playJimmyAnimation(afterEffects);
+                        } else if (reduction instanceof FadedNullExpr) {
+                            (function () {
+                                var red = afterEffects();
+                                red.ignoreEvents = true; // don't let them move a null.
+                                Resource.play('pop');
+                                Animate.blink(red, 1000, [1, 1, 1], 0.4).after(function () {
+                                    red.poof();
+                                });
+                                //this.playJimmyAnimation(afterEffects);
+                            })();
+                        } else {
+                            _this2.playUnlockAnimation(afterEffects);
+                        }
 
-                    _this2.ignoreEvents = true;
-                    //var shatter = new ShatterExpressionEffect(this);
-                    //shatter.run(stage, (() => {
-                    //    super.performReduction();
-                    //}).bind(this));
-                })();
-            }
+                        _this2.ignoreEvents = true;
+                        //var shatter = new ShatterExpressionEffect(this);
+                        //shatter.run(stage, (() => {
+                        //    super.performReduction();
+                        //}).bind(this));
+                    })();
+                } else {
+                    reject();
+                }
+            });
         }
     }, {
         key: 'value',

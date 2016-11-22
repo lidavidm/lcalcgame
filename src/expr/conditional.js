@@ -54,53 +54,69 @@ class IfStatement extends Expression {
         Animate.wait(150).after(onComplete);
     }
 
+    canReduce() {
+        return this.cond && (this.cond.canReduce() || this.cond.isValue()) &&
+            this.branch && (this.branch.canReduce() || this.branch.isValue());
+    }
+
     performReduction(animated=true) {
         if (this.cond && this.cond.canReduce()) {
-            this.performSubReduction(this.cond, animated).then(() => {
-                this.performReduction();
+            return this.performSubReduction(this.cond, animated).then(() => {
+                return this.performReduction();
             });
-            return;
         }
 
         if (this.branch && this.branch.canReduce()) {
-            this.performSubReduction(this.branch, animated).then(() => {
-                this.performReduction();
+            return this.performSubReduction(this.branch, animated).then(() => {
+                return this.performReduction();
             });
-            return;
         }
 
-        var reduction = this.reduce();
-        if (reduction != this) {
+        return new Promise((resolve, reject) => {
+            var reduction = this.reduce();
+            if (reduction != this) {
 
-            let stage = this.stage;
-            let afterEffects = () => {
-                this.ignoreEvents = false;
-                let rtn = super.performReduction();
-                stage.update();
-                stage.draw();
-                return rtn;
-            };
+                let stage = this.stage;
+                let afterEffects = () => {
+                    this.ignoreEvents = false;
+                    let rtn = super.performReduction();
+                    stage.update();
+                    stage.draw();
+                    if (reduction instanceof FadedNullExpr) {
+                        resolve(null);
+                    }
+                    else {
+                        resolve(rtn);
+                    }
+                    return rtn;
+                };
 
-            if (reduction === null)
-                this.playJimmyAnimation(afterEffects);
-            else if (reduction instanceof FadedNullExpr) {
-                let red = afterEffects();
-                red.ignoreEvents = true; // don't let them move a null.
-                Resource.play('pop');
-                Animate.blink(red, 1000, [1,1,1], 0.4).after(() => {
-                    red.poof();
-                });
-                //this.playJimmyAnimation(afterEffects);
+                if (reduction === null) {
+                    this.playJimmyAnimation(afterEffects);
+                }
+                else if (reduction instanceof FadedNullExpr) {
+                    let red = afterEffects();
+                    red.ignoreEvents = true; // don't let them move a null.
+                    Resource.play('pop');
+                    Animate.blink(red, 1000, [1,1,1], 0.4).after(() => {
+                        red.poof();
+                    });
+                    //this.playJimmyAnimation(afterEffects);
+                }
+                else {
+                    this.playUnlockAnimation(afterEffects);
+                }
+
+                this.ignoreEvents = true;
+                //var shatter = new ShatterExpressionEffect(this);
+                //shatter.run(stage, (() => {
+                //    super.performReduction();
+                //}).bind(this));
             }
-            else
-                this.playUnlockAnimation(afterEffects);
-
-            this.ignoreEvents = true;
-            //var shatter = new ShatterExpressionEffect(this);
-            //shatter.run(stage, (() => {
-            //    super.performReduction();
-            //}).bind(this));
-        }
+            else {
+                reject();
+            }
+        });
     }
 
     value() {
