@@ -36,6 +36,7 @@ var Expression = function (_mag$RoundedRect) {
         _this2.padding = { left: 10, inner: 10, right: 10 };
         _this2._size = { w: EMPTY_EXPR_WIDTH, h: DEFAULT_EXPR_HEIGHT };
         _this2.environment = null;
+        _this2._layout = { 'direction': 'horizontal', 'align': 'vertical' };
 
         if (_this2.holes) {
             var _this = _this2;
@@ -169,7 +170,7 @@ var Expression = function (_mag$RoundedRect) {
             var padding = this.padding.inner;
             var x = this.padding.left;
             var y = this.size.h / 2.0 + (this.exprOffsetY ? this.exprOffsetY : 0);
-            if (this._stackVertically) {
+            if (this._layout.direction == "vertical") {
                 y = padding;
             }
 
@@ -180,13 +181,17 @@ var Expression = function (_mag$RoundedRect) {
                 expr.scale = { x: 0.85, y: 0.85 };
                 expr.update();
 
-                if (_this3._stackVertically) {
+                if (_this3._layout.direction == "vertical") {
                     y += expr.anchor.y * expr.size.h * expr.scale.y;
-                    // Centering
                     var offset = x;
-                    var innerWidth = size.w;
-                    var scale = expr.scale.x;
-                    offset = (innerWidth - scale * expr.size.w) / 2;
+
+                    // Centering
+                    if (_this3._layout.align == "horizontal") {
+                        var innerWidth = size.w;
+                        var scale = expr.scale.x;
+                        offset = (innerWidth - scale * expr.size.w) / 2;
+                    }
+
                     expr.pos = { x: offset, y: y };
 
                     y += (1 - expr.anchor.y) * expr.size.h * expr.scale.y;
@@ -506,7 +511,7 @@ var Expression = function (_mag$RoundedRect) {
             var sizes = this.getHoleSizes();
             var scale_x = this.scale.x;
 
-            if (this._stackVertically) {
+            if (this._layout.direction == "vertical") {
                 width = EMPTY_EXPR_WIDTH;
                 height = 0;
             }
@@ -514,7 +519,7 @@ var Expression = function (_mag$RoundedRect) {
             if (sizes.length === 0) return { w: this._size.w, h: this._size.h };
 
             sizes.forEach(function (s) {
-                if (_this4._stackVertically) {
+                if (_this4._layout.direction == "vertical") {
                     height += s.h;
                     width = Math.max(width, s.w);
                 } else {
@@ -523,8 +528,9 @@ var Expression = function (_mag$RoundedRect) {
                 }
             });
 
-            if (this._stackVertically) {
+            if (this._layout.direction == "vertical") {
                 height += 2 * padding.inner;
+                width += padding.left + padding.right;
             } else {
                 width += padding.right; // the end
             }

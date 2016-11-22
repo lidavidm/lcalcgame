@@ -12,7 +12,6 @@
              this._scale = { x:1, y:1 };
              this._color = "lightgray";
              this._highlightColor = 'yellow';
-             this._stackVertically = false;
              this.stroke = null;
              this.shadowOffset = 2;
          }

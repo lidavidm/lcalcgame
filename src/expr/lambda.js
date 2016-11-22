@@ -810,7 +810,7 @@ class InlineEnvironmentDisplay extends Expression {
         this.lambda = lambda;
         this.parent = lambda;
 
-        this._stackVertically = true;
+        this._layout = { direction: "vertical", align: "none" };
         this.displays = {};
         this._state = 'open';
         this._height = 1.0;

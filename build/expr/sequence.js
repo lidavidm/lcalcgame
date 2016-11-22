@@ -20,7 +20,7 @@ var Sequence = function (_Expression) {
 
         var _this = _possibleConstructorReturn(this, (Sequence.__proto__ || Object.getPrototypeOf(Sequence)).call(this, exprs));
 
-        _this._stackVertically = true;
+        _this._layout = { direction: "vertical", align: "none" };
         _this._animating = false;
         return _this;
     }

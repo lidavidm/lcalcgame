@@ -1,7 +1,7 @@
 class Sequence extends Expression {
     constructor(...exprs) {
         super(exprs);
-        this._stackVertically = true;
+        this._layout = { direction: "vertical", align: "none" };
         this._animating = false;
     }
 

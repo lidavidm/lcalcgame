@@ -1076,7 +1076,7 @@ var InlineEnvironmentDisplay = function (_Expression2) {
         _this15.lambda = lambda;
         _this15.parent = lambda;
 
-        _this15._stackVertically = true;
+        _this15._layout = { direction: "vertical", align: "none" };
         _this15.displays = {};
         _this15._state = 'open';
         _this15._height = 1.0;

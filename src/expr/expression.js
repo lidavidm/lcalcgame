@@ -18,6 +18,7 @@ class Expression extends mag.RoundedRect {
         this.padding = { left:10, inner:10, right:10 };
         this._size = { w:EMPTY_EXPR_WIDTH, h:DEFAULT_EXPR_HEIGHT };
         this.environment = null;
+        this._layout = { 'direction': 'horizontal', 'align': 'vertical' };
 
         if (this.holes) {
             var _this = this;
@@ -115,7 +116,7 @@ class Expression extends mag.RoundedRect {
         var sizes = this.getHoleSizes();
         var scale_x = this.scale.x;
 
-        if (this._stackVertically) {
+        if (this._layout.direction == "vertical") {
             width = EMPTY_EXPR_WIDTH;
             height = 0;
         }
@@ -123,7 +124,7 @@ class Expression extends mag.RoundedRect {
         if (sizes.length === 0) return { w:this._size.w, h:this._size.h };
 
         sizes.forEach((s) => {
-            if (this._stackVertically) {
+            if (this._layout.direction == "vertical") {
                 height += s.h;
                 width = Math.max(width, s.w);
             }
@@ -133,8 +134,9 @@ class Expression extends mag.RoundedRect {
             }
         });
 
-        if (this._stackVertically) {
+        if (this._layout.direction == "vertical") {
             height += 2 * padding.inner;
+            width += padding.left + padding.right;
         }
         else {
             width += padding.right; // the end
@@ -173,7 +175,7 @@ class Expression extends mag.RoundedRect {
         var padding = this.padding.inner;
         var x = this.padding.left;
         var y = this.size.h / 2.0 + (this.exprOffsetY ? this.exprOffsetY : 0);
-        if (this._stackVertically) {
+        if (this._layout.direction == "vertical") {
             y = padding;
         }
 
@@ -183,13 +185,17 @@ class Expression extends mag.RoundedRect {
             expr.scale = { x:0.85, y:0.85 };
             expr.update();
 
-            if (this._stackVertically) {
+            if (this._layout.direction == "vertical") {
                 y += expr.anchor.y * expr.size.h * expr.scale.y;
-                // Centering
                 var offset = x;
-                var innerWidth = size.w;
-                var scale = expr.scale.x;
-                offset = (innerWidth - scale * expr.size.w) / 2;
+
+                // Centering
+                if (this._layout.align == "horizontal") {
+                    var innerWidth = size.w;
+                    var scale = expr.scale.x;
+                    offset = (innerWidth - scale * expr.size.w) / 2;
+                }
+
                 expr.pos = { x:offset, y:y };
 
                 y += (1 - expr.anchor.y) * expr.size.h * expr.scale.y;

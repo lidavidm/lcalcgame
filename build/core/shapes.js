@@ -30,7 +30,6 @@ var mag = function (_) {
             _this._scale = { x: 1, y: 1 };
             _this._color = "lightgray";
             _this._highlightColor = 'yellow';
-            _this._stackVertically = false;
             _this.stroke = null;
             _this.shadowOffset = 2;
             return _this;
