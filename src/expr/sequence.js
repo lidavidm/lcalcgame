@@ -26,6 +26,15 @@ class Sequence extends Expression {
             Animate.poof(this);
             (this.parent || this.stage).swap(this, null);
             return null;
+        }, () => {
+            // Something went wrong
+            mag.Stage.getNodesWithClass(Expression, [], true, [this]).forEach((node) => {
+                node.lock();
+            });
+            this.stroke = {
+                color: 'red',
+                lineWidth: 2,
+            };
         });
     }
 

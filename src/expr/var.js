@@ -685,7 +685,18 @@ class AssignExpr extends Expression {
         this._animating = true;
 
         return this.performSubReduction(this.value, true).then(() => {
-            return this.animateReduction();
+            if (this.value == null) {
+                // Uhoh, we got a null - likely from a conditional
+                // TODO: what behavior do we actually want?
+                return new Promise((resolve, reject) => {
+                    Animate.blink(this, 1000, [1,0,0]).after(() => {
+                        reject();
+                    });
+                });
+            }
+            else {
+                return this.animateReduction();
+            }
         });
     }
 

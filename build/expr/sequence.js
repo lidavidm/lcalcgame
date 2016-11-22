@@ -73,6 +73,15 @@ var Sequence = function (_Expression) {
                 Animate.poof(_this2);
                 (_this2.parent || _this2.stage).swap(_this2, null);
                 return null;
+            }, function () {
+                // Something went wrong
+                mag.Stage.getNodesWithClass(Expression, [], true, [_this2]).forEach(function (node) {
+                    node.lock();
+                });
+                _this2.stroke = {
+                    color: 'red',
+                    lineWidth: 2
+                };
             });
         }
     }, {

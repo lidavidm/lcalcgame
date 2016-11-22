@@ -867,7 +867,17 @@ var AssignExpr = function (_Expression4) {
             this._animating = true;
 
             return this.performSubReduction(this.value, true).then(function () {
-                return _this19.animateReduction();
+                if (_this19.value == null) {
+                    // Uhoh, we got a null - likely from a conditional
+                    // TODO: what behavior do we actually want?
+                    return new Promise(function (resolve, reject) {
+                        Animate.blink(_this19, 1000, [1, 0, 0]).after(function () {
+                            reject();
+                        });
+                    });
+                } else {
+                    return _this19.animateReduction();
+                }
             });
         }
     }, {

@@ -598,7 +598,10 @@ function reduceExprs(exprList) {
                         }, delay);
                     };
                     if (result instanceof Promise) {
-                        result.then(delay);
+                        result.then(delay, function () {
+                            // Uh-oh, an error happened
+                            reject();
+                        });
                     } else {
                         delay(result || expr);
                     }
