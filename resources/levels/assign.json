@@ -197,6 +197,14 @@
             }
         },
         {
+            "description": "Constructing bags",
+            "board": "(array_constructor /($x) /(star))",
+            "goal": "(bag star star)",
+            "globals": {
+                "x": "(star)"
+            }
+        },
+        {
             "description": "Fade out variables",
             "board": "(assign /$x /$y) (assign /$y /(triangle))",
             "goal": "(triangle)",
@@ -276,49 +284,6 @@
             "board": "(λx /(λy /(== /$x /$y))) (λx /(if /$x /(diamond)))",
             "goal": "(diamond)",
             "toolbox": "(triangle) (star) (triangle)"
-        },
-        {
-            "description": "Sequence operator",
-            "board": "(sequence /(assign ($x) (star)) /(assign ($y) ($x)))",
-            "goal": "(diamond)",
-            "toolbox": "(star)"
-        },
-        {
-            "description": "Lambda variables shadow external ones",
-            "board": "(λx /$x) ($x)",
-            "goal": "(star) (triangle)",
-            "toolbox": "(diamond) (star) (triangle)",
-            "globals": {
-                "x": "(star)"
-            }
-        },
-        {
-            "description": "Build a lambda with variables",
-            "board": "(λx _) ($x) (triangle)",
-            "goal": "(triangle)",
-            "globals": {
-            }
-        },
-        {
-            "description": "Lambda variables shadow outer ones",
-            "board": "(λx /(λx /$x)) ($x)",
-            "goal": "(star) (triangle)",
-            "toolbox": "(diamond) (triangle)",
-            "globals": {
-                "x": "(star)"
-            }
-        },
-        {
-            "description": "Outer variables are still visible",
-            "board": "(λy /(λx /$y))",
-            "goal": "(triangle)",
-            "toolbox": "(diamond) (star) (triangle)"
-        },
-        {
-            "description": "Long variable names are OK",
-            "board": "(λapple /$apple)",
-            "goal": "(diamond)",
-            "toolbox": "(diamond) (triangle)"
         }
     ]
 }

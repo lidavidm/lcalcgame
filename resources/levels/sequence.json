@@ -1,0 +1,24 @@
+{
+    "chapterName":"Chapter 0",
+    "description":"Sequencing",
+    "levels": [
+        {
+            "description": "Sequence operator",
+            "board": "(sequence /(assign /($x) _) /(assign /($y) /($x))) ($y)",
+            "goal": "(diamond)",
+            "toolbox": "(star) (diamond) (triangle)"
+        },
+        {
+            "description": "Bigger sequence",
+            "board": "(sequence /(assign /($x) _) /(assign /($y) _) /(assign /($z) /(array_constructor /($x) /($y)))) ($z)",
+            "goal": "(bag (star) (diamond))",
+            "toolbox": "(star) (diamond) (triangle)"
+        },
+        {
+            "description": "Fill in the blank",
+            "board": "(sequence /(assign /($z) _) _ /(assign /($y) /($x)))",
+            "goal": "(star)",
+            "toolbox": "(star) (assign _ _) ($x) ($y) ($z)"
+        }
+    ]
+}
