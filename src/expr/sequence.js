@@ -28,13 +28,13 @@ class Sequence extends Expression {
             return null;
         }, () => {
             // Something went wrong
-            mag.Stage.getNodesWithClass(Expression, [], true, [this]).forEach((node) => {
-                node.lock();
-            });
-            this.stroke = {
-                color: 'red',
-                lineWidth: 2,
-            };
+            this._animating = false;
+            while (this.holes.length > 0 && this.holes[0] instanceof MissingExpression) {
+                this.holes.shift();
+            }
+            this.update();
+
+            Animate.blink(this, 1000, [1.0, 0.0, 0.0]);
         });
     }
 

@@ -75,13 +75,13 @@ var Sequence = function (_Expression) {
                 return null;
             }, function () {
                 // Something went wrong
-                mag.Stage.getNodesWithClass(Expression, [], true, [_this2]).forEach(function (node) {
-                    node.lock();
-                });
-                _this2.stroke = {
-                    color: 'red',
-                    lineWidth: 2
-                };
+                _this2._animating = false;
+                while (_this2.holes.length > 0 && _this2.holes[0] instanceof MissingExpression) {
+                    _this2.holes.shift();
+                }
+                _this2.update();
+
+                Animate.blink(_this2, 1000, [1.0, 0.0, 0.0]);
             });
         }
     }, {

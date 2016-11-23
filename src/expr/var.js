@@ -668,7 +668,11 @@ class AssignExpr extends Expression {
             if (this.value && this.variable && !this.value.canReduce()) {
                 // Try and play any animation anyways to hint at why
                 // the value can't reduce.
-                return this.value.performReduction();
+                return this.value.performReduction().then(() => {
+                    return new Promise((resolve, reject) => {
+                        reject();
+                    });
+                });
             }
             return null;
         }
