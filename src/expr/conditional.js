@@ -65,6 +65,11 @@ class IfStatement extends Expression {
                 return this.performReduction();
             });
         }
+        else if (this.cond && !this.cond.isValue() && !this.cond.canReduce()) {
+            // Try and play any animation anyways
+            this.cond.performReduction();
+            return null;
+        }
 
         if (this.branch && this.branch.canReduce()) {
             return this.performSubReduction(this.branch, animated).then(() => {

@@ -242,7 +242,7 @@ class Expression extends mag.RoundedRect {
     // Is this expression missing any subexpressions?
     isComplete() {
         for (let child of this.holes) {
-            if (child instanceof MissingExpression || !child.isComplete()) {
+            if (child instanceof MissingExpression || (child instanceof Expression && !child.isComplete())) {
                 return false;
             }
         }
@@ -264,12 +264,13 @@ class Expression extends mag.RoundedRect {
                     if (expr.locked) result.lock();
 
                     window.setTimeout(() => {
-                        resolve();
+                        resolve(result);
                     }, 600);
                 });
             }
             else {
-                resolve();
+                if (!result) result = expr;
+                resolve(result);
             }
         });
     }
