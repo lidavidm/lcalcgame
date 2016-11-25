@@ -25,6 +25,25 @@ class RepeatLoopExpr extends Expression {
         };
     }
 
+    update() {
+        super.update();
+        let centerX = this.size.w / 2;
+        let centerY = this.size.h / 2;
+        let innerR = 0.1 * this.size.h / 2;
+        if (this.timesExpr) {
+            this.timesExpr.pos = {
+                x: centerX - this.timesExpr.size.w - innerR,
+                y: centerY,
+            };
+        }
+        if (this.bodyExpr) {
+            this.bodyExpr.pos = {
+                x: centerX + 2 * innerR,
+                y: centerY,
+            };
+        }
+    }
+
     drawInternal(ctx, pos, boundingSize) {
         super.drawInternal(ctx, pos, boundingSize);
 
@@ -33,8 +52,18 @@ class RepeatLoopExpr extends Expression {
         let outerR = 0.9 * boundingSize.h / 2;
         let innerR = 0.1 * boundingSize.h / 2;
 
+        ctx.lineWidth = 1.0;
         ctx.beginPath();
-        ctx.strokeStyle = 'black';
+        if (this.timesExpr && this.timesExpr.number && this.timesExpr.number > 0) {
+            ctx.strokeStyle = 'blue';
+            this.timesExpr.stroke = {
+                color: 'blue',
+                width: 2,
+            };
+        }
+        else {
+            ctx.strokeStyle = 'black';
+        }
         ctx.arc(centerX, centerY, outerR, 0, Math.PI * 2);
         ctx.closePath();
         ctx.stroke();
@@ -43,7 +72,6 @@ class RepeatLoopExpr extends Expression {
         ctx.stroke();
 
         let spokes = 24;
-        ctx.lineWidth = 1.0;
         for (let i = 0; i < spokes; i++) {
             let theta = i * 2 * Math.PI / spokes + this.rotationAngle;
             ctx.moveTo(centerX + innerR * Math.cos(theta), centerY + innerR * Math.sin(theta));
@@ -58,20 +86,25 @@ class RepeatLoopExpr extends Expression {
         let working = false;
         let stopped = false;
         let rotate = () => {
-            if (working) this.rotationAngle += Math.PI / 3 / 60.0;
+            if (working) this.rotationAngle += Math.PI / 2 / 60.0;
             this.stage.draw();
             if (!stopped) window.requestAnimationFrame(rotate);
         };
         rotate();
 
-        this.performSubReduction(this.timesExpr).then(() => {
+        return this.performSubReduction(this.timesExpr).then((num) => {
+            if (!(num instanceof NumberExpr) || !this.bodyExpr || this.bodyExpr instanceof MissingExpression) {
+                stopped = true;
+                this._animating = false;
+                return Promise.reject("RepeatLoopExpr incomplete!");
+            }
             let body = this.bodyExpr.clone();
             let times = this.timesExpr.number;
 
             let nextStep = () => {
                 if (times > 0) {
                     working = true;
-                    this.performSubReduction(this.bodyExpr).then(() => {
+                    return this.performSubReduction(this.bodyExpr).then(() => {
                         working = false;
 
                         this.swap(this.timesExpr, new NumberExpr(--times));
@@ -82,22 +115,29 @@ class RepeatLoopExpr extends Expression {
                         this.holes[1].stage = this.stage;
                         this.update();
 
-                        window.setTimeout(() => {
-                            nextStep();
-                        }, 500);
+                        return new Promise((resolve, reject) => {
+                            window.setTimeout(() => {
+                                let r = nextStep();
+                                if (r instanceof Promise) r.then(resolve, reject);
+                                else resolve(r);
+                            }, 500);
+                        });
                     });
                 }
                 else {
                     stopped = true;
                     Animate.poof(this);
                     (this.parent || this.stage).swap(this, null);
+                    return null;
                 }
             };
-            nextStep();
+            return nextStep();
         });
     }
 
     onmouseclick() {
-        this.performReduction();
+        if (!this._animating) {
+            this.performReduction();
+        }
     }
 }

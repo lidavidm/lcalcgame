@@ -28,6 +28,26 @@ var RepeatLoopExpr = function (_Expression) {
     // }
 
     _createClass(RepeatLoopExpr, [{
+        key: 'update',
+        value: function update() {
+            _get(RepeatLoopExpr.prototype.__proto__ || Object.getPrototypeOf(RepeatLoopExpr.prototype), 'update', this).call(this);
+            var centerX = this.size.w / 2;
+            var centerY = this.size.h / 2;
+            var innerR = 0.1 * this.size.h / 2;
+            if (this.timesExpr) {
+                this.timesExpr.pos = {
+                    x: centerX - this.timesExpr.size.w - innerR,
+                    y: centerY
+                };
+            }
+            if (this.bodyExpr) {
+                this.bodyExpr.pos = {
+                    x: centerX + 2 * innerR,
+                    y: centerY
+                };
+            }
+        }
+    }, {
         key: 'drawInternal',
         value: function drawInternal(ctx, pos, boundingSize) {
             _get(RepeatLoopExpr.prototype.__proto__ || Object.getPrototypeOf(RepeatLoopExpr.prototype), 'drawInternal', this).call(this, ctx, pos, boundingSize);
@@ -37,8 +57,17 @@ var RepeatLoopExpr = function (_Expression) {
             var outerR = 0.9 * boundingSize.h / 2;
             var innerR = 0.1 * boundingSize.h / 2;
 
+            ctx.lineWidth = 1.0;
             ctx.beginPath();
-            ctx.strokeStyle = 'black';
+            if (this.timesExpr && this.timesExpr.number && this.timesExpr.number > 0) {
+                ctx.strokeStyle = 'blue';
+                this.timesExpr.stroke = {
+                    color: 'blue',
+                    width: 2
+                };
+            } else {
+                ctx.strokeStyle = 'black';
+            }
             ctx.arc(centerX, centerY, outerR, 0, Math.PI * 2);
             ctx.closePath();
             ctx.stroke();
@@ -47,7 +76,6 @@ var RepeatLoopExpr = function (_Expression) {
             ctx.stroke();
 
             var spokes = 24;
-            ctx.lineWidth = 1.0;
             for (var i = 0; i < spokes; i++) {
                 var theta = i * 2 * Math.PI / spokes + this.rotationAngle;
                 ctx.moveTo(centerX + innerR * Math.cos(theta), centerY + innerR * Math.sin(theta));
@@ -65,20 +93,25 @@ var RepeatLoopExpr = function (_Expression) {
             var working = false;
             var stopped = false;
             var rotate = function rotate() {
-                if (working) _this2.rotationAngle += Math.PI / 3 / 60.0;
+                if (working) _this2.rotationAngle += Math.PI / 2 / 60.0;
                 _this2.stage.draw();
                 if (!stopped) window.requestAnimationFrame(rotate);
             };
             rotate();
 
-            this.performSubReduction(this.timesExpr).then(function () {
+            return this.performSubReduction(this.timesExpr).then(function (num) {
+                if (!(num instanceof NumberExpr) || !_this2.bodyExpr || _this2.bodyExpr instanceof MissingExpression) {
+                    stopped = true;
+                    _this2._animating = false;
+                    return Promise.reject("RepeatLoopExpr incomplete!");
+                }
                 var body = _this2.bodyExpr.clone();
                 var times = _this2.timesExpr.number;
 
                 var nextStep = function nextStep() {
                     if (times > 0) {
                         working = true;
-                        _this2.performSubReduction(_this2.bodyExpr).then(function () {
+                        return _this2.performSubReduction(_this2.bodyExpr).then(function () {
                             working = false;
 
                             _this2.swap(_this2.timesExpr, new NumberExpr(--times));
@@ -89,23 +122,29 @@ var RepeatLoopExpr = function (_Expression) {
                             _this2.holes[1].stage = _this2.stage;
                             _this2.update();
 
-                            window.setTimeout(function () {
-                                nextStep();
-                            }, 500);
+                            return new Promise(function (resolve, reject) {
+                                window.setTimeout(function () {
+                                    var r = nextStep();
+                                    if (r instanceof Promise) r.then(resolve, reject);else resolve(r);
+                                }, 500);
+                            });
                         });
                     } else {
                         stopped = true;
                         Animate.poof(_this2);
                         (_this2.parent || _this2.stage).swap(_this2, null);
+                        return null;
                     }
                 };
-                nextStep();
+                return nextStep();
             });
         }
     }, {
         key: 'onmouseclick',
         value: function onmouseclick() {
-            this.performReduction();
+            if (!this._animating) {
+                this.performReduction();
+            }
         }
     }, {
         key: 'timesExpr',
