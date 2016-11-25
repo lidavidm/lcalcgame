@@ -341,6 +341,7 @@ class Level {
             'cmp':ExprManager.getClass('cmp'),
             '==':ExprManager.getClass('=='),
             '!=':ExprManager.getClass('!='),
+            '+':ExprManager.getClass('+'),
             'bag':new (ExprManager.getClass('bag'))(0,0,54,54,[]),
             'count':new (ExprManager.getClass('count'))(),
             'map':ExprManager.getClass('map'),

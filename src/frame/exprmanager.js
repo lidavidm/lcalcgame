@@ -16,6 +16,7 @@ var ExprManager = (function() {
         'false':    [KeyFalseExpr, FalseExpr],
         'cmp':      [MirrorCompareExpr, FadedCompareExpr],
         '==':       [MirrorCompareExpr, FadedCompareExpr],
+        '+':        [AddExpr],
         '!=':       [MirrorCompareExpr, FadedCompareExpr],
         'bag':      [BagExpr, BracketArrayExpr],
         'count':    [CountExpr],
