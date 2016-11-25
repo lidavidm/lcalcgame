@@ -796,6 +796,7 @@ var Level = function () {
                 'assign': ExprManager.getClass('assign'),
                 'sequence': ExprManager.getClass('sequence'),
                 'array_constructor': new (ExprManager.getClass('array_constructor'))(0, 0, 54, 54, []),
+                'repeat': ExprManager.getClass('repeat'),
                 'dot': function () {
                     var circ = new CircleExpr(0, 0, 18);
                     circ.color = 'gold';

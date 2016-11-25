@@ -34,6 +34,7 @@ var ExprManager = (function() {
         'assign':   [JumpingAssignExpr, AssignExpr, EqualsAssignExpr],
         'sequence': [Sequence],
         'array_constructor': [BracketArrayConstructor],
+        'repeat':   [RepeatLoopExpr],
     };
     var fade_level = {};
     var DEFAULT_FADE_LEVEL = 0;
