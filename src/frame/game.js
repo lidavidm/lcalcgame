@@ -127,8 +127,7 @@ class Level {
             var nodes = [];
             var expr;
             for (let n of this.nodes) {
-                if (n in this.uiGoalNodes ||
-                    this.uiNodes.indexOf(n) > -1 ||
+                if (this.uiNodes.indexOf(n) > -1 ||
                     n.constructor.name === 'Rect' ||
                     n.constructor.name === 'ImageRect' ||
                     !(n instanceof Expression) ||
