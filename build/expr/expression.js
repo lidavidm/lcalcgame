@@ -262,7 +262,7 @@ var Expression = function (_mag$RoundedRect) {
                 for (var _iterator = this.holes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                     var child = _step.value;
 
-                    if (child instanceof MissingExpression || !child.isComplete()) {
+                    if (child instanceof MissingExpression || child instanceof Expression && !child.isComplete()) {
                         return false;
                     }
                 }
@@ -309,11 +309,12 @@ var Expression = function (_mag$RoundedRect) {
                         if (expr.locked) result.lock();
 
                         window.setTimeout(function () {
-                            resolve();
+                            resolve(result);
                         }, 600);
                     });
                 } else {
-                    resolve();
+                    if (!result) result = expr;
+                    resolve(result);
                 }
             });
         }

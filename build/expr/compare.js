@@ -112,8 +112,7 @@ var CompareExpr = function (_Expression) {
                         var shatter = new ShatterExpressionEffect(_this2);
                         shatter.run(stage, function () {
                             _this2.ignoreEvents = false;
-                            _get(CompareExpr.prototype.__proto__ || Object.getPrototypeOf(CompareExpr.prototype), 'performReduction', _this2).call(_this2);
-                            resolve();
+                            resolve(_get(CompareExpr.prototype.__proto__ || Object.getPrototypeOf(CompareExpr.prototype), 'performReduction', _this2).call(_this2));
                         }.bind(_this2));
                         _this2.ignoreEvents = true;
                     });

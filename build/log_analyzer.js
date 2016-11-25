@@ -667,9 +667,9 @@ var LogAnalyzer = function () {
             }));
             //label:('reduce:' + edge.reduce + '\nundo:' + edge.undo) }) ));
         } else {
-                // ... TBI ...
-                console.error('Not yet implemented.');
-            }
+            // ... TBI ...
+            console.error('Not yet implemented.');
+        }
     };
     pub.refreshTaskVis = refreshTaskVis;
 

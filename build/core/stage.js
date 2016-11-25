@@ -18,6 +18,7 @@ var mag = function (_) {
             if (canvas) this.canvas = canvas;else this.ctx = null;
             this.nodes = [];
             this.hoverNode = null;
+            this._scale = 1;
             this.requested = false;
         }
 

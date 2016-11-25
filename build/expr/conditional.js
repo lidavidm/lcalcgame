@@ -78,6 +78,10 @@ var IfStatement = function (_Expression) {
                 return this.performSubReduction(this.cond, animated).then(function () {
                     return _this2.performReduction();
                 });
+            } else if (this.cond && !this.cond.isValue() && !this.cond.canReduce()) {
+                // Try and play any animation anyways
+                this.cond.performReduction();
+                return null;
             }
 
             if (this.branch && this.branch.canReduce()) {
