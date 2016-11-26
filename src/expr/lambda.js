@@ -907,6 +907,7 @@ class InlineEnvironmentDisplay extends Expression {
     draw(ctx) {
         if (!ctx) return;
         ctx.save();
+        this.opacity = this.lambda.opacity;
         if (this.opacity !== undefined && this.opacity < 1.0) {
             ctx.globalAlpha = this.opacity;
         }

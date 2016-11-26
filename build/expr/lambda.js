@@ -1220,6 +1220,7 @@ var InlineEnvironmentDisplay = function (_Expression2) {
 
             if (!ctx) return;
             ctx.save();
+            this.opacity = this.lambda.opacity;
             if (this.opacity !== undefined && this.opacity < 1.0) {
                 ctx.globalAlpha = this.opacity;
             }
