@@ -36,11 +36,10 @@
         },
         {
             "description": "Variable in reduction",
-            "board": "(+ _ /2)",
+            "board": "(+ /($y) _)",
             "goal": "(4)",
-            "toolbox": "($x) ($y)",
+            "toolbox": "(1) (2)",
             "globals": {
-                "x": "(1)",
                 "y": "(2)"
             }
         },
