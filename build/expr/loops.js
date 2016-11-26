@@ -20,7 +20,8 @@ var RepeatLoopExpr = function (_Expression) {
 
         var _this = _possibleConstructorReturn(this, (RepeatLoopExpr.__proto__ || Object.getPrototypeOf(RepeatLoopExpr)).call(this, [times, body]));
 
-        _this.rotationAngle = 0;
+        _this.markerAngle = 0;
+        _this.drawMarker = false;
         return _this;
     }
 
@@ -36,13 +37,13 @@ var RepeatLoopExpr = function (_Expression) {
             var innerR = 0.1 * this.size.h / 2;
             if (this.timesExpr) {
                 this.timesExpr.pos = {
-                    x: centerX - this.timesExpr.size.w - innerR,
+                    x: centerX - this.timesExpr.size.w * this.timesExpr.scale.x - innerR,
                     y: centerY
                 };
             }
             if (this.bodyExpr) {
                 this.bodyExpr.pos = {
-                    x: centerX + 2 * innerR,
+                    x: centerX + innerR,
                     y: centerY
                 };
             }
@@ -55,84 +56,102 @@ var RepeatLoopExpr = function (_Expression) {
             var centerX = pos.x + boundingSize.w / 2;
             var centerY = pos.y + boundingSize.h / 2;
             var outerR = 0.9 * boundingSize.h / 2;
-            var innerR = 0.1 * boundingSize.h / 2;
 
             ctx.lineWidth = 1.0;
             ctx.beginPath();
-            if (this.timesExpr && this.timesExpr.number && this.timesExpr.number > 0) {
+            if (this.timesExpr && this.timesExpr.number && this.timesExpr.number > 0 || this.drawMarker) {
                 ctx.strokeStyle = 'blue';
-                this.timesExpr.stroke = {
-                    color: 'blue',
-                    width: 2
-                };
-            } else {
-                ctx.strokeStyle = 'black';
+                // this.timesExpr.stroke = this.bodyExpr.stroke = {
+                //     color: 'blue',
+                //     width: 2,
+                // };
             }
+            // else if (this.timesExpr && this.timesExpr.isValue()) {
+            // }
+            else {
+                    ctx.strokeStyle = 'black';
+                }
             ctx.arc(centerX, centerY, outerR, 0, Math.PI * 2);
             ctx.closePath();
             ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, innerR, 0, Math.PI * 2);
-            ctx.stroke();
 
-            var spokes = 24;
-            for (var i = 0; i < spokes; i++) {
-                var theta = i * 2 * Math.PI / spokes + this.rotationAngle;
-                ctx.moveTo(centerX + innerR * Math.cos(theta), centerY + innerR * Math.sin(theta));
-                ctx.lineTo(centerX + outerR * Math.cos(theta), centerY + outerR * Math.sin(theta));
+            // draw the arrows
+            var dy = Math.abs(this.timesExpr.absolutePos.y + this.timesExpr.absoluteSize.h / 2 - centerY);
+            var lowerTipAngle = Math.PI - Math.asin(dy / outerR);
+            drawArrowOnArc(ctx, lowerTipAngle, -Math.PI / 8, centerX, centerY, outerR);
+
+            dy = Math.abs(this.bodyExpr.absolutePos.y - this.bodyExpr.absoluteSize.h / 2 - centerY);
+            var upperTipAngle = -Math.asin(dy / outerR);
+            drawArrowOnArc(ctx, upperTipAngle, -Math.PI / 8, centerX, centerY, outerR);
+
+            if (this.drawMarker) {
+                ctx.strokeStyle = 'blue';
+                ctx.fillStyle = 'blue';
+
+                ctx.beginPath();
+                var _dy = Math.abs(this.timesExpr.absolutePos.y - this.timesExpr.absoluteSize.h / 2 - centerY);
+                var startAngle = Math.asin(_dy / outerR) - Math.PI;
+                _dy = Math.abs(this.bodyExpr.absolutePos.y - this.bodyExpr.absoluteSize.h / 2 - centerY);
+                var endAngle = -Math.asin(_dy / outerR);
+                var markerAngle = startAngle + this.markerAngle * (endAngle - startAngle);
+                ctx.arc(centerX + outerR * Math.cos(markerAngle), centerY + outerR * Math.sin(markerAngle), 0.1 * outerR, 0, Math.PI * 2);
                 ctx.stroke();
+                ctx.fill();
             }
+        }
+    }, {
+        key: 'animateNumber',
+        value: function animateNumber() {
+            var _this2 = this;
+
+            return new Promise(function (resolve, reject) {
+                _this2.drawMarker = true;
+                _this2.markerAngle = 0.0;
+                _this2.swap(_this2.timesExpr, new NumberExpr(_this2.timesExpr.number - 1));
+                _this2.timesExpr.lock();
+
+                Animate.tween(_this2, {
+                    markerAngle: 1.0
+                }, 500).after(function () {
+                    _this2.drawMarker = false;
+                    resolve();
+                });
+            });
         }
     }, {
         key: 'performReduction',
         value: function performReduction() {
-            var _this2 = this;
+            var _this3 = this;
 
             this._animating = true;
 
-            var working = false;
-            var stopped = false;
-            var rotate = function rotate() {
-                if (working) _this2.rotationAngle += Math.PI / 2 / 60.0;
-                _this2.stage.draw();
-                if (!stopped) window.requestAnimationFrame(rotate);
-            };
-            rotate();
-
             return this.performSubReduction(this.timesExpr).then(function (num) {
-                if (!(num instanceof NumberExpr) || !_this2.bodyExpr || _this2.bodyExpr instanceof MissingExpression) {
-                    stopped = true;
-                    _this2._animating = false;
+                if (!(num instanceof NumberExpr) || !_this3.bodyExpr || _this3.bodyExpr instanceof MissingExpression) {
+                    _this3._animating = false;
                     return Promise.reject("RepeatLoopExpr incomplete!");
                 }
-                var body = _this2.bodyExpr.clone();
-                var times = _this2.timesExpr.number;
+                var body = _this3.bodyExpr.clone();
 
                 var nextStep = function nextStep() {
-                    if (times > 0) {
-                        working = true;
-                        return _this2.performSubReduction(_this2.bodyExpr).then(function () {
-                            working = false;
+                    if (_this3.timesExpr.number > 0) {
+                        return _this3.animateNumber().then(function () {
+                            return _this3.performSubReduction(_this3.bodyExpr).then(function () {
+                                _this3.holes[1] = body.clone();
+                                _this3.holes[1].parent = _this3;
+                                _this3.holes[1].stage = _this3.stage;
+                                _this3.update();
 
-                            _this2.swap(_this2.timesExpr, new NumberExpr(--times));
-                            _this2.timesExpr.lock();
-
-                            _this2.holes[1] = body.clone();
-                            _this2.holes[1].parent = _this2;
-                            _this2.holes[1].stage = _this2.stage;
-                            _this2.update();
-
-                            return new Promise(function (resolve, reject) {
-                                window.setTimeout(function () {
-                                    var r = nextStep();
-                                    if (r instanceof Promise) r.then(resolve, reject);else resolve(r);
-                                }, 500);
+                                return new Promise(function (resolve, reject) {
+                                    window.setTimeout(function () {
+                                        var r = nextStep();
+                                        if (r instanceof Promise) r.then(resolve, reject);else resolve(r);
+                                    }, 500);
+                                });
                             });
                         });
                     } else {
-                        stopped = true;
-                        Animate.poof(_this2);
-                        (_this2.parent || _this2.stage).swap(_this2, null);
+                        Animate.poof(_this3);
+                        (_this3.parent || _this3.stage).swap(_this3, null);
                         return null;
                     }
                 };
@@ -162,10 +181,21 @@ var RepeatLoopExpr = function (_Expression) {
             var subSize = this.timesExpr.size;
             return {
                 w: subSize.w * 2.25,
-                h: subSize.h * 2
+                h: subSize.h * 1.5
             };
         }
     }]);
 
     return RepeatLoopExpr;
 }(Expression);
+
+function drawArrowOnArc(ctx, tipAngle, deltaAngle, centerX, centerY, radius) {
+    var baseAngle = tipAngle + deltaAngle;
+    ctx.beginPath();
+    ctx.moveTo(centerX + 0.9 * radius * Math.cos(baseAngle), centerY + 0.9 * radius * Math.sin(baseAngle));
+    ctx.lineTo(centerX + 1.1 * radius * Math.cos(baseAngle), centerY + 1.1 * radius * Math.sin(baseAngle));
+    ctx.lineTo(centerX + radius * Math.cos(tipAngle), centerY + radius * Math.sin(tipAngle));
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
+}

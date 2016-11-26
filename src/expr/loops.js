@@ -3,7 +3,8 @@ const SCALE_FACTOR = 0.33;
 class RepeatLoopExpr extends Expression {
     constructor(times, body) {
         super([times, body]);
-        this.rotationAngle = 0;
+        this.markerAngle = 0;
+        this.drawMarker = false;
     }
 
     // draw(ctx) {
@@ -21,7 +22,7 @@ class RepeatLoopExpr extends Expression {
         let subSize = this.timesExpr.size;
         return {
             w: subSize.w * 2.25,
-            h: subSize.h * 2,
+            h: subSize.h * 1.5,
         };
     }
 
@@ -32,13 +33,13 @@ class RepeatLoopExpr extends Expression {
         let innerR = 0.1 * this.size.h / 2;
         if (this.timesExpr) {
             this.timesExpr.pos = {
-                x: centerX - this.timesExpr.size.w - innerR,
+                x: centerX - this.timesExpr.size.w * this.timesExpr.scale.x - innerR,
                 y: centerY,
             };
         }
         if (this.bodyExpr) {
             this.bodyExpr.pos = {
-                x: centerX + 2 * innerR,
+                x: centerX + innerR,
                 y: centerY,
             };
         }
@@ -50,82 +51,98 @@ class RepeatLoopExpr extends Expression {
         let centerX = pos.x + boundingSize.w / 2;
         let centerY = pos.y + boundingSize.h / 2;
         let outerR = 0.9 * boundingSize.h / 2;
-        let innerR = 0.1 * boundingSize.h / 2;
 
         ctx.lineWidth = 1.0;
         ctx.beginPath();
-        if (this.timesExpr && this.timesExpr.number && this.timesExpr.number > 0) {
+        if ((this.timesExpr && this.timesExpr.number && this.timesExpr.number > 0) || this.drawMarker) {
             ctx.strokeStyle = 'blue';
-            this.timesExpr.stroke = {
-                color: 'blue',
-                width: 2,
-            };
+            // this.timesExpr.stroke = this.bodyExpr.stroke = {
+            //     color: 'blue',
+            //     width: 2,
+            // };
         }
+        // else if (this.timesExpr && this.timesExpr.isValue()) {
+        // }
         else {
             ctx.strokeStyle = 'black';
         }
         ctx.arc(centerX, centerY, outerR, 0, Math.PI * 2);
         ctx.closePath();
         ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, innerR, 0, Math.PI * 2);
-        ctx.stroke();
 
-        let spokes = 24;
-        for (let i = 0; i < spokes; i++) {
-            let theta = i * 2 * Math.PI / spokes + this.rotationAngle;
-            ctx.moveTo(centerX + innerR * Math.cos(theta), centerY + innerR * Math.sin(theta));
-            ctx.lineTo(centerX + outerR * Math.cos(theta), centerY + outerR * Math.sin(theta));
+        // draw the arrows
+        let dy = Math.abs(this.timesExpr.absolutePos.y + this.timesExpr.absoluteSize.h / 2 - centerY);
+        let lowerTipAngle = Math.PI - Math.asin(dy / outerR);
+        drawArrowOnArc(ctx, lowerTipAngle, -Math.PI / 8, centerX, centerY, outerR);
+
+        dy = Math.abs(this.bodyExpr.absolutePos.y - this.bodyExpr.absoluteSize.h / 2 - centerY);
+        let upperTipAngle = -Math.asin(dy / outerR);
+        drawArrowOnArc(ctx, upperTipAngle, -Math.PI / 8, centerX, centerY, outerR);
+
+        if (this.drawMarker) {
+            ctx.strokeStyle = 'blue';
+            ctx.fillStyle = 'blue';
+
+            ctx.beginPath();
+            let dy = Math.abs(this.timesExpr.absolutePos.y - this.timesExpr.absoluteSize.h / 2 - centerY);
+            let startAngle = Math.asin(dy / outerR) - Math.PI;
+            dy = Math.abs(this.bodyExpr.absolutePos.y - this.bodyExpr.absoluteSize.h / 2 - centerY);
+            let endAngle = -Math.asin(dy / outerR);
+            let markerAngle = startAngle + this.markerAngle * (endAngle - startAngle);
+            ctx.arc(centerX + outerR * Math.cos(markerAngle),
+                    centerY + outerR * Math.sin(markerAngle),
+                    0.1 * outerR, 0, Math.PI * 2);
             ctx.stroke();
+            ctx.fill();
         }
+    }
+
+    animateNumber() {
+        return new Promise((resolve, reject) => {
+            this.drawMarker = true;
+            this.markerAngle = 0.0;
+            this.swap(this.timesExpr, new NumberExpr(this.timesExpr.number - 1));
+            this.timesExpr.lock();
+
+            Animate.tween(this, {
+                markerAngle: 1.0,
+            }, 500).after(() => {
+                this.drawMarker = false;
+                resolve();
+            });
+        });
     }
 
     performReduction() {
         this._animating = true;
 
-        let working = false;
-        let stopped = false;
-        let rotate = () => {
-            if (working) this.rotationAngle += Math.PI / 2 / 60.0;
-            this.stage.draw();
-            if (!stopped) window.requestAnimationFrame(rotate);
-        };
-        rotate();
-
         return this.performSubReduction(this.timesExpr).then((num) => {
             if (!(num instanceof NumberExpr) || !this.bodyExpr || this.bodyExpr instanceof MissingExpression) {
-                stopped = true;
                 this._animating = false;
                 return Promise.reject("RepeatLoopExpr incomplete!");
             }
             let body = this.bodyExpr.clone();
-            let times = this.timesExpr.number;
 
             let nextStep = () => {
-                if (times > 0) {
-                    working = true;
-                    return this.performSubReduction(this.bodyExpr).then(() => {
-                        working = false;
+                if (this.timesExpr.number > 0) {
+                    return this.animateNumber().then(() => {
+                        return this.performSubReduction(this.bodyExpr).then(() => {
+                            this.holes[1] = body.clone();
+                            this.holes[1].parent = this;
+                            this.holes[1].stage = this.stage;
+                            this.update();
 
-                        this.swap(this.timesExpr, new NumberExpr(--times));
-                        this.timesExpr.lock();
-
-                        this.holes[1] = body.clone();
-                        this.holes[1].parent = this;
-                        this.holes[1].stage = this.stage;
-                        this.update();
-
-                        return new Promise((resolve, reject) => {
-                            window.setTimeout(() => {
-                                let r = nextStep();
-                                if (r instanceof Promise) r.then(resolve, reject);
-                                else resolve(r);
-                            }, 500);
+                            return new Promise((resolve, reject) => {
+                                window.setTimeout(() => {
+                                    let r = nextStep();
+                                    if (r instanceof Promise) r.then(resolve, reject);
+                                    else resolve(r);
+                                }, 500);
+                            });
                         });
                     });
                 }
                 else {
-                    stopped = true;
                     Animate.poof(this);
                     (this.parent || this.stage).swap(this, null);
                     return null;
@@ -140,4 +157,16 @@ class RepeatLoopExpr extends Expression {
             this.performReduction();
         }
     }
+}
+
+
+function drawArrowOnArc(ctx, tipAngle, deltaAngle, centerX, centerY, radius) {
+    let baseAngle = tipAngle + deltaAngle;
+    ctx.beginPath();
+    ctx.moveTo(centerX + 0.9 * radius * Math.cos(baseAngle), centerY + 0.9 * radius * Math.sin(baseAngle));
+    ctx.lineTo(centerX + 1.1 * radius * Math.cos(baseAngle), centerY + 1.1 * radius * Math.sin(baseAngle));
+    ctx.lineTo(centerX + radius * Math.cos(tipAngle), centerY + radius * Math.sin(tipAngle));
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
 }
