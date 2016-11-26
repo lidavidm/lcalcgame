@@ -269,8 +269,14 @@ class Expression extends mag.RoundedRect {
                 });
             }
             else {
-                if (!result) result = expr;
-                resolve(result);
+                let delay = 250;
+                if (!result) {
+                    result = expr;
+                    delay = 0;
+                }
+                window.setTimeout(() => {
+                    resolve(result);
+                }, delay);
             }
         });
     }

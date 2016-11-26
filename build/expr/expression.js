@@ -313,8 +313,14 @@ var Expression = function (_mag$RoundedRect) {
                         }, 600);
                     });
                 } else {
-                    if (!result) result = expr;
-                    resolve(result);
+                    var delay = 250;
+                    if (!result) {
+                        result = expr;
+                        delay = 0;
+                    }
+                    window.setTimeout(function () {
+                        resolve(result);
+                    }, delay);
                 }
             });
         }
