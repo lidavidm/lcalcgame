@@ -8,6 +8,7 @@ var canvas;
 
 var level_idx = getCookie('level_idx') || 0;
 if (level_idx !== 0) level_idx = parseInt(level_idx);
+var cur_menu = null;
 
 function init() {
 
@@ -57,7 +58,7 @@ function init() {
         }
 
         return loadChapterSelect();
-    }).then(initBoard);
+    }).then(initMainMenu);
 }
 
 function loadCustomLevel(lvl_desc, goal_desc) {
@@ -87,12 +88,66 @@ function clearStage() {
     }
 }
 
-function initBoard() {
+function redraw(stage) {
+    if (stage) {
+        stage.update();
+        stage.draw();
+        stage.draw();
+    }
+}
+
+// function initChapterMenu(chapterName) {
+//     canvas = document.getElementById('canvas');
+//     stage = Resource.startChapter(chapterName, canvas);
+//     cur_chapter = chapterName;
+//     redraw(stage);
+// }
+
+function initLevel(levelSelected, levelSelectedIdx) {
+    if (stage instanceof ChapterSelectMenu) {
+        cur_menu = stage;
+        cur_menu.invalidate();
+    }
+    level_idx = levelSelectedIdx;
+    stage = Resource.buildLevel(levelSelected, canvas);
+    redraw(stage);
+}
+
+function returnToMenu() {
+    if (cur_menu) {
+        prepareCanvas();
+        cur_menu.validate();
+        stage = cur_menu;
+        redraw(stage);
+    } else {
+        initMainMenu();
+    }
+}
+
+function initMainMenu() {
 
     canvas = document.getElementById('canvas');
 
     if (canvas.getContext) {
 
+        prepareCanvas();
+
+        stage = new MainMenu(canvas, () => {
+
+            //Clicks 'play' button. Transition to chapter select screen.
+            stage = new ChapterSelectMenu(canvas, initLevel);
+            redraw(stage);
+
+        }, () => {
+            // Clicked 'settings' button. Transition to settings screen.
+        });
+        redraw(stage);
+    }
+}
+
+function prepareCanvas() {
+    canvas = document.getElementById('canvas');
+    if (canvas.getContext) {
         clearStage();
 
         if (__IS_MOBILE) {
@@ -114,44 +169,22 @@ function initBoard() {
         hideEndGame();
         updateProgressBar();
 
-        // New: saves progress upon reload.
-        setCookie('level_idx', level_idx);
-
         GLOBAL_DEFAULT_CTX = canvas.getContext('2d');
         GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
+    }
+}
+
+function initBoard() {
+
+    canvas = document.getElementById('canvas');
+
+    if (canvas.getContext) {
+
+        prepareCanvas();
+
+        // New: saves progress upon reload.
+        setCookie('level_idx', level_idx);
         $('#lvl_num_visible').text((level_idx+1) + '');
-        //document.getElementById('lvl_desc').innerHTML = Resource.level[level_idx].description || '(No description.)';
-
-        let redraw = (stage) => {
-            stage.update();
-            stage.draw();
-            stage.draw();
-        };
-
-
-        stage = new MainMenu(canvas, () => {
-
-            // stage = new LevelSelectMenu(canvas, 'Basics', (level) => {
-            //     stage = Resource.buildLevel(level, canvas);
-            //     redraw(stage);
-            // });
-            // redraw(stage);
-
-            //Clicks 'play' button. Transition to chapter select screen.
-            stage = new ChapterSelectMenu(canvas, (chapterName) => {
-                stage = Resource.startChapter(chapterName, canvas);
-                redraw(stage);
-            }, (levelSelected) => {
-                stage = Resource.buildLevel(levelSelected, canvas);
-                redraw(stage);
-            });
-            redraw(stage);
-
-        }, () => {
-            // Clicked 'settings' button. Transition to settings screen.
-        });
-        redraw(stage);
-        return;
 
         stage = Resource.buildLevel(Resource.level[level_idx], canvas);
 

@@ -157,17 +157,14 @@ var mag = (function(_) {
             return rt;
         }
 
-        /** Invalidates a collection of nodes (or all the nodes on this stage)
-            and invalidates this stage, so that it won't draw to canvas anymore. */
-        invalidate(nodes) {
-            if (typeof nodes === 'undefined') nodes = this.nodes;
-            else if (nodes && nodes.length === 0) return;
-            var _this = this;
-            nodes.forEach((n) => {
-                n.ctx = null;
-                _this.invalidate(n.children);
-            });
+        /** Invalidates this stage, so that it won't draw to canvas or receive events. */
+        invalidate() {
             this.invalidated = true;
+            delegateMouse(this._canvas, null);
+        }
+        validate() {
+            this.invalidated = false;
+            delegateMouse(this._canvas, this);
         }
 
         /** Draw this stage to the canvas. */

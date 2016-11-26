@@ -148,8 +148,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     Resource.levelsForChapter = (chapterName) => {
         for (let i = 0; i < chapters.length; i++) {
             if (chapters[i].name === chapterName) {
-                if (i + 1 < chapters.length) return levels.slice(chapters[i].startIdx, chapters[i+1].startIdx);
-                else                         return levels.slice(chapters[i].startIdx);
+                if (i + 1 < chapters.length) return [levels.slice(chapters[i].startIdx, chapters[i+1].startIdx), chapters[i].startIdx];
+                else                         return [levels.slice(chapters[i].startIdx), chapters[i].startIdx];
             }
         }
         return [];

@@ -203,7 +203,7 @@ class LevelSelectGrid extends mag.Rect {
 
         // Layout measurement
         const levels = Resource.levelsForChapter(chapterName);
-        const NUM_CELLS = levels.length; // total number of cells to fit on the grid
+        const NUM_CELLS = levels[0].length; // total number of cells to fit on the grid
         const CELL_SIZE = this.gridSizeForLevelCount(NUM_CELLS); // width and height of each cell square, in pixels
         const SCREEN_WIDTH = GLOBAL_DEFAULT_SCREENSIZE.width; // the width of the screen to work with
         const PADDING = 20; // padding between cells
@@ -217,7 +217,7 @@ class LevelSelectGrid extends mag.Rect {
         console.log(SCREEN_WIDTH - GRID_MARGIN*2, CELL_SIZE + PADDING, NUM_CELLS, NUM_COLS, NUM_ROWS);
 
         const genClickCallback = (level_idx) => {
-            return () => onselect(levels[level_idx]);
+            return () => onselect(levels[0][level_idx], levels[1] + level_idx);
         };
 
         const leftmost = GRID_LEFTPAD + GRID_MARGIN;
@@ -235,7 +235,7 @@ class LevelSelectGrid extends mag.Rect {
                                          r === 0 ? 'LightGreen' : 'Gold', 'white', r === 0 ? 'Green' : 'Teal', r === 0 ? 'DarkGreen' : 'DarkMagenta');
                 cell.onDownColor = r === 0 ? 'YellowGreen' : 'Orange' ;
                 cell.anchor = { x:0.5, y:0.5 };
-                if (i > 5) cell.lock();
+                //if (i > 5) cell.lock();
                 this.addChild(cell);
 
                 // Animate cell into position.
@@ -275,9 +275,9 @@ class PlanetCard extends mag.Circle {
 }
 
 class ChapterSelectMenu extends mag.Stage {
-    constructor(canvas, onChapterSelect, onLevelSelect) {
+    constructor(canvas, onLevelSelect) {
         super(canvas);
-        this.showChapters(onChapterSelect, onLevelSelect);
+        this.showChapters(onLevelSelect);
     }
 
     getPlanetPos() {
@@ -327,7 +327,7 @@ class ChapterSelectMenu extends mag.Stage {
         this.add(btn_back);
     }
 
-    showChapters(onselect, onLevelSelect) {
+    showChapters(onLevelSelect) {
 
         // For now, hardcore positions and radii per chapter:
         // TODO: Move to .json specs.

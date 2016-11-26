@@ -86,7 +86,8 @@ var Level = function () {
             // UI Buttons
             var ui_padding = 10;
             var btn_back = new mag.Button(canvas_screen.w - 64 * 3 - ui_padding, ui_padding, 64, 64, { default: 'btn-back-default', hover: 'btn-back-hover', down: 'btn-back-down' }, function () {
-                prev(); // go back to previous level; see index.html.
+                returnToMenu();
+                //prev(); // go back to previous level; see index.html.
             });
             var btn_reset = new mag.Button(btn_back.pos.x + btn_back.size.w, btn_back.pos.y, 64, 64, { default: 'btn-reset-default', hover: 'btn-reset-hover', down: 'btn-reset-down' }, function () {
                 initBoard(); // reset board state; see index.html.
@@ -94,8 +95,9 @@ var Level = function () {
             var btn_next = new mag.Button(btn_reset.pos.x + btn_reset.size.w, ui_padding, 64, 64, { default: 'btn-next-default', hover: 'btn-next-hover', down: 'btn-next-down' }, function () {
                 next(); // go back to previous level; see index.html.
             });
+            btn_back.pos = btn_reset.pos;
             btn_reset.pos = btn_next.pos;
-            //stage.add(btn_back);
+            stage.add(btn_back);
             stage.add(btn_reset);
             //stage.add(btn_next);
 
@@ -206,6 +208,31 @@ var Level = function () {
                 }
                 return false;
             }.bind(stage);
+
+            // Default animation on expression creation:
+            stage.expressionNodes().forEach(function (n) {
+                n.scale = { x: 0.5, y: 0.5 };
+                n.anchor = { x: 0.5, y: 0.5 };
+                Animate.tween(n, { scale: { x: 1, y: 1 } }, 500, function (elapsed) {
+                    return Math.pow(elapsed, 0.3);
+                });
+            });
+            stage.goalNodes.forEach(function (n) {
+                n.pos = addPos(n.pos, { x: n.size.w / 2.0, y: n.size.h / 2.0 });
+                n.anchor = { x: 0.5, y: 0.5 };
+                n.scale = { x: 0.5, y: 0.5 };
+                Animate.tween(n, { scale: { x: 1, y: 1 } }, 500, function (elapsed) {
+                    return Math.pow(elapsed, 0.3);
+                });
+            });
+            stage.toolboxNodes().forEach(function (n, i) {
+                var final_pos = n.pos;
+                n.pos = addPos(n.pos, { x: 400, y: 0 });
+                n.scale = { x: 0.8, y: 0.8 };
+                Animate.tween(n, { pos: final_pos, scale: { x: 1, y: 1 } }, 500 + i * 100, function (elapsed) {
+                    return Math.pow(elapsed, 0.3);
+                });
+            });
 
             return stage;
         }

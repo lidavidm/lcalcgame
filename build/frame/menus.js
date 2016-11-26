@@ -306,7 +306,7 @@ var LevelSelectGrid = function (_mag$Rect2) {
 
             // Layout measurement
             var levels = Resource.levelsForChapter(chapterName);
-            var NUM_CELLS = levels.length; // total number of cells to fit on the grid
+            var NUM_CELLS = levels[0].length; // total number of cells to fit on the grid
             var CELL_SIZE = this.gridSizeForLevelCount(NUM_CELLS); // width and height of each cell square, in pixels
             var SCREEN_WIDTH = GLOBAL_DEFAULT_SCREENSIZE.width; // the width of the screen to work with
             var PADDING = 20; // padding between cells
@@ -321,7 +321,7 @@ var LevelSelectGrid = function (_mag$Rect2) {
 
             var genClickCallback = function genClickCallback(level_idx) {
                 return function () {
-                    return onselect(levels[level_idx]);
+                    return onselect(levels[0][level_idx], levels[1] + level_idx);
                 };
             };
 
@@ -339,7 +339,7 @@ var LevelSelectGrid = function (_mag$Rect2) {
                     var cell = new LevelCell(x + CELL_SIZE / 2.0, y + CELL_SIZE / 2.0, CELL_SIZE, CELL_SIZE, i.toString(), genClickCallback(i), r === 0 ? 'LightGreen' : 'Gold', 'white', r === 0 ? 'Green' : 'Teal', r === 0 ? 'DarkGreen' : 'DarkMagenta');
                     cell.onDownColor = r === 0 ? 'YellowGreen' : 'Orange';
                     cell.anchor = { x: 0.5, y: 0.5 };
-                    if (i > 5) cell.lock();
+                    //if (i > 5) cell.lock();
                     _this8.addChild(cell);
 
                     // Animate cell into position.
@@ -402,12 +402,12 @@ var PlanetCard = function (_mag$Circle) {
 var ChapterSelectMenu = function (_mag$Stage2) {
     _inherits(ChapterSelectMenu, _mag$Stage2);
 
-    function ChapterSelectMenu(canvas, onChapterSelect, onLevelSelect) {
+    function ChapterSelectMenu(canvas, onLevelSelect) {
         _classCallCheck(this, ChapterSelectMenu);
 
         var _this10 = _possibleConstructorReturn(this, (ChapterSelectMenu.__proto__ || Object.getPrototypeOf(ChapterSelectMenu)).call(this, canvas));
 
-        _this10.showChapters(onChapterSelect, onLevelSelect);
+        _this10.showChapters(onLevelSelect);
         return _this10;
     }
 
@@ -458,7 +458,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
         }
     }, {
         key: 'showChapters',
-        value: function showChapters(onselect, onLevelSelect) {
+        value: function showChapters(onLevelSelect) {
             var _this12 = this;
 
             // For now, hardcore positions and radii per chapter:
