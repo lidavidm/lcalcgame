@@ -853,14 +853,12 @@ var AssignExpr = function (_Expression4) {
                     var result = this.value.performReduction();
                     if (result instanceof Promise) {
                         return result.then(function () {
-                            return new Promise(function (resolve, reject) {
-                                reject();
-                            });
+                            return Promise.reject("AssignExpr: RHS cannot reduce");
                         });
                     }
-                    return result;
+                    return Promise.reject("AssignExpr: RHS cannot reduce");
                 }
-                return null;
+                return Promise.reject("AssignExpr: incomplete");
             }
 
             if (!animated) {

@@ -671,14 +671,12 @@ class AssignExpr extends Expression {
                 let result = this.value.performReduction();
                 if (result instanceof Promise) {
                     return result.then(() => {
-                        return new Promise((resolve, reject) => {
-                            reject();
-                        });
+                        return Promise.reject("AssignExpr: RHS cannot reduce");
                     });
                 }
-                return result;
+                return Promise.reject("AssignExpr: RHS cannot reduce");
             }
-            return null;
+            return Promise.reject("AssignExpr: incomplete");
         }
 
         if (!animated) {
