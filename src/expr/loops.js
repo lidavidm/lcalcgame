@@ -19,10 +19,15 @@ class RepeatLoopExpr extends Expression {
     }
 
     get size() {
+        if (this._animating) return this._cachedSize;
         let subSize = this.timesExpr.size;
+        let subHeight = Math.max(this.timesExpr.size.h, this.bodyExpr.size.h);
+        let w = subSize.w * 2.25;
+        let h = subHeight * 1.5;
+        if (w < h) w = h;
         return {
-            w: subSize.w * 2.25,
-            h: subSize.h * 1.5,
+            w: w,
+            h: h,
         };
     }
 
@@ -31,15 +36,20 @@ class RepeatLoopExpr extends Expression {
         let centerX = this.size.w / 2;
         let centerY = this.size.h / 2;
         let innerR = 0.1 * this.size.h / 2;
+        let outerR = 0.9 * this.size.h / 2;
         if (this.timesExpr) {
             this.timesExpr.pos = {
-                x: centerX - this.timesExpr.size.w * this.timesExpr.scale.x - innerR,
+                x: centerX - outerR - this.timesExpr.size.w / 3,
                 y: centerY,
             };
         }
         if (this.bodyExpr) {
+            this.bodyExpr.stroke = {
+                color: "#999",
+                width: 2,
+            };
             this.bodyExpr.pos = {
-                x: centerX + innerR,
+                x: centerX + outerR - Math.min(25, this.bodyExpr.size.w / 2),
                 y: centerY,
             };
         }
@@ -55,7 +65,7 @@ class RepeatLoopExpr extends Expression {
         ctx.lineWidth = 1.0;
         ctx.beginPath();
         if ((this.timesExpr && this.timesExpr.number && this.timesExpr.number > 0) || this.drawMarker) {
-            ctx.strokeStyle = 'blue';
+            ctx.strokeStyle = ctx.fillStyle = 'blue';
             // this.timesExpr.stroke = this.bodyExpr.stroke = {
             //     color: 'blue',
             //     width: 2,
@@ -64,7 +74,7 @@ class RepeatLoopExpr extends Expression {
         // else if (this.timesExpr && this.timesExpr.isValue()) {
         // }
         else {
-            ctx.strokeStyle = 'black';
+            ctx.strokeStyle = ctx.fillStyle = 'black';
         }
         ctx.arc(centerX, centerY, outerR, 0, Math.PI * 2);
         ctx.closePath();
@@ -73,16 +83,13 @@ class RepeatLoopExpr extends Expression {
         // draw the arrows
         let dy = Math.abs(this.timesExpr.absolutePos.y + this.timesExpr.absoluteSize.h / 2 - centerY);
         let lowerTipAngle = Math.PI - Math.asin(dy / outerR);
-        drawArrowOnArc(ctx, lowerTipAngle, -Math.PI / 8, centerX, centerY, outerR);
+        drawArrowOnArc(ctx, lowerTipAngle, -Math.PI / 10, centerX, centerY, outerR);
 
         dy = Math.abs(this.bodyExpr.absolutePos.y - this.bodyExpr.absoluteSize.h / 2 - centerY);
         let upperTipAngle = -Math.asin(dy / outerR);
-        drawArrowOnArc(ctx, upperTipAngle, -Math.PI / 8, centerX, centerY, outerR);
+        drawArrowOnArc(ctx, upperTipAngle, -Math.PI / 10, centerX, centerY, outerR);
 
         if (this.drawMarker) {
-            ctx.strokeStyle = 'blue';
-            ctx.fillStyle = 'blue';
-
             ctx.beginPath();
             let dy = Math.abs(this.timesExpr.absolutePos.y - this.timesExpr.absoluteSize.h / 2 - centerY);
             let startAngle = Math.asin(dy / outerR) - Math.PI;
@@ -114,6 +121,7 @@ class RepeatLoopExpr extends Expression {
     }
 
     performReduction() {
+        this._cachedSize = this.size;
         this._animating = true;
 
         return this.performSubReduction(this.timesExpr).then((num) => {

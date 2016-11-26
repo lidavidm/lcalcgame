@@ -104,6 +104,15 @@
             "globals": {
                 "x": "(3)"
             }
+        },
+        {
+            "description": "Use sequence in repeat",
+            "board": "(repeat /(2) /(sequence _ _)) (assign /$y /(+ /$y /1)) (assign /$x /(+ /$x /1)) ($x) ($y)",
+            "goal": "(3) (4)",
+            "globals": {
+                "x": "(1)",
+                "y": "(2)"
+            }
         }
     ]
 }

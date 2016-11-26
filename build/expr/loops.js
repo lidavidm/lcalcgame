@@ -35,15 +35,20 @@ var RepeatLoopExpr = function (_Expression) {
             var centerX = this.size.w / 2;
             var centerY = this.size.h / 2;
             var innerR = 0.1 * this.size.h / 2;
+            var outerR = 0.9 * this.size.h / 2;
             if (this.timesExpr) {
                 this.timesExpr.pos = {
-                    x: centerX - this.timesExpr.size.w * this.timesExpr.scale.x - innerR,
+                    x: centerX - outerR - this.timesExpr.size.w / 3,
                     y: centerY
                 };
             }
             if (this.bodyExpr) {
+                this.bodyExpr.stroke = {
+                    color: "#999",
+                    width: 2
+                };
                 this.bodyExpr.pos = {
-                    x: centerX + innerR,
+                    x: centerX + outerR - Math.min(25, this.bodyExpr.size.w / 2),
                     y: centerY
                 };
             }
@@ -60,7 +65,7 @@ var RepeatLoopExpr = function (_Expression) {
             ctx.lineWidth = 1.0;
             ctx.beginPath();
             if (this.timesExpr && this.timesExpr.number && this.timesExpr.number > 0 || this.drawMarker) {
-                ctx.strokeStyle = 'blue';
+                ctx.strokeStyle = ctx.fillStyle = 'blue';
                 // this.timesExpr.stroke = this.bodyExpr.stroke = {
                 //     color: 'blue',
                 //     width: 2,
@@ -69,7 +74,7 @@ var RepeatLoopExpr = function (_Expression) {
             // else if (this.timesExpr && this.timesExpr.isValue()) {
             // }
             else {
-                    ctx.strokeStyle = 'black';
+                    ctx.strokeStyle = ctx.fillStyle = 'black';
                 }
             ctx.arc(centerX, centerY, outerR, 0, Math.PI * 2);
             ctx.closePath();
@@ -78,16 +83,13 @@ var RepeatLoopExpr = function (_Expression) {
             // draw the arrows
             var dy = Math.abs(this.timesExpr.absolutePos.y + this.timesExpr.absoluteSize.h / 2 - centerY);
             var lowerTipAngle = Math.PI - Math.asin(dy / outerR);
-            drawArrowOnArc(ctx, lowerTipAngle, -Math.PI / 8, centerX, centerY, outerR);
+            drawArrowOnArc(ctx, lowerTipAngle, -Math.PI / 10, centerX, centerY, outerR);
 
             dy = Math.abs(this.bodyExpr.absolutePos.y - this.bodyExpr.absoluteSize.h / 2 - centerY);
             var upperTipAngle = -Math.asin(dy / outerR);
-            drawArrowOnArc(ctx, upperTipAngle, -Math.PI / 8, centerX, centerY, outerR);
+            drawArrowOnArc(ctx, upperTipAngle, -Math.PI / 10, centerX, centerY, outerR);
 
             if (this.drawMarker) {
-                ctx.strokeStyle = 'blue';
-                ctx.fillStyle = 'blue';
-
                 ctx.beginPath();
                 var _dy = Math.abs(this.timesExpr.absolutePos.y - this.timesExpr.absoluteSize.h / 2 - centerY);
                 var startAngle = Math.asin(_dy / outerR) - Math.PI;
@@ -123,6 +125,7 @@ var RepeatLoopExpr = function (_Expression) {
         value: function performReduction() {
             var _this3 = this;
 
+            this._cachedSize = this.size;
             this._animating = true;
 
             return this.performSubReduction(this.timesExpr).then(function (num) {
@@ -178,10 +181,15 @@ var RepeatLoopExpr = function (_Expression) {
     }, {
         key: 'size',
         get: function get() {
+            if (this._animating) return this._cachedSize;
             var subSize = this.timesExpr.size;
+            var subHeight = Math.max(this.timesExpr.size.h, this.bodyExpr.size.h);
+            var w = subSize.w * 2.25;
+            var h = subHeight * 1.5;
+            if (w < h) w = h;
             return {
-                w: subSize.w * 2.25,
-                h: subSize.h * 1.5
+                w: w,
+                h: h
             };
         }
     }]);
