@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -29,14 +29,18 @@ var RepeatLoopExpr = function (_Expression) {
     // }
 
     _createClass(RepeatLoopExpr, [{
-        key: 'update',
+        key: "update",
         value: function update() {
-            _get(RepeatLoopExpr.prototype.__proto__ || Object.getPrototypeOf(RepeatLoopExpr.prototype), 'update', this).call(this);
+            _get(RepeatLoopExpr.prototype.__proto__ || Object.getPrototypeOf(RepeatLoopExpr.prototype), "update", this).call(this);
             var centerX = this.size.w / 2;
             var centerY = this.size.h / 2;
             var innerR = 0.1 * this.size.h / 2;
             var outerR = 0.9 * this.size.h / 2;
             if (this.timesExpr) {
+                this.timesExpr.stroke = {
+                    color: "#999",
+                    width: 2
+                };
                 this.timesExpr.pos = {
                     x: centerX - outerR - this.timesExpr.size.w / 3,
                     y: centerY
@@ -54,9 +58,9 @@ var RepeatLoopExpr = function (_Expression) {
             }
         }
     }, {
-        key: 'drawInternal',
+        key: "drawInternal",
         value: function drawInternal(ctx, pos, boundingSize) {
-            _get(RepeatLoopExpr.prototype.__proto__ || Object.getPrototypeOf(RepeatLoopExpr.prototype), 'drawInternal', this).call(this, ctx, pos, boundingSize);
+            _get(RepeatLoopExpr.prototype.__proto__ || Object.getPrototypeOf(RepeatLoopExpr.prototype), "drawInternal", this).call(this, ctx, pos, boundingSize);
 
             var centerX = pos.x + boundingSize.w / 2;
             var centerY = pos.y + boundingSize.h / 2;
@@ -66,10 +70,6 @@ var RepeatLoopExpr = function (_Expression) {
             ctx.beginPath();
             if (this.timesExpr && this.timesExpr.number && this.timesExpr.number > 0 || this.drawMarker) {
                 ctx.strokeStyle = ctx.fillStyle = 'blue';
-                // this.timesExpr.stroke = this.bodyExpr.stroke = {
-                //     color: 'blue',
-                //     width: 2,
-                // };
             }
             // else if (this.timesExpr && this.timesExpr.isValue()) {
             // }
@@ -102,7 +102,7 @@ var RepeatLoopExpr = function (_Expression) {
             }
         }
     }, {
-        key: 'animateNumber',
+        key: "animateNumber",
         value: function animateNumber() {
             var _this2 = this;
 
@@ -121,7 +121,7 @@ var RepeatLoopExpr = function (_Expression) {
             });
         }
     }, {
-        key: 'performReduction',
+        key: "performReduction",
         value: function performReduction() {
             var _this3 = this;
 
@@ -162,24 +162,24 @@ var RepeatLoopExpr = function (_Expression) {
             });
         }
     }, {
-        key: 'onmouseclick',
+        key: "onmouseclick",
         value: function onmouseclick() {
             if (!this._animating) {
                 this.performReduction();
             }
         }
     }, {
-        key: 'timesExpr',
+        key: "timesExpr",
         get: function get() {
             return this.holes[0];
         }
     }, {
-        key: 'bodyExpr',
+        key: "bodyExpr",
         get: function get() {
             return this.holes[1];
         }
     }, {
-        key: 'size',
+        key: "size",
         get: function get() {
             if (this._animating) return this._cachedSize;
             var subSize = this.timesExpr.size;

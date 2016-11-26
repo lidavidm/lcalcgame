@@ -38,6 +38,10 @@ class RepeatLoopExpr extends Expression {
         let innerR = 0.1 * this.size.h / 2;
         let outerR = 0.9 * this.size.h / 2;
         if (this.timesExpr) {
+            this.timesExpr.stroke = {
+                color: "#999",
+                width: 2,
+            };
             this.timesExpr.pos = {
                 x: centerX - outerR - this.timesExpr.size.w / 3,
                 y: centerY,
@@ -66,10 +70,6 @@ class RepeatLoopExpr extends Expression {
         ctx.beginPath();
         if ((this.timesExpr && this.timesExpr.number && this.timesExpr.number > 0) || this.drawMarker) {
             ctx.strokeStyle = ctx.fillStyle = 'blue';
-            // this.timesExpr.stroke = this.bodyExpr.stroke = {
-            //     color: 'blue',
-            //     width: 2,
-            // };
         }
         // else if (this.timesExpr && this.timesExpr.isValue()) {
         // }
