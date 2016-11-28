@@ -891,7 +891,7 @@ class InlineEnvironmentDisplay extends Expression {
     }
 
     get pos() {
-        return { x: 0, y: this.lambda.size.h - 10 };
+        return { x: 5, y: this.lambda.size.h - 5 };
     }
 
     set pos(p) {

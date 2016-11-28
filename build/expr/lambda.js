@@ -1247,7 +1247,7 @@ var InlineEnvironmentDisplay = function (_Expression2) {
     }, {
         key: 'pos',
         get: function get() {
-            return { x: 0, y: this.lambda.size.h - 10 };
+            return { x: 5, y: this.lambda.size.h - 5 };
         },
         set: function set(p) {
             this._pos = p;
