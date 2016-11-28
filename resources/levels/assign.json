@@ -70,7 +70,7 @@
         {
             "description": "Assignment order still matters.",
             "board": "(assign /$x /$y) (assign /$y /star) ($_x) ($_y)",
-            "goal": "(star) (star)",
+            "goal": "(star) (triangle)",
             "globals": {
                 "x": "(diamond)",
                 "y": "(triangle)"
@@ -88,7 +88,7 @@
         },
         {
             "description": "Equality with a variable",
-            "board": "(== /$x (diamond))",
+            "board": "(== /$x /(diamond))",
             "goal": "(true)",
             "globals": {
                 "x": "(diamond)"
