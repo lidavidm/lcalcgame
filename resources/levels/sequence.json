@@ -35,6 +35,12 @@
             "goal": "(3)"
         },
         {
+            "description": "Introduce zero",
+            "board": "(+ /1 _)",
+            "toolbox": "(0)",
+            "goal": "(1)"
+        },
+        {
             "description": "Variable in reduction",
             "board": "(+ /($y) _)",
             "goal": "(4)",
