@@ -27,6 +27,11 @@ var MissingExpression = function (_Expression) {
     }
 
     _createClass(MissingExpression, [{
+        key: 'isComplete',
+        value: function isComplete() {
+            return false;
+        }
+    }, {
         key: 'getClass',
         value: function getClass() {
             return MissingExpression;

@@ -125,6 +125,11 @@ var RepeatLoopExpr = function (_Expression) {
         value: function performReduction() {
             var _this3 = this;
 
+            if (!this.bodyExpr.isComplete()) {
+                Animate.blink(this.bodyExpr, 300, [1.0, 0.0, 0.0]);
+                return Promise.reject("RepeatLoopExpr: missing body!");
+            }
+
             this._cachedSize = this.size;
             this._animating = true;
 

@@ -17,6 +17,7 @@ class MissingExpression extends Expression {
         this._size = { w:expr_to_miss.size.w, h:expr_to_miss.size.h };
         this.ghost = expr_to_miss;
     }
+    isComplete() { return false; }
     getClass() { return MissingExpression; }
     onmousedrag(pos) { } // disable drag
     ondropenter(node, pos) {

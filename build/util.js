@@ -582,6 +582,9 @@ function reduceExprs(exprList) {
     var delay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 300;
 
     var exprs = exprList.slice();
+    exprs.forEach(function (expr) {
+        return expr.lock();
+    });
     var reduced = [];
     return new Promise(function (resolve, reject) {
         var nextStep = function nextStep() {
@@ -593,6 +596,7 @@ function reduceExprs(exprList) {
                     var result = expr.performReduction();
                     var delay = function delay(newExpr) {
                         reduced.push(newExpr);
+                        if (newExpr instanceof Expression) newExpr.lock();
                         window.setTimeout(function () {
                             nextStep();
                         }, delay);

@@ -570,6 +570,7 @@ function drawBag(ctx, x, y, w, h, bagRadius, fill, stroke) {
 
 function reduceExprs(exprList, delay=300) {
     let exprs = exprList.slice();
+    exprs.forEach((expr) => expr.lock());
     let reduced = [];
     return new Promise((resolve, reject) => {
         let nextStep = () => {
@@ -581,6 +582,7 @@ function reduceExprs(exprList, delay=300) {
                 let result = expr.performReduction();
                 let delay = (newExpr) => {
                     reduced.push(newExpr);
+                    if (newExpr instanceof Expression) newExpr.lock();
                     window.setTimeout(() => {
                         nextStep();
                     }, delay);

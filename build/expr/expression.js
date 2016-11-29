@@ -306,7 +306,7 @@ var Expression = function (_mag$RoundedRect) {
                 var result = expr.performReduction(animated);
                 if (result instanceof Promise) {
                     result.then(function (result) {
-                        if (expr.locked) result.lock();
+                        if (result instanceof Expression) result.lock();
 
                         window.setTimeout(function () {
                             resolve(result);
@@ -318,6 +318,7 @@ var Expression = function (_mag$RoundedRect) {
                         result = expr;
                         delay = 0;
                     }
+                    if (result instanceof Expression) result.lock();
                     window.setTimeout(function () {
                         resolve(result);
                     }, delay);
