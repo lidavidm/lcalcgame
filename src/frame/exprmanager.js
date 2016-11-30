@@ -44,7 +44,7 @@ var ExprManager = (function() {
         'reference': [77, 79, 95],
         'reference_display': [79, 95],
         'lambda_abstraction': [97],
-        'assign': [77, 93],
+        'assign': [77, 95],
         'hole'  : [[9, 30], 30, 42],
         'if'    : [26, 45],
         '_b'    : [34],
