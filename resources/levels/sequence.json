@@ -118,6 +118,24 @@
                 "x": "(1)",
                 "y": "(2)"
             }
+        },
+        {
+            "description": "Use sequence in repeat with dependencies",
+            "board": "(repeat /(3) /(sequence _ _)) (assign /$y /(+ /$y /$x)) (assign /$x /(+ /$x /1)) ($y)",
+            "goal": "(6)",
+            "globals": {
+                "x": "(0)",
+                "y": "(0)"
+            }
+        },
+        {
+            "description": "Put together the loop",
+            "board": "(repeat _ _) (assign /$x /(+ /$x /1)) ($x) ($y)",
+            "goal": "(5)",
+            "globals": {
+                "x": "(2)",
+                "y": "(3)"
+            }
         }
     ]
 }
