@@ -863,11 +863,9 @@ class InlineEnvironmentDisplay extends Expression {
             let display = this.displays[name];
             if (!display) {
                 display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression(new Expression()));
-                this.addArg(display);
                 this.displays[name] = display;
             }
             display.ignoreEvents = true;
-            let oldExpr = display.getExpr();
             if (expr) {
                 display.setExpr(expr);
             }
@@ -879,6 +877,8 @@ class InlineEnvironmentDisplay extends Expression {
         for (let name of env.names()) {
             updateBinding(name, env.lookup(name));
         }
+
+        this.holes = Object.keys(this.displays).map((name) => this.displays[name]);
 
         super.update();
     }

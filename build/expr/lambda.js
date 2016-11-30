@@ -1143,11 +1143,9 @@ var InlineEnvironmentDisplay = function (_Expression2) {
                 var display = _this18.displays[name];
                 if (!display) {
                     display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression(new Expression()));
-                    _this18.addArg(display);
                     _this18.displays[name] = display;
                 }
                 display.ignoreEvents = true;
-                var oldExpr = display.getExpr();
                 if (expr) {
                     display.setExpr(expr);
                 }
@@ -1202,6 +1200,10 @@ var InlineEnvironmentDisplay = function (_Expression2) {
                     }
                 }
             }
+
+            this.holes = Object.keys(this.displays).map(function (name) {
+                return _this18.displays[name];
+            });
 
             _get(InlineEnvironmentDisplay.prototype.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay.prototype), 'update', this).call(this);
         }
