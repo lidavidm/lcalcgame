@@ -22,19 +22,47 @@ class Sequence extends Expression {
         }
 
         this._animating = true;
-        return reduceExprs(this.holes).then(() => {
-            Animate.poof(this);
-            (this.parent || this.stage).swap(this, null);
-            return null;
-        }, () => {
-            // Something went wrong
-            this._animating = false;
-            while (this.holes.length > 0 && this.holes[0] instanceof MissingExpression) {
-                this.holes.shift();
-            }
-            this.update();
 
-            Animate.blink(this, 1000, [1.0, 0.0, 0.0]);
+        this.holes.forEach((expr) => expr.lock());
+        let reduced = [];
+        return new Promise((resolve, reject) => {
+            let nextStep = () => {
+                if (this.holes.length === 0) {
+                    Animate.poof(this);
+                    (this.parent || this.stage).swap(this, null);
+                    resolve(null);
+                }
+                else {
+                    let expr = this.holes[0];
+                    let result = expr.performReduction();
+                    let delay = (newExpr) => {
+                        this.holes.shift();
+                        this.update();
+                        reduced.push(newExpr);
+                        if (newExpr instanceof Expression) newExpr.lock();
+                        window.setTimeout(() => {
+                            nextStep();
+                        }, delay);
+                    };
+                    if (result instanceof Promise) {
+                        result.then(delay, () => {
+                            // Uh-oh, an error happened
+                            this._animating = false;
+                            while (this.holes.length > 0 && this.holes[0] instanceof MissingExpression) {
+                                this.holes.shift();
+                            }
+                            this.update();
+
+                            Animate.blink(this, 1000, [1.0, 0.0, 0.0]);
+                            reject();
+                        });
+                    }
+                    else {
+                        delay(result || expr);
+                    }
+                }
+            };
+            nextStep();
         });
     }
 

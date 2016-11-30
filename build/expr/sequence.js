@@ -69,19 +69,49 @@ var Sequence = function (_Expression) {
             }
 
             this._animating = true;
-            return reduceExprs(this.holes).then(function () {
-                Animate.poof(_this2);
-                (_this2.parent || _this2.stage).swap(_this2, null);
-                return null;
-            }, function () {
-                // Something went wrong
-                _this2._animating = false;
-                while (_this2.holes.length > 0 && _this2.holes[0] instanceof MissingExpression) {
-                    _this2.holes.shift();
-                }
-                _this2.update();
 
-                Animate.blink(_this2, 1000, [1.0, 0.0, 0.0]);
+            this.holes.forEach(function (expr) {
+                return expr.lock();
+            });
+            var reduced = [];
+            return new Promise(function (resolve, reject) {
+                var nextStep = function nextStep() {
+                    if (_this2.holes.length === 0) {
+                        Animate.poof(_this2);
+                        (_this2.parent || _this2.stage).swap(_this2, null);
+                        resolve(null);
+                    } else {
+                        (function () {
+                            var expr = _this2.holes[0];
+                            var result = expr.performReduction();
+                            var delay = function delay(newExpr) {
+                                _this2.holes.shift();
+                                _this2.update();
+                                reduced.push(newExpr);
+                                if (newExpr instanceof Expression) newExpr.lock();
+                                window.setTimeout(function () {
+                                    nextStep();
+                                }, delay);
+                            };
+                            if (result instanceof Promise) {
+                                result.then(delay, function () {
+                                    // Uh-oh, an error happened
+                                    _this2._animating = false;
+                                    while (_this2.holes.length > 0 && _this2.holes[0] instanceof MissingExpression) {
+                                        _this2.holes.shift();
+                                    }
+                                    _this2.update();
+
+                                    Animate.blink(_this2, 1000, [1.0, 0.0, 0.0]);
+                                    reject();
+                                });
+                            } else {
+                                delay(result || expr);
+                            }
+                        })();
+                    }
+                };
+                nextStep();
             });
         }
     }, {
