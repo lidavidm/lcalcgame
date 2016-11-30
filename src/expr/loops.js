@@ -5,6 +5,7 @@ class RepeatLoopExpr extends Expression {
         super([times, body]);
         this.markerAngle = 0;
         this.drawMarker = false;
+        this.color = "orange";
     }
 
     // draw(ctx) {
@@ -68,14 +69,7 @@ class RepeatLoopExpr extends Expression {
 
         ctx.lineWidth = 1.0;
         ctx.beginPath();
-        if ((this.timesExpr && this.timesExpr.number && this.timesExpr.number > 0) || this.drawMarker) {
-            ctx.strokeStyle = ctx.fillStyle = 'blue';
-        }
-        // else if (this.timesExpr && this.timesExpr.isValue()) {
-        // }
-        else {
-            ctx.strokeStyle = ctx.fillStyle = 'black';
-        }
+        ctx.strokeStyle = ctx.fillStyle = 'black';
         ctx.arc(centerX, centerY, outerR, 0, Math.PI * 2);
         ctx.closePath();
         ctx.stroke();

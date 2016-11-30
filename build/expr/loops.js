@@ -22,6 +22,7 @@ var RepeatLoopExpr = function (_Expression) {
 
         _this.markerAngle = 0;
         _this.drawMarker = false;
+        _this.color = "orange";
         return _this;
     }
 
@@ -68,14 +69,7 @@ var RepeatLoopExpr = function (_Expression) {
 
             ctx.lineWidth = 1.0;
             ctx.beginPath();
-            if (this.timesExpr && this.timesExpr.number && this.timesExpr.number > 0 || this.drawMarker) {
-                ctx.strokeStyle = ctx.fillStyle = 'blue';
-            }
-            // else if (this.timesExpr && this.timesExpr.isValue()) {
-            // }
-            else {
-                    ctx.strokeStyle = ctx.fillStyle = 'black';
-                }
+            ctx.strokeStyle = ctx.fillStyle = 'black';
             ctx.arc(centerX, centerY, outerR, 0, Math.PI * 2);
             ctx.closePath();
             ctx.stroke();
