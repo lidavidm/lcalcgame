@@ -13,6 +13,15 @@ class Sequence extends Expression {
         return true;
     }
 
+    update() {
+        for (let expr of this.holes) {
+            if (expr instanceof MissingExpression) {
+                expr._size = { w: Math.max(100, this.size.w - 20), h: expr.size.h };
+            }
+        }
+        super.update();
+    }
+
     performReduction() {
         if (!this.canReduce()) {
             mag.Stage.getNodesWithClass(MissingExpression, [], true, [this]).forEach((node) => {
