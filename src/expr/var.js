@@ -572,6 +572,10 @@ class AssignExpr extends Expression {
         return this.holes[2] instanceof MissingExpression ? null : this.holes[2];
     }
 
+    set value(expr) {
+        this.holes[2] = expr;
+    }
+
     canReduce() {
         return this.value && this.variable && (this.value.canReduce() || this.value.isValue()) && this.variable instanceof VarExpr;
     }
@@ -690,19 +694,10 @@ class AssignExpr extends Expression {
 
         this._animating = true;
 
-        return this.performSubReduction(this.value, true).then(() => {
-            if (this.value == null) {
-                // Uhoh, we got a null - likely from a conditional
-                // TODO: what behavior do we actually want?
-                return new Promise((resolve, reject) => {
-                    Animate.blink(this, 1000, [1,0,0]).after(() => {
-                        reject();
-                    });
-                });
-            }
-            else {
-                return this.animateReduction();
-            }
+        return this.performSubReduction(this.value, true).then((value) => {
+            this.value = value;
+            this.update();
+            return this.animateReduction();
         });
     }
 

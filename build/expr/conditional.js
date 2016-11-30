@@ -106,11 +106,10 @@ var IfStatement = function (_Expression) {
                             var rtn = _get(IfStatement.prototype.__proto__ || Object.getPrototypeOf(IfStatement.prototype), 'performReduction', _this2).call(_this2);
                             stage.update();
                             stage.draw();
-                            if (reduction instanceof FadedNullExpr) {
-                                resolve(null);
-                            } else {
-                                resolve(rtn);
+                            if (rtn === null) {
+                                rtn = new FadedNullExpr();
                             }
+                            resolve(rtn);
                             return rtn;
                         };
 

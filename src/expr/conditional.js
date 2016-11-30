@@ -92,12 +92,10 @@ class IfStatement extends Expression {
                     let rtn = super.performReduction();
                     stage.update();
                     stage.draw();
-                    if (reduction instanceof FadedNullExpr) {
-                        resolve(null);
+                    if (rtn === null) {
+                        rtn = new FadedNullExpr();
                     }
-                    else {
-                        resolve(rtn);
-                    }
+                    resolve(rtn);
                     return rtn;
                 };
 
