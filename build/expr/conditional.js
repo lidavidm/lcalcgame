@@ -90,6 +90,11 @@ var IfStatement = function (_Expression) {
                 });
             }
 
+            if (this.branch && !this.branch.isValue()) {
+                this.branch.performReduction();
+                return Promise.reject("IfExpr: branch is not a value and not reducible");
+            }
+
             return new Promise(function (resolve, reject) {
                 var reduction = _this2.reduce();
                 if (reduction != _this2) {

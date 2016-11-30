@@ -77,6 +77,11 @@ class IfStatement extends Expression {
             });
         }
 
+        if (this.branch && (!this.branch.isValue())) {
+            this.branch.performReduction();
+            return Promise.reject("IfExpr: branch is not a value and not reducible");
+        }
+
         return new Promise((resolve, reject) => {
             var reduction = this.reduce();
             if (reduction != this) {
