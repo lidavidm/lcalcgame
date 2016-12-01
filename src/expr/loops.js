@@ -4,12 +4,8 @@ class RepeatLoopExpr extends Expression {
     constructor(times, body) {
         super([times, body]);
         this.markerAngle = 0;
-        this.drawMarker = false;
         this.color = "orange";
     }
-
-    // draw(ctx) {
-    // }
 
     get timesExpr() {
         return this.holes[0];
@@ -82,36 +78,6 @@ class RepeatLoopExpr extends Expression {
         dy = Math.abs(this.bodyExpr.absolutePos.y - this.bodyExpr.absoluteSize.h / 2 - centerY);
         let upperTipAngle = -Math.asin(dy / outerR);
         drawArrowOnArc(ctx, upperTipAngle, -Math.PI / 10, centerX, centerY, outerR);
-
-        if (this.drawMarker) {
-            ctx.beginPath();
-            let dy = Math.abs(this.timesExpr.absolutePos.y - this.timesExpr.absoluteSize.h / 2 - centerY);
-            let startAngle = Math.asin(dy / outerR) - Math.PI;
-            dy = Math.abs(this.bodyExpr.absolutePos.y - this.bodyExpr.absoluteSize.h / 2 - centerY);
-            let endAngle = -Math.asin(dy / outerR);
-            let markerAngle = startAngle + this.markerAngle * (endAngle - startAngle);
-            ctx.arc(centerX + outerR * Math.cos(markerAngle),
-                    centerY + outerR * Math.sin(markerAngle),
-                    0.1 * outerR, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.fill();
-        }
-    }
-
-    animateNumber() {
-        return new Promise((resolve, reject) => {
-            this.drawMarker = true;
-            this.markerAngle = 0.0;
-            this.swap(this.timesExpr, new NumberExpr(this.timesExpr.number - 1));
-            this.timesExpr.lock();
-
-            Animate.tween(this, {
-                markerAngle: 1.0,
-            }, 500).after(() => {
-                this.drawMarker = false;
-                resolve();
-            });
-        });
     }
 
     performReduction() {
@@ -128,34 +94,22 @@ class RepeatLoopExpr extends Expression {
                 this._animating = false;
                 return Promise.reject("RepeatLoopExpr incomplete!");
             }
-            let body = this.bodyExpr.clone();
 
-            let nextStep = () => {
-                if (this.timesExpr.number > 0) {
-                    return this.animateNumber().then(() => {
-                        return this.performSubReduction(this.bodyExpr).then(() => {
-                            this.holes[1] = body.clone();
-                            this.holes[1].parent = this;
-                            this.holes[1].stage = this.stage;
-                            this.update();
+            if (num.number <= 0) {
+                Animate.poof(this);
+                (this.parent || this.stage).swap(this, null);
+                return null;
+            }
 
-                            return new Promise((resolve, reject) => {
-                                window.setTimeout(() => {
-                                    let r = nextStep();
-                                    if (r instanceof Promise) r.then(resolve, reject);
-                                    else resolve(r);
-                                }, 500);
-                            });
-                        });
-                    });
-                }
-                else {
-                    Animate.poof(this);
-                    (this.parent || this.stage).swap(this, null);
-                    return null;
-                }
-            };
-            return nextStep();
+            let exprs = [];
+            for (let i = 0; i < num.number; i++) {
+                exprs.push(this.bodyExpr.clone());
+            }
+
+            let result = new Sequence(...exprs);
+            (this.parent || this.stage).swap(this, result);
+            result.update();
+            return result;
         });
     }
 

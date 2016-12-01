@@ -21,13 +21,9 @@ var RepeatLoopExpr = function (_Expression) {
         var _this = _possibleConstructorReturn(this, (RepeatLoopExpr.__proto__ || Object.getPrototypeOf(RepeatLoopExpr)).call(this, [times, body]));
 
         _this.markerAngle = 0;
-        _this.drawMarker = false;
         _this.color = "orange";
         return _this;
     }
-
-    // draw(ctx) {
-    // }
 
     _createClass(RepeatLoopExpr, [{
         key: "update",
@@ -82,42 +78,11 @@ var RepeatLoopExpr = function (_Expression) {
             dy = Math.abs(this.bodyExpr.absolutePos.y - this.bodyExpr.absoluteSize.h / 2 - centerY);
             var upperTipAngle = -Math.asin(dy / outerR);
             drawArrowOnArc(ctx, upperTipAngle, -Math.PI / 10, centerX, centerY, outerR);
-
-            if (this.drawMarker) {
-                ctx.beginPath();
-                var _dy = Math.abs(this.timesExpr.absolutePos.y - this.timesExpr.absoluteSize.h / 2 - centerY);
-                var startAngle = Math.asin(_dy / outerR) - Math.PI;
-                _dy = Math.abs(this.bodyExpr.absolutePos.y - this.bodyExpr.absoluteSize.h / 2 - centerY);
-                var endAngle = -Math.asin(_dy / outerR);
-                var markerAngle = startAngle + this.markerAngle * (endAngle - startAngle);
-                ctx.arc(centerX + outerR * Math.cos(markerAngle), centerY + outerR * Math.sin(markerAngle), 0.1 * outerR, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.fill();
-            }
-        }
-    }, {
-        key: "animateNumber",
-        value: function animateNumber() {
-            var _this2 = this;
-
-            return new Promise(function (resolve, reject) {
-                _this2.drawMarker = true;
-                _this2.markerAngle = 0.0;
-                _this2.swap(_this2.timesExpr, new NumberExpr(_this2.timesExpr.number - 1));
-                _this2.timesExpr.lock();
-
-                Animate.tween(_this2, {
-                    markerAngle: 1.0
-                }, 500).after(function () {
-                    _this2.drawMarker = false;
-                    resolve();
-                });
-            });
         }
     }, {
         key: "performReduction",
         value: function performReduction() {
-            var _this3 = this;
+            var _this2 = this;
 
             if (!this.bodyExpr.isComplete()) {
                 Animate.blink(this.bodyExpr, 300, [1.0, 0.0, 0.0]);
@@ -128,36 +93,26 @@ var RepeatLoopExpr = function (_Expression) {
             this._animating = true;
 
             return this.performSubReduction(this.timesExpr).then(function (num) {
-                if (!(num instanceof NumberExpr) || !_this3.bodyExpr || _this3.bodyExpr instanceof MissingExpression) {
-                    _this3._animating = false;
+                if (!(num instanceof NumberExpr) || !_this2.bodyExpr || _this2.bodyExpr instanceof MissingExpression) {
+                    _this2._animating = false;
                     return Promise.reject("RepeatLoopExpr incomplete!");
                 }
-                var body = _this3.bodyExpr.clone();
 
-                var nextStep = function nextStep() {
-                    if (_this3.timesExpr.number > 0) {
-                        return _this3.animateNumber().then(function () {
-                            return _this3.performSubReduction(_this3.bodyExpr).then(function () {
-                                _this3.holes[1] = body.clone();
-                                _this3.holes[1].parent = _this3;
-                                _this3.holes[1].stage = _this3.stage;
-                                _this3.update();
+                if (num.number <= 0) {
+                    Animate.poof(_this2);
+                    (_this2.parent || _this2.stage).swap(_this2, null);
+                    return null;
+                }
 
-                                return new Promise(function (resolve, reject) {
-                                    window.setTimeout(function () {
-                                        var r = nextStep();
-                                        if (r instanceof Promise) r.then(resolve, reject);else resolve(r);
-                                    }, 500);
-                                });
-                            });
-                        });
-                    } else {
-                        Animate.poof(_this3);
-                        (_this3.parent || _this3.stage).swap(_this3, null);
-                        return null;
-                    }
-                };
-                return nextStep();
+                var exprs = [];
+                for (var i = 0; i < num.number; i++) {
+                    exprs.push(_this2.bodyExpr.clone());
+                }
+
+                var result = new (Function.prototype.bind.apply(Sequence, [null].concat(exprs)))();
+                (_this2.parent || _this2.stage).swap(_this2, result);
+                result.update();
+                return result;
             });
         }
     }, {
