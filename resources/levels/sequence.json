@@ -10,6 +10,12 @@
         },
         {
             "description": "Bigger sequence",
+            "board": "(sequence /(assign /($x) /(triangle)) /(assign /($y) _) /(assign /($z) /(== /($x) /($y)))) ($z)",
+            "goal": "(false)",
+            "toolbox": "(star) (triangle)"
+        },
+        {
+            "description": "Bigger sequence",
             "board": "(sequence /(assign /($x) _) /(assign /($y) _) /(assign /($z) /(== /($x) /($y)))) ($z)",
             "goal": "(true)",
             "toolbox": "(star) (star) (triangle) (triangle)"
@@ -19,6 +25,16 @@
             "board": "(sequence /(assign /($z) _) _ /(assign /($y) /($x)))",
             "goal": "(star)",
             "toolbox": "(star) (assign _ _) ($x) ($y) ($z)"
+        },
+        {
+            "description": "Swap the variables",
+            "board": "(sequence /(assign /($z) /($x)) _ _ /(assign /$z /(diamond)))",
+            "goal": "(star)",
+            "toolbox": "($y) (assign /($x) /$y) /(assign /($y) /$z)",
+            "globals": {
+                "x": "(star)",
+                "y": "(triangle)"
+            }
         },
         {
             "description": "Unlock the conditional",

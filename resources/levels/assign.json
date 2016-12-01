@@ -233,33 +233,7 @@
             "board": "(λx /$x)",
             "goal": "(star)",
             "toolbox": "(diamond) (star)",
-            "globals": {
-                "x": "(diamond)"
-            }
-        },
-        {
-            "description": "Lambdas can read outside their environment.",
-            "board": "(λx /$y) ($y)",
-            "goal": "(star) (star)",
-            "toolbox": "(diamond)",
-            "globals": {
-                "y": "(star)"
-            }
-        },
-        {
-            "description": "Outside changes are reflected in the lambda.",
-            "board": "(λx /$y) (assign /$y _)",
-            "goal": "(triangle)",
-            "toolbox": "(diamond) (star) (triangle)",
-            "globals": {
-                "y": "(star)"
-            }
-        },
-        {
-            "description": "Outside changes are reflected in the lambda.",
-            "board": "(λx /$y) (assign /$y _)",
-            "goal": "(triangle)",
-            "toolbox": "(diamond) (star) (triangle)"
+            "globals": {}
         },
         {
             "description": "Lambdas can produce comparisons based on input",
@@ -290,6 +264,30 @@
             "board": "(λx /(λy /(== /$x /$y))) (λx /(if /$x /(diamond)))",
             "goal": "(diamond)",
             "toolbox": "(triangle) (star) (triangle)"
+        },
+        {
+            "description": "Lambdas can read outside their environment.",
+            "board": "(λx /$y) ($y)",
+            "goal": "(star) (star)",
+            "toolbox": "(diamond)",
+            "globals": {
+                "y": "(star)"
+            }
+        },
+        {
+            "description": "Outside changes are reflected in the lambda.",
+            "board": "(λx /$y) (assign /$y _)",
+            "goal": "(triangle)",
+            "toolbox": "(diamond) (star) (triangle)"
+        },
+        {
+            "description": "Outside changes are reflected in the lambda.",
+            "board": "(λx /$y)",
+            "goal": "(triangle)",
+            "toolbox": "(diamond) (star) (triangle) (assign /$y _)",
+            "globals": {
+                "y": "(star)"
+            }
         }
     ]
 }
