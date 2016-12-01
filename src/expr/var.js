@@ -601,8 +601,8 @@ class JumpingAssignExpr extends AssignExpr {
                         .prepareAssign(this.variable.name);
                 }
                 else {
-                    if (this.stage.environmentDisplay.contents.length === 0) {
-                        targetPos = this.stage.environmentDisplay.leftEdgePos;
+                    if (Object.keys(this.stage.environmentDisplay.bindings).length === 0) {
+                        targetPos = this.stage.environmentDisplay.absolutePos;
                     }
                     else {
                         let contents = this.stage.environmentDisplay.contents;

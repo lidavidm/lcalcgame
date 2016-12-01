@@ -752,8 +752,8 @@ var JumpingAssignExpr = function (_AssignExpr) {
                         value = _this17.value.clone();
                         _this17.stage.environmentDisplay.prepareAssign(_this17.variable.name);
                     } else {
-                        if (_this17.stage.environmentDisplay.contents.length === 0) {
-                            targetPos = _this17.stage.environmentDisplay.leftEdgePos;
+                        if (Object.keys(_this17.stage.environmentDisplay.bindings).length === 0) {
+                            targetPos = _this17.stage.environmentDisplay.absolutePos;
                         } else {
                             var contents = _this17.stage.environmentDisplay.contents;
                             var last = contents[contents.length - 1];
