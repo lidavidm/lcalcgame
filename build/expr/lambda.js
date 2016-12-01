@@ -1098,7 +1098,7 @@ var InlineEnvironmentDisplay = function (_SpreadsheetEnvironme) {
 
         _this15.lambda = lambda;
         _this15.parent = lambda;
-        _this15.padding = { left: 0, right: 0, inner: 10 };
+        _this15.padding = { left: 0, right: 10, inner: 10 };
 
         _this15._state = 'open';
         _this15._height = 1.0;
@@ -1182,6 +1182,14 @@ var InlineEnvironmentDisplay = function (_SpreadsheetEnvironme) {
             ctx.restore();
         }
     }, {
+        key: 'drawInternal',
+        value: function drawInternal(ctx, pos, boundingSize) {
+            this.drawBackground(ctx, pos, boundingSize);
+            if (this._state === "open") {
+                this.drawGrid(ctx);
+            }
+        }
+    }, {
         key: 'pos',
         get: function get() {
             return { x: 5, y: this.lambda.size.h - 5 };
@@ -1192,7 +1200,9 @@ var InlineEnvironmentDisplay = function (_SpreadsheetEnvironme) {
     }, {
         key: 'size',
         get: function get() {
-            return _get(InlineEnvironmentDisplay.prototype.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay.prototype), '_origSize', this);
+            var size = _get(InlineEnvironmentDisplay.prototype.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay.prototype), '_origSize', this);
+            size.w += this.padding.left + this.padding.right;
+            return size;
         }
     }, {
         key: 'absoluteSize',

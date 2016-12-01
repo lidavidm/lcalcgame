@@ -20,12 +20,12 @@ var DisplayChest = function (_Expression) {
         var _this = _possibleConstructorReturn(this, (DisplayChest.__proto__ || Object.getPrototypeOf(DisplayChest)).call(this, [expr]));
 
         _this.name = name;
-        _this.childPos = _this.origChildPos = { x: 10, y: 5 };
+        _this.childPos = _this.origChildPos = { x: 5, y: 5 };
 
         if (!expr) return _possibleConstructorReturn(_this);
         expr.ignoreEvents = true;
         expr.scale = { x: 0.6, y: 0.6 };
-        expr.anchor = { x: -0.1, y: 0.5 };
+        expr.anchor = { x: 0.5, y: 0.5 };
         return _this;
     }
 
@@ -41,7 +41,7 @@ var DisplayChest = function (_Expression) {
             this.holes[0] = expr;
             expr.ignoreEvents = true;
             expr.scale = { x: 0.6, y: 0.6 };
-            expr.anchor = { x: -0.1, y: 0.5 };
+            expr.anchor = { x: 0.5, y: 0.5 };
             expr.pos = { x: 0, y: 0 };
             this.update();
         }

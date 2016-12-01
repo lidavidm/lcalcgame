@@ -829,7 +829,7 @@ class InlineEnvironmentDisplay extends SpreadsheetEnvironmentDisplay {
         super([]);
         this.lambda = lambda;
         this.parent = lambda;
-        this.padding = { left: 0, right: 0, inner: 10 };
+        this.padding = { left: 0, right: 10, inner: 10 };
 
         this._state = 'open';
         this._height = 1.0;
@@ -885,7 +885,11 @@ class InlineEnvironmentDisplay extends SpreadsheetEnvironmentDisplay {
         this._pos = p;
     }
 
-    get size() { return super._origSize; }
+    get size() {
+        let size = super._origSize;
+        size.w += this.padding.left + this.padding.right;
+        return size;
+    }
 
     get absoluteSize() {
         var size = super.absoluteSize;
@@ -910,6 +914,13 @@ class InlineEnvironmentDisplay extends SpreadsheetEnvironmentDisplay {
             });
         }
         ctx.restore();
+    }
+
+    drawInternal(ctx, pos, boundingSize) {
+        this.drawBackground(ctx, pos, boundingSize);
+        if (this._state === "open") {
+            this.drawGrid(ctx);
+        }
     }
 }
 

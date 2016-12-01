@@ -133,10 +133,15 @@ var EnvironmentDisplay = function (_Expression) {
             }
         }
     }, {
-        key: "drawInternal",
-        value: function drawInternal(ctx, pos, boundingSize) {
+        key: "drawBackground",
+        value: function drawBackground(ctx, pos, boundingSize) {
             ctx.fillStyle = '#FFF8DC';
             ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+        }
+    }, {
+        key: "drawInternal",
+        value: function drawInternal(ctx, pos, boundingSize) {
+            this.drawBackground(ctx, pos, boundingSize);
         }
 
         // Show an animation in preparation for updating a binding
@@ -214,9 +219,13 @@ var SpreadsheetEnvironmentDisplay = function (_EnvironmentDisplay) {
     }, {
         key: "drawInternal",
         value: function drawInternal(ctx, pos, boundingSize) {
-            var _this5 = this;
-
             _get(SpreadsheetEnvironmentDisplay.prototype.__proto__ || Object.getPrototypeOf(SpreadsheetEnvironmentDisplay.prototype), "drawInternal", this).call(this, ctx, pos, boundingSize);
+            this.drawGrid(ctx);
+        }
+    }, {
+        key: "drawGrid",
+        value: function drawGrid(ctx) {
+            var _this5 = this;
 
             ctx.save();
             ctx.beginPath();

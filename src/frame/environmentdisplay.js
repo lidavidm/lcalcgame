@@ -75,9 +75,13 @@ class EnvironmentDisplay extends Expression {
         }
     }
 
-    drawInternal(ctx, pos, boundingSize) {
+    drawBackground(ctx, pos, boundingSize) {
         ctx.fillStyle = '#FFF8DC';
         ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+    }
+
+    drawInternal(ctx, pos, boundingSize) {
+        this.drawBackground(ctx, pos, boundingSize);
     }
 
     // Show an animation in preparation for updating a binding
@@ -115,7 +119,10 @@ class SpreadsheetEnvironmentDisplay extends EnvironmentDisplay {
 
     drawInternal(ctx, pos, boundingSize) {
         super.drawInternal(ctx, pos, boundingSize);
+        this.drawGrid(ctx);
+    }
 
+    drawGrid(ctx) {
         ctx.save();
         ctx.beginPath();
         ctx.lineWidth = 0.5;
