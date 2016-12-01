@@ -527,16 +527,21 @@ var BracketArrayExpr = function (_BagExpr) {
             Resource.play('bag-spill');
         }
     }, {
+        key: 'isAllowed',
+        value: function isAllowed(node) {
+            return !(node instanceof VarExpr);
+        }
+    }, {
         key: 'ondropenter',
         value: function ondropenter(node, pos) {
-            if (node instanceof VarExpr) return;
+            if (!this.isAllowed(node)) return;
 
             this.onmouseenter(pos);
         }
     }, {
         key: 'ondropexit',
         value: function ondropexit(node, pos) {
-            if (node instanceof VarExpr) return;
+            if (!this.isAllowed(node)) return;
 
             this.onmouseleave(pos);
         }
@@ -546,7 +551,7 @@ var BracketArrayExpr = function (_BagExpr) {
             this.ondropexit(node, pos);
 
             if (this.parent) return;
-            if (node instanceof VarExpr) return;
+            if (!this.isAllowed(node)) return;
 
             if (!(node instanceof Expression)) {
                 console.error('@ BagExpr.ondropped: Dropped node is not an Expression.', node);
@@ -733,6 +738,11 @@ var BracketArrayConstructor = function (_BracketArrayExpr) {
     }
 
     _createClass(BracketArrayConstructor, [{
+        key: 'isAllowed',
+        value: function isAllowed(node) {
+            return true;
+        }
+    }, {
         key: 'isValue',
         value: function isValue() {
             return this._items.reduce(function (a, b) {

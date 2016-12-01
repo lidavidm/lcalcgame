@@ -386,14 +386,18 @@ class BracketArrayExpr extends BagExpr {
         Resource.play('bag-spill');
     }
 
+    isAllowed(node) {
+        return !(node instanceof VarExpr);
+    }
+
     ondropenter(node, pos) {
-        if (node instanceof VarExpr) return;
+        if (!this.isAllowed(node)) return;
 
         this.onmouseenter(pos);
 
     }
     ondropexit(node, pos) {
-        if (node instanceof VarExpr) return;
+        if (!this.isAllowed(node)) return;
 
         this.onmouseleave(pos);
 
@@ -402,7 +406,7 @@ class BracketArrayExpr extends BagExpr {
         this.ondropexit(node, pos);
 
         if (this.parent) return;
-        if (node instanceof VarExpr) return;
+        if (!this.isAllowed(node)) return;
 
         if (!(node instanceof Expression)) {
             console.error('@ BagExpr.ondropped: Dropped node is not an Expression.', node);
@@ -502,6 +506,10 @@ class PopExpr extends Expression {
 class BracketArrayConstructor extends BracketArrayExpr {
     constructor(x, y, w, h, holding=[]) {
         super(x, y, w, h, holding);
+    }
+
+    isAllowed(node) {
+        return true;
     }
 
     isValue() {

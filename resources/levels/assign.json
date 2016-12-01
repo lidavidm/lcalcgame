@@ -170,15 +170,15 @@
             }
         },
         {
-            "description": "Variables can't go in bags",
-            "board": "(bag) ($x)",
+            "description": "Building bags",
+            "board": "(array_constructor) ($x)",
             "goal": "(bag diamond)",
             "globals": {
                 "x": "(diamond)"
             }
         },
         {
-            "description": "But bags can go in variables",
+            "description": "Bags can go in variables",
             "board": "",
             "goal": "(bag star diamond)",
             "toolbox": "($x) ($y)",
