@@ -502,7 +502,6 @@ var StringValueExpr = function (_Expression3) {
 
         var _this17 = _possibleConstructorReturn(this, (StringValueExpr.__proto__ || Object.getPrototypeOf(StringValueExpr)).call(this, [text]));
 
-        _this17.value = name;
         _this17.primitiveName = name;
         text.color = "OrangeRed";
         _this17.color = "gold";

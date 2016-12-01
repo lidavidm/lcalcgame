@@ -208,7 +208,6 @@ class StringValueExpr extends Expression {
     constructor(name) {
         let text = new TextExpr('"' + name + '"');
         super([text]);
-        this.value = name;
         this.primitiveName = name;
         text.color = "OrangeRed";
         this.color = "gold";
