@@ -203,3 +203,37 @@ class FadedTriangleExpr extends FadedValueExpr {
 class FadedCircleExpr extends FadedValueExpr {
     constructor() { super('dot'); }
 }
+
+class StringValueExpr extends Expression {
+    constructor(name) {
+        let text = new TextExpr('"' + name + '"');
+        super([text]);
+        this.value = name;
+        this.primitiveName = name;
+        text.color = "OrangeRed";
+        this.color = "gold";
+        this.primitiveName = name;
+    }
+
+    get graphicNode() { return this.holes[0]; }
+    reduceCompletely() { return this; }
+    reduce() { return this; }
+    canReduce() { return false; }
+    isValue() { return true; }
+    toString() {
+        return this.primitiveName;
+    }
+    value() { return this.primitiveName; }
+}
+class StringStarExpr extends StringValueExpr {
+    constructor() { super('star'); }
+}
+class StringRectExpr extends StringValueExpr {
+    constructor() { super('rect'); }
+}
+class StringTriangleExpr extends StringValueExpr {
+    constructor() { super('tri'); }
+}
+class StringCircleExpr extends StringValueExpr {
+    constructor() { super('dot'); }
+}

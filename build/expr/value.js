@@ -491,3 +491,109 @@ var FadedCircleExpr = function (_FadedValueExpr4) {
 
     return FadedCircleExpr;
 }(FadedValueExpr);
+
+var StringValueExpr = function (_Expression3) {
+    _inherits(StringValueExpr, _Expression3);
+
+    function StringValueExpr(name) {
+        _classCallCheck(this, StringValueExpr);
+
+        var text = new TextExpr('"' + name + '"');
+
+        var _this17 = _possibleConstructorReturn(this, (StringValueExpr.__proto__ || Object.getPrototypeOf(StringValueExpr)).call(this, [text]));
+
+        _this17.value = name;
+        _this17.primitiveName = name;
+        text.color = "OrangeRed";
+        _this17.color = "gold";
+        _this17.primitiveName = name;
+        return _this17;
+    }
+
+    _createClass(StringValueExpr, [{
+        key: 'reduceCompletely',
+        value: function reduceCompletely() {
+            return this;
+        }
+    }, {
+        key: 'reduce',
+        value: function reduce() {
+            return this;
+        }
+    }, {
+        key: 'canReduce',
+        value: function canReduce() {
+            return false;
+        }
+    }, {
+        key: 'isValue',
+        value: function isValue() {
+            return true;
+        }
+    }, {
+        key: 'toString',
+        value: function toString() {
+            return this.primitiveName;
+        }
+    }, {
+        key: 'value',
+        value: function value() {
+            return this.primitiveName;
+        }
+    }, {
+        key: 'graphicNode',
+        get: function get() {
+            return this.holes[0];
+        }
+    }]);
+
+    return StringValueExpr;
+}(Expression);
+
+var StringStarExpr = function (_StringValueExpr) {
+    _inherits(StringStarExpr, _StringValueExpr);
+
+    function StringStarExpr() {
+        _classCallCheck(this, StringStarExpr);
+
+        return _possibleConstructorReturn(this, (StringStarExpr.__proto__ || Object.getPrototypeOf(StringStarExpr)).call(this, 'star'));
+    }
+
+    return StringStarExpr;
+}(StringValueExpr);
+
+var StringRectExpr = function (_StringValueExpr2) {
+    _inherits(StringRectExpr, _StringValueExpr2);
+
+    function StringRectExpr() {
+        _classCallCheck(this, StringRectExpr);
+
+        return _possibleConstructorReturn(this, (StringRectExpr.__proto__ || Object.getPrototypeOf(StringRectExpr)).call(this, 'rect'));
+    }
+
+    return StringRectExpr;
+}(StringValueExpr);
+
+var StringTriangleExpr = function (_StringValueExpr3) {
+    _inherits(StringTriangleExpr, _StringValueExpr3);
+
+    function StringTriangleExpr() {
+        _classCallCheck(this, StringTriangleExpr);
+
+        return _possibleConstructorReturn(this, (StringTriangleExpr.__proto__ || Object.getPrototypeOf(StringTriangleExpr)).call(this, 'tri'));
+    }
+
+    return StringTriangleExpr;
+}(StringValueExpr);
+
+var StringCircleExpr = function (_StringValueExpr4) {
+    _inherits(StringCircleExpr, _StringValueExpr4);
+
+    function StringCircleExpr() {
+        _classCallCheck(this, StringCircleExpr);
+
+        return _possibleConstructorReturn(this, (StringCircleExpr.__proto__ || Object.getPrototypeOf(StringCircleExpr)).call(this, 'dot'));
+    }
+
+    return StringCircleExpr;
+}(StringValueExpr);

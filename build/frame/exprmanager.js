@@ -6,11 +6,11 @@ var ExprManager = function () {
     var _FADE_MAP = {
         'if': [LockIfStatement, InlineLockIfStatement, IfStatement],
         'ifelse': [IfElseStatement],
-        'triangle': [TriangleExpr, FadedTriangleExpr],
-        'rect': [RectExpr, FadedRectExpr],
-        'star': [StarExpr, FadedStarExpr],
-        'circle': [CircleExpr, FadedCircleExpr],
-        'diamond': [RectExpr, FadedRectExpr],
+        'triangle': [TriangleExpr, FadedTriangleExpr, StringTriangleExpr],
+        'rect': [RectExpr, FadedRectExpr, StringRectExpr],
+        'star': [StarExpr, FadedStarExpr, StringStarExpr],
+        'circle': [CircleExpr, FadedCircleExpr, StringCircleExpr],
+        'diamond': [RectExpr, FadedRectExpr, StringRectExpr],
         '_': [MissingExpression],
         '__': [MissingBagExpression, MissingBracketExpression],
         '_b': [MissingKeyExpression, MissingBooleanExpression],
@@ -55,7 +55,7 @@ var ExprManager = function () {
         'false': [46],
         'bag': [51],
         '__': [51],
-        'primitives': [66],
+        'primitives': [66, 72],
         'map': [61]
     };
     var primitives = ['triangle', 'rect', 'star', 'circle', 'diamond'];
