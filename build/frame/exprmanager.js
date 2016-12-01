@@ -44,11 +44,11 @@ var ExprManager = function () {
 
     var DEFAULT_FADE_PROGRESSION = {
         'var': [[9, 30], 30, 42],
-        'reference': [77, 79, 95],
-        'reference_display': [79, 95],
-        'environment_display': [95],
-        'lambda_abstraction': [97],
-        'assign': [77, 95],
+        'reference': [78, 80, 96],
+        'reference_display': [80, 96],
+        'environment_display': [96],
+        'lambda_abstraction': [98],
+        'assign': [78, 96],
         'hole': [[9, 30], 30, 42],
         'if': [26, 45],
         '_b': [34],

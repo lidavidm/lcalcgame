@@ -3,6 +3,12 @@
     "description":"Variables",
     "levels": [
         {
+            "description": "Introducing string values",
+            "board": "(== /(star) _)",
+            "toolbox": "(star) (diamond) (triangle)",
+            "goal": "(false)"
+        },
+        {
             "description": "Reducing a variable.",
             "board": "($_x)",
             "goal": "(diamond)",
