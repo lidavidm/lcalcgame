@@ -108,12 +108,10 @@ class LabeledVarExpr extends VarExpr {
                 stage.add(dummy);
                 dummy.pos = display.getExpr().absolutePos;
                 dummy.scale = display.getExpr().absoluteScale;
-                dummy.opacity = 0.3;
 
                 Animate.tween(dummy, {
                     pos: this.absolutePos,
                     scale: { x: 1, y: 1 },
-                    opacity: 1.0,
                 }, 300).after(() => {
                     let clone = display.getExpr().clone();
                     (this.parent || this.stage).swap(this, clone);

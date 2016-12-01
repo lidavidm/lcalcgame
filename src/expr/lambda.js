@@ -140,6 +140,10 @@ class LambdaHoleExpr extends MissingExpression {
             }
         });
 
+        parent.getEnvironment().update(this.name, node);
+        // Make sure the env display updates
+        parent.update();
+
         let vars = findNoncapturingVarExpr(this.parent, null, true, true);
         let capturedVars = findNoncapturingVarExpr(this.parent, this.name, true, true);
         for (let variable of vars) {
@@ -153,8 +157,6 @@ class LambdaHoleExpr extends MissingExpression {
                 return null;
             }
         }
-
-        parent.getEnvironment().update(this.name, node);
 
         // Now remove this hole from its parent expression.
         parent.removeArg(this);
@@ -670,6 +672,23 @@ class EnvironmentLambdaExpr extends LambdaExpr {
         this.environmentDisplay.scale = { x: 0.85, y: 0.85 };
     }
 
+    removeArg(arg) {
+        // Don't let holes remove themselves - we want to keep the
+        // parameter visible while we are reducing
+        if (arg instanceof LambdaHoleExpr) {
+            arg.isOpen = false;
+            return;
+        }
+        super.removeArg(arg);
+    }
+
+    get takesArgument() {
+        // Since the hole isn't removed by our override of removeArg,
+        // account for that when deciding whether the lambda is
+        // reducible
+        return this.holes.length > 0 && this.holes[0] instanceof LambdaHoleExpr && this.holes[0].isOpen;
+    }
+
     hits(pos, options=undefined) {
         if (this.parent) return super.hits(pos, options);
 
@@ -776,7 +795,6 @@ class EnvironmentLambdaExpr extends LambdaExpr {
                         }
 
                         if (result instanceof Promise) {
-                            // TODO: handle rejection
                             result.then(() => {
                                 stepReduction().then(() => innerresolve());
                             }, () => {
@@ -793,6 +811,9 @@ class EnvironmentLambdaExpr extends LambdaExpr {
             };
             stepReduction().then(() => {
                 window.setTimeout(() => {
+                    // Get rid of the parameter
+                    super.removeArg(this.holes[0]);
+
                     Animate.poof(this);
                     super.performReduction();
                     resolve();

@@ -162,6 +162,10 @@ var LambdaHoleExpr = function (_MissingExpression) {
                 }
             });
 
+            parent.getEnvironment().update(this.name, node);
+            // Make sure the env display updates
+            parent.update();
+
             var vars = findNoncapturingVarExpr(this.parent, null, true, true);
             var capturedVars = findNoncapturingVarExpr(this.parent, this.name, true, true);
             var _iteratorNormalCompletion = true;
@@ -182,6 +186,8 @@ var LambdaHoleExpr = function (_MissingExpression) {
                         return null;
                     }
                 }
+
+                // Now remove this hole from its parent expression.
             } catch (err) {
                 _didIteratorError = true;
                 _iteratorError = err;
@@ -197,9 +203,6 @@ var LambdaHoleExpr = function (_MissingExpression) {
                 }
             }
 
-            parent.getEnvironment().update(this.name, node);
-
-            // Now remove this hole from its parent expression.
             parent.removeArg(this);
 
             // GAME DESIGN CHOICE: Automatically break apart parenthesized values.
@@ -900,6 +903,17 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
     }
 
     _createClass(EnvironmentLambdaExpr, [{
+        key: 'removeArg',
+        value: function removeArg(arg) {
+            // Don't let holes remove themselves - we want to keep the
+            // parameter visible while we are reducing
+            if (arg instanceof LambdaHoleExpr) {
+                arg.isOpen = false;
+                return;
+            }
+            _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'removeArg', this).call(this, arg);
+        }
+    }, {
         key: 'hits',
         value: function hits(pos) {
             var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
@@ -1034,7 +1048,6 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
                             }
 
                             if (result instanceof Promise) {
-                                // TODO: handle rejection
                                 result.then(function () {
                                     stepReduction().then(function () {
                                         return innerresolve();
@@ -1052,12 +1065,23 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
                 };
                 stepReduction().then(function () {
                     window.setTimeout(function () {
+                        // Get rid of the parameter
+                        _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'removeArg', _this14).call(_this14, _this14.holes[0]);
+
                         Animate.poof(_this14);
                         _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'performReduction', _this14).call(_this14);
                         resolve();
                     }, 600);
                 });
             });
+        }
+    }, {
+        key: 'takesArgument',
+        get: function get() {
+            // Since the hole isn't removed by our override of removeArg,
+            // account for that when deciding whether the lambda is
+            // reducible
+            return this.holes.length > 0 && this.holes[0] instanceof LambdaHoleExpr && this.holes[0].isOpen;
         }
     }]);
 

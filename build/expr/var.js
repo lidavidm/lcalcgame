@@ -164,12 +164,10 @@ var LabeledVarExpr = function (_VarExpr) {
                         stage.add(dummy);
                         dummy.pos = display.getExpr().absolutePos;
                         dummy.scale = display.getExpr().absoluteScale;
-                        dummy.opacity = 0.3;
 
                         Animate.tween(dummy, {
                             pos: _this3.absolutePos,
-                            scale: { x: 1, y: 1 },
-                            opacity: 1.0
+                            scale: { x: 1, y: 1 }
                         }, 300).after(function () {
                             var clone = display.getExpr().clone();
                             (_this3.parent || _this3.stage).swap(_this3, clone);
