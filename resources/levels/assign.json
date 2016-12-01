@@ -189,7 +189,7 @@
             "goal": "(bag star diamond)",
             "toolbox": "($x) ($y)",
             "globals": {
-                "x": "(bag star)",
+                "x": "(array_constructor star)",
                 "y": "(diamond)"
             }
         },
