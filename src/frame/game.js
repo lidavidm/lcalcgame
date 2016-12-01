@@ -108,7 +108,7 @@ class Level {
 
         // Environment
         let yOffset = goal_node[0].absoluteSize.h + goal_node[0].absolutePos.y + 20;
-        var env = new EnvironmentDisplay(canvas_screen.w - envDisplayWidth, yOffset, envDisplayWidth, canvas_screen.h - TOOLBOX_HEIGHT - yOffset, stage);
+        var env = new (ExprManager.getClass('environment_display'))(canvas_screen.w - envDisplayWidth, yOffset, envDisplayWidth, canvas_screen.h - TOOLBOX_HEIGHT - yOffset);
         stage.add(env);
         stage.environmentDisplay = env;
         if (this.globals) {
@@ -116,7 +116,6 @@ class Level {
                 stage.environment.update(name, this.globals.lookup(name).clone());
             }
         }
-        env.showGlobals();
 
         stage.uiNodes = [ btn_back, btn_reset, btn_next, env, toolbox ];
 

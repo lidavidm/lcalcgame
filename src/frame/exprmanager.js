@@ -27,7 +27,8 @@ var ExprManager = (function() {
         'define':   [DefineExpr],
         'var':      [LambdaVarExpr, HalfFadedLambdaVarExpr, FadedLambdaVarExpr, FadedLambdaVarExpr],
         'reference':[JumpingChestVarExpr, ChestVarExpr, LabeledChestVarExpr, LabeledVarExpr],
-        'reference_display':[DisplayChest, LabeledDisplayChest, LabeledDisplay],
+        'reference_display':[DisplayChest, LabeledDisplayChest, SpreadsheetDisplay],
+        'environment_display':[EnvironmentDisplay, SpreadsheetEnvironmentDisplay],
         'hole':     [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedLambdaHoleExpr, FadedES6LambdaHoleExpr],
         'lambda':   [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr],
         'lambda_abstraction':   [LambdaExpr, EnvironmentLambdaExpr],
@@ -43,6 +44,7 @@ var ExprManager = (function() {
         'var'   : [[9, 30], 30, 42],
         'reference': [77, 79, 95],
         'reference_display': [79, 95],
+        'environment_display': [95],
         'lambda_abstraction': [97],
         'assign': [77, 95],
         'hole'  : [[9, 30], 30, 42],
@@ -63,7 +65,7 @@ var ExprManager = (function() {
     DEFAULT_FADE_PROGRESSION.primitives = undefined;
 
     // Classes that should not show the 'sparkle' when they are faded.
-    const FADE_EXCEPTIONS = [JumpingChestVarExpr, JumpingAssignExpr];
+    const FADE_EXCEPTIONS = [JumpingChestVarExpr, JumpingAssignExpr, EnvironmentDisplay];
 
     pub.isExcludedFromFadingAnimation = (expr) => {
         for (let klass of FADE_EXCEPTIONS) {

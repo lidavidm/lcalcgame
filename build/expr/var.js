@@ -592,7 +592,7 @@ var AssignExpr = function (_Expression2) {
             var _this13 = this;
 
             this.getEnvironment().update(this.variable.name, this._actualValue);
-            this.stage.environmentDisplay.showGlobals();
+            this.stage.environmentDisplay.update();
             var binding = this.stage.environmentDisplay.getBinding(this.variable.name);
             Animate.blink(binding.getExpr());
             this.stage.getNodesWithClass(EnvironmentLambdaExpr).forEach(function (lambda) {
@@ -663,7 +663,7 @@ var AssignExpr = function (_Expression2) {
                 this.value.performReduction(false);
                 var value = this.value.clone();
                 this.getEnvironment().update(this.variable.name, value);
-                this.stage.environmentDisplay.showGlobals();
+                this.stage.environmentDisplay.update();
                 this.stage.draw();
                 return null;
             }

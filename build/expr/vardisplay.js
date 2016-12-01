@@ -20,7 +20,7 @@ var DisplayChest = function (_Expression) {
         var _this = _possibleConstructorReturn(this, (DisplayChest.__proto__ || Object.getPrototypeOf(DisplayChest)).call(this, [expr]));
 
         _this.name = name;
-        _this.childPos = { x: 10, y: 5 };
+        _this.childPos = _this.origChildPos = { x: 10, y: 5 };
 
         if (!expr) return _possibleConstructorReturn(_this);
         expr.ignoreEvents = true;
@@ -41,7 +41,9 @@ var DisplayChest = function (_Expression) {
             this.holes[0] = expr;
             expr.ignoreEvents = true;
             expr.scale = { x: 0.6, y: 0.6 };
-            // expr.anchor = { x: -0.1, y: 0.5 };
+            expr.anchor = { x: -0.1, y: 0.5 };
+            expr.pos = { x: 0, y: 0 };
+            this.update();
         }
     }, {
         key: 'getExpr',
@@ -63,7 +65,7 @@ var DisplayChest = function (_Expression) {
                 }
             };
             return Animate.tween(this, target, 600).after(function () {
-                _this2.childPos = { x: 10, y: 5 };
+                _this2.childPos = { x: _this2.origChildPos.x, y: _this2.origChildPos.y };
             });
         }
     }, {
@@ -101,7 +103,7 @@ var LabeledDisplayChest = function (_DisplayChest) {
 
         var _this3 = _possibleConstructorReturn(this, (LabeledDisplayChest.__proto__ || Object.getPrototypeOf(LabeledDisplayChest)).call(this, name, expr));
 
-        _this3.childPos = { x: 22.5, y: 5 };
+        _this3.childPos = _this3.origChildPos = { x: 20, y: 5 };
         _this3.label = new TextExpr(name);
         _this3.label.color = 'white';
         _this3.holes.push(_this3.label);
@@ -109,11 +111,13 @@ var LabeledDisplayChest = function (_DisplayChest) {
     }
 
     _createClass(LabeledDisplayChest, [{
-        key: 'drawInternal',
-        value: function drawInternal(ctx, pos, boundingSize) {
-            _get(LabeledDisplayChest.prototype.__proto__ || Object.getPrototypeOf(LabeledDisplayChest.prototype), 'drawInternal', this).call(this, ctx, pos, boundingSize);
+        key: 'update',
+        value: function update() {
+            _get(LabeledDisplayChest.prototype.__proto__ || Object.getPrototypeOf(LabeledDisplayChest.prototype), 'update', this).call(this);
+            var expr = this.getExpr();
+
             this.label.pos = {
-                x: this.size.w / 2 - this.label.absoluteSize.w / 2,
+                x: this.childPos.x + expr.size.w / 2 * expr.scale.x - this.label.size.w / 2,
                 y: this.size.h / 2
             };
         }
@@ -150,9 +154,9 @@ var LabeledDisplay = function (_Expression2) {
 
         _this4.name = name;
         _this4.nameLabel = new TextExpr(name);
-        _this4.nameLabel.color = 'white';
+        _this4.nameLabel.color = 'black';
         _this4.equals = new TextExpr("=");
-        _this4.equals.color = 'white';
+        _this4.equals.color = 'black';
         _this4.value = expr;
         _this4.addArg(_this4.nameLabel);
         _this4.addArg(_this4.equals);
@@ -206,4 +210,80 @@ var LabeledDisplay = function (_Expression2) {
     }]);
 
     return LabeledDisplay;
+}(Expression);
+
+var SpreadsheetDisplay = function (_Expression3) {
+    _inherits(SpreadsheetDisplay, _Expression3);
+
+    function SpreadsheetDisplay(name, expr) {
+        _classCallCheck(this, SpreadsheetDisplay);
+
+        var _this5 = _possibleConstructorReturn(this, (SpreadsheetDisplay.__proto__ || Object.getPrototypeOf(SpreadsheetDisplay)).call(this, []));
+
+        _this5.name = name;
+        _this5.nameLabel = new TextExpr(name);
+        _this5.nameLabel.color = 'black';
+        _this5.value = expr;
+        _this5.addArg(_this5.nameLabel);
+        _this5.addArg(_this5.value);
+        _this5.setExpr(expr);
+        _this5.origValue = null;
+
+        _this5._fixedSize = { w: 0, h: 0 };
+        _this5.valuePos = 0;
+        return _this5;
+    }
+
+    _createClass(SpreadsheetDisplay, [{
+        key: 'update',
+        value: function update() {
+            _get(SpreadsheetDisplay.prototype.__proto__ || Object.getPrototypeOf(SpreadsheetDisplay.prototype), 'update', this).call(this);
+            this.holes[1].pos = {
+                x: this.valuePos + 10,
+                y: this.holes[1].pos.y
+            };
+        }
+    }, {
+        key: 'open',
+        value: function open(preview) {
+            if (!this.origValue) {
+                this.origValue = this.value;
+                this.setExpr(preview);
+            }
+        }
+    }, {
+        key: 'close',
+        value: function close() {
+            if (this.origValue) {
+                this.setExpr(this.origValue);
+                this.origValue = null;
+            }
+        }
+    }, {
+        key: 'getExpr',
+        value: function getExpr() {
+            if (this.origValue) {
+                return this.origValue;
+            }
+            return this.holes[1];
+        }
+    }, {
+        key: 'setExpr',
+        value: function setExpr(expr) {
+            expr.pos = { x: 0, y: 0 };
+            this.holes[1] = expr;
+            expr.scale = { x: 1.0, y: 1.0 };
+            expr.anchor = { x: 0, y: 0.5 };
+            expr.stroke = null;
+            expr.ignoreEvents = true;
+            expr.parent = this;
+            this.value = expr;
+            this.update();
+        }
+    }, {
+        key: 'drawInternal',
+        value: function drawInternal(ctx, pos, boundingSize) {}
+    }]);
+
+    return SpreadsheetDisplay;
 }(Expression);

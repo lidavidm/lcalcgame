@@ -788,7 +788,7 @@ class EnvironmentLambdaExpr extends LambdaExpr {
                         let expr = varExprs.pop();
                         let result;
                         if (expr instanceof LabeledVarExpr) {
-                            result = expr.animateReduction(this.environmentDisplay.displays[expr.name]);
+                            result = expr.animateReduction(this.environmentDisplay.bindings[expr.name]);
                         }
                         else {
                             result = expr.performReduction();
@@ -824,15 +824,13 @@ class EnvironmentLambdaExpr extends LambdaExpr {
 }
 
 
-class InlineEnvironmentDisplay extends Expression {
+class InlineEnvironmentDisplay extends SpreadsheetEnvironmentDisplay {
     constructor(lambda) {
         super([]);
-        this.padding = { left: 10, inner: 20, right: 10 };
         this.lambda = lambda;
         this.parent = lambda;
+        this.padding = { left: 0, right: 0, inner: 10 };
 
-        this._layout = { direction: "vertical", align: "none" };
-        this.displays = {};
         this._state = 'open';
         this._height = 1.0;
         this._animation = null;
@@ -873,42 +871,10 @@ class InlineEnvironmentDisplay extends Expression {
         }
     }
 
-    onmousedrag(pos) {
+    onmousedrag(pos) {}
 
-    }
-
-    update() {
-        if (this.stage) window.stage = this.stage;
-        let env = this.lambda.getEnvironment();
-        let updateBinding = (name, expr) => {
-            let display = this.displays[name];
-            if (!display) {
-                display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression(new Expression()));
-                this.displays[name] = display;
-            }
-            display.ignoreEvents = true;
-            if (expr) {
-                display.setExpr(expr);
-            }
-        };
-
-        for (let name of Object.keys(env.bound)) {
-            updateBinding(name, env.lookupDirect(name));
-        }
-        for (let name of env.names()) {
-            updateBinding(name, env.lookup(name));
-        }
-
-        this.holes = Object.keys(this.displays).map((name) => this.displays[name]);
-
-        super.update();
-    }
-
-    highlight(name) {
-        let display = this.displays[name];
-        if (display) {
-            Animate.blink(display.getExpr());
-        }
+    getEnvironment() {
+        return this.lambda.getEnvironment();
     }
 
     get pos() {
@@ -918,6 +884,8 @@ class InlineEnvironmentDisplay extends Expression {
     set pos(p) {
         this._pos = p;
     }
+
+    get size() { return super._origSize; }
 
     get absoluteSize() {
         var size = super.absoluteSize;
@@ -942,14 +910,6 @@ class InlineEnvironmentDisplay extends Expression {
             });
         }
         ctx.restore();
-    }
-
-    drawInternal(ctx, pos, boundingSize) {
-        ctx.fillStyle = '#444';
-        ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
-
-        ctx.fillStyle = '#CCC';
-        ctx.fillRect(pos.x + (boundingSize.w / 2) - 10, pos.y + boundingSize.h - 7.5, 20, 5);
     }
 }
 
@@ -1143,7 +1103,7 @@ function findNoncapturingVarExpr(lambda, name, skipLambda=false, skipLabel=false
         if (node instanceof VarExpr || node instanceof LambdaVarExpr) {
             subvarexprs.push(node);
         }
-        else if (!skipLabel && (node instanceof DisplayChest || node instanceof LabeledDisplay)) {
+        else if (!skipLabel && (node instanceof DisplayChest || node instanceof LabeledDisplay || node instanceof SpreadsheetDisplay)) {
             subvarexprs.push(node);
         }
         else if (node !== lambda &&
@@ -1159,7 +1119,8 @@ function findNoncapturingVarExpr(lambda, name, skipLambda=false, skipLabel=false
         }
 
         if (node instanceof EnvironmentLambdaExpr) {
-            queue = queue.concat(findNoncapturingVarExpr(node.environmentDisplay, name, skipLambda));
+            let displays = findNoncapturingVarExpr(node.environmentDisplay, name, skipLambda);
+            queue = queue.concat(displays);
         }
     }
 

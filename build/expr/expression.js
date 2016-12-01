@@ -195,6 +195,7 @@ var Expression = function (_mag$RoundedRect) {
                     expr.pos = { x: offset, y: y };
 
                     y += (1 - expr.anchor.y) * expr.size.h * expr.scale.y;
+                    if (_this3.padding.between) y += _this3.padding.between;
                 } else {
                     x += expr.size.w * expr.scale.x + padding;
                 }

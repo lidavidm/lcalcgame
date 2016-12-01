@@ -1042,7 +1042,7 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
                             var expr = varExprs.pop();
                             var result = void 0;
                             if (expr instanceof LabeledVarExpr) {
-                                result = expr.animateReduction(_this14.environmentDisplay.displays[expr.name]);
+                                result = expr.animateReduction(_this14.environmentDisplay.bindings[expr.name]);
                             } else {
                                 result = expr.performReduction();
                             }
@@ -1088,20 +1088,18 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
     return EnvironmentLambdaExpr;
 }(LambdaExpr);
 
-var InlineEnvironmentDisplay = function (_Expression2) {
-    _inherits(InlineEnvironmentDisplay, _Expression2);
+var InlineEnvironmentDisplay = function (_SpreadsheetEnvironme) {
+    _inherits(InlineEnvironmentDisplay, _SpreadsheetEnvironme);
 
     function InlineEnvironmentDisplay(lambda) {
         _classCallCheck(this, InlineEnvironmentDisplay);
 
         var _this15 = _possibleConstructorReturn(this, (InlineEnvironmentDisplay.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay)).call(this, []));
 
-        _this15.padding = { left: 10, inner: 20, right: 10 };
         _this15.lambda = lambda;
         _this15.parent = lambda;
+        _this15.padding = { left: 0, right: 0, inner: 10 };
 
-        _this15._layout = { direction: "vertical", align: "none" };
-        _this15.displays = {};
         _this15._state = 'open';
         _this15._height = 1.0;
         _this15._animation = null;
@@ -1157,92 +1155,14 @@ var InlineEnvironmentDisplay = function (_Expression2) {
         key: 'onmousedrag',
         value: function onmousedrag(pos) {}
     }, {
-        key: 'update',
-        value: function update() {
-            var _this18 = this;
-
-            if (this.stage) window.stage = this.stage;
-            var env = this.lambda.getEnvironment();
-            var updateBinding = function updateBinding(name, expr) {
-                var display = _this18.displays[name];
-                if (!display) {
-                    display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression(new Expression()));
-                    _this18.displays[name] = display;
-                }
-                display.ignoreEvents = true;
-                if (expr) {
-                    display.setExpr(expr);
-                }
-            };
-
-            var _iteratorNormalCompletion5 = true;
-            var _didIteratorError5 = false;
-            var _iteratorError5 = undefined;
-
-            try {
-                for (var _iterator5 = Object.keys(env.bound)[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                    var name = _step5.value;
-
-                    updateBinding(name, env.lookupDirect(name));
-                }
-            } catch (err) {
-                _didIteratorError5 = true;
-                _iteratorError5 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                        _iterator5.return();
-                    }
-                } finally {
-                    if (_didIteratorError5) {
-                        throw _iteratorError5;
-                    }
-                }
-            }
-
-            var _iteratorNormalCompletion6 = true;
-            var _didIteratorError6 = false;
-            var _iteratorError6 = undefined;
-
-            try {
-                for (var _iterator6 = env.names()[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                    var _name = _step6.value;
-
-                    updateBinding(_name, env.lookup(_name));
-                }
-            } catch (err) {
-                _didIteratorError6 = true;
-                _iteratorError6 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion6 && _iterator6.return) {
-                        _iterator6.return();
-                    }
-                } finally {
-                    if (_didIteratorError6) {
-                        throw _iteratorError6;
-                    }
-                }
-            }
-
-            this.holes = Object.keys(this.displays).map(function (name) {
-                return _this18.displays[name];
-            });
-
-            _get(InlineEnvironmentDisplay.prototype.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay.prototype), 'update', this).call(this);
-        }
-    }, {
-        key: 'highlight',
-        value: function highlight(name) {
-            var display = this.displays[name];
-            if (display) {
-                Animate.blink(display.getExpr());
-            }
+        key: 'getEnvironment',
+        value: function getEnvironment() {
+            return this.lambda.getEnvironment();
         }
     }, {
         key: 'draw',
         value: function draw(ctx) {
-            var _this19 = this;
+            var _this18 = this;
 
             if (!ctx) return;
             ctx.save();
@@ -1255,20 +1175,11 @@ var InlineEnvironmentDisplay = function (_Expression2) {
             this.drawInternal(ctx, upperLeftPos, boundingSize);
             if (this._state === 'open') {
                 this.children.forEach(function (child) {
-                    child.parent = _this19;
+                    child.parent = _this18;
                     child.draw(ctx);
                 });
             }
             ctx.restore();
-        }
-    }, {
-        key: 'drawInternal',
-        value: function drawInternal(ctx, pos, boundingSize) {
-            ctx.fillStyle = '#444';
-            ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
-
-            ctx.fillStyle = '#CCC';
-            ctx.fillRect(pos.x + boundingSize.w / 2 - 10, pos.y + boundingSize.h - 7.5, 20, 5);
         }
     }, {
         key: 'pos',
@@ -1277,6 +1188,11 @@ var InlineEnvironmentDisplay = function (_Expression2) {
         },
         set: function set(p) {
             this._pos = p;
+        }
+    }, {
+        key: 'size',
+        get: function get() {
+            return _get(InlineEnvironmentDisplay.prototype.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay.prototype), '_origSize', this);
         }
     }, {
         key: 'absoluteSize',
@@ -1288,7 +1204,7 @@ var InlineEnvironmentDisplay = function (_Expression2) {
     }]);
 
     return InlineEnvironmentDisplay;
-}(Expression);
+}(SpreadsheetEnvironmentDisplay);
 
 /** Faded lambda variants. */
 
@@ -1311,12 +1227,12 @@ var FadedLambdaHoleExpr = function (_LambdaHoleExpr) {
     function FadedLambdaHoleExpr(varname) {
         _classCallCheck(this, FadedLambdaHoleExpr);
 
-        var _this20 = _possibleConstructorReturn(this, (FadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedLambdaHoleExpr)).call(this, varname));
+        var _this19 = _possibleConstructorReturn(this, (FadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedLambdaHoleExpr)).call(this, varname));
 
-        _this20.label = new TextExpr("λ" + varname + ".");
-        _this20.holes.push(_this20.label);
-        _this20.label.color = "#000";
-        return _this20;
+        _this19.label = new TextExpr("λ" + varname + ".");
+        _this19.holes.push(_this19.label);
+        _this19.label.color = "#000";
+        return _this19;
     }
 
     _createClass(FadedLambdaHoleExpr, [{
@@ -1370,12 +1286,12 @@ var HalfFadedLambdaHoleExpr = function (_LambdaHoleExpr2) {
     function HalfFadedLambdaHoleExpr(varname) {
         _classCallCheck(this, HalfFadedLambdaHoleExpr);
 
-        var _this21 = _possibleConstructorReturn(this, (HalfFadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr)).call(this, varname));
+        var _this20 = _possibleConstructorReturn(this, (HalfFadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr)).call(this, varname));
 
-        _this21.label = new TextExpr("λ" + varname);
-        _this21.holes.push(_this21.label);
-        _this21.label.color = "#FFF";
-        return _this21;
+        _this20.label = new TextExpr("λ" + varname);
+        _this20.holes.push(_this20.label);
+        _this20.label.color = "#FFF";
+        return _this20;
     }
 
     _createClass(HalfFadedLambdaHoleExpr, [{
@@ -1457,15 +1373,15 @@ var FadedES6LambdaHoleExpr = function (_LambdaHoleExpr4) {
     function FadedES6LambdaHoleExpr(varname) {
         _classCallCheck(this, FadedES6LambdaHoleExpr);
 
-        var _this23 = _possibleConstructorReturn(this, (FadedES6LambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedES6LambdaHoleExpr)).call(this, varname));
+        var _this22 = _possibleConstructorReturn(this, (FadedES6LambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedES6LambdaHoleExpr)).call(this, varname));
 
-        _this23.label = new TextExpr("(" + varname + ")");
-        _this23.arrow = new TextExpr("=>");
-        _this23.holes.push(_this23.label);
-        _this23.holes.push(_this23.arrow);
-        _this23.label.color = "#000";
-        _this23.arrow.color = "#000";
-        return _this23;
+        _this22.label = new TextExpr("(" + varname + ")");
+        _this22.arrow = new TextExpr("=>");
+        _this22.holes.push(_this22.label);
+        _this22.holes.push(_this22.arrow);
+        _this22.label.color = "#000";
+        _this22.arrow.color = "#000";
+        return _this22;
     }
 
     _createClass(FadedES6LambdaHoleExpr, [{
@@ -1538,12 +1454,12 @@ var FadedLambdaVarExpr = function (_LambdaVarExpr2) {
     function FadedLambdaVarExpr(varname) {
         _classCallCheck(this, FadedLambdaVarExpr);
 
-        var _this25 = _possibleConstructorReturn(this, (FadedLambdaVarExpr.__proto__ || Object.getPrototypeOf(FadedLambdaVarExpr)).call(this, varname));
+        var _this24 = _possibleConstructorReturn(this, (FadedLambdaVarExpr.__proto__ || Object.getPrototypeOf(FadedLambdaVarExpr)).call(this, varname));
 
-        _this25.graphicNode.size = _this25.name === 'x' ? { w: 24, h: 24 } : { w: 24, h: 30 };
-        _this25.graphicNode.offset = _this25.name === 'x' ? { x: 0, y: 0 } : { x: 0, y: 2 };
-        _this25.handleOffset = 2;
-        return _this25;
+        _this24.graphicNode.size = _this24.name === 'x' ? { w: 24, h: 24 } : { w: 24, h: 30 };
+        _this24.graphicNode.offset = _this24.name === 'x' ? { x: 0, y: 0 } : { x: 0, y: 2 };
+        _this24.handleOffset = 2;
+        return _this24;
     }
 
     _createClass(FadedLambdaVarExpr, [{
@@ -1613,7 +1529,7 @@ function findNoncapturingVarExpr(lambda, name) {
         var node = queue.pop();
         if (node instanceof VarExpr || node instanceof LambdaVarExpr) {
             subvarexprs.push(node);
-        } else if (!skipLabel && (node instanceof DisplayChest || node instanceof LabeledDisplay)) {
+        } else if (!skipLabel && (node instanceof DisplayChest || node instanceof LabeledDisplay || node instanceof SpreadsheetDisplay)) {
             subvarexprs.push(node);
         } else if (node !== lambda && node instanceof LambdaExpr && (node.takesArgument && node.holes[0].name === name || skipLambda)) {
             // Capture-avoiding substitution
@@ -1625,7 +1541,8 @@ function findNoncapturingVarExpr(lambda, name) {
         }
 
         if (node instanceof EnvironmentLambdaExpr) {
-            queue = queue.concat(findNoncapturingVarExpr(node.environmentDisplay, name, skipLambda));
+            var displays = findNoncapturingVarExpr(node.environmentDisplay, name, skipLambda);
+            queue = queue.concat(displays);
         }
     }
 
