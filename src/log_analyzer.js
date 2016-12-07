@@ -50,7 +50,6 @@ var LogAnalyzer = (function() {
             return sessionStart[1]['session_id'];
         }
     }
-
     class StateRepr {
         constructor(str) {
             let exprs = argsForExprString(str);
@@ -63,6 +62,7 @@ var LogAnalyzer = (function() {
                         .replace(/star/g, '★')
                         .replace(/triangle/g, '▲')
                         .replace(/tri/g, '▲')
+                        .replace(/dot/g, '●')
                         .replace(/circle/g, '●');
 
                 if (isLambdaExpr(e))
@@ -104,7 +104,6 @@ var LogAnalyzer = (function() {
             return s.trim();
         }
     }
-
     class StateReprSet {
         constructor() {
             this.states = [];
@@ -144,7 +143,6 @@ var LogAnalyzer = (function() {
             return this.states[this.states.length-1];
         }
     }
-
     class Task {
         constructor(task_logs) {
             this.logs = task_logs;
@@ -227,27 +225,51 @@ var LogAnalyzer = (function() {
             var prev_node = null;
             var next_edge_detail = null;
 
+            // Recursive rule creator:
+            let createRule = (name, args) => {
+                if (!Array.isArray(args)) args = [ args ];
+                let s = name + '(';
+                args.forEach((a, i) => {
+                    s += ruleFor(a);
+                    if (i < args.length-1) s += ', ';
+                });
+                return s + ')';
+            };
+            let ruleFor = (expr) => {
+                let s = new StateRepr(stripParen(expr));
+                if (s.exprs.length === 1) return s.exprs[0];
+                let op = s.exprs[0];
+                if (op === 'if')
+                    return createRule('Cond', [s.exprs[1], s.exprs[2], 'null']);
+                else if (op === '==')
+                    return createRule('Equal', s.exprs.slice(1));
+                else if (op === 'map')
+                    return createRule('Map', s.exprs.slice(1));
+                else if (op === 'bag')
+                    return createRule('Collection', s.exprs.slice(1));
+                else if (stripParen(expr) === 'λ #0')
+                    return createRule('Lambda', 'x');
+                else if (stripParen(expr) === 'λ #0 #0')
+                    return createRule('Lambda', 'xx');
+                else if (stripParen(expr) === 'λ #0 #0 #0')
+                    return createRule('Lambda', 'xxx');
+                else if (op === 'λ')
+                    return createRule('Lambda', s.exprs.slice(1).map((s) => s.replace(/#0/g, 'x')));
+                return expr; // base case
+            };
+
             // Add initial state.
             nodes.update(this.initialState);
             prev_node = nodes.last();
 
-            actions.forEach((action) => {
+            actions.forEach((action, i) => {
                 let name = action['action_id'];
                 let data = action['action_detail'];
                 let victory = name === 'victory';
                 if (victory) {
                     data = JSON.parse(data)['final_state'];
                 }
-                if (name === 'state-save' || victory) {
-
-                    data = JSON.parse(data).board;
-
-                    let state = new StateRepr(data);
-                    //console.log(' >> state-save', data, state);
-                    if (victory) state.final = true;
-
-                    // Add a node for this state (does nothing if node already exists).
-                    let node = nodes.update( state );
+                let addState = (prev_node, node) => {
 
                     // Make an edge from the previous state to this one.
                     if (prev_node && !prev_node.equals(node)) {
@@ -258,6 +280,23 @@ var LogAnalyzer = (function() {
                         }
                         edges.push(e);
                     }
+
+                    if (!victory && i === actions.length-1) { // No victory was reached in this action path...
+                        let reset_node = nodes.update( new StateRepr('reset') );
+                        edges.push( {from:node, to:reset_node, reduce:1, undo:0} );
+                    }
+                };
+                if (name === 'state-save' || victory) {
+
+                    data = JSON.parse(data).board;
+
+                    let state = new StateRepr(data);
+                    //console.log(' >> state-save', data, state);
+                    if (victory) state.final = true;
+
+                    // Add a node for this state (does nothing if node already exists).
+                    let node = nodes.update( state );
+                    addState(prev_node, node);
 
                     prev_node = node;
 
@@ -283,10 +322,78 @@ var LogAnalyzer = (function() {
                 } else if (name.substring(0, 9) === 'reduction') {
 
                     data = JSON.parse(data);
-                    if ('applied' in data)
-                        data.before = data.before + ' ' + data.applied;
-                    next_edge_detail = data.before + ' → ' + data.after;
+                    let after = new StateRepr(data.after);
 
+                    if ('applied' in data) {
+                        let before = new StateRepr(data.before).toString();
+                        data.before = 'Apply(' + ruleFor(before) + ', ' + ruleFor(data.applied) + ')';
+                    } else {
+                        data.before = ruleFor(data.before);
+                    }
+
+                    // Add a node for this state (does nothing if node already exists).
+                    next_edge_detail = data.before + ' → ' + ruleFor(after.toString());
+                    if (!victory && i === actions.length-1) {
+                        let node = nodes.update( after );
+                        addState(prev_node, node);
+                    }
+
+                } else if (name === 'toolbox-remove') {
+                    next_edge_detail = "ToolboxPlace(" + ruleFor((new StateRepr(data)).toString()) + ")";
+                } else if (name === 'placed-expr') {
+
+                    // Recover what was placed:
+                    data = JSON.parse(data);
+                    let before = new StateRepr(JSON.parse(data.before).board);
+                    let after = new StateRepr(JSON.parse(data.after).board);
+
+                    if (next_edge_detail) {
+                        let node = nodes.update( before );
+                        addState(prev_node, node);
+                        prev_node = node;
+                    }
+
+                    let idxAfterMissing = (s) => {
+                        let k = s.indexOf('_');
+                        if (k === -1) return -1;
+                        else if (s.indexOf('_b') > -1) {
+                            return k + 2;
+                        } else if (s.indexOf('__') > -1) {
+                            return k + 2;
+                        } else
+                            return k + 1;
+                    };
+                    let typeOfMissing = (s) => {
+                        if (s.indexOf('_b') > -1) {
+                            return '_b';
+                        } else if (s.indexOf('__') > -1) {
+                            return '__';
+                        } else
+                            return '_';
+                    };
+
+                    for (let i = 0; i < before.exprs.length; i++) {
+                        if (before.exprs[i] !== after.exprs[i]) {
+                            if (before.exprs[i].indexOf('_') > -1) {
+                                let beforeLatter = before.exprs[i].substring(idxAfterMissing(before.exprs[i]));
+                                let placedExpr = after.exprs[i].substring(before.exprs[i].indexOf('_'), after.exprs[i].lastIndexOf(beforeLatter));
+                                next_edge_detail = 'Place(' + ruleFor(before.exprs[i]) + ', ' + typeOfMissing(before.exprs[i]) + ', ' + ruleFor(placedExpr) + ') → ' + ruleFor(after.exprs[i]);
+                            }
+                            else
+                                next_edge_detail = before.exprs[i] + ' → ' + after.exprs[i];
+                            break;
+                        }
+                    }
+                } else if (name === 'bag-spill') {
+                    data = JSON.parse(data);
+                    let bag = new StateRepr(data.item);
+                    let exprs = new StateRepr(stripParen(data.item));
+                    next_edge_detail = 'Spill(' + bag.toString() + ') → ' + exprs.exprs.slice(1).reduce((p,c) => p + ruleFor(c) + ' ', '');
+                } else if (name === 'bag-add') { // TODO: Fix this.
+                    data = JSON.parse(data);
+                    let bag = new StateRepr(data.item);
+                    let exprs = new StateRepr(stripParen(data.item));
+                    next_edge_detail = 'BagAdd(' + bag.toString() + ') → ' + exprs.exprs.slice(1).reduce((p,c) => p + ruleFor(c) + ' ', '');
                 }
             });
 
@@ -521,7 +628,7 @@ var LogAnalyzer = (function() {
                     if (e1.from.equals(e2.from) && e1.to.equals(e2.to)) {
 
                         // Edges are equal. Merge and remove.
-                        e1.reduce += e2.reduce;
+                        e1.reduce += e2.reduce; // since there is no undo in the released version, this is equal to the # of times this edge was passed (across tasks + users).
                         e1.undo += e2.undo; // tally any properties...
                         raw_edges.splice(j, 1);
                         j--;
@@ -555,13 +662,23 @@ var LogAnalyzer = (function() {
                                             }
                                         };
                                         node.final = true;
+                                    } else if (s === 'reset') {
+                                        node.color = {
+                                            background: '#BDAEC6',
+                                            border: '#732C7B',
+                                            highlight: {
+                                                background: '#BDAEC6',
+                                                border: 'Indigo'
+                                            }
+                                        };
+                                        node.reset = true;
                                     }
                                     return node;
                                 }),
                               raw_edges.map((edge) => {
                                     var e = { from:edge.from.toString(), to:edge.to.toString() };
                                     if (edge.undo > 0) e.color = 'red';
-                                    // if (edge.reduction) e.label = edge.reduction;
+                                    if (edge.reduction) e.label = edge.reduce + ' : ' + edge.reduction;
                                     return e;
                               }));
                                                          //label:('reduce:' + edge.reduce + '\nundo:' + edge.undo) }) ));
