@@ -236,8 +236,8 @@ var LogAnalyzer = (function() {
                 return s + ')';
             };
             let ruleFor = (expr) => {
+                if (stripParen(expr).trim() === '') return '()';
                 let s = new StateRepr(stripParen(expr));
-                if (s.exprs.length === 1) return s.exprs[0];
                 let op = s.exprs[0];
                 if (op === 'if')
                     return createRule('Cond', [s.exprs[1], s.exprs[2], 'null']);
@@ -254,8 +254,31 @@ var LogAnalyzer = (function() {
                 else if (stripParen(expr) === 'λ #0 #0 #0')
                     return createRule('Lambda', 'xxx');
                 else if (op === 'λ')
-                    return createRule('Lambda', s.exprs.slice(1).map((s) => s.replace(/#0/g, 'x')));
+                    return createRule('Lambda', s.exprs.slice(1).map((s) => s.replace(/#(0|1|2|3|4|5|6|7)/g, 'x')));
                 return expr; // base case
+            };
+
+            // Basic diff to determine what substring was changed in two strings.
+            let relRangeOfChangedSubstring = (s, t) => {
+                let a = s.length >= t.length ? t : s; // make sure 'a'
+                let b = s.length >= t.length ? s : t; // is shorter than 'b'
+                let start_idx = -1;
+                let end_idx = -1;
+                for (let i = 0; i < a.length; i++) {
+                    if ( start_idx < 0 && a[i] !== b[i] )
+                        start_idx = i;
+                    if ( end_idx < 0 && a[a.length-i-1] !== b[b.length-i-1] )
+                        end_idx = i;
+                    if ( start_idx >= 0 && end_idx >= 0 )
+                        break;
+                }
+                return {
+                    fromStart:start_idx,
+                    fromEnd:end_idx
+                };
+            };
+            let substringFromRelRange = (s, rel) => {
+                return s.substring(rel.fromStart, s.length-rel.fromEnd);
             };
 
             // Add initial state.
@@ -269,6 +292,7 @@ var LogAnalyzer = (function() {
                 if (victory) {
                     data = JSON.parse(data)['final_state'];
                 }
+
                 let addState = (prev_node, node) => {
 
                     // Make an edge from the previous state to this one.
@@ -280,12 +304,37 @@ var LogAnalyzer = (function() {
                         }
                         edges.push(e);
                     }
+                };
+                let logPatch = (prev_node, new_node) => {
+                    let arrWithoutElems = (a, elems) => {
+                        console.log('arrWithoutElems', a, elems);
+                        for (let i = 0; i < a.length; i++) {
+                            for (let k = 0; k < elems.length; k++) {
+                                if (a[i] === elems[k]) {
+                                    a.splice(i, 1);
+                                    elems.splice(k, 1);
+                                    i--;
+                                    break;
+                                }
+                            }
+                        }
+                        return a;
+                    };
+                    if (prev_node.toString().indexOf('map') > -1 && new_node.toString().indexOf('map') === -1) { // we lost a map reduction here...
+                        for (let i = 0; i < prev_node.exprs.length; i++) {
+                            if (prev_node.exprs[i].indexOf('map') > -1) {
 
-                    if (!victory && i === actions.length-1) { // No victory was reached in this action path...
-                        let reset_node = nodes.update( new StateRepr('reset') );
-                        edges.push( {from:node, to:reset_node, reduce:1, undo:0} );
+                                // Patch in the map reduce state:
+                                let prev_exprs = prev_node.exprs.slice();
+                                prev_exprs.splice(i, 1);
+                                next_edge_detail = ruleFor(prev_node.exprs[i]) + ' → ' + createRule('Collection', arrWithoutElems(new_node.exprs.slice(), prev_exprs));
+
+                                break;
+                            }
+                        }
                     }
                 };
+
                 if (name === 'state-save' || victory) {
 
                     data = JSON.parse(data).board;
@@ -293,6 +342,10 @@ var LogAnalyzer = (function() {
                     let state = new StateRepr(data);
                     //console.log(' >> state-save', data, state);
                     if (victory) state.final = true;
+
+                    // Since 'map' reductions were not logged, unfortunately...
+                    if (!next_edge_detail)
+                        logPatch(prev_node, state);
 
                     // Add a node for this state (does nothing if node already exists).
                     let node = nodes.update( state );
@@ -333,19 +386,19 @@ var LogAnalyzer = (function() {
 
                     // Add a node for this state (does nothing if node already exists).
                     next_edge_detail = data.before + ' → ' + ruleFor(after.toString());
-                    if (!victory && i === actions.length-1) {
-                        let node = nodes.update( after );
-                        addState(prev_node, node);
-                    }
 
                 } else if (name === 'toolbox-remove') {
                     next_edge_detail = "ToolboxPlace(" + ruleFor((new StateRepr(data)).toString()) + ")";
-                } else if (name === 'placed-expr') {
+                } else if (name === 'placed-expr' || name === 'detached-expr') {
+
+                    let ruleName = name === 'placed-expr' ? 'Place' : 'Detach';
 
                     // Recover what was placed:
                     data = JSON.parse(data);
                     let before = new StateRepr(JSON.parse(data.before).board);
                     let after = new StateRepr(JSON.parse(data.after).board);
+
+                    // TODO: Check toolbox-dragout!!
 
                     if (next_edge_detail) {
                         let node = nodes.update( before );
@@ -353,31 +406,15 @@ var LogAnalyzer = (function() {
                         prev_node = node;
                     }
 
-                    let idxAfterMissing = (s) => {
-                        let k = s.indexOf('_');
-                        if (k === -1) return -1;
-                        else if (s.indexOf('_b') > -1) {
-                            return k + 2;
-                        } else if (s.indexOf('__') > -1) {
-                            return k + 2;
-                        } else
-                            return k + 1;
-                    };
-                    let typeOfMissing = (s) => {
-                        if (s.indexOf('_b') > -1) {
-                            return '_b';
-                        } else if (s.indexOf('__') > -1) {
-                            return '__';
-                        } else
-                            return '_';
-                    };
-
                     for (let i = 0; i < before.exprs.length; i++) {
                         if (before.exprs[i] !== after.exprs[i]) {
                             if (before.exprs[i].indexOf('_') > -1) {
-                                let beforeLatter = before.exprs[i].substring(idxAfterMissing(before.exprs[i]));
-                                let placedExpr = after.exprs[i].substring(before.exprs[i].indexOf('_'), after.exprs[i].lastIndexOf(beforeLatter));
-                                next_edge_detail = 'Place(' + ruleFor(before.exprs[i]) + ', ' + typeOfMissing(before.exprs[i]) + ', ' + ruleFor(placedExpr) + ') → ' + ruleFor(after.exprs[i]);
+
+                                let relRange = relRangeOfChangedSubstring(before.exprs[i], after.exprs[i]);
+                                let missingExpr = substringFromRelRange(before.exprs[i], relRange);
+                                let placedExpr = substringFromRelRange(after.exprs[i], relRange);
+
+                                next_edge_detail = ruleName + '(' + ruleFor(before.exprs[i]) + ', ' + missingExpr + ', ' + ruleFor(placedExpr) + ') → ' + ruleFor(after.exprs[i]);
                             }
                             else
                                 next_edge_detail = before.exprs[i] + ' → ' + after.exprs[i];
@@ -388,14 +425,20 @@ var LogAnalyzer = (function() {
                     data = JSON.parse(data);
                     let bag = new StateRepr(data.item);
                     let exprs = new StateRepr(stripParen(data.item));
-                    next_edge_detail = 'Spill(' + bag.toString() + ') → ' + exprs.exprs.slice(1).reduce((p,c) => p + ruleFor(c) + ' ', '');
+                    next_edge_detail = 'Spill(' + bag.toString() + ') → ' + exprs.exprs.slice(1).reduce((p,c) => p + ruleFor(c) + ' ', '').trim();
                 } else if (name === 'bag-add') { // TODO: Fix this.
                     data = JSON.parse(data);
-                    let bag = new StateRepr(data.item);
-                    let exprs = new StateRepr(stripParen(data.item));
-                    next_edge_detail = 'BagAdd(' + bag.toString() + ') → ' + exprs.exprs.slice(1).reduce((p,c) => p + ruleFor(c) + ' ', '');
+                    let bag = new StateRepr(data.before);
+                    let item = new StateRepr(data.item);
+                    let after = new StateRepr(data.after);
+                    next_edge_detail = 'BagAdd(' + ruleFor(bag.toString()) + ', ' + ruleFor(item.toString()) + ') → ' + ruleFor(after.toString());
                 }
             });
+
+            if (!this.playerWon) { // No victory was reached in this action path...
+                let reset_node = nodes.update( new StateRepr('reset') );
+                edges.push( {from:prev_node, to:reset_node, reduce:1, undo:0} );
+            }
 
             return { nodes:nodes, edges:edges };
         }
@@ -679,6 +722,7 @@ var LogAnalyzer = (function() {
                                     var e = { from:edge.from.toString(), to:edge.to.toString() };
                                     if (edge.undo > 0) e.color = 'red';
                                     if (edge.reduction) e.label = edge.reduce + ' : ' + edge.reduction;
+                                    else if (edge.reduce) e.label = edge.reduce + '';
                                     return e;
                               }));
                                                          //label:('reduce:' + edge.reduce + '\nundo:' + edge.undo) }) ));

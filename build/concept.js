@@ -92,7 +92,10 @@ var concepts = [
 
 // Place in a hole
 // * Not sure about these!!
-'Place( HoleyExpression, _, Any ) -> Any', 'Place( HoleyExpression, _b, Boolean ) -> Any', 'Place( HoleyExpression, __, Collection ) -> Any', 'Spill( Collection ) -> ...Primitive', 'BagAdd( Collection, Primitive ) -> Collection',
+'Place( HoleyExpression, _, Any ) -> Any', 'Place( HoleyExpression, _b, Boolean ) -> Any', 'Place( HoleyExpression, __, Collection ) -> Any',
+
+// Detach inner expression, leaving a hole:
+'Detach( Any, Any, Hole ) -> HoleyExpression', 'Spill( Collection ) -> ...Primitive', 'BagAdd( Collection, Primitive ) -> Collection',
 
 // Apply rules
 'Apply( Lambda(T:), Any ) -> T', 'Identity := Apply( Lambda(x), E:Any ) -> E', 'Dup := Apply( Lambda(xx), E:Any ) -> E E', // Output can be a set of expressions; however len>1 forbids 'Dup' rule to be embedded (it must be top-level).

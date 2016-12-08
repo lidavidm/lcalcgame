@@ -228,13 +228,33 @@ var LogAnalyzer = function () {
                     return s + ')';
                 };
                 var ruleFor = function ruleFor(expr) {
+                    if (stripParen(expr).trim() === '') return '()';
                     var s = new StateRepr(stripParen(expr));
-                    if (s.exprs.length === 1) return s.exprs[0];
                     var op = s.exprs[0];
                     if (op === 'if') return createRule('Cond', [s.exprs[1], s.exprs[2], 'null']);else if (op === '==') return createRule('Equal', s.exprs.slice(1));else if (op === 'map') return createRule('Map', s.exprs.slice(1));else if (op === 'bag') return createRule('Collection', s.exprs.slice(1));else if (stripParen(expr) === 'λ #0') return createRule('Lambda', 'x');else if (stripParen(expr) === 'λ #0 #0') return createRule('Lambda', 'xx');else if (stripParen(expr) === 'λ #0 #0 #0') return createRule('Lambda', 'xxx');else if (op === 'λ') return createRule('Lambda', s.exprs.slice(1).map(function (s) {
-                        return s.replace(/#0/g, 'x');
+                        return s.replace(/#(0|1|2|3|4|5|6|7)/g, 'x');
                     }));
                     return expr; // base case
+                };
+
+                // Basic diff to determine what substring was changed in two strings.
+                var relRangeOfChangedSubstring = function relRangeOfChangedSubstring(s, t) {
+                    var a = s.length >= t.length ? t : s; // make sure 'a'
+                    var b = s.length >= t.length ? s : t; // is shorter than 'b'
+                    var start_idx = -1;
+                    var end_idx = -1;
+                    for (var i = 0; i < a.length; i++) {
+                        if (start_idx < 0 && a[i] !== b[i]) start_idx = i;
+                        if (end_idx < 0 && a[a.length - i - 1] !== b[b.length - i - 1]) end_idx = i;
+                        if (start_idx >= 0 && end_idx >= 0) break;
+                    }
+                    return {
+                        fromStart: start_idx,
+                        fromEnd: end_idx
+                    };
+                };
+                var substringFromRelRange = function substringFromRelRange(s, rel) {
+                    return s.substring(rel.fromStart, s.length - rel.fromEnd);
                 };
 
                 // Add initial state.
@@ -248,6 +268,7 @@ var LogAnalyzer = function () {
                     if (victory) {
                         data = JSON.parse(data)['final_state'];
                     }
+
                     var addState = function addState(prev_node, node) {
 
                         // Make an edge from the previous state to this one.
@@ -259,13 +280,38 @@ var LogAnalyzer = function () {
                             }
                             edges.push(e);
                         }
+                    };
+                    var logPatch = function logPatch(prev_node, new_node) {
+                        var arrWithoutElems = function arrWithoutElems(a, elems) {
+                            console.log('arrWithoutElems', a, elems);
+                            for (var _i = 0; _i < a.length; _i++) {
+                                for (var k = 0; k < elems.length; k++) {
+                                    if (a[_i] === elems[k]) {
+                                        a.splice(_i, 1);
+                                        elems.splice(k, 1);
+                                        _i--;
+                                        break;
+                                    }
+                                }
+                            }
+                            return a;
+                        };
+                        if (prev_node.toString().indexOf('map') > -1 && new_node.toString().indexOf('map') === -1) {
+                            // we lost a map reduction here...
+                            for (var _i2 = 0; _i2 < prev_node.exprs.length; _i2++) {
+                                if (prev_node.exprs[_i2].indexOf('map') > -1) {
 
-                        if (!victory && i === actions.length - 1) {
-                            // No victory was reached in this action path...
-                            var reset_node = nodes.update(new StateRepr('reset'));
-                            edges.push({ from: node, to: reset_node, reduce: 1, undo: 0 });
+                                    // Patch in the map reduce state:
+                                    var prev_exprs = prev_node.exprs.slice();
+                                    prev_exprs.splice(_i2, 1);
+                                    next_edge_detail = ruleFor(prev_node.exprs[_i2]) + ' → ' + createRule('Collection', arrWithoutElems(new_node.exprs.slice(), prev_exprs));
+
+                                    break;
+                                }
+                            }
                         }
                     };
+
                     if (name === 'state-save' || victory) {
 
                         data = JSON.parse(data).board;
@@ -273,6 +319,9 @@ var LogAnalyzer = function () {
                         var state = new StateRepr(data);
                         //console.log(' >> state-save', data, state);
                         if (victory) state.final = true;
+
+                        // Since 'map' reductions were not logged, unfortunately...
+                        if (!next_edge_detail) logPatch(prev_node, state);
 
                         // Add a node for this state (does nothing if node already exists).
                         var node = nodes.update(state);
@@ -312,48 +361,35 @@ var LogAnalyzer = function () {
 
                         // Add a node for this state (does nothing if node already exists).
                         next_edge_detail = data.before + ' → ' + ruleFor(after.toString());
-                        if (!victory && i === actions.length - 1) {
-                            var _node2 = nodes.update(after);
-                            addState(prev_node, _node2);
-                        }
                     } else if (name === 'toolbox-remove') {
                         next_edge_detail = "ToolboxPlace(" + ruleFor(new StateRepr(data).toString()) + ")";
-                    } else if (name === 'placed-expr') {
+                    } else if (name === 'placed-expr' || name === 'detached-expr') {
+
+                        var ruleName = name === 'placed-expr' ? 'Place' : 'Detach';
 
                         // Recover what was placed:
                         data = JSON.parse(data);
                         var _before = new StateRepr(JSON.parse(data.before).board);
                         var _after = new StateRepr(JSON.parse(data.after).board);
 
+                        // TODO: Check toolbox-dragout!!
+
                         if (next_edge_detail) {
-                            var _node3 = nodes.update(_before);
-                            addState(prev_node, _node3);
-                            prev_node = _node3;
+                            var _node2 = nodes.update(_before);
+                            addState(prev_node, _node2);
+                            prev_node = _node2;
                         }
 
-                        var idxAfterMissing = function idxAfterMissing(s) {
-                            var k = s.indexOf('_');
-                            if (k === -1) return -1;else if (s.indexOf('_b') > -1) {
-                                return k + 2;
-                            } else if (s.indexOf('__') > -1) {
-                                return k + 2;
-                            } else return k + 1;
-                        };
-                        var typeOfMissing = function typeOfMissing(s) {
-                            if (s.indexOf('_b') > -1) {
-                                return '_b';
-                            } else if (s.indexOf('__') > -1) {
-                                return '__';
-                            } else return '_';
-                        };
+                        for (var _i3 = 0; _i3 < _before.exprs.length; _i3++) {
+                            if (_before.exprs[_i3] !== _after.exprs[_i3]) {
+                                if (_before.exprs[_i3].indexOf('_') > -1) {
 
-                        for (var _i = 0; _i < _before.exprs.length; _i++) {
-                            if (_before.exprs[_i] !== _after.exprs[_i]) {
-                                if (_before.exprs[_i].indexOf('_') > -1) {
-                                    var beforeLatter = _before.exprs[_i].substring(idxAfterMissing(_before.exprs[_i]));
-                                    var placedExpr = _after.exprs[_i].substring(_before.exprs[_i].indexOf('_'), _after.exprs[_i].lastIndexOf(beforeLatter));
-                                    next_edge_detail = 'Place(' + ruleFor(_before.exprs[_i]) + ', ' + typeOfMissing(_before.exprs[_i]) + ', ' + ruleFor(placedExpr) + ') → ' + ruleFor(_after.exprs[_i]);
-                                } else next_edge_detail = _before.exprs[_i] + ' → ' + _after.exprs[_i];
+                                    var relRange = relRangeOfChangedSubstring(_before.exprs[_i3], _after.exprs[_i3]);
+                                    var missingExpr = substringFromRelRange(_before.exprs[_i3], relRange);
+                                    var placedExpr = substringFromRelRange(_after.exprs[_i3], relRange);
+
+                                    next_edge_detail = ruleName + '(' + ruleFor(_before.exprs[_i3]) + ', ' + missingExpr + ', ' + ruleFor(placedExpr) + ') → ' + ruleFor(_after.exprs[_i3]);
+                                } else next_edge_detail = _before.exprs[_i3] + ' → ' + _after.exprs[_i3];
                                 break;
                             }
                         }
@@ -363,17 +399,22 @@ var LogAnalyzer = function () {
                         var exprs = new StateRepr(stripParen(data.item));
                         next_edge_detail = 'Spill(' + bag.toString() + ') → ' + exprs.exprs.slice(1).reduce(function (p, c) {
                             return p + ruleFor(c) + ' ';
-                        }, '');
+                        }, '').trim();
                     } else if (name === 'bag-add') {
                         // TODO: Fix this.
                         data = JSON.parse(data);
-                        var _bag = new StateRepr(data.item);
-                        var _exprs = new StateRepr(stripParen(data.item));
-                        next_edge_detail = 'BagAdd(' + _bag.toString() + ') → ' + _exprs.exprs.slice(1).reduce(function (p, c) {
-                            return p + ruleFor(c) + ' ';
-                        }, '');
+                        var _bag = new StateRepr(data.before);
+                        var item = new StateRepr(data.item);
+                        var _after2 = new StateRepr(data.after);
+                        next_edge_detail = 'BagAdd(' + ruleFor(_bag.toString()) + ', ' + ruleFor(item.toString()) + ') → ' + ruleFor(_after2.toString());
                     }
                 });
+
+                if (!this.playerWon) {
+                    // No victory was reached in this action path...
+                    var reset_node = nodes.update(new StateRepr('reset'));
+                    edges.push({ from: prev_node, to: reset_node, reduce: 1, undo: 0 });
+                }
 
                 return { nodes: nodes, edges: edges };
             }
@@ -770,7 +811,7 @@ var LogAnalyzer = function () {
             }), raw_edges.map(function (edge) {
                 var e = { from: edge.from.toString(), to: edge.to.toString() };
                 if (edge.undo > 0) e.color = 'red';
-                if (edge.reduction) e.label = edge.reduce + ' : ' + edge.reduction;
+                if (edge.reduction) e.label = edge.reduce + ' : ' + edge.reduction;else if (edge.reduce) e.label = edge.reduce + '';
                 return e;
             }));
             //label:('reduce:' + edge.reduce + '\nundo:' + edge.undo) }) ));

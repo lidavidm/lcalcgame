@@ -73,6 +73,9 @@ var concepts = [
     'Place( HoleyExpression, _b, Boolean ) -> Any',
     'Place( HoleyExpression, __, Collection ) -> Any',
 
+    // Detach inner expression, leaving a hole:
+    'Detach( Any, Any, Hole ) -> HoleyExpression',
+
     'Spill( Collection ) -> ...Primitive',
     'BagAdd( Collection, Primitive ) -> Collection',
 
