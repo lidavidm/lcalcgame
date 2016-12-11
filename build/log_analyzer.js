@@ -85,16 +85,22 @@ var LogAnalyzer = function () {
         return Session;
     }();
 
+    var stringsToShapes = function stringsToShapes(s) {
+        return s.replace(/diamond/g, '■').replace(/rect/g, '■').replace(/star/g, '★').replace(/triangle/g, '▲').replace(/tri/g, '▲').replace(/dot/g, '●').replace(/circle/g, '●');
+    };
+
     var StateRepr = function () {
         function StateRepr(str) {
             _classCallCheck(this, StateRepr);
+
+            if (!str) return;
 
             var exprs = argsForExprString(str);
 
             // Convert lambda expressions to an invariant representation.
             this.exprs = exprs.map(function (e) {
 
-                e = e.replace(/diamond/g, '■').replace(/rect/g, '■').replace(/star/g, '★').replace(/triangle/g, '▲').replace(/tri/g, '▲').replace(/dot/g, '●').replace(/circle/g, '●');
+                e = stringsToShapes(e);
 
                 if (isLambdaExpr(e)) return deBruijn(e);else return e;
             });
@@ -234,7 +240,13 @@ var LogAnalyzer = function () {
                     if (op === 'if') return createRule('Cond', [s.exprs[1], s.exprs[2], 'null']);else if (op === '==') return createRule('Equal', s.exprs.slice(1));else if (op === 'map') return createRule('Map', s.exprs.slice(1));else if (op === 'bag') return createRule('Collection', s.exprs.slice(1));else if (stripParen(expr) === 'λ #0') return createRule('Lambda', 'x');else if (stripParen(expr) === 'λ #0 #0') return createRule('Lambda', 'xx');else if (stripParen(expr) === 'λ #0 #0 #0') return createRule('Lambda', 'xxx');else if (op === 'λ') return createRule('Lambda', s.exprs.slice(1).map(function (s) {
                         return s.replace(/#(0|1|2|3|4|5|6|7)/g, 'x');
                     }));
-                    return expr; // base case
+
+                    if (s.exprs.length === 1) return expr; // base case
+                    else return s.exprs.map(function (e) {
+                            return ruleFor(e);
+                        }).reduce(function (p, c) {
+                            return p + c + ' ';
+                        }, '').trim();
                 };
 
                 // Basic diff to determine what substring was changed in two strings.
@@ -263,10 +275,25 @@ var LogAnalyzer = function () {
 
                 actions.forEach(function (action, i) {
                     var name = action['action_id'];
+
+                    if (name === 'moved' || name === 'condition') return; // skip
+
                     var data = action['action_detail'];
+
+                    // Clean up any redundant slashes:
+                    data = data.replace(/\\\\\\\\/g, '\\').replace(/\\\\/g, '\\');
+
                     var victory = name === 'victory';
                     if (victory) {
-                        data = JSON.parse(data)['final_state'];
+                        var final_state = void 0;
+                        try {
+                            final_state = JSON.parse(data)['final_state'];
+                        } catch (e) {
+                            data = data.replace(/\\\\/g, '\\'); // replace double backslashes with single ones...
+                            final_state = JSON.parse(data)['final_state'];
+                            //console.error(typeof data, data, e);
+                        }
+                        data = final_state;
                     }
 
                     var addState = function addState(prev_node, node) {
@@ -450,7 +477,7 @@ var LogAnalyzer = function () {
             key: 'moves',
             get: function get() {
                 //let v = this.victoryAction;
-                var moveActionIDs = ['reduction-lambda', 'toolbox-remove', 'bag-spill', 'reduction', 'detach-commit', 'placed-expr']; // bag-add...
+                var moveActionIDs = ['reduction-lambda', 'toolbox-remove', 'bag-spill', 'reduction', 'detach-commit', 'detached-expr', 'placed-expr']; // bag-add...
                 return this.actions.filter(function (act, idx, arr) {
 
                     // this patches map level logs in the late-game...
@@ -714,66 +741,124 @@ var LogAnalyzer = function () {
             loadPartitionBar('levelTimeBarContainer', parts);
         } else loadPartitionBar('levelTimeBarContainer', []);
     };
-    var refreshTaskVis = function refreshTaskVis() {
-        var task = getSelectedTask();
 
-        if (parseInt(userSelElem.selectedIndex) === -1) return;
-        if (parseInt(sessionSelElem.selectedIndex) === -1) {
-            // No sessions selected. Go off user selection.
-            var sel_users = getSelectedUsers();
+    var mergeStateGraphs = function mergeStateGraphs(state_graphs) {
 
-            // Get all data on level taskName that the selected users have played.
-            var sel_tasks = sel_users.reduce(function (tasks, user) {
-                return tasks.concat(user.getTasksNamed(task));
-            }, []);
-
-            // Convert these tasks into state graphs.
-            var state_graphs = sel_tasks.map(function (task) {
-                return task.getStateGraph();
+        // (a) Merge the nodes.
+        var all_nodes = new StateReprSet();
+        var raw_nodesets = state_graphs.reduce(function (nodes, graph) {
+            return nodes.concat(graph.nodes.slice());
+        }, []);
+        raw_nodesets.forEach(function (nodeset) {
+            nodeset.forEach(function (node) {
+                all_nodes.update(node); // Add node to merged set.
             });
+        });
+        // (b) Recalculate the edges with respect to the kept nodes.
+        var raw_edges = state_graphs.reduce(function (edges, graph) {
+            return edges.concat(graph.edges.slice());
+        }, []);
+        raw_edges = raw_edges.map(function (edge) {
+            var e = { from: all_nodes.get(edge.from),
+                to: all_nodes.get(edge.to),
+                reduce: edge.reduce,
+                undo: edge.undo };
+            if (edge.reduction) e.reduction = edge.reduction;
+            return e;
+        });
+        // (c) Merge identical edges.
+        for (var i = 0; i < raw_edges.length - 1; i++) {
+            var e1 = raw_edges[i];
+            for (var j = i + 1; j < raw_edges.length; j++) {
+                var e2 = raw_edges[j];
+                if (e1.from.equals(e2.from) && e1.to.equals(e2.to)) {
 
-            // Merge the state graphs.
-            // (a) Merge the nodes.
-            var all_nodes = new StateReprSet();
-            var raw_nodesets = state_graphs.reduce(function (nodes, graph) {
-                return nodes.concat(graph.nodes.slice());
-            }, []);
-            raw_nodesets.forEach(function (nodeset) {
-                nodeset.forEach(function (node) {
-                    all_nodes.update(node); // Add node to merged set.
-                });
-            });
-            // (b) Recalculate the edges with respect to the kept nodes.
-            var raw_edges = state_graphs.reduce(function (edges, graph) {
-                return edges.concat(graph.edges.slice());
-            }, []);
-            raw_edges = raw_edges.map(function (edge) {
-                var e = { from: all_nodes.get(edge.from),
-                    to: all_nodes.get(edge.to),
-                    reduce: edge.reduce,
-                    undo: edge.undo };
-                if (edge.reduction) e.reduction = edge.reduction;
-                return e;
-            });
-            // (c) Merge identical edges.
-            for (var i = 0; i < raw_edges.length - 1; i++) {
-                var e1 = raw_edges[i];
-                for (var j = i + 1; j < raw_edges.length; j++) {
-                    var e2 = raw_edges[j];
-                    if (e1.from.equals(e2.from) && e1.to.equals(e2.to)) {
-
-                        // Edges are equal. Merge and remove.
-                        e1.reduce += e2.reduce; // since there is no undo in the released version, this is equal to the # of times this edge was passed (across tasks + users).
-                        e1.undo += e2.undo; // tally any properties...
-                        raw_edges.splice(j, 1);
-                        j--;
-                    }
+                    // Edges are equal. Merge and remove.
+                    e1.reduce += e2.reduce; // since there is no undo in the released version, this is equal to the # of times this edge was passed (across tasks + users).
+                    e1.undo += e2.undo; // tally any properties...
+                    raw_edges.splice(j, 1);
+                    j--;
                 }
             }
+        }
 
-            // Edges and nodes should now be unique.
-            // Merge back into a single state graph + display with vis.js.
-            createStateGraph(all_nodes.map(function (state) {
+        return { nodes: all_nodes, edges: raw_edges };
+    };
+
+    var generateActionGraphs = function generateActionGraphs(users, taskRange) {
+        if (!taskRange) taskRange = [0, 71];
+        var graphs = {};
+        for (var i = taskRange[0]; i < taskRange[1] - taskRange[0]; i++) {
+            graphs[i.toString()] = generateActionGraph(users, i + taskRange[0]);
+        }return graphs;
+    };
+
+    var generateActionGraph = function generateActionGraph(sel_users, task) {
+        console.log(sel_users);
+
+        // Get all data on level taskName that the selected users have played.
+        var sel_tasks = sel_users.reduce(function (tasks, user) {
+            return tasks.concat(user.getTasksNamed(task));
+        }, []);
+
+        // Convert these tasks into state graphs.
+        var state_graphs = sel_tasks.map(function (task) {
+            return task.getStateGraph();
+        });
+
+        // Merge all playthroughs of this level into a single state graph.
+        var merged_graph = mergeStateGraphs(state_graphs);
+
+        // Return the merged graph.
+        // Edges and nodes should now be unique.
+        return merged_graph;
+    };
+
+    var toNetworkVisFormat = function toNetworkVisFormat(raw_graph) {
+
+        // Turn this graph inside-out.
+        // let dual = (visgraph) => {
+        //     let action_nodes = {};
+        //     let action_edges = {};
+        //     let nodes = visgraph.nodes;
+        //     let edges = visgraph.edges;
+        //     edges.forEach((e) => {
+        //         if (e.reduction) {
+        //             if (e.reduction in actions)
+        //                 action_nodes[e.reduction].count += parseInt(e.label);
+        //             else
+        //                 action_nodes[e.reduction] = { id:e.reduction, label:e.reduction, shape:'box', count:parseInt(e.label) };
+        //
+        //             if (!(e.from in action_edges)) {
+        //                 action_edges[e.from] = { from:e.reduction, to: }
+        //             }
+        //         }
+        //     });
+        // };
+
+        // Make nodes reached by a lot of players more visible,
+        // and nodes reached by less players less visible.
+        var flowSaturate = function flowSaturate(visgraph) {
+            var nodes = visgraph.nodes;
+            var edges = visgraph.edges;
+            nodes.forEach(function (n) {
+                var flow = 0;
+                edges.forEach(function (e) {
+                    if (e.from === n.label || n.final && e.to === n.label) flow += parseInt(e.label);
+                });
+                if (flow < 100) n.color = {
+                    background: colorFrom255(255 - flow / 2),
+                    border: colorFrom255(255 - flow / 2 - 40),
+                    highlight: {
+                        background: '#aaa',
+                        border: '#666'
+                    }
+                };
+            });
+            return visgraph;
+        };
+
+        return flowSaturate({ nodes: raw_graph.nodes.map(function (state) {
                 var s = state.toString();
                 var node = { id: s, label: s, shape: 'box' };
                 if (state.initial) {
@@ -808,17 +893,42 @@ var LogAnalyzer = function () {
                     node.reset = true;
                 }
                 return node;
-            }), raw_edges.map(function (edge) {
+            }), //.filter((n) => !n.reset),
+            edges: raw_graph.edges.map(function (edge) {
                 var e = { from: edge.from.toString(), to: edge.to.toString() };
                 if (edge.undo > 0) e.color = 'red';
-                if (edge.reduction) e.label = edge.reduce + ' : ' + edge.reduction;else if (edge.reduce) e.label = edge.reduce + '';
+                if (edge.reduce) {
+                    // Edge becomes more visible proportional to player count.
+                    e.label = edge.reduce + '';
+                    e.width = edge.reduce / 200.0;
+                    if (e.width < 0.5) {
+                        e.color = colorFrom255(200);
+                        if (e.width < 0.1) e.physics = false;
+                    } else {
+                        e.label = edge.reduce + ' : ' + edge.reduction;
+                        e.reduction = edge.reduction;
+                    }
+                }
+                //if (edge.reduction) e.label = edge.reduce + ' : ' + edge.reduction;
+                //else if (edge.reduce) e.label = edge.reduce + '';
                 return e;
-            }));
-            //label:('reduce:' + edge.reduce + '\nundo:' + edge.undo) }) ));
+            }) }); //.filter((e) => e.to !== 'reset')};
+    };
+
+    var refreshTaskVis = function refreshTaskVis() {
+        var task = getSelectedTask();
+
+        if (parseInt(userSelElem.selectedIndex) === -1) return;
+        if (parseInt(sessionSelElem.selectedIndex) === -1) {
+            // No sessions selected. Go off user selection.
+            var sel_users = getSelectedUsers();
+
+            var visG = toNetworkVisFormat(generateActionGraph(sel_users, task));
+            createStateGraph(visG.nodes, visG.edges);
         } else {
-                // ... TBI ...
-                console.error('Not yet implemented.');
-            }
+            // ... TBI ...
+            console.error('Not yet implemented.');
+        }
     };
     pub.refreshTaskVis = refreshTaskVis;
 
@@ -847,10 +957,9 @@ var LogAnalyzer = function () {
             });
         } else logs = JSON.parse(json);
 
+        // We can assume these logs are for one user...
         var username = User.for(logs);
-        var sessionID = Session.for(logs);
         var new_user = false;
-
         if (!(username in users)) {
             console.log(' > Added user ' + username + '.');
             users[username] = new User(username);
@@ -858,33 +967,305 @@ var LogAnalyzer = function () {
             new_user = true;
         }
 
-        console.log(' > For user: ' + username + '\n >> added session ' + sessionID + '.');
-        users[username].addSession(new Session(sessionID, logs));
+        // ... but not one session.
+        var sessionStartIndices = [];
+        for (var i = 0; i < logs.length; i++) {
+            if (logs[i][0] === 'startSession') sessionStartIndices.push(i);
+        }
+        // Generate sessions
+        for (var _i4 = 0; _i4 < sessionStartIndices.length; _i4++) {
+            var idx = sessionStartIndices[_i4];
+            var sessionLogs = _i4 < sessionStartIndices.length - 1 ? logs.slice(idx, sessionStartIndices[_i4 + 1]) : logs.slice(idx);
+            console.log(sessionLogs);
+            var sessionID = Session.for(sessionLogs);
+            users[username].addSession(new Session(sessionID, logs));
+            console.log(' > For user: ' + username + '\n >> added session ' + sessionID + '.');
+        }
 
-        if (new_user) refreshSessionList();
+        if (new_user) {
+            refreshSessionList();
+
+            // Optional: Generate and export all
+            // action graphs of this user to a single JSON file.
+            var actionGraphs = generateActionGraphs([users[username]]);
+            var file = new File([JSON.stringify(actionGraphs)], username + ".json", { type: "text/plain;charset=utf-8" });
+            saveAs(file, username + ".actiongraphs"); // Save JSON file to disk (with FileSaver.js).
+        }
     };
 
     pub.handleFiles = function (files) {
 
+        var userGraphs = [];
+        var toStateRepr = function toStateRepr(jsonNode) {
+            var r = new StateRepr();
+            r.exprs = jsonNode.exprs;
+            if (jsonNode.initial) r.initial = jsonNode.initial;
+            if (jsonNode.final) r.final = jsonNode.final;
+            return r;
+        };
+        var toStateGraph = function toStateGraph(jsonRep) {
+
+            // Cast nodes as StateRepr objects.
+            if (!Array.isArray(jsonRep.nodes)) {
+                var nodeset = new StateReprSet();
+                nodeset.states = jsonRep.nodes.states.map(function (jsonStateRep) {
+                    return toStateRepr(jsonStateRep);
+                });
+                jsonRep.nodes = nodeset;
+            }
+            jsonRep.edges.forEach(function (edge) {
+                if (edge.from && !(edge.from instanceof StateRepr)) edge.from = toStateRepr(edge.from);
+                if (edge.to && !(edge.to instanceof StateRepr)) edge.to = toStateRepr(edge.to);
+            });
+
+            return jsonRep;
+        };
+        var onAllFilesLoaded = function onAllFilesLoaded() {
+            if (userGraphs.length === 0) return;
+
+            // Get array of graphs for each task from 0 to 70:
+            var graphsPerTask = {};
+
+            var _loop = function _loop(i) {
+                var task = i.toString();
+                userGraphs.forEach(function (G) {
+                    if (task in G) {
+                        var sg = toStateGraph(G[task]);
+                        if (!(task in graphsPerTask)) graphsPerTask[task] = [sg];else graphsPerTask[task].push(sg);
+                    }
+                });
+            };
+
+            for (var i = 0; i < 71; i++) {
+                _loop(i);
+            }
+
+            // For each task, merge all loaded graphs into a single state graph.
+            for (var _i5 = 0; _i5 < 71; _i5++) {
+                var _task = _i5.toString();
+                if (_task in graphsPerTask) {
+                    graphsPerTask[_task] = mergeStateGraphs(graphsPerTask[_task]);
+                }
+            }
+
+            // Export the merged graphs to a single file.
+            var file = new File([JSON.stringify(graphsPerTask)], "merged.json", { type: "text/plain;charset=utf-8" });
+            saveAs(file, "merged.mergedgraph"); // Save JSON file to disk (with FileSaver.js).
+        };
+
+        var commonConceptsFromEdges = function commonConceptsFromEdges(edges) {
+            var concepts = {};
+            edges.forEach(function (e) {
+                if (e.reduction && !(e.reduction in concepts)) concepts[e.reduction] = true;
+            });
+            return Object.keys(concepts);
+        };
+
+        var cleanXs = function cleanXs(s) {
+            return s.replace(/\#(0|1|2|3|4|5|6|7|x)/g, 'x');
+        };
+
+        /**
+         * Takes a concept in parametrized form
+         * and an abstraction hierarchy and compares the two.
+         * Adds the concept to the hierarchy if !exist and
+         * returns both new hierarchy and information about
+         * the 'novelty' of the concept.
+         *
+         * 	Novelty takes 3 forms:
+         * 		> Global novelty
+         * 			- Whether a concept, regardless of its embeddedness,
+         * 			has been used at all before.
+         * 		> Local novelty
+         * 			- Whether a concept has been used as an argument to its'
+         * 			parent concept before, in that parameter position. For
+         * 			instance, whether in Apply(Lambda(xx), Lambda(x)), the
+         * 			concept Apply has seen a Lambda in its 2nd parameter before.
+         * 		> Contextual novelty
+         * 			- Whether the entire instantiation has been seen before.
+         * 			For instance, Apply(Lambda(x), star) will be seen a lot
+         * 			(this is identity applied to star). The difference between
+         * 			this and local is that contextual takes into account
+         * 			the other parameter(s).
+         *
+         * Novelty of the entire expression is tallied according to these 3 forms.
+         */
+        var __TEST_conceptApply = function __TEST_conceptApply() {
+            var knowledge = {};
+
+            var nov = applyConceptToKnowledgeHierarchy('Apply(Lambda(x), star) → star', knowledge);
+            console.log('Knowledge: ', knowledge);
+            console.log('Novelty: ', nov); // 4, 4, 0
+
+            nov = applyConceptToKnowledgeHierarchy('Apply(Lambda(xx), star) → star', knowledge);
+            console.log('Knowledge: ', knowledge);
+            console.log('Novelty: ', nov); // 1, 2, 0
+
+            nov = applyConceptToKnowledgeHierarchy('Apply(Lambda(Equal(x, x)), star) → Equal(star, star)', knowledge);
+            console.log('Knowledge: ', knowledge);
+            console.log('Novelty: ', nov); //
+        };
+        var stripConceptName = function stripConceptName(e) {
+            if (e.indexOf('(') > -1) return e.substring(0, e.indexOf('('));else return e;
+        };
+        var getConceptParams = function getConceptParams(e) {
+            e = e.trim();
+            if (e.indexOf('→') > -1) e = e.substring(0, e.indexOf('→')).trim();
+            if (e.indexOf('(') > -1) e = e.substring(e.indexOf('(') + 1);else return [];
+            if (e.lastIndexOf(')') > -1) e = e.substring(0, e.lastIndexOf(')'));
+            e = e.replace(',', ' ');
+            return argsForExprString(e);
+        };
+        var applyConceptToKnowledgeHierarchy = function applyConceptToKnowledgeHierarchy(concept, hierarchy, global_hierarchy) {
+            var localized = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
+            if (!global_hierarchy) global_hierarchy = hierarchy;
+            var conceptName = stripConceptName(concept);
+            var conceptParams = getConceptParams(concept);
+            var novelty = {
+                global: 0,
+                local: 0,
+                contextual: 0
+            };
+            var mergeNovelty = function mergeNovelty(n1, n2) {
+                return {
+                    global: n1.global + n2.global,
+                    local: n1.local + n2.local,
+                    contextual: n1.contextual + n2.contextual
+                };
+            };
+            var createEmptyObjArray = function createEmptyObjArray(len) {
+                return Array.apply(null, Array(len)).map(function () {
+                    return {};
+                });
+            };
+            var paramArrayForLength = function paramArrayForLength(conceptNode, len, name) {
+                if (!('versions' in conceptNode)) conceptNode.versions = {};
+                if (!(len.toString() in conceptNode.versions)) {
+                    if (len === 0) conceptNode.versions[len.toString()] = name;else conceptNode.versions[len.toString()] = createEmptyObjArray(len);
+                }
+                return conceptNode.versions[len.toString()];
+            };
+
+            if (conceptName in hierarchy) {
+                (function () {
+                    // This alters hierarchy[conceptName][i] in-position, returning novelty.
+                    var hierarchyParams = paramArrayForLength(hierarchy[conceptName], conceptParams.length, conceptName);
+                    if (Array.isArray(hierarchyParams)) {
+                        // Recurse if array.
+                        var innerComparisons = conceptParams.map(function (param, i) {
+                            return applyConceptToKnowledgeHierarchy(param, hierarchyParams[i], global_hierarchy, localized);
+                        });
+                        novelty = innerComparisons.reduce(function (p, c) {
+                            return mergeNovelty(p, c);
+                        }, novelty); // merge inner novelty scores
+                    }
+                })();
+            } else if (hierarchy != global_hierarchy) {
+                    (function () {
+
+                        //Concept is 'new' at a local level.
+                        if (!localized) {
+                            novelty.local += 1;
+                            console.log(' >> new local concept: ', conceptName, 'in hier', hierarchy);
+                        }
+
+                        hierarchy[conceptName] = {};
+                        var a = paramArrayForLength(hierarchy[conceptName], conceptParams.length, conceptName);
+                        if (Array.isArray(a)) {
+                            var innerComparisons = a.map(function (obj, i) {
+                                return applyConceptToKnowledgeHierarchy(conceptParams[i], a[i], global_hierarchy, true);
+                            });
+                            novelty = innerComparisons.reduce(function (p, c) {
+                                return mergeNovelty(p, c);
+                            }, novelty); // merge inner novelty scores
+                        } else {
+                                //console.log('>>>', conceptName, hierarchy[conceptName], a);
+                            }
+                    })();
+                }
+
+            if (!(conceptName in global_hierarchy)) {
+                (function () {
+                    // New global concept.
+                    novelty.global += 1;
+                    global_hierarchy[conceptName] = {};
+                    var a = paramArrayForLength(global_hierarchy[conceptName], conceptParams.length, conceptName);
+                    if (Array.isArray(a)) {
+                        var innerComparisons = a.map(function (obj, i) {
+                            return applyConceptToKnowledgeHierarchy(conceptParams[i], a[i], global_hierarchy, localized);
+                        });
+                        novelty = innerComparisons.reduce(function (p, c) {
+                            return mergeNovelty(p, c);
+                        }, novelty); // merge inner novelty scores
+                    }
+                })();
+            } else if (hierarchy != global_hierarchy) {
+                    (function () {
+                        var a = paramArrayForLength(global_hierarchy[conceptName], conceptParams.length, conceptName);
+                        if (Array.isArray(a)) {
+                            var innerComparisons = a.map(function (obj, i) {
+                                return applyConceptToKnowledgeHierarchy(conceptParams[i], a[i], global_hierarchy, true);
+                            });
+                            novelty = innerComparisons.reduce(function (p, c) {
+                                return mergeNovelty(p, c);
+                            }, novelty); // merge inner novelty scores
+                        }
+                    })();
+                }
+
+            return novelty;
+        };
+
+        var displayStateGraphFromJSON = function displayStateGraphFromJSON(json) {
+
+            // DEBUG
+            __TEST_conceptApply();
+
+            var commonConcepts = '';
+            var graphs = JSON.parse(json);
+
+            for (var i = 0; i < 71; i++) {
+                var k = i.toString();
+
+                var G = toStateGraph(graphs[k]);
+                var visG = toNetworkVisFormat(G);
+
+                commonConcepts += k + '\n' + cleanXs(stringsToShapes(commonConceptsFromEdges(visG.edges).reduce(function (p, c) {
+                    return p + c + '\n';
+                }, '').trim())) + '\n\n';
+
+                if (k === '21') createStateGraph(visG.nodes, visG.edges);
+            }
+
+            // List concepts used.
+            $('#conceptsTextarea').text(commonConcepts);
+        };
+
+        var filesLoaded = 0;
         var numFiles = files.length;
 
-        var _loop = function _loop(i) {
+        var _loop2 = function _loop2(i) {
             var file = files[i];
             var filename = file.name;
 
             var reader = new FileReader();
             reader.onload = function (e) {
+
                 var contents = e.target.result;
                 console.log('Read file "' + filename + '"...');
-                //console.log( " > " + contents);
-                parseLog(contents);
+
+                if (filename.indexOf('.actiongraphs') > -1) userGraphs.push(JSON.parse(contents));else if (filename.indexOf('.mergedgraph') > -1) displayStateGraphFromJSON(contents);else parseLog(contents);
+
+                filesLoaded++;
+                if (filesLoaded === numFiles) onAllFilesLoaded();
             };
 
             reader.readAsText(file);
         };
 
         for (var i = 0; i < numFiles; i++) {
-            _loop(i);
+            _loop2(i);
         }
     };
 
