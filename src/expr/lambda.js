@@ -185,6 +185,8 @@ class LambdaHoleExpr extends MissingExpression {
         if (node instanceof LambdaHoleExpr) node = node.parent;
         // Variables must be reduced before application
         if (node instanceof VarExpr || node instanceof AssignExpr) return;
+        // Disallow interaction with nested lambdas
+        if (this.parent && this.parent.parent instanceof LambdaExpr) return;
         super.ondropenter(node, pos);
 
         // Special case: Funnel representation of 'map' hovered over hole.
@@ -231,6 +233,7 @@ class LambdaHoleExpr extends MissingExpression {
     ondropexit(node, pos) {
         if (node instanceof LambdaHoleExpr) node = node.parent;
         if (node instanceof VarExpr || node instanceof AssignExpr) return;
+        if (this.parent && this.parent.parent instanceof LambdaExpr) return;
 
         super.ondropexit(node, pos);
 
@@ -243,6 +246,11 @@ class LambdaHoleExpr extends MissingExpression {
     }
     ondropped(node, pos) {
         if (node instanceof LambdaHoleExpr) node = node.parent;
+        // Disallow interaction with nested lambda
+        if (this.parent && this.parent.parent instanceof LambdaExpr) {
+            return null;
+        }
+
         if (node.dragging) { // Make sure node is being dragged by the user.
 
             // Special case: Funnel dropped over hole.

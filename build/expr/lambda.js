@@ -239,6 +239,8 @@ var LambdaHoleExpr = function (_MissingExpression) {
             if (node instanceof LambdaHoleExpr) node = node.parent;
             // Variables must be reduced before application
             if (node instanceof VarExpr || node instanceof AssignExpr) return;
+            // Disallow interaction with nested lambdas
+            if (this.parent && this.parent.parent instanceof LambdaExpr) return;
             _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'ondropenter', this).call(this, node, pos);
 
             // Special case: Funnel representation of 'map' hovered over hole.
@@ -288,6 +290,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
         value: function ondropexit(node, pos) {
             if (node instanceof LambdaHoleExpr) node = node.parent;
             if (node instanceof VarExpr || node instanceof AssignExpr) return;
+            if (this.parent && this.parent.parent instanceof LambdaExpr) return;
 
             _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'ondropexit', this).call(this, node, pos);
 
@@ -304,6 +307,11 @@ var LambdaHoleExpr = function (_MissingExpression) {
             var _this7 = this;
 
             if (node instanceof LambdaHoleExpr) node = node.parent;
+            // Disallow interaction with nested lambda
+            if (this.parent && this.parent.parent instanceof LambdaExpr) {
+                return null;
+            }
+
             if (node.dragging) {
                 // Make sure node is being dragged by the user.
 
