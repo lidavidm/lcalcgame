@@ -227,7 +227,7 @@ class BagExpr extends CollectionExpr {
         this.ondropexit(node, pos);
 
         if (this.parent) return;
-        if (node instanceof FunnelMapFunc || node instanceof VarExpr) return;
+        if (node instanceof FunnelMapFunc) return;
 
         if (!(node instanceof Expression)) {
             console.error('@ BagExpr.ondropped: Dropped node is not an Expression.', node);
@@ -386,19 +386,11 @@ class BracketArrayExpr extends BagExpr {
         Resource.play('bag-spill');
     }
 
-    isAllowed(node) {
-        return !(node instanceof VarExpr);
-    }
-
     ondropenter(node, pos) {
-        if (!this.isAllowed(node)) return;
-
         this.onmouseenter(pos);
 
     }
     ondropexit(node, pos) {
-        if (!this.isAllowed(node)) return;
-
         this.onmouseleave(pos);
 
     }
@@ -406,7 +398,6 @@ class BracketArrayExpr extends BagExpr {
         this.ondropexit(node, pos);
 
         if (this.parent) return;
-        if (!this.isAllowed(node)) return;
 
         if (!(node instanceof Expression)) {
             console.error('@ BagExpr.ondropped: Dropped node is not an Expression.', node);
@@ -427,6 +418,10 @@ class BracketArrayExpr extends BagExpr {
         let n = node.clone();
         let before_str = this.toString();
         this.addItem(n);
+
+        if (n instanceof VarExpr) {
+            n.performReduction();
+        }
 
         Logger.log('bag-add', {'before':before_str, 'after':this.toString(), 'item':n.toString()});
 
@@ -499,38 +494,4 @@ class PopExpr extends Expression {
         }
     }
     toString() { return '(pop ' + this.collection.toString() + ')'; }
-}
-
-// A bag-like object that is not a value, so it has to reduce -
-// i.e. it's a constructor for a new bag.
-class BracketArrayConstructor extends BracketArrayExpr {
-    constructor(x, y, w, h, holding=[]) {
-        super(x, y, w, h, holding);
-    }
-
-    isAllowed(node) {
-        return true;
-    }
-
-    isValue() {
-        return this._items.reduce((a, b) => a && b.isValue(), true);
-    }
-
-    canReduce() {
-        return this._items.reduce((a, b) => a && b.canReduce(), true);
-    }
-
-    onmouseclick() {
-        this.performReduction();
-    }
-
-    performReduction() {
-        return reduceExprs(this._items).then((newExprs) => {
-            Animate.poof(this);
-            let result = new BracketArrayExpr(0, 0, 0, 0, []);
-            newExprs.forEach(result.addItem.bind(result));
-            (this.parent || this.stage).swap(this, result);
-            return result;
-        });
-    }
 }

@@ -329,7 +329,7 @@ var BagExpr = function (_CollectionExpr) {
             this.ondropexit(node, pos);
 
             if (this.parent) return;
-            if (node instanceof FunnelMapFunc || node instanceof VarExpr) return;
+            if (node instanceof FunnelMapFunc) return;
 
             if (!(node instanceof Expression)) {
                 console.error('@ BagExpr.ondropped: Dropped node is not an Expression.', node);
@@ -527,22 +527,13 @@ var BracketArrayExpr = function (_BagExpr) {
             Resource.play('bag-spill');
         }
     }, {
-        key: 'isAllowed',
-        value: function isAllowed(node) {
-            return !(node instanceof VarExpr);
-        }
-    }, {
         key: 'ondropenter',
         value: function ondropenter(node, pos) {
-            if (!this.isAllowed(node)) return;
-
             this.onmouseenter(pos);
         }
     }, {
         key: 'ondropexit',
         value: function ondropexit(node, pos) {
-            if (!this.isAllowed(node)) return;
-
             this.onmouseleave(pos);
         }
     }, {
@@ -551,7 +542,6 @@ var BracketArrayExpr = function (_BagExpr) {
             this.ondropexit(node, pos);
 
             if (this.parent) return;
-            if (!this.isAllowed(node)) return;
 
             if (!(node instanceof Expression)) {
                 console.error('@ BagExpr.ondropped: Dropped node is not an Expression.', node);
@@ -572,6 +562,10 @@ var BracketArrayExpr = function (_BagExpr) {
             var n = node.clone();
             var before_str = this.toString();
             this.addItem(n);
+
+            if (n instanceof VarExpr) {
+                n.performReduction();
+            }
 
             Logger.log('bag-add', { 'before': before_str, 'after': this.toString(), 'item': n.toString() });
 
@@ -721,60 +715,3 @@ var PopExpr = function (_Expression2) {
 
     return PopExpr;
 }(Expression);
-
-// A bag-like object that is not a value, so it has to reduce -
-// i.e. it's a constructor for a new bag.
-
-
-var BracketArrayConstructor = function (_BracketArrayExpr) {
-    _inherits(BracketArrayConstructor, _BracketArrayExpr);
-
-    function BracketArrayConstructor(x, y, w, h) {
-        var holding = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : [];
-
-        _classCallCheck(this, BracketArrayConstructor);
-
-        return _possibleConstructorReturn(this, (BracketArrayConstructor.__proto__ || Object.getPrototypeOf(BracketArrayConstructor)).call(this, x, y, w, h, holding));
-    }
-
-    _createClass(BracketArrayConstructor, [{
-        key: 'isAllowed',
-        value: function isAllowed(node) {
-            return true;
-        }
-    }, {
-        key: 'isValue',
-        value: function isValue() {
-            return this._items.reduce(function (a, b) {
-                return a && b.isValue();
-            }, true);
-        }
-    }, {
-        key: 'canReduce',
-        value: function canReduce() {
-            return this._items.reduce(function (a, b) {
-                return a && b.canReduce();
-            }, true);
-        }
-    }, {
-        key: 'onmouseclick',
-        value: function onmouseclick() {
-            this.performReduction();
-        }
-    }, {
-        key: 'performReduction',
-        value: function performReduction() {
-            var _this14 = this;
-
-            return reduceExprs(this._items).then(function (newExprs) {
-                Animate.poof(_this14);
-                var result = new BracketArrayExpr(0, 0, 0, 0, []);
-                newExprs.forEach(result.addItem.bind(result));
-                (_this14.parent || _this14.stage).swap(_this14, result);
-                return result;
-            });
-        }
-    }]);
-
-    return BracketArrayConstructor;
-}(BracketArrayExpr);

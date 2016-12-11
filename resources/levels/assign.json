@@ -177,7 +177,7 @@
         },
         {
             "description": "Building bags",
-            "board": "(array_constructor) ($x)",
+            "board": "(bag) ($x)",
             "goal": "(bag diamond)",
             "globals": {
                 "x": "(diamond)"
@@ -189,7 +189,7 @@
             "goal": "(bag star diamond)",
             "toolbox": "($x) ($y)",
             "globals": {
-                "x": "(array_constructor star)",
+                "x": "(bag star)",
                 "y": "(diamond)"
             }
         },
@@ -204,10 +204,11 @@
         },
         {
             "description": "Constructing bags",
-            "board": "(array_constructor /($x) /(star))",
-            "goal": "(bag star star)",
+            "board": "(if /(== /($x) /(star)) /(bag /(star)))",
+            "goal": "(bag star)",
+            "toolbox": "(assign /($x) _) (diamond) (star)",
             "globals": {
-                "x": "(star)"
+                "x": "(triangle)"
             }
         },
         {
