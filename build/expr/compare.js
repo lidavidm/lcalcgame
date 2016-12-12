@@ -52,7 +52,9 @@ var CompareExpr = function (_Expression) {
         key: 'onmouseclick',
         value: function onmouseclick(pos) {
             console.log('Expressions are equal: ', this.compare());
-            this.performReduction();
+            if (!this._animating) {
+                this.performReduction();
+            }
         }
     }, {
         key: 'reduce',

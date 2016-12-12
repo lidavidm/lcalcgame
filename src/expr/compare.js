@@ -29,7 +29,9 @@ class CompareExpr extends Expression {
     get rightExpr() { return this.holes[2]; }
     onmouseclick(pos) {
         console.log('Expressions are equal: ', this.compare());
-        this.performReduction();
+        if (!this._animating) {
+            this.performReduction();
+        }
     }
     reduce() {
         var cmp = this.compare();
