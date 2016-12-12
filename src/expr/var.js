@@ -618,7 +618,7 @@ class JumpingAssignExpr extends AssignExpr {
                 value.scale = { x: 0.3, y: 0.3 };
                 let target = {
                     pos: targetPos,
-                    scale: { x: 1, y: 1 },
+                    scale: { x: 0.7, y: 0.7 },
                 };
 
                 let lerp = arcLerp(value.absolutePos.y, targetPos.y, -150);

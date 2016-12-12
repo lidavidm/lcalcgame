@@ -768,7 +768,7 @@ var JumpingAssignExpr = function (_AssignExpr) {
                     value.scale = { x: 0.3, y: 0.3 };
                     var target = {
                         pos: targetPos,
-                        scale: { x: 1, y: 1 }
+                        scale: { x: 0.7, y: 0.7 }
                     };
 
                     var lerp = arcLerp(value.absolutePos.y, targetPos.y, -150);

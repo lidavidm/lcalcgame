@@ -3,12 +3,10 @@ class DisplayChest extends Expression {
     constructor(name, expr) {
         super([expr]);
         this.name = name;
-        this.childPos = this.origChildPos = { x: 5, y: 5 };
+        this.childPos = this.origChildPos = { x: 0, y: -20 };
 
         if (!expr) return;
-        expr.ignoreEvents = true;
-        expr.scale = { x: 0.6, y: 0.6 };
-        expr.anchor = { x: 0.5, y: 0.5 };
+        this.setExpr(expr);
     }
 
     open() {}
@@ -17,10 +15,21 @@ class DisplayChest extends Expression {
     setExpr(expr) {
         this.holes[0] = expr;
         expr.ignoreEvents = true;
-        expr.scale = { x: 0.6, y: 0.6 };
-        expr.anchor = { x: 0.5, y: 0.5 };
-        expr.pos = { x: 0, y: 0 };
-        this.update();
+        expr.anchor = { x: 0.5, y: 0 };
+        expr.scale = { x: 0.7, y: 0.7 };
+        expr.pos = {
+            x: this.childPos.x,
+            y: this.childPos.y,
+        };
+    }
+
+    update() {
+        this.children = [];
+        this.holes.forEach((expr) => this.addChild(expr));
+
+        this.childPos.x = this.origChildPos.x = this.size.w / 2;
+
+        this.holes[0].update();
     }
 
     getExpr() {
@@ -32,7 +41,7 @@ class DisplayChest extends Expression {
     prepareAssign() {
         let target = {
             childPos: {
-                x: 10,
+                x: this.origChildPos.x,
                 y: -200,
             },
         };
@@ -44,8 +53,7 @@ class DisplayChest extends Expression {
     drawInternal(ctx, pos, boundingSize) {
         let size = this._size;
         let scale = this.absoluteScale;
-        let adjustedSize = this.absoluteSize;
-        let offsetX = (adjustedSize.w - size.w) / 2;
+        let offsetX = (boundingSize.w - size.w * scale.x) / 2;
         ctx.drawImage(ChestImages.lidOpen(this.name), pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
         this.holes[0].pos = {
             x: this.childPos.x,
@@ -56,8 +64,7 @@ class DisplayChest extends Expression {
     drawInternalAfterChildren(ctx, pos, boundingSize) {
         let size = this._size;
         let scale = this.absoluteScale;
-        let adjustedSize = this.absoluteSize;
-        let offsetX = (adjustedSize.w - size.w) / 2;
+        let offsetX = (boundingSize.w - size.w * scale.x) / 2;
         ctx.drawImage(ChestImages.base(this.name), pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
     }
 }
@@ -65,9 +72,10 @@ class DisplayChest extends Expression {
 class LabeledDisplayChest extends DisplayChest {
     constructor(name, expr) {
         super(name, expr);
-        this.childPos = this.origChildPos = { x: 20, y: 5 };
         this.label = new TextExpr(name);
         this.label.color = 'white';
+        this.label.scale = { x: 0.8, y: 0.8 };
+        this.label.anchor = { x: 0.5, y: 0.7 };
         this.holes.push(this.label);
     }
 
@@ -76,7 +84,7 @@ class LabeledDisplayChest extends DisplayChest {
         let expr = this.getExpr();
 
         this.label.pos = {
-            x: this.childPos.x + expr.size.w / 2 * expr.scale.x - this.label.size.w / 2,
+            x: this.childPos.x,
             y: this.size.h / 2,
         };
     }

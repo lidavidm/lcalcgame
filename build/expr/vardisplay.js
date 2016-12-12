@@ -20,12 +20,10 @@ var DisplayChest = function (_Expression) {
         var _this = _possibleConstructorReturn(this, (DisplayChest.__proto__ || Object.getPrototypeOf(DisplayChest)).call(this, [expr]));
 
         _this.name = name;
-        _this.childPos = _this.origChildPos = { x: 5, y: 5 };
+        _this.childPos = _this.origChildPos = { x: 0, y: -20 };
 
         if (!expr) return _possibleConstructorReturn(_this);
-        expr.ignoreEvents = true;
-        expr.scale = { x: 0.6, y: 0.6 };
-        expr.anchor = { x: 0.5, y: 0.5 };
+        _this.setExpr(expr);
         return _this;
     }
 
@@ -40,10 +38,26 @@ var DisplayChest = function (_Expression) {
         value: function setExpr(expr) {
             this.holes[0] = expr;
             expr.ignoreEvents = true;
-            expr.scale = { x: 0.6, y: 0.6 };
-            expr.anchor = { x: 0.5, y: 0.5 };
-            expr.pos = { x: 0, y: 0 };
-            this.update();
+            expr.anchor = { x: 0.5, y: 0 };
+            expr.scale = { x: 0.7, y: 0.7 };
+            expr.pos = {
+                x: this.childPos.x,
+                y: this.childPos.y
+            };
+        }
+    }, {
+        key: 'update',
+        value: function update() {
+            var _this2 = this;
+
+            this.children = [];
+            this.holes.forEach(function (expr) {
+                return _this2.addChild(expr);
+            });
+
+            this.childPos.x = this.origChildPos.x = this.size.w / 2;
+
+            this.holes[0].update();
         }
     }, {
         key: 'getExpr',
@@ -56,16 +70,16 @@ var DisplayChest = function (_Expression) {
     }, {
         key: 'prepareAssign',
         value: function prepareAssign() {
-            var _this2 = this;
+            var _this3 = this;
 
             var target = {
                 childPos: {
-                    x: 10,
+                    x: this.origChildPos.x,
                     y: -200
                 }
             };
             return Animate.tween(this, target, 600).after(function () {
-                _this2.childPos = { x: _this2.origChildPos.x, y: _this2.origChildPos.y };
+                _this3.childPos = { x: _this3.origChildPos.x, y: _this3.origChildPos.y };
             });
         }
     }, {
@@ -73,8 +87,7 @@ var DisplayChest = function (_Expression) {
         value: function drawInternal(ctx, pos, boundingSize) {
             var size = this._size;
             var scale = this.absoluteScale;
-            var adjustedSize = this.absoluteSize;
-            var offsetX = (adjustedSize.w - size.w) / 2;
+            var offsetX = (boundingSize.w - size.w * scale.x) / 2;
             ctx.drawImage(ChestImages.lidOpen(this.name), pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
             this.holes[0].pos = {
                 x: this.childPos.x,
@@ -86,8 +99,7 @@ var DisplayChest = function (_Expression) {
         value: function drawInternalAfterChildren(ctx, pos, boundingSize) {
             var size = this._size;
             var scale = this.absoluteScale;
-            var adjustedSize = this.absoluteSize;
-            var offsetX = (adjustedSize.w - size.w) / 2;
+            var offsetX = (boundingSize.w - size.w * scale.x) / 2;
             ctx.drawImage(ChestImages.base(this.name), pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
         }
     }]);
@@ -101,13 +113,14 @@ var LabeledDisplayChest = function (_DisplayChest) {
     function LabeledDisplayChest(name, expr) {
         _classCallCheck(this, LabeledDisplayChest);
 
-        var _this3 = _possibleConstructorReturn(this, (LabeledDisplayChest.__proto__ || Object.getPrototypeOf(LabeledDisplayChest)).call(this, name, expr));
+        var _this4 = _possibleConstructorReturn(this, (LabeledDisplayChest.__proto__ || Object.getPrototypeOf(LabeledDisplayChest)).call(this, name, expr));
 
-        _this3.childPos = _this3.origChildPos = { x: 20, y: 5 };
-        _this3.label = new TextExpr(name);
-        _this3.label.color = 'white';
-        _this3.holes.push(_this3.label);
-        return _this3;
+        _this4.label = new TextExpr(name);
+        _this4.label.color = 'white';
+        _this4.label.scale = { x: 0.8, y: 0.8 };
+        _this4.label.anchor = { x: 0.5, y: 0.7 };
+        _this4.holes.push(_this4.label);
+        return _this4;
     }
 
     _createClass(LabeledDisplayChest, [{
@@ -117,7 +130,7 @@ var LabeledDisplayChest = function (_DisplayChest) {
             var expr = this.getExpr();
 
             this.label.pos = {
-                x: this.childPos.x + expr.size.w / 2 * expr.scale.x - this.label.size.w / 2,
+                x: this.childPos.x,
                 y: this.size.h / 2
             };
         }
@@ -150,20 +163,20 @@ var LabeledDisplay = function (_Expression2) {
     function LabeledDisplay(name, expr) {
         _classCallCheck(this, LabeledDisplay);
 
-        var _this4 = _possibleConstructorReturn(this, (LabeledDisplay.__proto__ || Object.getPrototypeOf(LabeledDisplay)).call(this, []));
+        var _this5 = _possibleConstructorReturn(this, (LabeledDisplay.__proto__ || Object.getPrototypeOf(LabeledDisplay)).call(this, []));
 
-        _this4.name = name;
-        _this4.nameLabel = new TextExpr(name);
-        _this4.nameLabel.color = 'black';
-        _this4.equals = new TextExpr("=");
-        _this4.equals.color = 'black';
-        _this4.value = expr;
-        _this4.addArg(_this4.nameLabel);
-        _this4.addArg(_this4.equals);
-        _this4.addArg(_this4.value);
-        _this4.setExpr(expr);
-        _this4.origValue = null;
-        return _this4;
+        _this5.name = name;
+        _this5.nameLabel = new TextExpr(name);
+        _this5.nameLabel.color = 'black';
+        _this5.equals = new TextExpr("=");
+        _this5.equals.color = 'black';
+        _this5.value = expr;
+        _this5.addArg(_this5.nameLabel);
+        _this5.addArg(_this5.equals);
+        _this5.addArg(_this5.value);
+        _this5.setExpr(expr);
+        _this5.origValue = null;
+        return _this5;
     }
 
     _createClass(LabeledDisplay, [{
@@ -218,20 +231,20 @@ var SpreadsheetDisplay = function (_Expression3) {
     function SpreadsheetDisplay(name, expr) {
         _classCallCheck(this, SpreadsheetDisplay);
 
-        var _this5 = _possibleConstructorReturn(this, (SpreadsheetDisplay.__proto__ || Object.getPrototypeOf(SpreadsheetDisplay)).call(this, []));
+        var _this6 = _possibleConstructorReturn(this, (SpreadsheetDisplay.__proto__ || Object.getPrototypeOf(SpreadsheetDisplay)).call(this, []));
 
-        _this5.name = name;
-        _this5.nameLabel = new TextExpr(name);
-        _this5.nameLabel.color = 'black';
-        _this5.value = expr;
-        _this5.addArg(_this5.nameLabel);
-        _this5.addArg(_this5.value);
-        _this5.setExpr(expr);
-        _this5.origValue = null;
+        _this6.name = name;
+        _this6.nameLabel = new TextExpr(name);
+        _this6.nameLabel.color = 'black';
+        _this6.value = expr;
+        _this6.addArg(_this6.nameLabel);
+        _this6.addArg(_this6.value);
+        _this6.setExpr(expr);
+        _this6.origValue = null;
 
-        _this5._fixedSize = { w: 0, h: 0 };
-        _this5.valuePos = 0;
-        return _this5;
+        _this6._fixedSize = { w: 0, h: 0 };
+        _this6.valuePos = 0;
+        return _this6;
     }
 
     _createClass(SpreadsheetDisplay, [{
