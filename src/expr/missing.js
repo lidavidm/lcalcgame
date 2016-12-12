@@ -202,3 +202,12 @@ class MissingKeyExpression extends MissingBooleanExpression {
         this.graphicNode.children[0].drawInternal( ctx, addPos(pos, { x:boundingSize.w/2.0-sz.w/2, y:boundingSize.h/2.0-sz.h/2 }), sz);
     }
 }
+
+class MissingChestExpression extends MissingTypedExpression {
+    constructor(expr_to_miss) {
+        super(expr_to_miss);
+        this.label = new TextExpr("xy");
+        this.holes.push(this.label);
+    }
+    getClass() { return MissingChestExpression; }
+}

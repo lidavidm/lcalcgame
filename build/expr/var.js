@@ -518,7 +518,7 @@ var AssignExpr = function (_Expression2) {
         if (variable && !(variable instanceof MissingExpression)) {
             _this11.holes.push(variable);
         } else {
-            var missing = new MissingTypedExpression(new VarExpr("_"));
+            var missing = new MissingChestExpression(new VarExpr("_"));
             missing.acceptedClasses = [VarExpr];
             _this11.holes.push(missing);
         }

@@ -394,7 +394,7 @@ class AssignExpr extends Expression {
             this.holes.push(variable);
         }
         else {
-            let missing = new MissingTypedExpression(new VarExpr("_"));
+            let missing = new MissingChestExpression(new VarExpr("_"));
             missing.acceptedClasses = [VarExpr];
             this.holes.push(missing);
         }

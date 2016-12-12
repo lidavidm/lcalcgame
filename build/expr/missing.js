@@ -352,3 +352,26 @@ var MissingKeyExpression = function (_MissingBooleanExpres) {
 
     return MissingKeyExpression;
 }(MissingBooleanExpression);
+
+var MissingChestExpression = function (_MissingTypedExpressi3) {
+    _inherits(MissingChestExpression, _MissingTypedExpressi3);
+
+    function MissingChestExpression(expr_to_miss) {
+        _classCallCheck(this, MissingChestExpression);
+
+        var _this7 = _possibleConstructorReturn(this, (MissingChestExpression.__proto__ || Object.getPrototypeOf(MissingChestExpression)).call(this, expr_to_miss));
+
+        _this7.label = new TextExpr("xy");
+        _this7.holes.push(_this7.label);
+        return _this7;
+    }
+
+    _createClass(MissingChestExpression, [{
+        key: 'getClass',
+        value: function getClass() {
+            return MissingChestExpression;
+        }
+    }]);
+
+    return MissingChestExpression;
+}(MissingTypedExpression);
