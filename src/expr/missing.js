@@ -211,3 +211,16 @@ class MissingChestExpression extends MissingTypedExpression {
     }
     getClass() { return MissingChestExpression; }
 }
+
+class MissingSequenceExpression extends MissingExpression {
+    constructor() {
+        super(new Expression());
+    }
+
+    getClass() { return MissingSequenceExpression; }
+
+    ondropped(node, pos) {
+        super.ondropped(node, pos);
+        node.lockInteraction();
+    }
+}

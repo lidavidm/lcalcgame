@@ -19,6 +19,7 @@ class Expression extends mag.RoundedRect {
         this._size = { w:EMPTY_EXPR_WIDTH, h:DEFAULT_EXPR_HEIGHT };
         this.environment = null;
         this._layout = { 'direction': 'horizontal', 'align': 'vertical' };
+        this.lockedInteraction = false;
 
         if (this.holes) {
             var _this = this;
@@ -379,6 +380,10 @@ class Expression extends mag.RoundedRect {
             this.toolbox.removeExpression(this); // remove this expression from the toolbox
             Logger.log('toolbox-dragout', this.toString());
         }
+
+        if (this.lockedInteraction) {
+            this.unlockInteraction();
+        }
     }
 
     lock() {
@@ -408,6 +413,33 @@ class Expression extends mag.RoundedRect {
                 child.unlockSubexpressions(filterFunc);
             }
         });
+    }
+
+    lockInteraction() {
+        if (!this.lockedInteraction) {
+            this.lockedInteraction = true;
+            this._origonmouseclick = this.onmouseclick;
+            this.onmouseclick = function(pos) {
+                if (this.parent) this.parent.onmouseclick(pos);
+            }.bind(this);
+            this.holes.forEach((child) => {
+                if (child instanceof Expression) {
+                    child.lockInteraction();
+                }
+            });
+        }
+    }
+
+    unlockInteraction() {
+        if (this.lockedInteraction) {
+            this.lockedInteraction = false;
+            this.onmouseclick = this._origonmouseclick;
+            this.holes.forEach((child) => {
+                if (child instanceof Expression) {
+                    child.unlockInteraction();
+                }
+            });
+        }
     }
 
     hits(pos, options=undefined) {

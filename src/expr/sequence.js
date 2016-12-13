@@ -1,6 +1,12 @@
 class Sequence extends Expression {
     constructor(...exprs) {
-        super(exprs);
+        super([]);
+        exprs.forEach((expr) => {
+            if (expr instanceof MissingExpression) {
+                expr = new MissingSequenceExpression();
+            }
+            this.holes.push(expr);
+        });
         this._layout = { direction: "vertical", align: "none" };
         this._animating = false;
     }
@@ -14,9 +20,10 @@ class Sequence extends Expression {
     }
 
     update() {
+        super.update();
         for (let expr of this.holes) {
             if (expr instanceof MissingExpression) {
-                expr._size = { w: Math.max(100, this.size.w - 20), h: expr.size.h };
+                expr._size = { w: this.size.w, h: expr.size.h };
             }
         }
         super.update();

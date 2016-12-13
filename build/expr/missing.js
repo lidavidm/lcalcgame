@@ -375,3 +375,28 @@ var MissingChestExpression = function (_MissingTypedExpressi3) {
 
     return MissingChestExpression;
 }(MissingTypedExpression);
+
+var MissingSequenceExpression = function (_MissingExpression2) {
+    _inherits(MissingSequenceExpression, _MissingExpression2);
+
+    function MissingSequenceExpression() {
+        _classCallCheck(this, MissingSequenceExpression);
+
+        return _possibleConstructorReturn(this, (MissingSequenceExpression.__proto__ || Object.getPrototypeOf(MissingSequenceExpression)).call(this, new Expression()));
+    }
+
+    _createClass(MissingSequenceExpression, [{
+        key: 'getClass',
+        value: function getClass() {
+            return MissingSequenceExpression;
+        }
+    }, {
+        key: 'ondropped',
+        value: function ondropped(node, pos) {
+            _get(MissingSequenceExpression.prototype.__proto__ || Object.getPrototypeOf(MissingSequenceExpression.prototype), 'ondropped', this).call(this, node, pos);
+            node.lockInteraction();
+        }
+    }]);
+
+    return MissingSequenceExpression;
+}(MissingExpression);

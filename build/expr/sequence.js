@@ -16,12 +16,18 @@ var Sequence = function (_Expression) {
     function Sequence() {
         _classCallCheck(this, Sequence);
 
+        var _this = _possibleConstructorReturn(this, (Sequence.__proto__ || Object.getPrototypeOf(Sequence)).call(this, []));
+
         for (var _len = arguments.length, exprs = Array(_len), _key = 0; _key < _len; _key++) {
             exprs[_key] = arguments[_key];
         }
 
-        var _this = _possibleConstructorReturn(this, (Sequence.__proto__ || Object.getPrototypeOf(Sequence)).call(this, exprs));
-
+        exprs.forEach(function (expr) {
+            if (expr instanceof MissingExpression) {
+                expr = new MissingSequenceExpression();
+            }
+            _this.holes.push(expr);
+        });
         _this._layout = { direction: "vertical", align: "none" };
         _this._animating = false;
         return _this;
@@ -61,6 +67,7 @@ var Sequence = function (_Expression) {
     }, {
         key: "update",
         value: function update() {
+            _get(Sequence.prototype.__proto__ || Object.getPrototypeOf(Sequence.prototype), "update", this).call(this);
             var _iteratorNormalCompletion2 = true;
             var _didIteratorError2 = false;
             var _iteratorError2 = undefined;
@@ -70,7 +77,7 @@ var Sequence = function (_Expression) {
                     var expr = _step2.value;
 
                     if (expr instanceof MissingExpression) {
-                        expr._size = { w: Math.max(100, this.size.w - 20), h: expr.size.h };
+                        expr._size = { w: this.size.w, h: expr.size.h };
                     }
                 }
             } catch (err) {

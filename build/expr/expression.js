@@ -37,6 +37,7 @@ var Expression = function (_mag$RoundedRect) {
         _this2._size = { w: EMPTY_EXPR_WIDTH, h: DEFAULT_EXPR_HEIGHT };
         _this2.environment = null;
         _this2._layout = { 'direction': 'horizontal', 'align': 'vertical' };
+        _this2.lockedInteraction = false;
 
         if (_this2.holes) {
             var _this = _this2;
@@ -425,6 +426,10 @@ var Expression = function (_mag$RoundedRect) {
                 this.toolbox.removeExpression(this); // remove this expression from the toolbox
                 Logger.log('toolbox-dragout', this.toString());
             }
+
+            if (this.lockedInteraction) {
+                this.unlockInteraction();
+            }
         }
     }, {
         key: 'lock',
@@ -463,6 +468,35 @@ var Expression = function (_mag$RoundedRect) {
                     child.unlockSubexpressions(filterFunc);
                 }
             });
+        }
+    }, {
+        key: 'lockInteraction',
+        value: function lockInteraction() {
+            if (!this.lockedInteraction) {
+                this.lockedInteraction = true;
+                this._origonmouseclick = this.onmouseclick;
+                this.onmouseclick = function (pos) {
+                    if (this.parent) this.parent.onmouseclick(pos);
+                }.bind(this);
+                this.holes.forEach(function (child) {
+                    if (child instanceof Expression) {
+                        child.lockInteraction();
+                    }
+                });
+            }
+        }
+    }, {
+        key: 'unlockInteraction',
+        value: function unlockInteraction() {
+            if (this.lockedInteraction) {
+                this.lockedInteraction = false;
+                this.onmouseclick = this._origonmouseclick;
+                this.holes.forEach(function (child) {
+                    if (child instanceof Expression) {
+                        child.unlockInteraction();
+                    }
+                });
+            }
         }
     }, {
         key: 'hits',
