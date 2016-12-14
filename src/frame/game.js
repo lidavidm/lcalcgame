@@ -74,12 +74,28 @@ class Level {
 
         // UI Buttons
         var ui_padding = 10;
-        var btn_back = new mag.Button(canvas_screen.w - 64*3 - ui_padding, ui_padding, 64, 64,
+        var btn_back = new mag.Button(canvas_screen.w - 64*4 - ui_padding, ui_padding, 64, 64,
             { default:'btn-back-default', hover:'btn-back-hover', down:'btn-back-down' },
             () => {
             prev(); // go back to previous level; see index.html.
         });
-        var btn_reset = new mag.Button(btn_back.pos.x + btn_back.size.w, btn_back.pos.y, 64, 64,
+        var btn_mute = new mag.Button(btn_back.pos.x + btn_back.size.w, ui_padding, 64, 64,
+            { default:'btn-mute-default', hover:'btn-mute-hover', down:'btn-mute-down' },
+            function() {
+                if (this.muted) {
+                    Resource.unmute();
+                    this.muted = false;
+                    this.images = { default:'btn-mute-default', hover:'btn-mute-hover', down:'btn-mute-down' };
+                }
+                else {
+                    Resource.mute();
+                    this.muted = true;
+                    this.images = { default:'btn-unmute-default', hover:'btn-unmute-hover', down:'btn-unmute-down' };
+                }
+                this.onmouseenter();
+        });
+        btn_mute.muted = false;
+        var btn_reset = new mag.Button(btn_mute.pos.x + btn_mute.size.w, ui_padding, 64, 64,
             { default:'btn-reset-default', hover:'btn-reset-hover', down:'btn-reset-down' },
             () => {
             initBoard(); // reset board state; see index.html.
@@ -89,10 +105,11 @@ class Level {
             () => {
             next(); // go back to previous level; see index.html.
         });
-        btn_reset.pos = btn_next.pos;
-        //stage.add(btn_back);
+        // btn_reset.pos = btn_next.pos;
+        stage.add(btn_back);
+        stage.add(btn_mute);
         stage.add(btn_reset);
-        //stage.add(btn_next);
+        stage.add(btn_next);
 
         // Toolbox
         const TOOLBOX_HEIGHT = 90;

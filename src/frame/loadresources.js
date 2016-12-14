@@ -107,6 +107,12 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadImage('btn-reset-default', 'reset-button.png');
     loadImage('btn-reset-hover', 'reset-button-hover.png');
     loadImage('btn-reset-down', 'reset-button-down.png');
+    loadImage('btn-mute-default', 'mute-button.png');
+    loadImage('btn-mute-hover', 'mute-button-hover.png');
+    loadImage('btn-mute-down', 'mute-button-down.png');
+    loadImage('btn-unmute-default', 'unmute-button.png');
+    loadImage('btn-unmute-hover', 'unmute-button-hover.png');
+    loadImage('btn-unmute-down', 'unmute-button-down.png');
     loadImage('toolbox-bg', 'toolbox-tiled-bg.png');
     loadImage('victory', 'you-win.png');
 

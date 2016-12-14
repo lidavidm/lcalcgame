@@ -64,6 +64,8 @@ var mag = (function(_) {
             }
         };
 
+        let muted = false;
+
         return { // TODO: Add more resource types.
             loadImage:loadImage,
             loadImageSequence:loadImageSequence,
@@ -76,6 +78,7 @@ var mag = (function(_) {
             getAudio:(name) => audioRsc[name],
             getAnimation:(name) => animPresets[name].clone(),
             play:(alias, volume) => {
+                if (muted) return;
                 if (audioEngine === 'html5') {
                     if(volume) audioRsc[alias].volume = volume;
                     else audioRsc[alias].volume = 1.0;
@@ -83,7 +86,9 @@ var mag = (function(_) {
                 } else {
                     lowLag.play(alias);
                 }
-            }
+            },
+            mute: () => { muted = true; },
+            unmute: () => { muted = false; },
         };
     })();
 

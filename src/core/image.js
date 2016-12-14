@@ -39,7 +39,7 @@ var mag = (function(_) {
             //  { default, hover (optional), down (opt.) }
             super(x, y, w, h, resource_map.default);
             this.images = resource_map;
-            this.clickFunc = onclick;
+            this.clickFunc = onclick.bind(this);
         }
         onmouseenter(pos) {
             if ('hover' in this.images)
