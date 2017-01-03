@@ -79,6 +79,11 @@ function clipToRect(upperLeftPos, itemSize, clipOrigin, clipSize) {
     if (q.y > bot_boundary) q.y = bot_boundary;else if (q.y < top_boundary) q.y = top_boundary;
     return q;
 }
+function randomPointInRect(rect) {
+    return { x: rect.x + rect.w * Math.random(),
+        y: rect.y + rect.h * Math.random() };
+}
+
 function zeroPos() {
     return { x: 0, y: 0 };
 }

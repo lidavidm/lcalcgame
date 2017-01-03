@@ -1095,15 +1095,15 @@ var LogAnalyzer = function () {
 
             var nov = applyConceptToKnowledgeHierarchy('Apply(Lambda(x), star) → star', knowledge);
             console.log('Knowledge: ', knowledge);
-            console.log('Novelty: ', nov); // 4, 4, 0
+            console.log('Novelty: ', nov); // 4, 3, 0 bc x to Lambda, star to Apply, Lambda to Apply
 
             nov = applyConceptToKnowledgeHierarchy('Apply(Lambda(xx), star) → star', knowledge);
             console.log('Knowledge: ', knowledge);
-            console.log('Novelty: ', nov); // 1, 2, 0
+            console.log('Novelty: ', nov); // 1, 1, 0 bc xx to Lambda
 
             nov = applyConceptToKnowledgeHierarchy('Apply(Lambda(Equal(x, x)), star) → Equal(star, star)', knowledge);
             console.log('Knowledge: ', knowledge);
-            console.log('Novelty: ', nov); //
+            console.log('Novelty: ', nov); // 1, 3, 0 bc Equal to Lambda, x twice to Equal
         };
         var stripConceptName = function stripConceptName(e) {
             if (e.indexOf('(') > -1) return e.substring(0, e.indexOf('('));else return e;
@@ -1116,24 +1116,28 @@ var LogAnalyzer = function () {
             e = e.replace(',', ' ');
             return argsForExprString(e);
         };
+        var mergeNovelty = function mergeNovelty(n1, n2) {
+            return {
+                global: n1.global + n2.global,
+                local: n1.local + n2.local,
+                contextual: n1.contextual + n2.contextual
+            };
+        };
+        var zeroNovelty = function zeroNovelty() {
+            return {
+                global: 0,
+                local: 0,
+                contextual: 0
+            };
+        };
         var applyConceptToKnowledgeHierarchy = function applyConceptToKnowledgeHierarchy(concept, hierarchy, global_hierarchy) {
             var localized = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
             if (!global_hierarchy) global_hierarchy = hierarchy;
             var conceptName = stripConceptName(concept);
+            if (conceptName === 'Place' || conceptName === 'Detach') return zeroNovelty();
             var conceptParams = getConceptParams(concept);
-            var novelty = {
-                global: 0,
-                local: 0,
-                contextual: 0
-            };
-            var mergeNovelty = function mergeNovelty(n1, n2) {
-                return {
-                    global: n1.global + n2.global,
-                    local: n1.local + n2.local,
-                    contextual: n1.contextual + n2.contextual
-                };
-            };
+            var novelty = zeroNovelty();
             var createEmptyObjArray = function createEmptyObjArray(len) {
                 return Array.apply(null, Array(len)).map(function () {
                     return {};
@@ -1167,7 +1171,7 @@ var LogAnalyzer = function () {
                         //Concept is 'new' at a local level.
                         if (!localized) {
                             novelty.local += 1;
-                            console.log(' >> new local concept: ', conceptName, 'in hier', hierarchy);
+                            //console.log(' >> new local concept: ', conceptName, 'in hier', hierarchy);
                         }
 
                         hierarchy[conceptName] = {};
@@ -1220,7 +1224,9 @@ var LogAnalyzer = function () {
         var displayStateGraphFromJSON = function displayStateGraphFromJSON(json) {
 
             // DEBUG
-            __TEST_conceptApply();
+            //__TEST_conceptApply();
+
+            var knowledge = {};
 
             var commonConcepts = '';
             var graphs = JSON.parse(json);
@@ -1231,12 +1237,28 @@ var LogAnalyzer = function () {
                 var G = toStateGraph(graphs[k]);
                 var visG = toNetworkVisFormat(G);
 
-                commonConcepts += k + '\n' + cleanXs(stringsToShapes(commonConceptsFromEdges(visG.edges).reduce(function (p, c) {
+                var concepts = cleanXs(stringsToShapes(commonConceptsFromEdges(visG.edges).reduce(function (p, c) {
                     return p + c + '\n';
-                }, '').trim())) + '\n\n';
+                }, '').trim()));
+                if (i === 21 || i === 25) {
+                    concepts += '\nCond(false, ★, null) → ★';
+                }
+                if (i < 61) {
+                    (function () {
+                        var novelty = zeroNovelty();
+                        concepts.split('\n').forEach(function (c) {
+                            novelty = mergeNovelty(applyConceptToKnowledgeHierarchy(c, knowledge), novelty);
+                        });
+                        console.log('Level ' + i + ' novelty: ', novelty);
+                    })();
+                }
 
-                if (k === '21') createStateGraph(visG.nodes, visG.edges);
+                commonConcepts += k + '\n' + concepts + '\n\n';
+
+                if (k === '60') createStateGraph(visG.nodes, visG.edges);
             }
+
+            console.warn(knowledge);
 
             // List concepts used.
             $('#conceptsTextarea').text(commonConcepts);

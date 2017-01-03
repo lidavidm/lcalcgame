@@ -107,12 +107,137 @@ class MenuButton extends mag.RoundedRect {
 
 class MainMenu extends mag.Stage {
 
-    constructor(canvas=null, onClickPlay, onClickSettings) {
+    constructor(canvas=null, onClickPlay=null, onClickSettings=null) {
         super(canvas);
 
-        this.showTitle();
-        this.showPlayButton(onClickPlay);
-        this.showSettingsButton(onClickSettings);
+        let bg = new mag.Rect(0, 0, GLOBAL_DEFAULT_SCREENSIZE.width, GLOBAL_DEFAULT_SCREENSIZE.height);
+        bg.color = '#594764';
+        bg.pos = zeroPos();
+        bg.ignoreEvents = true;
+        this.add(bg);
+        this.bg = bg;
+
+        //this.showTitle();
+        this.showStars();
+        this.showStarboy();
+        //this.showPlayButton(onClickPlay);
+        //this.showSettingsButton(onClickSettings);
+    }
+
+    showStars() {
+        const NUM_STARS = 70;
+        const STARBOY_RECT = {x:GLOBAL_DEFAULT_SCREENSIZE.width / 2.0-298/1.8/2, y:GLOBAL_DEFAULT_SCREENSIZE.height / 2.1-385/1.8/2, w:298/1.8, h:385/1.8};
+        let genRandomPt = () => {
+            return randomPointInRect( {x:0, y:0, w:GLOBAL_DEFAULT_SCREENSIZE.width, h:GLOBAL_DEFAULT_SCREENSIZE.height} );
+        };
+        let stars = [];
+        let n = NUM_STARS;
+        while(n-- > 0) {
+
+            // Create an instance of a star illustration.
+            let star = new mag.ImageRect('mainmenu-star' + Math.floor(Math.random() * 14 + 1));
+            //star.anchor = { x:0.5, y:0.5 };
+
+            // Find a random position that doesn't intersect other previously created stars.
+            let p = genRandomPt();
+            for (let i = 0; i < stars.length; i++) {
+                let s = stars[i];
+                let prect = {x:p.x, y:p.y, w:star.size.w, h:star.size.h};
+                let srect = {x:s._pos.x, y:s._pos.y, w:s.size.w, h:s.size.h};
+                if (intersects(STARBOY_RECT, prect) ||
+                    intersects(prect, srect)) {
+                    p = genRandomPt();
+                    i = 0;
+                }
+            }
+
+            // Set star properties
+            star.pos = p;
+            star.opacity = 0.4;
+            const scale = Math.random() * 0.3 + 0.3;
+            star.scale = { x:scale, y:scale };
+            const blinkDur = 350 + Math.random() * 100;
+            this.add(star);
+            stars.push(star);
+
+            // Twinkling effect
+            let blink = () => {
+                if (star.cancelBlink) return;
+                Animate.tween(star, { opacity:0.4 }, blinkDur, (e) => Math.pow(e, 2)).after(() => {
+                    if (star.cancelBlink) return;
+                    Animate.tween(star, { opacity:1 }, blinkDur, (e) => Math.pow(e, 2)).after(blink);
+                });
+            };
+            Animate.wait(1000 * Math.random()).after(blink);
+
+            // "Zoom"
+            let screenCenter = {x:GLOBAL_DEFAULT_SCREENSIZE.width/2.0, y:GLOBAL_DEFAULT_SCREENSIZE.height/2.0};
+            let fromCenter = fromTo( screenCenter, star.pos);
+            let offscreenDest = addPos(screenCenter, rescalePos( fromCenter, screenCenter.x * 1.6));
+            let comebackDest = addPos(screenCenter, rescalePos( fromCenter, 120));
+            let zoom = () => {
+                Animate.tween(star, { pos:offscreenDest, scale:{x:0.6,y:0.6} }, 3000 * distBetweenPos(star.pos, screenCenter) / distBetweenPos(offscreenDest, screenCenter),
+                (e) => Math.pow(e, 0.8)).after(() => {
+                    star.pos = comebackDest;
+                    star.scale = { x:scale, y:scale };
+                    star.opacity = 0;
+                    zoom();
+                });
+            };
+            star.zoomAnimation = () => {
+
+                zoom();
+                //Animate.wait(distBetweenPos(p, screenCenter) / distBetweenPos(offscreenDest, screenCenter) * 1000).after(zoom);
+            };
+
+        }
+        this.stars = stars;
+    }
+
+    zoom() {
+        this.stars.forEach((star) => {
+            star.zoomAnimation();
+        });
+    }
+
+    showStarboy() {
+        let bg = this.bg;
+        let _this = this;
+        let starboy = new mag.Button(0, 0, 298/1.8, 385/1.8,
+                                    {default:'mainmenu-starboy', hover:'mainmenu-starboy-glow', down:'mainmenu-starboy-glow'},
+                                    () => {
+                                        starboy.cancelFloat = true;
+                                        Animate.tween(starboy, { scale:{x:0.0001, y:0.0001} }, 2500, (e) => Math.pow(e, 2.0));
+                                        Animate.wait(2000).after(() => {
+                                            Animate.run((e) => {
+                                                bg.color = colorTween(e, [89/255.0, 71/255.0, 100/255.0], [0, 0, 0]);
+                                                _this.stars.forEach((s) => {
+                                                    s.opacity = 1 - e;
+                                                    s.cancelBlink = true;
+                                                });
+                                                _this.draw();
+                                            }, 700).after(() => {
+                                                _this.stars.forEach((s) => {
+                                                    _this.remove(s);
+                                                });
+                                                _this.stars = [];
+                                                _this.draw();
+                                            });
+                                        });
+                                        this.zoom();
+                                    });
+        starboy.anchor = { x:0.5, y:0.5 };
+        starboy.pos = { x:GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y:GLOBAL_DEFAULT_SCREENSIZE.height / 2.1 };
+        this.add(starboy);
+
+        let y = starboy._pos.y;
+        let float = 0;
+        var twn = new mag.IndefiniteTween((delta) => {
+            float += delta / 600;
+            starboy.pos = { x:starboy.pos.x, y:y+Math.cos(float)*14 };
+            if (starboy.cancelFloat) twn.cancel();
+        });
+        twn.run();
     }
 
     showTitle() {
@@ -126,7 +251,7 @@ class MainMenu extends mag.Stage {
 
     showPlayButton(onClickPlay) {
         let b = new MenuButton(GLOBAL_DEFAULT_SCREENSIZE.width / 2.0,
-                               GLOBAL_DEFAULT_SCREENSIZE.height / 2.0,
+                               GLOBAL_DEFAULT_SCREENSIZE.height / 2.0 + 80,
                                140, 100,
                                'Play', onClickPlay);
         b.anchor = { x:0.5, y:0.5 };
@@ -135,7 +260,7 @@ class MainMenu extends mag.Stage {
 
     showSettingsButton(onClickSettings) {
         let b = new MenuButton(GLOBAL_DEFAULT_SCREENSIZE.width / 2.0,
-                               GLOBAL_DEFAULT_SCREENSIZE.height / 2.0 + 120,
+                               GLOBAL_DEFAULT_SCREENSIZE.height / 2.0 + 80 + 120,
                                140, 60,
                                'Settings',
                                onClickSettings,

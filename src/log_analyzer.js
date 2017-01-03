@@ -818,7 +818,7 @@ var LogAnalyzer = (function() {
                                     if (e.width < 0.5) {
                                         e.color = colorFrom255(200);
                                         if (e.width < 0.1)
-                                            e.physics = false;
+                                           e.physics = false;
                                     } else {
                                         e.label = edge.reduce + ' : ' + edge.reduction;
                                         e.reduction = edge.reduction;
@@ -1019,15 +1019,15 @@ var LogAnalyzer = (function() {
 
             let nov = applyConceptToKnowledgeHierarchy( 'Apply(Lambda(x), star) → star', knowledge );
             console.log('Knowledge: ', knowledge);
-            console.log('Novelty: ', nov); // 4, 4, 0
+            console.log('Novelty: ', nov); // 4, 3, 0 bc x to Lambda, star to Apply, Lambda to Apply
 
             nov = applyConceptToKnowledgeHierarchy( 'Apply(Lambda(xx), star) → star', knowledge );
             console.log('Knowledge: ', knowledge);
-            console.log('Novelty: ', nov); // 1, 2, 0
+            console.log('Novelty: ', nov); // 1, 1, 0 bc xx to Lambda
 
             nov = applyConceptToKnowledgeHierarchy( 'Apply(Lambda(Equal(x, x)), star) → Equal(star, star)', knowledge );
             console.log('Knowledge: ', knowledge);
-            console.log('Novelty: ', nov); //
+            console.log('Novelty: ', nov); // 1, 3, 0 bc Equal to Lambda, x twice to Equal
 
         };
         var stripConceptName = (e) => {
@@ -1045,22 +1045,26 @@ var LogAnalyzer = (function() {
             e = e.replace(',', ' ');
             return argsForExprString(e);
         };
-        var applyConceptToKnowledgeHierarchy = (concept, hierarchy, global_hierarchy, localized=false) => {
-            if (!global_hierarchy) global_hierarchy = hierarchy;
-            let conceptName = stripConceptName(concept);
-            let conceptParams = getConceptParams(concept);
-            let novelty = {
+        var mergeNovelty = (n1, n2) => {
+            return {
+                global:n1.global+n2.global,
+                local:n1.local+n2.local,
+                contextual:n1.contextual+n2.contextual
+            };
+        };
+        var zeroNovelty = () => {
+            return {
                 global:0,
                 local:0,
                 contextual:0
             };
-            let mergeNovelty = (n1, n2) => {
-                return {
-                    global:n1.global+n2.global,
-                    local:n1.local+n2.local,
-                    contextual:n1.contextual+n2.contextual
-                };
-            };
+        };
+        var applyConceptToKnowledgeHierarchy = (concept, hierarchy, global_hierarchy, localized=false) => {
+            if (!global_hierarchy) global_hierarchy = hierarchy;
+            let conceptName = stripConceptName(concept);
+            if (conceptName === 'Place' || conceptName === 'Detach') return zeroNovelty();
+            let conceptParams = getConceptParams(concept);
+            let novelty = zeroNovelty();
             let createEmptyObjArray = (len) => {
                 return Array.apply(null, Array(len)).map(() => { return {}; });
             };
@@ -1089,7 +1093,7 @@ var LogAnalyzer = (function() {
                 //Concept is 'new' at a local level.
                 if (!localized) {
                     novelty.local += 1;
-                    console.log(' >> new local concept: ', conceptName, 'in hier', hierarchy);
+                    //console.log(' >> new local concept: ', conceptName, 'in hier', hierarchy);
                 }
 
                 hierarchy[conceptName] = {};
@@ -1124,7 +1128,9 @@ var LogAnalyzer = (function() {
         var displayStateGraphFromJSON = (json) => {
 
             // DEBUG
-            __TEST_conceptApply();
+            //__TEST_conceptApply();
+
+            let knowledge = {};
 
             let commonConcepts = '';
             let graphs = JSON.parse(json);
@@ -1135,11 +1141,25 @@ var LogAnalyzer = (function() {
                 let G = toStateGraph( graphs[k] );
                 let visG = toNetworkVisFormat( G );
 
-                commonConcepts += k + '\n' + cleanXs(stringsToShapes(commonConceptsFromEdges(visG.edges).reduce((p, c) => p + c + '\n', '').trim())) + '\n\n';
+                let concepts = cleanXs(stringsToShapes(commonConceptsFromEdges(visG.edges).reduce((p, c) => p + c + '\n', '').trim()));
+                if (i === 21 || i === 25) {
+                    concepts += '\nCond(false, ★, null) → ★';
+                }
+                if (i < 61) {
+                    let novelty = zeroNovelty();
+                    concepts.split('\n').forEach((c) => {
+                        novelty = mergeNovelty( applyConceptToKnowledgeHierarchy(c, knowledge), novelty );
+                    });
+                    console.log('Level ' + i + ' novelty: ', novelty);
+                }
 
-                if (k === '21')
+                commonConcepts += k + '\n' + concepts + '\n\n';
+
+                if (k === '60')
                     createStateGraph( visG.nodes, visG.edges );
             }
+
+            console.warn(knowledge);
 
             // List concepts used.
             $('#conceptsTextarea').text( commonConcepts );

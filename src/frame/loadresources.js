@@ -129,6 +129,11 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadImage('lambda-hole-xside-closed', 'lambda-hole-xside-closed.png');
     loadImage('lambda-pipe-xside-closed', 'lambda-pipe-xside-closed.png');
 
+    // Main menu
+    loadImage('mainmenu-starboy', 'starboy/starboy.png');
+    loadImage('mainmenu-starboy-glow', 'starboy/starboy-glowing.png');
+    loadImageSequence('mainmenu-star', 'starboy/stars/star.png', [1, 14]);
+
     // Loads poof0.png, poof1.png, ..., poof4.png (as poof0, poof1, ..., poof4, respectively).
     loadImageSequence('poof', 'poof.png', [0, 4]);
 

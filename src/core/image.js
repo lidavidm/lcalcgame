@@ -2,6 +2,21 @@ var mag = (function(_) {
 
     class ImageRect extends _.Rect {
         constructor(x, y, w, h, resource_key) {
+
+            // Just passing resource_key as first argument
+            // should set w, h to the image's pixel width and height.
+            if (arguments.length === 1 && typeof x === 'string') {
+                let img = Resource.getImage(x);
+                if (!img)
+                    x = y = w = h = 0;
+                else {
+                    resource_key = x;
+                    x = 0; y = 0;
+                    w = img.naturalWidth;
+                    h = img.naturalHeight;
+                }
+            }
+
             super(x,y,w,h);
             this.image = resource_key;
             this._offset = { x:0, y:0 };
@@ -41,9 +56,14 @@ var mag = (function(_) {
 
     class Button extends ImageRect {
         constructor(x, y, w, h, resource_map, onclick) {
+            if (arguments.length === 2) {
+                super(x.default);
+                resource_map = x;
+                onclick = y;
+            } else super(x, y, w, h, resource_map.default);
+
             // where resource_map properties are:
             //  { default, hover (optional), down (opt.) }
-            super(x, y, w, h, resource_map.default);
             this.images = resource_map;
             this.clickFunc = onclick;
         }

@@ -57,6 +57,11 @@ var __IS_MOBILE = /Mobi/.test(navigator.userAgent);
         q.y = top_boundary;
      return q;
  }
+ function randomPointInRect(rect) {
+     return { x:rect.x+rect.w*Math.random(),
+              y:rect.y+rect.h*Math.random() };
+ }
+
  function zeroPos() { return {x:0, y:0}; }
  function middleOf(p, q) {
      return { x:(p.x + q.x) / 2.0, y:(p.y + q.y) / 2.0 };

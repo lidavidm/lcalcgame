@@ -23,37 +23,37 @@ var MenuButton = function (_mag$RoundedRect) {
 
         _classCallCheck(this, MenuButton);
 
-        var _this = _possibleConstructorReturn(this, (MenuButton.__proto__ || Object.getPrototypeOf(MenuButton)).call(this, x, y, w, h, 10));
+        var _this2 = _possibleConstructorReturn(this, (MenuButton.__proto__ || Object.getPrototypeOf(MenuButton)).call(this, x, y, w, h, 10));
 
         var t = new TextExpr(text, 'Futura');
         t.color = textColor;
         t.anchor = { x: 0.5, y: 0.5 };
         t.pos = { x: w / 2, y: h / 2 };
-        _this.text = t;
-        _this.addChild(t);
+        _this2.text = t;
+        _this2.addChild(t);
 
-        _this.origShadowOffset = 14;
-        _this.shadowOffset = 14;
-        _this.hoverIndent = -4;
-        _this.downIndent = 4;
-        _this.shadowColor = shadowColor;
-        _this.onDownColor = shadowColor;
-        _this.onDownShadowColor = onDownShadowColor;
-        _this.onUpShadowColor = shadowColor;
-        _this.onUpColor = color;
-        _this.textColor = textColor;
-        _this.color = color;
+        _this2.origShadowOffset = 14;
+        _this2.shadowOffset = 14;
+        _this2.hoverIndent = -4;
+        _this2.downIndent = 4;
+        _this2.shadowColor = shadowColor;
+        _this2.onDownColor = shadowColor;
+        _this2.onDownShadowColor = onDownShadowColor;
+        _this2.onUpShadowColor = shadowColor;
+        _this2.onUpColor = color;
+        _this2.textColor = textColor;
+        _this2.color = color;
 
-        _this.clickFunc = onclick;
+        _this2.clickFunc = onclick;
 
-        _this.pos = { x: x, y: y };
-        return _this;
+        _this2.pos = { x: x, y: y };
+        return _this2;
     }
 
     _createClass(MenuButton, [{
         key: 'runButtonClickEffect',
         value: function runButtonClickEffect() {
-            var _this2 = this;
+            var _this3 = this;
 
             var rr = new mag.RoundedRect(this.absolutePos.x, this.absolutePos.y, this.absoluteSize.w, this.absoluteSize.h, this.radius);
             rr.color = null;
@@ -66,21 +66,21 @@ var MenuButton = function (_mag$RoundedRect) {
             Animate.chain(function (elapsed) {
                 var c = colorTween(elapsed, [1, 215 / 255.0, 0], [1, 1, 1]);
                 var sc = colorTween(elapsed, [1, 0, 0], [0.8, 0.8, 0.8]);
-                _this2.color = c;
-                _this2.text.color = c;
-                _this2.shadowColor = sc;
-                _this2.stage.draw();
+                _this3.color = c;
+                _this3.text.color = c;
+                _this3.shadowColor = sc;
+                _this3.stage.draw();
             }, 200, null, function (elapsed) {
                 //elapsed = elapsed * elapsed;
                 rr.scale = { x: 1 + elapsed, y: 1 + elapsed };
                 rr.stroke.opacity = 1 - elapsed;
-                _this2.stage.draw();
+                _this3.stage.draw();
             }, 160, function () {
-                _this2.stage.remove(rr);
-                _this2.onmouseleave();
-                _this2.stage.draw();
-                if (_this2.clickFunc) {
-                    _this2.clickFunc();
+                _this3.stage.remove(rr);
+                _this3.onmouseleave();
+                _this3.stage.draw();
+                if (_this3.clickFunc) {
+                    _this3.clickFunc();
                 }
             });
         }
@@ -152,20 +152,160 @@ var MainMenu = function (_mag$Stage) {
 
     function MainMenu() {
         var canvas = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-        var onClickPlay = arguments[1];
-        var onClickSettings = arguments[2];
+        var onClickPlay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+        var onClickSettings = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
         _classCallCheck(this, MainMenu);
 
-        var _this3 = _possibleConstructorReturn(this, (MainMenu.__proto__ || Object.getPrototypeOf(MainMenu)).call(this, canvas));
+        var _this4 = _possibleConstructorReturn(this, (MainMenu.__proto__ || Object.getPrototypeOf(MainMenu)).call(this, canvas));
 
-        _this3.showTitle();
-        _this3.showPlayButton(onClickPlay);
-        _this3.showSettingsButton(onClickSettings);
-        return _this3;
+        var bg = new mag.Rect(0, 0, GLOBAL_DEFAULT_SCREENSIZE.width, GLOBAL_DEFAULT_SCREENSIZE.height);
+        bg.color = '#594764';
+        bg.pos = zeroPos();
+        bg.ignoreEvents = true;
+        _this4.add(bg);
+        _this4.bg = bg;
+
+        //this.showTitle();
+        _this4.showStars();
+        _this4.showStarboy();
+        //this.showPlayButton(onClickPlay);
+        //this.showSettingsButton(onClickSettings);
+        return _this4;
     }
 
     _createClass(MainMenu, [{
+        key: 'showStars',
+        value: function showStars() {
+            var _this5 = this;
+
+            var NUM_STARS = 70;
+            var STARBOY_RECT = { x: GLOBAL_DEFAULT_SCREENSIZE.width / 2.0 - 298 / 1.8 / 2, y: GLOBAL_DEFAULT_SCREENSIZE.height / 2.1 - 385 / 1.8 / 2, w: 298 / 1.8, h: 385 / 1.8 };
+            var genRandomPt = function genRandomPt() {
+                return randomPointInRect({ x: 0, y: 0, w: GLOBAL_DEFAULT_SCREENSIZE.width, h: GLOBAL_DEFAULT_SCREENSIZE.height });
+            };
+            var stars = [];
+            var n = NUM_STARS;
+
+            var _loop = function _loop() {
+
+                // Create an instance of a star illustration.
+                var star = new mag.ImageRect('mainmenu-star' + Math.floor(Math.random() * 14 + 1));
+                //star.anchor = { x:0.5, y:0.5 };
+
+                // Find a random position that doesn't intersect other previously created stars.
+                var p = genRandomPt();
+                for (var i = 0; i < stars.length; i++) {
+                    var s = stars[i];
+                    var prect = { x: p.x, y: p.y, w: star.size.w, h: star.size.h };
+                    var srect = { x: s._pos.x, y: s._pos.y, w: s.size.w, h: s.size.h };
+                    if (intersects(STARBOY_RECT, prect) || intersects(prect, srect)) {
+                        p = genRandomPt();
+                        i = 0;
+                    }
+                }
+
+                // Set star properties
+                star.pos = p;
+                star.opacity = 0.4;
+                var scale = Math.random() * 0.3 + 0.3;
+                star.scale = { x: scale, y: scale };
+                var blinkDur = 350 + Math.random() * 100;
+                _this5.add(star);
+                stars.push(star);
+
+                // Twinkling effect
+                var blink = function blink() {
+                    if (star.cancelBlink) return;
+                    Animate.tween(star, { opacity: 0.4 }, blinkDur, function (e) {
+                        return Math.pow(e, 2);
+                    }).after(function () {
+                        if (star.cancelBlink) return;
+                        Animate.tween(star, { opacity: 1 }, blinkDur, function (e) {
+                            return Math.pow(e, 2);
+                        }).after(blink);
+                    });
+                };
+                Animate.wait(1000 * Math.random()).after(blink);
+
+                // "Zoom"
+                var screenCenter = { x: GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y: GLOBAL_DEFAULT_SCREENSIZE.height / 2.0 };
+                var fromCenter = fromTo(screenCenter, star.pos);
+                var offscreenDest = addPos(screenCenter, rescalePos(fromCenter, screenCenter.x * 1.6));
+                var comebackDest = addPos(screenCenter, rescalePos(fromCenter, 120));
+                var zoom = function zoom() {
+                    Animate.tween(star, { pos: offscreenDest, scale: { x: 0.6, y: 0.6 } }, 3000 * distBetweenPos(star.pos, screenCenter) / distBetweenPos(offscreenDest, screenCenter), function (e) {
+                        return Math.pow(e, 0.8);
+                    }).after(function () {
+                        star.pos = comebackDest;
+                        star.scale = { x: scale, y: scale };
+                        star.opacity = 0;
+                        zoom();
+                    });
+                };
+                star.zoomAnimation = function () {
+
+                    zoom();
+                    //Animate.wait(distBetweenPos(p, screenCenter) / distBetweenPos(offscreenDest, screenCenter) * 1000).after(zoom);
+                };
+            };
+
+            while (n-- > 0) {
+                _loop();
+            }
+            this.stars = stars;
+        }
+    }, {
+        key: 'zoom',
+        value: function zoom() {
+            this.stars.forEach(function (star) {
+                star.zoomAnimation();
+            });
+        }
+    }, {
+        key: 'showStarboy',
+        value: function showStarboy() {
+            var _this6 = this;
+
+            var bg = this.bg;
+            var _this = this;
+            var starboy = new mag.Button(0, 0, 298 / 1.8, 385 / 1.8, { default: 'mainmenu-starboy', hover: 'mainmenu-starboy-glow', down: 'mainmenu-starboy-glow' }, function () {
+                starboy.cancelFloat = true;
+                Animate.tween(starboy, { scale: { x: 0.0001, y: 0.0001 } }, 2500, function (e) {
+                    return Math.pow(e, 2.0);
+                });
+                Animate.wait(2000).after(function () {
+                    Animate.run(function (e) {
+                        bg.color = colorTween(e, [89 / 255.0, 71 / 255.0, 100 / 255.0], [0, 0, 0]);
+                        _this.stars.forEach(function (s) {
+                            s.opacity = 1 - e;
+                            s.cancelBlink = true;
+                        });
+                        _this.draw();
+                    }, 700).after(function () {
+                        _this.stars.forEach(function (s) {
+                            _this.remove(s);
+                        });
+                        _this.stars = [];
+                        _this.draw();
+                    });
+                });
+                _this6.zoom();
+            });
+            starboy.anchor = { x: 0.5, y: 0.5 };
+            starboy.pos = { x: GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y: GLOBAL_DEFAULT_SCREENSIZE.height / 2.1 };
+            this.add(starboy);
+
+            var y = starboy._pos.y;
+            var float = 0;
+            var twn = new mag.IndefiniteTween(function (delta) {
+                float += delta / 600;
+                starboy.pos = { x: starboy.pos.x, y: y + Math.cos(float) * 14 };
+                if (starboy.cancelFloat) twn.cancel();
+            });
+            twn.run();
+        }
+    }, {
         key: 'showTitle',
         value: function showTitle() {
             var title = new TextExpr('R (E) D U C T', 'Futura', 80);
@@ -178,14 +318,14 @@ var MainMenu = function (_mag$Stage) {
     }, {
         key: 'showPlayButton',
         value: function showPlayButton(onClickPlay) {
-            var b = new MenuButton(GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, GLOBAL_DEFAULT_SCREENSIZE.height / 2.0, 140, 100, 'Play', onClickPlay);
+            var b = new MenuButton(GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, GLOBAL_DEFAULT_SCREENSIZE.height / 2.0 + 80, 140, 100, 'Play', onClickPlay);
             b.anchor = { x: 0.5, y: 0.5 };
             this.add(b);
         }
     }, {
         key: 'showSettingsButton',
         value: function showSettingsButton(onClickSettings) {
-            var b = new MenuButton(GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, GLOBAL_DEFAULT_SCREENSIZE.height / 2.0 + 120, 140, 60, 'Settings', onClickSettings, 'Purple', 'lightgray', 'Indigo', 'Purple');
+            var b = new MenuButton(GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, GLOBAL_DEFAULT_SCREENSIZE.height / 2.0 + 80 + 120, 140, 60, 'Settings', onClickSettings, 'Purple', 'lightgray', 'Indigo', 'Purple');
             b.anchor = { x: 0.5, y: 0.5 };
             this.add(b);
         }
@@ -273,23 +413,23 @@ var LevelSelectGrid = function (_mag$Rect2) {
     function LevelSelectGrid(chapterName, onLevelSelect) {
         _classCallCheck(this, LevelSelectGrid);
 
-        var _this6 = _possibleConstructorReturn(this, (LevelSelectGrid.__proto__ || Object.getPrototypeOf(LevelSelectGrid)).call(this, 0, 0, 0, 0));
+        var _this9 = _possibleConstructorReturn(this, (LevelSelectGrid.__proto__ || Object.getPrototypeOf(LevelSelectGrid)).call(this, 0, 0, 0, 0));
 
-        _this6.color = null;
-        _this6.showGrid(chapterName, onLevelSelect);
-        return _this6;
+        _this9.color = null;
+        _this9.showGrid(chapterName, onLevelSelect);
+        return _this9;
     }
 
     _createClass(LevelSelectGrid, [{
         key: 'hide',
         value: function hide(dur) {
-            var _this7 = this;
+            var _this10 = this;
 
             var len = this.children.length;
             this.children.forEach(function (c, i) {
                 c.opacity = 1;
                 Animate.tween(c, { scale: { x: 0, y: 0 }, opacity: 0 }, (len - i - 1) * 30).after(function () {
-                    _this7.removeChild(c);
+                    _this10.removeChild(c);
                 });
             });
             return Animate.wait((len - 1) * 30);
@@ -302,7 +442,7 @@ var LevelSelectGrid = function (_mag$Rect2) {
     }, {
         key: 'showGrid',
         value: function showGrid(chapterName, onselect) {
-            var _this8 = this;
+            var _this11 = this;
 
             // Layout measurement
             var levels = Resource.levelsForChapter(chapterName);
@@ -333,14 +473,14 @@ var LevelSelectGrid = function (_mag$Rect2) {
 
                 var i = r * NUM_COLS;
 
-                var _loop = function _loop(c) {
+                var _loop2 = function _loop2(c) {
 
                     // Create a level cell and add it to the grid.
                     var cell = new LevelCell(x + CELL_SIZE / 2.0, y + CELL_SIZE / 2.0, CELL_SIZE, CELL_SIZE, i.toString(), genClickCallback(i), r === 0 ? 'LightGreen' : 'Gold', 'white', r === 0 ? 'Green' : 'Teal', r === 0 ? 'DarkGreen' : 'DarkMagenta');
                     cell.onDownColor = r === 0 ? 'YellowGreen' : 'Orange';
                     cell.anchor = { x: 0.5, y: 0.5 };
                     //if (i > 5) cell.lock();
-                    _this8.addChild(cell);
+                    _this11.addChild(cell);
 
                     // Animate cell into position.
                     cell.scale = { x: 0.0, y: 0 };
@@ -359,9 +499,9 @@ var LevelSelectGrid = function (_mag$Rect2) {
                 };
 
                 for (var c = 0; c < NUM_COLS; c++) {
-                    var _ret = _loop(c);
+                    var _ret2 = _loop2(c);
 
-                    if (_ret === 'break') break;
+                    if (_ret2 === 'break') break;
                 }
 
                 if (i >= NUM_CELLS) break;
@@ -382,11 +522,11 @@ var PlanetCard = function (_mag$Circle) {
     function PlanetCard(x, y, r, name, onclick) {
         _classCallCheck(this, PlanetCard);
 
-        var _this9 = _possibleConstructorReturn(this, (PlanetCard.__proto__ || Object.getPrototypeOf(PlanetCard)).call(this, x, y, r));
+        var _this12 = _possibleConstructorReturn(this, (PlanetCard.__proto__ || Object.getPrototypeOf(PlanetCard)).call(this, x, y, r));
 
-        _this9.name = name;
-        _this9.onclick = onclick;
-        return _this9;
+        _this12.name = name;
+        _this12.onclick = onclick;
+        return _this12;
     }
 
     _createClass(PlanetCard, [{
@@ -405,10 +545,10 @@ var ChapterSelectMenu = function (_mag$Stage2) {
     function ChapterSelectMenu(canvas, onLevelSelect) {
         _classCallCheck(this, ChapterSelectMenu);
 
-        var _this10 = _possibleConstructorReturn(this, (ChapterSelectMenu.__proto__ || Object.getPrototypeOf(ChapterSelectMenu)).call(this, canvas));
+        var _this13 = _possibleConstructorReturn(this, (ChapterSelectMenu.__proto__ || Object.getPrototypeOf(ChapterSelectMenu)).call(this, canvas));
 
-        _this10.showChapters(onLevelSelect);
-        return _this10;
+        _this13.showChapters(onLevelSelect);
+        return _this13;
     }
 
     _createClass(ChapterSelectMenu, [{
@@ -438,17 +578,17 @@ var ChapterSelectMenu = function (_mag$Stage2) {
     }, {
         key: 'showLevelSelectGrid',
         value: function showLevelSelectGrid(chapterName, onLevelSelect) {
-            var _this11 = this;
+            var _this14 = this;
 
             var grid = new LevelSelectGrid(chapterName, onLevelSelect);
             grid.pos = { x: 0, y: 40 };
 
             var btn_back = new mag.Button(10, 10, 50, 50, { default: 'btn-back-default', hover: 'btn-back-hover', down: 'btn-back-down' }, function () {
                 grid.hide().after(function () {
-                    return _this11.remove(grid);
+                    return _this14.remove(grid);
                 });
-                _this11.remove(btn_back);
-                _this11.setPlanetsToDefaultPos(500);
+                _this14.remove(btn_back);
+                _this14.setPlanetsToDefaultPos(500);
                 Resource.play('goback');
             });
             btn_back.opacity = 0.5;
@@ -459,7 +599,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
     }, {
         key: 'showChapters',
         value: function showChapters(onLevelSelect) {
-            var _this12 = this;
+            var _this15 = this;
 
             // For now, hardcore positions and radii per chapter:
             // TODO: Move to .json specs.
@@ -499,14 +639,14 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                         }
                         Resource.play('zoomin');
                         Animate.wait(500).after(function () {
-                            return _this12.showLevelSelectGrid(planet.name, onLevelSelect);
+                            return _this15.showLevelSelectGrid(planet.name, onLevelSelect);
                         });
                     };
-                    _this12.add(planet);
+                    _this15.add(planet);
                     planets.push(planet);
                 });
 
-                _this12.planets = planets;
+                _this15.planets = planets;
             });
         }
     }]);

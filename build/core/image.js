@@ -15,6 +15,18 @@ var mag = function (_) {
         function ImageRect(x, y, w, h, resource_key) {
             _classCallCheck(this, ImageRect);
 
+            // Just passing resource_key as first argument
+            // should set w, h to the image's pixel width and height.
+            if (arguments.length === 1 && typeof x === 'string') {
+                var img = Resource.getImage(x);
+                if (!img) x = y = w = h = 0;else {
+                    resource_key = x;
+                    x = 0;y = 0;
+                    w = img.naturalWidth;
+                    h = img.naturalHeight;
+                }
+            }
+
             var _this = _possibleConstructorReturn(this, (ImageRect.__proto__ || Object.getPrototypeOf(ImageRect)).call(this, x, y, w, h));
 
             _this.image = resource_key;
@@ -84,14 +96,20 @@ var mag = function (_) {
         function Button(x, y, w, h, resource_map, onclick) {
             _classCallCheck(this, Button);
 
-            var _this3 = _possibleConstructorReturn(this, (Button.__proto__ || Object.getPrototypeOf(Button)).call(this, x, y, w, h, resource_map.default));
-            // where resource_map properties are:
+            if (arguments.length === 2) {
+                var _this3 = _possibleConstructorReturn(this, (Button.__proto__ || Object.getPrototypeOf(Button)).call(this, x.default));
+
+                resource_map = x;
+                onclick = y;
+            } else {
+                ;
+
+                var _this3 = _possibleConstructorReturn(this, (Button.__proto__ || Object.getPrototypeOf(Button)).call(this, x, y, w, h, resource_map.default));
+            } // where resource_map properties are:
             //  { default, hover (optional), down (opt.) }
-
-
             _this3.images = resource_map;
             _this3.clickFunc = onclick;
-            return _this3;
+            return _possibleConstructorReturn(_this3);
         }
 
         _createClass(Button, [{
