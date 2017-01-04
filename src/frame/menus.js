@@ -117,9 +117,9 @@ class MainMenu extends mag.Stage {
         this.add(bg);
         this.bg = bg;
 
-        //this.showTitle();
         this.showStars();
-        this.showStarboy();
+        this.showStarboy(onClickPlay);
+        this.showTitle();
         //this.showPlayButton(onClickPlay);
         //this.showSettingsButton(onClickSettings);
     }
@@ -200,14 +200,17 @@ class MainMenu extends mag.Stage {
         });
     }
 
-    showStarboy() {
+    showStarboy(onclick) {
         let bg = this.bg;
         let _this = this;
         let starboy = new mag.Button(0, 0, 298/1.8, 385/1.8,
                                     {default:'mainmenu-starboy', hover:'mainmenu-starboy-glow', down:'mainmenu-starboy-glow'},
                                     () => {
+                                        if (_this.title) _this.remove(_this.title);
+                                        Resource.play('mainmenu-enter');
                                         starboy.cancelFloat = true;
-                                        Animate.tween(starboy, { scale:{x:0.0001, y:0.0001} }, 2500, (e) => Math.pow(e, 2.0));
+                                        starboy.ignoreEvents = true;
+                                        Animate.tween(starboy, { scale:{x:0.0001, y:0.0001} }, 2500, (e) => Math.pow(e, 2));
                                         Animate.wait(2000).after(() => {
                                             Animate.run((e) => {
                                                 bg.color = colorTween(e, [89/255.0, 71/255.0, 100/255.0], [0, 0, 0]);
@@ -221,7 +224,10 @@ class MainMenu extends mag.Stage {
                                                     _this.remove(s);
                                                 });
                                                 _this.stars = [];
+                                                _this.remove(starboy);
+                                                _this.starboy = null;
                                                 _this.draw();
+                                                onclick();
                                             });
                                         });
                                         this.zoom();
@@ -241,12 +247,12 @@ class MainMenu extends mag.Stage {
     }
 
     showTitle() {
-        let title = new TextExpr('R (E) D U C T', 'Futura', 80);
-        title.color = 'black';
+        let title = new TextExpr('R   E   D   U   C   T', 'Consolas', 30);
+        title.color = 'white';
         title.anchor = { x:0.5, y:0.5 };
-        title.pos = { x:GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y:GLOBAL_DEFAULT_SCREENSIZE.height / 5 };
+        title.pos = { x:GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y:GLOBAL_DEFAULT_SCREENSIZE.height / 1.2 };
         this.add(title);
-        console.log(title);
+        this.title = title;
     }
 
     showPlayButton(onClickPlay) {
@@ -386,10 +392,11 @@ class LevelSelectGrid extends mag.Rect {
     }
 }
 
-class PlanetCard extends mag.Circle {
-    constructor(x, y, r, name, onclick) {
-        super(x, y, r);
+class PlanetCard extends mag.ImageRect {
+    constructor(x, y, r, name, planet_image, onclick) {
+        super(x, y, r*2, r*2, planet_image);
 
+        this.radius = r;
         this.name = name;
         this.onclick = onclick;
     }
@@ -403,6 +410,8 @@ class ChapterSelectMenu extends mag.Stage {
     constructor(canvas, onLevelSelect) {
         super(canvas);
         this.showChapters(onLevelSelect);
+
+        //$('body').css('background', '#222');
     }
 
     getPlanetPos() {
@@ -417,6 +426,14 @@ class ChapterSelectMenu extends mag.Stage {
             { x:760, y:580, r:30 }
         ];
     }
+    getPlanetImages() {
+        return {
+            'Equality':'planet-boolili',
+            'Basics':'planet-functiana',
+            'Conditionals':'planet-conditionabo',
+            'Collections':'planet-bagbag'
+        };
+    }
 
     setPlanetsToDefaultPos(dur) {
         let stage = this;
@@ -424,7 +441,8 @@ class ChapterSelectMenu extends mag.Stage {
         stage.planets.forEach((p, i) => {
             p.ignoreEvents = false;
             if (!stage.has(p)) stage.add(p);
-            Animate.tween(p, { pos: {x:POS_MAP[i].x+15, y:POS_MAP[i].y+40}, radius: POS_MAP[i].r, opacity:1.0 }, dur);
+            let rad = POS_MAP[i].r;
+            Animate.tween(p, { pos: {x:POS_MAP[i].x+15, y:POS_MAP[i].y+40}, size:{w:rad*2, h:rad*2}, opacity:1.0 }, dur);
         });
     }
 
@@ -448,7 +466,7 @@ class ChapterSelectMenu extends mag.Stage {
         });
         btn_back.opacity = 0.5;
 
-        this.add(grid);
+        //this.add(grid);
         this.add(btn_back);
     }
 
@@ -457,13 +475,14 @@ class ChapterSelectMenu extends mag.Stage {
         // For now, hardcore positions and radii per chapter:
         // TODO: Move to .json specs.
         const POS_MAP = this.getPlanetPos();
+        const IMG_MAP = this.getPlanetImages();
 
         // Expand and disappear animations.
         let stage = this;
         let expand = (planet) => {
-            let r = GLOBAL_DEFAULT_SCREENSIZE.width / 2.0 * Math.pow(planet.radius / 120, 0.5);
-            let centerBottom = { x:GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y:GLOBAL_DEFAULT_SCREENSIZE.height };
-            Animate.tween(planet, { radius:r, pos: addPos(centerBottom, {x:0, y:r / 2.0}) }, 1000, (elapsed) => {
+            let r = GLOBAL_DEFAULT_SCREENSIZE.width / 3.0;
+            let center = { x:GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y:GLOBAL_DEFAULT_SCREENSIZE.height / 2.0 };
+            Animate.tween(planet, { size:{w:r*2, h:r*2}, pos: center }, 1000, (elapsed) => {
                 return Math.pow(elapsed, 3);
             });
         };
@@ -481,7 +500,7 @@ class ChapterSelectMenu extends mag.Stage {
 
             chapters.forEach((chap, i) => {
                 let pos = i < POS_MAP.length ? POS_MAP[i] : { x:0, y:0, r:10 };
-                let planet = new PlanetCard(pos.x + 15, pos.y + 40, pos.r, chap.name);
+                let planet = new PlanetCard(pos.x + 15, pos.y + 40, pos.r, chap.name, (chap.name in IMG_MAP) ? IMG_MAP[chap.name] : 'planet-bagbag');
                 planet.color = 'white';
                 planet.anchor = { x:0.5, y:0.5 };
                 planet.shadowOffset = 0;

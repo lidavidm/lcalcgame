@@ -141,7 +141,12 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     // Main menu
     loadImage('mainmenu-starboy', 'starboy/starboy.png');
     loadImage('mainmenu-starboy-glow', 'starboy/starboy-glowing.png');
+    loadImage('planet-bagbag', 'starboy/planet_bagbag.png');
+    loadImage('planet-conditionabo', 'starboy/planet_conditionabo.png');
+    loadImage('planet-boolili', 'starboy/planet_boolili.png');
+    loadImage('planet-functiana', 'starboy/planet_functiana.png');
     loadImageSequence('mainmenu-star', 'starboy/stars/star.png', [1, 14]);
+    loadAudio('mainmenu-enter', 'sci-fi-engine-startup.wav');
 
     // Loads poof0.png, poof1.png, ..., poof4.png (as poof0, poof1, ..., poof4, respectively).
     loadImageSequence('poof', 'poof.png', [0, 4]);

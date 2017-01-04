@@ -166,9 +166,9 @@ var MainMenu = function (_mag$Stage) {
         _this4.add(bg);
         _this4.bg = bg;
 
-        //this.showTitle();
         _this4.showStars();
-        _this4.showStarboy();
+        _this4.showStarboy(onClickPlay);
+        _this4.showTitle();
         //this.showPlayButton(onClickPlay);
         //this.showSettingsButton(onClickSettings);
         return _this4;
@@ -264,15 +264,18 @@ var MainMenu = function (_mag$Stage) {
         }
     }, {
         key: 'showStarboy',
-        value: function showStarboy() {
+        value: function showStarboy(onclick) {
             var _this6 = this;
 
             var bg = this.bg;
             var _this = this;
             var starboy = new mag.Button(0, 0, 298 / 1.8, 385 / 1.8, { default: 'mainmenu-starboy', hover: 'mainmenu-starboy-glow', down: 'mainmenu-starboy-glow' }, function () {
+                if (_this.title) _this.remove(_this.title);
+                Resource.play('mainmenu-enter');
                 starboy.cancelFloat = true;
+                starboy.ignoreEvents = true;
                 Animate.tween(starboy, { scale: { x: 0.0001, y: 0.0001 } }, 2500, function (e) {
-                    return Math.pow(e, 2.0);
+                    return Math.pow(e, 2);
                 });
                 Animate.wait(2000).after(function () {
                     Animate.run(function (e) {
@@ -287,7 +290,10 @@ var MainMenu = function (_mag$Stage) {
                             _this.remove(s);
                         });
                         _this.stars = [];
+                        _this.remove(starboy);
+                        _this.starboy = null;
                         _this.draw();
+                        onclick();
                     });
                 });
                 _this6.zoom();
@@ -308,12 +314,12 @@ var MainMenu = function (_mag$Stage) {
     }, {
         key: 'showTitle',
         value: function showTitle() {
-            var title = new TextExpr('R (E) D U C T', 'Futura', 80);
-            title.color = 'black';
+            var title = new TextExpr('R   E   D   U   C   T', 'Consolas', 30);
+            title.color = 'white';
             title.anchor = { x: 0.5, y: 0.5 };
-            title.pos = { x: GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y: GLOBAL_DEFAULT_SCREENSIZE.height / 5 };
+            title.pos = { x: GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y: GLOBAL_DEFAULT_SCREENSIZE.height / 1.2 };
             this.add(title);
-            console.log(title);
+            this.title = title;
         }
     }, {
         key: 'showPlayButton',
@@ -516,14 +522,15 @@ var LevelSelectGrid = function (_mag$Rect2) {
     return LevelSelectGrid;
 }(mag.Rect);
 
-var PlanetCard = function (_mag$Circle) {
-    _inherits(PlanetCard, _mag$Circle);
+var PlanetCard = function (_mag$ImageRect) {
+    _inherits(PlanetCard, _mag$ImageRect);
 
-    function PlanetCard(x, y, r, name, onclick) {
+    function PlanetCard(x, y, r, name, planet_image, onclick) {
         _classCallCheck(this, PlanetCard);
 
-        var _this12 = _possibleConstructorReturn(this, (PlanetCard.__proto__ || Object.getPrototypeOf(PlanetCard)).call(this, x, y, r));
+        var _this12 = _possibleConstructorReturn(this, (PlanetCard.__proto__ || Object.getPrototypeOf(PlanetCard)).call(this, x, y, r * 2, r * 2, planet_image));
 
+        _this12.radius = r;
         _this12.name = name;
         _this12.onclick = onclick;
         return _this12;
@@ -537,7 +544,7 @@ var PlanetCard = function (_mag$Circle) {
     }]);
 
     return PlanetCard;
-}(mag.Circle);
+}(mag.ImageRect);
 
 var ChapterSelectMenu = function (_mag$Stage2) {
     _inherits(ChapterSelectMenu, _mag$Stage2);
@@ -548,6 +555,8 @@ var ChapterSelectMenu = function (_mag$Stage2) {
         var _this13 = _possibleConstructorReturn(this, (ChapterSelectMenu.__proto__ || Object.getPrototypeOf(ChapterSelectMenu)).call(this, canvas));
 
         _this13.showChapters(onLevelSelect);
+
+        //$('body').css('background', '#222');
         return _this13;
     }
 
@@ -557,6 +566,16 @@ var ChapterSelectMenu = function (_mag$Stage2) {
             return [{ x: 144, y: 104, r: 120 }, { x: 426, y: 86, r: 55 }, { x: 690, y: 208, r: 44 }, { x: 456, y: 324, r: 60 }, { x: 138, y: 388, r: 80 }, { x: 316, y: 480, r: 40 }, { x: 530, y: 492, r: 70 }, { x: 760, y: 580, r: 30 }];
         }
     }, {
+        key: 'getPlanetImages',
+        value: function getPlanetImages() {
+            return {
+                'Equality': 'planet-boolili',
+                'Basics': 'planet-functiana',
+                'Conditionals': 'planet-conditionabo',
+                'Collections': 'planet-bagbag'
+            };
+        }
+    }, {
         key: 'setPlanetsToDefaultPos',
         value: function setPlanetsToDefaultPos(dur) {
             var stage = this;
@@ -564,7 +583,8 @@ var ChapterSelectMenu = function (_mag$Stage2) {
             stage.planets.forEach(function (p, i) {
                 p.ignoreEvents = false;
                 if (!stage.has(p)) stage.add(p);
-                Animate.tween(p, { pos: { x: POS_MAP[i].x + 15, y: POS_MAP[i].y + 40 }, radius: POS_MAP[i].r, opacity: 1.0 }, dur);
+                var rad = POS_MAP[i].r;
+                Animate.tween(p, { pos: { x: POS_MAP[i].x + 15, y: POS_MAP[i].y + 40 }, size: { w: rad * 2, h: rad * 2 }, opacity: 1.0 }, dur);
             });
         }
     }, {
@@ -593,7 +613,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
             });
             btn_back.opacity = 0.5;
 
-            this.add(grid);
+            //this.add(grid);
             this.add(btn_back);
         }
     }, {
@@ -604,13 +624,14 @@ var ChapterSelectMenu = function (_mag$Stage2) {
             // For now, hardcore positions and radii per chapter:
             // TODO: Move to .json specs.
             var POS_MAP = this.getPlanetPos();
+            var IMG_MAP = this.getPlanetImages();
 
             // Expand and disappear animations.
             var stage = this;
             var expand = function expand(planet) {
-                var r = GLOBAL_DEFAULT_SCREENSIZE.width / 2.0 * Math.pow(planet.radius / 120, 0.5);
-                var centerBottom = { x: GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y: GLOBAL_DEFAULT_SCREENSIZE.height };
-                Animate.tween(planet, { radius: r, pos: addPos(centerBottom, { x: 0, y: r / 2.0 }) }, 1000, function (elapsed) {
+                var r = GLOBAL_DEFAULT_SCREENSIZE.width / 3.0;
+                var center = { x: GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y: GLOBAL_DEFAULT_SCREENSIZE.height / 2.0 };
+                Animate.tween(planet, { size: { w: r * 2, h: r * 2 }, pos: center }, 1000, function (elapsed) {
                     return Math.pow(elapsed, 3);
                 });
             };
@@ -628,7 +649,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
 
                 chapters.forEach(function (chap, i) {
                     var pos = i < POS_MAP.length ? POS_MAP[i] : { x: 0, y: 0, r: 10 };
-                    var planet = new PlanetCard(pos.x + 15, pos.y + 40, pos.r, chap.name);
+                    var planet = new PlanetCard(pos.x + 15, pos.y + 40, pos.r, chap.name, chap.name in IMG_MAP ? IMG_MAP[chap.name] : 'planet-bagbag');
                     planet.color = 'white';
                     planet.anchor = { x: 0.5, y: 0.5 };
                     planet.shadowOffset = 0;

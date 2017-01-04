@@ -138,9 +138,10 @@ function initMainMenu() {
             stage = new ChapterSelectMenu(canvas, initLevel);
             redraw(stage);
 
-        }, () => {
-            // Clicked 'settings' button. Transition to settings screen.
         });
+        //}, () => {
+            // Clicked 'settings' button. Transition to settings screen.
+        //});
         redraw(stage);
     }
 }
@@ -292,7 +293,8 @@ function toggleLogging() {
 }
 
 function updateProgressBar() {
-    setProgressBar('progressBar', 'progressBarContainer', level_idx / (Resource.level.length - 1));
+    if ($('#progressBar').length > 0)
+        setProgressBar('progressBar', 'progressBarContainer', level_idx / (Resource.level.length - 1));
 }
 function prev() {
     if (!Logger.sessionBegan()) return;
