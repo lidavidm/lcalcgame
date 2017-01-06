@@ -66,6 +66,8 @@ var mag = function (_) {
             }
         };
 
+        var muted = false;
+
         return { // TODO: Add more resource types.
             loadImage: loadImage,
             loadImageSequence: loadImageSequence,
@@ -84,12 +86,22 @@ var mag = function (_) {
                 return animPresets[name].clone();
             },
             play: function play(alias, volume) {
+                if (muted) return;
                 if (audioEngine === 'html5') {
                     if (volume) audioRsc[alias].volume = volume;else audioRsc[alias].volume = 1.0;
                     audioRsc[alias].play();
                 } else {
                     lowLag.play(alias);
                 }
+            },
+            mute: function mute() {
+                muted = true;
+            },
+            unmute: function unmute() {
+                muted = false;
+            },
+            isMuted: function isMuted() {
+                return muted;
             }
         };
     }();

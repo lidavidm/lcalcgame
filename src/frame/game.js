@@ -79,22 +79,25 @@ class Level {
             () => {
             prev(); // go back to previous level; see index.html.
         });
+
+        let mute_images = { default:'btn-mute-default', hover:'btn-mute-hover', down:'btn-mute-down' };
+        let unmute_images = { default:'btn-unmute-default', hover:'btn-unmute-hover', down:'btn-unmute-down' };
         var btn_mute = new mag.Button(btn_back.pos.x + btn_back.size.w, ui_padding, 64, 64,
-            { default:'btn-mute-default', hover:'btn-mute-hover', down:'btn-mute-down' },
+            Resource.isMuted() ? unmute_images : mute_images,
             function() {
                 if (this.muted) {
                     Resource.unmute();
                     this.muted = false;
-                    this.images = { default:'btn-mute-default', hover:'btn-mute-hover', down:'btn-mute-down' };
+                    this.images = mute_images;
                 }
                 else {
                     Resource.mute();
                     this.muted = true;
-                    this.images = { default:'btn-unmute-default', hover:'btn-unmute-hover', down:'btn-unmute-down' };
+                    this.images = unmute_images;
                 }
                 this.onmouseenter();
         });
-        btn_mute.muted = false;
+        btn_mute.muted = Resource.isMuted();
         var btn_reset = new mag.Button(btn_mute.pos.x + btn_mute.size.w, ui_padding, 64, 64,
             { default:'btn-reset-default', hover:'btn-reset-hover', down:'btn-reset-down' },
             () => {

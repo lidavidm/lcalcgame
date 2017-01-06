@@ -83,17 +83,34 @@ var Level = function () {
 
             // UI Buttons
             var ui_padding = 10;
-            var btn_back = new mag.Button(canvas_screen.w - 64 * 3 - ui_padding, ui_padding, 64, 64, { default: 'btn-back-default', hover: 'btn-back-hover', down: 'btn-back-down' }, function () {
+            var btn_back = new mag.Button(canvas_screen.w - 64 * 4 - ui_padding, ui_padding, 64, 64, { default: 'btn-back-default', hover: 'btn-back-hover', down: 'btn-back-down' }, function () {
                 prev(); // go back to previous level; see index.html.
             });
-            var btn_reset = new mag.Button(btn_back.pos.x + btn_back.size.w, btn_back.pos.y, 64, 64, { default: 'btn-reset-default', hover: 'btn-reset-hover', down: 'btn-reset-down' }, function () {
+
+            var mute_images = { default: 'btn-mute-default', hover: 'btn-mute-hover', down: 'btn-mute-down' };
+            var unmute_images = { default: 'btn-unmute-default', hover: 'btn-unmute-hover', down: 'btn-unmute-down' };
+            var btn_mute = new mag.Button(btn_back.pos.x + btn_back.size.w, ui_padding, 64, 64, Resource.isMuted() ? unmute_images : mute_images, function () {
+                if (this.muted) {
+                    Resource.unmute();
+                    this.muted = false;
+                    this.images = mute_images;
+                } else {
+                    Resource.mute();
+                    this.muted = true;
+                    this.images = unmute_images;
+                }
+                this.onmouseenter();
+            });
+            btn_mute.muted = Resource.isMuted();
+            var btn_reset = new mag.Button(btn_mute.pos.x + btn_mute.size.w, ui_padding, 64, 64, { default: 'btn-reset-default', hover: 'btn-reset-hover', down: 'btn-reset-down' }, function () {
                 initBoard(); // reset board state; see index.html.
             });
             var btn_next = new mag.Button(btn_reset.pos.x + btn_reset.size.w, ui_padding, 64, 64, { default: 'btn-next-default', hover: 'btn-next-hover', down: 'btn-next-down' }, function () {
                 next(); // go back to previous level; see index.html.
             });
-            btn_reset.pos = btn_next.pos;
-            //stage.add(btn_back);
+            // btn_reset.pos = btn_next.pos;
+            stage.add(btn_back);
+            stage.add(btn_mute);
             stage.add(btn_reset);
             //stage.add(btn_next);
 

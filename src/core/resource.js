@@ -89,6 +89,7 @@ var mag = (function(_) {
             },
             mute: () => { muted = true; },
             unmute: () => { muted = false; },
+            isMuted: () => { return muted; },
         };
     })();
 
