@@ -106,6 +106,9 @@ function distBetweenPos(p, q) {
 function lengthOfPos(p) {
     return Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
 }
+function dotProduct(p, q) {
+    return p.x * q.x + p.y * q.y;
+}
 function normalize(p) {
     var len = distBetweenPos(p, { x: 0, y: 0 });
     if (len === 0) return { x: 0, y: 0 };else return { x: p.x / len, y: p.y / len };
@@ -129,6 +132,7 @@ function setStrokeStyle(ctx, stroke) {
     if (!stroke) ctx.strokeStyle = null;else {
         ctx.lineWidth = stroke.lineWidth;
         ctx.strokeStyle = stroke.color;
+        if (stroke.lineDash) ctx.setLineDash(stroke.lineDash);else ctx.setLineDash([]);
     }
 }
 function strokeWithOpacity(ctx, opacity) {

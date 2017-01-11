@@ -8,7 +8,7 @@ var GLOBAL_DEFAULT_SCREENSIZE = null;
 var stage;
 var canvas;
 
-var level_idx = getCookie('level_idx') || 0;
+var level_idx = 0; //getCookie('level_idx') || 0;
 if (level_idx !== 0) level_idx = parseInt(level_idx);
 var cur_menu = null;
 
@@ -131,12 +131,13 @@ function initMainMenu() {
 
         prepareCanvas();
 
-        stage = new MainMenu(canvas, function () {
+        //stage = new MainMenu(canvas, () => {
 
-            //Clicks 'play' button. Transition to chapter select screen.
-            stage = new ChapterSelectMenu(canvas, initLevel);
-            redraw(stage);
-        });
+        //Clicks 'play' button. Transition to chapter select screen.
+        stage = new ChapterSelectMenu(canvas, initLevel);
+        redraw(stage);
+
+        //});
         //}, () => {
         // Clicked 'settings' button. Transition to settings screen.
         //});

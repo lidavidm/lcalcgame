@@ -43,6 +43,21 @@ var mag = (function(_) {
         }
     }
 
+    class RotatableImageRect extends ImageRect {
+        constructor(x, y, w, h, resource_key) {
+            if (typeof x === 'string') super(x);
+            else super(x, y, w, h, resource_key);
+            this.rotation = 0;
+        }
+        drawInternal(ctx, pos, boundingSize) {
+            ctx.save();
+            ctx.translate(pos.x + this._offset.x, pos.y + this._offset.y);
+            ctx.rotate(this.rotation);
+            super.drawInternal(ctx, zeroPos(), boundingSize);
+            ctx.restore();
+        }
+    }
+
     class PatternRect extends ImageRect {
         drawInternal(ctx, pos, boundingSize) {
             if (!ctx || !this.image) return;
@@ -85,6 +100,7 @@ var mag = (function(_) {
     }
 
     _.ImageRect = ImageRect;
+    _.RotatableImageRect = RotatableImageRect;
     _.PatternRect = PatternRect;
     _.Button = Button;
     return _;

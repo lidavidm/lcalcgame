@@ -105,6 +105,24 @@ class MenuButton extends mag.RoundedRect {
     }
 }
 
+class MenuStar extends mag.ImageRect {
+    constructor() {
+        super('mainmenu-star' + Math.floor(Math.random() * 14 + 1));
+    }
+    twinkle(dur=350) {
+        const blinkDur = dur + Math.random() * 100;
+        let _this = this;
+        let blink = () => {
+            if (_this.cancelBlink) return;
+            Animate.tween(_this, { opacity:0.4 }, blinkDur, (e) => Math.pow(e, 2)).after(() => {
+                if (_this.cancelBlink) return;
+                Animate.tween(_this, { opacity:1 }, blinkDur, (e) => Math.pow(e, 2)).after(blink);
+            });
+        };
+        blink();
+    }
+}
+
 class MainMenu extends mag.Stage {
 
     constructor(canvas=null, onClickPlay=null, onClickSettings=null) {
@@ -135,7 +153,7 @@ class MainMenu extends mag.Stage {
         while(n-- > 0) {
 
             // Create an instance of a star illustration.
-            let star = new mag.ImageRect('mainmenu-star' + Math.floor(Math.random() * 14 + 1));
+            let star = new MenuStar();
             //star.anchor = { x:0.5, y:0.5 };
 
             // Find a random position that doesn't intersect other previously created stars.
@@ -156,19 +174,11 @@ class MainMenu extends mag.Stage {
             star.opacity = 0.4;
             const scale = Math.random() * 0.3 + 0.3;
             star.scale = { x:scale, y:scale };
-            const blinkDur = 350 + Math.random() * 100;
             this.add(star);
             stars.push(star);
 
             // Twinkling effect
-            let blink = () => {
-                if (star.cancelBlink) return;
-                Animate.tween(star, { opacity:0.4 }, blinkDur, (e) => Math.pow(e, 2)).after(() => {
-                    if (star.cancelBlink) return;
-                    Animate.tween(star, { opacity:1 }, blinkDur, (e) => Math.pow(e, 2)).after(blink);
-                });
-            };
-            Animate.wait(1000 * Math.random()).after(blink);
+            Animate.wait(1000 * Math.random()).after(() => star.twinkle());
 
             // "Zoom"
             let screenCenter = {x:GLOBAL_DEFAULT_SCREENSIZE.width/2.0, y:GLOBAL_DEFAULT_SCREENSIZE.height/2.0};
@@ -392,26 +402,222 @@ class LevelSelectGrid extends mag.Rect {
     }
 }
 
+class LevelSpot extends mag.Circle {
+    constructor(x, y, r, onclick) {
+        super(x, y, r);
+        this.color = 'gray';
+        this.enabled = false;
+        this.shadowOffset = 0;
+        this.highlightColor = 'YellowGreen';
+        this.disabledColor = 'gray';
+        this.enabledColor = 'white';
+        this.stroke = { color:'black', lineWidth:2 };
+        this.onclick = onclick;
+    }
+    blink() {
+
+    }
+    enable() {
+        this.color = 'white';
+        this.enabled = true;
+    }
+    disable() {
+        this.color = 'gray';
+        this.enabled = false;
+    }
+    onmouseenter(pos) {
+        if (!this.enabled) return;
+        this.stroke = { color:'yellow', lineWidth:2 };
+        this.color = this.highlightColor;
+    }
+    onmouseleave(pos) {
+        if (!this.enabled) return;
+        this.stroke = { color:'black', lineWidth:2 };
+        this.color = this.enabledColor;
+    }
+    onmouseclick(pos) {
+        if (this.onclick) this.onclick();
+    }
+}
+
 class PlanetCard extends mag.ImageRect {
     constructor(x, y, r, name, planet_image, onclick) {
-        super(x, y, r*2, r*2, planet_image);
+        super(x, y, r*2, r*2, planet_image+'-locked');
 
         this.radius = r;
         this.name = name;
         this.onclick = onclick;
+
+        // Crashed ship graphic
+        let ship = new mag.ImageRect(0, 0, r, r, 'ship-crashed');
+        ship.scale = { x:0.4, y:0.4 };
+        ship.anchor = { x:0.5, y:0 };
+        ship.pos = { x:r, y:0 };
+        ship.ignoreEvents = true;
+        this.ship = ship;
+
+        // Level path
+        let path = new ArrowPath();
+        path.stroke.color = 'white';
+        path.stroke.lineDash = [5*this.radius/120];
+        path.drawArrowHead = false;
+        this.path = path;
+        this.addChild(path);
+
+        this.pts = [];
+        this.unitpos = (pos) => {
+            pos = clonePos(pos);
+            pos.x -= this.absolutePos.x;
+            pos.y -= this.absolutePos.y;
+            pos.x /= this.absoluteSize.w / 2;
+            pos.y /= this.absoluteSize.h / 2;
+            return pos;
+        };
     }
+
+    onmousedown(pos) {
+        //if (this.scale.x > 1.01) {
+        //
+        //}
+
+        pos = this.unitpos(pos);
+        this.pts = [ pos ];
+        console.warn(pos);
+    }
+    onmousedrag(pos) {
+        pos = this.unitpos(pos);
+        if (this.pts.length > 0) {
+             pos.y *= -1;
+             pos.x *= -1;
+             let relpos = fromTo(pos, this.pts[0]);
+             this.pts.push(relpos);
+             //console.log(relpos);
+        }
+        // else this.pts.push(pos);
+    }
+    onmouseup(pos) {
+        console.log(this.pts.reduce((prev, cur) => prev + '{"x":' + (cur.x) + ', "y":' + (cur.y) + '},\n', ''));
+        if(this.pts.length>2)
+            setCurve(this.pts);
+        this.pts = [];
+
+        this.stage.draw();
+    }
+
+    setCurve(pts) {
+        this.path.points = pts.map((p) => ({ x:p.x*this.radius+this.radius, y:p.y*this.radius+this.radius }));
+    }
+
+    setLevels(levels, onLevelSelect) {
+        if (window.level_idx < levels[1]) {
+            this.removeChild(this.path);
+            return;
+        }
+
+        this.image = this.image.replace('-locked', '');
+        this.addChild(this.ship);
+
+        const NUM_LVLS = levels[0].length; // total number of cells to fit on the grid
+        const genClickCallback = (level_idx) => {
+            return () => onLevelSelect(levels[0][level_idx], levels[1] + level_idx);
+        };
+
+        // Level spots
+        for (let i = 1; i <= NUM_LVLS; i++) {
+            let spotpos = this.path.posAlongPath(i / NUM_LVLS);
+            let spot = new LevelSpot( spotpos.x, spotpos.y, 6 * this.radius / 120, genClickCallback(i-1) );
+            spot.anchor = { x:0.5, y:0.5 };
+            if (window.level_idx >= levels[1] + i-1)
+                spot.enable();
+            this.addChild(spot);
+        }
+    }
+
     onmouseclick() {
         if (this.onclick)
             this.onclick();
     }
 }
 
+class ChapterSelectShip extends mag.RotatableImageRect {
+    constructor() {
+        super('ship-small');
+        this.pointing = { x:1, y:0 };
+        this.velocity = { x:0, y:0 };
+    }
+    thrust(force, delta) {
+        const MAX_VEL = 1;
+        let deltaForce = scalarMultiply(force, delta);
+        let step = dotProduct(deltaForce, this.pointing);
+        this.pointing = normalize(addPos(this.pointing, deltaForce));
+        this.velocity = addPos(this.velocity, scalarMultiply(this.pointing, step));
+        if(lengthOfPos(this.velocity) > MAX_VEL) this.velocity = rescalePos(this.velocity, MAX_VEL);
+        this.pos = addPos(this.velocity, this.pos);
+        this.rotation = Math.atan2(this.pointing.y, this.pointing.x);
+    }
+    flyTo(dest) {
+        const FORCE = 10;
+        let totalDist = distBetweenPos(this.pos, dest);
+        let twn = new mag.IndefiniteTween((delta) => {
+            this.thrust( rescalePos( fromTo(this.pos, dest), distBetweenPos(this.pos, dest) / totalDist), delta / 1000.0 * 10);
+            if (distBetweenPos(this.pos, dest) <= 1) {
+                twn.cancel();
+            }
+            this.stage.draw();
+        });
+        twn.run();
+    }
+}
+
 class ChapterSelectMenu extends mag.Stage {
     constructor(canvas, onLevelSelect) {
         super(canvas);
+
+        this.showStarField();
         this.showChapters(onLevelSelect);
 
-        //$('body').css('background', '#222');
+        //let ship = new ChapterSelectShip();
+        //this.add(ship);
+        //ship.flyTo( {x:600, y:200} );
+
+        $('body').css('background', '#333');
+    }
+
+    showStarField() {
+        const NUM_STARS = 100;
+        let genRandomPt = () => randomPointInRect( {x:0, y:0, w:GLOBAL_DEFAULT_SCREENSIZE.width, h:GLOBAL_DEFAULT_SCREENSIZE.height} );
+        let stars = [];
+        let n = NUM_STARS;
+        while(n-- > 0) {
+
+            // Create an instance of a star illustration.
+            let star = new MenuStar();
+            //star.anchor = { x:0.5, y:0.5 };
+
+            // Find a random position that doesn't intersect other previously created stars.
+            let p = genRandomPt();
+            // for (let i = 0; i < stars.length; i++) {
+            //     let s = stars[i];
+            //     let prect = {x:p.x, y:p.y, w:star.size.w, h:star.size.h};
+            //     let srect = {x:s._pos.x, y:s._pos.y, w:s.size.w, h:s.size.h};
+            //     if (intersects(STARBOY_RECT, prect) ||
+            //         intersects(prect, srect)) {
+            //         p = genRandomPt();
+            //         i = 0;
+            //     }
+            // }
+
+            // Set star properties
+            star.pos = p;
+            star.opacity = 0.4;
+            const scale = Math.random() * 0.3 + 0.1;
+            star.scale = { x:scale, y:scale };
+            this.add(star);
+            stars.push(star);
+
+            // Twinkling effect
+            Animate.wait(1000 * Math.random()).after(() => star.twinkle(1000));
+        }
     }
 
     getPlanetPos() {
@@ -440,15 +646,16 @@ class ChapterSelectMenu extends mag.Stage {
         let POS_MAP = this.getPlanetPos();
         stage.planets.forEach((p, i) => {
             p.ignoreEvents = false;
+            if (p.expandFunc) p.onclick = p.expandFunc;
             if (!stage.has(p)) stage.add(p);
             let rad = POS_MAP[i].r;
-            Animate.tween(p, { pos: {x:POS_MAP[i].x+15, y:POS_MAP[i].y+40}, size:{w:rad*2, h:rad*2}, opacity:1.0 }, dur);
+            Animate.tween(p, { pos: {x:POS_MAP[i].x+15, y:POS_MAP[i].y+40}, scale:{x:1,y:1}, opacity:1.0 }, dur);
         });
     }
 
     clear() {
         this.ctx.save();
-        this.ctx.fillStyle = '#222';
+        this.ctx.fillStyle = '#333';//'#594764';
         this.ctx.fillRect(0, 0, canvas.width, canvas.height);
         this.ctx.restore();
     }
@@ -480,15 +687,19 @@ class ChapterSelectMenu extends mag.Stage {
         // Expand and disappear animations.
         let stage = this;
         let expand = (planet) => {
+            planet.ignoreEvents = false;
+            planet.expandFunc = planet.onclick;
+            planet.onclick = null;
             let r = GLOBAL_DEFAULT_SCREENSIZE.width / 3.0;
             let center = { x:GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y:GLOBAL_DEFAULT_SCREENSIZE.height / 2.0 };
-            Animate.tween(planet, { size:{w:r*2, h:r*2}, pos: center }, 1000, (elapsed) => {
+            let scale = r / planet.radius;
+            Animate.tween(planet, { scale:{x:scale, y:scale}, pos: center }, 1000, (elapsed) => {
                 return Math.pow(elapsed, 3);
             });
         };
         let hide = (planet) => {
             planet.opacity = 1.0;
-            Animate.tween(planet, { opacity:0 }, 500).after(() => {
+            Animate.tween(planet, { scale:{x:1, y:1}, opacity:0 }, 500).after(() => {
                 stage.remove(planet);
             });
         };
@@ -499,8 +710,9 @@ class ChapterSelectMenu extends mag.Stage {
             let planets = [];
 
             chapters.forEach((chap, i) => {
+
                 let pos = i < POS_MAP.length ? POS_MAP[i] : { x:0, y:0, r:10 };
-                let planet = new PlanetCard(pos.x + 15, pos.y + 40, pos.r, chap.name, (chap.name in IMG_MAP) ? IMG_MAP[chap.name] : 'planet-bagbag');
+                let planet = new PlanetCard(pos.x + 15, pos.y + 40, pos.r, chap.name, chap.resources ? chap.resources.planet : 'planet-bagbag');
                 planet.color = 'white';
                 planet.anchor = { x:0.5, y:0.5 };
                 planet.shadowOffset = 0;
@@ -513,6 +725,19 @@ class ChapterSelectMenu extends mag.Stage {
                     Resource.play('zoomin');
                     Animate.wait(500).after(() => this.showLevelSelectGrid(planet.name, onLevelSelect));
                 };
+
+                if (chap.resources) {
+
+                    const levels = Resource.levelsForChapter(chap.name);
+
+                    // Set path curve on planet.
+                    planet.setCurve(chap.resources.curve);
+
+                    // Set levels along curve.
+                    planet.setLevels(levels, onLevelSelect);
+
+                }
+
                 this.add(planet);
                 planets.push(planet);
             });

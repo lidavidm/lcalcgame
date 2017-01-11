@@ -9,11 +9,13 @@ function LOAD_REDUCT_RESOURCES(Resource) {
 
     var levels = [];
     var chapters = [];
-    var markChapter = (alias, desc, prev_levels) => {
-        chapters.push({ name:alias, description:desc, startIdx:prev_levels.length });
+    var markChapter = (json, prev_levels) => {
+        var d = { name:json.chapterName, description:json.description, startIdx:prev_levels.length };
+        if (json.resources) d.resources = json.resources;
+        chapters.push(d);
     };
     var pushChapter = (json) => {
-        markChapter(json.chapterName, json.description, levels);
+        markChapter(json, levels);
         json.levels.forEach((lvl) => {
             levels.push(lvl);
         });
@@ -132,12 +134,19 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     // Main menu
     loadImage('mainmenu-starboy', 'starboy/starboy.png');
     loadImage('mainmenu-starboy-glow', 'starboy/starboy-glowing.png');
+
     loadImage('planet-bagbag', 'starboy/planet_bagbag.png');
     loadImage('planet-conditionabo', 'starboy/planet_conditionabo.png');
     loadImage('planet-boolili', 'starboy/planet_boolili.png');
     loadImage('planet-functiana', 'starboy/planet_functiana.png');
+    loadImage('planet-bagbag-locked', 'starboy/planet_bagbag-locked.png');
+    loadImage('planet-conditionabo-locked', 'starboy/planet_conditionabo-locked.png');
+    loadImage('planet-boolili-locked', 'starboy/planet_boolili-locked.png');
+    
+    loadImage('ship-small', 'starboy/ship-small.png');
+    loadImage('ship-crashed', 'starboy/ship-crashed1.png');
     loadImageSequence('mainmenu-star', 'starboy/stars/star.png', [1, 14]);
-    loadAudio('mainmenu-enter', 'sci-fi-engine-startup.wav');
+    loadAudio('mainmenu-enter', 'mouth-revving.wav');
 
     // Loads poof0.png, poof1.png, ..., poof4.png (as poof0, poof1, ..., poof4, respectively).
     loadImageSequence('poof', 'poof.png', [0, 4]);

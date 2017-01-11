@@ -20,6 +20,7 @@ var ArrowPath = function (_mag$Node) {
         var points = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
         var stroke = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { color: 'black', lineWidth: 1 };
         var arrowWidth = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 8;
+        var drawArrow = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
 
         _classCallCheck(this, ArrowPath);
 
@@ -28,6 +29,7 @@ var ArrowPath = function (_mag$Node) {
         _this.stroke = stroke;
         _this.points = points;
         _this.arrowWidth = arrowWidth;
+        _this.drawArrowHead = drawArrow;
         return _this;
     }
 
@@ -99,17 +101,19 @@ var ArrowPath = function (_mag$Node) {
             if (this.stroke) ctx.stroke();
 
             // Draw arrowhead.
-            var lastseg = reversePos(rescalePos(this.lastSegment, this.arrowWidth)); // Vector pointing from final point to 2nd-to-last point.
-            var leftpt = addPos(rotateBy(lastseg, Math.PI / 4.0), lastpt);
-            var rightpt = addPos(rotateBy(lastseg, -Math.PI / 4.0), lastpt);
-            ctx.fillStyle = this.stroke ? this.stroke.color : null;
-            setStrokeStyle(ctx, null);
-            ctx.beginPath();
-            ctx.moveTo(lastpt.x, lastpt.y);
-            ctx.lineTo(leftpt.x, leftpt.y);
-            ctx.lineTo(rightpt.x, rightpt.y);
-            ctx.closePath();
-            ctx.fill();
+            if (this.drawArrowHead) {
+                var lastseg = reversePos(rescalePos(this.lastSegment, this.arrowWidth)); // Vector pointing from final point to 2nd-to-last point.
+                var leftpt = addPos(rotateBy(lastseg, Math.PI / 4.0), lastpt);
+                var rightpt = addPos(rotateBy(lastseg, -Math.PI / 4.0), lastpt);
+                ctx.fillStyle = this.stroke ? this.stroke.color : null;
+                setStrokeStyle(ctx, null);
+                ctx.beginPath();
+                ctx.moveTo(lastpt.x, lastpt.y);
+                ctx.lineTo(leftpt.x, leftpt.y);
+                ctx.lineTo(rightpt.x, rightpt.y);
+                ctx.closePath();
+                ctx.fill();
+            }
 
             ctx.restore();
         }

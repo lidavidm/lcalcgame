@@ -4,11 +4,12 @@
  */
 
 class ArrowPath extends mag.Node {
-    constructor(points=[], stroke={color:'black', lineWidth:1}, arrowWidth=8) {
+    constructor(points=[], stroke={color:'black', lineWidth:1}, arrowWidth=8,drawArrow=true) {
         super(0, 0);
         this.stroke = stroke;
         this.points = points;
         this.arrowWidth = arrowWidth;
+        this.drawArrowHead = drawArrow;
     }
 
     get absolutePos() {
@@ -100,17 +101,19 @@ class ArrowPath extends mag.Node {
         if (this.stroke) ctx.stroke();
 
         // Draw arrowhead.
-        let lastseg = reversePos( rescalePos( this.lastSegment, this.arrowWidth ) ); // Vector pointing from final point to 2nd-to-last point.
-        let leftpt = addPos( rotateBy(lastseg, Math.PI / 4.0), lastpt );
-        let rightpt = addPos( rotateBy(lastseg, -Math.PI / 4.0), lastpt );
-        ctx.fillStyle = this.stroke ? this.stroke.color : null;
-        setStrokeStyle(ctx, null);
-        ctx.beginPath();
-        ctx.moveTo(  lastpt.x,  lastpt.y  );
-        ctx.lineTo(  leftpt.x,  leftpt.y  );
-        ctx.lineTo( rightpt.x, rightpt.y  );
-        ctx.closePath();
-        ctx.fill();
+        if (this.drawArrowHead) {
+            let lastseg = reversePos( rescalePos( this.lastSegment, this.arrowWidth ) ); // Vector pointing from final point to 2nd-to-last point.
+            let leftpt = addPos( rotateBy(lastseg, Math.PI / 4.0), lastpt );
+            let rightpt = addPos( rotateBy(lastseg, -Math.PI / 4.0), lastpt );
+            ctx.fillStyle = this.stroke ? this.stroke.color : null;
+            setStrokeStyle(ctx, null);
+            ctx.beginPath();
+            ctx.moveTo(  lastpt.x,  lastpt.y  );
+            ctx.lineTo(  leftpt.x,  leftpt.y  );
+            ctx.lineTo( rightpt.x, rightpt.y  );
+            ctx.closePath();
+            ctx.fill();
+        }
 
         ctx.restore();
     }
