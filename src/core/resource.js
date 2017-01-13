@@ -65,6 +65,9 @@ var mag = (function(_) {
         };
 
         let muted = false;
+        if (getCookie("muted") === "true") {
+            muted = true;
+        }
 
         return { // TODO: Add more resource types.
             loadImage:loadImage,
@@ -87,8 +90,14 @@ var mag = (function(_) {
                     lowLag.play(alias);
                 }
             },
-            mute: () => { muted = true; },
-            unmute: () => { muted = false; },
+            mute: () => {
+                muted = true;
+                setCookie("muted", "true", 1000);
+            },
+            unmute: () => {
+                muted = false;
+                setCookie("muted", "false", 1000);
+            },
             isMuted: () => { return muted; },
         };
     })();

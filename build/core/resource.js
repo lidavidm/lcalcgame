@@ -67,6 +67,9 @@ var mag = function (_) {
         };
 
         var muted = false;
+        if (getCookie("muted") === "true") {
+            muted = true;
+        }
 
         return { // TODO: Add more resource types.
             loadImage: loadImage,
@@ -96,9 +99,11 @@ var mag = function (_) {
             },
             mute: function mute() {
                 muted = true;
+                setCookie("muted", "true", 1000);
             },
             unmute: function unmute() {
                 muted = false;
+                setCookie("muted", "false", 1000);
             },
             isMuted: function isMuted() {
                 return muted;
