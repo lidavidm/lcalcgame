@@ -31,7 +31,6 @@ var RepeatLoopExpr = function (_Expression) {
             _get(RepeatLoopExpr.prototype.__proto__ || Object.getPrototypeOf(RepeatLoopExpr.prototype), "update", this).call(this);
             var centerX = this.size.w / 2;
             var centerY = this.size.h / 2;
-            var innerR = 0.1 * this.size.h / 2;
             var outerR = 0.9 * this.size.h / 2;
             if (this.timesExpr) {
                 this.timesExpr.stroke = {
@@ -39,7 +38,7 @@ var RepeatLoopExpr = function (_Expression) {
                     width: 2
                 };
                 this.timesExpr.pos = {
-                    x: centerX - outerR - this.timesExpr.size.w / 3,
+                    x: centerX - outerR - this.timesExpr.size.w / 2,
                     y: centerY
                 };
             }
@@ -78,6 +77,13 @@ var RepeatLoopExpr = function (_Expression) {
             dy = Math.abs(this.bodyExpr.absolutePos.y - this.bodyExpr.absoluteSize.h / 2 - centerY);
             var upperTipAngle = -Math.asin(dy / outerR);
             drawArrowOnArc(ctx, upperTipAngle, -Math.PI / 10, centerX, centerY, outerR);
+
+            ctx.beginPath();
+            ctx.moveTo(centerX - 5, centerY - 5);
+            ctx.lineTo(centerX + 5, centerY + 5);
+            ctx.moveTo(centerX + 5, centerY - 5);
+            ctx.lineTo(centerX - 5, centerY + 5);
+            ctx.stroke();
         }
     }, {
         key: "performReduction",

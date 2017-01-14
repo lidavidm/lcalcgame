@@ -32,7 +32,6 @@ class RepeatLoopExpr extends Expression {
         super.update();
         let centerX = this.size.w / 2;
         let centerY = this.size.h / 2;
-        let innerR = 0.1 * this.size.h / 2;
         let outerR = 0.9 * this.size.h / 2;
         if (this.timesExpr) {
             this.timesExpr.stroke = {
@@ -40,7 +39,7 @@ class RepeatLoopExpr extends Expression {
                 width: 2,
             };
             this.timesExpr.pos = {
-                x: centerX - outerR - this.timesExpr.size.w / 3,
+                x: centerX - outerR - this.timesExpr.size.w / 2,
                 y: centerY,
             };
         }
@@ -78,6 +77,13 @@ class RepeatLoopExpr extends Expression {
         dy = Math.abs(this.bodyExpr.absolutePos.y - this.bodyExpr.absoluteSize.h / 2 - centerY);
         let upperTipAngle = -Math.asin(dy / outerR);
         drawArrowOnArc(ctx, upperTipAngle, -Math.PI / 10, centerX, centerY, outerR);
+
+        ctx.beginPath();
+        ctx.moveTo(centerX - 5, centerY - 5);
+        ctx.lineTo(centerX + 5, centerY + 5);
+        ctx.moveTo(centerX + 5, centerY - 5);
+        ctx.lineTo(centerX - 5, centerY + 5);
+        ctx.stroke();
     }
 
     performReduction() {

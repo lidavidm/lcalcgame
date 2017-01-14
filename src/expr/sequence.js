@@ -21,9 +21,13 @@ class Sequence extends Expression {
 
     update() {
         super.update();
+        let width = 75;
+        for (let expr of this.holes) {
+            width = Math.max(width, expr.size.w);
+        }
         for (let expr of this.holes) {
             if (expr instanceof MissingExpression) {
-                expr._size = { w: this.size.w, h: expr.size.h };
+                expr._size = { w: width, h: expr.size.h };
             }
         }
         super.update();
