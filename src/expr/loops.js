@@ -109,10 +109,18 @@ class RepeatLoopExpr extends Expression {
 
             let exprs = [];
             for (let i = 0; i < num.number; i++) {
-                exprs.push(this.bodyExpr.clone());
+                if (this.bodyExpr instanceof Sequence) {
+                    for (let expr of this.bodyExpr.subexpressions) {
+                        exprs.push(expr.clone());
+                    }
+                }
+                else {
+                    exprs.push(this.bodyExpr.clone());
+                }
             }
 
-            let result = new Sequence(...exprs);
+            let seqClass = ExprManager.getClass('sequence');
+            let result = new seqClass(...exprs);
             (this.parent || this.stage).swap(this, result);
             result.update();
             return result;

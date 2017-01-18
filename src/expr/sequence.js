@@ -1,6 +1,7 @@
 class Sequence extends Expression {
     constructor(...exprs) {
         super([]);
+        this.padding.between = 5;
         exprs.forEach((expr) => {
             if (expr instanceof MissingExpression) {
                 expr = new MissingSequenceExpression();
@@ -9,6 +10,10 @@ class Sequence extends Expression {
         });
         this._layout = { direction: "vertical", align: "none" };
         this._animating = false;
+    }
+
+    get subexpressions() {
+        return this.holes;
     }
 
     canReduce() {
@@ -89,6 +94,51 @@ class Sequence extends Expression {
     onmouseclick() {
         if (!this._animating) {
             this.performReduction();
+        }
+    }
+}
+
+class NumberedSequence extends Sequence {
+    constructor(...exprs) {
+        super(...exprs);
+        this.labels = [];
+        this.padding.left = 30;
+
+        for (let i = 0; i < exprs.length; i++) {
+            let label = new TextExpr((i + 1).toString() + ":");
+            label.fontSize = 20;
+            this.labels.push(label);
+        }
+    }
+
+    drawInternal(ctx, pos, boundingSize) {
+        super.drawInternal(ctx, pos, boundingSize);
+        let radius = this.radius*this.absoluteScale.x;
+        ctx.fillStyle = "#fff";
+        roundRect(ctx,
+                  pos.x, pos.y,
+                  27.5 * this.scale.x, boundingSize.h,
+                  {
+                      tl: radius,
+                      bl: radius,
+                      tr: 0,
+                      br: 0,
+                  }, true, false,
+                  null);
+
+        // When reducing, statements are removed from
+        // this.holes. Offset the label so that the right label stays
+        // with the right statement.
+        let offset = this.labels.length - this.holes.length;
+        for (let i = 0; i < this.holes.length; i++) {
+            let statement = this.holes[i];
+            let label = this.labels[i + offset];
+            label._pos.x = statement.pos.x - 25;
+            label._pos.y = statement.pos.y + 8;
+            label.parent = this;
+            label.update();
+            label.update();
+            label.draw(ctx);
         }
     }
 }
