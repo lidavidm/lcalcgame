@@ -3,7 +3,7 @@ const SCALE_FACTOR = 0.33;
 class RepeatLoopExpr extends Expression {
     constructor(times, body) {
         super([times, body]);
-        this.markerAngle = 0;
+        this.arcAngle = 0;
         this.color = "orange";
     }
 
@@ -56,28 +56,41 @@ class RepeatLoopExpr extends Expression {
     }
 
     drawInternal(ctx, pos, boundingSize) {
-        super.drawInternal(ctx, pos, boundingSize);
-
         let centerX = pos.x + boundingSize.w / 2;
         let centerY = pos.y + boundingSize.h / 2;
         let outerR = 0.9 * boundingSize.h / 2;
 
         ctx.lineWidth = 1.0;
         ctx.beginPath();
-        ctx.strokeStyle = ctx.fillStyle = 'black';
+        ctx.fillStyle = 'orange';
+        ctx.strokeStyle = 'black';
         ctx.arc(centerX, centerY, outerR, 0, Math.PI * 2);
         ctx.closePath();
         ctx.stroke();
+        ctx.fill();
+
+        ctx.lineWidth = 2.0;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, outerR, this.arcAngle, this.arcAngle + Math.PI / 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, outerR, this.arcAngle + Math.PI, this.arcAngle + 3 * Math.PI / 2);
+        ctx.stroke();
 
         // draw the arrows
-        let dy = Math.abs(this.timesExpr.absolutePos.y + this.timesExpr.absoluteSize.h / 2 - centerY);
-        let lowerTipAngle = Math.PI - Math.asin(dy / outerR);
-        drawArrowOnArc(ctx, lowerTipAngle, -Math.PI / 10, centerX, centerY, outerR);
+        ctx.lineWidth = 1.5;
+        ctx.fillStyle = 'black';
 
-        dy = Math.abs(this.bodyExpr.absolutePos.y - this.bodyExpr.absoluteSize.h / 2 - centerY);
-        let upperTipAngle = -Math.asin(dy / outerR);
-        drawArrowOnArc(ctx, upperTipAngle, -Math.PI / 10, centerX, centerY, outerR);
+        let arrowOffsetAngle = Math.PI / 2 + this.arcAngle;
+        let arrowCenterX = centerX + Math.cos(arrowOffsetAngle) * outerR;
+        let arrowCenterY = centerY + Math.sin(arrowOffsetAngle) * outerR;
+        drawPointsAround(ctx, arrowCenterX, arrowCenterY, [[-6.0, 0.0], [6.0, 3.0], [6.0, -3.0]], this.arcAngle);
+        arrowOffsetAngle = -Math.PI / 2 + this.arcAngle;
+        arrowCenterX = centerX + Math.cos(arrowOffsetAngle) * outerR;
+        arrowCenterY = centerY + Math.sin(arrowOffsetAngle) * outerR;
+        drawPointsAround(ctx, arrowCenterX, arrowCenterY, [[6.0, 0.0], [-6.0, 3.0], [-6.0, -3.0]], this.arcAngle);
 
+        // draw the times symbol
         ctx.beginPath();
         ctx.moveTo(centerX - 5, centerY - 5);
         ctx.lineTo(centerX + 5, centerY + 5);
@@ -88,7 +101,7 @@ class RepeatLoopExpr extends Expression {
 
     performReduction() {
         if (!this.bodyExpr.isComplete()) {
-            Animate.blink(this.bodyExpr, 300, [1.0, 0.0, 0.0]);
+            Animate.blink(this.bodyExpr, 1000, [1.0, 0.0, 0.0]);
             return Promise.reject("RepeatLoopExpr: missing body!");
         }
 
@@ -109,19 +122,13 @@ class RepeatLoopExpr extends Expression {
 
             let exprs = [];
             for (let i = 0; i < num.number; i++) {
-                if (this.bodyExpr instanceof Sequence) {
-                    for (let expr of this.bodyExpr.subexpressions) {
-                        exprs.push(expr.clone());
-                    }
-                }
-                else {
-                    exprs.push(this.bodyExpr.clone());
-                }
+                exprs.push(this.bodyExpr.clone());
             }
 
             let seqClass = ExprManager.getClass('sequence');
             let result = new seqClass(...exprs);
             (this.parent || this.stage).swap(this, result);
+            result.lockSubexpressions();
             result.update();
             return result;
         });
@@ -134,14 +141,21 @@ class RepeatLoopExpr extends Expression {
     }
 }
 
-
-function drawArrowOnArc(ctx, tipAngle, deltaAngle, centerX, centerY, radius) {
-    let baseAngle = tipAngle + deltaAngle;
+function drawPointsAround(ctx, centerX, centerY, points, rotation) {
     ctx.beginPath();
-    ctx.moveTo(centerX + 0.9 * radius * Math.cos(baseAngle), centerY + 0.9 * radius * Math.sin(baseAngle));
-    ctx.lineTo(centerX + 1.1 * radius * Math.cos(baseAngle), centerY + 1.1 * radius * Math.sin(baseAngle));
-    ctx.lineTo(centerX + radius * Math.cos(tipAngle), centerY + radius * Math.sin(tipAngle));
+    let first = true;
+    for (let [x, y] of points) {
+        let tx = centerX + x * Math.cos(rotation) - y * Math.sin(rotation);
+        let ty = centerY + x * Math.sin(rotation) + y * Math.cos(rotation);
+        if (first) {
+            ctx.moveTo(tx, ty);
+            first = false;
+        }
+        else {
+            ctx.lineTo(tx, ty);
+        }
+    }
     ctx.closePath();
-    ctx.stroke();
     ctx.fill();
+    ctx.stroke();
 }

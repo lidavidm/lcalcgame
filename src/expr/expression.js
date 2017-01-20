@@ -127,7 +127,6 @@ class Expression extends mag.RoundedRect {
         sizes.forEach((s) => {
             if (this._layout.direction == "vertical") {
                 height += s.h;
-                height += this.padding.between || 0;
                 width = Math.max(width, s.w);
             }
             else {
@@ -135,6 +134,10 @@ class Expression extends mag.RoundedRect {
                 width += s.w + padding.inner;
             }
         });
+
+        if (this._layout.direction == "vertical" && this.padding.between) {
+            height += this.padding.between * (sizes.length - 1);
+        }
 
         if (this._layout.direction == "vertical") {
             height += 2 * padding.inner;
