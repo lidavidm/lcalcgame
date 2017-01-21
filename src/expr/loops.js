@@ -11,8 +11,16 @@ class RepeatLoopExpr extends Expression {
         return this.holes[0];
     }
 
+    set timesExpr(expr) {
+        this.holes[0] = expr;
+    }
+
     get bodyExpr() {
         return this.holes[1];
+    }
+
+    set bodyExpr(expr) {
+        this.holes[1] = expr;
     }
 
     get size() {
@@ -39,7 +47,7 @@ class RepeatLoopExpr extends Expression {
                 width: 2,
             };
             this.timesExpr.pos = {
-                x: centerX - outerR - this.timesExpr.size.w / 2,
+                x: centerX - outerR - this.timesExpr.absoluteSize.w + 10,
                 y: centerY,
             };
         }
@@ -49,7 +57,7 @@ class RepeatLoopExpr extends Expression {
                 width: 2,
             };
             this.bodyExpr.pos = {
-                x: centerX + outerR - Math.min(25, this.bodyExpr.size.w / 2),
+                x: centerX + outerR - 10,
                 y: centerY,
             };
         }
@@ -120,17 +128,22 @@ class RepeatLoopExpr extends Expression {
                 return null;
             }
 
-            let exprs = [];
-            for (let i = 0; i < num.number; i++) {
-                exprs.push(this.bodyExpr.clone());
-            }
-
             let seqClass = ExprManager.getClass('sequence');
-            let result = new seqClass(...exprs);
-            (this.parent || this.stage).swap(this, result);
+            let body = [];
+            for (let i = 0; i < num.number; i++) {
+                body.push(this.bodyExpr.clone());
+            }
+            let result = new seqClass(...body);
             result.lockSubexpressions();
             result.update();
-            return result;
+            return new Promise((resolve, _reject) => {
+                Animate.tween(this, {
+                    arcAngle: body.length * Math.PI,
+                }, 500 * body.length).after(() => {
+                    (this.parent || this.stage).swap(this, result);
+                    return result;
+                });
+            });
         });
     }
 
