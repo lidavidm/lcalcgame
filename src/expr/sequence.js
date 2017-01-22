@@ -48,8 +48,17 @@ class Sequence extends Expression {
 
         this._animating = true;
 
-        this.holes.forEach((expr) => expr.lock());
-        let reduced = [];
+        let cleanup = () => {
+            this._animating = false;
+            while (this.holes.length > 0 && this.holes[0] instanceof MissingExpression) {
+                this.holes.shift();
+            }
+            this.update();
+
+            Animate.blink(this, 1000, [1.0, 0.0, 0.0]);
+        };
+
+        this.lockSubexpressions();
         return new Promise((resolve, reject) => {
             let nextStep = () => {
                 if (this.holes.length === 0) {
@@ -61,9 +70,18 @@ class Sequence extends Expression {
                     let expr = this.holes[0];
                     let result = expr.performReduction();
                     let delay = (newExpr) => {
-                        this.holes.shift();
+                        if (newExpr instanceof Expression && newExpr != expr) {
+                            this.holes[0] = newExpr;
+                        }
+                        else if (newExpr == expr) {
+                            cleanup();
+                            reject();
+                            return;
+                        }
+                        else {
+                            this.holes.shift();
+                        }
                         this.update();
-                        reduced.push(newExpr);
                         if (newExpr instanceof Expression) newExpr.lock();
                         window.setTimeout(() => {
                             nextStep();
@@ -72,13 +90,7 @@ class Sequence extends Expression {
                     if (result instanceof Promise) {
                         result.then(delay, () => {
                             // Uh-oh, an error happened
-                            this._animating = false;
-                            while (this.holes.length > 0 && this.holes[0] instanceof MissingExpression) {
-                                this.holes.shift();
-                            }
-                            this.update();
-
-                            Animate.blink(this, 1000, [1.0, 0.0, 0.0]);
+                            cleanup();
                             reject();
                         });
                     }

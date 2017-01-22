@@ -280,6 +280,7 @@ class Level {
             } else { // Class name. Invoke the instantiator.
                 var op_class = exprs[0];
                 if (!(op_class instanceof LambdaHoleExpr) &&
+                    !(op_class instanceof Sequence) &&
                     !(op_class instanceof BagExpr) && op_class.length !== exprs.length-1) { // missing an argument, or there's an extra argument:
                     console.warn('Operator-argument mismatch with exprs: ', exprs);
                     console.warn('Continuing...');

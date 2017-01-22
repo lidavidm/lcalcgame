@@ -133,7 +133,7 @@ class RepeatLoopExpr extends Expression {
                     arcAngle: body.length * Math.PI,
                 }, 500 * body.length).after(() => {
                     (this.parent || this.stage).swap(this, result);
-                    return result;
+                    resolve(result);
                 });
             });
         });
