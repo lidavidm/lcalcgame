@@ -5,6 +5,7 @@ class RepeatLoopExpr extends Expression {
         super([times, body]);
         this.arcAngle = 0;
         this.color = "orange";
+        this.radius = 30;
     }
 
     get timesExpr() {
@@ -24,15 +25,10 @@ class RepeatLoopExpr extends Expression {
     }
 
     get size() {
-        if (this._animating) return this._cachedSize;
-        let subSize = this.timesExpr.size;
-        let subHeight = Math.max(this.timesExpr.size.h, this.bodyExpr.size.h);
-        let w = subSize.w * 2.25;
-        let h = subHeight * 1.5;
-        if (w < h) w = h;
+        let size = super.size;
         return {
-            w: w,
-            h: h,
+            w: size.w + this.radius,
+            h: Math.max(2 * this.radius + 10, size.h),
         };
     }
 
@@ -40,15 +36,10 @@ class RepeatLoopExpr extends Expression {
         super.update();
         let centerX = this.size.w / 2;
         let centerY = this.size.h / 2;
-        let outerR = 0.9 * this.size.h / 2;
         if (this.timesExpr) {
             this.timesExpr.stroke = {
                 color: "#999",
                 width: 2,
-            };
-            this.timesExpr.pos = {
-                x: centerX - outerR - this.timesExpr.absoluteSize.w + 10,
-                y: centerY,
             };
         }
         if (this.bodyExpr) {
@@ -56,33 +47,34 @@ class RepeatLoopExpr extends Expression {
                 color: "#999",
                 width: 2,
             };
-            this.bodyExpr.pos = {
-                x: centerX + outerR - 10,
-                y: centerY,
-            };
         }
+        this.bodyExpr.pos = {
+            x: this.bodyExpr.pos.x + this.radius,
+            y: this.bodyExpr.pos.y,
+        };
     }
 
     drawInternal(ctx, pos, boundingSize) {
-        let centerX = pos.x + boundingSize.w / 2;
+        // let centerX = pos.x + boundingSize.w / 2;
+        let leftEdge = this.timesExpr.absolutePos.x + this.timesExpr.absoluteSize.w;
+        let centerX = leftEdge + (this.bodyExpr.absolutePos.x - leftEdge) / 2;
         let centerY = pos.y + boundingSize.h / 2;
-        let outerR = 0.9 * boundingSize.h / 2;
 
         ctx.lineWidth = 1.0;
         ctx.beginPath();
         ctx.fillStyle = 'orange';
         ctx.strokeStyle = 'black';
-        ctx.arc(centerX, centerY, outerR, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY, this.radius, 0, Math.PI * 2);
         ctx.closePath();
         ctx.stroke();
         ctx.fill();
 
         ctx.lineWidth = 2.0;
         ctx.beginPath();
-        ctx.arc(centerX, centerY, outerR, this.arcAngle, this.arcAngle + Math.PI / 2);
+        ctx.arc(centerX, centerY, this.radius, this.arcAngle, this.arcAngle + Math.PI / 2);
         ctx.stroke();
         ctx.beginPath();
-        ctx.arc(centerX, centerY, outerR, this.arcAngle + Math.PI, this.arcAngle + 3 * Math.PI / 2);
+        ctx.arc(centerX, centerY, this.radius, this.arcAngle + Math.PI, this.arcAngle + 3 * Math.PI / 2);
         ctx.stroke();
 
         // draw the arrows
@@ -90,12 +82,12 @@ class RepeatLoopExpr extends Expression {
         ctx.fillStyle = 'black';
 
         let arrowOffsetAngle = Math.PI / 2 + this.arcAngle;
-        let arrowCenterX = centerX + Math.cos(arrowOffsetAngle) * outerR;
-        let arrowCenterY = centerY + Math.sin(arrowOffsetAngle) * outerR;
+        let arrowCenterX = centerX + Math.cos(arrowOffsetAngle) * this.radius;
+        let arrowCenterY = centerY + Math.sin(arrowOffsetAngle) * this.radius;
         drawPointsAround(ctx, arrowCenterX, arrowCenterY, [[-6.0, 0.0], [6.0, 3.0], [6.0, -3.0]], this.arcAngle);
         arrowOffsetAngle = -Math.PI / 2 + this.arcAngle;
-        arrowCenterX = centerX + Math.cos(arrowOffsetAngle) * outerR;
-        arrowCenterY = centerY + Math.sin(arrowOffsetAngle) * outerR;
+        arrowCenterX = centerX + Math.cos(arrowOffsetAngle) * this.radius;
+        arrowCenterY = centerY + Math.sin(arrowOffsetAngle) * this.radius;
         drawPointsAround(ctx, arrowCenterX, arrowCenterY, [[6.0, 0.0], [-6.0, 3.0], [-6.0, -3.0]], this.arcAngle);
 
         // draw the times symbol
