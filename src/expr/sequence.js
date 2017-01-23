@@ -73,6 +73,9 @@ class Sequence extends Expression {
                         if (newExpr instanceof Expression && newExpr != expr) {
                             this.holes[0] = newExpr;
                         }
+                        else if (newExpr instanceof Expression && newExpr.isValue()) {
+                            this.holes.shift();
+                        }
                         else if (newExpr == expr) {
                             cleanup();
                             reject();

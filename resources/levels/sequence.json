@@ -103,24 +103,35 @@
         },
         {
             "description": "Increment things with repeat",
-            "board": "(repeat /(2) /(assign /$x /(+ /$x /1))) ($x)",
+            "board": "(repeat /(2) /(assign /$x /(+ /$x /1)))",
             "goal": "(3)",
+            "toolbox": "($x)",
+            "globals": {
+                "x": "(1)"
+            }
+        },
+        {
+            "description": "Increment things with repeat",
+            "board": "(repeat _ /(assign /$x /(+ /$x /1)))",
+            "goal": "(6)",
+            "toolbox": "($x) (0) (1) (2) (3) (4) (5)",
             "globals": {
                 "x": "(1)"
             }
         },
         {
             "description": "Repeating things 0 times does nothing",
-            "board": "(repeat _ /(assign /$x /(+ /$x /1))) ($x) (0)",
-            "goal": "(1)",
+            "board": "(sequence /(repeat _ /(assign /$x /(+ /$x /1))) /(assign /$y /(== /$x /1)))",
+            "goal": "(true)",
+            "toolbox": "($y) (0) (1) (2) (3) (4) (5)",
             "globals": {
                 "x": "(1)"
             }
         },
         {
             "description": "You can repeat a variable number of times",
-            "board": "(repeat _ /(assign /$x /(+ /$x /1)))",
-            "toolbox": "($x) ($x)",
+            "board": "(repeat _ _)",
+            "toolbox": "(0) (1) (2) (assign /$x /(+ /$x /1)) ($x) ($x)",
             "goal": "(6)",
             "globals": {
                 "x": "(3)"
@@ -128,8 +139,9 @@
         },
         {
             "description": "Use sequence in repeat",
-            "board": "(repeat /(2) /(sequence _ _)) (assign /$y /(+ /$y /1)) (assign /$x /(+ /$x /1)) ($x) ($y)",
-            "goal": "(3) (4)",
+            "board": "(repeat /(2) /(sequence _ _)) (assign /$y /(+ /$y _)) (assign /$x /(+ /$x _))",
+            "goal": "(4) (6)",
+            "toolbox": "($x) ($x) ($y) (1) (2)",
             "globals": {
                 "x": "(1)",
                 "y": "(2)"
@@ -137,20 +149,23 @@
         },
         {
             "description": "Use sequence in repeat with dependencies",
-            "board": "(repeat /(3) /(sequence _ _)) (assign /$y /(+ /$y /$x)) (assign /$x /(+ /$x /1)) ($y)",
-            "goal": "(6)",
+            "board": "(repeat /(3) /(sequence _ _)) (assign /$y /(+ /$y /$x)) (assign /$x /(+ /$x _))",
+            "goal": "(true) (true)",
+            "toolbox": "(== /$x /3) (== /$y _) (1) (4) (5) (6)",
             "globals": {
                 "x": "(0)",
                 "y": "(0)"
             }
         },
         {
-            "description": "Put together the loop",
-            "board": "(repeat _ /(assign /$x /(+ /$x /1))) ($x) ($y)",
-            "goal": "(5)",
+            "description": "Use sequence in repeat with dependencies",
+            "board": "(repeat /(3) /(sequence _ _)) (assign /$x /(+ /$x _)) (assign /$z /(== /$x /4))",
+            "goal": "(true)",
+            "toolbox": "(2) (3) (4) ($y) ($z)",
             "globals": {
-                "x": "(2)",
-                "y": "(3)"
+                "x": "(1)",
+                "y": "(1)",
+                "z": "(false)"
             }
         }
     ]
