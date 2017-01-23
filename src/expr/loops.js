@@ -55,12 +55,18 @@ class RepeatLoopExpr extends Expression {
     }
 
     drawInternal(ctx, pos, boundingSize) {
-        // let centerX = pos.x + boundingSize.w / 2;
         let leftEdge = this.timesExpr.absolutePos.x + this.timesExpr.absoluteSize.w;
         let centerX = leftEdge + (this.bodyExpr.absolutePos.x - leftEdge) / 2;
         let centerY = pos.y + boundingSize.h / 2;
 
         ctx.lineWidth = 1.0;
+        ctx.fillStyle = '#999';
+        ctx.beginPath();
+        ctx.arc(centerX, centerY + this.shadowOffset, this.radius, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.fill();
+
         ctx.beginPath();
         ctx.fillStyle = 'orange';
         ctx.strokeStyle = 'black';
