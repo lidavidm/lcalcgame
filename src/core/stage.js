@@ -119,6 +119,7 @@ var mag = (function(_) {
         bringToFront(node) {
             var i = this.nodes.indexOf(node);
             if (i > -1 && i < this.nodes.length-1) {
+                console.error('fefef');
                 var n = this.nodes[i];
                 this.nodes.splice(i, 1);
                 this.nodes.push(n);
@@ -189,7 +190,11 @@ var mag = (function(_) {
             this.ctx.save();
             this.ctx.scale(this._scale, this._scale);
             this.clear();
-            this.nodes.forEach((n) => n.draw(this.ctx));
+            const len = this.nodes.length;
+            for (let i = 0; i < len; i++) {
+                this.nodes[i].draw(this.ctx);
+            }
+            //this.nodes.forEach((n) => n.draw(this.ctx));
             this.ctx.restore();
         }
 
@@ -375,16 +380,19 @@ var mag = (function(_) {
                 return false;
             };
             canvas.onmousedown = (e) => {
-                if (e.button === RIGHT_BTN) return;
+                if (e.button === RIGHT_BTN) return false;
                 onmousedown( getMousePos(e) );
+                return false;
             };
             canvas.onmousemove = (e) => {
-                if (e.button === RIGHT_BTN) return;
+                if (e.button === RIGHT_BTN) return false;
                 onmousemove( getMousePos(e) );
+                return false;
             };
             canvas.onmouseup   = (e) => {
-                if (e.button === RIGHT_BTN) return;
+                if (e.button === RIGHT_BTN) return false;
                 onmouseup( getMousePos(e) );
+                return false;
             };
 
             var ontouchstart = function(e) {

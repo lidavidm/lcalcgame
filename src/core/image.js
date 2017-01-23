@@ -49,11 +49,37 @@ var mag = (function(_) {
             else super(x, y, w, h, resource_key);
             this.rotation = 0;
         }
-        drawInternal(ctx, pos, boundingSize) {
+
+        draw(ctx) {
+            if (!ctx) return;
             ctx.save();
-            ctx.translate(pos.x + this._offset.x, pos.y + this._offset.y);
+            if (this.opacity !== undefined && this.opacity < 1.0) {
+                ctx.globalAlpha = this.opacity;
+            }
+            var boundingSize = this.absoluteSize;
+            var upperLeftPos = this.upperLeftPos(this.absolutePos, boundingSize);
+
+            ctx.translate(upperLeftPos.x + this._offset.x, upperLeftPos.y + this._offset.y);
             ctx.rotate(this.rotation);
-            super.drawInternal(ctx, zeroPos(), boundingSize);
+
+            if (this._color || this.stroke) this.drawInternal(ctx, zeroPos(), boundingSize);
+
+            this.children.forEach((child) => {
+                let realpos = child.pos;
+                let scale = this.absoluteScale;
+                child.parent = this;
+                child.pos = { x:(-upperLeftPos.x-this._offset.x)/scale.x+realpos.x, y:(-upperLeftPos.y-this._offset.y)/scale.y+realpos.y };
+                child.draw(ctx);
+                child.pos = realpos;
+            });
+
+            if (this._color || this.stroke) this.drawInternalAfterChildren(ctx, upperLeftPos, boundingSize);
+
+            ctx.restore();
+        }
+
+        drawInternalAfterChildren(ctx, pos, boundingSize) {
+            super.drawInternalAfterChildren(ctx, pos, boundingSize);
             ctx.restore();
         }
     }

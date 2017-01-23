@@ -521,6 +521,7 @@ var mag = function (_) {
             value: function timeout() {
                 var delta = new Date().getTime() - this.startTimeMS;
                 this.startTimeMS += delta;
+                if (delta > 50) delta = 50; // cap it, just in case.
                 this.update(delta); // how much time has passed _between frames_ (in ms)
             }
         }]);

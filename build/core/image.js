@@ -87,12 +87,40 @@ var mag = function (_) {
         }
 
         _createClass(RotatableImageRect, [{
-            key: 'drawInternal',
-            value: function drawInternal(ctx, pos, boundingSize) {
+            key: 'draw',
+            value: function draw(ctx) {
+                var _this3 = this;
+
+                if (!ctx) return;
                 ctx.save();
-                ctx.translate(pos.x + this._offset.x, pos.y + this._offset.y);
+                if (this.opacity !== undefined && this.opacity < 1.0) {
+                    ctx.globalAlpha = this.opacity;
+                }
+                var boundingSize = this.absoluteSize;
+                var upperLeftPos = this.upperLeftPos(this.absolutePos, boundingSize);
+
+                ctx.translate(upperLeftPos.x + this._offset.x, upperLeftPos.y + this._offset.y);
                 ctx.rotate(this.rotation);
-                _get(RotatableImageRect.prototype.__proto__ || Object.getPrototypeOf(RotatableImageRect.prototype), 'drawInternal', this).call(this, ctx, zeroPos(), boundingSize);
+
+                if (this._color || this.stroke) this.drawInternal(ctx, zeroPos(), boundingSize);
+
+                this.children.forEach(function (child) {
+                    var realpos = child.pos;
+                    var scale = _this3.absoluteScale;
+                    child.parent = _this3;
+                    child.pos = { x: (-upperLeftPos.x - _this3._offset.x) / scale.x + realpos.x, y: (-upperLeftPos.y - _this3._offset.y) / scale.y + realpos.y };
+                    child.draw(ctx);
+                    child.pos = realpos;
+                });
+
+                if (this._color || this.stroke) this.drawInternalAfterChildren(ctx, upperLeftPos, boundingSize);
+
+                ctx.restore();
+            }
+        }, {
+            key: 'drawInternalAfterChildren',
+            value: function drawInternalAfterChildren(ctx, pos, boundingSize) {
+                _get(RotatableImageRect.prototype.__proto__ || Object.getPrototypeOf(RotatableImageRect.prototype), 'drawInternalAfterChildren', this).call(this, ctx, pos, boundingSize);
                 ctx.restore();
             }
         }]);
@@ -131,19 +159,19 @@ var mag = function (_) {
             _classCallCheck(this, Button);
 
             if (arguments.length === 2) {
-                var _this4 = _possibleConstructorReturn(this, (Button.__proto__ || Object.getPrototypeOf(Button)).call(this, x.default));
+                var _this5 = _possibleConstructorReturn(this, (Button.__proto__ || Object.getPrototypeOf(Button)).call(this, x.default));
 
                 resource_map = x;
                 onclick = y;
             } else {
                 ;
 
-                var _this4 = _possibleConstructorReturn(this, (Button.__proto__ || Object.getPrototypeOf(Button)).call(this, x, y, w, h, resource_map.default));
+                var _this5 = _possibleConstructorReturn(this, (Button.__proto__ || Object.getPrototypeOf(Button)).call(this, x, y, w, h, resource_map.default));
             } // where resource_map properties are:
             //  { default, hover (optional), down (opt.) }
-            _this4.images = resource_map;
-            _this4.clickFunc = onclick;
-            return _possibleConstructorReturn(_this4);
+            _this5.images = resource_map;
+            _this5.clickFunc = onclick;
+            return _possibleConstructorReturn(_this5);
         }
 
         _createClass(Button, [{

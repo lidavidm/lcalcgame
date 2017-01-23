@@ -347,6 +347,13 @@ var MirrorExpr = function (_ImageExpr3) {
             ctx.restore();
         }
     }, {
+        key: 'size',
+        get: function get() {
+            var sz = _get(MirrorExpr.prototype.__proto__ || Object.getPrototypeOf(MirrorExpr.prototype), 'size', this);
+            sz.h = 54;
+            return sz;
+        }
+    }, {
         key: 'exprInMirror',
         set: function set(e) {
             this.innerExpr = e;

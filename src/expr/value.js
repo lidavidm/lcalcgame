@@ -136,6 +136,11 @@ class MirrorExpr extends ImageExpr {
         this.innerExpr = null;
         this._broken = false;
     }
+    get size() {
+        let sz = super.size;
+        sz.h = 54;
+        return sz;
+    }
     set exprInMirror(e) {
         this.innerExpr = e;
 

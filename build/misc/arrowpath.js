@@ -30,6 +30,7 @@ var ArrowPath = function (_mag$Node) {
         _this.points = points;
         _this.arrowWidth = arrowWidth;
         _this.drawArrowHead = drawArrow;
+        _this.percentDrawn = 1;
         return _this;
     }
 
@@ -69,6 +70,21 @@ var ArrowPath = function (_mag$Node) {
             return this.lastPoint;
         }
     }, {
+        key: 'indexOfPointNearest',
+        value: function indexOfPointNearest(elapsed) {
+            if (elapsed < 0) return this.pointAtIndex(0);else if (elapsed > 1) return this.lastPoint;
+
+            var totalLen = this.pathLength;
+            var fraction = 0;
+            for (var i = 1; i < this.points.length; i++) {
+                var len = distBetweenPos(this.points[i - 1], this.points[i]);
+                if (elapsed < fraction + len / totalLen) return i - 1;
+                fraction += len / totalLen;
+            }
+
+            return this.points.length - 1;
+        }
+    }, {
         key: 'draw',
         value: function draw(ctx, offset) {
             this.drawInternal(ctx, this.absolutePos);
@@ -94,10 +110,21 @@ var ArrowPath = function (_mag$Node) {
             var startpt = this.points[0];
             ctx.beginPath();
             ctx.moveTo(startpt.x, startpt.y);
-            this.points.slice(1).forEach(function (pt) {
-                var p = pt;
-                ctx.lineTo(p.x, p.y);
-            });
+
+            if (this.percentDrawn > 0.999) {
+                this.points.slice(1).forEach(function (pt) {
+                    var p = pt;
+                    ctx.lineTo(p.x, p.y);
+                });
+            } else {
+                var idx = this.indexOfPointNearest(this.percentDrawn);
+                if (idx > 1) {
+                    this.points.slice(1, idx).forEach(function (pt) {
+                        var p = pt;
+                        ctx.lineTo(p.x, p.y);
+                    });
+                }
+            }
             if (this.stroke) ctx.stroke();
 
             // Draw arrowhead.

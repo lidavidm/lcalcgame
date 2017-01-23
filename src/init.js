@@ -6,7 +6,7 @@ var GLOBAL_DEFAULT_SCREENSIZE = null;
 var stage;
 var canvas;
 
-var level_idx = 0; //getCookie('level_idx') || 0;
+var level_idx = getCookie('level_idx') || 0;
 if (level_idx !== 0) level_idx = parseInt(level_idx);
 var cur_menu = null;
 
@@ -25,6 +25,7 @@ function init() {
     //     }
     // });
 
+    Resource.setCurrentLoadSequence('init');
     LOAD_REDUCT_RESOURCES(Resource);
 
     if (!__SHOW_DEV_INFO)
@@ -46,19 +47,30 @@ function init() {
         }
     }
 
-    // Start a new log session (creating userID as necessary),
-    // and then begin the game.
-    Logger.startSession().then(function (userinfo) {
+    // Wait until page is loaded, then...
+    Pace.on('done', () => {
 
-        if (userinfo.cond) {
-            __COND = userinfo.cond;
+        // Wait until all resources are loaded...
+        // * This callback must be set only after all load() method calls... *
+        Resource.afterLoadSequence('init', () => {
 
-            if (userinfo.cond === 'B')
-                ExprManager.setDefaultFadeLevel(100);
-        }
+            // Start a new log session (creating userID as necessary),
+            // and then begin the game.
+            Logger.startSession().then(function (userinfo) {
 
-        return loadChapterSelect();
-    }).then(initMainMenu);
+                if (userinfo.cond) {
+                    __COND = userinfo.cond;
+
+                    if (userinfo.cond === 'B')
+                        ExprManager.setDefaultFadeLevel(100);
+                }
+
+                return loadChapterSelect();
+            }).then(initMainMenu);
+
+        });
+
+    });
 }
 
 function loadCustomLevel(lvl_desc, goal_desc) {
@@ -117,10 +129,22 @@ function returnToMenu() {
     if (cur_menu) {
         prepareCanvas();
         cur_menu.validate();
+        console.log(cur_menu);
+        cur_menu.updateLevelSpots();
         stage = cur_menu;
         redraw(stage);
     } else {
         initMainMenu();
+    }
+}
+
+function initChapterSelectMenu(flyToChapIdx) {
+    canvas = document.getElementById('canvas');
+    if (canvas.getContext) {
+        clearStage();
+        prepareCanvas();
+        stage = new ChapterSelectMenu(canvas, initLevel, flyToChapIdx);
+        redraw(stage);
     }
 }
 
@@ -131,14 +155,17 @@ function initMainMenu() {
     if (canvas.getContext) {
 
         prepareCanvas();
+        $(canvas).css('background-color','#EEE');
 
-        //stage = new MainMenu(canvas, () => {
+        //stage = new MainMenu(canvas, initChapterSelectMenu);
 
-            //Clicks 'play' button. Transition to chapter select screen.
-            stage = new ChapterSelectMenu(canvas, initLevel);
-            redraw(stage);
-
-        //});
+        // stage = new MainMenu(canvas, () => {
+        //
+        //     //Clicks 'play' button. Transition to chapter select screen.
+             stage = new ChapterSelectMenu(canvas, initLevel);
+             redraw(stage);
+        //
+        // });
         //}, () => {
             // Clicked 'settings' button. Transition to settings screen.
         //});
@@ -175,16 +202,24 @@ function prepareCanvas() {
     }
 }
 
+function saveProgress() {
+    var cookie = getCookie('level_idx');
+    if (cookie.length === 0 || level_idx > parseInt(cookie)) {
+        setCookie('level_idx', level_idx);
+    }
+}
+
 function initBoard() {
 
     canvas = document.getElementById('canvas');
 
     if (canvas.getContext) {
 
+        clearStage();
         prepareCanvas();
 
         // New: saves progress upon reload.
-        setCookie('level_idx', level_idx);
+        saveProgress();
         $('#lvl_num_visible').text((level_idx+1) + '');
 
         stage = Resource.buildLevel(Resource.level[level_idx], canvas);
@@ -311,7 +346,21 @@ function next() {
     }
     else {
         level_idx++;
-        initBoard();
+
+        Resource.getChapters().then((chapters) => {
+            for (let i = 0; i < chapters.length; i++) {
+                if (chapters[i].startIdx === level_idx) {
+                    // Fly to the next planet,
+                    // instead of going to the next level.
+                    level_idx--;
+                    initChapterSelectMenu(i);
+                    return;
+                }
+            }
+
+            // Otherwise...
+            initBoard();
+        });
     }
 }
 function undo() {

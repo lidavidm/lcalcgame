@@ -220,7 +220,7 @@ class MainMenu extends mag.Stage {
                                         Resource.play('mainmenu-enter');
                                         starboy.cancelFloat = true;
                                         starboy.ignoreEvents = true;
-                                        Animate.tween(starboy, { scale:{x:0.0001, y:0.0001} }, 2500, (e) => Math.pow(e, 2));
+                                        Animate.tween(starboy, { scale:{x:0.0, y:0.0} }, 2500, (e) => Math.pow(e, 2));
                                         Animate.wait(2000).after(() => {
                                             Animate.run((e) => {
                                                 bg.color = colorTween(e, [89/255.0, 71/255.0, 100/255.0], [0, 0, 0]);
@@ -408,18 +408,31 @@ class LevelSpot extends mag.Circle {
         this.color = 'gray';
         this.enabled = false;
         this.shadowOffset = 0;
-        this.highlightColor = 'YellowGreen';
+        this.highlightColor = 'lime';
         this.disabledColor = 'gray';
         this.enabledColor = 'white';
         this.stroke = { color:'black', lineWidth:2 };
         this.onclick = onclick;
     }
-    blink() {
-
+    flash() {
+        const dur = 600;
+        this.opacity =  1.0;
+        let _this = this;
+        let blink = () => {
+            if (_this.cancelBlink) return;
+            Animate.tween(_this, { opacity:0.4 }, dur, (e) => Math.pow(e, 2)).after(() => {
+                if (_this.cancelBlink) return;
+                Animate.tween(_this, { opacity:1 }, dur, (e) => Math.pow(e, 0.5)).after(blink);
+            });
+        };
+        this.enabledColor = 'cyan';
+        this.color = 'cyan';
+        blink();
     }
     enable() {
         this.color = 'white';
         this.enabled = true;
+        this.enabledColor = 'white';
     }
     disable() {
         this.color = 'gray';
@@ -427,16 +440,18 @@ class LevelSpot extends mag.Circle {
     }
     onmouseenter(pos) {
         if (!this.enabled) return;
-        this.stroke = { color:'yellow', lineWidth:2 };
+        this.stroke = { color:'yellow', lineWidth:this.stroke.lineWidth };
         this.color = this.highlightColor;
     }
     onmouseleave(pos) {
         if (!this.enabled) return;
-        this.stroke = { color:'black', lineWidth:2 };
+        this.stroke = { color:'black', lineWidth:this.stroke.lineWidth };
         this.color = this.enabledColor;
     }
     onmouseclick(pos) {
-        if (this.onclick) this.onclick();
+        if (this.enabled && this.onclick) {
+            this.onclick();
+        }
     }
 }
 
@@ -448,19 +463,20 @@ class PlanetCard extends mag.ImageRect {
         this.name = name;
         this.onclick = onclick;
 
-        // Crashed ship graphic
-        let ship = new mag.ImageRect(0, 0, r, r, 'ship-crashed');
-        ship.scale = { x:0.4, y:0.4 };
-        ship.anchor = { x:0.5, y:0 };
-        ship.pos = { x:r, y:0 };
-        ship.ignoreEvents = true;
-        this.ship = ship;
+        // Backing Glow on Mouseover
+        let glow = new mag.ImageRect(0, 0, r*2.5, r*2.5, 'planet-glow');
+        glow.anchor = { x:0.5, y:0.5 };
+        glow.pos = { x:r, y:r };
+        glow.ignoreEvents = true;
+        this.glow = glow;
 
         // Level path
         let path = new ArrowPath();
         path.stroke.color = 'white';
         path.stroke.lineDash = [5*this.radius/120];
+        path.stroke.lineWidth = r / 120;
         path.drawArrowHead = false;
+        path.ignoreEvents = true;
         this.path = path;
         this.addChild(path);
 
@@ -475,11 +491,60 @@ class PlanetCard extends mag.ImageRect {
         };
     }
 
-    onmousedown(pos) {
-        //if (this.scale.x > 1.01) {
-        //
-        //}
+    get landingPoint() {
+        let a = this.absolutePos;
+        return {x:a.x, y:a.y - this.absoluteSize.h / 3};
+    }
+    get localLandingPoint() {
+        return {x:this.size.w/2.0, y:this.size.h/2.0 / 3};
+    }
 
+    showShip(worldShip) {
+        // Create ship graphic
+        let ship = new mag.RotatableImageRect('ship-small');
+        ship.anchor = worldShip.anchor;
+        ship.scale = worldShip.absoluteScale;
+        ship.rotation = -Math.PI/2.0;
+        //ship.scale = { x:0.5*r/120, y:0.5*r/120 };
+        ship.pos = this.localLandingPoint;
+        ship.ignoreEvents = true;
+        this.ship = ship;
+        this.addChild(ship);
+    }
+    hideShip() {
+        if (this.ship) {
+            this.removeChild(this.ship);
+            this.ship = null;
+        }
+    }
+
+    onmouseclick() {
+        if (this.onclick)
+            this.onclick();
+        this.selected = false;
+    }
+    onmouseenter() {
+        this.selected = true;
+        this.glow.opacity = 0;
+        Animate.tween(this.glow, { opacity:1.0 }, 100).after(() => {
+            this.glow.opacity = 1;
+        });
+    }
+    onmouseleave(pos) {
+        if (distBetweenPos(pos, this.pos) > this.absoluteSize.h / 4.0)
+            this.selected = false;
+    }
+
+    drawInternal(ctx, pos, boundingSize) {
+        if (this.selected && this.scale.x < 1.1) {
+            this.glow.parent = this;
+            this.glow.draw(ctx);
+        }
+        super.drawInternal(ctx, pos, boundingSize);
+    }
+
+    // Uncomment for drawing curves directly on planets (DEBUG).
+    onmousedown(pos) {
         pos = this.unitpos(pos);
         this.pts = [ pos ];
         console.warn(pos);
@@ -491,17 +556,69 @@ class PlanetCard extends mag.ImageRect {
              pos.x *= -1;
              let relpos = fromTo(pos, this.pts[0]);
              this.pts.push(relpos);
-             //console.log(relpos);
         }
-        // else this.pts.push(pos);
     }
     onmouseup(pos) {
         console.log(this.pts.reduce((prev, cur) => prev + '{"x":' + (cur.x) + ', "y":' + (cur.y) + '},\n', ''));
         if(this.pts.length>2)
-            setCurve(this.pts);
+            this.setCurve(this.pts);
         this.pts = [];
-
         this.stage.draw();
+    }
+
+    activate() {
+        this.image = this.image.replace('-locked', '');
+        this.active = true;
+    }
+    activateSpots() {
+        if (!this.spots) return;
+
+        this.addChild(this.path);
+
+        // Make all spots invisible.
+        this.spots.forEach((spot) => {
+            spot.opacity = 0;
+            spot.ignoreEvents = true;
+            this.addChild(spot);
+        });
+
+        // Animate-in how much of the path is drawn.
+        const dur = 2000;
+        this.path.percentDrawn = 0;
+        Animate.tween(this.path, { percentDrawn:1.0 }, dur);
+        Animate.run((e) => {
+            this.spots.forEach((spot) => {
+                if (spot.relPosAlongPath <= this.path.percentDrawn) {
+                    if (spot.opacity === 0) Resource.play('levelspot-activate');
+                    spot.opacity = 1.0;
+                }
+            });
+        }, dur).after(() => {
+            this.spots.forEach((spot) => {
+                if (spot.opacity === 0) Resource.play('levelspot-activate');
+                spot.opacity = 1.0;
+                spot.ignoreEvents = false;
+            });
+            this.path.percentDrawn = 1;
+            this.spots[0].enable();
+            this.spots[0].flash();
+            Resource.play('fatbtn-beep');
+        });
+    }
+    updateLevelSpots() {
+        if (!this.spots) return;
+        let c = getCookie('level_idx');
+        if (c) c = parseInt(c);
+        this.spots.forEach((spot) => {
+            spot.opacity = 1.0;
+            if (c > spot.levelId)
+                spot.enable();
+            else if (c === spot.levelId) {
+                spot.enable();
+                spot.flash();
+            }
+            else spot.disable();
+        });
     }
 
     setCurve(pts) {
@@ -511,31 +628,38 @@ class PlanetCard extends mag.ImageRect {
     setLevels(levels, onLevelSelect) {
         if (window.level_idx < levels[1]) {
             this.removeChild(this.path);
-            return;
         }
-
-        this.image = this.image.replace('-locked', '');
-        this.addChild(this.ship);
+        else {
+            this.activate();
+        }
 
         const NUM_LVLS = levels[0].length; // total number of cells to fit on the grid
         const genClickCallback = (level_idx) => {
-            return () => onLevelSelect(levels[0][level_idx], levels[1] + level_idx);
+            return () => {
+                Resource.play('fatbtn-beep');
+                onLevelSelect(levels[0][level_idx], levels[1] + level_idx);
+            };
         };
 
         // Level spots
+        this.spots = [];
         for (let i = 1; i <= NUM_LVLS; i++) {
-            let spotpos = this.path.posAlongPath(i / NUM_LVLS);
+            let spotpos = this.path.posAlongPath((i-1) / (NUM_LVLS-1));
             let spot = new LevelSpot( spotpos.x, spotpos.y, 6 * this.radius / 120, genClickCallback(i-1) );
             spot.anchor = { x:0.5, y:0.5 };
-            if (window.level_idx >= levels[1] + i-1)
+            spot.relPosAlongPath = i / NUM_LVLS;
+            spot.levelId = levels[1] + i-1;
+            spot.stroke.lineWidth = Math.max(this.radius / 120 * 2, 1.5);
+            spot.ignoreEvents = true;
+            if (window.level_idx >= levels[1] + i-1) {
                 spot.enable();
-            this.addChild(spot);
-        }
-    }
+                if (window.level_idx === levels[1] + i-1) spot.flash();
+            }
+            this.spots.push(spot);
 
-    onmouseclick() {
-        if (this.onclick)
-            this.onclick();
+            if (window.level_idx >= levels[1])
+                this.addChild(spot);
+        }
     }
 }
 
@@ -544,7 +668,84 @@ class ChapterSelectShip extends mag.RotatableImageRect {
         super('ship-small');
         this.pointing = { x:1, y:0 };
         this.velocity = { x:0, y:0 };
+
+        const trailWidth = 140;
+        let trail = new RainbowTrail(0, 0, trailWidth, 30);
+        trail.pos = { x:-trailWidth+20, y:20 };
+        //trail.anchor = { x:1, y:0 };
+        this.trail = trail;
+        this.addChild(trail);
     }
+
+    // Fly to another planet. (entire sequence)
+    flyToPlanet(startPlanet, endPlanet) {
+
+        // Hide the local ships and make the world ship
+        // the only ship visible.
+        this.pos = startPlanet.landingPoint;
+        startPlanet.hideShip();
+        endPlanet.hideShip();
+
+        const endScale = endPlanet.radius / 120 / 2;
+        let dest = endPlanet.landingPoint;
+        let aboveOrbitDest = addPos(dest, { x:0, y:-20 });
+        let pointing = fromTo(this.pos, aboveOrbitDest);
+        let pointAngle = Math.atan2(pointing.y, pointing.x);
+        this.trail.opacity = 0;
+        let _this = this;
+        this.rotation = -Math.PI / 2.0; // make the ship face upright
+
+        return this.launch().then(() => {
+            this.rotateTo(pointAngle);
+            return this.moveTo(addPos({x:-20, y:-50}, addPos(this.pos, scalarMultiply(pointing, 0.05))));
+        }).then(() => {
+            Animate.tween(this.trail, { opacity:1.0 }, 100);
+            return new Promise((resolve, reject) => {
+                let dur = _this.flyTo(aboveOrbitDest, resolve);
+                Animate.tween(this, { scale:{x:endScale, y:endScale} }, dur);
+            });
+        }).then(() => {
+            return _this.land(dest);
+        }).then(() => {
+            endPlanet.showShip(_this);
+        });
+    }
+    attachToPlanet(planet) {
+        this.pos = planet.landingPoint;
+        planet.showShip(this);
+    }
+
+    // Launch the ship into the air.
+    launch() {
+        return new Promise((resolve, reject) => {
+            this.moveTo(addPos(this.pos, { x:0, y:-20 }), 1000).then(resolve);
+        });
+    }
+
+    // Rotate to angle.
+    rotateTo(angle, dur=1000, smoothFunc=(e)=>e) {
+        return new Promise((resolve, reject) => {
+            Animate.tween(this, { rotation:angle }, dur, smoothFunc).after(resolve);
+        });
+    }
+
+    // Move to pos (without changing rotation).
+    moveTo(dest, dur=1000, smoothFunc=(e)=>e) {
+        return new Promise((resolve, reject) => {
+            Animate.tween(this, { pos:clonePos(dest) }, dur, smoothFunc).after(() => {
+                resolve();
+            });
+        });
+    }
+
+    // Execute landing sequence.
+    land(dest) {
+        this.trail.opacity = 0;
+        return this.rotateTo(-Math.PI/2.0, 500).then(() => {
+            return this.moveTo(dest, 1000);
+        });
+    }
+
     thrust(force, delta) {
         const MAX_VEL = 1;
         let deltaForce = scalarMultiply(force, delta);
@@ -554,33 +755,112 @@ class ChapterSelectShip extends mag.RotatableImageRect {
         if(lengthOfPos(this.velocity) > MAX_VEL) this.velocity = rescalePos(this.velocity, MAX_VEL);
         this.pos = addPos(this.velocity, this.pos);
         this.rotation = Math.atan2(this.pointing.y, this.pointing.x);
+        this.trail.time += delta*400;
     }
-    flyTo(dest) {
+
+    flyTo(dest, onReachingDest) {
         const FORCE = 10;
-        let totalDist = distBetweenPos(this.pos, dest);
-        let twn = new mag.IndefiniteTween((delta) => {
-            this.thrust( rescalePos( fromTo(this.pos, dest), distBetweenPos(this.pos, dest) / totalDist), delta / 1000.0 * 10);
-            if (distBetweenPos(this.pos, dest) <= 1) {
-                twn.cancel();
-            }
-            this.stage.draw();
-        });
-        twn.run();
+        const travelDist = distBetweenPos(this.pos, dest);
+        const pointing = fromTo(this.pos, dest);
+        const DUR = travelDist / 100 * 1000; // 1 sec per 100 units.
+        this.rotation = Math.atan2(pointing.y, pointing.x);
+
+        let del = 0;
+        Animate.run((e) => {
+            this.trail.opacity = Math.pow(e, 0.5);
+            this.trail.time += (e - del) * 8000;
+            del = e;
+        }, DUR);
+        this.moveTo(dest, DUR).then(onReachingDest);
+        return DUR;
+
+        // let twn = new mag.IndefiniteTween((delta) => {
+        //     this.thrust( rescalePos( fromTo(this.pos, dest), distBetweenPos(this.pos, dest) / totalDist), delta / 1000.0 * 10);
+        //
+        //     let distleft = distBetweenPos(this.pos, dest);
+        //     this.trail.opacity = Math.pow(distleft / totalDist, 0.5);
+        //
+        //     if (distleft <= 10) {
+        //         if (onReachingDest) onReachingDest();
+        //         twn.cancel();
+        //     }
+        //     //this.stage.draw();
+        // });
+        // twn.run();
     }
 }
 
 class ChapterSelectMenu extends mag.Stage {
-    constructor(canvas, onLevelSelect) {
+    constructor(canvas, onLevelSelect, flyToChapIdx) {
         super(canvas);
 
         this.showStarField();
         this.showChapters(onLevelSelect);
 
-        //let ship = new ChapterSelectShip();
-        //this.add(ship);
-        //ship.flyTo( {x:600, y:200} );
+        let _this = this;
+        _this.offset = { x:0, y:0 };
+        Animate.wait(100).after(() => {
 
-        $('body').css('background', '#333');
+            let lastActivePlanet = _this.planets[0];
+            _this.planets.forEach((p) => {
+                if (p.active) lastActivePlanet = p;
+            });
+
+            let ship = new ChapterSelectShip();
+            const shipScale = lastActivePlanet.radius / 120 / 2;
+            ship.scale = { x:shipScale, y:shipScale };
+            //_this.bringToFront(ship);
+
+            if (flyToChapIdx) {
+                this.add(ship);
+                ship.attachToPlanet(_this.planets[flyToChapIdx-1]);
+                ship.flyToPlanet(_this.planets[flyToChapIdx-1], _this.planets[flyToChapIdx]).then(() => {
+                    _this.planets[flyToChapIdx].activate();
+                    return new Promise(function(resolve, reject) {
+                        Animate.wait(600).after(() => {
+                            _this.remove(ship);
+                            resolve();
+                        });
+                    });
+                }).then(_this.planets[flyToChapIdx].onclick)
+                  .then(() => {
+                    _this.planets[flyToChapIdx].activateSpots();
+                    level_idx++;
+                    saveProgress();
+                });
+            } else {
+                ship.attachToPlanet(lastActivePlanet);
+            }
+
+            // Camera follow...
+            //let twn = new mag.IndefiniteTween((delta) => {
+            //    _this.planetNode.pos = { x:-ship.pos.x+GLOBAL_DEFAULT_SCREENSIZE.width/2.0, y:-ship.pos.y+GLOBAL_DEFAULT_SCREENSIZE.height/2.0 };
+            //});
+            //twn.run();
+
+        });
+
+        //$('body').css('background', '#333');
+    }
+
+    updateLevelSpots() {
+        if (this.planets) {
+            this.planets.forEach((p) => p.updateLevelSpots());
+        }
+    }
+
+    drawImpl() {
+        if (this.invalidated) return; // don't draw invalidated stages.
+        this.ctx.save();
+        this.ctx.scale(this._scale, this._scale);
+        this.clear();
+        this.ctx.translate(this.offset.x, this.offset.y);
+        const len = this.nodes.length;
+        for (let i = 0; i < len; i++) {
+            this.nodes[i].draw(this.ctx);
+        }
+        //this.nodes.forEach((n) => n.draw(this.ctx));
+        this.ctx.restore();
     }
 
     showStarField() {
@@ -622,8 +902,8 @@ class ChapterSelectMenu extends mag.Stage {
 
     getPlanetPos() {
         return [
-            { x:144, y:104, r:120 },
-            { x:426, y:86,  r:55 },
+            { x:154, y:124, r:120 },
+            { x:446, y:86,  r:80 },
             { x:690, y:208, r:44 },
             { x:456, y:324, r:60 },
             { x:138, y:388, r:80 },
@@ -646,6 +926,7 @@ class ChapterSelectMenu extends mag.Stage {
         let POS_MAP = this.getPlanetPos();
         stage.planets.forEach((p, i) => {
             p.ignoreEvents = false;
+            if (p.spots) p.spots.forEach((s) => { s.ignoreEvents = true; });
             if (p.expandFunc) p.onclick = p.expandFunc;
             if (!stage.has(p)) stage.add(p);
             let rad = POS_MAP[i].r;
@@ -655,7 +936,7 @@ class ChapterSelectMenu extends mag.Stage {
 
     clear() {
         this.ctx.save();
-        this.ctx.fillStyle = '#333';//'#594764';
+        this.ctx.fillStyle = '#594764';
         this.ctx.fillRect(0, 0, canvas.width, canvas.height);
         this.ctx.restore();
     }
@@ -671,7 +952,7 @@ class ChapterSelectMenu extends mag.Stage {
             this.setPlanetsToDefaultPos(500);
             Resource.play('goback');
         });
-        btn_back.opacity = 0.5;
+        btn_back.opacity = 0.7;
 
         //this.add(grid);
         this.add(btn_back);
@@ -690,21 +971,26 @@ class ChapterSelectMenu extends mag.Stage {
             planet.ignoreEvents = false;
             planet.expandFunc = planet.onclick;
             planet.onclick = null;
+            stage.bringToFront(planet);
             let r = GLOBAL_DEFAULT_SCREENSIZE.width / 3.0;
             let center = { x:GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y:GLOBAL_DEFAULT_SCREENSIZE.height / 2.0 };
             let scale = r / planet.radius;
             Animate.tween(planet, { scale:{x:scale, y:scale}, pos: center }, 1000, (elapsed) => {
                 return Math.pow(elapsed, 3);
+            }).after(() => {
+                if (planet.spots) planet.spots.forEach((s) => { s.ignoreEvents = false; });
             });
         };
         let hide = (planet) => {
             planet.opacity = 1.0;
+            if (planet.spots) planet.spots.forEach((s) => { s.ignoreEvents = true; });
             Animate.tween(planet, { scale:{x:1, y:1}, opacity:0 }, 500).after(() => {
                 stage.remove(planet);
             });
         };
 
         // Each chapter is a 'Planet' in Starboy's Universe:
+        //let planetNode = new mag.Rect(0,0,1,1);
         Resource.getChapters().then((chapters) => {
 
             let planets = [];
@@ -714,6 +1000,7 @@ class ChapterSelectMenu extends mag.Stage {
                 let pos = i < POS_MAP.length ? POS_MAP[i] : { x:0, y:0, r:10 };
                 let planet = new PlanetCard(pos.x + 15, pos.y + 40, pos.r, chap.name, chap.resources ? chap.resources.planet : 'planet-bagbag');
                 planet.color = 'white';
+                if (i === 1) planet.path.stroke.color = 'gray';
                 planet.anchor = { x:0.5, y:0.5 };
                 planet.shadowOffset = 0;
                 planet.onclick = () => {
@@ -723,7 +1010,12 @@ class ChapterSelectMenu extends mag.Stage {
                         else         expand(planets[k]);
                     }
                     Resource.play('zoomin');
-                    Animate.wait(500).after(() => this.showLevelSelectGrid(planet.name, onLevelSelect));
+                    Animate.wait(500).after(() => {
+                        stage.showLevelSelectGrid(planet.name, onLevelSelect);
+                    });
+                    return new Promise((resolve, reject) => {
+                        Animate.wait(1000).after(resolve);
+                    });
                 };
 
                 if (chap.resources) {
@@ -735,7 +1027,6 @@ class ChapterSelectMenu extends mag.Stage {
 
                     // Set levels along curve.
                     planet.setLevels(levels, onLevelSelect);
-
                 }
 
                 this.add(planet);
@@ -743,6 +1034,8 @@ class ChapterSelectMenu extends mag.Stage {
             });
 
             this.planets = planets;
+            //this.add(planetNode);
+            //this.planetNode = planetNode;
 
         });
 

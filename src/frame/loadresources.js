@@ -135,18 +135,27 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadImage('mainmenu-starboy', 'starboy/starboy.png');
     loadImage('mainmenu-starboy-glow', 'starboy/starboy-glowing.png');
 
+    loadImage('planet-variablana', 'starboy/planet_variablana.png');
+    loadImage('planet-variablana-locked', 'starboy/planet_variablana-locked.png');
+    loadImage('planet-binder', 'starboy/planet_binder.png');
+    loadImage('planet-binder-locked', 'starboy/planet_binder-locked.png');
+    loadImage('planet-mapa', 'starboy/planet_mapa.png');
+    loadImage('planet-mapa-locked', 'starboy/planet_mapa-locked.png');
     loadImage('planet-bagbag', 'starboy/planet_bagbag.png');
     loadImage('planet-conditionabo', 'starboy/planet_conditionabo.png');
     loadImage('planet-boolili', 'starboy/planet_boolili.png');
     loadImage('planet-functiana', 'starboy/planet_functiana.png');
+    loadImage('planet-functiana-locked', 'starboy/planet_functiana-locked.png');
+    loadImage('planet-glow', 'starboy/planet-glow.png');
     loadImage('planet-bagbag-locked', 'starboy/planet_bagbag-locked.png');
     loadImage('planet-conditionabo-locked', 'starboy/planet_conditionabo-locked.png');
     loadImage('planet-boolili-locked', 'starboy/planet_boolili-locked.png');
-    
+    loadAudio('levelspot-activate', 'popin.wav');
+
     loadImage('ship-small', 'starboy/ship-small.png');
     loadImage('ship-crashed', 'starboy/ship-crashed1.png');
     loadImageSequence('mainmenu-star', 'starboy/stars/star.png', [1, 14]);
-    loadAudio('mainmenu-enter', 'mouth-revving.wav');
+    loadAudio('mainmenu-enter', 'sci-fi-engine-startup.wav');
 
     // Loads poof0.png, poof1.png, ..., poof4.png (as poof0, poof1, ..., poof4, respectively).
     loadImageSequence('poof', 'poof.png', [0, 4]);
@@ -203,6 +212,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             }
 
             unfaded.invalidate();
+            faded.validate();
 
             for (let border of fadedBorders) {
 
@@ -224,8 +234,10 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                         root = root.children[0];
                     }
 
-                    if (unfaded_root.fadingOut)
+                    if (unfaded_root.fadingOut) {
+                    //    console.log('sdasdads');
                         continue;
+                    }
 
                     unfaded_root.fadingOut = true;
                     unfaded_root.opacity = 1.0;
@@ -234,22 +246,25 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                     faded.add(unfaded_root);
                     root.opacity = 0;
 
-                    SparkleTrigger.run(unfaded_root, () => {
+                    Animate.wait(500).after(() => {
+                        SparkleTrigger.run(unfaded_root, () => {
 
-                        Logger.log('faded-expr', { 'expr':unfaded_root.toString(), 'state':faded.toString() } );
-                        Resource.play('mutate');
+                            Logger.log('faded-expr', { 'expr':unfaded_root.toString(), 'state':faded.toString() } );
+                            Resource.play('mutate');
 
-                        Animate.tween(root, { 'opacity':1.0 }, 2000).after(() => {
-                            root.ignoreEvents = false;
-                        });
-                        Animate.tween(unfaded_root, { 'opacity':0.0 }, 1000).after(() => {
-                            faded.remove(unfaded_root);
+                            Animate.tween(root, { 'opacity':1.0 }, 2000).after(() => {
+                                root.ignoreEvents = false;
+                            });
+                            Animate.tween(unfaded_root, { 'opacity':0.0 }, 1000).after(() => {
+                                faded.remove(unfaded_root);
+                            });
                         });
                     });
 
                     // Cross-fade old expression to new.
                     root.ignoreEvents = true;
                     unfaded_root.ignoreEvents = true;
+
                     /*Animate.tween(root, { 'opacity':1.0 }, 3000).after(() => {
                         root.ignoreEvents = false;
                     });

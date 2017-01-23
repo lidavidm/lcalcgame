@@ -298,7 +298,7 @@ var MainMenu = function (_mag$Stage) {
                 Resource.play('mainmenu-enter');
                 starboy.cancelFloat = true;
                 starboy.ignoreEvents = true;
-                Animate.tween(starboy, { scale: { x: 0.0001, y: 0.0001 } }, 2500, function (e) {
+                Animate.tween(starboy, { scale: { x: 0.0, y: 0.0 } }, 2500, function (e) {
                     return Math.pow(e, 2);
                 });
                 Animate.wait(2000).after(function () {
@@ -557,7 +557,7 @@ var LevelSpot = function (_mag$Circle) {
         _this13.color = 'gray';
         _this13.enabled = false;
         _this13.shadowOffset = 0;
-        _this13.highlightColor = 'YellowGreen';
+        _this13.highlightColor = 'lime';
         _this13.disabledColor = 'gray';
         _this13.enabledColor = 'white';
         _this13.stroke = { color: 'black', lineWidth: 2 };
@@ -566,13 +566,32 @@ var LevelSpot = function (_mag$Circle) {
     }
 
     _createClass(LevelSpot, [{
-        key: 'blink',
-        value: function blink() {}
+        key: 'flash',
+        value: function flash() {
+            var dur = 600;
+            this.opacity = 1.0;
+            var _this = this;
+            var blink = function blink() {
+                if (_this.cancelBlink) return;
+                Animate.tween(_this, { opacity: 0.4 }, dur, function (e) {
+                    return Math.pow(e, 2);
+                }).after(function () {
+                    if (_this.cancelBlink) return;
+                    Animate.tween(_this, { opacity: 1 }, dur, function (e) {
+                        return Math.pow(e, 0.5);
+                    }).after(blink);
+                });
+            };
+            this.enabledColor = 'cyan';
+            this.color = 'cyan';
+            blink();
+        }
     }, {
         key: 'enable',
         value: function enable() {
             this.color = 'white';
             this.enabled = true;
+            this.enabledColor = 'white';
         }
     }, {
         key: 'disable',
@@ -584,20 +603,22 @@ var LevelSpot = function (_mag$Circle) {
         key: 'onmouseenter',
         value: function onmouseenter(pos) {
             if (!this.enabled) return;
-            this.stroke = { color: 'yellow', lineWidth: 2 };
+            this.stroke = { color: 'yellow', lineWidth: this.stroke.lineWidth };
             this.color = this.highlightColor;
         }
     }, {
         key: 'onmouseleave',
         value: function onmouseleave(pos) {
             if (!this.enabled) return;
-            this.stroke = { color: 'black', lineWidth: 2 };
+            this.stroke = { color: 'black', lineWidth: this.stroke.lineWidth };
             this.color = this.enabledColor;
         }
     }, {
         key: 'onmouseclick',
         value: function onmouseclick(pos) {
-            if (this.onclick) this.onclick();
+            if (this.enabled && this.onclick) {
+                this.onclick();
+            }
         }
     }]);
 
@@ -616,19 +637,20 @@ var PlanetCard = function (_mag$ImageRect2) {
         _this14.name = name;
         _this14.onclick = onclick;
 
-        // Crashed ship graphic
-        var ship = new mag.ImageRect(0, 0, r, r, 'ship-crashed');
-        ship.scale = { x: 0.4, y: 0.4 };
-        ship.anchor = { x: 0.5, y: 0 };
-        ship.pos = { x: r, y: 0 };
-        ship.ignoreEvents = true;
-        _this14.ship = ship;
+        // Backing Glow on Mouseover
+        var glow = new mag.ImageRect(0, 0, r * 2.5, r * 2.5, 'planet-glow');
+        glow.anchor = { x: 0.5, y: 0.5 };
+        glow.pos = { x: r, y: r };
+        glow.ignoreEvents = true;
+        _this14.glow = glow;
 
         // Level path
         var path = new ArrowPath();
         path.stroke.color = 'white';
         path.stroke.lineDash = [5 * _this14.radius / 120];
+        path.stroke.lineWidth = r / 120;
         path.drawArrowHead = false;
+        path.ignoreEvents = true;
         _this14.path = path;
         _this14.addChild(path);
 
@@ -645,12 +667,64 @@ var PlanetCard = function (_mag$ImageRect2) {
     }
 
     _createClass(PlanetCard, [{
+        key: 'showShip',
+        value: function showShip(worldShip) {
+            // Create ship graphic
+            var ship = new mag.RotatableImageRect('ship-small');
+            ship.anchor = worldShip.anchor;
+            ship.scale = worldShip.absoluteScale;
+            ship.rotation = -Math.PI / 2.0;
+            //ship.scale = { x:0.5*r/120, y:0.5*r/120 };
+            ship.pos = this.localLandingPoint;
+            ship.ignoreEvents = true;
+            this.ship = ship;
+            this.addChild(ship);
+        }
+    }, {
+        key: 'hideShip',
+        value: function hideShip() {
+            if (this.ship) {
+                this.removeChild(this.ship);
+                this.ship = null;
+            }
+        }
+    }, {
+        key: 'onmouseclick',
+        value: function onmouseclick() {
+            if (this.onclick) this.onclick();
+            this.selected = false;
+        }
+    }, {
+        key: 'onmouseenter',
+        value: function onmouseenter() {
+            var _this15 = this;
+
+            this.selected = true;
+            this.glow.opacity = 0;
+            Animate.tween(this.glow, { opacity: 1.0 }, 100).after(function () {
+                _this15.glow.opacity = 1;
+            });
+        }
+    }, {
+        key: 'onmouseleave',
+        value: function onmouseleave(pos) {
+            if (distBetweenPos(pos, this.pos) > this.absoluteSize.h / 4.0) this.selected = false;
+        }
+    }, {
+        key: 'drawInternal',
+        value: function drawInternal(ctx, pos, boundingSize) {
+            if (this.selected && this.scale.x < 1.1) {
+                this.glow.parent = this;
+                this.glow.draw(ctx);
+            }
+            _get(PlanetCard.prototype.__proto__ || Object.getPrototypeOf(PlanetCard.prototype), 'drawInternal', this).call(this, ctx, pos, boundingSize);
+        }
+
+        // Uncomment for drawing curves directly on planets (DEBUG).
+
+    }, {
         key: 'onmousedown',
         value: function onmousedown(pos) {
-            //if (this.scale.x > 1.01) {
-            //
-            //}
-
             pos = this.unitpos(pos);
             this.pts = [pos];
             console.warn(pos);
@@ -664,9 +738,7 @@ var PlanetCard = function (_mag$ImageRect2) {
                 pos.x *= -1;
                 var relpos = fromTo(pos, this.pts[0]);
                 this.pts.push(relpos);
-                //console.log(relpos);
             }
-            // else this.pts.push(pos);
         }
     }, {
         key: 'onmouseup',
@@ -674,18 +746,76 @@ var PlanetCard = function (_mag$ImageRect2) {
             console.log(this.pts.reduce(function (prev, cur) {
                 return prev + '{"x":' + cur.x + ', "y":' + cur.y + '},\n';
             }, ''));
-            if (this.pts.length > 2) setCurve(this.pts);
+            if (this.pts.length > 2) this.setCurve(this.pts);
             this.pts = [];
-
             this.stage.draw();
+        }
+    }, {
+        key: 'activate',
+        value: function activate() {
+            this.image = this.image.replace('-locked', '');
+            this.active = true;
+        }
+    }, {
+        key: 'activateSpots',
+        value: function activateSpots() {
+            var _this16 = this;
+
+            if (!this.spots) return;
+
+            this.addChild(this.path);
+
+            // Make all spots invisible.
+            this.spots.forEach(function (spot) {
+                spot.opacity = 0;
+                spot.ignoreEvents = true;
+                _this16.addChild(spot);
+            });
+
+            // Animate-in how much of the path is drawn.
+            var dur = 2000;
+            this.path.percentDrawn = 0;
+            Animate.tween(this.path, { percentDrawn: 1.0 }, dur);
+            Animate.run(function (e) {
+                _this16.spots.forEach(function (spot) {
+                    if (spot.relPosAlongPath <= _this16.path.percentDrawn) {
+                        if (spot.opacity === 0) Resource.play('levelspot-activate');
+                        spot.opacity = 1.0;
+                    }
+                });
+            }, dur).after(function () {
+                _this16.spots.forEach(function (spot) {
+                    if (spot.opacity === 0) Resource.play('levelspot-activate');
+                    spot.opacity = 1.0;
+                    spot.ignoreEvents = false;
+                });
+                _this16.path.percentDrawn = 1;
+                _this16.spots[0].enable();
+                _this16.spots[0].flash();
+                Resource.play('fatbtn-beep');
+            });
+        }
+    }, {
+        key: 'updateLevelSpots',
+        value: function updateLevelSpots() {
+            if (!this.spots) return;
+            var c = getCookie('level_idx');
+            if (c) c = parseInt(c);
+            this.spots.forEach(function (spot) {
+                spot.opacity = 1.0;
+                if (c > spot.levelId) spot.enable();else if (c === spot.levelId) {
+                    spot.enable();
+                    spot.flash();
+                } else spot.disable();
+            });
         }
     }, {
         key: 'setCurve',
         value: function setCurve(pts) {
-            var _this15 = this;
+            var _this17 = this;
 
             this.path.points = pts.map(function (p) {
-                return { x: p.x * _this15.radius + _this15.radius, y: p.y * _this15.radius + _this15.radius };
+                return { x: p.x * _this17.radius + _this17.radius, y: p.y * _this17.radius + _this17.radius };
             });
         }
     }, {
@@ -693,32 +823,47 @@ var PlanetCard = function (_mag$ImageRect2) {
         value: function setLevels(levels, onLevelSelect) {
             if (window.level_idx < levels[1]) {
                 this.removeChild(this.path);
-                return;
+            } else {
+                this.activate();
             }
-
-            this.image = this.image.replace('-locked', '');
-            this.addChild(this.ship);
 
             var NUM_LVLS = levels[0].length; // total number of cells to fit on the grid
             var genClickCallback = function genClickCallback(level_idx) {
                 return function () {
-                    return onLevelSelect(levels[0][level_idx], levels[1] + level_idx);
+                    Resource.play('fatbtn-beep');
+                    onLevelSelect(levels[0][level_idx], levels[1] + level_idx);
                 };
             };
 
             // Level spots
+            this.spots = [];
             for (var i = 1; i <= NUM_LVLS; i++) {
-                var spotpos = this.path.posAlongPath(i / NUM_LVLS);
+                var spotpos = this.path.posAlongPath((i - 1) / (NUM_LVLS - 1));
                 var spot = new LevelSpot(spotpos.x, spotpos.y, 6 * this.radius / 120, genClickCallback(i - 1));
                 spot.anchor = { x: 0.5, y: 0.5 };
-                if (window.level_idx >= levels[1] + i - 1) spot.enable();
-                this.addChild(spot);
+                spot.relPosAlongPath = i / NUM_LVLS;
+                spot.levelId = levels[1] + i - 1;
+                spot.stroke.lineWidth = Math.max(this.radius / 120 * 2, 1.5);
+                spot.ignoreEvents = true;
+                if (window.level_idx >= levels[1] + i - 1) {
+                    spot.enable();
+                    if (window.level_idx === levels[1] + i - 1) spot.flash();
+                }
+                this.spots.push(spot);
+
+                if (window.level_idx >= levels[1]) this.addChild(spot);
             }
         }
     }, {
-        key: 'onmouseclick',
-        value: function onmouseclick() {
-            if (this.onclick) this.onclick();
+        key: 'landingPoint',
+        get: function get() {
+            var a = this.absolutePos;
+            return { x: a.x, y: a.y - this.absoluteSize.h / 3 };
+        }
+    }, {
+        key: 'localLandingPoint',
+        get: function get() {
+            return { x: this.size.w / 2.0, y: this.size.h / 2.0 / 3 };
         }
     }]);
 
@@ -731,14 +876,126 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
     function ChapterSelectShip() {
         _classCallCheck(this, ChapterSelectShip);
 
-        var _this16 = _possibleConstructorReturn(this, (ChapterSelectShip.__proto__ || Object.getPrototypeOf(ChapterSelectShip)).call(this, 'ship-small'));
+        var _this18 = _possibleConstructorReturn(this, (ChapterSelectShip.__proto__ || Object.getPrototypeOf(ChapterSelectShip)).call(this, 'ship-small'));
 
-        _this16.pointing = { x: 1, y: 0 };
-        _this16.velocity = { x: 0, y: 0 };
-        return _this16;
+        _this18.pointing = { x: 1, y: 0 };
+        _this18.velocity = { x: 0, y: 0 };
+
+        var trailWidth = 140;
+        var trail = new RainbowTrail(0, 0, trailWidth, 30);
+        trail.pos = { x: -trailWidth + 20, y: 20 };
+        //trail.anchor = { x:1, y:0 };
+        _this18.trail = trail;
+        _this18.addChild(trail);
+        return _this18;
     }
 
+    // Fly to another planet. (entire sequence)
+
+
     _createClass(ChapterSelectShip, [{
+        key: 'flyToPlanet',
+        value: function flyToPlanet(startPlanet, endPlanet) {
+            var _this19 = this;
+
+            // Hide the local ships and make the world ship
+            // the only ship visible.
+            this.pos = startPlanet.landingPoint;
+            startPlanet.hideShip();
+            endPlanet.hideShip();
+
+            var endScale = endPlanet.radius / 120 / 2;
+            var dest = endPlanet.landingPoint;
+            var aboveOrbitDest = addPos(dest, { x: 0, y: -20 });
+            var pointing = fromTo(this.pos, aboveOrbitDest);
+            var pointAngle = Math.atan2(pointing.y, pointing.x);
+            this.trail.opacity = 0;
+            var _this = this;
+            this.rotation = -Math.PI / 2.0; // make the ship face upright
+
+            return this.launch().then(function () {
+                _this19.rotateTo(pointAngle);
+                return _this19.moveTo(addPos({ x: -20, y: -50 }, addPos(_this19.pos, scalarMultiply(pointing, 0.05))));
+            }).then(function () {
+                Animate.tween(_this19.trail, { opacity: 1.0 }, 100);
+                return new Promise(function (resolve, reject) {
+                    var dur = _this.flyTo(aboveOrbitDest, resolve);
+                    Animate.tween(_this19, { scale: { x: endScale, y: endScale } }, dur);
+                });
+            }).then(function () {
+                return _this.land(dest);
+            }).then(function () {
+                endPlanet.showShip(_this);
+            });
+        }
+    }, {
+        key: 'attachToPlanet',
+        value: function attachToPlanet(planet) {
+            this.pos = planet.landingPoint;
+            planet.showShip(this);
+        }
+
+        // Launch the ship into the air.
+
+    }, {
+        key: 'launch',
+        value: function launch() {
+            var _this20 = this;
+
+            return new Promise(function (resolve, reject) {
+                _this20.moveTo(addPos(_this20.pos, { x: 0, y: -20 }), 1000).then(resolve);
+            });
+        }
+
+        // Rotate to angle.
+
+    }, {
+        key: 'rotateTo',
+        value: function rotateTo(angle) {
+            var _this21 = this;
+
+            var dur = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1000;
+            var smoothFunc = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function (e) {
+                return e;
+            };
+
+            return new Promise(function (resolve, reject) {
+                Animate.tween(_this21, { rotation: angle }, dur, smoothFunc).after(resolve);
+            });
+        }
+
+        // Move to pos (without changing rotation).
+
+    }, {
+        key: 'moveTo',
+        value: function moveTo(dest) {
+            var _this22 = this;
+
+            var dur = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1000;
+            var smoothFunc = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function (e) {
+                return e;
+            };
+
+            return new Promise(function (resolve, reject) {
+                Animate.tween(_this22, { pos: clonePos(dest) }, dur, smoothFunc).after(function () {
+                    resolve();
+                });
+            });
+        }
+
+        // Execute landing sequence.
+
+    }, {
+        key: 'land',
+        value: function land(dest) {
+            var _this23 = this;
+
+            this.trail.opacity = 0;
+            return this.rotateTo(-Math.PI / 2.0, 500).then(function () {
+                return _this23.moveTo(dest, 1000);
+            });
+        }
+    }, {
         key: 'thrust',
         value: function thrust(force, delta) {
             var MAX_VEL = 1;
@@ -749,22 +1006,41 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
             if (lengthOfPos(this.velocity) > MAX_VEL) this.velocity = rescalePos(this.velocity, MAX_VEL);
             this.pos = addPos(this.velocity, this.pos);
             this.rotation = Math.atan2(this.pointing.y, this.pointing.x);
+            this.trail.time += delta * 400;
         }
     }, {
         key: 'flyTo',
-        value: function flyTo(dest) {
-            var _this17 = this;
+        value: function flyTo(dest, onReachingDest) {
+            var _this24 = this;
 
             var FORCE = 10;
-            var totalDist = distBetweenPos(this.pos, dest);
-            var twn = new mag.IndefiniteTween(function (delta) {
-                _this17.thrust(rescalePos(fromTo(_this17.pos, dest), distBetweenPos(_this17.pos, dest) / totalDist), delta / 1000.0 * 10);
-                if (distBetweenPos(_this17.pos, dest) <= 1) {
-                    twn.cancel();
-                }
-                _this17.stage.draw();
-            });
-            twn.run();
+            var travelDist = distBetweenPos(this.pos, dest);
+            var pointing = fromTo(this.pos, dest);
+            var DUR = travelDist / 100 * 1000; // 1 sec per 100 units.
+            this.rotation = Math.atan2(pointing.y, pointing.x);
+
+            var del = 0;
+            Animate.run(function (e) {
+                _this24.trail.opacity = Math.pow(e, 0.5);
+                _this24.trail.time += (e - del) * 8000;
+                del = e;
+            }, DUR);
+            this.moveTo(dest, DUR).then(onReachingDest);
+            return DUR;
+
+            // let twn = new mag.IndefiniteTween((delta) => {
+            //     this.thrust( rescalePos( fromTo(this.pos, dest), distBetweenPos(this.pos, dest) / totalDist), delta / 1000.0 * 10);
+            //
+            //     let distleft = distBetweenPos(this.pos, dest);
+            //     this.trail.opacity = Math.pow(distleft / totalDist, 0.5);
+            //
+            //     if (distleft <= 10) {
+            //         if (onReachingDest) onReachingDest();
+            //         twn.cancel();
+            //     }
+            //     //this.stage.draw();
+            // });
+            // twn.run();
         }
     }]);
 
@@ -774,26 +1050,87 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
 var ChapterSelectMenu = function (_mag$Stage2) {
     _inherits(ChapterSelectMenu, _mag$Stage2);
 
-    function ChapterSelectMenu(canvas, onLevelSelect) {
+    function ChapterSelectMenu(canvas, onLevelSelect, flyToChapIdx) {
         _classCallCheck(this, ChapterSelectMenu);
 
-        var _this18 = _possibleConstructorReturn(this, (ChapterSelectMenu.__proto__ || Object.getPrototypeOf(ChapterSelectMenu)).call(this, canvas));
+        var _this25 = _possibleConstructorReturn(this, (ChapterSelectMenu.__proto__ || Object.getPrototypeOf(ChapterSelectMenu)).call(this, canvas));
 
-        _this18.showStarField();
-        _this18.showChapters(onLevelSelect);
+        _this25.showStarField();
+        _this25.showChapters(onLevelSelect);
 
-        //let ship = new ChapterSelectShip();
-        //this.add(ship);
-        //ship.flyTo( {x:600, y:200} );
+        var _this = _this25;
+        _this.offset = { x: 0, y: 0 };
+        Animate.wait(100).after(function () {
 
-        $('body').css('background', '#333');
-        return _this18;
+            var lastActivePlanet = _this.planets[0];
+            _this.planets.forEach(function (p) {
+                if (p.active) lastActivePlanet = p;
+            });
+
+            var ship = new ChapterSelectShip();
+            var shipScale = lastActivePlanet.radius / 120 / 2;
+            ship.scale = { x: shipScale, y: shipScale };
+            //_this.bringToFront(ship);
+
+            if (flyToChapIdx) {
+                _this25.add(ship);
+                ship.attachToPlanet(_this.planets[flyToChapIdx - 1]);
+                ship.flyToPlanet(_this.planets[flyToChapIdx - 1], _this.planets[flyToChapIdx]).then(function () {
+                    _this.planets[flyToChapIdx].activate();
+                    return new Promise(function (resolve, reject) {
+                        Animate.wait(600).after(function () {
+                            _this.remove(ship);
+                            resolve();
+                        });
+                    });
+                }).then(_this.planets[flyToChapIdx].onclick).then(function () {
+                    _this.planets[flyToChapIdx].activateSpots();
+                    level_idx++;
+                    saveProgress();
+                });
+            } else {
+                ship.attachToPlanet(lastActivePlanet);
+            }
+
+            // Camera follow...
+            //let twn = new mag.IndefiniteTween((delta) => {
+            //    _this.planetNode.pos = { x:-ship.pos.x+GLOBAL_DEFAULT_SCREENSIZE.width/2.0, y:-ship.pos.y+GLOBAL_DEFAULT_SCREENSIZE.height/2.0 };
+            //});
+            //twn.run();
+        });
+
+        //$('body').css('background', '#333');
+        return _this25;
     }
 
     _createClass(ChapterSelectMenu, [{
+        key: 'updateLevelSpots',
+        value: function updateLevelSpots() {
+            if (this.planets) {
+                this.planets.forEach(function (p) {
+                    return p.updateLevelSpots();
+                });
+            }
+        }
+    }, {
+        key: 'drawImpl',
+        value: function drawImpl() {
+            if (this.invalidated) return; // don't draw invalidated stages.
+            this.ctx.save();
+            this.ctx.scale(this._scale, this._scale);
+            this.clear();
+            this.ctx.translate(this.offset.x, this.offset.y);
+            var len = this.nodes.length;
+            for (var i = 0; i < len; i++) {
+                this.nodes[i].draw(this.ctx);
+            }
+            //this.nodes.forEach((n) => n.draw(this.ctx));
+            this.ctx.restore();
+        }
+    }, {
         key: 'showStarField',
         value: function showStarField() {
-            var _this19 = this;
+            var _this26 = this;
 
             var NUM_STARS = 100;
             var genRandomPt = function genRandomPt() {
@@ -826,7 +1163,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                 star.opacity = 0.4;
                 var scale = Math.random() * 0.3 + 0.1;
                 star.scale = { x: scale, y: scale };
-                _this19.add(star);
+                _this26.add(star);
                 stars.push(star);
 
                 // Twinkling effect
@@ -842,7 +1179,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
     }, {
         key: 'getPlanetPos',
         value: function getPlanetPos() {
-            return [{ x: 144, y: 104, r: 120 }, { x: 426, y: 86, r: 55 }, { x: 690, y: 208, r: 44 }, { x: 456, y: 324, r: 60 }, { x: 138, y: 388, r: 80 }, { x: 316, y: 480, r: 40 }, { x: 530, y: 492, r: 70 }, { x: 760, y: 580, r: 30 }];
+            return [{ x: 154, y: 124, r: 120 }, { x: 446, y: 86, r: 80 }, { x: 690, y: 208, r: 44 }, { x: 456, y: 324, r: 60 }, { x: 138, y: 388, r: 80 }, { x: 316, y: 480, r: 40 }, { x: 530, y: 492, r: 70 }, { x: 760, y: 580, r: 30 }];
         }
     }, {
         key: 'getPlanetImages',
@@ -861,6 +1198,9 @@ var ChapterSelectMenu = function (_mag$Stage2) {
             var POS_MAP = this.getPlanetPos();
             stage.planets.forEach(function (p, i) {
                 p.ignoreEvents = false;
+                if (p.spots) p.spots.forEach(function (s) {
+                    s.ignoreEvents = true;
+                });
                 if (p.expandFunc) p.onclick = p.expandFunc;
                 if (!stage.has(p)) stage.add(p);
                 var rad = POS_MAP[i].r;
@@ -871,27 +1211,27 @@ var ChapterSelectMenu = function (_mag$Stage2) {
         key: 'clear',
         value: function clear() {
             this.ctx.save();
-            this.ctx.fillStyle = '#333'; //'#594764';
+            this.ctx.fillStyle = '#594764';
             this.ctx.fillRect(0, 0, canvas.width, canvas.height);
             this.ctx.restore();
         }
     }, {
         key: 'showLevelSelectGrid',
         value: function showLevelSelectGrid(chapterName, onLevelSelect) {
-            var _this20 = this;
+            var _this27 = this;
 
             var grid = new LevelSelectGrid(chapterName, onLevelSelect);
             grid.pos = { x: 0, y: 40 };
 
             var btn_back = new mag.Button(10, 10, 50, 50, { default: 'btn-back-default', hover: 'btn-back-hover', down: 'btn-back-down' }, function () {
                 grid.hide().after(function () {
-                    return _this20.remove(grid);
+                    return _this27.remove(grid);
                 });
-                _this20.remove(btn_back);
-                _this20.setPlanetsToDefaultPos(500);
+                _this27.remove(btn_back);
+                _this27.setPlanetsToDefaultPos(500);
                 Resource.play('goback');
             });
-            btn_back.opacity = 0.5;
+            btn_back.opacity = 0.7;
 
             //this.add(grid);
             this.add(btn_back);
@@ -899,7 +1239,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
     }, {
         key: 'showChapters',
         value: function showChapters(onLevelSelect) {
-            var _this21 = this;
+            var _this28 = this;
 
             // For now, hardcore positions and radii per chapter:
             // TODO: Move to .json specs.
@@ -912,21 +1252,30 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                 planet.ignoreEvents = false;
                 planet.expandFunc = planet.onclick;
                 planet.onclick = null;
+                stage.bringToFront(planet);
                 var r = GLOBAL_DEFAULT_SCREENSIZE.width / 3.0;
                 var center = { x: GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y: GLOBAL_DEFAULT_SCREENSIZE.height / 2.0 };
                 var scale = r / planet.radius;
                 Animate.tween(planet, { scale: { x: scale, y: scale }, pos: center }, 1000, function (elapsed) {
                     return Math.pow(elapsed, 3);
+                }).after(function () {
+                    if (planet.spots) planet.spots.forEach(function (s) {
+                        s.ignoreEvents = false;
+                    });
                 });
             };
             var hide = function hide(planet) {
                 planet.opacity = 1.0;
+                if (planet.spots) planet.spots.forEach(function (s) {
+                    s.ignoreEvents = true;
+                });
                 Animate.tween(planet, { scale: { x: 1, y: 1 }, opacity: 0 }, 500).after(function () {
                     stage.remove(planet);
                 });
             };
 
             // Each chapter is a 'Planet' in Starboy's Universe:
+            //let planetNode = new mag.Rect(0,0,1,1);
             Resource.getChapters().then(function (chapters) {
 
                 var planets = [];
@@ -936,6 +1285,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                     var pos = i < POS_MAP.length ? POS_MAP[i] : { x: 0, y: 0, r: 10 };
                     var planet = new PlanetCard(pos.x + 15, pos.y + 40, pos.r, chap.name, chap.resources ? chap.resources.planet : 'planet-bagbag');
                     planet.color = 'white';
+                    if (i === 1) planet.path.stroke.color = 'gray';
                     planet.anchor = { x: 0.5, y: 0.5 };
                     planet.shadowOffset = 0;
                     planet.onclick = function () {
@@ -945,7 +1295,10 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                         }
                         Resource.play('zoomin');
                         Animate.wait(500).after(function () {
-                            return _this21.showLevelSelectGrid(planet.name, onLevelSelect);
+                            stage.showLevelSelectGrid(planet.name, onLevelSelect);
+                        });
+                        return new Promise(function (resolve, reject) {
+                            Animate.wait(1000).after(resolve);
                         });
                     };
 
@@ -960,11 +1313,13 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                         planet.setLevels(levels, onLevelSelect);
                     }
 
-                    _this21.add(planet);
+                    _this28.add(planet);
                     planets.push(planet);
                 });
 
-                _this21.planets = planets;
+                _this28.planets = planets;
+                //this.add(planetNode);
+                //this.planetNode = planetNode;
             });
         }
     }]);
