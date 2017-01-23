@@ -644,6 +644,17 @@ var PlanetCard = function (_mag$ImageRect2) {
         glow.ignoreEvents = true;
         _this14.glow = glow;
 
+        // Text
+        var capitalize = function capitalize(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        };
+        var t = new TextExpr(capitalize(name), 'Futura', 14);
+        t.color = 'white';
+        t.anchor = { x: 0.5, y: 0.5 };
+        t.pos = { x: r, y: r * 2.25 };
+        _this14.text = t;
+        //this.addChild(t);
+
         // Level path
         var path = new ArrowPath();
         path.stroke.color = 'white';
@@ -667,6 +678,16 @@ var PlanetCard = function (_mag$ImageRect2) {
     }
 
     _createClass(PlanetCard, [{
+        key: 'showText',
+        value: function showText() {
+            if (this.children.indexOf(this.text) === -1) this.addChild(this.text);
+        }
+    }, {
+        key: 'hideText',
+        value: function hideText() {
+            if (this.children.indexOf(this.text) > -1) this.removeChild(this.text);
+        }
+    }, {
         key: 'showShip',
         value: function showShip(worldShip) {
             // Create ship graphic
@@ -754,6 +775,7 @@ var PlanetCard = function (_mag$ImageRect2) {
         key: 'activate',
         value: function activate() {
             this.image = this.image.replace('-locked', '');
+            this.showText();
             this.active = true;
         }
     }, {
@@ -1204,7 +1226,9 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                 if (p.expandFunc) p.onclick = p.expandFunc;
                 if (!stage.has(p)) stage.add(p);
                 var rad = POS_MAP[i].r;
-                Animate.tween(p, { pos: { x: POS_MAP[i].x + 15, y: POS_MAP[i].y + 40 }, scale: { x: 1, y: 1 }, opacity: 1.0 }, dur);
+                Animate.tween(p, { pos: { x: POS_MAP[i].x + 15, y: POS_MAP[i].y + 40 }, scale: { x: 1, y: 1 }, opacity: 1.0 }, dur).after(function () {
+                    if (p.active) p.showText();
+                });
             });
         }
     }, {
@@ -1252,6 +1276,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                 planet.ignoreEvents = false;
                 planet.expandFunc = planet.onclick;
                 planet.onclick = null;
+                planet.hideText();
                 stage.bringToFront(planet);
                 var r = GLOBAL_DEFAULT_SCREENSIZE.width / 3.0;
                 var center = { x: GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y: GLOBAL_DEFAULT_SCREENSIZE.height / 2.0 };

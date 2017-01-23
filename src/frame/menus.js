@@ -470,6 +470,15 @@ class PlanetCard extends mag.ImageRect {
         glow.ignoreEvents = true;
         this.glow = glow;
 
+        // Text
+        const capitalize = (string) => (string.charAt(0).toUpperCase() + string.slice(1));
+        let t = new TextExpr(capitalize(name), 'Futura', 14);
+        t.color = 'white';
+        t.anchor = { x:0.5, y:0.5 };
+        t.pos = { x:r, y:r*2.25 };
+        this.text = t;
+        //this.addChild(t);
+
         // Level path
         let path = new ArrowPath();
         path.stroke.color = 'white';
@@ -497,6 +506,15 @@ class PlanetCard extends mag.ImageRect {
     }
     get localLandingPoint() {
         return {x:this.size.w/2.0, y:this.size.h/2.0 / 3};
+    }
+
+    showText() {
+        if (this.children.indexOf(this.text) === -1)
+            this.addChild(this.text);
+    }
+    hideText() {
+        if (this.children.indexOf(this.text) > -1)
+            this.removeChild(this.text);
     }
 
     showShip(worldShip) {
@@ -568,6 +586,7 @@ class PlanetCard extends mag.ImageRect {
 
     activate() {
         this.image = this.image.replace('-locked', '');
+        this.showText();
         this.active = true;
     }
     activateSpots() {
@@ -930,7 +949,9 @@ class ChapterSelectMenu extends mag.Stage {
             if (p.expandFunc) p.onclick = p.expandFunc;
             if (!stage.has(p)) stage.add(p);
             let rad = POS_MAP[i].r;
-            Animate.tween(p, { pos: {x:POS_MAP[i].x+15, y:POS_MAP[i].y+40}, scale:{x:1,y:1}, opacity:1.0 }, dur);
+            Animate.tween(p, { pos: {x:POS_MAP[i].x+15, y:POS_MAP[i].y+40}, scale:{x:1,y:1}, opacity:1.0 }, dur).after(() => {
+                if (p.active) p.showText();
+            });
         });
     }
 
@@ -971,6 +992,7 @@ class ChapterSelectMenu extends mag.Stage {
             planet.ignoreEvents = false;
             planet.expandFunc = planet.onclick;
             planet.onclick = null;
+            planet.hideText();
             stage.bringToFront(planet);
             let r = GLOBAL_DEFAULT_SCREENSIZE.width / 3.0;
             let center = { x:GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y:GLOBAL_DEFAULT_SCREENSIZE.height / 2.0 };
