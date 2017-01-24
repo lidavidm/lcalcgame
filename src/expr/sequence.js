@@ -113,17 +113,10 @@ class Sequence extends Expression {
     }
 }
 
-class NumberedSequence extends Sequence {
+class NotchedSequence extends Sequence {
     constructor(...exprs) {
         super(...exprs);
-        this.labels = [];
-        this.padding.left = 30;
-
-        for (let i = 0; i < exprs.length; i++) {
-            let label = new TextExpr((i + 1).toString() + ":");
-            label.fontSize = 20;
-            this.labels.push(label);
-        }
+        this.padding.left = 17.5;
     }
 
     drawInternal(ctx, pos, boundingSize) {
@@ -132,7 +125,7 @@ class NumberedSequence extends Sequence {
         ctx.fillStyle = "#fff";
         roundRect(ctx,
                   pos.x, pos.y,
-                  27.5 * this.scale.x, boundingSize.h,
+                  15 * this.scale.x, boundingSize.h,
                   {
                       tl: radius,
                       bl: radius,
@@ -140,20 +133,21 @@ class NumberedSequence extends Sequence {
                       br: 0,
                   }, true, false,
                   null);
-
         // When reducing, statements are removed from
         // this.holes. Offset the label so that the right label stays
         // with the right statement.
-        let offset = this.labels.length - this.holes.length;
-        for (let i = 0; i < this.holes.length; i++) {
-            let statement = this.holes[i];
-            let label = this.labels[i + offset];
-            label._pos.x = statement.pos.x - 25;
-            label._pos.y = statement.pos.y + 8;
-            label.parent = this;
-            label.update();
-            label.update();
-            label.draw(ctx);
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < this.holes.length - 1; i++) {
+            let expr1 = this.holes[i];
+            let expr2 = this.holes[i + 1];
+            let expr1y = expr1.absolutePos.y + expr1.anchor.y * expr1.absoluteSize.h;
+            let expr2y = expr2.absolutePos.y;
+            let tickPos = expr1y + (expr2y - expr1y) / 2;
+            ctx.beginPath();
+            ctx.moveTo(pos.x, expr1y);
+            ctx.lineTo(pos.x + 15, expr1y);
+            ctx.stroke();
         }
     }
 }
