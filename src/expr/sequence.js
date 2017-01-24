@@ -4,9 +4,14 @@ class Sequence extends Expression {
         this.padding.between = 5;
         exprs.forEach((expr) => {
             if (expr instanceof MissingExpression) {
-                expr = new MissingSequenceExpression();
+                this.holes.push(new MissingSequenceExpression());
             }
-            this.holes.push(expr);
+            else if (expr instanceof Sequence) {
+                expr.holes.forEach((x) => this.holes.push(x));
+            }
+            else {
+                this.holes.push(expr);
+            }
         });
         this._layout = { direction: "vertical", align: "none" };
         this._animating = false;
