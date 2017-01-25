@@ -2,7 +2,15 @@ const SCALE_FACTOR = 0.33;
 
 class RepeatLoopExpr extends Expression {
     constructor(times, body) {
-        super([times, (!body || body instanceof MissingExpression) ? new InvisibleMissingExpression() : body]);
+        super([]);
+        if (times instanceof MissingExpression) {
+            times = new MissingNumberExpression();
+        }
+        if (body instanceof MissingExpression) {
+            body = new InvisibleMissingExpression();
+        }
+        this.holes.push(times);
+        this.holes.push(body);
         this.padding.right = 0;
         this.color = "orange";
     }

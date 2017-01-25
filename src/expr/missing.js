@@ -240,3 +240,28 @@ class InvisibleMissingExpression extends MissingExpression {
         }
     }
 }
+
+class MissingNumberExpression extends MissingTypedExpression {
+    constructor(expr_to_miss) {
+        super(expr_to_miss);
+        this.graphicNode = new DiceNumber(3);
+
+        this.acceptedClasses = [ VarExpr, NumberExpr ];
+    }
+    getClass() { return MissingNumberExpression; }
+
+    drawInternal(ctx, pos, boundingSize) {
+        super.drawInternal(ctx, pos, boundingSize);
+        this.graphicNode.color = '#111';
+        this.graphicNode.shadowOffset = this.shadowOffset;
+        let subPos = {
+            x: pos.x + 0.1 * boundingSize.w,
+            y: pos.y + 0.1 * boundingSize.h,
+        };
+        let subSize = {
+            w: 0.8 * boundingSize.w,
+            h: 0.8 * boundingSize.h,
+        };
+        this.graphicNode.drawInternal(ctx, subPos, subSize);
+    }
+}
