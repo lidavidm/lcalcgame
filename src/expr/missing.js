@@ -224,3 +224,19 @@ class MissingSequenceExpression extends MissingExpression {
         node.lockInteraction();
     }
 }
+
+class InvisibleMissingExpression extends MissingExpression {
+    constructor() {
+        super(new Expression());
+    }
+
+    getClass() { return InvisibleMissingExpression; }
+
+    drawInternal(ctx, pos, boundingSize) {
+        if (this.stroke) {
+            ctx.fillStyle = this.stroke.color;
+            ctx.globalAlpha = 0.5;
+            ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+        }
+    }
+}

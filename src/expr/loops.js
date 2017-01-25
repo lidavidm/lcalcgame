@@ -2,10 +2,9 @@ const SCALE_FACTOR = 0.33;
 
 class RepeatLoopExpr extends Expression {
     constructor(times, body) {
-        super([times, body]);
-        this.arcAngle = 0;
+        super([times, (!body || body instanceof MissingExpression) ? new InvisibleMissingExpression() : body]);
+        this.padding.right = 0;
         this.color = "orange";
-        this.radius = 30;
     }
 
     get timesExpr() {
@@ -25,84 +24,67 @@ class RepeatLoopExpr extends Expression {
     }
 
     get size() {
-        let size = super.size;
-        return {
-            w: size.w + this.radius,
-            h: Math.max(2 * this.radius + 10, size.h),
-        };
+        var padding = this.padding;
+        var width = 0;
+        var height = 50;
+        var sizes = this.getHoleSizes();
+        var scale_x = this.scale.x;
+
+        sizes.forEach((s) => {
+            height = Math.max(height, s.h);
+            width += s.w + padding.inner;
+        });
+        width += padding.right;
+        height += padding.inner;
+        return { w:width, h: height };
     }
 
     update() {
         super.update();
-        let centerX = this.size.w / 2;
-        let centerY = this.size.h / 2;
-        if (this.timesExpr) {
-            this.timesExpr.stroke = {
-                color: "#999",
-                width: 2,
-            };
-        }
-        if (this.bodyExpr) {
-            this.bodyExpr.stroke = {
-                color: "#999",
-                width: 2,
-            };
-        }
-        this.bodyExpr.pos = {
-            x: this.bodyExpr.pos.x + this.radius,
-            y: this.bodyExpr.pos.y,
-        };
     }
 
     drawInternal(ctx, pos, boundingSize) {
-        let leftEdge = this.timesExpr.absolutePos.x + this.timesExpr.absoluteSize.w;
-        let centerX = leftEdge + (this.bodyExpr.absolutePos.x - leftEdge) / 2;
-        let centerY = pos.y + boundingSize.h / 2;
+        let leftWidth = this.timesExpr.absolutePos.x + this.timesExpr.absoluteSize.w + this.padding.inner / 2 - pos.x;
+        let rightWidth = boundingSize.w - leftWidth + 1;
+        let rightX = pos.x + leftWidth - 1;
+        let bracketHeight = (boundingSize.h - this.bodyExpr.absoluteSize.h) / 2;
+        let radius = this.radius*this.absoluteScale.x;
+        let bracketRadius = bracketHeight;
 
-        ctx.lineWidth = 1.0;
-        ctx.fillStyle = '#999';
-        ctx.beginPath();
-        ctx.arc(centerX, centerY + this.shadowOffset, this.radius, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.stroke();
-        ctx.fill();
+        let offsetLineTo = (offset, x, y) => ctx.lineTo(x, y + offset);
+        let offsetQuadraticCurveTo = (offset, cx, cy, x, y) => ctx.quadraticCurveTo(cx, cy + offset, x, y + offset);
 
-        ctx.beginPath();
-        ctx.fillStyle = 'orange';
-        ctx.strokeStyle = 'black';
-        ctx.arc(centerX, centerY, this.radius, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.stroke();
-        ctx.fill();
+        let draw = (offset) => {
+            ctx.beginPath();
+            ctx.moveTo(pos.x + radius + offset, pos.y + offset);
+            offsetLineTo(offset, pos.x + boundingSize.w - bracketRadius, pos.y);
+            offsetQuadraticCurveTo(offset, pos.x + boundingSize.w, pos.y,
+                                 pos.x + boundingSize.w, pos.y + bracketRadius);
+            offsetLineTo(offset, pos.x + leftWidth, pos.y + bracketRadius);
+            offsetLineTo(offset, pos.x + leftWidth, pos.y + boundingSize.h - bracketRadius);
+            offsetLineTo(offset, pos.x + boundingSize.w, pos.y + boundingSize.h - bracketRadius);
+            offsetQuadraticCurveTo(offset, pos.x + boundingSize.w, pos.y + boundingSize.h,
+                                 pos.x + boundingSize.w - bracketRadius, pos.y + boundingSize.h);
+            offsetLineTo(offset, pos.x + radius, pos.y + boundingSize.h);
+            offsetQuadraticCurveTo(offset, pos.x, pos.y + boundingSize.h,
+                                 pos.x, pos.y + boundingSize.h - radius);
+            offsetLineTo(offset, pos.x, pos.y + radius);
+            offsetQuadraticCurveTo(offset, pos.x, pos.y,
+                                 pos.x + radius, pos.y);
+            ctx.closePath();
+            if (this.stroke) {
+                strokeWithOpacity(ctx, this.stroke.opacity);
+            }
+            ctx.fill();
+        };
 
-        ctx.lineWidth = 2.0;
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, this.radius, this.arcAngle, this.arcAngle + Math.PI / 2);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, this.radius, this.arcAngle + Math.PI, this.arcAngle + 3 * Math.PI / 2);
-        ctx.stroke();
-
-        // draw the arrows
-        ctx.lineWidth = 1.5;
-        ctx.fillStyle = 'black';
-
-        let arrowOffsetAngle = Math.PI / 2 + this.arcAngle;
-        let arrowCenterX = centerX + Math.cos(arrowOffsetAngle) * this.radius;
-        let arrowCenterY = centerY + Math.sin(arrowOffsetAngle) * this.radius;
-        drawPointsAround(ctx, arrowCenterX, arrowCenterY, [[-6.0, 0.0], [6.0, 3.0], [6.0, -3.0]], this.arcAngle);
-        arrowOffsetAngle = -Math.PI / 2 + this.arcAngle;
-        arrowCenterX = centerX + Math.cos(arrowOffsetAngle) * this.radius;
-        arrowCenterY = centerY + Math.sin(arrowOffsetAngle) * this.radius;
-        drawPointsAround(ctx, arrowCenterX, arrowCenterY, [[6.0, 0.0], [-6.0, 3.0], [-6.0, -3.0]], this.arcAngle);
-
-        // draw the times symbol
-        ctx.beginPath();
-        ctx.moveTo(centerX - 5, centerY - 5);
-        ctx.lineTo(centerX + 5, centerY + 5);
-        ctx.moveTo(centerX + 5, centerY - 5);
-        ctx.lineTo(centerX - 5, centerY + 5);
-        ctx.stroke();
+        setStrokeStyle(ctx, this.stroke);
+        if (this.shadowOffset !== 0) {
+            ctx.fillStyle = 'black';
+            draw(this.shadowOffset);
+        }
+        ctx.fillStyle = this.color;
+        draw(0);
     }
 
     performReduction() {
@@ -116,6 +98,7 @@ class RepeatLoopExpr extends Expression {
 
         return this.performSubReduction(this.timesExpr).then((num) => {
             if (!(num instanceof NumberExpr) || !this.bodyExpr || this.bodyExpr instanceof MissingExpression) {
+                Animate.blink(this.timesExpr, 1000, [1.0, 0.0, 0.0]);
                 this._animating = false;
                 return Promise.reject("RepeatLoopExpr incomplete!");
             }
@@ -134,14 +117,8 @@ class RepeatLoopExpr extends Expression {
             let result = new seqClass(...body);
             result.lockSubexpressions();
             result.update();
-            return new Promise((resolve, _reject) => {
-                Animate.tween(this, {
-                    arcAngle: body.length * Math.PI,
-                }, 500 * body.length).after(() => {
-                    (this.parent || this.stage).swap(this, result);
-                    resolve(result);
-                });
-            });
+            (this.parent || this.stage).swap(this, result);
+            return result;
         });
     }
 

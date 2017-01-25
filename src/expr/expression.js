@@ -280,7 +280,7 @@ class Expression extends mag.RoundedRect {
                     result = expr;
                     delay = 0;
                 }
-                if (result instanceof Expression) result.lock();
+                if (result instanceof Expression && !(result instanceof MissingExpression)) result.lock();
                 window.setTimeout(() => {
                     resolve(result);
                 }, delay);
