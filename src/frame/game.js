@@ -40,16 +40,19 @@ class Level {
 
         var canvas_screen = stage.boundingSize;
 
+        const showEnvironment = Object.keys(this.globals.bindings).length > 0 ||
+              mag.Stage.getNodesWithClass(VarExpr, [], true, this.exprs).length > 0;
         const envDisplayWidth = 0.20 * canvas_screen.w;
 
         GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
+
         const usableWidth = canvas_screen.w - envDisplayWidth;
         const screenOffsetX = usableWidth * (1 - 1/1.4) / 2.0;
         var screen = {
             height: canvas_screen.h/1.4 - 90,
-            width: usableWidth - 2*screenOffsetX,
+            width: showEnvironment ? usableWidth - 2 * screenOffsetX : usableWidth/1.4,
             y: canvas_screen.h*(1-1/1.4) / 2.0,
-            x: screenOffsetX,
+            x: showEnvironment ? screenOffsetX : ((usableWidth*(1-1/1.4)) / 2.0),
         };
         var board_packing = this.findBestPacking(this.exprs, screen);
         stage.addAll(board_packing); // add expressions to the stage
@@ -138,7 +141,9 @@ class Level {
         // Environment
         let yOffset = goal_node[0].absoluteSize.h + goal_node[0].absolutePos.y + 20;
         var env = new (ExprManager.getClass('environment_display'))(canvas_screen.w - envDisplayWidth, yOffset, envDisplayWidth, canvas_screen.h - TOOLBOX_HEIGHT - yOffset);
-        stage.add(env);
+        if (showEnvironment) {
+            stage.add(env);
+        }
         stage.environmentDisplay = env;
         if (this.globals) {
             for (let name of this.globals.names()) {
