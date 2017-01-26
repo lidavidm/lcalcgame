@@ -121,9 +121,15 @@ var SparkleTrigger = function () {
 
                 var ghostySparkle = function ghostySparkle() {
                     if (triggered) return;
+
+                    size = node.absoluteSize;
+                    if (size.w === 0) size = { w: 50, h: 50 };
+
                     var vec = { x: (Math.random() - 0.5) * size.w * 1.2,
                         y: (Math.random() - 0.5) * size.h * 1.2 - part.size.h / 2.0 };
-                    part.pos = addPos(center, vec);
+
+                    //part.pos = addPos(center, vec);
+                    part.pos = addPos(node.centerPos(), vec);
                     part.color = "#0F0";
                     part.shadowOffset = 0;
                     part.opacity = 1.0;

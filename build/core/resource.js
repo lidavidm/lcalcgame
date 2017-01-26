@@ -23,6 +23,59 @@ var mag = function (_) {
         var imageRsc = {};
         var animPresets = {};
 
+        // Call this before running and load[...]() methods,
+        // and call afterDoneLoading to trigger an event
+        // when all assets in the sequence are loaded.
+        var loadSequences = {};
+        var currentLoadSequence = null;
+        var setCurrentLoadSequence = function setCurrentLoadSequence(seqName) {
+            if (!seqName) {
+                console.error('Resource: Please specify a name for the load sequence.');
+                return;
+            } else if (seqName in loadSequences) {
+                console.warn('Resource: Load sequence already named.');
+                return;
+            }
+            loadSequences[seqName] = {
+                'setOnload': function setOnload(rsc, type) {
+                    loadSequences[seqName].length++;
+                    var cb = function cb() {
+                        var seq = loadSequences[seqName];
+                        seq.loadCount++;
+                        if (seq.queryFinished) seq.queryFinished();
+                    };
+                    if (type === 'audio') {
+                        rsc.addEventListener('loadeddata', cb, false);
+                    } else if (type === 'image') {
+                        rsc.onload = cb;
+                    }
+                },
+                'loadCount': 0,
+                'queryFinished': null, // set in afterDoneLoading
+                'length': 0
+            };
+            currentLoadSequence = seqName;
+        };
+        var afterLoadSequence = function afterLoadSequence(seqName, onComplete) {
+            if (!seqName) {
+                console.error('Resource: Please specify a name for the load sequence.');
+                return;
+            } else if (!onComplete) {
+                console.error('Resource: Please specify a callback function for the load sequence.');
+                return;
+            } else if (!(seqName in loadSequences)) {
+                console.error('Resource: Load sequence named "' + seqName + '" is not an active sequence.');
+                return;
+            }
+            loadSequences[seqName].queryFinished = function () {
+                var seq = loadSequences[seqName];
+                // Check if all resources are loaded...
+                if (seq.loadCount >= seq.length) onComplete();
+            };
+            loadSequences[seqName].queryFinished(); // check immediately, in case all resources are already loaded...
+            currentLoadSequence = null;
+        };
+
         var loadAudio = function loadAudio(alias, filename) {
             if (!audioEngineLoaded) {
                 if (lowLag) {
@@ -38,6 +91,9 @@ var mag = function (_) {
             }
 
             var audio = new Audio(__AUDIO_PATH + filename);
+            if (currentLoadSequence) {
+                loadSequences[currentLoadSequence].setOnload(audio, 'audio');
+            }
             audioRsc[alias] = audio;
 
             // Cross-browser low-latency audio.
@@ -45,6 +101,9 @@ var mag = function (_) {
         };
         var loadImage = function loadImage(alias, filename) {
             var img = new Image();
+            if (currentLoadSequence) {
+                loadSequences[currentLoadSequence].setOnload(img, 'image');
+            }
             img.src = __GRAPHICS_PATH + filename;
             img.alt = alias;
             imageRsc[alias] = img;
@@ -62,7 +121,6 @@ var mag = function (_) {
                 animPresets[imageSeqAlias] = _.Animation.forImageSequence(imageSeqAlias, range, duration);
             } catch (e) {
                 console.log(e);
-                //
             }
         };
 
@@ -72,6 +130,8 @@ var mag = function (_) {
         }
 
         return { // TODO: Add more resource types.
+            setCurrentLoadSequence: setCurrentLoadSequence,
+            afterLoadSequence: afterLoadSequence,
             loadImage: loadImage,
             loadImageSequence: loadImageSequence,
             loadAnimation: loadAnimation,

@@ -11,6 +11,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 // Wrapper class to make arbitrary nodes into draggable expressions.
+
 var ValueExpr = function (_Expression) {
     _inherits(ValueExpr, _Expression);
 
@@ -356,6 +357,13 @@ var MirrorExpr = function (_ImageExpr3) {
             this.innerExpr.anchor = { x: 0.5, y: 0.8 };
             this.innerExpr.draw(ctx);
             ctx.restore();
+        }
+    }, {
+        key: 'size',
+        get: function get() {
+            var sz = _get(MirrorExpr.prototype.__proto__ || Object.getPrototypeOf(MirrorExpr.prototype), 'size', this);
+            sz.h = 54;
+            return sz;
         }
     }, {
         key: 'exprInMirror',

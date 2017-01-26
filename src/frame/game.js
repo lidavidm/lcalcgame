@@ -77,7 +77,8 @@ class Level {
         var btn_back = new mag.Button(canvas_screen.w - 64*4 - ui_padding, ui_padding, 64, 64,
             { default:'btn-back-default', hover:'btn-back-hover', down:'btn-back-down' },
             () => {
-            prev(); // go back to previous level; see index.html.
+            returnToMenu();
+            //prev(); // go back to previous level; see index.html.
         });
 
         let mute_images = { default:'btn-mute-default', hover:'btn-mute-hover', down:'btn-mute-down' };
@@ -108,9 +109,9 @@ class Level {
             () => {
             next(); // go back to previous level; see index.html.
         });
-        // btn_reset.pos = btn_next.pos;
+        btn_back.pos = btn_reset.pos;
+        btn_reset.pos = btn_next.pos;
         stage.add(btn_back);
-        stage.add(btn_mute);
         stage.add(btn_reset);
         stage.add(btn_next);
 
@@ -171,6 +172,25 @@ class Level {
             }
             return false;
         }.bind(stage);
+
+        // Default animation on expression creation:
+        stage.expressionNodes().forEach((n) => {
+            n.scale = { x:0.5, y:0.5 };
+            n.anchor = { x:0.5, y:0.5 };
+            Animate.tween(n, { scale:{x:1,y:1} }, 500, (elapsed) => Math.pow(elapsed, 0.3));
+        });
+        stage.goalNodes.forEach((n) => {
+            n.pos = addPos(n.pos, { x:n.size.w/2.0, y:n.size.h/2.0 });
+            n.anchor = { x:0.5, y:0.5 };
+            n.scale = { x:0.5, y:0.5 };
+            Animate.tween(n, { scale:{x:1,y:1} }, 500, (elapsed) => Math.pow(elapsed, 0.3));
+        });
+        stage.toolboxNodes().forEach((n, i) => {
+            let final_pos = n.pos;
+            n.pos = addPos(n.pos, { x:400, y:0 });
+            n.scale = { x:0.8, y:0.8 };
+            Animate.tween(n, { pos:final_pos, scale:{x:1,y:1} }, 500 + i * 100, (elapsed) => Math.pow(elapsed, 0.3));
+        });
 
         return stage;
     }

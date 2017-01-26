@@ -79,6 +79,11 @@ function clipToRect(upperLeftPos, itemSize, clipOrigin, clipSize) {
     if (q.y > bot_boundary) q.y = bot_boundary;else if (q.y < top_boundary) q.y = top_boundary;
     return q;
 }
+function randomPointInRect(rect) {
+    return { x: rect.x + rect.w * Math.random(),
+        y: rect.y + rect.h * Math.random() };
+}
+
 function zeroPos() {
     return { x: 0, y: 0 };
 }
@@ -100,6 +105,9 @@ function distBetweenPos(p, q) {
 }
 function lengthOfPos(p) {
     return Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
+}
+function dotProduct(p, q) {
+    return p.x * q.x + p.y * q.y;
 }
 function normalize(p) {
     var len = distBetweenPos(p, { x: 0, y: 0 });
@@ -124,6 +132,7 @@ function setStrokeStyle(ctx, stroke) {
     if (!stroke) ctx.strokeStyle = null;else {
         ctx.lineWidth = stroke.lineWidth;
         ctx.strokeStyle = stroke.color;
+        if (stroke.lineDash) ctx.setLineDash(stroke.lineDash);else ctx.setLineDash([]);
     }
 }
 function strokeWithOpacity(ctx, opacity) {
@@ -138,6 +147,13 @@ function colorFrom255(val) {
     var colorWeights = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [1, 1, 1];
 
     return 'rgb(' + Math.round(val * colorWeights[0]) + ',' + Math.round(val * colorWeights[1]) + ',' + Math.round(val * colorWeights[2]) + ')';
+}
+function colorTween(val) {
+    var colorStartWeights = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [0, 0, 0];
+    var colorEndWeights = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [1, 1, 1];
+
+    val = val * 255;
+    return 'rgb(' + Math.round(val * colorEndWeights[0] + (255 - val) * colorStartWeights[0]) + ',' + Math.round(val * colorEndWeights[1] + (255 - val) * colorStartWeights[1]) + ',' + Math.round(val * colorEndWeights[2] + (255 - val) * colorStartWeights[2]) + ')';
 }
 function computeVariance(arr) {
     if (arr.length <= 1) return 0;

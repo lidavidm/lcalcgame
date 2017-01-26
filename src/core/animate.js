@@ -23,6 +23,37 @@ var mag = (function(_) {
             return twn;
         }
 
+        static run(func, dur=1000) {
+            var twn = new Tween(func, dur);
+            twn.run();
+            return twn;
+        }
+
+        // Takes alternating sequence of func, dur, onComplete arguments and runs tweens in sequence.
+        static chain(...args) {
+            if (args.length % 3 !== 0 || args.length === 0) {
+                console.error('Cannot chain even (or zero) number of arguments.');
+                return;
+            }
+
+            let tweens = [];
+            for (let i = 0; i < args.length; i+=3) {
+
+                let f = args[i];
+                let d = args[i+1];
+                let o = args[i+2];
+
+                let t = new Tween(f, d);
+                if (o) t.after(o);
+                if (tweens.length > 0)
+                    tweens[tweens.length-1].after(() => t.run());
+                tweens.push( t );
+            }
+
+            tweens[0].run();
+            return tweens[0];
+        }
+
         static blink(nodes, dur=1000, colorWeights=[1,1,1], blinkCount=2) {
             if (!Array.isArray(nodes)) nodes = [nodes];
             nodes = nodes.map((n) => {
@@ -340,6 +371,7 @@ var mag = (function(_) {
         timeout() {
             let delta = ((new Date()).getTime() - this.startTimeMS);
             this.startTimeMS += delta;
+            if (delta > 50) delta = 50; // cap it, just in case.
             this.update(delta); // how much time has passed _between frames_ (in ms)
         }
     }
