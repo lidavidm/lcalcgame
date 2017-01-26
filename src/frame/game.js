@@ -109,11 +109,19 @@ class Level {
             () => {
             next(); // go back to previous level; see index.html.
         });
-        btn_back.pos = btn_reset.pos;
-        btn_reset.pos = btn_next.pos;
-        stage.add(btn_back);
+        if (__SHOW_DEV_INFO) {
+            stage.add(btn_back);
+            stage.add(btn_next);
+        }
+        else {
+            btn_mute.pos = {
+                x: canvas_screen.w - 64 * 2 - ui_padding,
+                y: btn_mute.pos.y,
+            };
+            btn_reset.pos = btn_next.pos;
+        }
+        stage.add(btn_mute);
         stage.add(btn_reset);
-        stage.add(btn_next);
 
         // Toolbox
         const TOOLBOX_HEIGHT = 90;
