@@ -40,8 +40,9 @@ class Level {
 
         var canvas_screen = stage.boundingSize;
 
-        const showEnvironment = Object.keys(this.globals.bindings).length > 0 ||
-              mag.Stage.getNodesWithClass(VarExpr, [], true, this.exprs).length > 0;
+        const showEnvironment = Object.keys(this.globals.bindings).length > 0
+              || mag.Stage.getNodesWithClass(VarExpr, [], true, this.exprs).length > 0
+              || mag.Stage.getNodesWithClass(VarExpr, [], true, this.toolbox).length > 0;
         const envDisplayWidth = 0.20 * canvas_screen.w;
 
         GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
