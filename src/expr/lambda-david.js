@@ -347,6 +347,12 @@ class LambdaVarExpr extends ImageExpr {
         this.stateGraph.enter('closed');
     }
 
+    get size() {
+        let sz = super.size;
+        sz.h = 54;
+        return sz;
+    }
+
     get openImage() { return this.name === 'x' ? 'lambda-pipe-open' : 'lambda-pipe-red-open'; }
     get closedImage() { return this.name === 'x' ? 'lambda-pipe' : 'lambda-pipe-red'; }
     get openingAnimation() {
