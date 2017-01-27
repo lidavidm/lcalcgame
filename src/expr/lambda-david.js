@@ -943,7 +943,7 @@ class FadedLambdaHoleExpr extends LambdaHoleExpr {
         super(varname);
         this.padding.left = 5;
         this.label = new TextExpr("λ" + varname + ".");
-        this.holes.push(this.label);
+        this.addArg(this.label);
         this.label.color = "#000";
     }
 
@@ -987,7 +987,7 @@ class HalfFadedLambdaHoleExpr extends LambdaHoleExpr {
     constructor(varname) {
         super(varname);
         this.label = new TextExpr("λ" + varname);
-        this.holes.push(this.label);
+        this.addArg(this.label);
         this.label.color = "#FFF";
     }
 
@@ -1034,10 +1034,11 @@ class FadedPythonLambdaHoleExpr extends LambdaHoleExpr {
 class FadedES6LambdaHoleExpr extends LambdaHoleExpr {
     constructor(varname) {
         super(varname);
+        this.padding.left = 5;
         this.label = new TextExpr("(" + varname + ")");
         this.arrow = new TextExpr("=>");
-        this.holes.push(this.label);
-        this.holes.push(this.arrow);
+        this.addArg(this.label);
+        this.addArg(this.arrow);
         this.label.color = "#000";
         this.arrow.color = "#000";
     }
