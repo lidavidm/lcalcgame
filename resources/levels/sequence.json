@@ -139,9 +139,9 @@
         },
         {
             "description": "Use sequence in repeat",
-            "board": "(repeat /(2) /(sequence _ _)) (assign /$y /(+ /$y _)) (assign /$x /(+ /$x _))",
-            "goal": "(4) (6)",
-            "toolbox": "($x) ($x) ($y) (1) (2)",
+            "board": "(repeat /(2) /(sequence /(assign /$x /(+ /$x _)) /(assign /$y /(+ /$y _))))",
+            "goal": "(3) (6)",
+            "toolbox": "($x) ($y) (0) (1) (2)",
             "globals": {
                 "x": "(1)",
                 "y": "(2)"
@@ -149,23 +149,12 @@
         },
         {
             "description": "Use sequence in repeat with dependencies",
-            "board": "(repeat /(3) /(sequence _ _)) (assign /$y /(+ /$y /$x)) (assign /$x /(+ /$x _))",
-            "goal": "(true) (true)",
-            "toolbox": "(== /$x /3) (== /$y _) (1) (4) (5) (6)",
+            "board": "(repeat /(3) /(sequence /(assign _ /(+ /$x _)) /(assign /$y /(+ /$y /$x))))",
+            "goal": "(6)",
+            "toolbox": "($x) ($y) (1) (2)",
             "globals": {
                 "x": "(0)",
                 "y": "(0)"
-            }
-        },
-        {
-            "description": "Use sequence in repeat with dependencies",
-            "board": "(repeat /(3) /(sequence _ _)) (assign /$x /(+ /$x _)) (assign /$z /(== /$x /4))",
-            "goal": "(true)",
-            "toolbox": "(2) (3) (4) ($y) ($z)",
-            "globals": {
-                "x": "(1)",
-                "y": "(1)",
-                "z": "(false)"
             }
         }
     ],
