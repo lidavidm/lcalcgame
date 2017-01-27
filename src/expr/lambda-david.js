@@ -941,9 +941,17 @@ class FadedLambdaHoleExpr extends LambdaHoleExpr {
 
     constructor(varname) {
         super(varname);
+        this.padding.left = 5;
         this.label = new TextExpr("λ" + varname + ".");
         this.holes.push(this.label);
         this.label.color = "#000";
+    }
+
+    get size() {
+        return {
+            w: 50,
+            h: 50,
+        };
     }
 
     open() {
@@ -973,13 +981,6 @@ class FadedLambdaHoleExpr extends LambdaHoleExpr {
         ctx.arc(pos.x+rad,pos.y+rad,rad,0,2*Math.PI);
         setStrokeStyle(ctx, this.stroke);
         if(this.stroke) ctx.stroke();
-    }
-
-    get size() {
-        let size = super.size;
-        size.w = Math.max(size.w, size.h);
-        size.h = Math.max(size.w, size.h);
-        return size;
     }
 }
 class HalfFadedLambdaHoleExpr extends LambdaHoleExpr {
