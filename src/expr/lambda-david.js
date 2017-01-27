@@ -404,11 +404,6 @@ class LambdaVarExpr extends ImageExpr {
         return c;
     }
 
-    hits(pos, options) {
-        if(this.holes[0].hits(pos, options)) return this;
-        else return null;
-    }
-
     onmouseclick(pos) {
         // TODO: DML enable reduction, but make sure we are not bound
         // by a lambda
