@@ -1057,12 +1057,29 @@ class FadedES6LambdaHoleExpr extends LambdaHoleExpr {
         else return null;
     }
 
+    update() {
+        super.update();
+        this.label.pos = {
+            x: this.label.pos.x,
+            y: 22,
+        };
+        this.arrow.pos = {
+            x: this.arrow.pos.x,
+            y: 22,
+        };
+    }
+
     // Draw special round rect around just x term.
     drawInternal(ctx, pos, boundingSize) {
         setStrokeStyle(ctx, this.stroke);
         ctx.fillStyle = this.color;
         if (this.stroke) {
-            roundRect(ctx, pos.x, pos.y, this.arrow.absolutePos.x - pos.x, boundingSize.h, 6, false, true, this.stroke.opacity);
+            roundRect(ctx,
+                      this.label.absolutePos.x,
+                      this.label.absolutePos.y - this.label.anchor.y * this.label.absoluteSize.h,
+                      this.label.absoluteSize.w,
+                      this.label.absoluteSize.h,
+                      6, false, true, this.stroke.opacity);
         }
     }
 }
