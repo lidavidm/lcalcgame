@@ -722,6 +722,10 @@ class ExpressionPattern {
                 //console.log(' > Constructors don\'t match.');
                 return false; // expressions don't match
             }
+            else if (e instanceof Expression && f instanceof Expression &&
+                     (e.isValue() != f.isValue() || e.value() !== f.value())) {
+                return false;
+            }
             else { // Check whether the expressions at this level have the same # of children. If so, do one-to-one comparison.
                 var e_children = e.children;
                 var f_children = f.children;
