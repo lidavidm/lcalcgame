@@ -31,6 +31,7 @@ class Sequence extends Expression {
 
     update() {
         super.update();
+
         let width = 75;
         for (let expr of this.holes) {
             width = Math.max(width, expr.size.w);
@@ -89,6 +90,21 @@ class Sequence extends Expression {
                         else {
                             this.holes.shift();
                         }
+
+                        // To handle expressions like loops that
+                        // expand into sequences, flatten any
+                        // subsequences we encounter.
+                        let newHoles = [];
+                        for (let expr of this.holes) {
+                            if (expr instanceof Sequence) {
+                                newHoles = newHoles.concat(expr.holes);
+                            }
+                            else {
+                                newHoles.push(expr);
+                            }
+                        }
+                        this.holes = newHoles;
+
                         this.update();
                         if (newExpr instanceof Expression) newExpr.lock();
                         window.setTimeout(() => {
