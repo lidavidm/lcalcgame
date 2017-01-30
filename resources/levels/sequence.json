@@ -114,7 +114,7 @@
             "description": "Increment things with repeat",
             "board": "(repeat _ /(assign /$x /(+ /$x /1)))",
             "goal": "(6)",
-            "toolbox": "($x) (0) (1) (2) (3) (4) (5)",
+            "toolbox": "($x) (0) (1) (2) (3)",
             "globals": {
                 "x": "(1)"
             }
@@ -123,16 +123,25 @@
             "description": "Repeating things 0 times does nothing",
             "board": "(sequence /(repeat _ /(assign /$x /(+ /$x /1))) /(assign /$y /(== /$x /1)))",
             "goal": "(true)",
-            "toolbox": "($y) (0) (1) (2) (3) (4) (5)",
+            "toolbox": "($y) (0) (1) (2) (3)",
             "globals": {
                 "x": "(1)"
             }
         },
         {
             "description": "You can repeat a variable number of times",
-            "board": "(repeat _ _)",
-            "toolbox": "(0) (1) (2) (assign /$x /(+ /$x /1)) ($x) ($x)",
-            "goal": "(6)",
+            "board": "(repeat /$x /(assign /$x /(+ /$x /1)))",
+            "toolbox": "($x)",
+            "goal": "(4)",
+            "globals": {
+                "x": "(2)"
+            }
+        },
+        {
+            "description": "You can repeat a variable number of times",
+            "board": "(sequence /(repeat /$x /(assign /$x /(+ /$x /1))) /(assign /$y /(== /$x _))) ($y)",
+            "toolbox": "(4) (5) (6)",
+            "goal": "(true)",
             "globals": {
                 "x": "(3)"
             }
