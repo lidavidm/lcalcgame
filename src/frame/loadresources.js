@@ -103,6 +103,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadImage('chest-metal-base', 'chest-metal-base.png');
     loadImage('chest-metal-lid-open', 'chest-metal-lid-open.png');
     loadImage('chest-metal-lid-closed', 'chest-metal-lid-closed.png');
+    loadImage('die', 'die.png');
 
     // UI.
     loadImage('btn-next-default', 'next-button.png');
