@@ -26,6 +26,8 @@ class NumberExpr extends Expression {
 class AddExpr extends Expression {
     constructor(left, right) {
         let op = new TextExpr("+");
+        if (left instanceof MissingExpression) left = new MissingNumberExpression();
+        if (right instanceof MissingExpression) right = new MissingNumberExpression();
         super([left, op, right]);
     }
 
