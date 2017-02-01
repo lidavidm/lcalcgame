@@ -619,3 +619,11 @@ function reduceExprs(exprList, delay=300) {
         nextStep();
     });
 }
+
+function after(ms) {
+    return new Promise((resolve, reject) => {
+        window.setTimeout(() => {
+            resolve();
+        }, ms);
+    });
+}

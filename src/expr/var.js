@@ -545,7 +545,8 @@ class AssignExpr extends Expression {
         return this.performSubReduction(this.value, true).then((value) => {
             this.value = value;
             this.update();
-            return this.animateReduction();
+            if (this.stage) this.stage.draw();
+            return after(500).then(() => this.animateReduction());
         });
     }
 

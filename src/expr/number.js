@@ -67,6 +67,7 @@ class AddExpr extends Expression {
                 }
 
                 let stage = this.stage;
+
                 let val = super.performReduction();
                 stage.update();
                 return val;
