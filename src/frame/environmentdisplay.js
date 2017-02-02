@@ -47,8 +47,6 @@ class EnvironmentDisplay extends Expression {
     }
 
     updateBindings() {
-        if (this.stage) window.stage = this.stage;
-
         if (!this.stage) return;
 
         let env = this.getEnvironment();
