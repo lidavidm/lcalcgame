@@ -112,11 +112,30 @@
         },
         {
             "description": "Increment things with repeat",
+            "board": "(repeat /(4) /(assign /$x /(+ /$x /1))) (repeat /(1) /(assign /$y /(+ /$y /1)))",
+            "goal": "(5) (1)",
+            "toolbox": "($x) ($y)",
+            "globals": {
+                "x": "(1)",
+                "y": "(0)"
+            }
+        },
+        {
+            "description": "Increment things with repeat",
             "board": "(repeat _ /(assign /$x /(+ /$x /1)))",
-            "goal": "(6)",
+            "goal": "(4)",
             "toolbox": "($x) (0) (1) (2) (3)",
             "globals": {
                 "x": "(1)"
+            }
+        },
+        {
+            "description": "Repeating things 0 times does nothing",
+            "board": "(repeat /(0) /(assign /$x /(6)))",
+            "goal": "(2)",
+            "toolbox": "($x)",
+            "globals": {
+                "x": "(2)"
             }
         },
         {
@@ -158,12 +177,28 @@
         },
         {
             "description": "Use sequence in repeat with dependencies",
-            "board": "(repeat /(3) /(sequence /(assign _ /(+ /$x _)) /(assign /$y /(+ /$y /$x))))",
-            "goal": "(6)",
-            "toolbox": "($x) ($y) (1) (2)",
+            "board": "(repeat /(3) /(sequence /(assign /$x /(+ /$x /1)) /(assign /$y /(== /$x _))))",
+            "goal": "(true)",
+            "toolbox": "($y) (3) (4) (5) (6)",
             "globals": {
-                "x": "(0)",
-                "y": "(0)"
+                "x": "(2)"
+            }
+        },
+        {
+            "description": "Use sequence in repeat with dependencies",
+            "board": "(repeat /(2) /(sequence /(assign /$x /(+ /$x /1)) /(assign /$y /(if /(== /$x _) /(star)))))",
+            "goal": "(star)",
+            "toolbox": "($y) (1) (2) (3)",
+            "globals": {
+                "x": "(1)"
+            }
+        },
+        {
+            "description": "The choice block",
+            "board": "(choice (2) (3) (4) (5) (6))",
+            "goal": "(6)",
+            "toolbox": "",
+            "globals": {
             }
         }
     ],
