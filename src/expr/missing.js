@@ -207,7 +207,7 @@ class MissingChestExpression extends MissingTypedExpression {
     constructor(expr_to_miss) {
         super(expr_to_miss);
         this.label = new TextExpr("xy");
-        this.holes.push(this.label);
+        this.addArg(this.label);
     }
     getClass() { return MissingChestExpression; }
 }

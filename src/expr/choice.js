@@ -8,10 +8,26 @@ class ChoiceExpr extends Expression {
         this._sparkling = false;
         this._state = "closed";
         this._sparkles = [];
+        this.padding.between = 10;
     }
 
     get rowSize() {
-        return Math.ceil(Math.sqrt(this.choices.length));
+        let hasRectangular = false;
+        for (let expr of this.choices) {
+            if (expr.size.h > 0 && expr.size.w / expr.size.h >= 1.7) {
+                hasRectangular = true;
+                break;
+            }
+        }
+
+        let root = Math.ceil(Math.sqrt(this.choices.length));
+
+        if (hasRectangular) {
+            return Math.min(root, 2);
+        }
+        else {
+            return root;
+        }
     }
 
     get size() {
@@ -20,22 +36,33 @@ class ChoiceExpr extends Expression {
         }
         else if (this._state === "open") {
             var padding = this.padding;
-            var sizes = this.getHoleSizes();
-            if (sizes.length === 0) return { w:this._size.w, h:this._size.h };
+            if (this.getHoleSizes().length === 0) return { w:this._size.w, h:this._size.h };
 
-            let boxW = 0;
-            let boxH = 0;
-
-            for (let size of sizes) {
-                if (size.w > boxW) boxW = size.w;
-                if (size.h > boxH) boxH = size.h;
-            }
-
+            let { w: boxW, h: boxH } = this.cellSize;
             let width = this.padding.left + this.rowSize * boxW + this.padding.right;
-            let height = this.padding.inner + this.rowSize * boxH;
+            let height = this.padding.inner * 2 + Math.ceil(this.choices.length / this.rowSize) * boxH;
 
             return { w:width, h: height };
         }
+    }
+
+    get cellSize() {
+        var sizes = this.getHoleSizes();
+        let boxW = 0;
+        let boxH = 0;
+
+        for (let size of sizes) {
+            if (size.w > boxW) boxW = size.w;
+            if (size.h > boxH) boxH = size.h;
+        }
+
+        boxW += this.padding.between;
+        boxH += this.padding.between;
+
+        return {
+            w: boxW,
+            h: boxH,
+        };
     }
 
     update() {
@@ -61,23 +88,17 @@ class ChoiceExpr extends Expression {
             });
             var size = this.size;
 
-            let boxW = 0;
-            let boxH = 0;
-
-            for (let size of this.getHoleSizes()) {
-                if (size.w > boxW) boxW = size.w;
-                if (size.h > boxH) boxH = size.h;
-            }
+            let { w: boxW, h: boxH } = this.cellSize;
 
             let col = 0;
             let row = 0;
             for (let expr of this.holes) {
-                expr.anchor = { x:0, y:0.5 };
+                let centerX = Math.max(0, (boxW - expr.absoluteSize.w) / 2);
+                let centerY = Math.max(0, (boxH - expr.absoluteSize.h) / 2);
                 expr.pos = {
-                    x: this.padding.left + col * boxW,
-                    y: this.padding.inner / 2 + row * boxH + expr.anchor.y * expr.size.h,
+                    x: this.padding.left + col * boxW + centerX,
+                    y: this.padding.inner / 2 + row * boxH + expr.anchor.y * expr.size.h + centerY,
                 };
-                expr.scale = { x:0.85, y:0.85 };
                 expr.update();
 
                 col += 1;

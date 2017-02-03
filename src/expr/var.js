@@ -391,22 +391,22 @@ class AssignExpr extends Expression {
     constructor(variable, value) {
         super([]);
         if (variable && !(variable instanceof MissingExpression)) {
-            this.holes.push(variable);
+            this.addArg(variable);
         }
         else {
             let missing = new MissingChestExpression(new VarExpr("_"));
             missing.acceptedClasses = [VarExpr];
-            this.holes.push(missing);
+            this.addArg(missing);
         }
 
         this.arrowLabel = new TextExpr("←");
-        this.holes.push(this.arrowLabel);
+        this.addArg(this.arrowLabel);
 
         if (value) {
-            this.holes.push(value);
+            this.addArg(value);
         }
         else {
-            this.holes.push(new MissingExpression(new Expression()));
+            this.addArg(new MissingExpression(new Expression()));
         }
 
         this._animating = false;

@@ -9,8 +9,8 @@ class RepeatLoopExpr extends Expression {
         if (body instanceof MissingExpression) {
             body = new InvisibleMissingExpression();
         }
-        this.holes.push(times);
-        this.holes.push(body);
+        this.addArg(times);
+        this.addArg(body);
         this.padding.right = 0;
         this.color = "orange";
     }
