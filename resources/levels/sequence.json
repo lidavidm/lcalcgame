@@ -195,10 +195,19 @@
         },
         {
             "description": "The choice block",
-            "board": "(choice (2) (3) (4) (5) (6)) (choice (assign _ _) (repeat _ _) (== _ _) (diamond) (triangle) (star) (if _b _))",
+            "board": "(choice (2) (3) (4) (5) (6))",
             "goal": "(6)",
             "toolbox": "",
             "globals": {
+            }
+        },
+        {
+            "description": "The choice block",
+            "board": "(assign /$x /(+ /$x /1))",
+            "goal": "(3)",
+            "toolbox": "($x) (2) (choice (assign _ _) (repeat _ _))",
+            "globals": {
+                "x": "(1)"
             }
         }
     ],
