@@ -203,11 +203,37 @@
         },
         {
             "description": "The choice block",
+            "board": "(assign /$x (star)) ($x)",
+            "goal": "(false)",
+            "toolbox": "(choice (== _ /(star)) (== _ /(triangle)))",
+            "globals": {
+            }
+        },
+        {
+            "description": "The choice block",
             "board": "(assign /$x /(+ /$x /1))",
             "goal": "(3)",
             "toolbox": "($x) (2) (choice (assign _ _) (repeat _ _))",
             "globals": {
                 "x": "(1)"
+            }
+        },
+        {
+            "description": "The choice block",
+            "board": "($x) (choice (assign /$x _) (repeat _ _) (== _ _)) (choice (triangle) (star) (diamond))",
+            "goal": "(triangle)",
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "description": "The choice block",
+            "board": "($y) (repeat /(3) /(sequence /(assign /$x /(+ /$x /1)) /(assign /$y _)))",
+            "goal": "(true)",
+            "toolbox": "(choice (assign /$x _) (repeat /$x _) (== /$x _) (if /$x _)) (choice (1) (2) (3) (4) (5) (6))",
+            "globals": {
+                "x": "(2)",
+                "y": "(false)"
             }
         }
     ],
