@@ -163,6 +163,12 @@ class ChoiceExpr extends Expression {
         }
     }
 
+    clone(parent=null) {
+        var c = super.clone(parent);
+        c.choices = this.choices.map((c) => c.clone());
+        return c;
+    }
+
     sparkle() {
         // Derived from SparkleTrigger
         this._sparkling = true;

@@ -91,7 +91,7 @@ class LabeledVarExpr extends VarExpr {
     constructor(name) {
         super(name);
         this.label = new TextExpr(name);
-        this.holes.push(this.label);
+        this.addArg(this.label);
     }
 
     // Used by EnvironmentLambdaExpr
