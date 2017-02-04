@@ -11,6 +11,7 @@ class ChoiceExpr extends Expression {
         this.padding.between = 10;
     }
 
+    /** The max number of choices to lay out in a single row */
     get rowSize() {
         let hasRectangular = false;
         for (let expr of this.choices) {
@@ -44,8 +45,12 @@ class ChoiceExpr extends Expression {
 
             return { w:width, h: height };
         }
+        else {
+            throw "Invalid state";
+        }
     }
 
+    /** The size of a single cell in our grid layout. */
     get cellSize() {
         var sizes = this.getHoleSizes();
         let boxW = 0;
@@ -66,6 +71,7 @@ class ChoiceExpr extends Expression {
     }
 
     update() {
+        // (Re)start the sparkle
         if (!this._sparkling && this.stage) {
             this.sparkle();
         }
@@ -77,6 +83,7 @@ class ChoiceExpr extends Expression {
             super.update();
         }
         else if (this._state === "open") {
+            // Grid layout for our contents
             let rowSize = this.rowSize;
             this.children = [];
 
@@ -112,17 +119,7 @@ class ChoiceExpr extends Expression {
         }
     }
 
-    swap(arg, anotherArg) {
-        let poof = this.holes.indexOf(arg) > -1 && (anotherArg instanceof MissingExpression || anotherArg === null);
-        super.swap(arg, anotherArg);
-
-        if (poof) {
-            Animate.poof(this);
-            this.cleanup();
-            (this.parent || this.stage).swap(this, null);
-        }
-    }
-
+    /** Get rid of any current sparkles */
     cleanup() {
         this._sparkling = false;
         for (let sparkle of this._sparkles) {
@@ -147,15 +144,29 @@ class ChoiceExpr extends Expression {
         }
     }
 
+    /** Pretend to be a Toolbox so we can use the same API. */
+    removeExpression(expr) {
+        Animate.poof(this);
+        this.cleanup();
+        (this.parent || this.stage).swap(this, null);
+    }
+
     onmouseclick() {
-        this.removeArg(this.label);
-        this.choices.forEach((c) => this.holes.push(c.clone()));
-        this._state = "open";
+        if (this._state === "closed") {
+            this.removeArg(this.label);
+            this.choices.forEach((c) => {
+                let choice = c.clone();
+                choice.toolbox = this;
+                this.holes.push(choice);
+            });
+            this._state = "open";
+        }
     }
 
     sparkle() {
+        // Derived from SparkleTrigger
         this._sparkling = true;
-        // Store node center pos.
+
         var center = this.centerPos();
         var size = this.absoluteSize;
         if (size.w === 0) size = { w:50, h:50 };
@@ -170,9 +181,7 @@ class ChoiceExpr extends Expression {
             return `#${r}${g}${b}`;
         };
 
-        // Create a bunch of floaty particles.
         for (let i = 0; i < count; i++) {
-
             let part = new mag.SparkleStar(
                 center.x, center.y,
                 Math.floor(minRad + (maxRad - minRad) * Math.random()));
