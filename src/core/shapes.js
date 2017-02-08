@@ -12,7 +12,6 @@
              this._scale = { x:1, y:1 };
              this._color = "lightgray";
              this._highlightColor = 'yellow';
-             this._stackVertically = false;
              this.stroke = null;
              this.shadowOffset = 2;
              this.shadowColor = 'black';
@@ -212,6 +211,19 @@
          }
      }
 
+     class SparkleStar extends Star {
+         constructor(x, y, rad, points=5) {
+             super(x, y, rad, points);
+             this.ignoreEvents = true;
+         }
+
+         drawInternal(ctx, pos, boundingSize) {
+             drawStar(ctx, pos.x+boundingSize.w/2, pos.y+boundingSize.h/2+this.shadowOffset,
+                      this.starPoints, boundingSize.w / 2, boundingSize.w / 4,
+                      null, this.color);
+         }
+     }
+
      class Triangle extends Rect {
          drawInternal(ctx, pos, boundingSize) {
              setStrokeStyle(ctx, this.stroke);
@@ -314,6 +326,7 @@
      _.RoundedRect = RoundedRect;
      _.HexaRect = HexaRect;
      _.Star = Star;
+     _.SparkleStar = SparkleStar;
      _.Triangle = Triangle;
      _.Circle = Circle;
      _.Pipe = Pipe;

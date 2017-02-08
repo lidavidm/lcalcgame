@@ -84,10 +84,13 @@ class LambdaHoleExpr extends MissingExpression {
         }
     }
     hits(pos, options=undefined) {
-        if (this.isOpen)
+        if (this.isOpen) {
+            if (this.parent && this.parent.parent) return null;
             return super.hits(pos, options);
-        else
+        }
+        else {
             return null;
+        }
     }
 
     applyExpr(node) {
@@ -160,6 +163,10 @@ class LambdaHoleExpr extends MissingExpression {
                     e.close();
                 });
                 this.opened_subexprs = null;
+
+                if (this.parent.environmentDisplay && wasClosed) {
+                    this.parent.environmentDisplay.closeDrawer({ force: true, speed: 50 });
+                }
             };
         }
     }
@@ -177,6 +184,11 @@ class LambdaHoleExpr extends MissingExpression {
     }
     ondropped(node, pos) {
         if (node instanceof LambdaHoleExpr) node = node.parent;
+        // Disallow interaction with nested lambda
+        if (this.parent && this.parent.parent instanceof LambdaExpr) {
+            return null;
+        }
+
         if (node.dragging) { // Make sure node is being dragged by the user.
 
             // Special case: Funnel dropped over hole.
@@ -510,6 +522,266 @@ class LambdaExpr extends Expression {
             return '(' + super.toString() + ')';
         else
             return super.toString();
+    }
+}
+
+
+class EnvironmentLambdaExpr extends LambdaExpr {
+    constructor(exprs) {
+        super(exprs);
+        this.environmentDisplay = new InlineEnvironmentDisplay(this);
+        this.environmentDisplay.scale = { x: 0.85, y: 0.85 };
+    }
+
+    removeArg(arg) {
+        // Don't let holes remove themselves - we want to keep the
+        // parameter visible while we are reducing
+        if (arg instanceof LambdaHoleExpr) {
+            arg.isOpen = false;
+            return;
+        }
+        super.removeArg(arg);
+    }
+
+    get takesArgument() {
+        // Since the hole isn't removed by our override of removeArg,
+        // account for that when deciding whether the lambda is
+        // reducible
+        return this.holes.length > 0 && this.holes[0] instanceof LambdaHoleExpr && this.holes[0].isOpen;
+    }
+
+    hits(pos, options=undefined) {
+        if (this.parent) return super.hits(pos, options);
+
+        let result = super.hits(pos, options) || this.environmentDisplay.hits(pos, options);
+        if (result == this.environmentDisplay) {
+            return this;
+        }
+        return result;
+    }
+
+    onmousedown(pos) {
+        if (this.parent) super.onmousedown(pos);
+
+        if (super.hits(pos)) {
+            this._eventTarget = this;
+            super.onmousedown(pos);
+        }
+        else {
+            this._eventTarget = this.environmentDisplay;
+            this.environmentDisplay.onmousedown(pos);
+        }
+    }
+
+    onmousedrag(pos) {
+        if (this.parent) super.onmousedrag(pos);
+
+        if (!this._eventTarget) return;
+        if (this._eventTarget == this) {
+            super.onmousedrag(pos);
+        }
+        else {
+            this._eventTarget.onmousedrag(pos);
+        }
+    }
+
+    onmouseup(pos) {
+        if (this.parent) super.onmouseup(pos);
+
+        if (!this._eventTarget) return;
+        if (this._eventTarget == this) {
+            super.onmouseup(pos);
+        }
+        else {
+            this._eventTarget.onmouseup(pos);
+        }
+        this._eventTarget = null;
+    }
+
+    update() {
+        super.update();
+        this.environmentDisplay.update();
+    }
+
+    draw(ctx) {
+        if (!this.parent) {
+            this.environmentDisplay.parent = this;
+            this.environmentDisplay.draw(ctx);
+        }
+        super.draw(ctx);
+    }
+
+    onmouseclick() {
+        if (!this._animating) {
+            this.performReduction();
+        }
+    }
+
+    performReduction() {
+        // If we don't have all our arguments, refuse to evaluate.
+        if (this.takesArgument) {
+            return this;
+        }
+
+        return new Promise((resolve, _reject) => {
+            this._animating = true;
+            this.environmentDisplay.openDrawer({ force: true, speed: 100 });
+
+            // Perform substitution, but stop at the 'boundary' of another lambda.
+            let varExprs = findNoncapturingVarExpr(this, null, true, true);
+            let environment = this.getEnvironment();
+
+            for (let v of varExprs) {
+                if (!v.canReduce()) {
+                    // Play the animation
+                    v.performReduction();
+                    _reject();
+                    return;
+                }
+            }
+
+            let stepReduction = () => {
+                return new Promise((innerresolve, innerreject) => {
+                    if (varExprs.length === 0) {
+                        innerresolve();
+                    }
+                    else {
+                        let expr = varExprs.pop();
+                        let result;
+                        if (expr instanceof LabeledVarExpr) {
+                            result = expr.animateReduction(this.environmentDisplay.bindings[expr.name]);
+                        }
+                        else {
+                            result = expr.performReduction();
+                        }
+
+                        if (result instanceof Promise) {
+                            result.then(() => {
+                                stepReduction().then(() => innerresolve());
+                            }, () => {
+                                innerreject();
+                                _reject();
+                                this._animating = false;
+                            });
+                        }
+                        else {
+                            return stepReduction();
+                        }
+                    }
+                });
+            };
+            stepReduction().then(() => {
+                window.setTimeout(() => {
+                    // Get rid of the parameter
+                    super.removeArg(this.holes[0]);
+
+                    Animate.poof(this);
+                    super.performReduction();
+                    resolve();
+                }, 600);
+            });
+        });
+    }
+}
+
+
+class InlineEnvironmentDisplay extends SpreadsheetEnvironmentDisplay {
+    constructor(lambda) {
+        super([]);
+        this.lambda = lambda;
+        this.parent = lambda;
+        this.padding = { left: 0, right: 10, inner: 10 };
+
+        this._state = 'open';
+        this._height = 1.0;
+        this._animation = null;
+    }
+
+    openDrawer(options={}) {
+        let force = options.force || false;
+        let speed = options.speed || 300;
+        if (this._state === 'closed' || force) {
+            if (this._animation) this._animation.cancelWithoutFiringCallbacks();
+            this._state = 'opening';
+            this._animation = Animate.tween(this, { _height: 1.0 }, speed).after(() => {
+                this._state = 'open';
+                this._animation = null;
+            });
+        }
+    }
+
+    closeDrawer(options={}) {
+        let force = options.force || false;
+        let speed = options.speed || 300;
+        if (this._state === 'open' || force) {
+            if (this._animation) this._animation.cancelWithoutFiringCallbacks();
+            this._state = 'closing';
+            this._animation = Animate.tween(this, { _height: 0.0 }, speed).after(() => {
+                this._state = 'closed';
+                this._animation = null;
+            });
+        }
+    }
+
+    onmouseup() {
+        if (this._state === 'open') {
+            this.closeDrawer();
+        }
+        else if (this._state === 'closed') {
+            this.openDrawer();
+        }
+    }
+
+    onmousedrag(pos) {}
+
+    getEnvironment() {
+        return this.lambda.getEnvironment();
+    }
+
+    get pos() {
+        return { x: 5, y: this.lambda.size.h - 5 };
+    }
+
+    set pos(p) {
+        this._pos = p;
+    }
+
+    get size() {
+        let size = super._origSize;
+        size.w += this.padding.left + this.padding.right;
+        return size;
+    }
+
+    get absoluteSize() {
+        var size = super.absoluteSize;
+        size.h = Math.max(25, this._height * size.h);
+        return size;
+    }
+
+    draw(ctx) {
+        if (!ctx) return;
+        ctx.save();
+        this.opacity = this.lambda.opacity;
+        if (this.opacity !== undefined && this.opacity < 1.0) {
+            ctx.globalAlpha = this.opacity;
+        }
+        var boundingSize = this.absoluteSize;
+        var upperLeftPos = this.upperLeftPos(this.absolutePos, boundingSize);
+        this.drawInternal(ctx, upperLeftPos, boundingSize);
+        if (this._state === 'open') {
+            this.children.forEach((child) => {
+                child.parent = this;
+                child.draw(ctx);
+            });
+        }
+        ctx.restore();
+    }
+
+    drawInternal(ctx, pos, boundingSize) {
+        this.drawBackground(ctx, pos, boundingSize);
+        if (this._state === "open") {
+            this.drawGrid(ctx);
+        }
     }
 }
 

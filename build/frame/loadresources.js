@@ -1,6 +1,6 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function LOAD_REDUCT_RESOURCES(Resource) {
     var __RESOURCE_PATH = Resource.path;
@@ -49,7 +49,10 @@ function LOAD_REDUCT_RESOURCES(Resource) {
 
     // Add resources here:
     loadAudio('pop', 'pop.wav');
-    loadAudio('poof', 'poof.wav');
+    loadAudio('poof', '208111__planman__poof-of-smoke.wav');
+    loadAudio('fly-to', '60012__qubodup__swing-25.wav');
+    loadAudio('fall-to', '202753__sheepfilms__slide-whistle-1.wav');
+    loadAudio('come-out', '202753__sheepfilms__slide-whistle-2.wav');
     loadAudio('bag-spill', 'spill.wav');
     loadAudio('bag-addItem', 'putaway.wav');
     loadAudio('heatup', 'heatup.wav');
@@ -64,6 +67,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAudio('matching-goal', 'matching-the-goal2.wav');
     loadAudio('mutate', 'deflate.wav');
     loadAudio('game-complete', 'game-complete.wav');
+    loadAudio('chest-open', '202092__spookymodem__chest-opening.wav');
     loadAudio('fatbtn-click', 'fatbtn_click.wav');
     loadAudio('fatbtn-beep', 'fatbtn_space.wav');
     loadAudio('fatbtn-beep2', 'fatbtn_space2.wav');
@@ -119,6 +123,12 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadImage('btn-reset-default', 'reset-button.png');
     loadImage('btn-reset-hover', 'reset-button-hover.png');
     loadImage('btn-reset-down', 'reset-button-down.png');
+    loadImage('btn-mute-default', 'mute-button.png');
+    loadImage('btn-mute-hover', 'mute-button-hover.png');
+    loadImage('btn-mute-down', 'mute-button-down.png');
+    loadImage('btn-unmute-default', 'unmute-button.png');
+    loadImage('btn-unmute-hover', 'unmute-button-hover.png');
+    loadImage('btn-unmute-down', 'unmute-button-down.png');
     loadImage('toolbox-bg', 'toolbox-tiled-bg.png');
     loadImage('victory', 'you-win.png');
 
@@ -173,7 +183,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAnimation('poof', [0, 4], 120); // Cloud 'poof' animation for destructor piece.
 
     // Add levels here: (for now)
-    var chapter_load_prom = loadChaptersFromFiles(['intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map', 'assign']);
+    var chapter_load_prom = loadChaptersFromFiles(['intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map', 'assign', 'sequence']);
 
     Resource.startChapter = function (chapterName, canvas) {
         for (var i = 0; i < chapters.length; i++) {
@@ -262,6 +272,12 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                             unfaded_root.pos = root.pos;
                             faded.add(unfaded_root);
                             root.opacity = 0;
+
+                            if (ExprManager.isExcludedFromFadingAnimation(unfaded_root)) {
+                                faded.remove(unfaded_root);
+                                root.opacity = 1;
+                                return 'continue';
+                            }
 
                             Animate.wait(500).after(function () {
                                 SparkleTrigger.run(unfaded_root, function () {

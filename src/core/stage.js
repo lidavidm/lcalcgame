@@ -201,11 +201,14 @@ var mag = (function(_) {
 
         // Event handlers.
         getNodeUnder(node, pos) {
+            // Exclude nodes that are in the toolbox - we don't want
+            // to allow any interaction except dragging them out.
+            let is_toolbox = (e) => e && (e.toolbox || (e.parent && is_toolbox(e.parent)));
             var hit_nodes = this.getHitNodes(pos, {'exclude':[node]});
             var hit = null;
             if (hit_nodes.length > 0) {
                 for(let i = hit_nodes.length-1; i > -1; i--) {
-                    if (hit_nodes[i] != node)
+                    if (hit_nodes[i] != node && !is_toolbox(hit_nodes[i]))
                         hit = hit_nodes[i];
                 }
             }

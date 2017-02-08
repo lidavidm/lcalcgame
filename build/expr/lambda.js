@@ -15,7 +15,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * The LambdaHoleExpr performs substitution on LambdaVar subexpressions in its parent expression context.
  * -----------------------------------------------
  * */
-
 var LambdaHoleExpr = function (_MissingExpression) {
     _inherits(LambdaHoleExpr, _MissingExpression);
 
@@ -63,16 +62,6 @@ var LambdaHoleExpr = function (_MissingExpression) {
 
     _createClass(LambdaHoleExpr, [{
         key: 'colorForVarName',
-        //'IndianRed';
-
-        // return {
-        //
-        //     'x':'orange',
-        //     'y':'IndianRed',
-        //     'z':'green',
-        //     'w':'blue'
-        //
-        // }[v];
         value: function colorForVarName() {
             return LambdaHoleExpr.colorForVarName(this.name);
         }
@@ -130,7 +119,12 @@ var LambdaHoleExpr = function (_MissingExpression) {
         value: function hits(pos) {
             var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
 
-            if (this.isOpen) return _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'hits', this).call(this, pos, options);else return null;
+            if (this.isOpen) {
+                if (this.parent && this.parent.parent) return null;
+                return _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'hits', this).call(this, pos, options);
+            } else {
+                return null;
+            }
         }
     }, {
         key: 'applyExpr',
@@ -213,6 +207,10 @@ var LambdaHoleExpr = function (_MissingExpression) {
                         e.close();
                     });
                     _this6.opened_subexprs = null;
+
+                    if (_this6.parent.environmentDisplay && wasClosed) {
+                        _this6.parent.environmentDisplay.closeDrawer({ force: true, speed: 50 });
+                    }
                 };
             }
         }
@@ -236,6 +234,11 @@ var LambdaHoleExpr = function (_MissingExpression) {
             var _this7 = this;
 
             if (node instanceof LambdaHoleExpr) node = node.parent;
+            // Disallow interaction with nested lambda
+            if (this.parent && this.parent.parent instanceof LambdaExpr) {
+                return null;
+            }
+
             if (node.dragging) {
                 // Make sure node is being dragged by the user.
 
@@ -326,7 +329,16 @@ var LambdaHoleExpr = function (_MissingExpression) {
         key: 'colorForVarName',
         value: function colorForVarName(v) {
 
-            if (v === 'x') return 'lightgray';else return 'white';
+            if (v === 'x') return 'lightgray';else return 'white'; //'IndianRed';
+
+            // return {
+            //
+            //     'x':'orange',
+            //     'y':'IndianRed',
+            //     'z':'green',
+            //     'w':'blue'
+            //
+            // }[v];
         }
     }]);
 
@@ -563,9 +575,9 @@ var LambdaExpr = function (_Expression) {
                     // if expression was removed...
                     this.holes[0].close(); // close the hole, undoubtedly
                 } else if (node instanceof MissingExpression) {
-                        // if expression was placed...
-                        this.updateHole();
-                    }
+                    // if expression was placed...
+                    this.updateHole();
+                }
             }
         }
     }, {
@@ -681,6 +693,333 @@ var LambdaExpr = function (_Expression) {
     return LambdaExpr;
 }(Expression);
 
+var EnvironmentLambdaExpr = function (_LambdaExpr) {
+    _inherits(EnvironmentLambdaExpr, _LambdaExpr);
+
+    function EnvironmentLambdaExpr(exprs) {
+        _classCallCheck(this, EnvironmentLambdaExpr);
+
+        var _this13 = _possibleConstructorReturn(this, (EnvironmentLambdaExpr.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr)).call(this, exprs));
+
+        _this13.environmentDisplay = new InlineEnvironmentDisplay(_this13);
+        _this13.environmentDisplay.scale = { x: 0.85, y: 0.85 };
+        return _this13;
+    }
+
+    _createClass(EnvironmentLambdaExpr, [{
+        key: 'removeArg',
+        value: function removeArg(arg) {
+            // Don't let holes remove themselves - we want to keep the
+            // parameter visible while we are reducing
+            if (arg instanceof LambdaHoleExpr) {
+                arg.isOpen = false;
+                return;
+            }
+            _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'removeArg', this).call(this, arg);
+        }
+    }, {
+        key: 'hits',
+        value: function hits(pos) {
+            var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
+
+            if (this.parent) return _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'hits', this).call(this, pos, options);
+
+            var result = _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'hits', this).call(this, pos, options) || this.environmentDisplay.hits(pos, options);
+            if (result == this.environmentDisplay) {
+                return this;
+            }
+            return result;
+        }
+    }, {
+        key: 'onmousedown',
+        value: function onmousedown(pos) {
+            if (this.parent) _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmousedown', this).call(this, pos);
+
+            if (_get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'hits', this).call(this, pos)) {
+                this._eventTarget = this;
+                _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmousedown', this).call(this, pos);
+            } else {
+                this._eventTarget = this.environmentDisplay;
+                this.environmentDisplay.onmousedown(pos);
+            }
+        }
+    }, {
+        key: 'onmousedrag',
+        value: function onmousedrag(pos) {
+            if (this.parent) _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmousedrag', this).call(this, pos);
+
+            if (!this._eventTarget) return;
+            if (this._eventTarget == this) {
+                _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmousedrag', this).call(this, pos);
+            } else {
+                this._eventTarget.onmousedrag(pos);
+            }
+        }
+    }, {
+        key: 'onmouseup',
+        value: function onmouseup(pos) {
+            if (this.parent) _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmouseup', this).call(this, pos);
+
+            if (!this._eventTarget) return;
+            if (this._eventTarget == this) {
+                _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmouseup', this).call(this, pos);
+            } else {
+                this._eventTarget.onmouseup(pos);
+            }
+            this._eventTarget = null;
+        }
+    }, {
+        key: 'update',
+        value: function update() {
+            _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'update', this).call(this);
+            this.environmentDisplay.update();
+        }
+    }, {
+        key: 'draw',
+        value: function draw(ctx) {
+            if (!this.parent) {
+                this.environmentDisplay.parent = this;
+                this.environmentDisplay.draw(ctx);
+            }
+            _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'draw', this).call(this, ctx);
+        }
+    }, {
+        key: 'onmouseclick',
+        value: function onmouseclick() {
+            if (!this._animating) {
+                this.performReduction();
+            }
+        }
+    }, {
+        key: 'performReduction',
+        value: function performReduction() {
+            var _this14 = this;
+
+            // If we don't have all our arguments, refuse to evaluate.
+            if (this.takesArgument) {
+                return this;
+            }
+
+            return new Promise(function (resolve, _reject) {
+                _this14._animating = true;
+                _this14.environmentDisplay.openDrawer({ force: true, speed: 100 });
+
+                // Perform substitution, but stop at the 'boundary' of another lambda.
+                var varExprs = findNoncapturingVarExpr(_this14, null, true, true);
+                var environment = _this14.getEnvironment();
+
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
+
+                try {
+                    for (var _iterator = varExprs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        var v = _step.value;
+
+                        if (!v.canReduce()) {
+                            // Play the animation
+                            v.performReduction();
+                            _reject();
+                            return;
+                        }
+                    }
+                } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion && _iterator.return) {
+                            _iterator.return();
+                        }
+                    } finally {
+                        if (_didIteratorError) {
+                            throw _iteratorError;
+                        }
+                    }
+                }
+
+                var stepReduction = function stepReduction() {
+                    return new Promise(function (innerresolve, innerreject) {
+                        if (varExprs.length === 0) {
+                            innerresolve();
+                        } else {
+                            var expr = varExprs.pop();
+                            var result = void 0;
+                            if (expr instanceof LabeledVarExpr) {
+                                result = expr.animateReduction(_this14.environmentDisplay.bindings[expr.name]);
+                            } else {
+                                result = expr.performReduction();
+                            }
+
+                            if (result instanceof Promise) {
+                                result.then(function () {
+                                    stepReduction().then(function () {
+                                        return innerresolve();
+                                    });
+                                }, function () {
+                                    innerreject();
+                                    _reject();
+                                    _this14._animating = false;
+                                });
+                            } else {
+                                return stepReduction();
+                            }
+                        }
+                    });
+                };
+                stepReduction().then(function () {
+                    window.setTimeout(function () {
+                        // Get rid of the parameter
+                        _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'removeArg', _this14).call(_this14, _this14.holes[0]);
+
+                        Animate.poof(_this14);
+                        _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'performReduction', _this14).call(_this14);
+                        resolve();
+                    }, 600);
+                });
+            });
+        }
+    }, {
+        key: 'takesArgument',
+        get: function get() {
+            // Since the hole isn't removed by our override of removeArg,
+            // account for that when deciding whether the lambda is
+            // reducible
+            return this.holes.length > 0 && this.holes[0] instanceof LambdaHoleExpr && this.holes[0].isOpen;
+        }
+    }]);
+
+    return EnvironmentLambdaExpr;
+}(LambdaExpr);
+
+var InlineEnvironmentDisplay = function (_SpreadsheetEnvironme) {
+    _inherits(InlineEnvironmentDisplay, _SpreadsheetEnvironme);
+
+    function InlineEnvironmentDisplay(lambda) {
+        _classCallCheck(this, InlineEnvironmentDisplay);
+
+        var _this15 = _possibleConstructorReturn(this, (InlineEnvironmentDisplay.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay)).call(this, []));
+
+        _this15.lambda = lambda;
+        _this15.parent = lambda;
+        _this15.padding = { left: 0, right: 10, inner: 10 };
+
+        _this15._state = 'open';
+        _this15._height = 1.0;
+        _this15._animation = null;
+        return _this15;
+    }
+
+    _createClass(InlineEnvironmentDisplay, [{
+        key: 'openDrawer',
+        value: function openDrawer() {
+            var _this16 = this;
+
+            var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+            var force = options.force || false;
+            var speed = options.speed || 300;
+            if (this._state === 'closed' || force) {
+                if (this._animation) this._animation.cancelWithoutFiringCallbacks();
+                this._state = 'opening';
+                this._animation = Animate.tween(this, { _height: 1.0 }, speed).after(function () {
+                    _this16._state = 'open';
+                    _this16._animation = null;
+                });
+            }
+        }
+    }, {
+        key: 'closeDrawer',
+        value: function closeDrawer() {
+            var _this17 = this;
+
+            var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+            var force = options.force || false;
+            var speed = options.speed || 300;
+            if (this._state === 'open' || force) {
+                if (this._animation) this._animation.cancelWithoutFiringCallbacks();
+                this._state = 'closing';
+                this._animation = Animate.tween(this, { _height: 0.0 }, speed).after(function () {
+                    _this17._state = 'closed';
+                    _this17._animation = null;
+                });
+            }
+        }
+    }, {
+        key: 'onmouseup',
+        value: function onmouseup() {
+            if (this._state === 'open') {
+                this.closeDrawer();
+            } else if (this._state === 'closed') {
+                this.openDrawer();
+            }
+        }
+    }, {
+        key: 'onmousedrag',
+        value: function onmousedrag(pos) {}
+    }, {
+        key: 'getEnvironment',
+        value: function getEnvironment() {
+            return this.lambda.getEnvironment();
+        }
+    }, {
+        key: 'draw',
+        value: function draw(ctx) {
+            var _this18 = this;
+
+            if (!ctx) return;
+            ctx.save();
+            this.opacity = this.lambda.opacity;
+            if (this.opacity !== undefined && this.opacity < 1.0) {
+                ctx.globalAlpha = this.opacity;
+            }
+            var boundingSize = this.absoluteSize;
+            var upperLeftPos = this.upperLeftPos(this.absolutePos, boundingSize);
+            this.drawInternal(ctx, upperLeftPos, boundingSize);
+            if (this._state === 'open') {
+                this.children.forEach(function (child) {
+                    child.parent = _this18;
+                    child.draw(ctx);
+                });
+            }
+            ctx.restore();
+        }
+    }, {
+        key: 'drawInternal',
+        value: function drawInternal(ctx, pos, boundingSize) {
+            this.drawBackground(ctx, pos, boundingSize);
+            if (this._state === "open") {
+                this.drawGrid(ctx);
+            }
+        }
+    }, {
+        key: 'pos',
+        get: function get() {
+            return { x: 5, y: this.lambda.size.h - 5 };
+        },
+        set: function set(p) {
+            this._pos = p;
+        }
+    }, {
+        key: 'size',
+        get: function get() {
+            var size = _get(InlineEnvironmentDisplay.prototype.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay.prototype), '_origSize', this);
+            size.w += this.padding.left + this.padding.right;
+            return size;
+        }
+    }, {
+        key: 'absoluteSize',
+        get: function get() {
+            var size = _get(InlineEnvironmentDisplay.prototype.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay.prototype), 'absoluteSize', this);
+            size.h = Math.max(25, this._height * size.h);
+            return size;
+        }
+    }]);
+
+    return InlineEnvironmentDisplay;
+}(SpreadsheetEnvironmentDisplay);
+
 /** Faded lambda variants. */
 
 
@@ -795,27 +1134,27 @@ var FadedES6LambdaHoleExpr = function (_FadedPythonLambdaHol) {
             else if (!this.isOpen) return null;
 
             if (typeof options !== 'undefined' && options.hasOwnProperty('exclude')) {
-                var _iteratorNormalCompletion = true;
-                var _didIteratorError = false;
-                var _iteratorError = undefined;
+                var _iteratorNormalCompletion2 = true;
+                var _didIteratorError2 = false;
+                var _iteratorError2 = undefined;
 
                 try {
-                    for (var _iterator = options.exclude[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                        var e = _step.value;
+                    for (var _iterator2 = options.exclude[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                        var e = _step2.value;
 
                         if (e == this) return null;
                     }
                 } catch (err) {
-                    _didIteratorError = true;
-                    _iteratorError = err;
+                    _didIteratorError2 = true;
+                    _iteratorError2 = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion && _iterator.return) {
-                            _iterator.return();
+                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                            _iterator2.return();
                         }
                     } finally {
-                        if (_didIteratorError) {
-                            throw _iteratorError;
+                        if (_didIteratorError2) {
+                            throw _iteratorError2;
                         }
                     }
                 }
@@ -888,12 +1227,12 @@ var FadedLambdaVarExpr = function (_LambdaVarExpr2) {
     function FadedLambdaVarExpr(varname) {
         _classCallCheck(this, FadedLambdaVarExpr);
 
-        var _this18 = _possibleConstructorReturn(this, (FadedLambdaVarExpr.__proto__ || Object.getPrototypeOf(FadedLambdaVarExpr)).call(this, varname));
+        var _this24 = _possibleConstructorReturn(this, (FadedLambdaVarExpr.__proto__ || Object.getPrototypeOf(FadedLambdaVarExpr)).call(this, varname));
 
-        _this18.graphicNode.size = _this18.name === 'x' ? { w: 24, h: 24 } : { w: 24, h: 30 };
-        _this18.graphicNode.offset = _this18.name === 'x' ? { x: 0, y: 0 } : { x: 0, y: 2 };
-        _this18.handleOffset = 2;
-        return _this18;
+        _this24.graphicNode.size = _this24.name === 'x' ? { w: 24, h: 24 } : { w: 24, h: 30 };
+        _this24.graphicNode.offset = _this24.name === 'x' ? { x: 0, y: 0 } : { x: 0, y: 2 };
+        _this24.handleOffset = 2;
+        return _this24;
     }
 
     _createClass(FadedLambdaVarExpr, [{
