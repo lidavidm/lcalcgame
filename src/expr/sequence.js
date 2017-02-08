@@ -70,6 +70,7 @@ class Sequence extends Expression {
                 if (this.holes.length === 0) {
                     Animate.poof(this);
                     (this.parent || this.stage).swap(this, null);
+                    this._animating = false;
                     resolve(null);
                 }
                 else {
@@ -136,15 +137,17 @@ class NotchedSequence extends Sequence {
     constructor(...exprs) {
         super(...exprs);
         this.padding.left = 17.5;
+        this._reductionIndicatorStart = 0;
     }
 
     drawInternal(ctx, pos, boundingSize) {
         super.drawInternal(ctx, pos, boundingSize);
-        let radius = this.radius*this.absoluteScale.x;
+        const radius = this.radius*this.absoluteScale.x;
+        const leftMargin = 15 * this.scale.x;
         ctx.fillStyle = "#fff";
         roundRect(ctx,
                   pos.x, pos.y,
-                  15 * this.scale.x, boundingSize.h,
+                  leftMargin, boundingSize.h,
                   {
                       tl: radius,
                       bl: radius,
@@ -152,9 +155,7 @@ class NotchedSequence extends Sequence {
                       br: 0,
                   }, true, false,
                   null);
-        // When reducing, statements are removed from
-        // this.holes. Offset the label so that the right label stays
-        // with the right statement.
+
         ctx.strokeStyle = '#000';
         ctx.lineWidth = 1;
         for (let i = 0; i < this.holes.length - 1; i++) {
@@ -168,5 +169,24 @@ class NotchedSequence extends Sequence {
             ctx.lineTo(pos.x + 15, expr1y);
             ctx.stroke();
         }
+
+        if (this._animating) {
+            const rad = leftMargin / 3;
+            const indicatorX = pos.x + leftMargin / 2 - rad;
+            const verticalDistance = boundingSize.h - 2 * radius;
+            const verticalOffset = 0.5 * (1.0 + Math.sin((Date.now() - this._reductionIndicatorStart) / 250)) * verticalDistance;
+            drawCircle(ctx, indicatorX, pos.y + radius + verticalOffset, rad, "#000", null);
+        }
+    }
+
+    performReduction() {
+        let result = super.performReduction();
+
+        Animate.drawUntil(this.stage, () => {
+            return !this._animating || !this.stage;
+        });
+        this._reductionIndicatorStart = Date.now();
+
+        return result;
     }
 }
