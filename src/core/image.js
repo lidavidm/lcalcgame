@@ -106,7 +106,7 @@ var mag = (function(_) {
             // where resource_map properties are:
             //  { default, hover (optional), down (opt.) }
             this.images = resource_map;
-            this.clickFunc = onclick;
+            this.clickFunc = onclick.bind(this);
         }
         onmouseenter(pos) {
             if ('hover' in this.images)

@@ -1,6 +1,6 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -11,7 +11,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * Given a set of "expressions", a player must manipulate those expressions to
  * reach a "goal" state, with optional support from a "toolbox" of primitive expressions.
  * (*This may change in time.*) */
-
 var Level = function () {
     function Level(expressions, goal) {
         var toolbox = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
@@ -48,19 +47,18 @@ var Level = function () {
             // levels appear the same each time you play.
             Math.seed = 12045;
 
-            var showEnvironment = Object.keys(this.globals.bindings).length > 0 || mag.Stage.getNodesWithClass(VarExpr, [], true, this.exprs).length > 0;
-
             var canvas_screen = stage.boundingSize;
 
-            var envDisplayWidth = showEnvironment ? 0.25 * canvas_screen.w : 0;
+            var envDisplayWidth = 0.20 * canvas_screen.w;
 
             GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
             var usableWidth = canvas_screen.w - envDisplayWidth;
+            var screenOffsetX = usableWidth * (1 - 1 / 1.4) / 2.0;
             var screen = {
                 height: canvas_screen.h / 1.4 - 90,
-                width: usableWidth / (showEnvironment ? 1.0 : 1.4),
-                y: canvas_screen.h * (1 - 1 / 1.4) / 2.0 + 90,
-                x: showEnvironment ? envDisplayWidth : usableWidth * (1 - 1 / 1.4) / 2.0
+                width: usableWidth - 2 * screenOffsetX,
+                y: canvas_screen.h * (1 - 1 / 1.4) / 2.0,
+                x: screenOffsetX
             };
             var board_packing = this.findBestPacking(this.exprs, screen);
             stage.addAll(board_packing); // add expressions to the stage
@@ -85,21 +83,37 @@ var Level = function () {
 
             // UI Buttons
             var ui_padding = 10;
-            var btn_back = new mag.Button(canvas_screen.w - 64 * 3 - ui_padding, ui_padding, 64, 64, { default: 'btn-back-default', hover: 'btn-back-hover', down: 'btn-back-down' }, function () {
+            var btn_back = new mag.Button(canvas_screen.w - 64 * 4 - ui_padding, ui_padding, 64, 64, { default: 'btn-back-default', hover: 'btn-back-hover', down: 'btn-back-down' }, function () {
                 returnToMenu();
                 //prev(); // go back to previous level; see index.html.
             });
-            var btn_reset = new mag.Button(btn_back.pos.x + btn_back.size.w, btn_back.pos.y, 64, 64, { default: 'btn-reset-default', hover: 'btn-reset-hover', down: 'btn-reset-down' }, function () {
+
+            var mute_images = { default: 'btn-mute-default', hover: 'btn-mute-hover', down: 'btn-mute-down' };
+            var unmute_images = { default: 'btn-unmute-default', hover: 'btn-unmute-hover', down: 'btn-unmute-down' };
+            var btn_mute = new mag.Button(btn_back.pos.x + btn_back.size.w, ui_padding, 64, 64, Resource.isMuted() ? unmute_images : mute_images, function () {
+                if (this.muted) {
+                    Resource.unmute();
+                    this.muted = false;
+                    this.images = mute_images;
+                } else {
+                    Resource.mute();
+                    this.muted = true;
+                    this.images = unmute_images;
+                }
+                this.onmouseenter();
+            });
+            btn_mute.muted = Resource.isMuted();
+            var btn_reset = new mag.Button(btn_mute.pos.x + btn_mute.size.w, ui_padding, 64, 64, { default: 'btn-reset-default', hover: 'btn-reset-hover', down: 'btn-reset-down' }, function () {
                 initBoard(); // reset board state; see index.html.
             });
             var btn_next = new mag.Button(btn_reset.pos.x + btn_reset.size.w, ui_padding, 64, 64, { default: 'btn-next-default', hover: 'btn-next-hover', down: 'btn-next-down' }, function () {
                 next(); // go back to previous level; see index.html.
             });
-            btn_back.pos = btn_reset.pos;
-            btn_reset.pos = btn_next.pos;
+            // btn_reset.pos = btn_next.pos;
             stage.add(btn_back);
+            stage.add(btn_mute);
             stage.add(btn_reset);
-            //stage.add(btn_next);
+            stage.add(btn_next);
 
             // Toolbox
             var TOOLBOX_HEIGHT = 90;
@@ -114,11 +128,9 @@ var Level = function () {
             stage.toolbox = toolbox;
 
             // Environment
-            var yOffset = goal_node[0].absoluteSize.h + goal_node[0].absolutePos.y + 10;
-            var env = new EnvironmentDisplay(0, yOffset, 0.15 * canvas_screen.w, canvas_screen.h - TOOLBOX_HEIGHT - yOffset, stage);
-            if (showEnvironment) {
-                stage.add(env);
-            }
+            var yOffset = goal_node[0].absoluteSize.h + goal_node[0].absolutePos.y + 20;
+            var env = new (ExprManager.getClass('environment_display'))(canvas_screen.w - envDisplayWidth, yOffset, envDisplayWidth, canvas_screen.h - TOOLBOX_HEIGHT - yOffset);
+            stage.add(env);
             stage.environmentDisplay = env;
             if (this.globals) {
                 var _iteratorNormalCompletion = true;
@@ -146,7 +158,6 @@ var Level = function () {
                     }
                 }
             }
-            env.showGlobals();
 
             stage.uiNodes = [btn_back, btn_reset, btn_next, env, toolbox];
 
@@ -164,7 +175,7 @@ var Level = function () {
                     for (var _iterator2 = this.nodes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                         var n = _step2.value;
 
-                        if (n in this.uiGoalNodes || this.uiNodes.indexOf(n) > -1 || n.constructor.name === 'Rect' || n.constructor.name === 'ImageRect' || !(n instanceof Expression) || n.fadingOut || n.toolbox) continue;
+                        if (this.uiNodes.indexOf(n) > -1 || n.constructor.name === 'Rect' || n.constructor.name === 'ImageRect' || !(n instanceof Expression) || n.fadingOut || n.toolbox) continue;
                         nodes.push(n);
                     }
                 } catch (err) {
@@ -244,11 +255,6 @@ var Level = function () {
 
     }, {
         key: 'findFastPacking',
-
-        //return new Expression();
-
-
-        // Unreachable....
 
 
         // David's rather terrible packing algorithm. Used if there are a
@@ -657,8 +663,9 @@ var Level = function () {
             var es = descs.map(function (expr_desc) {
                 return Level.parseExpr(expr_desc);
             });
+            var LambdaClass = ExprManager.getClass('lambda_abstraction');
             es = es.map(function (e) {
-                return e instanceof LambdaHoleExpr ? new LambdaExpr([e]) : e;
+                return e instanceof LambdaHoleExpr ? new LambdaClass([e]) : e;
             });
             //console.log('exprs', es);
             return es;
@@ -732,7 +739,7 @@ var Level = function () {
                 } else {
                     // Class name. Invoke the instantiator.
                     var op_class = exprs[0];
-                    if (!(op_class instanceof LambdaHoleExpr) && !(op_class instanceof BagExpr) && op_class.length !== exprs.length - 1) {
+                    if (!(op_class instanceof LambdaHoleExpr) && !(op_class instanceof Sequence) && !(op_class instanceof BagExpr) && op_class.length !== exprs.length - 1) {
                         // missing an argument, or there's an extra argument:
                         console.warn('Operator-argument mismatch with exprs: ', exprs);
                         console.warn('Continuing...');
@@ -749,7 +756,8 @@ var Level = function () {
                                 }
                     }
                     if (op_class instanceof LambdaHoleExpr) {
-                        var lexp = new LambdaExpr([op_class]);
+                        var LambdaClass = ExprManager.getClass('lambda_abstraction');
+                        var lexp = new LambdaClass([op_class]);
                         for (var _i2 = 1; _i2 < exprs.length; _i2++) {
                             lexp.addArg(exprs[_i2]);
                         }
@@ -788,9 +796,9 @@ var Level = function () {
                         var es = exprs.slice(1);es.push(args[0]);
                         return lock(constructClassInstance(op_class, es), toplevel_lock); // pass the operator name to the comparator
                     } else {
-                            //console.log(exprs);
-                            return lock(constructClassInstance(op_class, exprs.slice(1)), toplevel_lock); // (this is really generic, man)
-                        }
+                        //console.log(exprs);
+                        return lock(constructClassInstance(op_class, exprs.slice(1)), toplevel_lock); // (this is really generic, man)
+                    }
                 }
             }
 
@@ -818,6 +826,7 @@ var Level = function () {
                 'cmp': ExprManager.getClass('cmp'),
                 '==': ExprManager.getClass('=='),
                 '!=': ExprManager.getClass('!='),
+                '+': ExprManager.getClass('+'),
                 'bag': new (ExprManager.getClass('bag'))(0, 0, 54, 54, []),
                 'count': new (ExprManager.getClass('count'))(),
                 'map': ExprManager.getClass('map'),
@@ -827,6 +836,8 @@ var Level = function () {
                 'define': ExprManager.getClass('define'),
                 'null': new NullExpr(0, 0, 64, 64),
                 'assign': ExprManager.getClass('assign'),
+                'sequence': ExprManager.getClass('sequence'),
+                'repeat': ExprManager.getClass('repeat'),
                 'dot': function () {
                     var circ = new CircleExpr(0, 0, 18);
                     circ.color = 'gold';
@@ -863,8 +874,11 @@ var Level = function () {
                 return lock(new (ExprManager.getClass('reference'))(_varname2), locked);
             } else {
                 console.error('Unknown argument: ', arg);
-                return lock(new FadedValueExpr(arg), locked);
+                return new FadedValueExpr(arg);
+                //return new Expression();
             }
+
+            // Unreachable....
         }
     }]);
 
@@ -1010,21 +1024,21 @@ var ExpressionPattern = function () {
                     //console.log(' > Constructors don\'t match.');
                     return false; // expressions don't match
                 } else {
-                        // Check whether the expressions at this level have the same # of children. If so, do one-to-one comparison.
-                        var e_children = e.children;
-                        var f_children = f.children;
-                        if (e_children.length !== f_children.length) {
-                            //console.log(' > Length of child array doesn\'t match.');
-                            return false;
-                        } else {
-                            for (var i = 0; i < e_children.length; i++) {
-                                if (!compare(e_children[i], f_children[i])) {
-                                    //console.log(' > Children don\'t match.');
-                                    return false;
-                                }
+                    // Check whether the expressions at this level have the same # of children. If so, do one-to-one comparison.
+                    var e_children = e.children;
+                    var f_children = f.children;
+                    if (e_children.length !== f_children.length) {
+                        //console.log(' > Length of child array doesn\'t match.');
+                        return false;
+                    } else {
+                        for (var i = 0; i < e_children.length; i++) {
+                            if (!compare(e_children[i], f_children[i])) {
+                                //console.log(' > Children don\'t match.');
+                                return false;
                             }
                         }
                     }
+                }
 
                 //console.log(' > Expressions are equal.');
                 return true;

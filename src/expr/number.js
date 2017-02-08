@@ -15,8 +15,77 @@ class NumberExpr extends Expression {
     value() {
         return this.number;
     }
+    isValue() {
+        return true;
+    }
     toString() {
         return this.number.toString();
+    }
+
+    onmouseclick(pos) {
+        // We can't really reduce, let's see if our parent wants to
+        if (this.parent) {
+            this.parent.onmouseclick(pos);
+        }
+    }
+}
+
+class AddExpr extends Expression {
+    constructor(left, right) {
+        let op = new TextExpr("+");
+        if (left instanceof MissingExpression) left = new MissingNumberExpression();
+        if (right instanceof MissingExpression) right = new MissingNumberExpression();
+        super([left, op, right]);
+    }
+
+    canReduce() {
+        return this.leftExpr && (this.leftExpr.isValue() || this.leftExpr.canReduce()) &&
+            this.rightExpr && (this.rightExpr.isValue() || this.rightExpr.canReduce());
+    }
+
+    get leftExpr() {
+        return this.holes[0];
+    }
+
+    get rightExpr() {
+        return this.holes[2];
+    }
+
+    reduce() {
+        if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {
+            return new NumberExpr(this.leftExpr.value() + this.rightExpr.value());
+        }
+        else {
+            return this;
+        }
+    }
+
+    performReduction() {
+        this._animating = true;
+        return this.performSubReduction(this.leftExpr).then((left) => {
+            if (!(left instanceof NumberExpr)) {
+                this._animating = false;
+                return Promise.reject();
+            }
+            return this.performSubReduction(this.rightExpr).then((right) => {
+                if (!(right instanceof NumberExpr)) {
+                    this._animating = false;
+                    return Promise.reject();
+                }
+
+                let stage = this.stage;
+
+                let val = super.performReduction();
+                stage.update();
+                return val;
+            });
+        });
+    }
+
+    onmouseclick() {
+        if (!this._animating) {
+            this.performReduction();
+        }
     }
 }
 

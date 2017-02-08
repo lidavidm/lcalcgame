@@ -174,6 +174,20 @@ var mag = (function(_) {
                 if (autodraw && node.stage) node.stage.draw();
             }, dur);
             twn.run();
+            twn.after(() => {
+                // Make sure the final value is actually set by using
+                // elapsed = 1.0; also, redraw the stage one last
+                // time.
+                let new_props = lerpProps(sourceValue, targetValue, 1.0);
+
+                for (let prop in new_props) {
+                    if (new_props.hasOwnProperty(prop)) {
+                        node[prop] = new_props[prop];
+                    }
+                }
+
+                if (autodraw && node.stage) node.stage.draw();
+            });
             return twn;
         }
 

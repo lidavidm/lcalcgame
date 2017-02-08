@@ -124,6 +124,11 @@ var mag = function (_) {
             }
         };
 
+        var muted = false;
+        if (getCookie("muted") === "true") {
+            muted = true;
+        }
+
         return { // TODO: Add more resource types.
             setCurrentLoadSequence: setCurrentLoadSequence,
             afterLoadSequence: afterLoadSequence,
@@ -144,12 +149,24 @@ var mag = function (_) {
                 return animPresets[name].clone();
             },
             play: function play(alias, volume) {
+                if (muted) return;
                 if (audioEngine === 'html5') {
                     if (volume) audioRsc[alias].volume = volume;else audioRsc[alias].volume = 1.0;
                     audioRsc[alias].play();
                 } else {
                     lowLag.play(alias);
                 }
+            },
+            mute: function mute() {
+                muted = true;
+                setCookie("muted", "true", 1000);
+            },
+            unmute: function unmute() {
+                muted = false;
+                setCookie("muted", "false", 1000);
+            },
+            isMuted: function isMuted() {
+                return muted;
             }
         };
     }();
