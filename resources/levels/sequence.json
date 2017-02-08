@@ -103,18 +103,18 @@
         },
         {
             "description": "Increment things with repeat",
-            "board": "(repeat /(2) /(assign /$x /(+ /$x /1)))",
+            "board": "($x) (repeat /(2) /(assign /$x /(+ /$x /1)))",
             "goal": "(3)",
-            "toolbox": "($x)",
+            "toolbox": "",
             "globals": {
                 "x": "(1)"
             }
         },
         {
             "description": "Increment things with repeat",
-            "board": "(repeat /(4) /(assign /$x /(+ /$x /1))) (repeat /(1) /(assign /$y /(+ /$y /1)))",
+            "board": "($x) ($y) (repeat /(4) /(assign /$x /(+ /$x /1))) (repeat /(1) /(assign /$y /(+ /$y /1)))",
             "goal": "(5) (1)",
-            "toolbox": "($x) ($y)",
+            "toolbox": "",
             "globals": {
                 "x": "(1)",
                 "y": "(0)"
@@ -122,35 +122,17 @@
         },
         {
             "description": "Increment things with repeat",
-            "board": "(repeat _ /(assign /$x /(+ /$x /1)))",
+            "board": "($x) (repeat _ /(assign /$x /(+ /$x /1)))",
             "goal": "(4)",
-            "toolbox": "($x) (0) (1) (2) (3)",
-            "globals": {
-                "x": "(1)"
-            }
-        },
-        {
-            "description": "Repeating things 0 times does nothing",
-            "board": "(repeat /(0) /(assign /$x /(6)))",
-            "goal": "(2)",
-            "toolbox": "($x)",
-            "globals": {
-                "x": "(2)"
-            }
-        },
-        {
-            "description": "Repeating things 0 times does nothing",
-            "board": "(sequence /(repeat _ /(assign /$x /(+ /$x /1))) /(assign /$y /(== /$x /1)))",
-            "goal": "(true)",
-            "toolbox": "($y) (0) (1) (2) (3)",
+            "toolbox": "(0) (1) (2) (3)",
             "globals": {
                 "x": "(1)"
             }
         },
         {
             "description": "You can repeat a variable number of times",
-            "board": "(repeat /$x /(assign /$x /(+ /$x /1)))",
-            "toolbox": "($x)",
+            "board": "($x) (repeat /$x /(assign /$x /(+ /$x /1)))",
+            "toolbox": "",
             "goal": "(4)",
             "globals": {
                 "x": "(2)"
@@ -168,9 +150,19 @@
         },
         {
             "description": "Use sequence in repeat",
-            "board": "(repeat /(2) /(sequence /(assign /$x /(+ /$x _)) /(assign /$y /(+ /$y _))))",
+            "board": "($x) ($y) (repeat /(2) /(sequence /(assign /$x /(+ /$x _)) /(assign /$y /(+ /$y _))))",
             "goal": "(3) (6)",
-            "toolbox": "($x) ($y) (0) (1) (2)",
+            "toolbox": "(0) (1) (2)",
+            "globals": {
+                "x": "(1)",
+                "y": "(2)"
+            }
+        },
+        {
+            "description": "Overwriting variables",
+            "board": "($x) ($y) (assign /$y /(4)) (assign /$x /(3)) (assign /$y /(5)) (sequence _ _ _)",
+            "goal": "(1) (4)",
+            "toolbox": "",
             "globals": {
                 "x": "(1)",
                 "y": "(2)"
@@ -178,18 +170,18 @@
         },
         {
             "description": "Use sequence in repeat with dependencies",
-            "board": "(repeat /(3) /(sequence /(assign /$x /(+ /$x /1)) /(assign /$y /(== /$x _))))",
+            "board": "($y) (repeat /(3) /(sequence /(assign /$x /(+ /$x /1)) /(assign /$y /(== /$x _))))",
             "goal": "(true)",
-            "toolbox": "($y) (3) (4) (5) (6)",
+            "toolbox": "(3) (4) (5) (6)",
             "globals": {
                 "x": "(2)"
             }
         },
         {
             "description": "Use sequence in repeat with dependencies",
-            "board": "(repeat /(2) /(sequence /(assign /$x /(+ /$x /1)) /(assign /$y /(if /(== /$x _) /(star)))))",
+            "board": "($y) (repeat /(2) /(sequence /(assign /$x /(+ /$x /1)) /(assign /$y /(if /(== /$x _) /(star)))))",
             "goal": "(star)",
-            "toolbox": "($y) (1) (2) (3)",
+            "toolbox": "(1) (2) (3)",
             "globals": {
                 "x": "(1)"
             }
