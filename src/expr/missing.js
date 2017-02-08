@@ -29,8 +29,8 @@ class MissingExpression extends Expression {
         super.ondropped(node, pos);
         if (node.dragging) { // Reattach node.
 
-            // Should not be able to stick lambdas in MissingExpression holes (exception of Map)
-            if (node instanceof LambdaExpr && !(this.parent instanceof MapFunc))
+            // Should not be able to stick lambdas in MissingExpression holes (exception of Map and Define)
+            if (node instanceof LambdaExpr && !(this.parent instanceof MapFunc) && !(this.parent instanceof DefineExpr))
                 return;
 
             let stage = this.stage;

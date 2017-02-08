@@ -411,7 +411,7 @@ class Level {
             return lock(new (ExprManager.getClass('reference'))(varname), locked);
         } else {
             console.error('Unknown argument: ', arg);
-            return new FadedValueExpr(arg);
+            return lock(new FadedValueExpr(arg), locked);
             //return new Expression();
         }
 

@@ -863,7 +863,7 @@ var Level = function () {
                 return lock(new (ExprManager.getClass('reference'))(_varname2), locked);
             } else {
                 console.error('Unknown argument: ', arg);
-                return new FadedValueExpr(arg);
+                return lock(new FadedValueExpr(arg), locked);
             }
         }
     }]);

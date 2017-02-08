@@ -113,9 +113,10 @@ class ArrowIfStatement extends IfStatement {
 class IfElseStatement extends IfStatement {
     constructor(cond, branch, elseBranch) {
         super(cond, branch);
-        var txt = new TextExpr('else');
-        txt.color = 'black';
-        this.addArg(txt);
+        this.children[this.children.length - 1].text = ":";
+        //var txt = new TextExpr('else');
+        //txt.color = 'black';
+        //this.addArg(txt);
         this.addArg(elseBranch);
     }
     get elseBranch() { return this.holes[4]; }

@@ -183,9 +183,10 @@ var IfElseStatement = function (_IfStatement2) {
 
         var _this4 = _possibleConstructorReturn(this, (IfElseStatement.__proto__ || Object.getPrototypeOf(IfElseStatement)).call(this, cond, branch));
 
-        var txt = new TextExpr('else');
-        txt.color = 'black';
-        _this4.addArg(txt);
+        _this4.children[_this4.children.length - 1].text = ":";
+        //var txt = new TextExpr('else');
+        //txt.color = 'black';
+        //this.addArg(txt);
         _this4.addArg(elseBranch);
         return _this4;
     }
