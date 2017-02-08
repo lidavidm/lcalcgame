@@ -566,7 +566,11 @@ class AssignExpr extends Expression {
         }
     }
 
-    onmouseclick() {
+    onmouseclick(pos) {
+        if (this.parent) {
+            this.parent.onmouseclick(pos);
+        }
+
         if (!this._animating) {
             this.performReduction();
         }
