@@ -97,7 +97,10 @@ class RepeatLoopExpr extends Expression {
 
     performReduction() {
         if (!this.bodyExpr.isComplete()) {
-            Animate.blink(this.bodyExpr, 1000, [1.0, 0.0, 0.0]);
+            const incomplete = mag.Stage.getNodesWithClass(MissingExpression, [], true, [this.bodyExpr]);
+            incomplete.forEach((expr) => {
+                Animate.blink(expr, 1000, [1.0, 0.0, 0.0]);
+            });
             return Promise.reject("RepeatLoopExpr: missing body!");
         }
 
