@@ -21,6 +21,13 @@ class NumberExpr extends Expression {
     toString() {
         return this.number.toString();
     }
+
+    onmouseclick(pos) {
+        // We can't really reduce, let's see if our parent wants to
+        if (this.parent) {
+            this.parent.onmouseclick(pos);
+        }
+    }
 }
 
 class AddExpr extends Expression {
