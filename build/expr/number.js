@@ -11,6 +11,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 // Integers
+
 var NumberExpr = function (_Expression) {
     _inherits(NumberExpr, _Expression);
 
@@ -41,6 +42,14 @@ var NumberExpr = function (_Expression) {
             return this.number.toString();
         }
     }, {
+        key: 'onmouseclick',
+        value: function onmouseclick(pos) {
+            // We can't really reduce, let's see if our parent wants to
+            if (this.parent) {
+                this.parent.onmouseclick(pos);
+            }
+        }
+    }, {
         key: 'constructorArgs',
         get: function get() {
             return [this.number];
@@ -57,6 +66,8 @@ var AddExpr = function (_Expression2) {
         _classCallCheck(this, AddExpr);
 
         var op = new TextExpr("+");
+        if (left instanceof MissingExpression) left = new MissingNumberExpression();
+        if (right instanceof MissingExpression) right = new MissingNumberExpression();
         return _possibleConstructorReturn(this, (AddExpr.__proto__ || Object.getPrototypeOf(AddExpr)).call(this, [left, op, right]));
     }
 
@@ -92,6 +103,7 @@ var AddExpr = function (_Expression2) {
                     }
 
                     var stage = _this3.stage;
+
                     var val = _get(AddExpr.prototype.__proto__ || Object.getPrototypeOf(AddExpr.prototype), 'performReduction', _this3).call(_this3);
                     stage.update();
                     return val;

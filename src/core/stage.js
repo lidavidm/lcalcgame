@@ -4,6 +4,82 @@
  */
 var mag = (function(_) {
 
+    // This construct allows us to embed stages within each other,
+    // without messing with the internal logic that may be relied on
+    // for the stage's children (such as identifying the part node as a Stage)
+    class StageNode extends mag.Rect {
+        constructor(x, y, stageToEmbed, canvas) {
+            stageToEmbed._canvas = canvas; // if we try this normally, it's going to try to delegate the mouse, which we dont want.
+            let sz = stageToEmbed.boundingSize;
+            super(x, y, sz.w, sz.h);
+            this._embeddedStage = stageToEmbed;
+            this._embeddedStage.draw = () => {
+                this.draw(this._embeddedStage.ctx);
+            };
+        }
+
+        // Access to embedded stage.
+        get embeddedStage() {
+            return this._embeddedStage;
+        }
+        set embeddedStage(s) {
+            this._embeddedStage = s;
+        }
+
+        update() {
+            this._embeddedStage.update();
+        }
+
+        drawInternal(ctx, pos, boundingSize) {
+            let bz = this._embeddedStage.boundingSize;
+            let scaleRatio = { x:boundingSize.w / bz.w, y:boundingSize.h / bz.h };
+            this._embeddedStage.ctx = ctx;
+            ctx.save();
+            ctx.translate(pos.x, pos.y);
+            ctx.scale(scaleRatio.x, scaleRatio.y);
+            this._embeddedStage.drawImpl();
+            ctx.restore();
+        }
+
+        // Events
+        hits(pos, options={}) {
+            let h = this.hitsWithin(pos);
+            if (h) console.log('hit');
+            return h;
+        }
+        onmousedown(pos) {
+            pos.x /= this.scale.x;
+            pos.y /= this.scale.y;
+            this._embeddedStage.onmousedown(pos);
+        }
+        onmousedrag(pos) {
+            pos.x /= this.scale.x;
+            pos.y /= this.scale.y;
+            this._embeddedStage.onmousedrag(pos);
+        }
+        onmouseclick(pos) {
+            pos.x /= this.scale.x;
+            pos.y /= this.scale.y;
+            this._embeddedStage.onmouseclick(pos);
+        }
+        onmousehover(pos) {
+            pos.x /= this.scale.x;
+            pos.y /= this.scale.y;
+            this._embeddedStage.onmousehover(pos);
+        }
+        //onmouseenter(pos) {
+        //    this._embeddedStage.onmouseenter(pos);
+        //}
+        //onmouseleave(pos) {
+        //    this._embeddedStage.onmouseleave(pos);
+        //}
+        onmouseup(pos) {
+            pos.x /= this.scale.x;
+            pos.y /= this.scale.y;
+            this._embeddedStage.onmouseup(pos);
+        }
+    }
+
     class Stage {
         constructor(canvas=null) {
             if (canvas) this.canvas = canvas;
@@ -25,10 +101,10 @@ var mag = (function(_) {
         get canvas() { return this._canvas; }
         set canvas(c) {
             if (c) {
-                delegateMouse(canvas, this);
+                delegateMouse(c, this);
                 this.ctx = canvas.getContext('2d');
             } else {
-                delegateMouse(canvas, null);
+                delegateMouse(this._canvas, null);
                 this.ctx = null;
             }
             this._canvas = c;
@@ -119,7 +195,6 @@ var mag = (function(_) {
         bringToFront(node) {
             var i = this.nodes.indexOf(node);
             if (i > -1 && i < this.nodes.length-1) {
-                console.error('fefef');
                 var n = this.nodes[i];
                 this.nodes.splice(i, 1);
                 this.nodes.push(n);
@@ -227,6 +302,11 @@ var mag = (function(_) {
         }
         onmousedrag(pos) { // Mouse clicked + moving (drag).
             if (this.heldNode) { // Only send this event to the 'mousedown'd node.
+                if (this.heldNode instanceof mag.StageNode) {
+                    this.heldNode.onmousedrag(pos);
+                    this.draw();
+                    return;
+                }
 
                 var nodepos = pos;
                 if (this.heldNode.absoluteSize) {
@@ -446,5 +526,6 @@ var mag = (function(_) {
 
     // Exports
     _.Stage = Stage;
+    _.StageNode = StageNode;
     return _;
 }(mag || {}));

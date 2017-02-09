@@ -280,12 +280,12 @@ var __GET_PARAMS = function () {
             query_string[pair[0]] = decodeURIComponent(pair[1]);
             // If second entry with this name
         } else if (typeof query_string[pair[0]] === "string") {
-            var arr = [query_string[pair[0]], decodeURIComponent(pair[1])];
-            query_string[pair[0]] = arr;
-            // If third or later entry with this name
-        } else {
-            query_string[pair[0]].push(decodeURIComponent(pair[1]));
-        }
+                var arr = [query_string[pair[0]], decodeURIComponent(pair[1])];
+                query_string[pair[0]] = arr;
+                // If third or later entry with this name
+            } else {
+                    query_string[pair[0]].push(decodeURIComponent(pair[1]));
+                }
     }
     return query_string;
 }();
@@ -630,5 +630,13 @@ function reduceExprs(exprList) {
         };
 
         nextStep();
+    });
+}
+
+function after(ms) {
+    return new Promise(function (resolve, reject) {
+        window.setTimeout(function () {
+            resolve();
+        }, ms);
     });
 }

@@ -1,6 +1,6 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 function LOAD_REDUCT_RESOURCES(Resource) {
     var __RESOURCE_PATH = Resource.path;
@@ -112,6 +112,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadImage('chest-metal-base', 'chest-metal-base.png');
     loadImage('chest-metal-lid-open', 'chest-metal-lid-open.png');
     loadImage('chest-metal-lid-closed', 'chest-metal-lid-closed.png');
+    loadImage('die', 'die.png');
 
     // UI.
     loadImage('btn-next-default', 'next-button.png');

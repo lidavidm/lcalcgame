@@ -58,8 +58,6 @@ var EnvironmentDisplay = function (_Expression) {
         value: function updateBindings() {
             var _this2 = this;
 
-            if (this.stage) window.stage = this.stage;
-
             if (!this.stage) return;
 
             var env = this.getEnvironment();

@@ -166,6 +166,15 @@ function initMainMenu() {
         //}, () => {
         // Clicked 'settings' button. Transition to settings screen.
         //});
+
+        var substage = new mag.StageNode(0, 0, Resource.buildLevel(Resource.level[10], canvas), canvas);
+        //substage.scale = { x:0.5, y:0.9 };
+        //substage.anchor = { x:0.5, y:0.5 };
+        stage.add(substage);
+        substage.canvas = null;
+        stage.canvas = null;
+        stage.canvas = canvas;
+
         redraw(stage);
     }
 }

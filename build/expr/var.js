@@ -2,7 +2,7 @@
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -139,7 +139,7 @@ var LabeledVarExpr = function (_VarExpr) {
         var _this2 = _possibleConstructorReturn(this, (LabeledVarExpr.__proto__ || Object.getPrototypeOf(LabeledVarExpr)).call(this, name));
 
         _this2.label = new TextExpr(name);
-        _this2.holes.push(_this2.label);
+        _this2.addArg(_this2.label);
         return _this2;
     }
 
@@ -231,6 +231,7 @@ var ChestVarExpr = function (_VarExpr2) {
         _classCallCheck(this, ChestVarExpr);
 
         // See MissingTypedExpression#constructor
+
         var _this5 = _possibleConstructorReturn(this, (ChestVarExpr.__proto__ || Object.getPrototypeOf(ChestVarExpr)).call(this, name));
 
         _this5.equivalentClasses = [ChestVarExpr];
@@ -475,6 +476,7 @@ var LabeledChestVarExpr = function (_ChestVarExpr2) {
         _classCallCheck(this, LabeledChestVarExpr);
 
         // See MissingTypedExpression#constructor
+
         var _this10 = _possibleConstructorReturn(this, (LabeledChestVarExpr.__proto__ || Object.getPrototypeOf(LabeledChestVarExpr)).call(this, name));
 
         _this10.equivalentClasses = [LabeledChestVarExpr];
@@ -516,20 +518,20 @@ var AssignExpr = function (_Expression2) {
         var _this11 = _possibleConstructorReturn(this, (AssignExpr.__proto__ || Object.getPrototypeOf(AssignExpr)).call(this, []));
 
         if (variable && !(variable instanceof MissingExpression)) {
-            _this11.holes.push(variable);
+            _this11.addArg(variable);
         } else {
             var missing = new MissingChestExpression(new VarExpr("_"));
             missing.acceptedClasses = [VarExpr];
-            _this11.holes.push(missing);
+            _this11.addArg(missing);
         }
 
         _this11.arrowLabel = new TextExpr("←");
-        _this11.holes.push(_this11.arrowLabel);
+        _this11.addArg(_this11.arrowLabel);
 
         if (value) {
-            _this11.holes.push(value);
+            _this11.addArg(value);
         } else {
-            _this11.holes.push(new MissingExpression(new Expression()));
+            _this11.addArg(new MissingExpression(new Expression()));
         }
 
         _this11._animating = false;
@@ -673,7 +675,10 @@ var AssignExpr = function (_Expression2) {
             return this.performSubReduction(this.value, true).then(function (value) {
                 _this15.value = value;
                 _this15.update();
-                return _this15.animateReduction();
+                if (_this15.stage) _this15.stage.draw();
+                return after(500).then(function () {
+                    return _this15.animateReduction();
+                });
             });
         }
     }, {
@@ -694,7 +699,11 @@ var AssignExpr = function (_Expression2) {
         }
     }, {
         key: "onmouseclick",
-        value: function onmouseclick() {
+        value: function onmouseclick(pos) {
+            if (this.parent) {
+                this.parent.onmouseclick(pos);
+            }
+
             if (!this._animating) {
                 this.performReduction();
             }

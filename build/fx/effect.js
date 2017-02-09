@@ -9,6 +9,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 // Node disappears and is replaced by a firework-like particle explosion.
+
 var SplosionEffect = function () {
     function SplosionEffect() {
         _classCallCheck(this, SplosionEffect);
@@ -284,7 +285,9 @@ var MirrorShatterEffect = function (_ImageExpr) {
         var pos = mirrorToShatter.upperLeftPos(mirrorToShatter.absolutePos, size);
         pos = addPos(pos, { x: size.w / 2.0 - 4, y: size.h / 2.0 - 11 });
 
+
         //this.size = size;
+
         var _this4 = _possibleConstructorReturn(this, (MirrorShatterEffect.__proto__ || Object.getPrototypeOf(MirrorShatterEffect)).call(this, pos.x, pos.y, size.w, size.h, shouldBreak ? 'mirror-icon-fade-false' : 'mirror-icon-fade-true'));
 
         _this4.pos = pos;

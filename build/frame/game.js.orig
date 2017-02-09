@@ -1,6 +1,6 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -11,7 +11,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * Given a set of "expressions", a player must manipulate those expressions to
  * reach a "goal" state, with optional support from a "toolbox" of primitive expressions.
  * (*This may change in time.*) */
-
 var Level = function () {
     function Level(expressions, goal) {
         var toolbox = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
@@ -50,20 +49,16 @@ var Level = function () {
 
             var canvas_screen = stage.boundingSize;
 
-            var varNodesOnBoard = mag.Stage.getNodesWithClass(VarExpr, [], true, this.exprs);
-            var varNodesInToolbox = mag.Stage.getNodesWithClass(VarExpr, [], true, this.toolbox);
-            var showEnvironment = Object.keys(this.globals.bindings).length > 0 || varNodesOnBoard && varNodesOnBoard.length > 0 || varNodesInToolbox && varNodesInToolbox.length > 0;
             var envDisplayWidth = 0.20 * canvas_screen.w;
 
             GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
-
             var usableWidth = canvas_screen.w - envDisplayWidth;
             var screenOffsetX = usableWidth * (1 - 1 / 1.4) / 2.0;
             var screen = {
                 height: canvas_screen.h / 1.4 - 90,
-                width: showEnvironment ? usableWidth - 2 * screenOffsetX : usableWidth / 1.4,
+                width: usableWidth - 2 * screenOffsetX,
                 y: canvas_screen.h * (1 - 1 / 1.4) / 2.0,
-                x: showEnvironment ? screenOffsetX : usableWidth * (1 - 1 / 1.4) / 2.0
+                x: screenOffsetX
             };
             var board_packing = this.findBestPacking(this.exprs, screen);
             stage.addAll(board_packing); // add expressions to the stage
@@ -114,18 +109,11 @@ var Level = function () {
             var btn_next = new mag.Button(btn_reset.pos.x + btn_reset.size.w, ui_padding, 64, 64, { default: 'btn-next-default', hover: 'btn-next-hover', down: 'btn-next-down' }, function () {
                 next(); // go back to previous level; see index.html.
             });
-            if (__SHOW_DEV_INFO) {
-                stage.add(btn_back);
-                stage.add(btn_next);
-            } else {
-                btn_mute.pos = {
-                    x: canvas_screen.w - 64 * 2 - ui_padding,
-                    y: btn_mute.pos.y
-                };
-                btn_reset.pos = btn_next.pos;
-            }
+            // btn_reset.pos = btn_next.pos;
+            stage.add(btn_back);
             stage.add(btn_mute);
             stage.add(btn_reset);
+            stage.add(btn_next);
 
             // Toolbox
             var TOOLBOX_HEIGHT = 90;
@@ -142,9 +130,7 @@ var Level = function () {
             // Environment
             var yOffset = goal_node[0].absoluteSize.h + goal_node[0].absolutePos.y + 20;
             var env = new (ExprManager.getClass('environment_display'))(canvas_screen.w - envDisplayWidth, yOffset, envDisplayWidth, canvas_screen.h - TOOLBOX_HEIGHT - yOffset);
-            if (showEnvironment) {
-                stage.add(env);
-            }
+            stage.add(env);
             stage.environmentDisplay = env;
             if (this.globals) {
                 var _iteratorNormalCompletion = true;
@@ -269,11 +255,6 @@ var Level = function () {
 
     }, {
         key: 'findFastPacking',
-
-        //return new Expression();
-
-
-        // Unreachable....
 
 
         // David's rather terrible packing algorithm. Used if there are a
@@ -815,9 +796,9 @@ var Level = function () {
                         var es = exprs.slice(1);es.push(args[0]);
                         return lock(constructClassInstance(op_class, es), toplevel_lock); // pass the operator name to the comparator
                     } else {
-                            //console.log(exprs);
-                            return lock(constructClassInstance(op_class, exprs.slice(1)), toplevel_lock); // (this is really generic, man)
-                        }
+                        //console.log(exprs);
+                        return lock(constructClassInstance(op_class, exprs.slice(1)), toplevel_lock); // (this is really generic, man)
+                    }
                 }
             }
 
@@ -857,7 +838,6 @@ var Level = function () {
                 'assign': ExprManager.getClass('assign'),
                 'sequence': ExprManager.getClass('sequence'),
                 'repeat': ExprManager.getClass('repeat'),
-                'choice': ExprManager.getClass('choice'),
                 'dot': function () {
                     var circ = new CircleExpr(0, 0, 18);
                     circ.color = 'gold';
@@ -894,8 +874,15 @@ var Level = function () {
                 return lock(new (ExprManager.getClass('reference'))(_varname2), locked);
             } else {
                 console.error('Unknown argument: ', arg);
+<<<<<<< HEAD
                 return lock(new FadedValueExpr(arg), locked);
+=======
+                return new FadedValueExpr(arg);
+                //return new Expression();
+>>>>>>> ce53285845591b80b85cf086cabee226f5efb077
             }
+
+            // Unreachable....
         }
     }]);
 
@@ -1040,24 +1027,22 @@ var ExpressionPattern = function () {
                 if (e.constructor.name !== f.constructor.name) {
                     //console.log(' > Constructors don\'t match.');
                     return false; // expressions don't match
-                } else if (e instanceof Expression && f instanceof Expression && (e.isValue() != f.isValue() || e.value() !== f.value())) {
+                } else {
+                    // Check whether the expressions at this level have the same # of children. If so, do one-to-one comparison.
+                    var e_children = e.children;
+                    var f_children = f.children;
+                    if (e_children.length !== f_children.length) {
+                        //console.log(' > Length of child array doesn\'t match.');
                         return false;
                     } else {
-                        // Check whether the expressions at this level have the same # of children. If so, do one-to-one comparison.
-                        var e_children = e.children;
-                        var f_children = f.children;
-                        if (e_children.length !== f_children.length) {
-                            //console.log(' > Length of child array doesn\'t match.');
-                            return false;
-                        } else {
-                            for (var i = 0; i < e_children.length; i++) {
-                                if (!compare(e_children[i], f_children[i])) {
-                                    //console.log(' > Children don\'t match.');
-                                    return false;
-                                }
+                        for (var i = 0; i < e_children.length; i++) {
+                            if (!compare(e_children[i], f_children[i])) {
+                                //console.log(' > Children don\'t match.');
+                                return false;
                             }
                         }
                     }
+                }
 
                 //console.log(' > Expressions are equal.');
                 return true;

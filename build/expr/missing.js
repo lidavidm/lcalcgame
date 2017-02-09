@@ -57,8 +57,8 @@ var MissingExpression = function (_Expression) {
             if (node.dragging) {
                 // Reattach node.
 
-                // Should not be able to stick lambdas in MissingExpression holes (exception of Map)
-                if (node instanceof LambdaExpr && !(this.parent instanceof MapFunc)) return;
+                // Should not be able to stick lambdas in MissingExpression holes (exception of Map and Define)
+                if (node instanceof LambdaExpr && !(this.parent instanceof MapFunc) && !(this.parent instanceof DefineExpr)) return;
 
                 var stage = this.stage;
                 var beforeState = stage.toString();
@@ -362,7 +362,8 @@ var MissingChestExpression = function (_MissingTypedExpressi3) {
         var _this7 = _possibleConstructorReturn(this, (MissingChestExpression.__proto__ || Object.getPrototypeOf(MissingChestExpression)).call(this, expr_to_miss));
 
         _this7.label = new TextExpr("xy");
-        _this7.holes.push(_this7.label);
+        _this7.label.color = "#AAA";
+        _this7.addArg(_this7.label);
         return _this7;
     }
 
@@ -400,3 +401,71 @@ var MissingSequenceExpression = function (_MissingExpression2) {
 
     return MissingSequenceExpression;
 }(MissingExpression);
+
+var InvisibleMissingExpression = function (_MissingExpression3) {
+    _inherits(InvisibleMissingExpression, _MissingExpression3);
+
+    function InvisibleMissingExpression() {
+        _classCallCheck(this, InvisibleMissingExpression);
+
+        return _possibleConstructorReturn(this, (InvisibleMissingExpression.__proto__ || Object.getPrototypeOf(InvisibleMissingExpression)).call(this, new Expression()));
+    }
+
+    _createClass(InvisibleMissingExpression, [{
+        key: 'getClass',
+        value: function getClass() {
+            return InvisibleMissingExpression;
+        }
+    }, {
+        key: 'drawInternal',
+        value: function drawInternal(ctx, pos, boundingSize) {
+            if (this.stroke) {
+                ctx.fillStyle = this.stroke.color;
+                ctx.globalAlpha = 0.5;
+                ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
+            }
+        }
+    }]);
+
+    return InvisibleMissingExpression;
+}(MissingExpression);
+
+var MissingNumberExpression = function (_MissingTypedExpressi4) {
+    _inherits(MissingNumberExpression, _MissingTypedExpressi4);
+
+    function MissingNumberExpression(expr_to_miss) {
+        _classCallCheck(this, MissingNumberExpression);
+
+        var _this10 = _possibleConstructorReturn(this, (MissingNumberExpression.__proto__ || Object.getPrototypeOf(MissingNumberExpression)).call(this, expr_to_miss));
+
+        _this10.graphicNode = new mag.ImageRect(0, 0, 24, 32, 'die');
+
+        _this10.acceptedClasses = [VarExpr, NumberExpr];
+        return _this10;
+    }
+
+    _createClass(MissingNumberExpression, [{
+        key: 'getClass',
+        value: function getClass() {
+            return MissingNumberExpression;
+        }
+    }, {
+        key: 'drawInternal',
+        value: function drawInternal(ctx, pos, boundingSize) {
+            _get(MissingNumberExpression.prototype.__proto__ || Object.getPrototypeOf(MissingNumberExpression.prototype), 'drawInternal', this).call(this, ctx, pos, boundingSize);
+            this.graphicNode.color = '#111';
+            this.graphicNode.shadowOffset = this.shadowOffset;
+            var subPos = {
+                x: pos.x + 0.1 * boundingSize.w,
+                y: pos.y + 0.1 * boundingSize.h
+            };
+            var subSize = {
+                w: 0.8 * boundingSize.w,
+                h: 0.8 * boundingSize.h
+            };
+            this.graphicNode.drawInternal(ctx, subPos, subSize);
+        }
+    }]);
+
+    return MissingNumberExpression;
+}(MissingTypedExpression);

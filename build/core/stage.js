@@ -4,11 +4,125 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * A core drawing 'layer'.
  * You can add Nodes to this layer to display them and update them.
  */
 var mag = function (_) {
+
+    // This construct allows us to embed stages within each other,
+    // without messing with the internal logic that may be relied on
+    // for the stage's children (such as identifying the part node as a Stage)
+
+    var StageNode = function (_mag$Rect) {
+        _inherits(StageNode, _mag$Rect);
+
+        function StageNode(x, y, stageToEmbed, canvas) {
+            _classCallCheck(this, StageNode);
+
+            stageToEmbed._canvas = canvas; // if we try this normally, it's going to try to delegate the mouse, which we dont want.
+            var sz = stageToEmbed.boundingSize;
+
+            var _this = _possibleConstructorReturn(this, (StageNode.__proto__ || Object.getPrototypeOf(StageNode)).call(this, x, y, sz.w, sz.h));
+
+            _this._embeddedStage = stageToEmbed;
+            _this._embeddedStage.draw = function () {
+                _this.draw(_this._embeddedStage.ctx);
+            };
+            return _this;
+        }
+
+        // Access to embedded stage.
+
+
+        _createClass(StageNode, [{
+            key: 'update',
+            value: function update() {
+                this._embeddedStage.update();
+            }
+        }, {
+            key: 'drawInternal',
+            value: function drawInternal(ctx, pos, boundingSize) {
+                var bz = this._embeddedStage.boundingSize;
+                var scaleRatio = { x: boundingSize.w / bz.w, y: boundingSize.h / bz.h };
+                this._embeddedStage.ctx = ctx;
+                ctx.save();
+                ctx.translate(pos.x, pos.y);
+                ctx.scale(scaleRatio.x, scaleRatio.y);
+                this._embeddedStage.drawImpl();
+                ctx.restore();
+            }
+
+            // Events
+
+        }, {
+            key: 'hits',
+            value: function hits(pos) {
+                var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+                var h = this.hitsWithin(pos);
+                if (h) console.log('hit');
+                return h;
+            }
+        }, {
+            key: 'onmousedown',
+            value: function onmousedown(pos) {
+                pos.x /= this.scale.x;
+                pos.y /= this.scale.y;
+                this._embeddedStage.onmousedown(pos);
+            }
+        }, {
+            key: 'onmousedrag',
+            value: function onmousedrag(pos) {
+                pos.x /= this.scale.x;
+                pos.y /= this.scale.y;
+                this._embeddedStage.onmousedrag(pos);
+            }
+        }, {
+            key: 'onmouseclick',
+            value: function onmouseclick(pos) {
+                pos.x /= this.scale.x;
+                pos.y /= this.scale.y;
+                this._embeddedStage.onmouseclick(pos);
+            }
+        }, {
+            key: 'onmousehover',
+            value: function onmousehover(pos) {
+                pos.x /= this.scale.x;
+                pos.y /= this.scale.y;
+                this._embeddedStage.onmousehover(pos);
+            }
+            //onmouseenter(pos) {
+            //    this._embeddedStage.onmouseenter(pos);
+            //}
+            //onmouseleave(pos) {
+            //    this._embeddedStage.onmouseleave(pos);
+            //}
+
+        }, {
+            key: 'onmouseup',
+            value: function onmouseup(pos) {
+                pos.x /= this.scale.x;
+                pos.y /= this.scale.y;
+                this._embeddedStage.onmouseup(pos);
+            }
+        }, {
+            key: 'embeddedStage',
+            get: function get() {
+                return this._embeddedStage;
+            },
+            set: function set(s) {
+                this._embeddedStage = s;
+            }
+        }]);
+
+        return StageNode;
+    }(mag.Rect);
+
     var Stage = function () {
         function Stage() {
             var canvas = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -43,10 +157,10 @@ var mag = function (_) {
         }, {
             key: 'addAll',
             value: function addAll(nodes) {
-                var _this = this;
+                var _this2 = this;
 
                 nodes.forEach(function (n) {
-                    return _this.add(n);
+                    return _this2.add(n);
                 });
             }
         }, {
@@ -126,7 +240,6 @@ var mag = function (_) {
             value: function bringToFront(node) {
                 var i = this.nodes.indexOf(node);
                 if (i > -1 && i < this.nodes.length - 1) {
-                    console.error('fefef');
                     var n = this.nodes[i];
                     this.nodes.splice(i, 1);
                     this.nodes.push(n);
@@ -190,7 +303,7 @@ var mag = function (_) {
         }, {
             key: 'draw',
             value: function draw() {
-                var _this2 = this;
+                var _this3 = this;
 
                 // To avoid redundant draws, when someone calls draw, we
                 // instead try to schedule an actual redraw. Another
@@ -201,8 +314,8 @@ var mag = function (_) {
                 if (!this.requested) {
                     this.requested = true;
                     window.requestAnimationFrame(function () {
-                        _this2.drawImpl();
-                        _this2.requested = false;
+                        _this3.drawImpl();
+                        _this3.requested = false;
                     });
                 }
             }
@@ -226,11 +339,16 @@ var mag = function (_) {
         }, {
             key: 'getNodeUnder',
             value: function getNodeUnder(node, pos) {
+                // Exclude nodes that are in the toolbox - we don't want
+                // to allow any interaction except dragging them out.
+                var is_toolbox = function is_toolbox(e) {
+                    return e && (e.toolbox || e.parent && is_toolbox(e.parent));
+                };
                 var hit_nodes = this.getHitNodes(pos, { 'exclude': [node] });
                 var hit = null;
                 if (hit_nodes.length > 0) {
                     for (var i = hit_nodes.length - 1; i > -1; i--) {
-                        if (hit_nodes[i] != node) hit = hit_nodes[i];
+                        if (hit_nodes[i] != node && !is_toolbox(hit_nodes[i])) hit = hit_nodes[i];
                     }
                 }
                 return hit;
@@ -254,6 +372,11 @@ var mag = function (_) {
                 // Mouse clicked + moving (drag).
                 if (this.heldNode) {
                     // Only send this event to the 'mousedown'd node.
+                    if (this.heldNode instanceof mag.StageNode) {
+                        this.heldNode.onmousedrag(pos);
+                        this.draw();
+                        return;
+                    }
 
                     var nodepos = pos;
                     if (this.heldNode.absoluteSize) {
@@ -380,10 +503,10 @@ var mag = function (_) {
             },
             set: function set(c) {
                 if (c) {
-                    delegateMouse(canvas, this);
+                    delegateMouse(c, this);
                     this.ctx = canvas.getContext('2d');
                 } else {
-                    delegateMouse(canvas, null);
+                    delegateMouse(this._canvas, null);
                     this.ctx = null;
                 }
                 this._canvas = c;
@@ -393,7 +516,7 @@ var mag = function (_) {
             value: function getNodesWithClass(Class) {
                 var excludedNodes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
-                var _this3 = this;
+                var _this4 = this;
 
                 var recursive = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
                 var nodes = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
@@ -407,7 +530,7 @@ var mag = function (_) {
                     });
                     if (excluded) return;else if (n instanceof Class) rt.push(n);
                     if (recursive && n.children.length > 0) {
-                        var childs = _this3.getNodesWithClass(Class, excludedNodes, true, n.children);
+                        var childs = _this4.getNodesWithClass(Class, excludedNodes, true, n.children);
                         childs.forEach(function (c) {
                             return rt.push(c);
                         });
@@ -547,5 +670,6 @@ var mag = function (_) {
 
     // Exports
     _.Stage = Stage;
+    _.StageNode = StageNode;
     return _;
 }(mag || {});

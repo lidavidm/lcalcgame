@@ -302,28 +302,34 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'performSubReduction',
         value: function performSubReduction(expr) {
+            var _this4 = this;
+
             var animated = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
             return new Promise(function (resolve, reject) {
                 var result = expr.performReduction(animated);
                 if (result instanceof Promise) {
                     result.then(function (result) {
+                        if (_this4.stage) _this4.stage.draw();
                         if (result instanceof Expression) result.lock();
 
-                        window.setTimeout(function () {
-                            resolve(result);
-                        }, 600);
+                        after(400).then(function () {
+                            if (_this4.stage) _this4.stage.draw();
+                            return resolve(result);
+                        });
                     });
                 } else {
-                    var delay = 250;
+                    if (_this4.stage) _this4.stage.draw();
+                    var delay = 400;
                     if (!result) {
                         result = expr;
                         delay = 0;
                     }
-                    if (result instanceof Expression) result.lock();
-                    window.setTimeout(function () {
-                        resolve(result);
-                    }, delay);
+                    if (result instanceof Expression && !(result instanceof MissingExpression)) result.lock();
+                    after(400).then(function () {
+                        if (_this4.stage) _this4.stage.draw();
+                        return resolve(result);
+                    });
                 }
             });
         }
@@ -581,7 +587,7 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'size',
         get: function get() {
-            var _this4 = this;
+            var _this5 = this;
 
             var padding = this.padding;
             var width = 0;
@@ -597,7 +603,7 @@ var Expression = function (_mag$RoundedRect) {
             if (sizes.length === 0) return { w: this._size.w, h: this._size.h };
 
             sizes.forEach(function (s) {
-                if (_this4._layout.direction == "vertical") {
+                if (_this5._layout.direction == "vertical") {
                     height += s.h;
                     width = Math.max(width, s.w);
                 } else {
@@ -605,6 +611,10 @@ var Expression = function (_mag$RoundedRect) {
                     width += s.w + padding.inner;
                 }
             });
+
+            if (this._layout.direction == "vertical" && this.padding.between) {
+                height += this.padding.between * (sizes.length - 1);
+            }
 
             if (this._layout.direction == "vertical") {
                 height += 2 * padding.inner;

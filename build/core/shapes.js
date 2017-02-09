@@ -364,6 +364,30 @@ var mag = function (_) {
         return Star;
     }(Rect);
 
+    var SparkleStar = function (_Star) {
+        _inherits(SparkleStar, _Star);
+
+        function SparkleStar(x, y, rad) {
+            var points = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 5;
+
+            _classCallCheck(this, SparkleStar);
+
+            var _this6 = _possibleConstructorReturn(this, (SparkleStar.__proto__ || Object.getPrototypeOf(SparkleStar)).call(this, x, y, rad, points));
+
+            _this6.ignoreEvents = true;
+            return _this6;
+        }
+
+        _createClass(SparkleStar, [{
+            key: 'drawInternal',
+            value: function drawInternal(ctx, pos, boundingSize) {
+                drawStar(ctx, pos.x + boundingSize.w / 2, pos.y + boundingSize.h / 2 + this.shadowOffset, this.starPoints, boundingSize.w / 2, boundingSize.w / 4, null, this.color);
+            }
+        }]);
+
+        return SparkleStar;
+    }(Star);
+
     var Triangle = function (_Rect4) {
         _inherits(Triangle, _Rect4);
 
@@ -405,11 +429,11 @@ var mag = function (_) {
         function Circle(x, y, rad) {
             _classCallCheck(this, Circle);
 
-            var _this7 = _possibleConstructorReturn(this, (Circle.__proto__ || Object.getPrototypeOf(Circle)).call(this, x, y, rad * 2, rad * 2));
+            var _this8 = _possibleConstructorReturn(this, (Circle.__proto__ || Object.getPrototypeOf(Circle)).call(this, x, y, rad * 2, rad * 2));
 
-            _this7._radius = rad;
-            _this7.clipChildren = false;
-            return _this7;
+            _this8._radius = rad;
+            _this8.clipChildren = false;
+            return _this8;
         }
 
         _createClass(Circle, [{
@@ -471,12 +495,12 @@ var mag = function (_) {
 
             _classCallCheck(this, Pipe);
 
-            var _this8 = _possibleConstructorReturn(this, (Pipe.__proto__ || Object.getPrototypeOf(Pipe)).call(this, x, y, w, h));
+            var _this9 = _possibleConstructorReturn(this, (Pipe.__proto__ || Object.getPrototypeOf(Pipe)).call(this, x, y, w, h));
 
-            _this8.topColor = topColor;
-            _this8.sideColor = sideColor;
-            _this8.cylStroke = { color: 'blue', lineWidth: 1 };
-            return _this8;
+            _this9.topColor = topColor;
+            _this9.sideColor = sideColor;
+            _this9.cylStroke = { color: 'blue', lineWidth: 1 };
+            return _this9;
         }
 
         _createClass(Pipe, [{
@@ -516,6 +540,7 @@ var mag = function (_) {
     _.RoundedRect = RoundedRect;
     _.HexaRect = HexaRect;
     _.Star = Star;
+    _.SparkleStar = SparkleStar;
     _.Triangle = Triangle;
     _.Circle = Circle;
     _.Pipe = Pipe;
