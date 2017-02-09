@@ -166,7 +166,7 @@ class NotchedSequence extends Sequence {
             let tickPos = expr1y + (expr2y - expr1y) / 2;
             ctx.beginPath();
             ctx.moveTo(pos.x, expr1y);
-            ctx.lineTo(pos.x + 15, expr1y);
+            ctx.lineTo(pos.x + 15 * this.scale.x, expr1y);
             ctx.stroke();
         }
 

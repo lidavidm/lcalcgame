@@ -6,13 +6,13 @@ class RepeatLoopExpr extends Expression {
         if (times instanceof MissingExpression) {
             times = new MissingNumberExpression();
         }
-        if (body instanceof MissingExpression) {
-            body = new InvisibleMissingExpression();
-        }
+        this.color = "#444477";
         this.addArg(times);
         this.addArg(body);
-        this.padding.right = 0;
-        this.color = "orange";
+        this.template = null;
+
+        // Offset drawing self for a "stamp" effect
+        this._animationOffset = 0;
     }
 
     get timesExpr() {
@@ -31,31 +31,44 @@ class RepeatLoopExpr extends Expression {
         this.holes[1] = expr;
     }
 
-    get size() {
-        var padding = this.padding;
-        var width = 0;
-        var height = 50;
-        var sizes = this.getHoleSizes();
-        var scale_x = this.scale.x;
-
-        sizes.forEach((s) => {
-            height = Math.max(height, s.h);
-            width += s.w + padding.inner;
-        });
-        width += padding.right;
-        height += padding.inner;
-        return { w:width, h: height };
-    }
-
     update() {
         super.update();
+
+        if (this.timesExpr instanceof NumberExpr) {
+            let missing = [];
+            for (let i = 0; i < this.timesExpr.number; i++) {
+                missing.push(this.bodyExpr.clone());
+            }
+            this.template = new NotchedSequence(...missing);
+            this.template.lockSubexpressions();
+            this.template.scale = { x: 0.8, y: 0.8 };
+            this.template.parent = this;
+            this.template.pos = {
+                x: this.bodyExpr.pos.x,
+                y: this.size.h - this.template.padding.inner,
+            };
+            this.template.holes.forEach((expr) => {
+                expr.opacity = 0.3;
+            });
+        }
+        else {
+            this.template = null;
+        }
+
+        if (this.template != null) {
+            this.template.update();
+        };
     }
 
     drawInternal(ctx, pos, boundingSize) {
-        let leftWidth = this.timesExpr.absolutePos.x + this.timesExpr.absoluteSize.w + this.padding.inner / 2 - pos.x;
-        let rightWidth = boundingSize.w - leftWidth + 1;
-        let rightX = pos.x + leftWidth - 1;
-        let bracketHeight = (boundingSize.h - this.bodyExpr.absoluteSize.h) / 2;
+        if (this.template != null) {
+            ctx.save();
+            this.template.draw(ctx);
+            ctx.restore();
+        }
+
+        let divotX = this.timesExpr.absolutePos.x + this.timesExpr.absoluteSize.w + (this.bodyExpr.absolutePos.x - (this.timesExpr.absolutePos.x + this.timesExpr.absoluteSize.w)) / 2.0;
+        let bracketHeight = boundingSize.h - this.bodyExpr.absoluteSize.h;
         let radius = this.radius*this.absoluteScale.x;
         let bracketRadius = bracketHeight;
 
@@ -65,18 +78,35 @@ class RepeatLoopExpr extends Expression {
         let draw = (offset) => {
             ctx.beginPath();
             ctx.moveTo(pos.x + radius + offset, pos.y + offset);
-            offsetLineTo(offset, pos.x + boundingSize.w - bracketRadius, pos.y);
+            offsetLineTo(offset, divotX - bracketRadius, pos.y);
+            // "Divot" separating stamp and number
+            offsetQuadraticCurveTo(offset, divotX, pos.y,
+                                   divotX, pos.y + bracketRadius);
+            offsetQuadraticCurveTo(offset, divotX, pos.y,
+                                   divotX + bracketRadius, pos.y);
+            offsetLineTo(offset, pos.x + boundingSize.w - radius, pos.y);
+            // Upper-right corner
             offsetQuadraticCurveTo(offset, pos.x + boundingSize.w, pos.y,
-                                 pos.x + boundingSize.w, pos.y + bracketRadius);
-            offsetLineTo(offset, pos.x + leftWidth, pos.y + bracketRadius);
-            offsetLineTo(offset, pos.x + leftWidth, pos.y + boundingSize.h - bracketRadius);
-            offsetLineTo(offset, pos.x + boundingSize.w, pos.y + boundingSize.h - bracketRadius);
+                                   pos.x + boundingSize.w, pos.y + radius);
+            // Right side
+            offsetLineTo(offset, pos.x + boundingSize.w, pos.y + boundingSize.h - radius);
+            // Bottom-right corner
             offsetQuadraticCurveTo(offset, pos.x + boundingSize.w, pos.y + boundingSize.h,
-                                 pos.x + boundingSize.w - bracketRadius, pos.y + boundingSize.h);
+                                   pos.x + boundingSize.w - radius, pos.y + boundingSize.h);
+            // Bottom side
+            offsetLineTo(offset, divotX + bracketRadius, pos.y + boundingSize.h);
+            // "Divot" on bottom
+            offsetQuadraticCurveTo(offset, divotX, pos.y + boundingSize.h,
+                                   divotX, pos.y + boundingSize.h - bracketRadius);
+            offsetQuadraticCurveTo(offset, divotX, pos.y + boundingSize.h,
+                                   divotX - bracketRadius, pos.y + boundingSize.h);
             offsetLineTo(offset, pos.x + radius, pos.y + boundingSize.h);
+            // Bottom-left corner
             offsetQuadraticCurveTo(offset, pos.x, pos.y + boundingSize.h,
                                  pos.x, pos.y + boundingSize.h - radius);
+            // Left side
             offsetLineTo(offset, pos.x, pos.y + radius);
+            // Upper-left corner
             offsetQuadraticCurveTo(offset, pos.x, pos.y,
                                  pos.x + radius, pos.y);
             ctx.closePath();
@@ -120,16 +150,74 @@ class RepeatLoopExpr extends Expression {
                 return null;
             }
 
-            let seqClass = ExprManager.getClass('sequence');
-            let body = [];
-            for (let i = 0; i < num.number; i++) {
-                body.push(this.bodyExpr.clone());
-            }
-            let result = new seqClass(...body);
-            result.lockSubexpressions();
-            result.update();
-            (this.parent || this.stage).swap(this, result);
-            return result;
+            return new Promise((resolve, reject) => {
+                let index = 0;
+                let x = this.template.pos.x;
+                let y = this.template.pos.y;
+
+                let nextStep = () => {
+                    if (index > this.template.subexpressions.length) {
+                        resolve(this.template);
+                        Animate.poof(this);
+                        this.template.parent = null;
+                        (this.parent || this.stage).swap(this, this.template);
+                        return;
+                    }
+
+                    if (index == this.template.subexpressions.length) {
+                        y -= this.size.h;
+                        Animate.tween(this.template, {
+                            pos: {
+                                x: x,
+                                y: y,
+                            },
+                        }, 300).after(() => {
+                            index++;
+                            after(400).then(nextStep);
+                        });
+                    }
+                    else {
+                        let current = this.template.subexpressions[index];
+                        // If we're stamping a sequence, treat each
+                        // group of expressions as a single stamp
+                        let numExprs = 1;
+                        if (this.bodyExpr instanceof Sequence) {
+                            numExprs = this.bodyExpr.subexpressions.length;
+                        }
+
+                        for (let i = 0; i < numExprs; i++) {
+                            let expr = this.template.subexpressions[index + i];
+                            y -= expr.size.h * expr.scale.y;
+                        }
+
+                        Animate.tween(this.template, {
+                            pos: {
+                                x: x,
+                                y: y,
+                            },
+                        }, 300).after(() => {
+                            this.bodyExpr.pos = {
+                                x: this.bodyExpr.pos.x,
+                                y: this.bodyExpr.pos.y + 2,
+                            };
+                            for (let i = 0; i < numExprs; i++) {
+                                this.template.subexpressions[index + i].opacity = 1.0;
+                            }
+                            index += numExprs;
+
+                            after(300).then(() => {
+                                this.bodyExpr.pos = {
+                                    x: this.bodyExpr.pos.x,
+                                    y: this.bodyExpr.pos.y - 2,
+                                };
+                                this.stage.draw();
+                                after(400).then(nextStep);
+                            });
+                        });
+                    }
+                };
+                nextStep();
+            });
         });
     }
 
