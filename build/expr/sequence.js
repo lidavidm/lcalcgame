@@ -18,15 +18,22 @@ var Sequence = function (_Expression) {
 
         var _this = _possibleConstructorReturn(this, (Sequence.__proto__ || Object.getPrototypeOf(Sequence)).call(this, []));
 
+        _this.padding.between = 5;
+
         for (var _len = arguments.length, exprs = Array(_len), _key = 0; _key < _len; _key++) {
             exprs[_key] = arguments[_key];
         }
 
         exprs.forEach(function (expr) {
             if (expr instanceof MissingExpression) {
-                expr = new MissingSequenceExpression();
+                _this.holes.push(new MissingSequenceExpression());
+            } else if (expr instanceof Sequence) {
+                expr.holes.forEach(function (x) {
+                    return _this.holes.push(x);
+                });
+            } else {
+                _this.holes.push(expr);
             }
-            _this.holes.push(expr);
         });
         _this._layout = { direction: "vertical", align: "none" };
         _this._animating = false;
@@ -68,6 +75,7 @@ var Sequence = function (_Expression) {
         key: "update",
         value: function update() {
             _get(Sequence.prototype.__proto__ || Object.getPrototypeOf(Sequence.prototype), "update", this).call(this);
+
             var width = 75;
             var _iteratorNormalCompletion2 = true;
             var _didIteratorError2 = false;
@@ -137,39 +145,86 @@ var Sequence = function (_Expression) {
 
             this._animating = true;
 
-            this.holes.forEach(function (expr) {
-                return expr.lock();
-            });
-            var reduced = [];
+            var cleanup = function cleanup() {
+                _this2._animating = false;
+                while (_this2.holes.length > 0 && _this2.holes[0] instanceof MissingExpression) {
+                    _this2.holes.shift();
+                }
+                _this2.update();
+
+                Animate.blink(_this2, 1000, [1.0, 0.0, 0.0]);
+            };
+
+            this.lockSubexpressions();
             return new Promise(function (resolve, reject) {
                 var nextStep = function nextStep() {
                     if (_this2.holes.length === 0) {
                         Animate.poof(_this2);
                         (_this2.parent || _this2.stage).swap(_this2, null);
+                        _this2._animating = false;
                         resolve(null);
                     } else {
                         (function () {
                             var expr = _this2.holes[0];
                             var result = expr.performReduction();
                             var delay = function delay(newExpr) {
-                                _this2.holes.shift();
+                                if (newExpr instanceof Expression && newExpr != expr) {
+                                    _this2.holes[0] = newExpr;
+                                } else if (newExpr instanceof Expression && newExpr.isValue()) {
+                                    _this2.holes.shift();
+                                } else if (newExpr == expr) {
+                                    cleanup();
+                                    reject();
+                                    return;
+                                } else {
+                                    _this2.holes.shift();
+                                }
+
+                                // To handle expressions like loops that
+                                // expand into sequences, flatten any
+                                // subsequences we encounter.
+                                var newHoles = [];
+                                var _iteratorNormalCompletion4 = true;
+                                var _didIteratorError4 = false;
+                                var _iteratorError4 = undefined;
+
+                                try {
+                                    for (var _iterator4 = _this2.holes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                                        var _expr2 = _step4.value;
+
+                                        if (_expr2 instanceof Sequence) {
+                                            newHoles = newHoles.concat(_expr2.holes);
+                                        } else {
+                                            newHoles.push(_expr2);
+                                        }
+                                    }
+                                } catch (err) {
+                                    _didIteratorError4 = true;
+                                    _iteratorError4 = err;
+                                } finally {
+                                    try {
+                                        if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                                            _iterator4.return();
+                                        }
+                                    } finally {
+                                        if (_didIteratorError4) {
+                                            throw _iteratorError4;
+                                        }
+                                    }
+                                }
+
+                                _this2.holes = newHoles;
+
                                 _this2.update();
-                                reduced.push(newExpr);
                                 if (newExpr instanceof Expression) newExpr.lock();
-                                window.setTimeout(function () {
-                                    nextStep();
-                                }, delay);
+                                after(800).then(function () {
+                                    return nextStep();
+                                });
                             };
                             if (result instanceof Promise) {
                                 result.then(delay, function () {
                                     // Uh-oh, an error happened
-                                    _this2._animating = false;
-                                    while (_this2.holes.length > 0 && _this2.holes[0] instanceof MissingExpression) {
-                                        _this2.holes.shift();
-                                    }
-                                    _this2.update();
-
-                                    Animate.blink(_this2, 1000, [1.0, 0.0, 0.0]);
+                                    cleanup();
                                     reject();
                                 });
                             } else {
@@ -188,7 +243,86 @@ var Sequence = function (_Expression) {
                 this.performReduction();
             }
         }
+    }, {
+        key: "subexpressions",
+        get: function get() {
+            return this.holes;
+        }
     }]);
 
     return Sequence;
 }(Expression);
+
+var NotchedSequence = function (_Sequence) {
+    _inherits(NotchedSequence, _Sequence);
+
+    function NotchedSequence() {
+        var _ref;
+
+        _classCallCheck(this, NotchedSequence);
+
+        for (var _len2 = arguments.length, exprs = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+            exprs[_key2] = arguments[_key2];
+        }
+
+        var _this3 = _possibleConstructorReturn(this, (_ref = NotchedSequence.__proto__ || Object.getPrototypeOf(NotchedSequence)).call.apply(_ref, [this].concat(exprs)));
+
+        _this3.padding.left = 17.5;
+        _this3._reductionIndicatorStart = 0;
+        return _this3;
+    }
+
+    _createClass(NotchedSequence, [{
+        key: "drawInternal",
+        value: function drawInternal(ctx, pos, boundingSize) {
+            _get(NotchedSequence.prototype.__proto__ || Object.getPrototypeOf(NotchedSequence.prototype), "drawInternal", this).call(this, ctx, pos, boundingSize);
+            var radius = this.radius * this.absoluteScale.x;
+            var leftMargin = 15 * this.scale.x;
+            ctx.fillStyle = "#fff";
+            roundRect(ctx, pos.x, pos.y, leftMargin, boundingSize.h, {
+                tl: radius,
+                bl: radius,
+                tr: 0,
+                br: 0
+            }, true, false, null);
+
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 1;
+            for (var i = 0; i < this.holes.length - 1; i++) {
+                var expr1 = this.holes[i];
+                var expr2 = this.holes[i + 1];
+                var expr1y = expr1.absolutePos.y + expr1.anchor.y * expr1.absoluteSize.h;
+                var expr2y = expr2.absolutePos.y;
+                var tickPos = expr1y + (expr2y - expr1y) / 2;
+                ctx.beginPath();
+                ctx.moveTo(pos.x, expr1y);
+                ctx.lineTo(pos.x + 15, expr1y);
+                ctx.stroke();
+            }
+
+            if (this._animating) {
+                var rad = leftMargin / 3;
+                var indicatorX = pos.x + leftMargin / 2 - rad;
+                var verticalDistance = boundingSize.h - 2 * radius;
+                var verticalOffset = 0.5 * (1.0 + Math.sin((Date.now() - this._reductionIndicatorStart) / 250)) * verticalDistance;
+                drawCircle(ctx, indicatorX, pos.y + radius + verticalOffset, rad, "#000", null);
+            }
+        }
+    }, {
+        key: "performReduction",
+        value: function performReduction() {
+            var _this4 = this;
+
+            var result = _get(NotchedSequence.prototype.__proto__ || Object.getPrototypeOf(NotchedSequence.prototype), "performReduction", this).call(this);
+
+            Animate.drawUntil(this.stage, function () {
+                return !_this4._animating || !_this4.stage;
+            });
+            this._reductionIndicatorStart = Date.now();
+
+            return result;
+        }
+    }]);
+
+    return NotchedSequence;
+}(Sequence);

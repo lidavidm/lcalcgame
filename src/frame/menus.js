@@ -402,12 +402,6 @@ class LevelSelectGrid extends mag.Rect {
     }
 }
 
-
-((x) => ((x == x) ? "a" : "b"))("star");
-("star" == "star") ? "match" : "different";
-true ? "match" : "different";
-"match";
-
 class LevelSpot extends mag.Circle {
     constructor(x, y, r, onclick) {
         super(x, y, r);

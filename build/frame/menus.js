@@ -546,13 +546,6 @@ var LevelSelectGrid = function (_mag$Rect2) {
     return LevelSelectGrid;
 }(mag.Rect);
 
-(function (x) {
-    return x == x ? "a" : "b";
-})("star");
-"star" == "star" ? "match" : "different";
-true ? "match" : "different";
-"match";
-
 var LevelSpot = function (_mag$Circle) {
     _inherits(LevelSpot, _mag$Circle);
 

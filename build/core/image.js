@@ -170,7 +170,7 @@ var mag = function (_) {
             } // where resource_map properties are:
             //  { default, hover (optional), down (opt.) }
             _this5.images = resource_map;
-            _this5.clickFunc = onclick;
+            _this5.clickFunc = onclick.bind(_this5);
             return _possibleConstructorReturn(_this5);
         }
 
