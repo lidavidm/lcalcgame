@@ -19,7 +19,14 @@ class MissingExpression extends Expression {
     }
     isComplete() { return false; }
     getClass() { return MissingExpression; }
-    onmousedrag(pos) { } // disable drag
+    onmousedrag(pos) {
+        // disable drag
+        // forward it to parent
+        if (this.parent) {
+            pos = addPos(pos, fromTo(this.absolutePos, this.parent.absolutePos));
+            this.parent.onmousedrag(pos);
+        }
+    }
     ondropenter(node, pos) {
         this.onmouseenter(pos);
     }
