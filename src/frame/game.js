@@ -552,7 +552,9 @@ class Level {
                     y = Math.seededRandom() * (screen.height - size.h) + screen.y;
                 }
 
-                e.pos = { x:Math.seededRandom() * (screen.width - size.w) + screen.x,
+                let x = Math.max(Math.seededRandom() * (screen.width - size.w) + screen.x, screen.x);
+
+                e.pos = { x:x,
                           y:y };
             }
 
