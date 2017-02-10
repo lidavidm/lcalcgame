@@ -531,10 +531,6 @@ class Level {
         if (!Array.isArray(es))
             es = [es];
 
-        if (es.length >= 5) {
-            return this.findFastPacking(es, screen);
-        }
-
         // Bounds cache seems to greatly destroy performance
         var sizeCache = {};
         var getSize = function(e) {
