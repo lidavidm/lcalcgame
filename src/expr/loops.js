@@ -6,7 +6,7 @@ class RepeatLoopExpr extends Expression {
         if (times instanceof MissingExpression) {
             times = new MissingNumberExpression();
         }
-        this.color = "#444477";
+        this.color = "#7777CC";
         this.addArg(times);
         this.addArg(body);
         this.template = null;
@@ -44,8 +44,8 @@ class RepeatLoopExpr extends Expression {
             this.template.scale = { x: 0.8, y: 0.8 };
             this.template.parent = this;
             this.template.pos = {
-                x: this.bodyExpr.pos.x,
-                y: this.size.h - this.template.padding.inner,
+                x: this.bodyExpr.pos.x + 5,
+                y: this.size.h - this.template.padding.inner / 2,
             };
             this.template.holes.forEach((expr) => {
                 expr.opacity = 0.3;
@@ -68,9 +68,16 @@ class RepeatLoopExpr extends Expression {
         }
 
         let divotX = this.timesExpr.absolutePos.x + this.timesExpr.absoluteSize.w + (this.bodyExpr.absolutePos.x - (this.timesExpr.absolutePos.x + this.timesExpr.absoluteSize.w)) / 2.0;
-        let bracketHeight = boundingSize.h - this.bodyExpr.absoluteSize.h;
+        let bracketHeight = boundingSize.h * 0.2;
         let radius = this.radius*this.absoluteScale.x;
         let bracketRadius = bracketHeight;
+
+        let trayLeft = this.bodyExpr.absolutePos.x;
+        let trayRight = this.bodyExpr.absolutePos.x + this.bodyExpr.absoluteSize.w;
+        if (this.template) {
+            trayLeft = Math.min(trayLeft, this.template.absolutePos.x);
+            trayRight = Math.max(trayRight, this.template.absolutePos.x + this.template.absoluteSize.w);
+        }
 
         let offsetLineTo = (offset, x, y) => ctx.lineTo(x, y + offset);
         let offsetQuadraticCurveTo = (offset, cx, cy, x, y) => ctx.quadraticCurveTo(cx, cy + offset, x, y + offset);
@@ -82,22 +89,21 @@ class RepeatLoopExpr extends Expression {
             // "Divot" separating stamp and number
             offsetQuadraticCurveTo(offset, divotX, pos.y,
                                    divotX, pos.y + bracketRadius);
-            offsetQuadraticCurveTo(offset, divotX, pos.y,
-                                   divotX + bracketRadius, pos.y);
-            offsetLineTo(offset, pos.x + boundingSize.w - radius, pos.y);
-            // Upper-right corner
-            offsetQuadraticCurveTo(offset, pos.x + boundingSize.w, pos.y,
-                                   pos.x + boundingSize.w, pos.y + radius);
+            // "Output tray"
+            offsetLineTo(offset, trayLeft, pos.y - 10);
+            offsetLineTo(offset, trayLeft, pos.y);
+            offsetLineTo(offset, trayRight, pos.y);
+            offsetLineTo(offset, trayRight, pos.y - 10);
+            offsetLineTo(offset, pos.x + boundingSize.w, pos.y + radius);
             // Right side
             offsetLineTo(offset, pos.x + boundingSize.w, pos.y + boundingSize.h - radius);
-            // Bottom-right corner
-            offsetQuadraticCurveTo(offset, pos.x + boundingSize.w, pos.y + boundingSize.h,
-                                   pos.x + boundingSize.w - radius, pos.y + boundingSize.h);
-            // Bottom side
-            offsetLineTo(offset, divotX + bracketRadius, pos.y + boundingSize.h);
+            // "Input tray"
+            offsetLineTo(offset, trayRight, pos.y + boundingSize.h + 10);
+            offsetLineTo(offset, trayRight, pos.y + boundingSize.h);
+            offsetLineTo(offset, trayLeft, pos.y + boundingSize.h);
+            offsetLineTo(offset, trayLeft, pos.y + boundingSize.h + 10);
+            offsetLineTo(offset, divotX, pos.y + boundingSize.h - bracketRadius);
             // "Divot" on bottom
-            offsetQuadraticCurveTo(offset, divotX, pos.y + boundingSize.h,
-                                   divotX, pos.y + boundingSize.h - bracketRadius);
             offsetQuadraticCurveTo(offset, divotX, pos.y + boundingSize.h,
                                    divotX - bracketRadius, pos.y + boundingSize.h);
             offsetLineTo(offset, pos.x + radius, pos.y + boundingSize.h);
@@ -196,6 +202,8 @@ class RepeatLoopExpr extends Expression {
                                 y: y,
                             },
                         }, 300).after(() => {
+                            let oldOffset = this.bodyExpr.shadowOffset;
+                            this.bodyExpr.shadowOffset = -4;
                             this.bodyExpr.pos = {
                                 x: this.bodyExpr.pos.x,
                                 y: this.bodyExpr.pos.y + 2,
@@ -206,6 +214,7 @@ class RepeatLoopExpr extends Expression {
                             index += numExprs;
 
                             after(300).then(() => {
+                                this.bodyExpr.shadowOffset = oldOffset;
                                 this.bodyExpr.pos = {
                                     x: this.bodyExpr.pos.x,
                                     y: this.bodyExpr.pos.y - 2,
