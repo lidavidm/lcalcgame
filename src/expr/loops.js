@@ -60,6 +60,15 @@ class RepeatLoopExpr extends Expression {
         };
     }
 
+    getHoleSizes() {
+        let result = super.getHoleSizes();
+        if (this.template) {
+            // Adjust size if the template is larger than the body
+            result[1].w = Math.max(result[1].w, this.template.size.w * this.template.scale.x);
+        }
+        return result;
+    }
+
     drawInternal(ctx, pos, boundingSize) {
         if (this.template != null) {
             ctx.save();
@@ -75,8 +84,8 @@ class RepeatLoopExpr extends Expression {
         let trayLeft = this.bodyExpr.absolutePos.x;
         let trayRight = this.bodyExpr.absolutePos.x + this.bodyExpr.absoluteSize.w;
         if (this.template) {
-            trayLeft = Math.min(trayLeft, this.template.absolutePos.x);
-            trayRight = Math.max(trayRight, this.template.absolutePos.x + this.template.absoluteSize.w);
+            trayLeft = this.template.absolutePos.x;
+            trayRight = this.template.absolutePos.x + this.template.absoluteSize.w;
         }
 
         let offsetLineTo = (offset, x, y) => ctx.lineTo(x, y + offset);
@@ -94,10 +103,24 @@ class RepeatLoopExpr extends Expression {
             offsetLineTo(offset, trayLeft, pos.y);
             offsetLineTo(offset, trayRight, pos.y);
             offsetLineTo(offset, trayRight, pos.y - 10);
-            offsetLineTo(offset, pos.x + boundingSize.w, pos.y + radius);
+            if (pos.x + boundingSize.w - trayRight > 20) {
+                offsetLineTo(offset, trayRight + 5, pos.y);
+                offsetLineTo(offset, pos.x + boundingSize.w - radius, pos.y);
+                offsetQuadraticCurveTo(offset, pos.x + boundingSize.w, pos.y,
+                                       pos.x + boundingSize.w, pos.y + radius);
+            }
+            else {
+                offsetLineTo(offset, pos.x + boundingSize.w, pos.y + radius);
+            }
             // Right side
             offsetLineTo(offset, pos.x + boundingSize.w, pos.y + boundingSize.h - radius);
             // "Input tray"
+            if (pos.x + boundingSize.w - trayRight > 20) {
+                offsetQuadraticCurveTo(offset, pos.x + boundingSize.w, pos.y + boundingSize.h,
+                                       pos.x + boundingSize.w - radius, pos.y + boundingSize.h);
+                offsetLineTo(offset, trayRight + 5, pos.y + boundingSize.h);
+            }
+
             offsetLineTo(offset, trayRight, pos.y + boundingSize.h + 10);
             offsetLineTo(offset, trayRight, pos.y + boundingSize.h);
             offsetLineTo(offset, trayLeft, pos.y + boundingSize.h);
