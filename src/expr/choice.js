@@ -35,7 +35,7 @@ class ChoiceExpr extends Expression {
         if (this._state === "closed") {
             return super.size;
         }
-        else if (this._state === "opening") {
+        else if (this._state === "opening" || this._state === "closing") {
             return this._size;
         }
         else if (this._state === "open") {
@@ -149,9 +149,23 @@ class ChoiceExpr extends Expression {
 
     /** Pretend to be a Toolbox so we can use the same API. */
     removeExpression(expr) {
-        Animate.poof(this);
-        this.cleanup();
-        (this.parent || this.stage).swap(this, null);
+        this.holes.splice(0, this.holes.length);
+        this._state = "closing";
+        this.update();
+        Animate.tween(this, {
+            _size: {
+                w: 0,
+                h: 0,
+            },
+            opacity: 0.5,
+            scale: {
+                x: 0.5,
+                y: 0.5,
+            },
+        }, 200).after(() => {
+            this.cleanup();
+            (this.parent || this.stage).swap(this, null);
+        });
         expr.onmouseenter = expr._onmouseenter;
         expr.toolbox = null;
     }
