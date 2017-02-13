@@ -33,10 +33,11 @@ var mag = function (_) {
             _this._embeddedStage.draw = function () {
                 _this.draw(_this._embeddedStage.ctx);
             };
+            _this._clip = { l: 0, t: 0, r: 1, b: 1 };
             return _this;
         }
 
-        // Access to embedded stage.
+        // Clipping regions of the underlying stage.
 
 
         _createClass(StageNode, [{
@@ -51,14 +52,38 @@ var mag = function (_) {
                 var scaleRatio = { x: boundingSize.w / bz.w, y: boundingSize.h / bz.h };
                 this._embeddedStage.ctx = ctx;
                 ctx.save();
+
                 ctx.translate(pos.x, pos.y);
+
+                // Clip drawing to only the stage (and possibly a subregion)
+                var r = this.clip;
+                ctx.translate((r.r - r.l) * boundingSize.w * this.anchor.x - boundingSize.w * r.l, (r.b - r.t) * boundingSize.h * this.anchor.y - boundingSize.h * r.t);
+                //ctx.translate((boundingSize.w / 2 - boundingSize.w * r.l) - (r.r - r.l) * boundingSize.w * this.anchor.x,
+                //              (boundingSize.h / 2 - boundingSize.h * r.t) - (r.b - r.t) * boundingSize.h * this.anchor.y);
+                ctx.rect(boundingSize.w * r.l, boundingSize.h * r.t, boundingSize.w * (r.r - r.l), boundingSize.h * (r.b - r.t));
+                ctx.clip();
+
                 ctx.scale(scaleRatio.x, scaleRatio.y);
+
                 this._embeddedStage.drawImpl();
                 ctx.restore();
             }
 
             // Events
 
+        }, {
+            key: 'transformCoords',
+            value: function transformCoords(pos) {
+                pos = clonePos(pos);
+                var sz = this.absoluteSize;
+                pos.x += this.pos.x;
+                pos.y += this.pos.y;
+                pos.x -= sz.w * this.anchor.x;
+                pos.y -= sz.h * this.anchor.y;
+                pos.x /= this.scale.x;
+                pos.y /= this.scale.y;
+                return pos;
+            }
         }, {
             key: 'hits',
             value: function hits(pos) {
@@ -71,29 +96,25 @@ var mag = function (_) {
         }, {
             key: 'onmousedown',
             value: function onmousedown(pos) {
-                pos.x /= this.scale.x;
-                pos.y /= this.scale.y;
+                pos = this.transformCoords(pos);
                 this._embeddedStage.onmousedown(pos);
             }
         }, {
             key: 'onmousedrag',
             value: function onmousedrag(pos) {
-                pos.x /= this.scale.x;
-                pos.y /= this.scale.y;
+                pos = this.transformCoords(pos);
                 this._embeddedStage.onmousedrag(pos);
             }
         }, {
             key: 'onmouseclick',
             value: function onmouseclick(pos) {
-                pos.x /= this.scale.x;
-                pos.y /= this.scale.y;
+                pos = this.transformCoords(pos);
                 this._embeddedStage.onmouseclick(pos);
             }
         }, {
             key: 'onmousehover',
             value: function onmousehover(pos) {
-                pos.x /= this.scale.x;
-                pos.y /= this.scale.y;
+                pos = this.transformCoords(pos);
                 this._embeddedStage.onmousehover(pos);
             }
             //onmouseenter(pos) {
@@ -106,10 +127,26 @@ var mag = function (_) {
         }, {
             key: 'onmouseup',
             value: function onmouseup(pos) {
-                pos.x /= this.scale.x;
-                pos.y /= this.scale.y;
+                pos = this.transformCoords(pos);
                 this._embeddedStage.onmouseup(pos);
             }
+        }, {
+            key: 'clip',
+            get: function get() {
+                var c = this._clip;
+                return { l: c.l, t: c.t, r: c.r, b: c.b };
+            },
+            set: function set(c) {
+                this._clip = { l: c.l, t: c.t, r: c.r, b: c.b };
+            }
+        }, {
+            key: 'isClipped',
+            get: function get() {
+                return this._clip.l > 0 || this._clip.t > 0 || this._clip.r < 1 || this._clip.b < 1;
+            }
+
+            // Access to embedded stage.
+
         }, {
             key: 'embeddedStage',
             get: function get() {

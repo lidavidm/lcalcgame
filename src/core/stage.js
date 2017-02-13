@@ -16,6 +16,19 @@ var mag = (function(_) {
             this._embeddedStage.draw = () => {
                 this.draw(this._embeddedStage.ctx);
             };
+            this._clip = { l:0, t:0, r:1, b:1 };
+        }
+
+        // Clipping regions of the underlying stage.
+        get clip() {
+            let c = this._clip;
+            return { l:c.l, t:c.t, r:c.r, b:c.b };
+        }
+        set clip(c) {
+            this._clip = { l:c.l, t:c.t, r:c.r, b:c.b };
+        }
+        get isClipped() {
+            return this._clip.l > 0 || this._clip.t > 0 || this._clip.r < 1 || this._clip.b < 1;
         }
 
         // Access to embedded stage.
@@ -35,36 +48,55 @@ var mag = (function(_) {
             let scaleRatio = { x:boundingSize.w / bz.w, y:boundingSize.h / bz.h };
             this._embeddedStage.ctx = ctx;
             ctx.save();
+
             ctx.translate(pos.x, pos.y);
+
+            // Clip drawing to only the stage (and possibly a subregion)
+            let r = this.clip;
+            ctx.translate((r.r - r.l) * boundingSize.w * this.anchor.x - (boundingSize.w * r.l),
+                          (r.b - r.t) * boundingSize.h * this.anchor.y - (boundingSize.h * r.t));
+            //ctx.translate((boundingSize.w / 2 - boundingSize.w * r.l) - (r.r - r.l) * boundingSize.w * this.anchor.x,
+            //              (boundingSize.h / 2 - boundingSize.h * r.t) - (r.b - r.t) * boundingSize.h * this.anchor.y);
+            ctx.rect( boundingSize.w * r.l, boundingSize.h * r.t, boundingSize.w * (r.r - r.l), boundingSize.h * (r.b - r.t) );
+            ctx.clip();
+
             ctx.scale(scaleRatio.x, scaleRatio.y);
+
             this._embeddedStage.drawImpl();
             ctx.restore();
         }
 
         // Events
+        transformCoords(pos) {
+            pos = clonePos(pos);
+            let sz = this.absoluteSize;
+            pos.x += this.pos.x;
+            pos.y += this.pos.y;
+            pos.x -= sz.w * this.anchor.x;
+            pos.y -= sz.h * this.anchor.y;
+            pos.x /= this.scale.x;
+            pos.y /= this.scale.y;
+            return pos;
+        }
         hits(pos, options={}) {
             let h = this.hitsWithin(pos);
             if (h) console.log('hit');
             return h;
         }
         onmousedown(pos) {
-            pos.x /= this.scale.x;
-            pos.y /= this.scale.y;
+            pos = this.transformCoords(pos);
             this._embeddedStage.onmousedown(pos);
         }
         onmousedrag(pos) {
-            pos.x /= this.scale.x;
-            pos.y /= this.scale.y;
+            pos = this.transformCoords(pos);
             this._embeddedStage.onmousedrag(pos);
         }
         onmouseclick(pos) {
-            pos.x /= this.scale.x;
-            pos.y /= this.scale.y;
+            pos = this.transformCoords(pos);
             this._embeddedStage.onmouseclick(pos);
         }
         onmousehover(pos) {
-            pos.x /= this.scale.x;
-            pos.y /= this.scale.y;
+            pos = this.transformCoords(pos);
             this._embeddedStage.onmousehover(pos);
         }
         //onmouseenter(pos) {
@@ -74,8 +106,7 @@ var mag = (function(_) {
         //    this._embeddedStage.onmouseleave(pos);
         //}
         onmouseup(pos) {
-            pos.x /= this.scale.x;
-            pos.y /= this.scale.y;
+            pos = this.transformCoords(pos);
             this._embeddedStage.onmouseup(pos);
         }
     }

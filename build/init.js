@@ -159,23 +159,49 @@ function initMainMenu() {
         // stage = new MainMenu(canvas, () => {
         //
         //     //Clicks 'play' button. Transition to chapter select screen.
-        stage = new ChapterSelectMenu(canvas, initLevel);
-        redraw(stage);
+        //stage = new ChapterSelectMenu(canvas, initLevel);
+        //redraw(stage);
         //
         // });
         //}, () => {
         // Clicked 'settings' button. Transition to settings screen.
         //});
 
-        var substage = new mag.StageNode(0, 0, Resource.buildLevel(Resource.level[10], canvas), canvas);
-        //substage.scale = { x:0.5, y:0.9 };
-        //substage.anchor = { x:0.5, y:0.5 };
+        level_idx = 12;
+        initBoard();
+
+        var meta = new MetaExpression(stage, Resource.buildLevel(Resource.level[10], stage.canvas));
+        meta.pos = { x: 200, y: 200 };
+        stage.add(meta);
+
+        //let inf = new InfiniteExpression( new (ExprManager.getClass('star'))(0,0,25,5) );
+        var inf = new InfiniteExpression(new TrueExpr());
+        //let inf = new InfiniteExpression( new StarExpr() );
+        inf.pos = { x: 400, y: 300 };
+        stage.add(inf);
+
+        /*
+        let substage = new mag.StageNode(0, 0, Resource.buildLevel(Resource.level[10], canvas), canvas);
+        //substage.scale = { x:0.5, y:0.5 };
+        substage.anchor = { x:0.5, y:0.5 };
+        substage.pos = { x:stage.boundingSize.w/2, y:stage.boundingSize.h/2 };
         stage.add(substage);
         substage.canvas = null;
         stage.canvas = null;
-        stage.canvas = canvas;
+        stage.canvas = canvas;*/
+
+        //substage.clip = { l:0.14, r:0.22, t:0, b:0.11 };
 
         redraw(stage);
+
+        //Animate.tween(substage, { scale:{x:0.5, y:0.5} }, 1000);
+
+        //Animate.tween(substage, { clip:{ l:0.14, r:0.22, t:0, b:0.11 } }, 1000, (e) => Math.pow(e, 2)).after(() => {
+        //    Animate.tween(substage, { clip:{ l:0, r:1, t:0, b:1 } }, 1000, (e) => Math.pow(e, 2));
+        //});
+
+        //Animate.tween(substage, { clip:{ l:0.14, r:0.22, t:0, b:0.11 },
+        //    pos:{x:stage.boundingSize.w/2 - stage.boundingSize.w*0.14 + stage.boundingSize.w/2, y:stage.boundingSize.h*(1-0.11/2)} }, 1000);
     }
 }
 

@@ -66,6 +66,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAudio('zoomin', 'zoom_planet.wav');
 
     loadImage('bag-background', 'bg-stars.png');
+    loadImage('infinity-symbol', 'infinity_symbol.png');
     loadImage('lambda-hole', 'lambda-hole.png');
     loadImage('lambda-hole-opening0', 'lambda-hole-opening1.png');
     loadImage('lambda-hole-opening1', 'lambda-hole-opening2.png');
