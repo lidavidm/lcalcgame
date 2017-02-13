@@ -196,9 +196,9 @@
         },
         {
             "description": "The choice block",
-            "board": "(assign /$x (star)) ($x)",
+            "board": "(assign /$x (star)) ($x) (choice (== _ /(star)) (== _ /(triangle)))",
             "goal": "(false)",
-            "toolbox": "(choice (== _ /(star)) (== _ /(triangle)))",
+            "toolbox": "",
             "globals": {
             }
         },
