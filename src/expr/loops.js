@@ -34,6 +34,10 @@ class RepeatLoopExpr extends Expression {
     update() {
         super.update();
 
+        // If we're animating and we already have a template, don't
+        // reset it by accident
+        if (this._animating && this.template) return;
+
         if (this.timesExpr instanceof NumberExpr) {
             let missing = [];
             for (let i = 0; i < this.timesExpr.number; i++) {
