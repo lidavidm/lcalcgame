@@ -108,7 +108,12 @@ class Sequence extends Expression {
 
                         this.update();
                         if (newExpr instanceof Expression) newExpr.lock();
-                        after(800).then(() => nextStep());
+                        if (newHoles.length > 0) {
+                            after(800).then(() => nextStep());
+                        }
+                        else {
+                            nextStep();
+                        }
                     };
                     if (result instanceof Promise) {
                         result.then(delay, () => {
