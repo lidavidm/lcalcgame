@@ -196,6 +196,23 @@
         },
         {
             "description": "The choice block",
+            "board": "(choice (2) (3)) (choice (4) (5))",
+            "goal": "(2) (4)",
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "description": "The choice block",
+            "board": "(== _ _) (choice (star) (false)) (choice (2) (3) ($x))",
+            "goal": "(true)",
+            "toolbox": "",
+            "globals": {
+                "x": "(false)"
+            }
+        },
+        {
+            "description": "The choice block",
             "board": "(assign /$x (star)) ($x) (choice (== _ /(star)) (== _ /(triangle)))",
             "goal": "(false)",
             "toolbox": "",
