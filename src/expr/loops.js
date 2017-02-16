@@ -13,6 +13,9 @@ class RepeatLoopExpr extends Expression {
 
         // Offset drawing self for a "stamp" effect
         this._animationOffset = 0;
+
+        this._leverLength = 0.0;
+        this._leverAngle = -Math.PI / 2;
     }
 
     get timesExpr() {
@@ -90,6 +93,21 @@ class RepeatLoopExpr extends Expression {
         if (this.template) {
             trayLeft = this.template.absolutePos.x;
             trayRight = this.template.absolutePos.x + this.template.absoluteSize.w;
+        }
+
+        if (!this.parent) {
+            let leverCenterX = trayRight;
+            let leverCenterY = (pos.y - 10 + pos.y + boundingSize.h + 10) / 2;
+            let leverWidth = 5 * this._leverLength;
+            let leverLength = 50 * this._leverLength;
+
+            ctx.fillStyle = this.color;
+            drawPointsAround(ctx, leverCenterX, leverCenterY, [
+                [0, -leverWidth],
+                [0, leverWidth],
+                [leverLength, leverWidth],
+                [leverLength, -leverWidth],
+            ], this._leverAngle);
         }
 
         let offsetLineTo = (offset, x, y) => ctx.lineTo(x, y + offset);
@@ -193,6 +211,8 @@ class RepeatLoopExpr extends Expression {
                 }
 
                 let nextStep = () => {
+                    this._leverAngle = -Math.PI / 2;
+
                     if (index > this.template.subexpressions.length) {
                         this.template.holes.forEach((expr) => {
                             expr.opacity = 1;
@@ -237,17 +257,22 @@ class RepeatLoopExpr extends Expression {
                             },
                         }, 300).after(() => {
                             let oldOffset = this.bodyExpr.shadowOffset;
-                            this.bodyExpr.shadowOffset = -4;
-                            this.bodyExpr.pos = {
-                                x: this.bodyExpr.pos.x,
-                                y: this.bodyExpr.pos.y + 2,
-                            };
-                            for (let i = 0; i < numExprs; i++) {
-                                this.template.subexpressions[index + i].opacity = 1.0;
-                            }
-                            index += numExprs;
 
-                            after(300).then(() => {
+                            Animate.tween(this, {
+                                _leverAngle: 0,
+                            }, 300);
+                            Animate.tween(this.bodyExpr, {
+                                shadowOffset: -4,
+                                pos: {
+                                    x: this.bodyExpr.pos.x,
+                                    y: this.bodyExpr.pos.y + 2,
+                                },
+                            }, 400).after(() => {
+                                for (let i = 0; i < numExprs; i++) {
+                                    this.template.subexpressions[index + i].opacity = 1.0;
+                                }
+                                index += numExprs;
+
                                 this.bodyExpr.shadowOffset = oldOffset;
                                 this.bodyExpr.pos = {
                                     x: this.bodyExpr.pos.x,
@@ -259,7 +284,10 @@ class RepeatLoopExpr extends Expression {
                         });
                     }
                 };
-                nextStep();
+
+                Animate.tween(this, {
+                    _leverLength: 1.0,
+                }, 200).after(nextStep);
             });
         });
     }
