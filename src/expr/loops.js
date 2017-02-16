@@ -74,7 +74,7 @@ class RepeatLoopExpr extends Expression {
     }
 
     drawInternal(ctx, pos, boundingSize) {
-        if (this.template != null) {
+        if (this.template != null && !this.parent) {
             ctx.save();
             this.template.draw(ctx);
             ctx.restore();
@@ -188,8 +188,15 @@ class RepeatLoopExpr extends Expression {
                 let x = this.template.pos.x;
                 let y = this.template.pos.y;
 
+                if (this.parent) {
+                    index = this.template.subexpressions.length + 1;
+                }
+
                 let nextStep = () => {
                     if (index > this.template.subexpressions.length) {
+                        this.template.holes.forEach((expr) => {
+                            expr.opacity = 1;
+                        });
                         resolve(this.template);
                         Animate.poof(this);
                         this.template.parent = null;
