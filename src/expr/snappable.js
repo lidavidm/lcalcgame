@@ -128,17 +128,22 @@ class Snappable extends Expression {
 
         if (this.tentativeTarget) {
             if (this.tentativeRelation == 'next') {
-                // TODO: if we have a next, we should go down the
-                // chain (i.e. we should append the target to the end
-                // of our linked list)
                 this.next = this.tentativeTarget.next;
                 this.tentativeTarget.next = this;
                 this.prev = this.tentativeTarget;
+
+                if (this.next) {
+                    this.next.prev = this;
+                }
             }
             else {
                 this.prev = this.tentativeTarget.prev;
                 this.tentativeTarget.prev = this;
                 this.next = this.tentativeTarget;
+
+                if (this.prev) {
+                    this.prev.next = this;
+                }
             }
 
             this.tentativeTarget = this.tentativeRelation = null;
