@@ -146,6 +146,9 @@ class Snappable extends Expression {
                 }
             }
 
+            this.bottomDivotStroke = this.topDivotStroke =
+                this.tentativeTarget.topDivotStroke =
+                this.tentativeTarget.bottomDivotStroke = null;
             this.tentativeTarget = this.tentativeRelation = null;
         }
     }
@@ -224,12 +227,16 @@ class Snappable extends Expression {
 
         // Save stage since it gets erased down the line
         let stage = this.stage;
+
         let nodes = stage.getNodesWithClass(Snappable, [this], false);
         let canReduce = true;
 
         for (let node of nodes) {
-            if (!node.prev && !node.next) {
-                Animate.blink(node, 1000, [1.0, 0.0, 0.0]);
+            if (!node.prev) {
+                while (node) {
+                    Animate.blink(node, 1000, [1.0, 0.0, 0.0]);
+                    node = node.next;
+                }
                 canReduce = false;
             }
         }
