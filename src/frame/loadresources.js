@@ -251,18 +251,18 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                         continue;
                     }
 
+                    if (ExprManager.isExcludedFromFadingAnimation(unfaded_root)) {
+                        faded.remove(unfaded_root);
+                        root.opacity = 1;
+                        continue;
+                    }
+
                     unfaded_root.fadingOut = true;
                     unfaded_root.opacity = 1.0;
                     unfaded_root._stage = null;
                     unfaded_root.pos = root.pos;
                     faded.add(unfaded_root);
                     root.opacity = 0;
-
-                    if (ExprManager.isExcludedFromFadingAnimation(unfaded_root)) {
-                        faded.remove(unfaded_root);
-                        root.opacity = 1;
-                        continue;
-                    }
 
                     Animate.wait(500).after(() => {
                         SparkleTrigger.run(unfaded_root, () => {
