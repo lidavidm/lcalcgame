@@ -34,13 +34,15 @@ class Snappable extends Expression {
         return pos;
     }
 
-    // get pos() {
-    //     if (this._pos) return {
-    //         x: this._pos.x,
-    //         y: this._pos.y,
-    //     };
-    //     return super.pos;
-    // }
+    get bottom() {
+        let bottom = this;
+
+        while (bottom.next) {
+            bottom = bottom.next;
+        }
+
+        return bottom;
+    }
 
     update() {
         super.update();
@@ -82,7 +84,9 @@ class Snappable extends Expression {
 
         let nodes = this.stage.getNodesWithClass(Snappable, [this], false);
         let myTd = this.topDivotPos;
-        let myBd = this.bottomDivotPos;
+        // If dragging a stack around, use the last node's divot
+        let bottom = this.bottom;
+        let myBd = bottom.bottomDivotPos;
 
         this.tentativeRelation = this.tentativeTarget = null;
 
@@ -108,13 +112,13 @@ class Snappable extends Expression {
             distanceY = myBd.y - td.y;
 
             if (distanceX * distanceX + distanceY * distanceY < 360) {
-                this.bottomDivotStroke = node.topDivotStroke = { color: 'green', lineWidth:2 };
+                bottom.bottomDivotStroke = node.topDivotStroke = { color: 'green', lineWidth:2 };
                 this.tentativeTarget = node;
                 this.tentativeRelation = 'prev';
                 continue;
             }
             else {
-                this.bottomDivotStroke = node.topDivotStroke = null;
+                bottom.bottomDivotStroke = node.topDivotStroke = null;
             }
         }
 
@@ -127,23 +131,27 @@ class Snappable extends Expression {
         super.onmouseup(pos);
 
         if (this.tentativeTarget) {
+            let bottom = this.bottom;
+            console.log(this.tentativeRelation);
             if (this.tentativeRelation == 'next') {
-                this.next = this.tentativeTarget.next;
+                bottom.next = this.tentativeTarget.next;
                 this.tentativeTarget.next = this;
                 this.prev = this.tentativeTarget;
 
-                if (this.next) {
-                    this.next.prev = this;
+                if (bottom.next) {
+                    bottom.next.prev = bottom;
                 }
             }
             else {
                 this.prev = this.tentativeTarget.prev;
-                this.tentativeTarget.prev = this;
-                this.next = this.tentativeTarget;
+                this.tentativeTarget.prev = this.bottom;
+                bottom.next = this.tentativeTarget;
 
                 if (this.prev) {
                     this.prev.next = this;
                 }
+
+                bottom.bottomDivotStroke = null;
             }
 
             this.bottomDivotStroke = this.topDivotStroke =
