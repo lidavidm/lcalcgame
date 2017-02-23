@@ -34,7 +34,7 @@ var ExprManager = (function() {
         'lambda_abstraction':   [LambdaExpr, EnvironmentLambdaExpr],
         'assign':   [JumpingAssignExpr, AssignExpr, EqualsAssignExpr],
         'sequence': [NotchedSequence, Sequence],
-        'repeat':   [RepeatLoopExpr],
+        'repeat':   [RepeatLoopExpr, FadedRepeatLoopExpr],
         'choice':   [ChoiceExpr],
         'snappable':[Snappable],
     };
@@ -57,7 +57,8 @@ var ExprManager = (function() {
         'bag'   : [51],
         '__'    : [51],
         'primitives' : [66, 72],
-        'map'   : [61]
+        'map'   : [61],
+        'repeat': [138],
     };
     const primitives = ['triangle', 'rect', 'star', 'circle', 'diamond'];
     primitives.forEach((p) => {

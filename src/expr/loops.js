@@ -260,7 +260,7 @@ class RepeatLoopExpr extends Expression {
 
                             Animate.tween(this, {
                                 _leverAngle: 0,
-                            }, 300);
+                            }, 400);
                             Animate.tween(this.bodyExpr, {
                                 shadowOffset: -4,
                                 pos: {
@@ -296,6 +296,84 @@ class RepeatLoopExpr extends Expression {
         if (!this._animating) {
             this.performReduction();
         }
+    }
+}
+
+class FadedRepeatLoopExpr extends Expression {
+    constructor(times, body) {
+        super([new TextExpr("for (let i = 1; i <= "), times, new TextExpr("; i = i + 1 {"), body, new TextExpr("}")]);
+    }
+
+    get timesExpr() {
+        return this.holes[1];
+    }
+
+    set timesExpr(expr) {
+        this.holes[1] = expr;
+    }
+
+    get bodyExpr() {
+        return this.holes[3];
+    }
+
+    set bodyExpr(expr) {
+        this.holes[3] = expr;
+    }
+
+    get size() {
+        let padding = this.padding;
+        let sizes = this.getHoleSizes();
+
+        let top = sizes.slice(0, 3);
+        let middle = sizes[3];
+        let bottom = sizes[4];
+
+        let topWidth = 0;
+        let maxTopHeight = 0;
+        top.forEach((size) => {
+            topWidth += size.w;
+            maxTopHeight = Math.max(maxTopHeight, size.h);
+        });
+        let width = Math.max(topWidth, middle.w + 50, bottom.w) + padding.left + padding.right;
+        let height = maxTopHeight + middle.h + bottom.h + padding.inner;
+
+        return { w:width, h: height };
+    }
+
+    update() {
+        this.children = [];
+
+        this.holes.forEach((expr) => this.addChild(expr));
+        this.holes.forEach((expr) => {
+            expr.anchor = { x:0, y:0.5 };
+            expr.scale = { x:0.85, y:0.85 };
+            if (expr instanceof TextExpr) {
+                expr.scale = { x: 0.6, y: 0.6 };
+            }
+            expr.update();
+        });
+        var size = this.size;
+        var x = this.padding.left;
+        var y = 0;
+
+        let top = this.holes.slice(0, 3);
+        let middle = this.holes[3];
+        let bottom = this.holes[4];
+
+        let maxTopHeight = 0;
+        top.forEach((expr) => {
+            maxTopHeight = Math.max(maxTopHeight, expr.size.h);
+        });
+
+        top.forEach((expr) => {
+            expr.pos = { x:x, y: maxTopHeight / 2 };
+            x += expr.size.w * expr.scale.x;
+        });
+
+        middle.pos = { x: this.padding.left + 50, y: size.h / 2 };
+        bottom.pos = { x: this.padding.left, y: size.h - (bottom.size.h / 2) };
+
+        this.children = this.holes;
     }
 }
 
