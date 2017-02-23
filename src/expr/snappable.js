@@ -65,7 +65,7 @@ class Snappable extends Expression {
         if (this.prev) {
             this._pos = {
                 x: this.prev.pos.x,
-                y: this.prev.pos.y + this.prev.size.h,
+                y: this.prev.pos.y + this.prev.size.h - 4,
             };
         }
 
@@ -132,7 +132,6 @@ class Snappable extends Expression {
 
         if (this.tentativeTarget) {
             let bottom = this.bottom;
-            console.log(this.tentativeRelation);
             if (this.tentativeRelation == 'next') {
                 bottom.next = this.tentativeTarget.next;
                 this.tentativeTarget.next = this;
@@ -222,6 +221,22 @@ class Snappable extends Expression {
         }
         if (this.color) ctx.fillStyle = this.color;
         draw(0);
+    }
+
+    drawInternalAfterChildren(ctx, pos, boundingSize) {
+        let radius = this.radius * this.absoluteScale.x;
+        const leftMargin = 15 * this.scale.x;
+        ctx.fillStyle = "#fff";
+        roundRect(ctx,
+                  pos.x, pos.y,
+                  leftMargin, boundingSize.h,
+                  {
+                      tl: radius,
+                      bl: radius,
+                      tr: 0,
+                      br: 0,
+                  }, true, false,
+                  null);
     }
 
     onmouseclick() {
