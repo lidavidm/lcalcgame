@@ -63,8 +63,9 @@ class Snappable extends Expression {
 
     updatePos() {
         if (this.prev) {
+            let dx = (this.size.w - this.prev.size.w) / 2;
             this._pos = {
-                x: this.prev.pos.x,
+                x: this.prev.pos.x + dx,
                 y: this.prev.pos.y + this.prev.size.h - 4,
             };
         }
