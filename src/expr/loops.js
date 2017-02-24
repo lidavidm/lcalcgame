@@ -46,7 +46,7 @@ class RepeatLoopExpr extends Expression {
             for (let i = 0; i < this.timesExpr.number; i++) {
                 missing.push(this.bodyExpr.clone());
             }
-            this.template = new NotchedSequence(...missing);
+            this.template = new (ExprManager.getClass('sequence'))(...missing);
             this.template.lockSubexpressions();
             this.template.scale = { x: 0.8, y: 0.8 };
             this.template.parent = this;
@@ -374,6 +374,26 @@ class FadedRepeatLoopExpr extends Expression {
         bottom.pos = { x: this.padding.left, y: size.h - (bottom.size.h / 2) };
 
         this.children = this.holes;
+    }
+
+    reduce() {
+        if (this.timesExpr && this.bodyExpr) {
+            let missing = [];
+            for (let i = 0; i < this.timesExpr.number; i++) {
+                missing.push(this.bodyExpr.clone());
+            }
+
+            let template = new (ExprManager.getClass('sequence'))(...missing);
+            template.lockSubexpressions();
+            return template;
+        }
+        else {
+            return this;
+        }
+    }
+
+    onmouseclick() {
+        this.performReduction();
     }
 }
 

@@ -245,7 +245,8 @@ class Snappable extends Expression {
 
     performReduction() {
         if (this.prev) {
-            return this.prev.performReduction();
+            this.prev.performReduction();
+            return;
         }
 
         // Save stage since it gets erased down the line
