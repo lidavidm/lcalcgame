@@ -259,6 +259,7 @@ class Snappable extends Expression {
         let canReduce = true;
 
         for (let node of nodes) {
+            if (node.toolbox) continue;
             if (!node.prev) {
                 while (node) {
                     Animate.blink(node, 1000, [1.0, 0.0, 0.0]);
@@ -279,6 +280,7 @@ class Snappable extends Expression {
         }
 
         for (let node of nodes) {
+            if (node.toolbox) continue;
             stage.remove(node);
         }
         stage.swap(this, new (ExprManager.getClass('sequence'))(...body));
