@@ -245,6 +245,83 @@
                 "x": "(2)",
                 "y": "(false)"
             }
+        },
+        {
+            "description": "Snappables",
+            "board": "($x) (snappable /(assign /$x /(star))) (snappable /(assign /$x /(diamond)))",
+            "goal": "(star)",
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "description": "Snappables",
+            "board": "($y) (snappable /(assign /$x /3)) (snappable /(assign /$y /$x)) (snappable /(assign /$x /5))",
+            "goal": "(3)",
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "description": "Snappables",
+            "board": "($x) (snappable /(assign /$x /(star))) (snappable /(repeat /3 /(assign /$x /(+ /$x /1)))) (snappable /(assign /$x /2))",
+            "goal": "(5)",
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "description": "Snappables",
+            "board": "($z) (snappable /(assign /$z /(== /$x /$y)))",
+            "goal": "(true)",
+            "toolbox": "(snappable /(assign /$x /(+ /$x /1))) (snappable /(assign /$y /$x))",
+            "globals": {
+                "x": "(1)",
+                "y": "(3)"
+            }
+        },
+        {
+            "description": "Snappables",
+            "board": "($y) (snappable /(assign /$x _)) (snappable /(assign /$y /$x))",
+            "goal": "(star)",
+            "toolbox": "(diamond) (star) (triangle)",
+            "globals": {
+            }
+        },
+        {
+            "description": "Snappables",
+            "board": "($x) (snappable /(assign /$x /(== /$x _))) (snappable /(assign /$x /(star))) (snappable /(assign /$x /(diamond))) (choice (diamond) (triangle) (circle))",
+            "goal": "(true)",
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "description": "Snappables",
+            "board": "($z) (snappable /(assign /$z _)) (choice (== /$x _) (== /$x /(circle))) (snappable /(assign /$x /(diamond))) (choice (star) (diamond))",
+            "goal": "(circle)",
+            "toolbox": "(if _ /(circle))",
+            "globals": {
+            }
+        },
+        {
+            "description": "Fade repeat",
+            "board": "($x) (repeat /(2) /(assign /$x /(+ /$x /1)))",
+            "goal": "(3)",
+            "toolbox": "",
+            "globals": {
+                "x": "(1)"
+            }
+        },
+        {
+            "description": "Fade repeat",
+            "board": "($x) ($y) (repeat _ /(sequence /(assign /$x /(+ /$x /1)) /(assign /$y /(+ /$y /2))))",
+            "goal": "(3) (5)",
+            "toolbox": "(0) (1) (2)",
+            "globals": {
+                "x": "(1)",
+                "y": "(1)"
+            }
         }
     ],
     "resources": {
