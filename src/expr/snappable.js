@@ -22,9 +22,10 @@ class Snappable extends Expression {
     }
 
     get topDivotPos() {
-        let pos = this.pos;
-        pos.x += 25;
-        pos.y += this.divotHeight;
+        let pos = this.absolutePos;
+        let size = this.absoluteSize;
+        pos.x += 25 - this.anchor.x * size.w;
+        pos.y += this.divotHeight - this.anchor.y * size.h;
         return pos;
     }
 
@@ -63,10 +64,11 @@ class Snappable extends Expression {
 
     updatePos() {
         if (this.prev) {
-            let dx = (this.size.w - this.prev.size.w) / 2;
+            let ppos = this.prev.pos;
+            let psize = this.prev.size;
             this._pos = {
-                x: this.prev.pos.x + dx,
-                y: this.prev.pos.y + this.prev.size.h - 4,
+                x: ppos.x - this.prev.anchor.x * psize.w + this.anchor.x * this.size.w,
+                y: ppos.y + psize.h - 4,
             };
         }
 
@@ -192,12 +194,12 @@ class Snappable extends Expression {
             ctx.quadraticCurveTo(x, y, x + radius, y);
             ctx.closePath();
             ctx.fill();
+
+            if (offset) return;
             if (this.stroke) {
                 setStrokeStyle(ctx, this.stroke);
                 strokeWithOpacity(ctx, this.stroke.opacity);
             }
-
-            if (offset) return;
 
             if (this.topDivotStroke) {
                 ctx.beginPath();
