@@ -1,5 +1,5 @@
 class Snappable extends Expression {
-    constructor(expr) {
+    constructor(expr, next=null) {
         super([expr]);
         this.topDivotStroke = this.bottomDivotStroke = null;
         this.divotHeight = 6;
@@ -8,7 +8,11 @@ class Snappable extends Expression {
 
         this.tentativeTarget = null;
         this.tentativeRelation = null;
-        // this._pos = null;
+
+        if (next) {
+            this.next = next;
+            next.prev = this;
+        }
     }
 
     get contents() {
@@ -47,6 +51,10 @@ class Snappable extends Expression {
 
     update() {
         super.update();
+
+        if (this.next && !this.next.stage) {
+            this.stage.add(this.next);
+        }
 
         this.updatePos();
 
