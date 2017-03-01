@@ -248,7 +248,7 @@
         },
         {
             "description": "Snappables",
-            "board": "($x) (snappable /(assign /$x /(star))) (snappable /(assign /$x /(diamond)))",
+            "board": "($x) (snappable /(assign /$x /(star))) (snappable /(assign /$x /(diamond)) (snappable /(assign /$x /(circle))))",
             "goal": "(star)",
             "toolbox": "",
             "globals": {
@@ -321,6 +321,16 @@
             "globals": {
                 "x": "(1)",
                 "y": "(1)"
+            }
+        },
+        {
+            "description": "Fade repeat",
+            "board": "($x) (repeat /2 _) (choice (assign /$x /(+ /$x _)) (assign /$y /(+ /$y _))) (choice (0) (1) ($x) ($y))",
+            "goal": "(4)",
+            "toolbox": "",
+            "globals": {
+                "x": "(0)",
+                "y": "(2)"
             }
         }
     ],
