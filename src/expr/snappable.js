@@ -76,7 +76,7 @@ class Snappable extends Expression {
             let psize = this.prev.size;
             this._pos = {
                 x: ppos.x - this.prev.anchor.x * psize.w + this.anchor.x * this.size.w,
-                y: ppos.y + psize.h - 4,
+                y: ppos.y + (1 - this.prev.anchor.y) * psize.h + this.anchor.y * this.size.h - 4,
             };
         }
 
