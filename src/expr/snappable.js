@@ -168,6 +168,13 @@ class Snappable extends Expression {
                 this.tentativeTarget.topDivotStroke =
                 this.tentativeTarget.bottomDivotStroke = null;
             this.tentativeTarget = this.tentativeRelation = null;
+
+            if (this.canReduce()) {
+                let nodes = this.stage.getNodesWithClass(Snappable, [], false);
+                for (let node of nodes) {
+                    Animate.blink(node, 1000, [1,1,0], 1);
+                }
+            }
         }
     }
 
@@ -254,6 +261,26 @@ class Snappable extends Expression {
         this.performReduction();
     }
 
+    unattachedNodes() {
+        let nodes = this.stage.getNodesWithClass(Snappable, [], false);
+
+        let cur = this.prev;
+        while (cur) {
+            nodes.splice(nodes.indexOf(cur), 1);
+            cur = cur.prev;
+        }
+        cur = this;
+        while (cur) {
+            nodes.splice(nodes.indexOf(cur), 1);
+            cur = cur.next;
+        }
+        return nodes;
+    }
+
+    canReduce() {
+        return this.unattachedNodes().length == 0;
+    }
+
     performReduction() {
         if (this.prev) {
             this.prev.performReduction();
@@ -262,22 +289,15 @@ class Snappable extends Expression {
 
         // Save stage since it gets erased down the line
         let stage = this.stage;
-
-        let nodes = stage.getNodesWithClass(Snappable, [this], false);
-        let canReduce = true;
-
-        for (let node of nodes) {
-            if (node.toolbox) continue;
-            if (!node.prev) {
-                while (node) {
-                    Animate.blink(node, 1000, [1.0, 0.0, 0.0]);
-                    node = node.next;
-                }
-                canReduce = false;
+        for (let node of this.unattachedNodes()) {
+            while (node) {
+                Animate.blink(node, 1000, [1.0, 0.0, 0.0]);
+                node = node.next;
             }
         }
 
-        if (!canReduce) return;
+
+        if (!this.canReduce()) return;
 
         let body = [];
         let cur = this;
@@ -287,6 +307,7 @@ class Snappable extends Expression {
             cur = cur.next;
         }
 
+        let nodes = stage.getNodesWithClass(Snappable, [this], false);
         for (let node of nodes) {
             if (node.toolbox) continue;
             stage.remove(node);
