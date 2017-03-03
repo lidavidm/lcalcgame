@@ -41,6 +41,9 @@ class MissingExpression extends Expression {
             if (node instanceof LambdaExpr && !(this.parent instanceof MapFunc) && !(this.parent instanceof DefineExpr))
                 return;
 
+            // Should not be able to use choice exprs, ever
+            if (node instanceof ChoiceExpr) return;
+
             let stage = this.stage;
             let beforeState = stage.toString();
             let droppedExp = node.toString();
