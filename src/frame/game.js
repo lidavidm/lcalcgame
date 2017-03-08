@@ -62,11 +62,8 @@ class Level {
 
         // TODO: Offload this onto second stage?
         var goal_node = this.goal.nodeRepresentation;
-        goal_node[0].pos = { x:20, y:10 };
-        goal_node[1].pos = { x:110, y:10 };
         goal_node[1].ignoreGetClassInstance = true;
         var lastChild = goal_node[1].children[goal_node[1].children.length-1];
-        goal_node[0].children[0].size = { w:110+lastChild.pos.x+lastChild.size.w, h:70 };
         stage.add(goal_node[0]);
         stage.add(goal_node[1]);
 
@@ -215,9 +212,21 @@ class Level {
     // * In Scheme-esque format, with _ for holes:
     // * '(if _ triangle star) (== triangle _) (rect)'
     // NOTE: This does not do error checking! Make sure your desc is correct.
-    static make(expr_descs, goal_descs, toolbox_descs, globals_descs) {
-        var lvl = new Level(Level.parse(expr_descs), new Goal(new ExpressionPattern(Level.parse(goal_descs))),
-            toolbox_descs ? Level.parse(toolbox_descs) : null, Environment.parse(globals_descs));
+    static make(desc) {
+        let {
+            board: expr_descs,
+            goal: goal_descs,
+            toolbox: toolbox_descs,
+            globals: globals_descs,
+            resources: resources,
+        } = desc;
+
+        var lvl = new Level(
+            Level.parse(expr_descs),
+            new Goal(new ExpressionPattern(Level.parse(goal_descs)), resources.aliens),
+            toolbox_descs ? Level.parse(toolbox_descs) : null,
+            Environment.parse(globals_descs)
+        );
         return lvl;
     }
     static parse(desc) {
@@ -641,28 +650,35 @@ class Level {
 */
 class Goal {
 
-    constructor(accepted_patterns) {
+    constructor(accepted_patterns, alien_images=[]) {
         if (!Array.isArray(accepted_patterns)) accepted_patterns = [accepted_patterns];
         this.patterns = accepted_patterns;
+        // Choose a random alien to serve as our "goal person"
+        this.alien_image = alien_images[Math.floor(Math.random() * alien_images.length)];
     }
 
     get nodeRepresentation() {
         var exprs = flatten(this.patterns.map((p) => p.exprs)).map((expr) => expr.clone());
-        var bg = new mag.Rect(-20,-10,200,80);
+        var bg = new mag.Rect(-10,-10,200,80);
         bg.color = "#444";
         bg.shadowOffset = 0;
-        var txt = new TextExpr('Goal: ', 'Georgia');
         var node = new mag.Rect(0,0,100,50);
         node.color = null;
         node.ignoreEvents = true;
-        txt.pos = { x:0, y:node.size.h/2 };
-        txt.anchor = { x:0, y:0.5 };
-        txt.color = "#EEE";
+
+        let bubbleLeftImage = Resource.getImage('caption-long-left');
+        let bubbleRightImage = Resource.getImage('caption-long-right');
+        let bubbleMidImage = Resource.getImage('caption-long-mid');
+        let bubbleLeftWidth = (80 / bubbleLeftImage.naturalHeight) * bubbleLeftImage.naturalWidth;
+        let bubbleRightWidth = (80 / bubbleRightImage.naturalHeight) * bubbleRightImage.naturalWidth;
+        let bubbleMidWidth = (80 / bubbleMidImage.naturalHeight) * bubbleMidImage.naturalWidth;
+        let bubbleLeft = new mag.ImageRect(0, 0, bubbleLeftWidth, 80, 'caption-long-left');
+        let bubbleRight = new mag.ImageRect(0, 0, bubbleRightWidth, 80, 'caption-long-right');
 
         var exprs_node = new mag.Rect(0,0,0,0);
         exprs_node.addAll(exprs);
 
-        exprs[0].pos = { x:0, y:0 };
+        exprs[0].pos = { x:bubbleLeft.size.w / 4, y:0 };
 
         // TODO: Fix the need for this hack.
         if (exprs[0] instanceof BagExpr) {
@@ -676,7 +692,40 @@ class Goal {
             exprs[i].ignoreEvents = true;
         }
 
-        node.addAll([bg, txt]);
+        let image = Resource.getImage(this.alien_image);
+        let width = (60 / image.naturalHeight) * image.naturalWidth;
+        let alien = new mag.ImageRect(0, -10, width, 70, this.alien_image);
+
+        node.addAll([bg, alien]);
+
+        let lastExpr = exprs[exprs.length - 1];
+        let firstExpr = exprs[0];
+        let exprsWidth = lastExpr.absolutePos.x + lastExpr.absoluteSize.w - firstExpr.absolutePos.x;
+
+        console.log(exprsWidth);
+        exprsWidth -= 0.7 * (bubbleLeftWidth + bubbleRightWidth);
+        let bubble = [bubbleLeft];
+
+        while (exprsWidth > 0) {
+            exprsWidth -= bubbleMidWidth;
+            bubble.push(new mag.ImageRect(0, 0, bubbleMidWidth, 80, 'caption-long-mid'));
+        }
+
+        bubble.push(bubbleRight);
+
+        let x = alien.pos.x + alien.size.w;
+        for (let b of bubble) {
+            b.pos = { x: x, y: -15 };
+            x += b.size.w;
+        }
+
+        node.addAll(bubble);
+
+        node.pos = { x: 10, y: 10 };
+        exprs_node.pos = { x: bubble[0].absolutePos.x + 0.3 * bubble[0].absoluteSize.w, y:10 };
+        let lastChild = bubble[bubble.length - 1];
+        bg.size = { w: 10 + lastChild.absolutePos.x+ lastChild.absoluteSize.w, h:70 };
+
         return [node, exprs_node];
     }
 

@@ -23,6 +23,17 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     var loadChapterFromFile = (json_filename) => {
         return new Promise(function(resolve, reject) {
             $.getJSON(__LEVELS_PATH + json_filename + '.json', function(json) {
+                // Copy the planet's aliens to the individual level
+                // definitions, so that buildLevel has access to
+                // them. Provide a default alien when not specified.
+                let aliens = (json.resources && json.resources.aliens) ?
+                    json.resources.aliens : ["alien-function-1"];
+                for (let level of json.levels) {
+                    level.resources = level.resources || {
+                        aliens: aliens,
+                    };
+                }
+
                 pushChapter(json);
                 resolve();
             });
@@ -64,6 +75,26 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAudio('fatbtn-beep2', 'fatbtn_space2.wav');
     loadAudio('goback', 'ui_back.wav');
     loadAudio('zoomin', 'zoom_planet.wav');
+
+    loadImage('alien-bag-1', 'aliens/bagguys/1.png');
+    loadImage('alien-bag-2', 'aliens/bagguys/2.png');
+    loadImage('alien-bag-3', 'aliens/bagguys/3.png');
+    loadImage('alien-boolean-1', 'aliens/booleanguys/1.png');
+    loadImage('alien-boolean-2', 'aliens/booleanguys/2.png');
+    loadImage('alien-boolean-3', 'aliens/booleanguys/3.png');
+    loadImage('alien-boolean-4', 'aliens/booleanguys/4.png');
+    loadImage('alien-boolean-5', 'aliens/booleanguys/5.png');
+    loadImage('alien-conditional-1', 'aliens/conditionalguys/1.png');
+    loadImage('alien-conditional-2', 'aliens/conditionalguys/2.png');
+    loadImage('alien-conditional-3', 'aliens/conditionalguys/3.png');
+    loadImage('alien-conditional-4', 'aliens/conditionalguys/4.png');
+    loadImage('alien-function-1', 'aliens/functionguys/1.png');
+    loadImage('alien-function-2', 'aliens/functionguys/2.png');
+    loadImage('alien-function-3', 'aliens/functionguys/3.png');
+
+    loadImage('caption-long-left', 'starboy/caption-long-left.png');
+    loadImage('caption-long-mid', 'starboy/caption-long-mid.png');
+    loadImage('caption-long-right', 'starboy/caption-long-right.png');
 
     loadImage('bag-background', 'bg-stars.png');
     loadImage('infinity-symbol', 'infinity_symbol.png');
@@ -211,9 +242,9 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         if (fadedBorders.length > 0) {
 
             ExprManager.fadesAtBorder = false;
-            let unfaded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
+            let unfaded = Level.make(level_desc).build(canvas);
             ExprManager.fadesAtBorder = true;
-            let faded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
+            let faded = Level.make(level_desc).build(canvas);
 
             let unfaded_exprs = unfaded.nodes;
             let faded_exprs   = faded.nodes;
@@ -295,7 +326,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             return faded;
         }
         else {
-            return Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
+            return Level.make(level_desc).build(canvas);
         }
     };
     Resource.level = levels;
