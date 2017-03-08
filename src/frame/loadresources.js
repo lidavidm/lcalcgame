@@ -9,6 +9,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
 
     var levels = [];
     var chapters = [];
+    let digraph;
     var markChapter = (json, prev_levels) => {
         var d = { name:json.chapterName, description:json.description, startIdx:prev_levels.length };
         if (json.resources) d.resources = json.resources;
@@ -42,6 +43,16 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     var loadChaptersFromFiles = (files) => { // Loads all chapters from json files asynchronously.
         // Chain loading promises
         return files.reduce( (prev,curr) => prev.then(() => loadChapterFromFile(curr)), Promise.resolve());
+    };
+
+    const loadChaptersFromDigraph = (definition) => {
+        return Promise.all(Object.keys(definition).map(loadChapterFromFile)).then((chapters) => {
+            digraph = {
+                chapters: chapters,
+                transitions: definition,
+            };
+            return digraph;
+        });
     };
 
     Resource.markChapter = markChapter;
@@ -206,8 +217,21 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     // Load preset animations from image sequences.
     loadAnimation('poof', [0, 4], 120); // Cloud 'poof' animation for destructor piece.
 
+    const chapterDigraph = {
+        'intro': ['booleans'],
+        'booleans': ['conditionals'],
+        'conditionals': ['bindings', 'bags'],
+        'bindings': ['combination'],
+        'bags': ['combination'],
+        'combination': ['map'],
+        'map': ['assign'],
+        'assign': ['sequence'],
+        'sequence': [],
+    };
+
     // Add levels here: (for now)
-    var chapter_load_prom = loadChaptersFromFiles( ['intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map', 'assign', 'sequence'] );
+    let chapter_load_prom = loadChaptersFromDigraph(chapterDigraph);
+    // var chapter_load_prom = loadChaptersFromFiles( ['intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map', 'assign', 'sequence'] );
 
     Resource.startChapter = (chapterName, canvas) => {
         for (let i = 0; i < chapters.length; i++) {
@@ -346,5 +370,22 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             if (c.name === name) return c;
         }
         return undefined;
+    };
+    Resource.getChapterGraph = () => {
+        if (chapter_load_prom) return chapter_load_prom.then(() => {
+            chapter_load_prom = null;
+            return new Promise(function(resolve, reject) {
+                resolve({
+                    chapters: chapters.slice(),
+                    transitions: digraph.transitions,
+                });
+            });
+        });
+        else return new Promise(function(resolve, reject) {
+            resolve({
+                chapters: chapters.slice(),
+                transitions: digraph.transitions,
+            });
+        });
     };
 }

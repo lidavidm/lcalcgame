@@ -702,7 +702,6 @@ class Goal {
         let firstExpr = exprs[0];
         let exprsWidth = lastExpr.absolutePos.x + lastExpr.absoluteSize.w - firstExpr.absolutePos.x;
 
-        console.log(exprsWidth);
         exprsWidth -= 0.7 * (bubbleLeftWidth + bubbleRightWidth);
         let bubble = [bubbleLeft];
 
