@@ -470,6 +470,9 @@ class PlanetCard extends mag.ImageRect {
         glow.ignoreEvents = true;
         this.glow = glow;
 
+        // Enable backing glow for newly accessible planet
+        this.highlighted = false;
+
         // Text
         const capitalize = (string) => (string.charAt(0).toUpperCase() + string.slice(1));
         let t = new TextExpr(capitalize(name), 'Futura', 14);
@@ -536,6 +539,11 @@ class PlanetCard extends mag.ImageRect {
         }
     }
 
+    highlight() {
+        this.highlighted = true;
+        this.glow.opacity = 0.5;
+    }
+
     onmouseclick() {
         if (this.onclick)
             this.onclick();
@@ -543,18 +551,22 @@ class PlanetCard extends mag.ImageRect {
     }
     onmouseenter() {
         this.selected = true;
-        this.glow.opacity = 0;
+        this.glow.opacity = this.highlighted ? 0.5 : 0.0;
         Animate.tween(this.glow, { opacity:1.0 }, 100).after(() => {
             this.glow.opacity = 1;
         });
     }
     onmouseleave(pos) {
-        if (distBetweenPos(pos, this.pos) > this.absoluteSize.h / 4.0)
+        if (distBetweenPos(pos, this.pos) > this.absoluteSize.h / 4.0) {
             this.selected = false;
+            if (this.highlighted) {
+                this.highlight(); // Reset glow
+            }
+        }
     }
 
     drawInternal(ctx, pos, boundingSize) {
-        if (this.selected && this.scale.x < 1.1) {
+        if (this.highlighted || (this.selected && this.scale.x < 1.1)) {
             this.glow.parent = this;
             this.glow.draw(ctx);
         }
@@ -841,6 +853,7 @@ class ChapterSelectMenu extends mag.Stage {
                 for (let chap of flyToChapIdx) {
                     let newChapIdx = chap.chapterIdx;
                     let newPlanet = this.planets[newChapIdx];
+                    newPlanet.highlight();
                     newPlanet.activate();
                     let oldOnClick = newPlanet.onclick;
                     newPlanet.onclick = () => {
