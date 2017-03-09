@@ -380,20 +380,28 @@ function next() {
         initEndGame();
     }
     else {
-        level_idx++;
-
-        Resource.getChapters().then((chapters) => {
+        Resource.getChapterGraph().then((graph) => {
+            let { chapters, transitions } = graph;
             for (let i = 0; i < chapters.length; i++) {
-                if (chapters[i].startIdx === level_idx) {
+                if (chapters[i].endIdx === level_idx) {
                     // Fly to the next planet,
                     // instead of going to the next level.
-                    level_idx--;
-                    initChapterSelectMenu(i);
+                    let nextPlanets = [];
+                    for (let j = 0; j < chapters.length; j++) {
+                        if (chapters[i].transitions.indexOf(chapters[j].key) > -1) {
+                            nextPlanets.push({
+                                chapterIdx: j,
+                                startIdx: chapters[j].startIdx,
+                            });
+                        }
+                    }
+                    initChapterSelectMenu(nextPlanets);
                     return;
                 }
             }
 
             // Otherwise...
+            level_idx++;
             initBoard();
         });
     }

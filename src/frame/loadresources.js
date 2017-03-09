@@ -10,13 +10,19 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     var levels = [];
     var chapters = [];
     let digraph;
-    var markChapter = (json, prev_levels) => {
-        var d = { name:json.chapterName, description:json.description, startIdx:prev_levels.length };
+    var markChapter = (json, json_filename, prev_levels) => {
+        var d = {
+            name:json.chapterName,
+            description:json.description,
+            startIdx:prev_levels.length,
+            endIdx: prev_levels.length + json.levels.length - 1,
+            key: json_filename,
+        };
         if (json.resources) d.resources = json.resources;
         chapters.push(d);
     };
-    var pushChapter = (json) => {
-        markChapter(json, levels);
+    var pushChapter = (json, json_filename) => {
+        markChapter(json, json_filename, levels);
         json.levels.forEach((lvl) => {
             levels.push(lvl);
         });
@@ -35,7 +41,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                     };
                 }
 
-                pushChapter(json);
+                pushChapter(json, json_filename);
                 resolve();
             });
         });
@@ -46,8 +52,14 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     };
 
     const loadChaptersFromDigraph = (definition) => {
-        let load = Object.keys(definition).reduce( (prev,curr) => prev.then(() => loadChapterFromFile(curr)), Promise.resolve());
-        return load.then((chapters) => {
+        let filenames = Object.keys(definition);
+        let load = filenames.reduce( (prev,curr) => prev.then(() => loadChapterFromFile(curr)), Promise.resolve());
+        return load.then(() => {
+            console.log(chapters);
+            // Chapters are in the same order as filenames
+            for (let i = 0; i < chapters.length; i++) {
+                chapters[i].transitions = definition[filenames[i]];
+            }
             digraph = {
                 chapters: chapters,
                 transitions: definition,

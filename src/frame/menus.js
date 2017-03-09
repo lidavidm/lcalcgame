@@ -810,6 +810,11 @@ class ChapterSelectShip extends mag.RotatableImageRect {
 }
 
 class ChapterSelectMenu extends mag.Stage {
+    // flyToChapIdx should be an array of
+    // {
+    //     chapterIdx: chapter_idx,
+    //     startIdx: idx_of_starting_level,
+    // }
     constructor(canvas, onLevelSelect, flyToChapIdx) {
         super(canvas);
 
@@ -819,7 +824,7 @@ class ChapterSelectMenu extends mag.Stage {
         let _this = this;
         _this.offset = { x:0, y:0 };
         Animate.wait(100).after(() => {
-
+            // TODO: determine last active planet via level_idx
             let lastActivePlanet = _this.planets[0];
             _this.planets.forEach((p) => {
                 if (p.active) lastActivePlanet = p;
@@ -828,25 +833,35 @@ class ChapterSelectMenu extends mag.Stage {
             let ship = new ChapterSelectShip();
             const shipScale = lastActivePlanet.radius / 120 / 2;
             ship.scale = { x:shipScale, y:shipScale };
-            //_this.bringToFront(ship);
 
             if (flyToChapIdx) {
                 this.add(ship);
-                ship.attachToPlanet(_this.planets[flyToChapIdx-1]);
-                ship.flyToPlanet(_this.planets[flyToChapIdx-1], _this.planets[flyToChapIdx]).then(() => {
-                    _this.planets[flyToChapIdx].activate();
-                    return new Promise(function(resolve, reject) {
-                        Animate.wait(600).after(() => {
-                            _this.remove(ship);
-                            resolve();
-                        });
-                    });
-                }).then(_this.planets[flyToChapIdx].onclick)
-                  .then(() => {
-                    _this.planets[flyToChapIdx].activateSpots();
-                    level_idx++;
-                    saveProgress();
-                });
+                ship.attachToPlanet(lastActivePlanet);
+
+                for (let chap of flyToChapIdx) {
+                    let newChapIdx = chap.chapterIdx;
+                    let newPlanet = this.planets[newChapIdx];
+                    newPlanet.activate();
+                    let oldOnClick = newPlanet.onclick;
+                    newPlanet.onclick = () => {
+                        ship.flyToPlanet(lastActivePlanet, newPlanet).then(() => {
+                            return new Promise(function(resolve, reject) {
+                                Animate.wait(600).after(() => {
+                                    _this.remove(ship);
+                                    resolve();
+                                });
+                            });
+                        }).then(oldOnClick)
+                            .then(() => {
+                                newPlanet.activateSpots();
+                                // Get level_idx from the chapter
+                                // itself, instead of assuming
+                                // linearity
+                                level_idx = chap.startIdx;
+                                saveProgress();
+                            });
+                    };
+                }
             } else {
                 ship.attachToPlanet(lastActivePlanet);
             }
@@ -1101,8 +1116,6 @@ function layoutPlanets(adjacencyList, boundingSize) {
         xCells = Math.ceil(xCells);
     }
 
-    console.log(xCells, yCells);
-
     let cellWidth = (boundingSize.w - 20) / xCells;
     let cellHeight = (boundingSize.h - 20) / yCells;
     let firstCellMultiplier = 1.0;
@@ -1136,11 +1149,6 @@ function layoutPlanets(adjacencyList, boundingSize) {
         }
 
         y += height;
-    }
-
-    console.log(gridCells);
-    for (let planet of sorted) {
-
     }
 
     return gridCells;
