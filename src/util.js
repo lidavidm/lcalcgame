@@ -466,6 +466,54 @@ function hexaRect(ctx, x, y, width, height, fill, stroke, strokeOpacity) {
   if (stroke) strokeWithOpacity(ctx, strokeOpacity);
 }
 
+function clampRect(ctx, x, y, topWidth, topHeight, midWidth, midHeight, botWidth, botHeight, radius, fill, stroke, strokeOpacity) {
+  if (typeof stroke == 'undefined') stroke = true;
+  if (typeof radius === 'undefined') radius = 5;
+  if (typeof radius === 'number') radius = {tl: radius, tr: radius, br: radius, bl: radius};
+  else {
+    var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
+    for (var side in defaultRadius) {
+      radius[side] = radius[side] || defaultRadius[side];
+    }
+  }
+  ctx.beginPath();
+
+  // Top edge
+  ctx.moveTo(x + radius.tl, y);
+  ctx.lineTo(x + topWidth - radius.tr, y);
+  ctx.quadraticCurveTo(x + topWidth, y, x + topWidth, y + radius.tr);
+
+  // Top-right rounded edge
+  ctx.lineTo(x + topWidth, y + topHeight - radius.br);
+  ctx.quadraticCurveTo(x + topWidth, y + topHeight, x + topWidth - radius.br, y + topHeight);
+
+  // Top-bottom sharp edge, meeting at a point with mid-right edge:
+  ctx.lineTo(x + midWidth, y + topHeight);
+  //ctx.quadraticCurveTo(x + midWidth, y + topHeight, x, y + topHeight - radius.bl);
+
+  // Mid-right sharp edge
+  ctx.lineTo(x + midWidth, y + topHeight + midHeight);
+
+  // Bot-top sharp edge
+  ctx.lineTo(x + botWidth, y + topHeight + midHeight);
+
+  // Bot-right rounded edge
+  ctx.lineTo(x + botWidth, y + topHeight + midHeight + botHeight - radius.br);
+  ctx.quadraticCurveTo(x + botWidth, y + topHeight + midHeight + botHeight, x + botWidth - radius.br, y + topHeight + midHeight + botHeight);
+
+  // Bot-bot rounded edge
+  ctx.lineTo(x + radius.bl, y + topHeight + midHeight + botHeight);
+  ctx.quadraticCurveTo(x, y + topHeight + midHeight + botHeight, x, y + topHeight + midHeight + botHeight - radius.bl);
+
+  // Bot-left rounded edge
+  ctx.lineTo(x, y + radius.tl);
+  ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+
+  ctx.closePath();
+  if (fill) ctx.fill();
+  if (stroke) strokeWithOpacity(ctx, strokeOpacity);
+}
+
 /** Thanks to markE @ SO: http://stackoverflow.com/a/25840319 */
  function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius, strokeStyle=null, fillStyle='white') {
      var rot = Math.PI / 2 * 3;

@@ -24,7 +24,7 @@ var NamedExpr = function (_Expression) {
         }
         var _this = _possibleConstructorReturn(this, (NamedExpr.__proto__ || Object.getPrototypeOf(NamedExpr)).call(this, exprs));
 
-        _this.color = 'orange';
+        _this.color = 'OrangeRed';
         _this.name = name;
         _this._args = args.map(function (a) {
             return a.clone();
@@ -107,49 +107,76 @@ var NamedExpr = function (_Expression) {
 // Analogous to 'define' in Scheme.
 
 
-var DefineExpr = function (_Expression2) {
-    _inherits(DefineExpr, _Expression2);
+var DefineExpr = function (_ClampExpr) {
+    _inherits(DefineExpr, _ClampExpr);
 
     function DefineExpr(expr) {
+        var name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
         _classCallCheck(this, DefineExpr);
 
-        var txt_define = new TextExpr('define');
-        txt_define.color = 'black';
+        //let txt_define = new TextExpr('define');
+        //txt_define.color = 'black';
+        var txt_input = new Expression([new TextExpr(name ? name : 'foo')]); // TODO: Make this text input field (or dropdown menu).
+        txt_input.color = 'Salmon';
+        txt_input.radius = 2;
+        txt_input.lock();
 
-        var _this2 = _possibleConstructorReturn(this, (DefineExpr.__proto__ || Object.getPrototypeOf(DefineExpr)).call(this, [txt_define, expr]));
+        var _this2 = _possibleConstructorReturn(this, (DefineExpr.__proto__ || Object.getPrototypeOf(DefineExpr)).call(this, [txt_input, expr]));
 
+        _this2.breakIndices = { top: 1, mid: 2, bot: 2 }; // for ClampExpr
         _this2.color = 'OrangeRed';
+        if (name) _this2.funcname = name;
         return _this2;
     }
 
     _createClass(DefineExpr, [{
         key: 'onmouseclick',
         value: function onmouseclick() {
-            this.performReduction();
+
+            if (this.funcname) {
+                this.performReduction();
+            } else {
+                // For now, prompt the user for a function name:
+                var funcname = window.prompt("What do you want to call it?", "foo");
+                if (funcname) {
+                    this.funcname = funcname.trim();
+                    // Check that name has no spaces etc...
+                    if (funcname.indexOf(/\s+/g) === -1) {
+                        this.performReduction();
+                    } else {
+                        window.alert("Name can't have spaces. Try again with something simpler."); // cancel
+                    }
+                }
+            }
+        }
+    }, {
+        key: 'reduceCompletely',
+        value: function reduceCompletely() {
+            return this;
         }
     }, {
         key: 'reduce',
         value: function reduce() {
             if (!this.expr || this.expr instanceof MissingExpression) return this;else {
 
-                // For now, prompt the user for a function name:
-                var funcname = window.prompt("What do you want to call it?", "foo");
-                if (funcname) {
-                    funcname = funcname.trim(); // remove trailing whitespace
-
-                    // Check that name has no spaces etc...
-                    if (funcname.indexOf(/\s+/g) === -1) {
-
-                        var args = [];
-                        var numargs = 0;
-                        if (this.expr instanceof LambdaExpr) numargs = this.expr.numOfNestedLambdas();
-                        for (var i = 0; i < numargs; i++) {
-                            args.push(new MissingExpression());
-                        } // Return named function (expression).
-                        return new NamedExpr(funcname, this.expr.clone(), args);
-                    } else {
-                        window.alert("Name can't have spaces. Try again with something simpler."); // cancel
-                    }
+                if (this.funcname) {
+                    var funcname = this.funcname;
+                    var args = [];
+                    var numargs = 0;
+                    if (this.expr instanceof LambdaExpr) numargs = this.expr.numOfNestedLambdas();
+                    for (var i = 0; i < numargs; i++) {
+                        args.push(new MissingExpression());
+                    } // Return named function (expression).
+                    var inf = new InfiniteExpression(new NamedExpr(funcname, this.expr.clone(), args));
+                    inf.pos = addPos(this.expr.absolutePos, { x: inf.size.w / 2.0, y: 0 });
+                    inf.anchor = { x: 0, y: 0.5 };
+                    //inf.pos = { x:this.stage.boundingSize.w, y:this.stage.toolbox.leftEdgePos.y };
+                    this.stage.add(inf);
+                    inf.update();
+                    this.stage.update();
+                    this.stage.toolbox.addExpression(inf);
+                    return inf;
                 }
 
                 return this; // cancel
@@ -163,7 +190,7 @@ var DefineExpr = function (_Expression2) {
     }, {
         key: 'expr',
         get: function get() {
-            return this.holes[1];
+            return this.children[1];
         }
     }, {
         key: 'constructorArgs',
@@ -173,4 +200,4 @@ var DefineExpr = function (_Expression2) {
     }]);
 
     return DefineExpr;
-}(Expression);
+}(ClampExpr);

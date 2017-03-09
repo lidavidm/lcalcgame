@@ -37,6 +37,7 @@ var ExprManager = (function() {
         'repeat':   [RepeatLoopExpr, FadedRepeatLoopExpr],
         'choice':   [ChoiceExpr],
         'snappable':[Snappable],
+        'level':    [ReductStageExpr]
     };
     var fade_level = {};
     var DEFAULT_FADE_LEVEL = 0;

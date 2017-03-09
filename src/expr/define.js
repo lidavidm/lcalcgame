@@ -1,8 +1,3 @@
- 
- 
- 
- 
-
 // Acts as a named wrapper for a def'd expression.
 class NamedExpr extends Expression {
     constructor(name, expr, args) {
@@ -12,7 +7,7 @@ class NamedExpr extends Expression {
         for ( let i = 0; i < args.length; i++ )
             exprs.push( args[i].clone() );
         super(exprs);
-        this.color = 'orange';
+        this.color = 'OrangeRed';
         this.name = name;
         this._args = args.map((a) => a.clone());
         this._wrapped_expr = expr;
@@ -63,45 +58,67 @@ class NamedExpr extends Expression {
 }
 
 // Analogous to 'define' in Scheme.
-class DefineExpr extends Expression {
-    constructor(expr) {
-        let txt_define = new TextExpr('define');
-        txt_define.color = 'black';
-        super([txt_define, expr]);
+class DefineExpr extends ClampExpr {
+    constructor(expr, name=null) {
+        //let txt_define = new TextExpr('define');
+        //txt_define.color = 'black';
+        let txt_input = new Expression([ new TextExpr(name ? name : 'foo') ]); // TODO: Make this text input field (or dropdown menu).
+        txt_input.color = 'Salmon';
+        txt_input.radius = 2;
+        txt_input.lock();
+        super([txt_input, expr]);
+        this.breakIndices = { top:1, mid:2, bot:2 }; // for ClampExpr
         this.color = 'OrangeRed';
+        if (name) this.funcname = name;
     }
-    get expr() { return this.holes[1]; }
+    get expr() { return this.children[1]; }
     get constructorArgs() { return [ this.expr.clone() ]; }
     onmouseclick() {
-        this.performReduction();
+
+        if (this.funcname) {
+            this.performReduction();
+        }
+        else {
+            // For now, prompt the user for a function name:
+            let funcname = window.prompt("What do you want to call it?", "foo");
+            if (funcname) {
+                this.funcname = funcname.trim();
+                // Check that name has no spaces etc...
+                if (funcname.indexOf(/\s+/g) === -1) {
+                    this.performReduction();
+                }
+                else {
+                    window.alert("Name can't have spaces. Try again with something simpler."); // cancel
+                }
+            }
+        }
     }
+    reduceCompletely() { return this; }
     reduce() {
         if (!this.expr ||
             this.expr instanceof MissingExpression)
             return this;
         else {
 
-            // For now, prompt the user for a function name:
-            let funcname = window.prompt("What do you want to call it?", "foo");
-            if (funcname) {
-                funcname = funcname.trim(); // remove trailing whitespace
+            if (this.funcname) {
+                let funcname = this.funcname;
+                let args = [];
+                let numargs = 0;
+                if (this.expr instanceof LambdaExpr)
+                    numargs = this.expr.numOfNestedLambdas();
+                for (let i = 0; i < numargs; i++)
+                    args.push( new MissingExpression() );
 
-                // Check that name has no spaces etc...
-                if (funcname.indexOf(/\s+/g) === -1) {
-
-                    let args = [];
-                    let numargs = 0;
-                    if (this.expr instanceof LambdaExpr)
-                        numargs = this.expr.numOfNestedLambdas();
-                    for (let i = 0; i < numargs; i++)
-                        args.push( new MissingExpression() );
-
-                    // Return named function (expression).
-                    return new NamedExpr(funcname, this.expr.clone(), args);
-                }
-                else {
-                    window.alert("Name can't have spaces. Try again with something simpler."); // cancel
-                }
+                // Return named function (expression).
+                let inf = new InfiniteExpression( new NamedExpr(funcname, this.expr.clone(), args) );
+                inf.pos = addPos(this.expr.absolutePos, {x:inf.size.w/2.0, y:0});
+                inf.anchor = { x:0, y:0.5 };
+                //inf.pos = { x:this.stage.boundingSize.w, y:this.stage.toolbox.leftEdgePos.y };
+                this.stage.add(inf);
+                inf.update();
+                this.stage.update();
+                this.stage.toolbox.addExpression(inf);
+                return inf;
             }
 
             return this; // cancel

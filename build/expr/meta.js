@@ -114,21 +114,62 @@ var InfiniteExpression = function (_GraphicValueExpr) {
 }(GraphicValueExpr);
 
 // A game within a game...
+// Wraps around a Reduct stage.
 
 
-var MetaExpression = function (_GraphicValueExpr2) {
-    _inherits(MetaExpression, _GraphicValueExpr2);
+var ReductStageExpr = function (_GraphicValueExpr2) {
+    _inherits(ReductStageExpr, _GraphicValueExpr2);
 
-    function MetaExpression(parentStage, levelStage) {
-        _classCallCheck(this, MetaExpression);
+    function ReductStageExpr(goal, board, toolbox) {
+        _classCallCheck(this, ReductStageExpr);
 
-        var _this3 = _possibleConstructorReturn(this, (MetaExpression.__proto__ || Object.getPrototypeOf(MetaExpression)).call(this, new MetaInnerExpression(0, 0, parentStage, levelStage)));
+        // The inputs can be either arrays or expressions, so let's cast them all into arrays:
+        if (!Array.isArray(goal)) goal = [goal];
+        if (!Array.isArray(board)) board = [board];
+        if (!Array.isArray(toolbox)) toolbox = [toolbox];
 
+        // Delay building the stage until after we have a parent...
+
+        var _this3 = _possibleConstructorReturn(this, (ReductStageExpr.__proto__ || Object.getPrototypeOf(ReductStageExpr)).call(this, new Expression()));
+
+        _this3.initialExprs = [goal, board, toolbox];
         _this3.ignoreEvents = false;
+        _this3._parent = null;
+        _this3.innerStage = null;
         return _this3;
     }
 
-    _createClass(MetaExpression, [{
+    _createClass(ReductStageExpr, [{
+        key: 'build',
+        value: function build(parent) {
+
+            // Get the parent's stage:
+            var parentStage = parent.stage;
+            if (!parentStage) {
+                console.error('@ ReductStageExpr.build: Parent has no Stage.');
+                return;
+            }
+
+            // Get the setup exprs:
+            if (!this.initialExprs) {
+                console.error('@ ReductStageExpr.build: No initial expressions.');
+                return;
+            }
+            var goal = this.initialExprs[0];
+            var board = this.initialExprs[1];
+            var toolbox = this.initialExprs[2];
+
+            // Create the inner stage:
+            var lvl = new Level(board, goal, toolbox);
+            var innerStage = lvl.build(parent.stage.canvas);
+            var v = new MetaInnerExpression(0, 0, parentStage, innerStage);
+
+            // Repair the pointers:
+            this.graphicNode = v;
+            this.children[0] = v;
+            this.holes[0] = v;
+        }
+    }, {
         key: 'onmouseclick',
         value: function onmouseclick(pos) {
             console.log('dsdfsf');
@@ -150,13 +191,24 @@ var MetaExpression = function (_GraphicValueExpr2) {
             return this.hitsWithin(pos);
         }
     }, {
+        key: 'parent',
+        get: function get() {
+            return this._parent;
+        },
+        set: function set(p) {
+            if (this._parent != p) {
+                if (!this.innerStage) this.build(p);
+                this._parent = p;
+            }
+        }
+    }, {
         key: 'delegateToInner',
         get: function get() {
             return false;
         }
     }]);
 
-    return MetaExpression;
+    return ReductStageExpr;
 }(GraphicValueExpr);
 
 var MetaInnerExpression = function (_mag$Rect) {

@@ -82,10 +82,15 @@ var Toolbox = function (_mag$ImageRect) {
             this.items.forEach(function (e) {
                 e.update();
                 e.anchor = { x: 0, y: 0.5 };
-                if (animated) Animate.tween(e, { pos: pos }, 300, function (elapsed) {
-                    return Math.pow(elapsed, 0.5);
-                });else e.pos = pos;
-                pos = addPos(pos, { x: e.size.w + _this2.padding, y: 0 });
+                if (e instanceof InfiniteExpression) pos.x += 80;
+                if (animated) {
+                    Animate.tween(e, { pos: clonePos(pos) }, 300, function (elapsed) {
+                        return Math.pow(elapsed, 0.5);
+                    });
+                } else {
+                    e.pos = clonePos(pos);
+                }
+                pos.x += e.size.w + _this2.padding;
             });
         }
     }, {
