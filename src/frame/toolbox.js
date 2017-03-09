@@ -44,15 +44,19 @@ class Toolbox extends mag.ImageRect {
 
     // Set expression positions in toolbox.
     setLayout(animated=false) {
-        let pos = this.leftEdgePos;
+        var pos = this.leftEdgePos;
         this.items.forEach((e) => {
             e.update();
             e.anchor = { x:0, y:0.5 };
-            if (animated)
-                Animate.tween(e, { pos:pos }, 300, (elapsed) => Math.pow(elapsed, 0.5));
-            else
-                e.pos = pos;
-            pos = addPos(pos, { x:e.size.w + this.padding, y:0 } );
+            if (e instanceof InfiniteExpression) pos.x += 80;
+            if (animated) {
+                Animate.tween(e, { pos:clonePos(pos) }, 300, (elapsed) => {
+                    return Math.pow(elapsed, 0.5);
+                });
+            } else {
+                e.pos = clonePos(pos);
+            }
+            pos.x += e.size.w + this.padding;
         });
     }
 

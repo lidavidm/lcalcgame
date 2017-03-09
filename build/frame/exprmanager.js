@@ -37,7 +37,8 @@ var ExprManager = function () {
         'assign': [JumpingAssignExpr, AssignExpr, EqualsAssignExpr],
         'sequence': [NotchedSequence, Sequence],
         'repeat': [RepeatLoopExpr],
-        'choice': [ChoiceExpr]
+        'choice': [ChoiceExpr],
+        'level': [ReductStageExpr]
     };
     var fade_level = {};
     var DEFAULT_FADE_LEVEL = 0;

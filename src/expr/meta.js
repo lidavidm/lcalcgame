@@ -74,12 +74,61 @@ class InfiniteExpression extends GraphicValueExpr {
 }
 
 // A game within a game...
-class MetaExpression extends GraphicValueExpr {
-    constructor(parentStage, levelStage) {
+// Wraps around a Reduct stage.
+class ReductStageExpr extends GraphicValueExpr {
+    constructor(goal, board, toolbox) {
 
-        super(new MetaInnerExpression(0, 0, parentStage, levelStage));
+        // The inputs can be either arrays or expressions, so let's cast them all into arrays:
+        if (!Array.isArray(goal)) goal = [goal];
+        if (!Array.isArray(board)) board = [board];
+        if (!Array.isArray(toolbox)) toolbox = [toolbox];
 
+        // Delay building the stage until after we have a parent...
+        super(new Expression());
+
+        this.initialExprs = [ goal, board, toolbox ];
         this.ignoreEvents = false;
+        this._parent = null;
+        this.innerStage = null;
+    }
+
+    get parent() {
+        return this._parent;
+    }
+    set parent(p) {
+        if (this._parent != p) {
+            if (!this.innerStage) this.build(p);
+            this._parent = p;
+        }
+    }
+
+    build(parent) {
+
+        // Get the parent's stage:
+        var parentStage = parent.stage;
+        if (!parentStage) {
+            console.error('@ ReductStageExpr.build: Parent has no Stage.');
+            return;
+        }
+
+        // Get the setup exprs:
+        if (!this.initialExprs) {
+            console.error('@ ReductStageExpr.build: No initial expressions.');
+            return;
+        }
+        var goal = this.initialExprs[0];
+        var board = this.initialExprs[1];
+        var toolbox = this.initialExprs[2];
+
+        // Create the inner stage:
+        var lvl = new Level(board, goal, toolbox);
+        var innerStage = lvl.build(parent.stage.canvas);
+        var v = new MetaInnerExpression(0, 0, parentStage, innerStage);
+
+        // Repair the pointers:
+        this.graphicNode = v;
+        this.children[0] = v;
+        this.holes[0] = v;
     }
 
     get delegateToInner() {

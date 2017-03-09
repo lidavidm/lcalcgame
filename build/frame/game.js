@@ -270,8 +270,6 @@ var Level = function () {
     }, {
         key: 'findFastPacking',
 
-        //return new Expression();
-
 
         // Unreachable....
 
@@ -858,6 +856,7 @@ var Level = function () {
                 'sequence': ExprManager.getClass('sequence'),
                 'repeat': ExprManager.getClass('repeat'),
                 'choice': ExprManager.getClass('choice'),
+                'level': ExprManager.getClass('level'),
                 'dot': function () {
                     var circ = new CircleExpr(0, 0, 18);
                     circ.color = 'gold';
@@ -875,6 +874,9 @@ var Level = function () {
                     lock(e, locked);
                 } else e = op_mappings[arg];
                 return e;
+            } else if (arg.indexOf('`') > -1) {
+                // treat as string
+                return arg.replace('`', '');
             } else if (arg.indexOf('λ') > -1) {
                 var varname = arg.replace('λ', '');
                 return new (ExprManager.getClass('hole'))(varname);

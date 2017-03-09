@@ -25,6 +25,7 @@ function init() {
     //     }
     // });
 
+
     Resource.setCurrentLoadSequence('init');
     LOAD_REDUCT_RESOURCES(Resource);
 
@@ -170,18 +171,22 @@ function initMainMenu() {
             // Clicked 'settings' button. Transition to settings screen.
         //});
 
-        level_idx = 12;
         initBoard();
 
-        let meta = new MetaExpression(stage, Resource.buildLevel(Resource.level[10], stage.canvas));
-        meta.pos = { x:200, y:200 };
-        stage.add(meta);
+        // let meta = new MetaExpression(stage, Resource.buildLevel(Resource.level[10], stage.canvas));
+        // meta.pos = { x:200, y:200 };
+        // stage.add(meta);
 
         //let inf = new InfiniteExpression( new (ExprManager.getClass('star'))(0,0,25,5) );
-        let inf = new InfiniteExpression( new TrueExpr() );
-        //let inf = new InfiniteExpression( new StarExpr() );
-        inf.pos = { x:400, y:300 };
-        stage.add(inf);
+
+        // let inf = new InfiniteExpression( new TrueExpr() );
+        // inf.pos = { x:400, y:300 };
+        // stage.add(inf);
+        //
+        // let def = new DefineExpr( new MissingExpression(), 'double' );
+        // def.pos = { x:300, y:400 };
+        // stage.add(def);
+        // console.log(def);
 
         /*
         let substage = new mag.StageNode(0, 0, Resource.buildLevel(Resource.level[10], canvas), canvas);
