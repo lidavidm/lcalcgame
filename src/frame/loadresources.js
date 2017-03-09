@@ -55,7 +55,6 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         let filenames = Object.keys(definition);
         let load = filenames.reduce( (prev,curr) => prev.then(() => loadChapterFromFile(curr)), Promise.resolve());
         return load.then(() => {
-            console.log(chapters);
             // Chapters are in the same order as filenames
             for (let i = 0; i < chapters.length; i++) {
                 chapters[i].transitions = definition[filenames[i]];

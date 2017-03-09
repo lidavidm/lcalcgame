@@ -864,7 +864,9 @@ class ChapterSelectMenu extends mag.Stage {
                     newPlanet.activate();
                     let oldOnClick = newPlanet.onclick;
 
-                    this.makeTrail(lastActivePlanet, newPlanet);
+                    let trail = this.makeTrail(lastActivePlanet, newPlanet);
+                    trail.percentDrawn = 0;
+                    Animate.tween(trail, { percentDrawn:1.0 }, 1000);
 
                     newPlanet.onclick = () => {
                         newPlanet.removeHighlight();
@@ -923,7 +925,7 @@ class ChapterSelectMenu extends mag.Stage {
 
     showTrails() {
         this.trails.forEach((trail) => {
-            trail.percentDrawn = 100;
+            trail.percentDrawn = 1;
         });
     }
 
@@ -1107,15 +1109,38 @@ class ChapterSelectMenu extends mag.Stage {
     makeTrail(planet1, planet2) {
         let path1 = planet1.path.points;
         let path2 = planet2.path.points;
-        console.log(path1[path1.length - 1], path2[0]);
-        let trail = new ArrowPath([
-            addPos(
-                { x: -planet1.radius, y: -planet1.radius },
-                addPos(planet1.absolutePos, path1[path1.length - 1])),
-            addPos(
-                { x: -planet2.radius, y: -planet2.radius },
-                addPos(planet2.absolutePos, path2[0])),
-        ]);
+        let start = addPos(
+            { x: -planet1.radius, y: -planet1.radius },
+            addPos(planet1.absolutePos, path1[path1.length - 1]));
+        let end = addPos(
+            { x: -planet2.radius, y: -planet2.radius },
+            addPos(planet2.absolutePos, path2[0]));
+        let dx = end.x - start.x;
+        let dy = Math.abs(end.y - start.y);
+        let factor = 0.3;
+
+        let control1 = { x: start.x + factor * dx, y: 0 },
+            control2 = { x: end.x - factor * dx, y: 0 };
+        if (end.y < start.y) {
+            control1.y = start.y + factor * dy;
+            control2.y = end.y - factor * dy;
+        }
+        else {
+            control1.y = start.y - factor * dy;
+            control2.y = end.y + factor * dy;
+        }
+        // Cubic bezier curve
+        let points = [];
+        for (let i = 0; i < 101; i++) {
+            let t = i / 100;
+            let x = Math.pow(1-t, 3)*start.x + 3*Math.pow(1-t, 2)*t*control1.x
+                + 3*(1-t)*t*t*control2.x + t*t*t*end.x;
+            let y = Math.pow(1-t, 3)*start.y + 3*Math.pow(1-t, 2)*t*control1.y
+                + 3*(1-t)*t*t*control2.y + t*t*t*end.y;
+            points.push({ x: x, y: y });
+        }
+        let trail = new ArrowPath(points);
+        trail.percentDrawn = 1;
         trail.stroke.color = 'white';
         trail.stroke.lineDash = [5];
         trail.stroke.lineWidth = 2;
@@ -1124,6 +1149,8 @@ class ChapterSelectMenu extends mag.Stage {
         trail.parent = new mag.Rect(0, 0, this.boundingSize.w, this.boundingSize.h);
         this.add(trail);
         this.trails.push(trail);
+
+        return trail;
     }
 }
 
