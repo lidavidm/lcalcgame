@@ -46,7 +46,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     };
 
     const loadChaptersFromDigraph = (definition) => {
-        return Promise.all(Object.keys(definition).map(loadChapterFromFile)).then((chapters) => {
+        let load = Object.keys(definition).reduce( (prev,curr) => prev.then(() => loadChapterFromFile(curr)), Promise.resolve());
+        return load.then((chapters) => {
             digraph = {
                 chapters: chapters,
                 transitions: definition,
@@ -231,7 +232,6 @@ function LOAD_REDUCT_RESOURCES(Resource) {
 
     // Add levels here: (for now)
     let chapter_load_prom = loadChaptersFromDigraph(chapterDigraph);
-    // var chapter_load_prom = loadChaptersFromFiles( ['intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map', 'assign', 'sequence'] );
 
     Resource.startChapter = (chapterName, canvas) => {
         for (let i = 0; i < chapters.length; i++) {

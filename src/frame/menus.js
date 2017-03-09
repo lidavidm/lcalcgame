@@ -942,15 +942,17 @@ class ChapterSelectMenu extends mag.Stage {
 
     setPlanetsToDefaultPos(dur) {
         let stage = this;
-        let POS_MAP = this.getPlanetPos();
-        stage.planets.forEach((p, i) => {
-            p.ignoreEvents = false;
-            if (p.spots) p.spots.forEach((s) => { s.ignoreEvents = true; });
-            if (p.expandFunc) p.onclick = p.expandFunc;
-            if (!stage.has(p)) stage.add(p);
-            let rad = POS_MAP[i].r;
-            Animate.tween(p, { pos: {x:POS_MAP[i].x+15, y:POS_MAP[i].y+40}, scale:{x:1,y:1}, opacity:1.0 }, dur).after(() => {
-                if (p.active) p.showText();
+        Resource.getChapterGraph().then((chapters) => {
+            const POS_MAP = layoutPlanets(chapters.transitions, this.boundingSize);
+            stage.planets.forEach((p, i) => {
+                p.ignoreEvents = false;
+                if (p.spots) p.spots.forEach((s) => { s.ignoreEvents = true; });
+                if (p.expandFunc) p.onclick = p.expandFunc;
+                if (!stage.has(p)) stage.add(p);
+                let rad = POS_MAP[i].r;
+                Animate.tween(p, { pos: {x:POS_MAP[i].x+15, y:POS_MAP[i].y+40}, scale:{x:1,y:1}, opacity:1.0 }, dur).after(() => {
+                    if (p.active) p.showText();
+                });
             });
         });
     }
@@ -980,12 +982,6 @@ class ChapterSelectMenu extends mag.Stage {
     }
 
     showChapters(onLevelSelect) {
-
-        // For now, hardcore positions and radii per chapter:
-        // TODO: Move to .json specs.
-        const POS_MAP = this.getPlanetPos();
-        const IMG_MAP = this.getPlanetImages();
-
         // Expand and disappear animations.
         let stage = this;
         let expand = (planet) => {
@@ -1013,11 +1009,11 @@ class ChapterSelectMenu extends mag.Stage {
 
         // Each chapter is a 'Planet' in Starboy's Universe:
         //let planetNode = new mag.Rect(0,0,1,1);
-        Resource.getChapters().then((chapters) => {
-
+        Resource.getChapterGraph().then((chapters) => {
             let planets = [];
+            const POS_MAP = layoutPlanets(chapters.transitions, this.boundingSize);
 
-            chapters.forEach((chap, i) => {
+            chapters.chapters.forEach((chap, i) => {
 
                 let pos = i < POS_MAP.length ? POS_MAP[i] : { x:0, y:0, r:10 };
                 let planet = new PlanetCard(pos.x + 15, pos.y + 40, pos.r, chap.name, chap.resources ? chap.resources.planet : 'planet-bagbag');
@@ -1064,9 +1060,135 @@ class ChapterSelectMenu extends mag.Stage {
     }
 }
 
+function layoutPlanets(adjacencyList, boundingSize) {
+    // From src/util.js
+    let seed = 42;
+    let seededRandom = function(max, min) {
+        max = max || 1;
+        min = min || 0;
 
+        seed = (seed * 9301 + 49297) % 233280;
+        var rnd = seed / 233280;
 
+        return min + rnd * (max - min);
+    };
 
+    let layout = {};
+
+    // Perform a topological sort of the planets to get a layout
+    let sorted = topologicalSort(adjacencyList);
+
+    // Divide the available space into a grid
+    let gridCells = [];
+    let aspectRatio = boundingSize.w / boundingSize.h;
+    let yCells = Math.sqrt(sorted.length / aspectRatio);
+    let xCells = aspectRatio * yCells;
+
+    if (Math.floor(yCells) * Math.floor(xCells) >= sorted.length) {
+        yCells = Math.floor(yCells);
+        xCells = Math.floor(xCells);
+    }
+    else if (Math.ceil(yCells) * Math.floor(xCells) >= sorted.length) {
+        yCells = Math.ceil(yCells);
+        xCells = Math.floor(xCells);
+    }
+    else if (Math.floor(yCells) * Math.ceil(xCells) >= sorted.length) {
+        yCells = Math.floor(yCells);
+        xCells = Math.ceil(xCells);
+    }
+    else {
+        yCells = Math.ceil(yCells);
+        xCells = Math.ceil(xCells);
+    }
+
+    console.log(xCells, yCells);
+
+    let cellWidth = (boundingSize.w - 20) / xCells;
+    let cellHeight = (boundingSize.h - 20) / yCells;
+    let firstCellMultiplier = 1.0;
+    let xCellMultiplier = 1.0, yCellMultiplier = 1.0;
+    if (xCells > 1 && yCells > 1) {
+        // Make the first cell slightly larger
+        firstCellMultiplier = 1.5;
+        xCellMultiplier = (xCells - firstCellMultiplier) / (xCells - 1);
+        yCellMultiplier = (yCells - firstCellMultiplier) / (yCells - 1);
+    }
+
+    let y = 10;
+    for (let row = 0; row < yCells; row++) {
+        let x = 10;
+        let height = cellHeight * (row == 0 ? firstCellMultiplier : yCellMultiplier);
+        for (let col = 0; col < xCells; col++) {
+            let width = cellWidth * (col == 0 ? firstCellMultiplier : xCellMultiplier);
+            let r = seededRandom(0.6, 0.8) * Math.min(width, height) / 2;
+            let xfudge = 1.2 * (width - 2 * r) / 2.0;
+            let yfudge = 1.2 * (height - 2 * r) / 2.0;
+            let xf = (col == 0 && row == 0) ? 0 : seededRandom(-xfudge, xfudge);
+            let yf = (col == 0 && row == 0) ? 0 : seededRandom(-yfudge, yfudge);
+            gridCells.push({
+                x: x + (width / 2) - r + xf,
+                y: y + (height / 2) - r + yf,
+                w: width,
+                h: height,
+                r: r
+            });
+            x += width;
+        }
+
+        y += height;
+    }
+
+    console.log(gridCells);
+    for (let planet of sorted) {
+
+    }
+
+    return gridCells;
+    // return layout;
+}
+
+function topologicalSort(adjacencyList) {
+    // Get all nodes without dependencies. Add them to the result
+    // list, sorting all nodes at each stage. Remove them from the
+    // dependencies of other nodes, and repeat. Continue until there
+    // are no remaining nodes without dependencies.
+    let result = [];
+
+    let dependencies = {};
+    for (let src of Object.keys(adjacencyList)) {
+        dependencies[src] = {};
+    }
+
+    for (let [src, dsts] of Object.entries(adjacencyList)) {
+        for (let dst of dsts) {
+            dependencies[dst][src] = true;
+        }
+    }
+
+    while (true) {
+        let found = [];
+        for (let [dst, deps] of Object.entries(dependencies)) {
+            if (Object.keys(deps).length === 0) {
+                found.push(dst);
+            }
+        }
+
+        if (found.length === 0) break;
+
+        for (let dst of found) {
+            for (let [_, deps] of Object.entries(dependencies)) {
+                delete deps[dst];
+            }
+            delete dependencies[dst];
+        }
+
+        // Sort the list to give us a deterministic order
+        found.sort();
+        result = result.concat(found);
+    }
+
+    return result;
+}
 
 
 
