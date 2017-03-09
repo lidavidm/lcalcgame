@@ -7,6 +7,10 @@ var stage;
 var canvas;
 
 var level_idx = getCookie('level_idx') || 0;
+var completedLevels = {};
+if (window.localStorage["completedLevels"]) {
+    completedLevels = JSON.parse(window.localStorage["completedLevels"]);
+}
 if (level_idx !== 0) level_idx = parseInt(level_idx);
 var cur_menu = null;
 
@@ -241,6 +245,7 @@ function saveProgress() {
     var cookie = getCookie('level_idx');
     if (cookie.length === 0 || level_idx > parseInt(cookie)) {
         setCookie('level_idx', level_idx);
+        window.localStorage["completedLevels"] = JSON.stringify(completedLevels);
     }
 }
 
@@ -382,6 +387,9 @@ function next() {
     else {
         Resource.getChapterGraph().then((graph) => {
             let { chapters, transitions } = graph;
+            completedLevels[level_idx] = true;
+            saveProgress();
+
             for (let i = 0; i < chapters.length; i++) {
                 if (chapters[i].endIdx === level_idx) {
                     // Fly to the next planet,
