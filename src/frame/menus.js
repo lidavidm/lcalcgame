@@ -544,6 +544,11 @@ class PlanetCard extends mag.ImageRect {
         this.glow.opacity = 0.5;
     }
 
+    removeHighlight() {
+        this.highlighted = false;
+        this.glow.opacity = 0;
+    }
+
     onmouseclick() {
         if (this.onclick)
             this.onclick();
@@ -830,6 +835,8 @@ class ChapterSelectMenu extends mag.Stage {
     constructor(canvas, onLevelSelect, flyToChapIdx) {
         super(canvas);
 
+        this.trails = [];
+
         this.showStarField();
         this.showChapters(onLevelSelect);
 
@@ -856,7 +863,11 @@ class ChapterSelectMenu extends mag.Stage {
                     newPlanet.highlight();
                     newPlanet.activate();
                     let oldOnClick = newPlanet.onclick;
+
+                    this.makeTrail(lastActivePlanet, newPlanet);
+
                     newPlanet.onclick = () => {
+                        newPlanet.removeHighlight();
                         ship.flyToPlanet(lastActivePlanet, newPlanet).then(() => {
                             return new Promise(function(resolve, reject) {
                                 Animate.wait(600).after(() => {
@@ -910,6 +921,18 @@ class ChapterSelectMenu extends mag.Stage {
         this.ctx.restore();
     }
 
+    showTrails() {
+        this.trails.forEach((trail) => {
+            trail.percentDrawn = 100;
+        });
+    }
+
+    hideTrails() {
+         this.trails.forEach((trail) => {
+            trail.percentDrawn = 0;
+        });
+    }
+
     showStarField() {
         const NUM_STARS = 100;
         let genRandomPt = () => randomPointInRect( {x:0, y:0, w:GLOBAL_DEFAULT_SCREENSIZE.width, h:GLOBAL_DEFAULT_SCREENSIZE.height} );
@@ -947,27 +970,6 @@ class ChapterSelectMenu extends mag.Stage {
         }
     }
 
-    getPlanetPos() {
-        return [
-            { x:154, y:124, r:120 },
-            { x:446, y:86,  r:80 },
-            { x:690, y:208, r:44 },
-            { x:456, y:324, r:60 },
-            { x:138, y:388, r:80 },
-            { x:316, y:480, r:40 },
-            { x:530, y:492, r:70 },
-            { x:760, y:580, r:30 }
-        ];
-    }
-    getPlanetImages() {
-        return {
-            'Equality':'planet-boolili',
-            'Basics':'planet-functiana',
-            'Conditionals':'planet-conditionabo',
-            'Collections':'planet-bagbag'
-        };
-    }
-
     setPlanetsToDefaultPos(dur) {
         let stage = this;
         Resource.getChapterGraph().then((chapters) => {
@@ -1000,6 +1002,7 @@ class ChapterSelectMenu extends mag.Stage {
         var btn_back = new mag.Button(10, 10, 50, 50, { default: 'btn-back-default', hover: 'btn-back-hover', down: 'btn-back-down' }, () => {
             grid.hide().after(() => this.remove(grid));
             this.remove(btn_back);
+            this.showTrails();
             this.setPlanetsToDefaultPos(500);
             Resource.play('goback');
         });
@@ -1050,6 +1053,7 @@ class ChapterSelectMenu extends mag.Stage {
                 planet.anchor = { x:0.5, y:0.5 };
                 planet.shadowOffset = 0;
                 planet.onclick = () => {
+                    this.hideTrails();
                     for (let k = 0; k < planets.length; k++) {
                         planets[k].ignoreEvents = true;
                         if (k !== i) hide(planets[k]);
@@ -1079,12 +1083,47 @@ class ChapterSelectMenu extends mag.Stage {
                 planets.push(planet);
             });
 
-            this.planets = planets;
-            //this.add(planetNode);
-            //this.planetNode = planetNode;
+            let transitionMap = {};
+            chapters.chapters.forEach((chap, i) => {
+                transitionMap[chap.key] = i;
+            });
+            chapters.chapters.forEach((chap, i) => {
+                let planet1 = planets[i];
+                if (planet1.active) {
+                    for (let t of chap.transitions) {
+                        let planet2 = planets[transitionMap[t]];
+                        if (planet2.active) {
+                            this.makeTrail(planet1, planet2);
+                        }
+                    }
+                }
+            });
 
+            this.planets = planets;
         });
 
+    }
+
+    makeTrail(planet1, planet2) {
+        let path1 = planet1.path.points;
+        let path2 = planet2.path.points;
+        console.log(path1[path1.length - 1], path2[0]);
+        let trail = new ArrowPath([
+            addPos(
+                { x: -planet1.radius, y: -planet1.radius },
+                addPos(planet1.absolutePos, path1[path1.length - 1])),
+            addPos(
+                { x: -planet2.radius, y: -planet2.radius },
+                addPos(planet2.absolutePos, path2[0])),
+        ]);
+        trail.stroke.color = 'white';
+        trail.stroke.lineDash = [5];
+        trail.stroke.lineWidth = 2;
+        trail.drawArrowHead = false;
+        trail.ignoreEvents = true;
+        trail.parent = new mag.Rect(0, 0, this.boundingSize.w, this.boundingSize.h);
+        this.add(trail);
+        this.trails.push(trail);
     }
 }
 
