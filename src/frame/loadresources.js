@@ -59,9 +59,23 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             for (let i = 0; i < chapters.length; i++) {
                 chapters[i].transitions = definition[filenames[i]];
             }
+
+            // Construct the dependencies list as well
+            let dependencies = {};
+            for (let i = 0; i < chapters.length; i++) {
+                dependencies[i] = {};
+            }
+            for (let i = 0; i < chapters.length; i++) {
+                let dsts = definition[filenames[i]];
+                for (let dst of dsts) {
+                    dependencies[filenames.indexOf(dst)][i] = true;
+                }
+            }
+
             digraph = {
                 chapters: chapters,
                 transitions: definition,
+                dependencies: dependencies,
             };
             return digraph;
         });
@@ -389,6 +403,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                 resolve({
                     chapters: chapters.slice(),
                     transitions: digraph.transitions,
+                    dependencies: digraph.dependencies,
                 });
             });
         });
@@ -396,7 +411,17 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             resolve({
                 chapters: chapters.slice(),
                 transitions: digraph.transitions,
+                dependencies: digraph.dependencies,
             });
         });
+    };
+
+    Resource.isChapterUnlocked = (idx) => {
+        for (let depIdx of Object.keys(digraph.dependencies[idx])) {
+            if (!completedLevels[chapters[depIdx].endIdx]) {
+                return false;
+            }
+        }
+        return true;
     };
 }

@@ -245,8 +245,8 @@ function saveProgress() {
     var cookie = getCookie('level_idx');
     if (cookie.length === 0 || level_idx > parseInt(cookie)) {
         setCookie('level_idx', level_idx);
-        window.localStorage["completedLevels"] = JSON.stringify(completedLevels);
     }
+    window.localStorage["completedLevels"] = JSON.stringify(completedLevels);
 }
 
 function initBoard() {
@@ -396,7 +396,8 @@ function next() {
                     // instead of going to the next level.
                     let nextPlanets = [];
                     for (let j = 0; j < chapters.length; j++) {
-                        if (chapters[i].transitions.indexOf(chapters[j].key) > -1) {
+                        if (Resource.isChapterUnlocked(j) &&
+                            chapters[i].transitions.indexOf(chapters[j].key) > -1) {
                             nextPlanets.push({
                                 chapterIdx: j,
                                 startIdx: chapters[j].startIdx,
@@ -437,4 +438,16 @@ function gotoChapter() {
     var selected_chapter = sel.options[sel.selectedIndex].value;
     level_idx = Resource.getChapter(selected_chapter).startIdx;
     initBoard();
+}
+
+function resetToLevel(idx) {
+    window.completedLevels = {};
+    level_idx = idx;
+
+    for (let i = 0; i < idx; i++) {
+        window.completedLevels[i] = true;
+    }
+
+    saveProgress();
+    document.cookie = "level_idx=" + level_idx.toString();
 }

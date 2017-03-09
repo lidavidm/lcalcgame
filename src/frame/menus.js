@@ -606,6 +606,13 @@ class PlanetCard extends mag.ImageRect {
         this.showText();
         this.active = true;
     }
+
+    deactivate() {
+        this.active = false;
+        this.hideText();
+        this.removeChild(this.path);
+    }
+
     activateSpots() {
         if (!this.spots) return;
 
@@ -641,15 +648,25 @@ class PlanetCard extends mag.ImageRect {
             Resource.play('fatbtn-beep');
         });
     }
+
+    deactivateSpots() {
+        this.removeChild(this.path);
+
+        this.spots.forEach((spot) => {
+            spot.opacity = 0;
+            spot.ignoreEvents = true;
+        });
+    }
+
     updateLevelSpots() {
         if (!this.spots) return;
         let c = getCookie('level_idx');
         if (c) c = parseInt(c);
         this.spots.forEach((spot) => {
             spot.opacity = 1.0;
-            if (c > spot.levelId)
+            if (completedLevels[spot.levelId])
                 spot.enable();
-            else if (c === spot.levelId) {
+            if (c === spot.levelId) {
                 spot.enable();
                 spot.flash();
             }
@@ -662,13 +679,8 @@ class PlanetCard extends mag.ImageRect {
     }
 
     setLevels(levels, onLevelSelect) {
-        if (window.level_idx < levels[1]) {
-            this.removeChild(this.path);
-        }
-        else {
-            this.activate();
-        }
-
+        this.startLevelIdx = levels[1];
+        this.endLevelIdx = levels[1] + levels[0].length - 1;
         const NUM_LVLS = levels[0].length; // total number of cells to fit on the grid
         const genClickCallback = (level_idx) => {
             return () => {
@@ -687,14 +699,24 @@ class PlanetCard extends mag.ImageRect {
             spot.levelId = levels[1] + i-1;
             spot.stroke.lineWidth = Math.max(this.radius / 120 * 2, 1.5);
             spot.ignoreEvents = true;
-            if (window.level_idx >= levels[1] + i-1) {
+
+            if (completedLevels[spot.levelId]) {
                 spot.enable();
-                if (window.level_idx === levels[1] + i-1) spot.flash();
+            }
+            // We have not completed the first level of this planet,
+            // but presumably this planet is enabled, so enable the
+            // first level
+            else if (i === 1) {
+                spot.enable();
+                spot.flash();
+            }
+            else if (window.level_idx === levels[1] + i-1) {
+                spot.enable();
+                spot.flash();
             }
             this.spots.push(spot);
 
-            if (window.level_idx >= levels[1])
-                this.addChild(spot);
+            if (this.active) this.addChild(spot);
         }
     }
 }
@@ -843,11 +865,13 @@ class ChapterSelectMenu extends mag.Stage {
         let _this = this;
         _this.offset = { x:0, y:0 };
         Animate.wait(100).after(() => {
-            // TODO: determine last active planet via level_idx
-            let lastActivePlanet = _this.planets[0];
-            _this.planets.forEach((p) => {
-                if (p.active) lastActivePlanet = p;
-            });
+            let lastActivePlanet;
+            for (let planet of this.planets) {
+                if (planet.active && level_idx >= planet.startLevelIdx && level_idx <= planet.endLevelIdx) {
+                    lastActivePlanet = planet;
+                    break;
+                }
+            }
 
             let ship = new ChapterSelectShip();
             const shipScale = lastActivePlanet.radius / 120 / 2;
@@ -862,6 +886,7 @@ class ChapterSelectMenu extends mag.Stage {
                     let newPlanet = this.planets[newChapIdx];
                     newPlanet.highlight();
                     newPlanet.activate();
+                    newPlanet.deactivateSpots();
                     let oldOnClick = newPlanet.onclick;
 
                     let trail = this.makeTrail(lastActivePlanet, newPlanet);
@@ -892,16 +917,7 @@ class ChapterSelectMenu extends mag.Stage {
             } else {
                 ship.attachToPlanet(lastActivePlanet);
             }
-
-            // Camera follow...
-            //let twn = new mag.IndefiniteTween((delta) => {
-            //    _this.planetNode.pos = { x:-ship.pos.x+GLOBAL_DEFAULT_SCREENSIZE.width/2.0, y:-ship.pos.y+GLOBAL_DEFAULT_SCREENSIZE.height/2.0 };
-            //});
-            //twn.run();
-
         });
-
-        //$('body').css('background', '#333');
     }
 
     updateLevelSpots() {
@@ -1048,7 +1064,6 @@ class ChapterSelectMenu extends mag.Stage {
             const POS_MAP = layoutPlanets(chapters.transitions, this.boundingSize);
 
             chapters.chapters.forEach((chap, i) => {
-
                 let pos = i < POS_MAP.length ? POS_MAP[i] : { x:0, y:0, r:10 };
                 let planet = new PlanetCard(pos.x + 15, pos.y + 40, pos.r, chap.name, chap.resources ? chap.resources.planet : 'planet-bagbag');
                 planet.color = 'white';
@@ -1072,11 +1087,18 @@ class ChapterSelectMenu extends mag.Stage {
                 };
 
                 if (chap.resources) {
-
                     const levels = Resource.levelsForChapter(chap.name);
 
                     // Set path curve on planet.
                     planet.setCurve(chap.resources.curve);
+
+                    // Activate planet if applicable
+                    if (Resource.isChapterUnlocked(i)) {
+                        planet.activate();
+                    }
+                    else {
+                        planet.deactivate();
+                    }
 
                     // Set levels along curve.
                     planet.setLevels(levels, onLevelSelect);
@@ -1168,8 +1190,6 @@ function layoutPlanets(adjacencyList, boundingSize) {
         return min + rnd * (max - min);
     };
 
-    let layout = {};
-
     // Perform a topological sort of the planets to get a layout
     let sorted = topologicalSort(adjacencyList);
 
@@ -1231,8 +1251,11 @@ function layoutPlanets(adjacencyList, boundingSize) {
         y += height;
     }
 
+    if (gridCells.length > sorted.length) {
+        let extraCells = gridCells.splice(sorted.length);
+    }
+
     return gridCells;
-    // return layout;
 }
 
 function topologicalSort(adjacencyList) {
