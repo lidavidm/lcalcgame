@@ -253,7 +253,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         'combination': ['map'],
         'map': ['assign'],
         'assign': ['sequence'],
-        'sequence': [],
+        'sequence': ['loops'],
+        'loops': [],
     };
 
     // Add levels here: (for now)

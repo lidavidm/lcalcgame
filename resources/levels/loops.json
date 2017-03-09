@@ -1,48 +1,293 @@
 {
-    "chapterName":"Sequencing",
-    "description":"Sequencing",
+    "chapterName":"Loops",
+    "description":"Loops",
     "levels": [
         {
-            "description": "Sequence operator",
-            "board": "(sequence /(assign /($x) _) /(assign /($y) /($x))) ($y)",
-            "goal": "(diamond)",
-            "toolbox": "(star) (diamond) (triangle)"
+            "description": "Introduce numbers",
+            "board": "(+ /1 /2)",
+            "goal": "(3)"
         },
         {
-            "description": "Bigger sequence",
-            "board": "(sequence /(assign /($x) /(triangle)) /(assign /($y) _) /(assign /($z) /(== /($x) /($y)))) ($z)",
-            "goal": "(false)",
-            "toolbox": "(star) (triangle)"
+            "description": "Introduce zero",
+            "board": "(+ /1 _)",
+            "toolbox": "(0)",
+            "goal": "(1)"
         },
         {
-            "description": "Bigger sequence",
-            "board": "(sequence /(assign /($x) _) /(assign /($y) _) /(assign /($z) /(== /($x) /($y)))) ($z)",
-            "goal": "(true)",
-            "toolbox": "(star) (star) (triangle) (triangle)"
-        },
-        {
-            "description": "Fill in the blank",
-            "board": "(sequence /(assign /($z) _) _ /(assign /($y) /($x)))",
-            "goal": "(star)",
-            "toolbox": "(star) (assign _ _) ($x) ($y) ($z)"
-        },
-        {
-            "description": "Swap the variables",
-            "board": "(sequence /(assign /($z) /($x)) _ _ /(assign /$z /(diamond)))",
-            "goal": "(star)",
-            "toolbox": "($y) (assign /($x) /$y) /(assign /($y) /$z)",
+            "description": "Variable in reduction",
+            "board": "(+ /($y) _)",
+            "goal": "(4)",
+            "toolbox": "(1) (2)",
             "globals": {
-                "x": "(star)",
-                "y": "(triangle)"
+                "y": "(2)"
             }
         },
         {
-            "description": "Unlock the conditional",
-            "board": "(sequence /(assign /($y) _) /(assign /($c) /(== /($y) /(diamond))) /(assign /($y) /(if /$c /$x))) ($y)",
-            "goal": "(star)",
-            "toolbox": "(triangle) (diamond)",
+            "description": "Assignment with addition",
+            "board": "(assign /$x /(+ _ /4))",
+            "goal": "(6)",
+            "toolbox": "($x) ($y)",
             "globals": {
-                "x": "(star)"
+                "x": "(1)",
+                "y": "(2)"
+            }
+        },
+        {
+            "description": "Order matters",
+            "board": "($x) ($x) (assign /$x /(+ /$x /1)) (assign /$x /4)",
+            "goal": "(3) (4)",
+            "globals": {
+                "x": "(2)"
+            }
+        },
+        {
+            "description": "Order matters",
+            "board": "(sequence _ /(assign /$y /$x) _) (assign /$x /(+ /$x /1)) (assign /$x /4)",
+            "goal": "(3) (4)",
+            "toolbox": "($x) ($y)",
+            "globals": {
+                "x": "(2)"
+            }
+        },
+        {
+            "description": "Increment things",
+            "board": "(sequence _ _)",
+            "goal": "(3)",
+            "toolbox": "($x) (assign /$x /(+ /$x /1)) (assign /$x /(+ /$x /1))",
+            "globals": {
+                "x": "(1)"
+            }
+        },
+        {
+            "description": "Increment things with repeat",
+            "board": "($x) (repeat /(2) /(assign /$x /(+ /$x /1)))",
+            "goal": "(3)",
+            "toolbox": "",
+            "globals": {
+                "x": "(1)"
+            }
+        },
+        {
+            "description": "Increment things with repeat",
+            "board": "($x) ($y) (repeat /(4) /(assign /$x /(+ /$x /1))) (repeat /(1) /(assign /$y /(+ /$y /1)))",
+            "goal": "(5) (1)",
+            "toolbox": "",
+            "globals": {
+                "x": "(1)",
+                "y": "(0)"
+            }
+        },
+        {
+            "description": "Increment things with repeat",
+            "board": "($x) (repeat _ /(assign /$x /(+ /$x /1)))",
+            "goal": "(4)",
+            "toolbox": "(0) (1) (2) (3)",
+            "globals": {
+                "x": "(1)"
+            }
+        },
+        {
+            "description": "You can repeat a variable number of times",
+            "board": "($x) (repeat /$x /(assign /$x /(+ /$x /1)))",
+            "toolbox": "",
+            "goal": "(4)",
+            "globals": {
+                "x": "(2)"
+            }
+        },
+        {
+            "description": "You can repeat a variable number of times",
+            "board": "(sequence /(repeat /$x /(assign /$x /(+ /$x /1))) /(assign /$y /(== /$x _))) ($y)",
+            "toolbox": "(4) (5) (6)",
+            "goal": "(true)",
+            "globals": {
+                "x": "(3)",
+                "y": "(false)"
+            }
+        },
+        {
+            "description": "Use sequence in repeat",
+            "board": "($x) ($y) (repeat /(2) /(sequence /(assign /$x /(+ /$x _)) /(assign /$y /(+ /$y _))))",
+            "goal": "(3) (6)",
+            "toolbox": "(0) (1) (2)",
+            "globals": {
+                "x": "(1)",
+                "y": "(2)"
+            }
+        },
+        {
+            "description": "Overwriting variables",
+            "board": "($x) ($y) (assign /$y /(4)) (assign /$x /(3)) (assign /$y /(5)) (sequence _ _ _)",
+            "goal": "(1) (4)",
+            "toolbox": "",
+            "globals": {
+                "x": "(1)",
+                "y": "(2)"
+            }
+        },
+        {
+            "description": "Use sequence in repeat with dependencies",
+            "board": "($y) (repeat /(3) /(sequence /(assign /$x /(+ /$x /1)) /(assign /$y /(== /$x _))))",
+            "goal": "(true)",
+            "toolbox": "(3) (4) (5) (6)",
+            "globals": {
+                "x": "(2)"
+            }
+        },
+        {
+            "description": "Use sequence in repeat with dependencies",
+            "board": "($y) (repeat /(2) /(sequence /(assign /$x /(+ /$x /1)) /(assign /$y /(if /(== /$x _) /(star)))))",
+            "goal": "(star)",
+            "toolbox": "(1) (2) (3)",
+            "globals": {
+                "x": "(1)"
+            }
+        },
+        {
+            "description": "The choice block",
+            "board": "(choice (2) (3) (4) (5) (6))",
+            "goal": "(6)",
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "description": "The choice block",
+            "board": "(choice (2) (3)) (choice (4) (5))",
+            "goal": "(2) (4)",
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "description": "The choice block",
+            "board": "(== _ _) (choice (star) (false)) (choice (2) (3) ($x))",
+            "goal": "(true)",
+            "toolbox": "",
+            "globals": {
+                "x": "(false)"
+            }
+        },
+        {
+            "description": "The choice block",
+            "board": "(assign /$x (star)) ($x) (choice (== _ /(star)) (== _ /(triangle)))",
+            "goal": "(false)",
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "description": "The choice block",
+            "board": "(assign /$x /(+ /$x /1))",
+            "goal": "(3)",
+            "toolbox": "($x) (2) (choice (assign _ _) (repeat _ _))",
+            "globals": {
+                "x": "(1)"
+            }
+        },
+        {
+            "description": "The choice block",
+            "board": "($x) (choice (assign /$x _) (repeat _ _) (== _ _)) (choice (triangle) (star) (diamond))",
+            "goal": "(triangle)",
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "description": "The choice block",
+            "board": "($y) (repeat /(3) /(sequence /(assign /$x /(+ /$x /1)) /(assign /$y _)))",
+            "goal": "(true)",
+            "toolbox": "(choice (assign /$x _) (repeat /$x _) (== /$x _) (if /$x _)) (choice (1) (2) (3) (4) (5) (6))",
+            "globals": {
+                "x": "(2)",
+                "y": "(false)"
+            }
+        },
+        {
+            "description": "Snappables",
+            "board": "($x) (snappable /(assign /$x /(star))) (snappable /(assign /$x /(diamond)) (snappable /(assign /$x /(circle))))",
+            "goal": "(star)",
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "description": "Snappables",
+            "board": "($y) (snappable /(assign /$x /3)) (snappable /(assign /$y /$x)) (snappable /(assign /$x /5))",
+            "goal": "(3)",
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "description": "Snappables",
+            "board": "($x) (snappable /(assign /$x /(star))) (snappable /(repeat /3 /(assign /$x /(+ /$x /1)))) (snappable /(assign /$x /2))",
+            "goal": "(5)",
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "description": "Snappables",
+            "board": "($z) (snappable /(assign /$z /(== /$x /$y)))",
+            "goal": "(true)",
+            "toolbox": "(snappable /(assign /$x /(+ /$x /1))) (snappable /(assign /$y /$x))",
+            "globals": {
+                "x": "(1)",
+                "y": "(3)"
+            }
+        },
+        {
+            "description": "Snappables",
+            "board": "($y) (snappable /(assign /$x _)) (snappable /(assign /$y /$x))",
+            "goal": "(star)",
+            "toolbox": "(diamond) (star) (triangle)",
+            "globals": {
+            }
+        },
+        {
+            "description": "Snappables",
+            "board": "($x) (snappable /(assign /$x /(== /$x _))) (snappable /(assign /$x /(star))) (snappable /(assign /$x /(diamond))) (choice (diamond) (triangle) (circle))",
+            "goal": "(true)",
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "description": "Snappables",
+            "board": "($z) (snappable /(assign /$z _)) (choice (== /$x _) (== /$x /(circle))) (snappable /(assign /$x /(diamond))) (choice (star) (diamond))",
+            "goal": "(circle)",
+            "toolbox": "(if _ /(circle))",
+            "globals": {
+            }
+        },
+        {
+            "description": "Fade repeat",
+            "board": "($x) (repeat /(2) /(assign /$x /(+ /$x /1)))",
+            "goal": "(3)",
+            "toolbox": "",
+            "globals": {
+                "x": "(1)"
+            }
+        },
+        {
+            "description": "Fade repeat",
+            "board": "($x) ($y) (repeat _ /(sequence /(assign /$x /(+ /$x /1)) /(assign /$y /(+ /$y /2))))",
+            "goal": "(3) (5)",
+            "toolbox": "(0) (1) (2)",
+            "globals": {
+                "x": "(1)",
+                "y": "(1)"
+            }
+        },
+        {
+            "description": "Fade repeat",
+            "board": "($x) (repeat /2 _) (choice (assign /$x /(+ /$x _)) (assign /$y /(+ /$y _))) (choice (0) (1) ($x) ($y))",
+            "goal": "(4)",
+            "toolbox": "",
+            "globals": {
+                "x": "(0)",
+                "y": "(2)"
             }
         }
     ],
