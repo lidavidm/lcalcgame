@@ -1141,10 +1141,10 @@ class ChapterSelectMenu extends mag.Stage {
         }
         let trail = new ArrowPath(points);
         trail.percentDrawn = 1;
-        trail.stroke.color = 'white';
-        trail.stroke.lineDash = [5];
+        trail.stroke.color = '#AAA';
+        trail.stroke.lineDash = [3];
         trail.stroke.lineWidth = 2;
-        trail.drawArrowHead = false;
+        trail.drawArrowHead = true;
         trail.ignoreEvents = true;
         trail.parent = new mag.Rect(0, 0, this.boundingSize.w, this.boundingSize.h);
         this.add(trail);
