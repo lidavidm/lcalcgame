@@ -869,6 +869,7 @@ class ChapterSelectMenu extends mag.Stage {
                     Animate.tween(trail, { percentDrawn:1.0 }, 1000);
 
                     newPlanet.onclick = () => {
+                        newPlanet.onclick = oldOnClick;
                         newPlanet.removeHighlight();
                         ship.flyToPlanet(lastActivePlanet, newPlanet).then(() => {
                             return new Promise(function(resolve, reject) {
