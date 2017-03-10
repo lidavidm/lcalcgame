@@ -44,6 +44,7 @@ class InfiniteExpression extends GraphicValueExpr {
         // and let the user drag the clone.
         let c = this.graphicNode.clone();
         this.stage.add(c);
+        Resource.play('place');
         c.onmouseenter(pos);
         c.onmousedrag(pos);
         //c.pos =  { x:c.size.w, y:0 };
@@ -88,24 +89,12 @@ class ReductStageExpr extends GraphicValueExpr {
 
         this.initialExprs = [ goal, board, toolbox ];
         this.ignoreEvents = false;
-        this._parent = null;
-        this.innerStage = null;
     }
 
-    get parent() {
-        return this._parent;
-    }
-    set parent(p) {
-        if (this._parent != p) {
-            if (!this.innerStage) this.build(p);
-            this._parent = p;
-        }
-    }
-
-    build(parent) {
+    build() {
 
         // Get the parent's stage:
-        var parentStage = parent.stage;
+        var parentStage = this.parent.stage;
         if (!parentStage) {
             console.error('@ ReductStageExpr.build: Parent has no Stage.');
             return;
@@ -121,12 +110,11 @@ class ReductStageExpr extends GraphicValueExpr {
         var toolbox = this.initialExprs[2];
 
         // Create the inner stage:
-        var lvl = new Level(board, goal, toolbox);
-        var innerStage = lvl.build(parent.stage.canvas);
+        var lvl = new Level(board, new Goal(new ExpressionPattern(goal)), toolbox);
+        var innerStage = lvl.build(parentStage.canvas);
         var v = new MetaInnerExpression(0, 0, parentStage, innerStage);
 
         // Repair the pointers:
-        this.graphicNode = v;
         this.children[0] = v;
         this.holes[0] = v;
     }
@@ -134,9 +122,27 @@ class ReductStageExpr extends GraphicValueExpr {
     get delegateToInner() {
         return false;
     }
+    get innerStage() {
+        return this.children[0];
+    }
+
+    onmousedown(pos) {
+        if (this.innerStage.expanded)
+            this.innerStage.onmousedown(pos);
+        else
+            super.onmousedown(pos);
+    }
+    onmousedrag(pos) {
+        if (this.innerStage.expanded)
+            this.innerStage.onmousedrag(pos);
+        else
+            super.onmousedrag(pos);
+    }
+    onmousehover(pos) {
+        this.innerStage.onmousehover(pos);
+    }
 
     onmouseclick(pos) {
-        console.log('dsdfsf');
         if (this.graphicNode.expanded)
             this.graphicNode.shrink();
         else
@@ -202,6 +208,16 @@ class MetaInnerExpression extends mag.Rect {
             this._size = { w:sz.w, h:sz.h };
             if (this.parent) this.parent.update();
         }
+    }
+
+    onmousedown(pos) {
+        this.substage.onmousedown(pos);
+    }
+    onmousedrag(pos) {
+        this.substage.onmousedrag(pos);
+    }
+    onmousehover(pos) {
+        this.substage.onmousehover(pos);
     }
 
     expand() {

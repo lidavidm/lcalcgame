@@ -36,8 +36,12 @@ class NamedExpr extends Expression {
 
                 // All the arguments check out. Now we need to apply them.
                 let expr = this.expr;
+                console.log(expr);
+
                 if (args.length > 0)
                     expr = args.reduce((lambdaExpr, arg) => lambdaExpr.applyExpr(arg), expr); // Chains application to inner lambda expressions.
+
+                Resource.play('define-convert');
 
                 return expr.clone(); // to be safe we'll clone it.
             }
@@ -69,6 +73,7 @@ class DefineExpr extends ClampExpr {
         super([txt_input, expr]);
         this.breakIndices = { top:1, mid:2, bot:2 }; // for ClampExpr
         this.color = 'OrangeRed';
+        this.expr.shadowOffset = -2;
         if (name) this.funcname = name;
     }
     get expr() { return this.children[1]; }
@@ -118,6 +123,9 @@ class DefineExpr extends ClampExpr {
                 inf.update();
                 this.stage.update();
                 this.stage.toolbox.addExpression(inf);
+
+                Resource.play('define');
+
                 return inf;
             }
 

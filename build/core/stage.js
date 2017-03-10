@@ -76,12 +76,12 @@ var mag = function (_) {
             value: function transformCoords(pos) {
                 pos = clonePos(pos);
                 var sz = this.absoluteSize;
-                pos.x += this.pos.x;
-                pos.y += this.pos.y;
+                pos.x -= this.absolutePos.x;
+                pos.y -= this.absolutePos.y;
                 pos.x -= sz.w * this.anchor.x;
                 pos.y -= sz.h * this.anchor.y;
-                pos.x /= this.scale.x;
-                pos.y /= this.scale.y;
+                pos.x /= this.absoluteScale.x;
+                pos.y /= this.absoluteScale.y;
                 return pos;
             }
         }, {
@@ -174,6 +174,14 @@ var mag = function (_) {
         }
 
         _createClass(Stage, [{
+            key: 'finishLoading',
+
+
+            // Call this once all nodes are loaded into the stage,
+            // for instance at level generation.
+            // Extend this to do any final setup.
+            value: function finishLoading() {}
+        }, {
             key: 'clear',
             value: function clear() {
                 this.ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -409,7 +417,8 @@ var mag = function (_) {
                 // Mouse clicked + moving (drag).
                 if (this.heldNode) {
                     // Only send this event to the 'mousedown'd node.
-                    if (this.heldNode instanceof mag.StageNode) {
+
+                    if (this.heldNode instanceof ReductStageExpr) {
                         this.heldNode.onmousedrag(pos);
                         this.draw();
                         return;

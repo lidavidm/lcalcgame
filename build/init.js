@@ -1,6 +1,6 @@
 'use strict';
 
-var __SHOW_DEV_INFO = false;
+var __SHOW_DEV_INFO = true;
 var __COND = 'unknown';
 
 var GLOBAL_DEFAULT_CTX = null;
@@ -168,6 +168,11 @@ function initMainMenu() {
         //});
 
         initBoard();
+
+        var apply = new ApplyExpr(Level.parse('star')[0], Level.parse('(λx #x #x)')[0]);
+        apply.pos = { x: 200, y: 400 };
+        stage.add(apply);
+        console.log(apply);
 
         // let meta = new MetaExpression(stage, Resource.buildLevel(Resource.level[10], stage.canvas));
         // meta.pos = { x:200, y:200 };

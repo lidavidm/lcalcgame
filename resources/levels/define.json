@@ -3,9 +3,27 @@
     "description":"Defining functions to add numbers",
     "levels": [
         {
-            "board": "(+ _ _) (2) (1)",
+            "board": "(define /star `star)",
+            "goal": "(star) (star) (star)"
+        },
+        {
+            "board": "(define /rect `rect) (define /triangle `triangle)",
+            "goal": "(triangle) (rect) (triangle)"
+        },
+        {
+            "description": "Deceptive naming",
+            "board": "(define /star `rect) (define /rect `star)",
+            "goal": "(star) (star)"
+        },
+        {
+            "board": "(define _ `???)",
+            "goal": "(rect) (rect) (rect)",
+            "toolbox": "(star) (triangle) (rect)"
+        },
+        {
+            "board": "(+ _ _)",
             "goal": "3",
-            "toolbox": ""
+            "toolbox": "(1) (2) (3)"
         },
         {
             "board": "(λx /(+ #x 2))",
@@ -28,9 +46,14 @@
             "toolbox": "(1)"
         },
         {
-            "board": "(define _ `???)",
-            "goal": "(3) (3) (3)",
-            "toolbox": "(1) (2) (3) (4)"
+            "board": "(define /(λx /(+ #x #x)) `double) (== 6 _)",
+            "goal": "true",
+            "toolbox": "(1) (2) (3)"
+        },
+        {
+            "board": "(define /(λx /(+ #x _)) `???)",
+            "goal": "6",
+            "toolbox": "(2) (1)"
         },
         {
             "board": "(define /(λx (level (+ #x #x) (+ _ _) (#_x))) `double)",

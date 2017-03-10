@@ -7,6 +7,13 @@ class ReductStage extends mag.Stage {
         this.environment = new Environment();
     }
 
+    finishLoading() {
+        let innerStages = this.getNodesWithClass(ReductStageExpr);
+        innerStages.forEach((stg) => {
+            stg.build();
+        });
+    }
+
     // Save state of game board and push onto undo stack.
     saveState() {
         // TODO: DML save and restore the environment as well.
@@ -58,7 +65,7 @@ class ReductStage extends mag.Stage {
 
                     let you_win = () => {
 
-                        if (level_idx < 1) {
+                        //if (level_idx < 1) {
                             var cmp = new mag.ImageRect(GLOBAL_DEFAULT_SCREENSIZE.w / 2, GLOBAL_DEFAULT_SCREENSIZE.h / 2, 740 / 2, 146 / 2, 'victory');
                             cmp.anchor = { x:0.5, y:0.5 };
                             this.add(cmp);
@@ -68,9 +75,9 @@ class ReductStage extends mag.Stage {
                             Animate.wait(1080).after(function () {
                                 next();
                             });
-                        } else { // Skip victory jingle on every level after first.
-                            next();
-                        }
+                        //} else { // Skip victory jingle on every level after first.
+                        //    next();
+                        //}
                     };
 
                     let pairs = level_complete;
