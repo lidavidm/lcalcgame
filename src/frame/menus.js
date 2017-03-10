@@ -413,20 +413,30 @@ class LevelSpot extends mag.Circle {
         this.enabledColor = 'white';
         this.stroke = { color:'black', lineWidth:2 };
         this.onclick = onclick;
+        this.flashing = false;
     }
     flash() {
+        this.enabledColor = 'cyan';
+        this.color = 'cyan';
+
+        if (this.flashing) return;
+        this.flashing = true;
         const dur = 600;
         this.opacity =  1.0;
         let _this = this;
         let blink = () => {
-            if (_this.cancelBlink) return;
+            if (_this.cancelBlink) {
+                this.flashing = false;
+                return;
+            }
             Animate.tween(_this, { opacity:0.4 }, dur, (e) => Math.pow(e, 2)).after(() => {
-                if (_this.cancelBlink) return;
+                if (_this.cancelBlink) {
+                    this.flashing = false;
+                    return;
+                }
                 Animate.tween(_this, { opacity:1 }, dur, (e) => Math.pow(e, 0.5)).after(blink);
             });
         };
-        this.enabledColor = 'cyan';
-        this.color = 'cyan';
         blink();
     }
     enable() {
