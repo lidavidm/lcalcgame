@@ -674,13 +674,16 @@ class PlanetCard extends mag.ImageRect {
         if (c) c = parseInt(c);
         this.spots.forEach((spot) => {
             spot.opacity = 1.0;
-            if (completedLevels[spot.levelId])
-                spot.enable();
             if (c === spot.levelId) {
                 spot.enable();
                 spot.flash();
             }
-            else spot.disable();
+            else if (completedLevels[spot.levelId]) {
+                spot.enable();
+            }
+            else {
+                spot.disable();
+            }
         });
     }
 
