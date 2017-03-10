@@ -891,7 +891,6 @@ class ChapterSelectMenu extends mag.Stage {
             ship.scale = { x:shipScale, y:shipScale };
 
             if (flyToChapIdx) {
-                this.add(ship);
                 ship.attachToPlanet(lastActivePlanet);
 
                 for (let chap of flyToChapIdx) {
@@ -909,6 +908,7 @@ class ChapterSelectMenu extends mag.Stage {
                     newPlanet.onclick = () => {
                         newPlanet.onclick = oldOnClick;
                         newPlanet.removeHighlight();
+                        this.add(ship);
                         ship.flyToPlanet(lastActivePlanet, newPlanet).then(() => {
                             return new Promise(function(resolve, reject) {
                                 Animate.wait(600).after(() => {
