@@ -670,11 +670,13 @@ class PlanetCard extends mag.ImageRect {
 
     updateLevelSpots() {
         if (!this.spots) return;
-        let c = getCookie('level_idx');
-        if (c) c = parseInt(c);
-        this.spots.forEach((spot) => {
+        this.spots.forEach((spot, i) => {
             spot.opacity = 1.0;
-            if (c === spot.levelId) {
+            // Flash the spot if it's the level after one we've
+            // completed (level_idx isn't reliable for this when
+            // there's multiple branches), or if it's the first spot
+            // on the planet
+            if ((!completedLevels[spot.levelId] && completedLevels[spot.levelId - 1]) || i == 0) {
                 spot.enable();
                 spot.flash();
             }
@@ -723,7 +725,7 @@ class PlanetCard extends mag.ImageRect {
                 spot.enable();
                 spot.flash();
             }
-            else if (window.level_idx === levels[1] + i-1) {
+            else if (!completedLevels[spot.levelId] && completedLevels[spot.levelId - 1]) {
                 spot.enable();
                 spot.flash();
             }
