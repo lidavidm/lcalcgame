@@ -488,7 +488,7 @@ class PlanetCard extends mag.ImageRect {
         let t = new TextExpr(capitalize(name), 'Futura', 14);
         t.color = 'white';
         t.anchor = { x:0.5, y:0.5 };
-        t.pos = { x:r, y:r*2.25 };
+        t.pos = { x:r, y: 2*r + 15 };
         this.text = t;
         //this.addChild(t);
 
@@ -1170,8 +1170,10 @@ class ChapterSelectMenu extends mag.Stage {
             control2.y = end.y - factor * dy;
         }
         else {
-            control1.y = start.y - factor * dy;
-            control2.y = end.y + factor * dy;
+            control1.x = start.x;
+            control1.y = start.y + Math.abs(factor * dy);
+            control2.x = end.x;
+            control2.y = end.y - Math.abs(factor * dy);
         }
         // Cubic bezier curve
         let points = [];
@@ -1248,32 +1250,57 @@ function layoutPlanets(adjacencyList, boundingSize) {
         yCellMultiplier = (yCells - firstCellMultiplier) / (yCells - 1);
     }
 
-    let y = 10;
+    // For whatever reason planets are given a +40 to their y position
+    // when constructed
+    let y = -30;
     for (let row = 0; row < yCells; row++) {
         let x = 10;
         let height = cellHeight * (row == 0 ? firstCellMultiplier : yCellMultiplier);
+
+        let newCells = [];
         for (let col = 0; col < xCells; col++) {
             let width = cellWidth * (col == 0 ? firstCellMultiplier : xCellMultiplier);
-            let r = seededRandom(0.6, 0.8) * Math.min(width, height) / 2;
+            let r = seededRandom(0.6, 0.9) * Math.min(width, height) / 2;
             let xfudge = 1.2 * (width - 2 * r) / 2.0;
-            let yfudge = 1.2 * (height - 2 * r) / 2.0;
+            let yfudge = (height - 2 * r) / 2.0;
             let xf = (col == 0 && row == 0) ? 0 : seededRandom(-xfudge, xfudge);
-            let yf = (col == 0 && row == 0) ? 0 : seededRandom(-yfudge, yfudge);
-            gridCells.push({
-                x: x + (width / 2) - r + xf,
-                y: y + (height / 2) - r + yf,
+            let yf = (col == 0 && row == 0) ? 0 : seededRandom(-1.2*yfudge, 0.7 * yfudge);
+            if (col == 0 && row == 0) {
+                r = Math.min(width, height) / 2;
+            }
+            let cell = {
+                x: x + (width / 2) + xf,
+                y: y + (height / 2) + yf,
                 w: width,
                 h: height,
                 r: r
-            });
+            };
+            newCells.push(cell);
             x += width;
         }
+
+        // Alternate direction of each row
+        if (row % 2 == 1) {
+            newCells.reverse();
+        }
+        gridCells = gridCells.concat(newCells);
 
         y += height;
     }
 
+    // Extra cells to use
     if (gridCells.length > sorted.length) {
         let extraCells = gridCells.splice(sorted.length);
+        // Merge last cell with cell in row above it
+        if (yCells > 1) {
+            let lastCell = extraCells.pop();
+            // Account for row direction reversal
+            let cellAboveIndex = xCells * yCells - 1 - xCells - xCells + 1;
+            let cellAbove = gridCells[cellAboveIndex];
+            gridCells[cellAboveIndex] = lastCell;
+            lastCell.x = 0.5 * lastCell.x + 0.5 * cellAbove.x;
+            lastCell.y = 0.7 * lastCell.y + 0.3 * cellAbove.y;
+        }
     }
 
     return gridCells;
