@@ -766,6 +766,39 @@ class ExpressionPattern {
         var compare = (e, f) => {
 
             //console.log(' comparing ', e, ' to ', f);
+            let valuesMatch = true;
+            // If both are values, check that their reported values
+            // match. This is for things like number expressions,
+            // which are otherwise structurally equal. The check here
+            // is recursive, for cases like bags, where the value can
+            // itself contain expressions.
+            if (e instanceof Expression && f instanceof Expression && e.isValue() && f.isValue()) {
+                let ev = e.value();
+                let fv = f.value();
+
+                if ((!ev && fv) || (ev && !fv)) {
+                    valuesMatch = false;
+                }
+                else if (Array.isArray(ev) && Array.isArray(fv)) {
+                    if (ev.length != fv.length) {
+                        valuesMatch = false;
+                    }
+                    else {
+                        for (let i = 0; i < ev.length; i++) {
+                            if (!compare(ev[i], fv[i])) {
+                                valuesMatch = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                else {
+                    valuesMatch = ev === fv && e.isValue() && f.isValue();
+                }
+            }
+            else {
+                valuesMatch = true;
+            }
 
             // Compares two expressions.
             // Right now this just checks if their class tree is the same.
@@ -773,8 +806,7 @@ class ExpressionPattern {
                 //console.log(' > Constructors don\'t match.');
                 return false; // expressions don't match
             }
-            else if (e instanceof Expression && f instanceof Expression &&
-                     (e.isValue() != f.isValue() || e.value() !== f.value())) {
+            else if (e instanceof Expression && f instanceof Expression && (e.isValue() != f.isValue() || !valuesMatch)) {
                 return false;
             }
             else { // Check whether the expressions at this level have the same # of children. If so, do one-to-one comparison.
