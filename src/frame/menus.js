@@ -742,6 +742,8 @@ class ChapterSelectShip extends mag.RotatableImageRect {
         this.pointing = { x:1, y:0 };
         this.velocity = { x:0, y:0 };
 
+        this.planet = null;
+
         const trailWidth = 140;
         let trail = new RainbowTrail(0, 0, trailWidth, 30);
         trail.pos = { x:-trailWidth+20, y:20 };
@@ -780,16 +782,19 @@ class ChapterSelectShip extends mag.RotatableImageRect {
         }).then(() => {
             return _this.land(dest);
         }).then(() => {
+            this.planet = endPlanet;
             endPlanet.showShip(_this);
         });
     }
     attachToPlanet(planet) {
         this.pos = planet.landingPoint;
+        this.planet = planet;
         planet.showShip(this);
     }
 
     // Launch the ship into the air.
     launch() {
+        this.planet = null;
         return new Promise((resolve, reject) => {
             this.moveTo(addPos(this.pos, { x:0, y:-20 }), 1000).then(resolve);
         });
@@ -911,7 +916,8 @@ class ChapterSelectMenu extends mag.Stage {
                         newPlanet.onclick = oldOnClick;
                         newPlanet.removeHighlight();
                         this.add(ship);
-                        ship.flyToPlanet(lastActivePlanet, newPlanet).then(() => {
+                        let startPlanet = ship.planet || lastActivePlanet;
+                        ship.flyToPlanet(startPlanet, newPlanet).then(() => {
                             return new Promise(function(resolve, reject) {
                                 Animate.wait(600).after(() => {
                                     _this.remove(ship);
