@@ -942,9 +942,12 @@ class FadedLambdaHoleExpr extends LambdaHoleExpr {
     constructor(varname) {
         super(varname);
         this.padding.left = 5;
-        this.label = new TextExpr("λ" + varname + ".");
-        this.addArg(this.label);
+        this.addArg(new TextExpr("λ" + varname + "."));
         this.label.color = "#000";
+    }
+
+    get label() {
+        return this.holes[0];
     }
 
     get size() {
@@ -986,9 +989,12 @@ class FadedLambdaHoleExpr extends LambdaHoleExpr {
 class HalfFadedLambdaHoleExpr extends LambdaHoleExpr {
     constructor(varname) {
         super(varname);
-        this.label = new TextExpr("λ" + varname);
-        this.addArg(this.label);
+        this.addArg(new TextExpr("λ" + varname));
         this.label.color = "#FFF";
+    }
+
+    get label() {
+        return this.holes[0];
     }
 
     open() {
@@ -1035,12 +1041,18 @@ class FadedES6LambdaHoleExpr extends LambdaHoleExpr {
     constructor(varname) {
         super(varname);
         this.padding.left = 5;
-        this.label = new TextExpr("(" + varname + ")");
-        this.arrow = new TextExpr("=>");
-        this.addArg(this.label);
-        this.addArg(this.arrow);
+        this.addArg(new TextExpr("(" + varname + ")"));
+        this.addArg(new TextExpr("=>"));
         this.label.color = "#000";
         this.arrow.color = "#000";
+    }
+
+    get label() {
+        return this.holes[0];
+    }
+
+    get arrow() {
+        return this.holes[1];
     }
 
     get openImage() { return this.name === 'x' ? 'lambda-hole-x-es6' : 'lambda-hole-y'; }
