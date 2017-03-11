@@ -205,7 +205,7 @@ var mag = (function(_) {
 
                 // Can't duplicate horizontally or we'll go off-screen.
                 // So, duplicate vertically.
-                if (total_width > GLOBAL_DEFAULT_SCREENSIZE.width) {
+                if (origpos.x + total_width > this.boundingSize.w) {
                     pos = clonePos(origpos);
                     anotherNode.forEach((n) => {
                         let p = n.pos;
@@ -214,8 +214,8 @@ var mag = (function(_) {
                         pos = addPos({x:0, y:an.size.h + 6}, pos);
                     });
                 }
-                if (pos.x > GLOBAL_DEFAULT_SCREENSIZE.width) {
-                    let offset = pos.x - GLOBAL_DEFAULT_SCREENSIZE.width;
+                if (pos.x > this.boundingSize.w) {
+                    let offset = pos.x - this.boundingSize.w;
                     anotherNode.forEach((n) => {
                         let p = n.pos;
                         n.pos = { x:p.x - offset, y:p.y };
