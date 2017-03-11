@@ -65,6 +65,7 @@
     ],
     "resources":{
         "planet":"planet-boolili",
+        "aliens":["alien-boolean-1", "alien-boolean-2", "alien-boolean-3", "alien-boolean-4", "alien-boolean-5"],
         "curve":[
             {"x":0.15820825567078808, "y":-0.6234722536626294},
             {"x":0.15820825567078808, "y":-0.6234722536626294},
