@@ -48,6 +48,12 @@ class MissingExpression extends Expression {
             let beforeState = stage.toString();
             let droppedExp = node.toString();
 
+            // Unset toolbox flag even when dragging directly to a hole
+            if (node.toolbox) {
+                node.toolbox.removeExpression(node);
+                node.toolbox = null;
+            }
+
             Resource.play('pop');
             node.stage.remove(node);
             node.droppedInClass = this.getClass();
