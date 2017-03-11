@@ -61,13 +61,6 @@ class Snappable extends Expression {
         if (this.next) {
             this.next.update();
         }
-
-        if (!(this.prev || this.next)) {
-            this.contents.opacity = 0.5;
-        }
-        else {
-            this.contents.opacity = 1.0;
-        }
     }
 
     updatePos() {
@@ -261,26 +254,6 @@ class Snappable extends Expression {
         this.performReduction();
     }
 
-    unattachedNodes() {
-        let nodes = this.stage.getNodesWithClass(Snappable, [], false);
-
-        let cur = this.prev;
-        while (cur) {
-            nodes.splice(nodes.indexOf(cur), 1);
-            cur = cur.prev;
-        }
-        cur = this;
-        while (cur) {
-            nodes.splice(nodes.indexOf(cur), 1);
-            cur = cur.next;
-        }
-        return nodes;
-    }
-
-    canReduce() {
-        return this.unattachedNodes().length == 0;
-    }
-
     performReduction() {
         if (this.prev) {
             this.prev.performReduction();
@@ -289,29 +262,18 @@ class Snappable extends Expression {
 
         // Save stage since it gets erased down the line
         let stage = this.stage;
-        for (let node of this.unattachedNodes()) {
-            while (node) {
-                Animate.blink(node, 1000, [1.0, 0.0, 0.0]);
-                node = node.next;
-            }
-        }
-
-
-        if (!this.canReduce()) return;
 
         let body = [];
         let cur = this;
 
         while (cur) {
+            if (cur != this) {
+                stage.swap(cur, null);
+            }
             body.push(cur.contents);
             cur = cur.next;
         }
 
-        let nodes = stage.getNodesWithClass(Snappable, [this], false);
-        for (let node of nodes) {
-            if (node.toolbox) continue;
-            stage.remove(node);
-        }
         stage.swap(this, new (ExprManager.getClass('sequence'))(...body));
     }
 }
