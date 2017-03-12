@@ -25,10 +25,14 @@ class EnvironmentDisplay extends Expression {
     get _origPos() { return super.pos; }
     get _origSize() { return super.size; }
 
+    get displayClass() {
+        return ExprManager.getClass('reference_display');
+    }
+
     updateBinding(name, expr) {
         let display = this.bindings[name];
         if (!display) {
-            display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression(new Expression()));
+            display = new (this.displayClass)(name, new MissingExpression(new Expression()));
             this.bindings[name] = display;
         }
         display.ignoreEvents = true;
@@ -101,6 +105,11 @@ class SpreadsheetEnvironmentDisplay extends EnvironmentDisplay {
         this._layout = { direction: "vertical", align: "none" };
         this.padding = { left: 0, inner: 0, between: 0, right: 0 };
         this.maxLabelSize = 30;
+    }
+
+    // This display is -only- compatible with SpreadsheetDisplay.
+    get displayClass() {
+        return SpreadsheetDisplay;
     }
 
     updateBindings(env) {
