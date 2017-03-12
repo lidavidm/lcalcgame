@@ -115,7 +115,7 @@ class LambdaHoleExpr extends MissingExpression {
         }
     }
 
-    applyExpr(node) {
+    applyExpr(node, animated=false) {
         if (!this.parent) {
             console.error('@ LambdaHoleExpr.applyExpr: No parent LambdaExpr.');
             return false;
@@ -153,7 +153,7 @@ class LambdaHoleExpr extends MissingExpression {
             // because it's the one bound by this argument.
             if (!variable.canReduce() && (idx == -1 || capturedVars[idx].name != this.name)) {
                 // Play the animation
-                variable.performReduction();
+                variable.performReduction(animated);
                 return null;
             }
         }
@@ -164,7 +164,7 @@ class LambdaHoleExpr extends MissingExpression {
         // GAME DESIGN CHOICE: Automatically break apart parenthesized values.
         // * If we don't do this, the player can stick everything into one expression and destroy that expression
         // * to destroy as many expressions as they like with a single destruction piece. And that kind of breaks gameplay.
-        return parent.performReduction();
+        return parent.performReduction(animated);
     }
 
     // Events
@@ -291,7 +291,8 @@ class LambdaHoleExpr extends MissingExpression {
                     let orig_exp_str = this.parent.toString();
                     let dropped_exp_str = node.toString();
 
-                    let result = this.applyExpr(node);
+                    // Animate this application
+                    let result = this.applyExpr(node, true);
                     if (result === null) {
                         // The application failed.
                         stage.add(node);
@@ -408,7 +409,7 @@ class LambdaVarExpr extends ImageExpr {
         // TODO: DML enable reduction, but make sure we are not bound
         // by a lambda
         if (!this.parent) {
-            this.performReduction();
+            this.performReduction(true);
         }
     }
 
@@ -501,9 +502,9 @@ class LambdaExpr extends Expression {
         }
         return env;
     }
-    applyExpr(node) {
+    applyExpr(node, animated=false) {
         if (this.takesArgument) {
-            return this.holes[0].applyExpr(node);
+            return this.holes[0].applyExpr(node, animated);
         } else return this;
     }
     numOfNestedLambdas() {
@@ -567,7 +568,7 @@ class LambdaExpr extends Expression {
     }
 
     onmouseclick(pos) {
-        this.performReduction();
+        this.performReduction(true);
     }
 
     hitsChild(pos) {
@@ -580,7 +581,7 @@ class LambdaExpr extends Expression {
             return this.holes;
         } else return super.reduce();
     }
-    performReduction() {
+    performReduction(animated=false) {
         // If we don't have all our arguments, refuse to evaluate.
         if (this.takesArgument) {
             return this;
@@ -590,7 +591,7 @@ class LambdaExpr extends Expression {
         let varExprs = findNoncapturingVarExpr(this, null, true, true);
         let environment = this.getEnvironment();
         for (let expr of varExprs) {
-            expr.performReduction();
+            expr.performReduction(animated);
         }
         for (let child of this.holes) {
             if (child instanceof LambdaExpr) {
@@ -761,14 +762,18 @@ class EnvironmentLambdaExpr extends LambdaExpr {
 
     onmouseclick() {
         if (!this._animating) {
-            this.performReduction();
+            this.performReduction(true);
         }
     }
 
-    performReduction() {
+    performReduction(animated=false) {
         // If we don't have all our arguments, refuse to evaluate.
         if (this.takesArgument) {
             return this;
+        }
+
+        if (!animated) {
+            return super.performReduction(false);
         }
 
         return new Promise((resolve, _reject) => {
