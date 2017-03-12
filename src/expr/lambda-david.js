@@ -680,14 +680,15 @@ class EnvironmentLambdaExpr extends LambdaExpr {
         super(exprs);
         this.environmentDisplay = new InlineEnvironmentDisplay(this);
         this.environmentDisplay.scale = { x: 0.85, y: 0.85 };
+        this._originalArg = null;
     }
 
     removeArg(arg) {
-        // Don't let holes remove themselves - we want to keep the
-        // parameter visible while we are reducing
+        // Save the hole for later - we want to keep the parameter
+        // visible while we are reducing (if we are animating)
         if (arg instanceof LambdaHoleExpr) {
             arg.isOpen = false;
-            return;
+            this._originalArg = arg;
         }
         super.removeArg(arg);
     }
@@ -774,6 +775,11 @@ class EnvironmentLambdaExpr extends LambdaExpr {
 
         if (!animated) {
             return super.performReduction(false);
+        }
+
+        // Add the parameter back, so it's visible while we reduce.
+        if (this._originalArg) {
+            this.addChildAt(0, this._originalArg);
         }
 
         return new Promise((resolve, _reject) => {
