@@ -73,6 +73,9 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAudio('fatbtn-beep2', 'fatbtn_space2.wav');
     loadAudio('goback', 'ui_back.wav');
     loadAudio('zoomin', 'zoom_planet.wav');
+    loadAudio('define', 'define.wav');
+    loadAudio('place', 'place_from_toolbox.wav');
+    loadAudio('define-convert', 'convert.wav');
 
     loadImage('bag-background', 'bg-stars.png');
     loadImage('infinity-symbol', 'infinity_symbol.png');
@@ -133,6 +136,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadImage('btn-unmute-down', 'unmute-button-down.png');
     loadImage('toolbox-bg', 'toolbox-tiled-bg.png');
     loadImage('victory', 'you-win.png');
+    loadImage('apply-arrow', 'apply_arrow.png');
 
     // Concreteness faded images.
     loadImage('missing-bracket', 'missing-bracket.png');

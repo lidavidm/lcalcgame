@@ -36,6 +36,8 @@ var Level = function () {
         key: 'build',
         value: function build(canvas) {
 
+            console.log('Building ', this);
+
             var stage = new ReductStage(canvas);
 
             // Scaling for mobile devices:
@@ -52,17 +54,17 @@ var Level = function () {
 
             var varNodesOnBoard = mag.Stage.getNodesWithClass(VarExpr, [], true, this.exprs);
             var varNodesInToolbox = mag.Stage.getNodesWithClass(VarExpr, [], true, this.toolbox);
-            var showEnvironment = Object.keys(this.globals.bindings).length > 0 || varNodesOnBoard && varNodesOnBoard.length > 0 || varNodesInToolbox && varNodesInToolbox.length > 0;
+            var showEnvironment = this.globals && (Object.keys(this.globals.bindings).length > 0 || varNodesOnBoard && varNodesOnBoard.length > 0 || varNodesInToolbox && varNodesInToolbox.length > 0);
             var envDisplayWidth = 0.20 * canvas_screen.w;
 
             GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
 
-            var usableWidth = canvas_screen.w - envDisplayWidth;
+            var usableWidth = canvas_screen.w - (showEnvironment ? envDisplayWidth : 0);
             var screenOffsetX = usableWidth * (1 - 1 / 1.4) / 2.0;
             var screen = {
                 height: canvas_screen.h / 1.4 - 90,
                 width: showEnvironment ? usableWidth - 2 * screenOffsetX : usableWidth / 1.4,
-                y: canvas_screen.h * (1 - 1 / 1.4) / 2.0,
+                y: canvas_screen.h * 0.2,
                 x: showEnvironment ? screenOffsetX : usableWidth * (1 - 1 / 1.4) / 2.0
             };
             var board_packing = this.findBestPacking(this.exprs, screen);
@@ -89,8 +91,8 @@ var Level = function () {
             // UI Buttons
             var ui_padding = 10;
             var btn_back = new mag.Button(canvas_screen.w - 64 * 4 - ui_padding, ui_padding, 64, 64, { default: 'btn-back-default', hover: 'btn-back-hover', down: 'btn-back-down' }, function () {
-                returnToMenu();
-                //prev(); // go back to previous level; see index.html.
+                //returnToMenu();
+                prev(); // go back to previous level; see index.html.
             });
 
             var mute_images = { default: 'btn-mute-default', hover: 'btn-mute-hover', down: 'btn-mute-down' };
@@ -258,6 +260,12 @@ var Level = function () {
                     return Math.pow(elapsed, 0.3);
                 });
             });
+
+            // Do final setup inside the nodes. This
+            // could be necessary for expressions that need information
+            // from the stage itself to finish constructing,
+            // like ReductStageExpr.
+            stage.finishLoading();
 
             return stage;
         }

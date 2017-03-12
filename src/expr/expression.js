@@ -1,4 +1,3 @@
-
 /** Foundation of all other expressions in Reduct.
  *	@module expression
  */

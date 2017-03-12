@@ -28,10 +28,18 @@ var ReductStage = function (_mag$Stage) {
         return _this;
     }
 
-    // Save state of game board and push onto undo stack.
-
-
     _createClass(ReductStage, [{
+        key: 'finishLoading',
+        value: function finishLoading() {
+            var innerStages = this.getNodesWithClass(ReductStageExpr);
+            innerStages.forEach(function (stg) {
+                stg.build();
+            });
+        }
+
+        // Save state of game board and push onto undo stack.
+
+    }, {
         key: 'saveState',
         value: function saveState() {
             // TODO: DML save and restore the environment as well.
@@ -108,20 +116,19 @@ var ReductStage = function (_mag$Stage) {
 
                             var you_win = function you_win() {
 
-                                if (level_idx < 1) {
-                                    var cmp = new mag.ImageRect(GLOBAL_DEFAULT_SCREENSIZE.w / 2, GLOBAL_DEFAULT_SCREENSIZE.h / 2, 740 / 2, 146 / 2, 'victory');
-                                    cmp.anchor = { x: 0.5, y: 0.5 };
-                                    _this3.add(cmp);
-                                    _this3.draw();
+                                //if (level_idx < 1) {
+                                var cmp = new mag.ImageRect(GLOBAL_DEFAULT_SCREENSIZE.w / 2, GLOBAL_DEFAULT_SCREENSIZE.h / 2, 740 / 2, 146 / 2, 'victory');
+                                cmp.anchor = { x: 0.5, y: 0.5 };
+                                _this3.add(cmp);
+                                _this3.draw();
 
-                                    Resource.play('victory');
-                                    Animate.wait(1080).after(function () {
-                                        next();
-                                    });
-                                } else {
-                                    // Skip victory jingle on every level after first.
+                                Resource.play('victory');
+                                Animate.wait(1080).after(function () {
                                     next();
-                                }
+                                });
+                                //} else { // Skip victory jingle on every level after first.
+                                //    next();
+                                //}
                             };
 
                             var pairs = level_complete;

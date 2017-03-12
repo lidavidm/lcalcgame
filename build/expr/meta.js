@@ -66,6 +66,7 @@ var InfiniteExpression = function (_GraphicValueExpr) {
             // and let the user drag the clone.
             var c = this.graphicNode.clone();
             this.stage.add(c);
+            Resource.play('place');
             c.onmouseenter(pos);
             c.onmousedrag(pos);
             //c.pos =  { x:c.size.w, y:0 };
@@ -134,17 +135,15 @@ var ReductStageExpr = function (_GraphicValueExpr2) {
 
         _this3.initialExprs = [goal, board, toolbox];
         _this3.ignoreEvents = false;
-        _this3._parent = null;
-        _this3.innerStage = null;
         return _this3;
     }
 
     _createClass(ReductStageExpr, [{
         key: 'build',
-        value: function build(parent) {
+        value: function build() {
 
             // Get the parent's stage:
-            var parentStage = parent.stage;
+            var parentStage = this.parent.stage;
             if (!parentStage) {
                 console.error('@ ReductStageExpr.build: Parent has no Stage.');
                 return;
@@ -160,19 +159,32 @@ var ReductStageExpr = function (_GraphicValueExpr2) {
             var toolbox = this.initialExprs[2];
 
             // Create the inner stage:
-            var lvl = new Level(board, goal, toolbox);
-            var innerStage = lvl.build(parent.stage.canvas);
+            var lvl = new Level(board, new Goal(new ExpressionPattern(goal)), toolbox);
+            var innerStage = lvl.build(parentStage.canvas);
             var v = new MetaInnerExpression(0, 0, parentStage, innerStage);
 
             // Repair the pointers:
-            this.graphicNode = v;
             this.children[0] = v;
             this.holes[0] = v;
         }
     }, {
+        key: 'onmousedown',
+        value: function onmousedown(pos) {
+            if (this.innerStage.expanded) this.innerStage.onmousedown(pos);else _get(ReductStageExpr.prototype.__proto__ || Object.getPrototypeOf(ReductStageExpr.prototype), 'onmousedown', this).call(this, pos);
+        }
+    }, {
+        key: 'onmousedrag',
+        value: function onmousedrag(pos) {
+            if (this.innerStage.expanded) this.innerStage.onmousedrag(pos);else _get(ReductStageExpr.prototype.__proto__ || Object.getPrototypeOf(ReductStageExpr.prototype), 'onmousedrag', this).call(this, pos);
+        }
+    }, {
+        key: 'onmousehover',
+        value: function onmousehover(pos) {
+            this.innerStage.onmousehover(pos);
+        }
+    }, {
         key: 'onmouseclick',
         value: function onmouseclick(pos) {
-            console.log('dsdfsf');
             if (this.graphicNode.expanded) this.graphicNode.shrink();else this.graphicNode.expand();
         }
     }, {
@@ -191,20 +203,14 @@ var ReductStageExpr = function (_GraphicValueExpr2) {
             return this.hitsWithin(pos);
         }
     }, {
-        key: 'parent',
-        get: function get() {
-            return this._parent;
-        },
-        set: function set(p) {
-            if (this._parent != p) {
-                if (!this.innerStage) this.build(p);
-                this._parent = p;
-            }
-        }
-    }, {
         key: 'delegateToInner',
         get: function get() {
             return false;
+        }
+    }, {
+        key: 'innerStage',
+        get: function get() {
+            return this.children[0];
         }
     }]);
 
@@ -253,6 +259,21 @@ var MetaInnerExpression = function (_mag$Rect) {
     // }
 
     _createClass(MetaInnerExpression, [{
+        key: 'onmousedown',
+        value: function onmousedown(pos) {
+            this.substage.onmousedown(pos);
+        }
+    }, {
+        key: 'onmousedrag',
+        value: function onmousedrag(pos) {
+            this.substage.onmousedrag(pos);
+        }
+    }, {
+        key: 'onmousehover',
+        value: function onmousehover(pos) {
+            this.substage.onmousehover(pos);
+        }
+    }, {
         key: 'expand',
         value: function expand() {
             var _this = this;

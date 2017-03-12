@@ -59,9 +59,13 @@ var NamedExpr = function (_Expression) {
 
                     // All the arguments check out. Now we need to apply them.
                     var expr = this.expr;
+                    console.log(expr);
+
                     if (args.length > 0) expr = args.reduce(function (lambdaExpr, arg) {
                         return lambdaExpr.applyExpr(arg);
                     }, expr); // Chains application to inner lambda expressions.
+
+                    Resource.play('define-convert');
 
                     return expr.clone(); // to be safe we'll clone it.
                 }
@@ -126,6 +130,7 @@ var DefineExpr = function (_ClampExpr) {
 
         _this2.breakIndices = { top: 1, mid: 2, bot: 2 }; // for ClampExpr
         _this2.color = 'OrangeRed';
+        _this2.expr.shadowOffset = -2;
         if (name) _this2.funcname = name;
         return _this2;
     }
@@ -176,6 +181,9 @@ var DefineExpr = function (_ClampExpr) {
                     inf.update();
                     this.stage.update();
                     this.stage.toolbox.addExpression(inf);
+
+                    Resource.play('define');
+
                     return inf;
                 }
 

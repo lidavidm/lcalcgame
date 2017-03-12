@@ -19,6 +19,8 @@ class Level {
     // * written in code, for instance -- and generate the entire game on-the-fly.
     build(canvas) {
 
+        console.log('Building ', this);
+
         var stage = new ReductStage(canvas);
 
         // Scaling for mobile devices:
@@ -42,7 +44,8 @@ class Level {
 
         const varNodesOnBoard = mag.Stage.getNodesWithClass(VarExpr, [], true, this.exprs);
         const varNodesInToolbox = mag.Stage.getNodesWithClass(VarExpr, [], true, this.toolbox);
-        const showEnvironment = Object.keys(this.globals.bindings).length > 0
+        const showEnvironment = this.globals &&
+              (Object.keys(this.globals.bindings).length > 0
               || (varNodesOnBoard && varNodesOnBoard.length > 0)
               || (varNodesInToolbox && varNodesInToolbox.length > 0);
         const envDisplayWidth = showEnvironment ? 0.20 * canvas_screen.w : 0;
@@ -78,8 +81,8 @@ class Level {
         var btn_back = new mag.Button(canvas_screen.w - 64*4 - ui_padding, ui_padding, 64, 64,
             { default:'btn-back-default', hover:'btn-back-hover', down:'btn-back-down' },
             () => {
-            returnToMenu();
-            //prev(); // go back to previous level; see index.html.
+            //returnToMenu();
+            prev(); // go back to previous level; see index.html.
         });
 
         let mute_images = { default:'btn-mute-default', hover:'btn-mute-hover', down:'btn-mute-down' };
@@ -204,6 +207,12 @@ class Level {
             n.scale = { x:0.8, y:0.8 };
             Animate.tween(n, { pos:final_pos, scale:{x:1,y:1} }, 500 + i * 100, (elapsed) => Math.pow(elapsed, 0.3));
         });
+
+        // Do final setup inside the nodes. This
+        // could be necessary for expressions that need information
+        // from the stage itself to finish constructing,
+        // like ReductStageExpr.
+        stage.finishLoading();
 
         return stage;
     }
