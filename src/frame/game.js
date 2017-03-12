@@ -46,8 +46,8 @@ class Level {
         const varNodesInToolbox = mag.Stage.getNodesWithClass(VarExpr, [], true, this.toolbox);
         const showEnvironment = this.globals &&
               (Object.keys(this.globals.bindings).length > 0
-              || (varNodesOnBoard && varNodesOnBoard.length > 0)
-              || (varNodesInToolbox && varNodesInToolbox.length > 0);
+               || (varNodesOnBoard && varNodesOnBoard.length > 0)
+               || (varNodesInToolbox && varNodesInToolbox.length > 0));
         const envDisplayWidth = showEnvironment ? 0.20 * canvas_screen.w : 0;
 
         GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
