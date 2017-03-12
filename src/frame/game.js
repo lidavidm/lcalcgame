@@ -662,7 +662,7 @@ class Level {
 */
 class Goal {
 
-    constructor(accepted_patterns, alien_images=[]) {
+    constructor(accepted_patterns, alien_images=['alien-function-1']) {
         if (!Array.isArray(accepted_patterns)) accepted_patterns = [accepted_patterns];
         this.patterns = accepted_patterns;
         // Choose a random alien to serve as our "goal person"
