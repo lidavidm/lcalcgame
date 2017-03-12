@@ -427,22 +427,24 @@ function undo() {
 }
 
 function loadChapterSelect() {
-    /*var sel = document.getElementById("chapterSelect");
-    removeOptions(sel); // clear old options.
+    var sel = document.getElementById("chapterSelect");
+    sel.onchange = gotoChapter;
+    // removeOptions(sel); // clear old options.
     return Resource.getChapters().then( function(chapters) {
-        chapters.forEach(function (chap) {
+        chapters.forEach(function (chap, i) {
             var option = document.createElement("option");
-            option.text = chap.description;
+            option.text = (i+1).toString() + " - " + chap.name + ": " + chap.description;
             option.value = chap.name;
             sel.add(option);
-        });*/
+        });
     return Resource.getChapters();
-    //} );
+    } );
 }
 function gotoChapter() {
     var sel = document.getElementById('chapterSelect');
     var selected_chapter = sel.options[sel.selectedIndex].value;
     level_idx = Resource.getChapter(selected_chapter).startIdx;
+    resetToLevel(level_idx);
     initBoard();
 }
 
