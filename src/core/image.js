@@ -39,7 +39,7 @@ var mag = (function(_) {
                 console.error('@ ImageRect: Cannot find resource image named ', this.image);
                 return;
             }
-            ctx.drawImage(ri, pos.x + this._offset.x, pos.y + this._offset.y, boundingSize.w, boundingSize.h);
+            ri.draw(ctx, pos.x + this._offset.x, pos.y + this._offset.y, boundingSize.w, boundingSize.h);
         }
     }
 
@@ -89,7 +89,7 @@ var mag = (function(_) {
             if (!ctx || !this.image) return;
             ctx.save();
             var ptrn = ctx.createPattern( Resource.getImage(this.image), 'repeat' );
-            ctx.fillStyle = ptrn;
+            ctx.fillStyle = ptrn.backingImage;
             ctx.fillRect(pos.x + this._offset.x, pos.y + this._offset.y, boundingSize.w, boundingSize.h);
             ctx.restore();
         }

@@ -104,12 +104,10 @@ var mag = (function(_) {
             lowLag.load([__AUDIO_PATH + filename], alias);
         };
         var loadImage = (alias, filename) => {
-            var img = new Image();
+            let img = new ImageProxy(alias, __GRAPHICS_PATH + filename);
             if (currentLoadSequence) {
                 loadSequences[currentLoadSequence].setOnload(img, 'image');
             }
-            img.src = __GRAPHICS_PATH + filename;
-            img.alt = alias;
             imageRsc[alias] = img;
         };
         var loadImageSequence = (alias, filename, range) => {
@@ -126,6 +124,15 @@ var mag = (function(_) {
                 console.log(e);
             }
         };
+        var loadImageAtlas = (alias, filename) => {
+            let atlas = new ImageAtlas(alias, __GRAPHICS_PATH + filename, (spriteName, sprite) => {
+                imageRsc[spriteName] = sprite;
+            });
+
+            if (currentLoadSequence) {
+                loadSequences[currentLoadSequence].setOnload(atlas, 'image');
+            }
+        };
 
         let muted = false;
         if (getCookie("muted") === "true") {
@@ -138,6 +145,7 @@ var mag = (function(_) {
             loadImage:loadImage,
             loadImageSequence:loadImageSequence,
             loadAnimation:loadAnimation,
+            loadImageAtlas:loadImageAtlas,
             loadAudio:loadAudio,
             audio:audioRsc,
             image:imageRsc,
@@ -172,3 +180,104 @@ var mag = (function(_) {
     Resource = _Resource;
     return _;
 }(mag || {}));
+
+class ImageAtlas {
+    constructor(alias, src, addSprite) {
+        this.callback = null;
+
+        // Load the JSON
+        $.getJSON(src).then((atlas) => {
+            let imageFile = atlas.meta.image;
+            let path = src.split("/");
+            path[path.length - 1] = imageFile;
+            path = path.join("/");
+
+            this.img = new Image();
+            this.img.src = path;
+            this.img.alt = alias;
+            this.img.onload = () => {
+                // Parse the atlas and add all the images
+                for (let [frameName, frame] of Object.entries(atlas.frames)) {
+                    // Convert resource-name.png to resource-name
+                    let resourceName = frameName.split(".")[0];
+                    let resource = new ImageAtlasProxy(resourceName, this, frame.frame);
+                    addSprite(resourceName, resource);
+                }
+
+                if (this.callback) {
+                    this.callback();
+                }
+            };
+        });
+    }
+
+    set onload(callback) {
+        // Keep the callback and call it once we are completely done
+        this.callback = callback;
+        // TODO: if we are already done, call the callback right away
+    }
+}
+
+class ImageProxy {
+    constructor(alias, src) {
+        this.img = new Image();
+        this.img.src = src;
+        this.img.alt = alias;
+    }
+
+    set onload(callback) {
+        this.img.onload = callback;
+    }
+
+    get naturalWidth() {
+        return this.img.naturalWidth;
+    }
+
+    get naturalHeight() {
+        return this.img.naturalHeight;
+    }
+
+    get backingImage() {
+        // This should raise an error for the AtlasProxy - you
+        // shouldn't be able to manipulate the backing image
+        return this.img;
+    }
+
+    draw(ctx, x, y, w=null, h=null) {
+        if (w === null) {
+            w = this.naturalWidth;
+        }
+        if (h === null) {
+            h = this.naturalHeight;
+        }
+
+        ctx.drawImage(this.img, x, y, w, h);
+    }
+}
+
+class ImageAtlasProxy {
+    constructor(alias, atlas, frame) {
+        this.alias = alias;
+        this.atlas = atlas;
+        this.frame = frame;
+    }
+
+    get naturalWidth() {
+        return this.frame.w;
+    }
+
+    get naturalHeight() {
+        return this.frame.h;
+    }
+
+    draw(ctx, x, y, w=null, h=null) {
+        if (w === null) {
+            w = this.naturalWidth;
+        }
+        if (h === null) {
+            h = this.naturalHeight;
+        }
+
+        ctx.drawImage(this.atlas.img, this.frame.x, this.frame.y, this.frame.w, this.frame.h, x, y, w, h);
+    }
+}
