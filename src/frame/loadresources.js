@@ -116,9 +116,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAudio('place', 'place_from_toolbox.wav');
     loadAudio('define-convert', 'convert.wav');
 
-    loadImage('alien-bag-1', 'aliens/bagguys/1.png');
-    loadImage('alien-bag-2', 'aliens/bagguys/2.png');
-    loadImage('alien-bag-3', 'aliens/bagguys/3.png');
+    Resource.loadImageAtlas('alien-bag', 'aliens/bagguys.json');
     loadImage('alien-boolean-1', 'aliens/booleanguys/1.png');
     loadImage('alien-boolean-2', 'aliens/booleanguys/2.png');
     loadImage('alien-boolean-3', 'aliens/booleanguys/3.png');

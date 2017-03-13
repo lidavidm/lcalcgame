@@ -1,0 +1,33 @@
+{
+	"meta": {
+		"image": "bagguys.png",
+		"size": {"w":717,"h":398},
+		"scale": "1"
+	},
+	"frames": {
+		"alien-bag-1.png":
+		{
+			"frame": {"x":0,"y":0,"w":359,"h":223},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":359,"h":223},
+			"sourceSize": {"w":359,"h":223}
+		},
+		"alien-bag-2.png":
+		{
+			"frame": {"x":359,"y":0,"w":358,"h":188},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":358,"h":188},
+			"sourceSize": {"w":358,"h":188}
+		},
+		"alien-bag-3.png":
+		{
+			"frame": {"x":0,"y":223,"w":239,"h":175},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":239,"h":175},
+			"sourceSize": {"w":239,"h":175}
+		}
+	}
+}
