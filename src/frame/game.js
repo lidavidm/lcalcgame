@@ -718,7 +718,7 @@ class Goal {
         let bubble = [bubbleLeft];
 
         while (exprsWidth > 0) {
-            exprsWidth -= bubbleMidWidth;
+            exprsWidth -= bubbleMidWidth - 1;
             bubble.push(new mag.ImageRect(0, 0, bubbleMidWidth, 80, 'caption-long-mid'));
         }
 
@@ -727,7 +727,7 @@ class Goal {
         let x = alien.pos.x + alien.size.w;
         for (let b of bubble) {
             b.pos = { x: x, y: -15 };
-            x += b.size.w;
+            x += b.size.w - 1;
         }
 
         node.addAll(bubble);
