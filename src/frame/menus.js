@@ -1084,9 +1084,11 @@ class ChapterSelectMenu extends mag.Stage {
             let planets = [];
             const POS_MAP = layoutPlanets(chapters.transitions, this.boundingSize);
 
+            let planetParent = new mag.Rect(0, 0, 0, 0);
+
             chapters.chapters.forEach((chap, i) => {
                 let pos = i < POS_MAP.length ? POS_MAP[i] : { x:0, y:0, r:10 };
-                let planet = new PlanetCard(pos.x + 15, pos.y + 40, pos.r, chap.name, chap.resources ? chap.resources.planet : 'planet-bagbag');
+                let planet = new PlanetCard(pos.x, pos.y, pos.r, chap.name, chap.resources ? chap.resources.planet : 'planet-bagbag');
                 planet.color = 'white';
                 if (i === 1) planet.path.stroke.color = 'gray';
                 planet.anchor = { x:0.5, y:0.5 };
@@ -1125,9 +1127,11 @@ class ChapterSelectMenu extends mag.Stage {
                     planet.setLevels(levels, onLevelSelect);
                 }
 
-                this.add(planet);
+                planetParent.addChild(planet);
                 planets.push(planet);
             });
+            this.add(planetParent);
+            this.planetParent = planetParent;
 
             let transitionMap = {};
             chapters.chapters.forEach((chap, i) => {
@@ -1192,8 +1196,7 @@ class ChapterSelectMenu extends mag.Stage {
         trail.stroke.lineWidth = 2;
         trail.drawArrowHead = true;
         trail.ignoreEvents = true;
-        trail.parent = new mag.Rect(0, 0, this.boundingSize.w, this.boundingSize.h);
-        this.add(trail);
+        this.planetParent.addChild(trail);
         this.trails.push(trail);
 
         return trail;
@@ -1201,6 +1204,8 @@ class ChapterSelectMenu extends mag.Stage {
 }
 
 function layoutPlanets(adjacencyList, boundingSize) {
+    const MAX_GROUP_SIZE = 4;
+
     // From src/util.js
     let seed = 42;
     let seededRandom = function(max, min) {
@@ -1215,22 +1220,83 @@ function layoutPlanets(adjacencyList, boundingSize) {
 
     // Perform a topological sort of the planets to get a layout
     let sorted = topologicalSort(adjacencyList);
+    let groups = [[]];
+    for (let group of sorted) {
+        if (group.length === 1) {
+            groups[groups.length - 1] = groups[groups.length - 1].concat(group);
+        }
+        else {
+            groups.push(group);
+            groups.push([]);
+        }
+    }
+    if (groups[groups.length - 1].length === 0) groups.pop();
 
+    let positions = [];
+
+    let startX = 0;
+    let startY = 0;
+    let subgroups = [];
+    for (let group of groups) {
+        if (group.length > MAX_GROUP_SIZE) {
+            let numSubgroups = Math.round(group.length / MAX_GROUP_SIZE);
+            let subgroupSize = Math.round(group.length / numSubgroups);
+            let subgroup = [];
+            while (group.length > 0) {
+                subgroup.push(group.shift());
+                if (subgroup.length == subgroupSize) {
+                    subgroups.push(subgroup);
+                    subgroup = [];
+                }
+            }
+            if (subgroup.length > 0) {
+                subgroups.push(subgroup);
+            }
+        }
+        else {
+            subgroups = [group];
+        }
+
+        for (let subgroup of subgroups) {
+            console.log(subgroup);
+            let boundingArea = {
+                x: startX,
+                y: startY,
+                w: 0.8 * boundingSize.w,
+                h: boundingSize.h,
+            };
+
+            let sublayout = layoutGroup(subgroup, boundingArea, seededRandom);
+            positions = positions.concat(sublayout);
+
+            let maxOffset = 0;
+            for (let cell of sublayout) {
+                maxOffset = Math.max(maxOffset, cell.x + cell.r - boundingArea.x);
+            }
+            startX += maxOffset;
+            console.log(maxOffset, boundingArea.w);
+        }
+    }
+
+    return positions;
+}
+
+function layoutGroup(group, boundingArea, seededRandom) {
     // Divide the available space into a grid
     let gridCells = [];
-    let aspectRatio = boundingSize.w / boundingSize.h;
-    let yCells = Math.sqrt(sorted.length / aspectRatio);
+    let aspectRatio = boundingArea.w / boundingArea.h;
+    let yCells = Math.sqrt(group.length / aspectRatio);
     let xCells = aspectRatio * yCells;
 
-    if (Math.floor(yCells) * Math.floor(xCells) >= sorted.length) {
+    if (Math.floor(yCells) * Math.floor(xCells) >= group.length) {
         yCells = Math.floor(yCells);
         xCells = Math.floor(xCells);
     }
-    else if (Math.ceil(yCells) * Math.floor(xCells) >= sorted.length) {
+    else if (Math.ceil(yCells) * Math.floor(xCells) >= group.length) {
         yCells = Math.ceil(yCells);
         xCells = Math.floor(xCells);
     }
-    else if (Math.floor(yCells) * Math.ceil(xCells) >= sorted.length) {
+    else if (Math.floor(yCells) * Math.ceil(xCells) >= group.length) {
         yCells = Math.floor(yCells);
         xCells = Math.ceil(xCells);
     }
@@ -1239,35 +1305,30 @@ function layoutPlanets(adjacencyList, boundingSize) {
         xCells = Math.ceil(xCells);
     }
 
-    let cellWidth = (boundingSize.w - 20) / xCells;
-    let cellHeight = (boundingSize.h - 20) / yCells;
+    let cellWidth = (boundingArea.w - 20) / xCells;
+    let cellHeight = (boundingArea.h - 20) / yCells;
     let firstCellMultiplier = 1.0;
     let xCellMultiplier = 1.0, yCellMultiplier = 1.0;
     if (xCells > 1 && yCells > 1) {
         // Make the first cell slightly larger
-        firstCellMultiplier = 1.5;
+        firstCellMultiplier = 1.2;
         xCellMultiplier = (xCells - firstCellMultiplier) / (xCells - 1);
         yCellMultiplier = (yCells - firstCellMultiplier) / (yCells - 1);
     }
 
-    // For whatever reason planets are given a +40 to their y position
-    // when constructed
-    let y = -30;
+    let y = boundingArea.y;
     for (let row = 0; row < yCells; row++) {
-        let x = 10;
+        let x = boundingArea.x;
         let height = cellHeight * (row == 0 ? firstCellMultiplier : yCellMultiplier);
 
         let newCells = [];
         for (let col = 0; col < xCells; col++) {
             let width = cellWidth * (col == 0 ? firstCellMultiplier : xCellMultiplier);
-            let r = seededRandom(0.6, 0.9) * Math.min(width, height) / 2;
+            let r = seededRandom(0.7, 0.9) * Math.min(width, height) / 2;
             let xfudge = 1.2 * (width - 2 * r) / 2.0;
             let yfudge = (height - 2 * r) / 2.0;
             let xf = (col == 0 && row == 0) ? 0 : seededRandom(-xfudge, xfudge);
             let yf = (col == 0 && row == 0) ? 0 : seededRandom(-1.2*yfudge, 0.7 * yfudge);
-            if (col == 0 && row == 0) {
-                r = Math.min(width, height) / 2;
-            }
             let cell = {
                 x: x + (width / 2) + xf,
                 y: y + (height / 2) + yf,
@@ -1279,23 +1340,18 @@ function layoutPlanets(adjacencyList, boundingSize) {
             x += width;
         }
 
-        // Alternate direction of each row
-        if (row % 2 == 1) {
-            newCells.reverse();
-        }
         gridCells = gridCells.concat(newCells);
 
         y += height;
     }
 
     // Extra cells to use
-    if (gridCells.length > sorted.length) {
-        let extraCells = gridCells.splice(sorted.length);
-        // Merge last cell with cell in row above it
+    if (gridCells.length > group.length) {
+        let extraCells = gridCells.splice(group.length);
+        // Merge last cell with cell next to it
         if (yCells > 1) {
             let lastCell = extraCells.pop();
-            // Account for row direction reversal
-            let cellAboveIndex = xCells * yCells - 1 - xCells - xCells + 1;
+            let cellAboveIndex = xCells * yCells - 2;
             let cellAbove = gridCells[cellAboveIndex];
             gridCells[cellAboveIndex] = lastCell;
             lastCell.x = 0.5 * lastCell.x + 0.5 * cellAbove.x;
@@ -1343,7 +1399,7 @@ function topologicalSort(adjacencyList) {
 
         // Sort the list to give us a deterministic order
         found.sort();
-        result = result.concat(found);
+        result.push(found);
     }
 
     return result;
