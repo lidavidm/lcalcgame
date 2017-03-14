@@ -270,6 +270,12 @@ class ImageAtlasProxy {
         return this.frame.h;
     }
 
+    get backingImage() {
+        throw {
+            "error": "Can't get the backing image of an image in an image atlas",
+        };
+    }
+
     draw(ctx, x, y, w=null, h=null) {
         if (w === null) {
             w = this.naturalWidth;

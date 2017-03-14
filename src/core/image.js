@@ -88,7 +88,7 @@ var mag = (function(_) {
         drawInternal(ctx, pos, boundingSize) {
             if (!ctx || !this.image) return;
             ctx.save();
-            var ptrn = ctx.createPattern( Resource.getImage(this.image), 'repeat' );
+            var ptrn = ctx.createPattern( Resource.getImage(this.image).backingImage, 'repeat' );
             ctx.fillStyle = ptrn.backingImage;
             ctx.fillRect(pos.x + this._offset.x, pos.y + this._offset.y, boundingSize.w, boundingSize.h);
             ctx.restore();
