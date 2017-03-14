@@ -877,6 +877,7 @@ class ChapterSelectMenu extends mag.Stage {
     constructor(canvas, onLevelSelect, flyToChapIdx) {
         super(canvas);
 
+        this.panningEnabled = true;
         this.trails = [];
 
         this.showStarField();
@@ -892,6 +893,8 @@ class ChapterSelectMenu extends mag.Stage {
                     break;
                 }
             }
+
+            this.setCameraX(lastActivePlanet.pos.x - 3 * lastActivePlanet.radius);
 
             let ship = new ChapterSelectShip();
             const shipScale = lastActivePlanet.radius / 120 / 2;
@@ -939,6 +942,35 @@ class ChapterSelectMenu extends mag.Stage {
                 ship.attachToPlanet(lastActivePlanet);
             }
         });
+    }
+
+    setCameraX(x) {
+        this.planetParent.pos = {
+            x: -x,
+            y: this.planetParent.pos.y,
+        };
+    }
+
+    onmousedown(pos) {
+        super.onmousedown(pos);
+        this._dragStart = pos;
+    }
+
+    onmousedrag(pos) {
+        if (this.panningEnabled) {
+            let dx = pos.x - this._dragStart.x;
+            this.planetParent.pos = {
+                x: Math.min(0, this.planetParent.pos.x + dx),
+                y: this.planetParent.pos.y,
+            };
+        }
+        this._dragStart = pos;
+        // TODO: we should use window.onmouseup as well to cancel dragging
+    }
+
+    onmouseup(pos) {
+        super.onmouseup(pos);
+        this._dragStart = null;
     }
 
     updateLevelSpots() {
@@ -1020,7 +1052,8 @@ class ChapterSelectMenu extends mag.Stage {
                 if (p.expandFunc) p.onclick = p.expandFunc;
                 if (!stage.has(p)) stage.add(p);
                 let rad = POS_MAP[i].r;
-                Animate.tween(p, { pos: {x:POS_MAP[i].x+15, y:POS_MAP[i].y+40}, scale:{x:1,y:1}, opacity:1.0 }, dur).after(() => {
+                Animate.tween(p, { pos: {x:POS_MAP[i].x, y:POS_MAP[i].y}, scale:{x:1,y:1}, opacity:1.0 }, dur).after(() => {
+                    this.panningEnabled = true;
                     if (p.active) p.showText();
                 });
             });
@@ -1056,13 +1089,23 @@ class ChapterSelectMenu extends mag.Stage {
         // Expand and disappear animations.
         let stage = this;
         let expand = (planet) => {
+            this.panningEnabled = false;
             planet.ignoreEvents = false;
             planet.expandFunc = planet.onclick;
             planet.onclick = null;
             planet.hideText();
-            stage.bringToFront(planet);
             let r = GLOBAL_DEFAULT_SCREENSIZE.width / 3.0;
-            let center = { x:GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y:GLOBAL_DEFAULT_SCREENSIZE.height / 2.0 };
+            let center = {
+                x: GLOBAL_DEFAULT_SCREENSIZE.width / 2.0,
+                y: GLOBAL_DEFAULT_SCREENSIZE.height / 2.0
+            };
+            // Account for camera
+            center = addPos(center, {
+                x: -this.planetParent.pos.x,
+                y: -this.planetParent.pos.y,
+            });
+            stage.bringToFront(planet);
+
             let scale = r / planet.radius;
             Animate.tween(planet, { scale:{x:scale, y:scale}, pos: center }, 1000, (elapsed) => {
                 return Math.pow(elapsed, 3);
@@ -1258,7 +1301,6 @@ function layoutPlanets(adjacencyList, boundingSize) {
         }
 
         for (let subgroup of subgroups) {
-            console.log(subgroup);
             let boundingArea = {
                 x: startX,
                 y: startY,
@@ -1274,7 +1316,6 @@ function layoutPlanets(adjacencyList, boundingSize) {
                 maxOffset = Math.max(maxOffset, cell.x + cell.r - boundingArea.x);
             }
             startX += maxOffset;
-            console.log(maxOffset, boundingArea.w);
         }
     }
 
@@ -1311,7 +1352,7 @@ function layoutGroup(group, boundingArea, seededRandom) {
     let xCellMultiplier = 1.0, yCellMultiplier = 1.0;
     if (xCells > 1 && yCells > 1) {
         // Make the first cell slightly larger
-        firstCellMultiplier = 1.2;
+        firstCellMultiplier = 1.1;
         xCellMultiplier = (xCells - firstCellMultiplier) / (xCells - 1);
         yCellMultiplier = (yCells - firstCellMultiplier) / (yCells - 1);
     }
