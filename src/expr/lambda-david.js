@@ -1042,7 +1042,7 @@ class FadedPythonLambdaHoleExpr extends LambdaHoleExpr {
     drawInternal(ctx, pos, boundingSize) {
         setStrokeStyle(ctx, this.stroke);
         ctx.fillStyle = this.color;
-        Resource.getImage(this.image).drawImage(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h);
+        Resource.getImage(this.image).draw(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h);
         if(this.stroke) {
             roundRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, 6, false, true, this.stroke.opacity);
         }

@@ -218,10 +218,10 @@ class ChestVarExpr extends VarExpr {
         let offset = Math.max(2, (adjustedSize.w - size.w) / 2);
         ChestImages.base(this.name).draw(ctx, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
         if (this._opened) {
-            ChestImages.lidOpen(this.name).drawImage(ctx, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
+            ChestImages.lidOpen(this.name).draw(ctx, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
         }
         else {
-            ChestImages.lidClosed(this.name).drawImage(ctx, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
+            ChestImages.lidClosed(this.name).draw(ctx, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
         }
         if (this.stroke) {
             ctx.save();
