@@ -671,9 +671,10 @@ class Goal {
 
     get nodeRepresentation() {
         var exprs = flatten(this.patterns.map((p) => p.exprs)).map((expr) => expr.clone());
-        var bg = new mag.Rect(-10,-10,200,80);
-        bg.color = "#444";
+        var bg = new mag.Circle(0, 0, 10);
+        bg.color = "#2b1d0e";
         bg.shadowOffset = 0;
+        bg.anchor = { x: 0.5, y: 0.5 };
         var node = new mag.Rect(0,0,100,50);
         node.color = null;
         node.ignoreEvents = true;
@@ -706,7 +707,7 @@ class Goal {
 
         let image = Resource.getImage(this.alien_image);
         let width = (60 / image.naturalHeight) * image.naturalWidth;
-        let alien = new mag.ImageRect(0, -10, width, 70, this.alien_image);
+        let alien = new mag.ImageRect(0, 0, width, 60, this.alien_image);
 
         node.addAll([bg, alien]);
 
@@ -726,7 +727,7 @@ class Goal {
 
         let x = alien.pos.x + alien.size.w;
         for (let b of bubble) {
-            b.pos = { x: x, y: -15 };
+            b.pos = { x: x, y: -10 };
             x += b.size.w - 1;
         }
 
@@ -734,8 +735,7 @@ class Goal {
 
         node.pos = { x: 10, y: 10 };
         exprs_node.pos = { x: bubble[0].absolutePos.x + 0.3 * bubble[0].absoluteSize.w, y:10 };
-        let lastChild = bubble[bubble.length - 1];
-        bg.size = { w: 10 + lastChild.absolutePos.x+ lastChild.absoluteSize.w, h:70 };
+        bg.radius = Math.max(10 + alien.absolutePos.x + alien.absoluteSize.w, 70);
 
         return [node, exprs_node];
     }
