@@ -301,7 +301,7 @@ class RepeatLoopExpr extends Expression {
 
 class FadedRepeatLoopExpr extends Expression {
     constructor(times, body) {
-        super([new TextExpr("for (let i = 1; i <= "), times, new TextExpr("; i = i + 1 {"), body, new TextExpr("}")]);
+        super([new TextExpr("repeat ("), times, new TextExpr(") {"), body, new TextExpr("}")]);
     }
 
     get timesExpr() {
