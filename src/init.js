@@ -463,3 +463,12 @@ function resetToLevel(idx) {
     saveProgress();
     document.cookie = "level_idx=" + level_idx.toString();
 }
+
+function toggleMute() {
+    if (Resource.isMuted()) {
+        Resource.unmute();
+    }
+    else {
+        Resource.mute();
+    }
+}
