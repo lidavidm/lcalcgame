@@ -683,8 +683,8 @@ class Goal {
         }
 
         let image = Resource.getImage(this.alien_image);
-        let width = (60 / image.naturalHeight) * image.naturalWidth;
-        let alien = new mag.ImageRect(0, 0, width, 60, this.alien_image);
+        let width = (70 / image.naturalHeight) * image.naturalWidth;
+        let alien = new mag.ImageRect(0, 0, width, 70, this.alien_image);
 
         node.addAll([bg, alien]);
 
@@ -713,6 +713,7 @@ class Goal {
         node.pos = { x: 10, y: 10 };
         exprs_node.pos = { x: bubble[0].absolutePos.x + 0.3 * bubble[0].absoluteSize.w, y:10 };
         bg.radius = Math.max(10 + alien.absolutePos.x + alien.absoluteSize.w, 70);
+        bg.radius = Math.max(10 + alien.absolutePos.y + alien.absoluteSize.h, bg.radius);
 
         return [node, exprs_node];
     }
