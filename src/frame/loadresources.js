@@ -229,6 +229,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadImage('planet-functiana', 'starboy/planet_functiana.png');
     loadImage('planet-functiana-locked', 'starboy/planet_functiana-locked.png');
     loadImage('planet-glow', 'starboy/planet-glow.png');
+    loadImage('level-spot-glow', 'starboy/level-spot-glow.png');
     loadImage('planet-bagbag-locked', 'starboy/planet_bagbag-locked.png');
     loadImage('planet-conditionabo-locked', 'starboy/planet_conditionabo-locked.png');
     loadImage('planet-boolili-locked', 'starboy/planet_boolili-locked.png');

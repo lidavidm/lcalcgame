@@ -414,31 +414,40 @@ class LevelSpot extends mag.Circle {
         this.stroke = { color:'black', lineWidth:2 };
         this.onclick = onclick;
         this.flashing = false;
+
+        let glow = new mag.ImageRect(0, 0, r*2.5, r*2.5, 'level-spot-glow');
+        glow.anchor = { x:0.5, y:0.5 };
+        glow.pos = { x:r, y:r };
+        glow.ignoreEvents = true;
+        this.glow = glow;
     }
+
     flash() {
         this.enabledColor = 'cyan';
         this.color = 'cyan';
 
         if (this.flashing) return;
+
         this.flashing = true;
-        const dur = 600;
-        this.opacity =  1.0;
+        const dur = 800;
+        this.glow.opacity = 1.0;
         let _this = this;
         let blink = () => {
             if (_this.cancelBlink) {
                 this.flashing = false;
                 return;
             }
-            Animate.tween(_this, { opacity:0.4 }, dur, (e) => Math.pow(e, 2)).after(() => {
+            Animate.tween(this.glow, { opacity:0.1 }, dur, (e) => Math.pow(e, 2)).after(() => {
                 if (_this.cancelBlink) {
                     this.flashing = false;
                     return;
                 }
-                Animate.tween(_this, { opacity:1 }, dur, (e) => Math.pow(e, 0.5)).after(blink);
+                Animate.tween(this.glow, { opacity:0.6 }, dur, (e) => Math.pow(e, 0.5)).after(blink);
             });
         };
         blink();
     }
+
     enable() {
         this.color = 'white';
         this.enabled = true;
@@ -462,6 +471,31 @@ class LevelSpot extends mag.Circle {
         if (this.enabled && this.onclick) {
             this.onclick();
         }
+    }
+
+    drawInternal(ctx, pos, boundingSize) {
+        if (this.flashing || this.color === this.highlightColor) {
+            ctx.save();
+            if (this.glow.opacity) {
+                if (this.color === this.highlightColor) {
+                    ctx.globalAlpha = Math.max(this.glow.opacity, 0.3) + 0.4;
+                }
+                else {
+                    ctx.globalAlpha = this.glow.opacity;
+                }
+            }
+            let glowPos = {
+                x: pos.x - 0.6 * boundingSize.w,
+                y: pos.y - 0.6 * boundingSize.h,
+            };
+            let glowSize = {
+                w: 2.2 * boundingSize.w,
+                h: 2.2 * boundingSize.h,
+            };
+            this.glow.drawInternal(ctx, glowPos, glowSize);
+            ctx.restore();
+        }
+        super.drawInternal(ctx, pos, boundingSize);
     }
 }
 
