@@ -474,7 +474,7 @@ class LevelSpot extends mag.Circle {
     }
 
     drawInternal(ctx, pos, boundingSize) {
-        if (this.flashing || this.color === this.highlightColor) {
+        if (!this.ignoreEvents && (this.flashing || this.color === this.highlightColor)) {
             ctx.save();
             if (this.glow.opacity) {
                 if (this.color === this.highlightColor) {
@@ -734,7 +734,18 @@ class PlanetCard extends mag.ImageRect {
         const genClickCallback = (level_idx) => {
             return () => {
                 Resource.play('fatbtn-beep');
-                onLevelSelect(levels[0][level_idx], levels[1] + level_idx);
+                let spot = this.spots[level_idx];
+                let pos = spot.absolutePos;
+                let r = spot.absoluteSize.w / 2;
+                let mask = new Mask(pos.x, pos.y, 20 * r);
+                this.stage.add(mask);
+                Animate.tween(mask, {
+                    opacity: 1.0,
+                    radius: 0.1,
+                    ringControl: 100,
+                }, 800).after(() => {
+                    onLevelSelect(levels[0][level_idx], levels[1] + level_idx);
+                });
             };
         };
 
@@ -1502,7 +1513,40 @@ function topologicalSort(adjacencyList) {
     return result;
 }
 
+class Mask extends mag.Rect {
+    constructor(cx, cy, r) {
+        super(0, 0, 0, 0);
+        this.cx = cx;
+        this.cy = cy;
+        this.radius = r;
+        this.opacity = 0.0;
+        this.ringControl = 0;
+    }
 
+    drawInternal(ctx, pos, boundingSize) {
+        ctx.globalAlpha = this.opacity;
+        ctx.fillStyle = "#594764";
+        ctx.beginPath();
+        ctx.arc(this.cx, this.cy, this.radius, 0, 2 * Math.PI);
+        ctx.rect(GLOBAL_DEFAULT_SCREENSIZE.width, 0,
+                 -GLOBAL_DEFAULT_SCREENSIZE.width, GLOBAL_DEFAULT_SCREENSIZE.height);
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+        let numRings = Math.min(Math.ceil(this.ringControl / 10), 4);
+
+        setStrokeStyle(ctx, {
+            lineWidth: 2,
+            color: 'cyan',
+        });
+        for (let i = 0; i < numRings; i++) {
+            let k = (this.ringControl - i * 20);
+            ctx.beginPath();
+            ctx.arc(this.cx, this.cy, 10 * Math.exp(k / 30), 0, 2 * Math.PI);
+            ctx.globalAlpha = Math.max(0.2, 1 - k / 50);
+            ctx.stroke();
+        }
+    }
+}
 
 
 
