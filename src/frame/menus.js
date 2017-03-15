@@ -882,6 +882,7 @@ class ChapterSelectMenu extends mag.Stage {
 
         this.showStarField();
         this.showChapters(onLevelSelect);
+        this.updateParallax();
 
         let _this = this;
         _this.offset = { x:0, y:0 };
@@ -945,10 +946,26 @@ class ChapterSelectMenu extends mag.Stage {
     }
 
     setCameraX(x) {
+        x = Math.max(x, 0);
+        x = Math.min(x, this.maxPlanetX - GLOBAL_DEFAULT_SCREENSIZE.width);
         this.planetParent.pos = {
             x: -x,
             y: this.planetParent.pos.y,
         };
+        this.updateParallax();
+    }
+
+    updateParallax() {
+        if (this.maxPlanetX) {
+            let cameraX = -Math.min(0, this.planetParent.pos.x);
+            let x = Math.min(1.0, (cameraX / (this.maxPlanetX - GLOBAL_DEFAULT_SCREENSIZE.width)))
+                * 0.5 * GLOBAL_DEFAULT_SCREENSIZE.width;
+            x = Math.max(x, 0);
+            this.starParent.pos = {
+                x: -x,
+                y: this.starParent.pos.y,
+            };
+        }
     }
 
     onmousedown(pos) {
@@ -959,10 +976,7 @@ class ChapterSelectMenu extends mag.Stage {
     onmousedrag(pos) {
         if (this.panningEnabled) {
             let dx = pos.x - this._dragStart.x;
-            this.planetParent.pos = {
-                x: Math.min(0, this.planetParent.pos.x + dx),
-                y: this.planetParent.pos.y,
-            };
+            this.setCameraX(-(this.planetParent.pos.x + dx));
         }
         this._dragStart = pos;
         // TODO: we should use window.onmouseup as well to cancel dragging
@@ -1006,8 +1020,10 @@ class ChapterSelectMenu extends mag.Stage {
     }
 
     showStarField() {
-        const NUM_STARS = 100;
-        let genRandomPt = () => randomPointInRect( {x:0, y:0, w:GLOBAL_DEFAULT_SCREENSIZE.width, h:GLOBAL_DEFAULT_SCREENSIZE.height} );
+        const NUM_STARS = 120;
+        let genRandomPt = () => randomPointInRect( {x:0, y:0, w: 1.5*GLOBAL_DEFAULT_SCREENSIZE.width, h:GLOBAL_DEFAULT_SCREENSIZE.height} );
+
+        let starParent = new mag.Rect(0, 0, 0, 0);
         let stars = [];
         let n = NUM_STARS;
         while(n-- > 0) {
@@ -1034,12 +1050,14 @@ class ChapterSelectMenu extends mag.Stage {
             star.opacity = 0.4;
             const scale = Math.random() * 0.3 + 0.1;
             star.scale = { x:scale, y:scale };
-            this.add(star);
+            starParent.addChild(star);
             stars.push(star);
 
             // Twinkling effect
             Animate.wait(1000 * Math.random()).after(() => star.twinkle(1000));
         }
+        this.starParent = starParent;
+        this.add(starParent);
     }
 
     setPlanetsToDefaultPos(dur) {
@@ -1128,10 +1146,13 @@ class ChapterSelectMenu extends mag.Stage {
             const POS_MAP = layoutPlanets(chapters.transitions, this.boundingSize);
 
             let planetParent = new mag.Rect(0, 0, 0, 0);
+            let maxPlanetX = GLOBAL_DEFAULT_SCREENSIZE.width;
 
             chapters.chapters.forEach((chap, i) => {
                 let pos = i < POS_MAP.length ? POS_MAP[i] : { x:0, y:0, r:10 };
                 let planet = new PlanetCard(pos.x, pos.y, pos.r, chap.name, chap.resources ? chap.resources.planet : 'planet-bagbag');
+                maxPlanetX = Math.max(maxPlanetX, pos.x + pos.r);
+
                 planet.color = 'white';
                 if (i === 1) planet.path.stroke.color = 'gray';
                 planet.anchor = { x:0.5, y:0.5 };
@@ -1175,6 +1196,7 @@ class ChapterSelectMenu extends mag.Stage {
             });
             this.add(planetParent);
             this.planetParent = planetParent;
+            this.maxPlanetX = maxPlanetX;
 
             let transitionMap = {};
             chapters.chapters.forEach((chap, i) => {
