@@ -1,0 +1,129 @@
+{
+	"meta": {
+		"image": "aliens.png",
+		"size": {"w":1118,"h":900},
+		"scale": "1"
+	},
+	"frames": {
+		"alien-bag-2.png":
+		{
+			"frame": {"x":359,"y":0,"w":358,"h":188},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":358,"h":188},
+			"sourceSize": {"w":358,"h":188}
+		},
+		"alien-bag-1.png":
+		{
+			"frame": {"x":0,"y":0,"w":359,"h":223},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":359,"h":223},
+			"sourceSize": {"w":359,"h":223}
+		},
+		"alien-conditional-4.png":
+		{
+			"frame": {"x":0,"y":223,"w":186,"h":290},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":186,"h":290},
+			"sourceSize": {"w":186,"h":290}
+		},
+		"alien-function-2.png":
+		{
+			"frame": {"x":186,"y":223,"w":158,"h":271},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":158,"h":271},
+			"sourceSize": {"w":158,"h":271}
+		},
+		"alien-conditional-3.png":
+		{
+			"frame": {"x":344,"y":223,"w":201,"h":257},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":201,"h":257},
+			"sourceSize": {"w":201,"h":257}
+		},
+		"alien-conditional-1.png":
+		{
+			"frame": {"x":717,"y":0,"w":236,"h":251},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":236,"h":251},
+			"sourceSize": {"w":236,"h":251}
+		},
+		"alien-function-3.png":
+		{
+			"frame": {"x":717,"y":251,"w":184,"h":243},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":184,"h":243},
+			"sourceSize": {"w":184,"h":243}
+		},
+		"alien-boolean-4.png":
+		{
+			"frame": {"x":953,"y":703,"w":138,"h":138},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":138,"h":138},
+			"sourceSize": {"w":138,"h":138}
+		},
+		"alien-boolean-5.png":
+		{
+			"frame": {"x":545,"y":223,"w":161,"h":217},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":161,"h":217},
+			"sourceSize": {"w":161,"h":217}
+		},
+		"alien-function-1.png":
+		{
+			"frame": {"x":0,"y":688,"w":216,"h":212},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":216,"h":212},
+			"sourceSize": {"w":216,"h":212}
+		},
+		"alien-conditional-2.png":
+		{
+			"frame": {"x":953,"y":0,"w":165,"h":216},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":165,"h":216},
+			"sourceSize": {"w":165,"h":216}
+		},
+		"alien-boolean-2.png":
+		{
+			"frame": {"x":953,"y":216,"w":135,"h":177},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":135,"h":177},
+			"sourceSize": {"w":135,"h":177}
+		},
+		"alien-boolean-3.png":
+		{
+			"frame": {"x":953,"y":393,"w":145,"h":155},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":145,"h":155},
+			"sourceSize": {"w":145,"h":155}
+		},
+		"alien-boolean-1.png":
+		{
+			"frame": {"x":953,"y":548,"w":128,"h":155},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":128,"h":155},
+			"sourceSize": {"w":128,"h":155}
+		},
+		"alien-bag-3.png":
+		{
+			"frame": {"x":0,"y":513,"w":239,"h":175},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":239,"h":175},
+			"sourceSize": {"w":239,"h":175}
+		}
+	}
+}
