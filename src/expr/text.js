@@ -7,27 +7,30 @@ class TextExpr extends Expression {
         this.color = 'black';
         this.shadow = null;
         this._sizeCache = null;
+        this._yMultiplier = 2.2;
+        this._xOffset = 0;
+        this._sizeOffset = { w:0, h:0 };
     }
     get size() {
         var ctx = this.ctx || GLOBAL_DEFAULT_CTX;
         if (!ctx || !this.text || this.text.length === 0) {
             console.error('Cannot size text: No context.');
-            return { w:4, h:this.fontSize };
+            return { w:4+this._sizeOffset.w, h:this.fontSize+this._sizeOffset.h };
         }
         else if (this.manualWidth) {
             return { w:this.manualWidth, h:DEFAULT_EXPR_HEIGHT };
         }
         else if (this._sizeCache) {
             // Return a copy because callers may mutate this
-            return { w: this._sizeCache.size.w, h: this._sizeCache.size.h };
+            return { w: this._sizeCache.size.w+this._sizeOffset.w, h: this._sizeCache.size.h+this._sizeOffset.h };
         }
 
         ctx.font = this.contextFont;
         var measure = ctx.measureText(this.text);
         this._sizeCache = {
-            size: { w: measure.width, h: DEFAULT_EXPR_HEIGHT },
+            size: { w: measure.width, h:DEFAULT_EXPR_HEIGHT },
         };
-        return { w:measure.width, h:DEFAULT_EXPR_HEIGHT };
+        return { w:measure.width+this._sizeOffset.w, h:DEFAULT_EXPR_HEIGHT+this._sizeOffset.h };
     }
     get contextFont() {
         return this.fontSize + 'px ' + this.font;
@@ -44,10 +47,10 @@ class TextExpr extends Expression {
             ctx.shadowBlur = this.shadow.blur;
             ctx.shadowOffsetX = this.shadow.x;
             ctx.shadowOffsetY = this.shadow.y;
-            ctx.fillText(this.text, pos.x / abs_scale.x, pos.y / abs_scale.y + 2.2 * this.fontSize * this.anchor.y);
+            ctx.fillText(this.text, (pos.x + this._xOffset) / abs_scale.x, pos.y / abs_scale.y + this._yMultiplier * this.fontSize * this.anchor.y);
             ctx.restore();
         }
-        ctx.fillText(this.text, pos.x / abs_scale.x, pos.y / abs_scale.y + 2.2 * this.fontSize * this.anchor.y);
+        ctx.fillText(this.text, (pos.x + this._xOffset) / abs_scale.x, pos.y / abs_scale.y + this._yMultiplier * this.fontSize * this.anchor.y);
         ctx.restore();
     }
     hits(pos, options) { return false; } // disable mouse events

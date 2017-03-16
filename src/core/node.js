@@ -25,6 +25,9 @@ var mag = (function(_) {
             else             return pos;
         }
         set pos(p) { this._pos = p; }
+        hasChild(child) {
+            return this.children.indexOf(child) > -1;
+        }
         addChild(child) {
             this.children.push(child);
             if (child) {

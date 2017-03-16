@@ -36,7 +36,8 @@ var ExprManager = (function() {
         'sequence': [NotchedSequence, Sequence],
         'repeat':   [RepeatLoopExpr],
         'choice':   [ChoiceExpr],
-        'level':    [ReductStageExpr]
+        'level':    [ReductStageExpr],
+        'arrayobj': [ArrayObjectExpr]
     };
     var fade_level = {};
     var DEFAULT_FADE_LEVEL = 0;

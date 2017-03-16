@@ -76,6 +76,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAudio('define', 'define.wav');
     loadAudio('place', 'place_from_toolbox.wav');
     loadAudio('define-convert', 'convert.wav');
+    loadAudio('drawer-open', 'drawer_close.wav');
+    loadAudio('drawer-close', 'drawer_open.wav');
 
     loadImage('bag-background', 'bg-stars.png');
     loadImage('infinity-symbol', 'infinity_symbol.png');
@@ -137,6 +139,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadImage('toolbox-bg', 'toolbox-tiled-bg.png');
     loadImage('victory', 'you-win.png');
     loadImage('apply-arrow', 'apply_arrow.png');
+    loadImage('handle', 'pullout-drawer-handle.png');
 
     // Concreteness faded images.
     loadImage('missing-bracket', 'missing-bracket.png');

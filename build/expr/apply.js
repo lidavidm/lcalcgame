@@ -19,18 +19,37 @@ var ApplyExpr = function (_Expression) {
         _this.lambdaExpr.pos = { x: 0, y: 0 };
         _this.exprToApply.pos = addPos(_this.lambdaExpr.pos, { x: -exprToApply.size.w, y: -exprToApply.size.h / 2 });
 
-        _this.shadowOffset = 4;
+        _this.shadowOffset = 2;
         _this.color = '#ddd';
 
         _this.exprToApply.lock();
+        _this.lambdaExpr.lock();
 
         var arrow = new ImageExpr(0, 0, 97 / 1.6, 60 / 1.6, 'apply-arrow');
         arrow.lock();
         _this.arrow = arrow;
+        _this.arrow.opacity = 1;
         return _this;
     }
 
     _createClass(ApplyExpr, [{
+        key: 'onmouseclick',
+        value: function onmouseclick() {
+            var _this2 = this;
+
+            this.lambdaExpr.hole.ondropenter(this.exprToApply);
+            //Animate.tween( this.arrow, {opacity:0}, 200 );
+            Animate.wait(500).after(function () {
+                var stg = _this2.stage;
+                var lambda = _this2.lambdaExpr;
+                _this2.exprToApply.opacity = 1.0;
+                _this2.lambdaExpr.applyExpr(_this2.exprToApply);
+                (_this2.parent || stg).swap(_this2, _this2.lambdaExpr);
+                //lambda.performReduction();
+                if (stg) stg.draw();
+            });
+        }
+    }, {
         key: 'hitsChild',
         value: function hitsChild() {
             return null;

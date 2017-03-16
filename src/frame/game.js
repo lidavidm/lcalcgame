@@ -420,6 +420,7 @@ class Level {
             'repeat':ExprManager.getClass('repeat'),
             'choice':ExprManager.getClass('choice'),
             'level':ExprManager.getClass('level'),
+            'arrayobj':ExprManager.getClass('arrayobj'),
             'dot':(() => {
                 let circ = new CircleExpr(0,0,18);
                 circ.color = 'gold';

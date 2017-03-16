@@ -229,7 +229,7 @@ class LambdaHoleExpr extends MissingExpression {
                     let orig_exp_str = this.parent.toString();
                     let dropped_exp_str = node.toString();
 
-                    this.applyExpr(node);
+                    let res = this.applyExpr(node);
 
                     // Log the reduction.
                     Logger.log('reduction-lambda', { 'before':orig_exp_str, 'applied':dropped_exp_str, 'after':parent.toString() });
@@ -247,6 +247,8 @@ class LambdaHoleExpr extends MissingExpression {
                     } else
                         stage.dumpState();
 
+                    return res;
+
                 } else {
                     console.warn('ERROR: Cannot perform lambda-substitution: Hole has no parent.');
 
@@ -260,7 +262,7 @@ class LambdaHoleExpr extends MissingExpression {
             if (level_idx < 1) {
                 Animate.tween(node, { opacity:0 }, 400, (elapsed) => Math.pow(elapsed, 0.5)).after(afterDrop);
             } else
-                afterDrop();
+                return afterDrop();
         }
     }
 
@@ -428,6 +430,7 @@ class LambdaExpr extends Expression {
         return this.takesArgument && mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [this]).length === 0;
     }
     get body() { return this.takesArgument ? this.holes[1] : null; }
+    get hole() { return this.takesArgument ? this.holes[0] : null; }
     updateHole() {
         // Determine whether this LambdaExpr has any MissingExpressions:
         if (this.holes[0].name !== 'x')

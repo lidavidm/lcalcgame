@@ -5,6 +5,7 @@
 const EMPTY_EXPR_WIDTH = 50;
 const DEFAULT_EXPR_HEIGHT = 50;
 const DEFAULT_CORNER_RAD = 20;
+const DEFAULT_SUBEXPR_SCALE = 0.85;
 var DEFAULT_RENDER_CTX = null;
 
 /** A generic expression. Could be a lambda expression, could be an if statement, could be a for.
@@ -19,6 +20,7 @@ class Expression extends mag.RoundedRect {
         this.environment = null;
         this._layout = { 'direction': 'horizontal', 'align': 'vertical' };
         this.lockedInteraction = false;
+        this._subexpScale = DEFAULT_SUBEXPR_SCALE;
 
         if (this.holes) {
             var _this = this;
@@ -92,7 +94,7 @@ class Expression extends mag.RoundedRect {
                     anotherArg.pos = arg.pos;
                     anotherArg.dragging = false;
                     anotherArg.parent = this;
-                    anotherArg.scale = { x:0.85, y:0.85 };
+                    anotherArg.scale = { x:this._subexpScale, y:this._subexpScale};
                     anotherArg.onmouseleave();
                     anotherArg.onmouseup();
                 }
@@ -172,7 +174,7 @@ class Expression extends mag.RoundedRect {
         // children.
         this.holes.forEach((expr) => {
             expr.anchor = { x:0, y:0.5 };
-            expr.scale = { x:0.85, y:0.85 };
+            expr.scale = { x:_this._subexpScale, y:_this._subexpScale };
             expr.update();
         });
         var size = this.size;
@@ -186,7 +188,7 @@ class Expression extends mag.RoundedRect {
         this.holes.forEach((expr) => { // Update hole expression positions.
             expr.anchor = { x:0, y:0.5 };
             expr.pos = { x:x, y:y };
-            expr.scale = { x:0.85, y:0.85 };
+            expr.scale = { x:_this._subexpScale, y:_this._subexpScale };
             expr.update();
 
             if (this._layout.direction == "vertical") {
@@ -507,5 +509,75 @@ class Expression extends mag.RoundedRect {
             s += this.holes[i].toString();
         }
         return s + ')';
+    }
+}
+
+// A base Expression which does not equate .holes and .children.
+// -> TODO: Remove the need for this by merging it with the base class.
+class ExpressionPlus extends Expression {
+    update() {
+        var _this = this;
+
+        this.holes.forEach((expr) => {
+            if (!_this.hasChild(expr)) _this.addChild(expr)
+        });
+        // In the centering calculation below, we need this expr's
+        // size to be stable. So we first set the scale on our
+        // children, then compute our size once to lay out the
+        // children.
+        this.holes.forEach((expr) => {
+            expr.anchor = { x:0, y:0.5 };
+            expr.scale = { x:_this._subexpScale, y:_this._subexpScale };
+            expr.update();
+        });
+        var size = this.size;
+        var padding = this.padding.inner;
+        var x = this.padding.left;
+        var y = this.size.h / 2.0 + (this.exprOffsetY ? this.exprOffsetY : 0);
+        if (this._layout.direction == "vertical") {
+            y = padding;
+        }
+
+        this.holes.forEach((expr) => { // Update hole expression positions.
+            expr.anchor = { x:0, y:0.5 };
+            expr.pos = { x:x, y:y };
+            expr.scale = { x:_this._subexpScale, y:_this._subexpScale };
+            expr.update();
+
+            if (this._layout.direction == "vertical") {
+                y += expr.anchor.y * expr.size.h * expr.scale.y;
+                var offset = x;
+
+                // Centering
+                if (this._layout.align == "horizontal") {
+                    var innerWidth = size.w;
+                    var scale = expr.scale.x;
+                    offset = (innerWidth - scale * expr.size.w) / 2;
+                }
+
+                expr.pos = { x:offset, y:y };
+
+                y += (1 - expr.anchor.y) * expr.size.h * expr.scale.y;
+                if (this.padding.between) y += this.padding.between;
+            }
+            else {
+                x += expr.size.w * expr.scale.x + padding;
+            }
+        });
+    }
+
+    clone(parent=null) {
+        if (this.drawer) {
+            let extras = [];
+            this.children.forEach((c) => {
+                if (this.holes.indexOf(c) === -1)
+                    extras.push(c);
+            });
+            extras.forEach((c) => this.removeChild(c));
+            let cln = super.clone(parent);
+            extras.forEach((c) => this.addChild(c));
+            return cln;
+        } else
+            return super.clone(parent);
     }
 }

@@ -865,6 +865,7 @@ var Level = function () {
                 'repeat': ExprManager.getClass('repeat'),
                 'choice': ExprManager.getClass('choice'),
                 'level': ExprManager.getClass('level'),
+                'arrayobj': ExprManager.getClass('arrayobj'),
                 'dot': function () {
                     var circ = new CircleExpr(0, 0, 18);
                     circ.color = 'gold';
