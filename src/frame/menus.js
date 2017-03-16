@@ -743,8 +743,15 @@ class PlanetCard extends mag.ImageRect {
                     opacity: 1.0,
                     radius: 0.1,
                     ringControl: 100,
-                }, 800).after(() => {
+                }, 500).after(() => {
                     onLevelSelect(levels[0][level_idx], levels[1] + level_idx);
+                    window.stage.add(mask);
+                    Animate.tween(mask, {
+                        radius: Math.max(stage.boundingSize.w, stage.boundingSize.h),
+                        ringControl: 150,
+                    }, 400).after(() => {
+                        window.stage.remove(mask);
+                    });
                 });
             };
         };
@@ -1528,8 +1535,9 @@ class Mask extends mag.Rect {
         ctx.fillStyle = "#594764";
         ctx.beginPath();
         ctx.arc(this.cx, this.cy, this.radius, 0, 2 * Math.PI);
-        ctx.rect(GLOBAL_DEFAULT_SCREENSIZE.width, 0,
-                 -GLOBAL_DEFAULT_SCREENSIZE.width, GLOBAL_DEFAULT_SCREENSIZE.height);
+        let w = GLOBAL_DEFAULT_SCREENSIZE.width || GLOBAL_DEFAULT_SCREENSIZE.w;
+        let h = GLOBAL_DEFAULT_SCREENSIZE.width || GLOBAL_DEFAULT_SCREENSIZE.h;
+        ctx.rect(w, 0, -w, h);
         ctx.fill();
         ctx.globalAlpha = 1.0;
         let numRings = Math.min(Math.ceil(this.ringControl / 10), 4);
@@ -1541,7 +1549,7 @@ class Mask extends mag.Rect {
         for (let i = 0; i < numRings; i++) {
             let k = (this.ringControl - i * 20);
             ctx.beginPath();
-            ctx.arc(this.cx, this.cy, 10 * Math.exp(k / 30), 0, 2 * Math.PI);
+            ctx.arc(this.cx, this.cy, 30 * Math.exp(k / 50), 0, 2 * Math.PI);
             ctx.globalAlpha = Math.max(0.2, 1 - k / 50);
             ctx.stroke();
         }
