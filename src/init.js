@@ -177,10 +177,35 @@ function initMainMenu() {
 
         initBoard();
 
-        let apply = new ApplyExpr( Level.parse('star')[0], Level.parse('(λx #x #x)')[0] );
-        apply.pos = { x:200, y:400 };
-        stage.add(apply);
-        console.log(apply);
+        // let dropdown = new DropdownSelect( 200, 100, 120, 40, [ "A", "B", "C" ], null, "YellowGreen", "Green", "PaleGreen", false );
+        // stage.add(dropdown);
+        // Animate.wait(1000).after(() => dropdown.expand(true));
+
+        // let drawer = new PulloutDrawer(200, 260, 14, 44, { 'pop':true, 'push':true, 'map':true });
+        // stage.add(drawer);
+
+        // let ee = new EntangledExpr( Level.parse('(2) (3) (4) (5)'), true );
+        // ee.pos = { x:300, y:230 };
+        // stage.add(ee);
+        //
+        // let ee2 = new EntangledExpr( Level.parse('(1) (2) (3) (4)'), false );
+        // ee2.pos = { x:300, y:280 };
+        // stage.add(ee2);
+        //
+        // EntangledExpr.pairedAnimate(ee, ee2);
+
+        // let obj = new ArrayObjectExpr(new BracketArrayExpr(0, 0, 44, 44));
+        // obj.pos = { x:200, y:200 };
+        // stage.add(obj);
+        //
+        // stage.add( Level.parse('(λx /(== #x /star))')[0] )
+        // stage.add( Level.parse('rect')[0] )
+        // stage.add( Level.parse('star')[0] )
+
+        // let apply = new ApplyExpr( Level.parse('3')[0], Level.parse('(λx /(+ #x /3))')[0] );
+        // apply.pos = { x:200, y:400 };
+        // stage.add(apply);
+        // console.log(apply);
 
         // let meta = new MetaExpression(stage, Resource.buildLevel(Resource.level[10], stage.canvas));
         // meta.pos = { x:200, y:200 };

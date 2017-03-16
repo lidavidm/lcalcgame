@@ -1,5 +1,7 @@
 'use strict';
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
@@ -17,6 +19,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var EMPTY_EXPR_WIDTH = 50;
 var DEFAULT_EXPR_HEIGHT = 50;
 var DEFAULT_CORNER_RAD = 20;
+var DEFAULT_SUBEXPR_SCALE = 0.85;
 var DEFAULT_RENDER_CTX = null;
 
 /** A generic expression. Could be a lambda expression, could be an if statement, could be a for.
@@ -38,6 +41,7 @@ var Expression = function (_mag$RoundedRect) {
         _this2.environment = null;
         _this2._layout = { 'direction': 'horizontal', 'align': 'vertical' };
         _this2.lockedInteraction = false;
+        _this2._subexpScale = DEFAULT_SUBEXPR_SCALE;
 
         if (_this2.holes) {
             var _this = _this2;
@@ -124,7 +128,7 @@ var Expression = function (_mag$RoundedRect) {
                         anotherArg.pos = arg.pos;
                         anotherArg.dragging = false;
                         anotherArg.parent = this;
-                        anotherArg.scale = { x: 0.85, y: 0.85 };
+                        anotherArg.scale = { x: this._subexpScale, y: this._subexpScale };
                         anotherArg.onmouseleave();
                         anotherArg.onmouseup();
                     }
@@ -164,7 +168,7 @@ var Expression = function (_mag$RoundedRect) {
             // children.
             this.holes.forEach(function (expr) {
                 expr.anchor = { x: 0, y: 0.5 };
-                expr.scale = { x: 0.85, y: 0.85 };
+                expr.scale = { x: _this._subexpScale, y: _this._subexpScale };
                 expr.update();
             });
             var size = this.size;
@@ -179,7 +183,7 @@ var Expression = function (_mag$RoundedRect) {
                 // Update hole expression positions.
                 expr.anchor = { x: 0, y: 0.5 };
                 expr.pos = { x: x, y: y };
-                expr.scale = { x: 0.85, y: 0.85 };
+                expr.scale = { x: _this._subexpScale, y: _this._subexpScale };
                 expr.update();
 
                 if (_this3._layout.direction == "vertical") {
@@ -629,3 +633,103 @@ var Expression = function (_mag$RoundedRect) {
 
     return Expression;
 }(mag.RoundedRect);
+
+// A base Expression which does not equate .holes and .children.
+// -> TODO: Remove the need for this by merging it with the base class.
+
+
+var ExpressionPlus = function (_Expression) {
+    _inherits(ExpressionPlus, _Expression);
+
+    function ExpressionPlus() {
+        _classCallCheck(this, ExpressionPlus);
+
+        return _possibleConstructorReturn(this, (ExpressionPlus.__proto__ || Object.getPrototypeOf(ExpressionPlus)).apply(this, arguments));
+    }
+
+    _createClass(ExpressionPlus, [{
+        key: 'update',
+        value: function update() {
+            var _this7 = this;
+
+            var _this = this;
+
+            this.holes.forEach(function (expr) {
+                if (!_this.hasChild(expr)) _this.addChild(expr);
+            });
+            // In the centering calculation below, we need this expr's
+            // size to be stable. So we first set the scale on our
+            // children, then compute our size once to lay out the
+            // children.
+            this.holes.forEach(function (expr) {
+                expr.anchor = { x: 0, y: 0.5 };
+                expr.scale = { x: _this._subexpScale, y: _this._subexpScale };
+                expr.update();
+            });
+            var size = this.size;
+            var padding = this.padding.inner;
+            var x = this.padding.left;
+            var y = this.size.h / 2.0 + (this.exprOffsetY ? this.exprOffsetY : 0);
+            if (this._layout.direction == "vertical") {
+                y = padding;
+            }
+
+            this.holes.forEach(function (expr) {
+                // Update hole expression positions.
+                expr.anchor = { x: 0, y: 0.5 };
+                expr.pos = { x: x, y: y };
+                expr.scale = { x: _this._subexpScale, y: _this._subexpScale };
+                expr.update();
+
+                if (_this7._layout.direction == "vertical") {
+                    y += expr.anchor.y * expr.size.h * expr.scale.y;
+                    var offset = x;
+
+                    // Centering
+                    if (_this7._layout.align == "horizontal") {
+                        var innerWidth = size.w;
+                        var scale = expr.scale.x;
+                        offset = (innerWidth - scale * expr.size.w) / 2;
+                    }
+
+                    expr.pos = { x: offset, y: y };
+
+                    y += (1 - expr.anchor.y) * expr.size.h * expr.scale.y;
+                    if (_this7.padding.between) y += _this7.padding.between;
+                } else {
+                    x += expr.size.w * expr.scale.x + padding;
+                }
+            });
+        }
+    }, {
+        key: 'clone',
+        value: function clone() {
+            var _this8 = this;
+
+            var parent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+            if (this.drawer) {
+                var _ret = function () {
+                    var extras = [];
+                    _this8.children.forEach(function (c) {
+                        if (_this8.holes.indexOf(c) === -1) extras.push(c);
+                    });
+                    extras.forEach(function (c) {
+                        return _this8.removeChild(c);
+                    });
+                    var cln = _get(ExpressionPlus.prototype.__proto__ || Object.getPrototypeOf(ExpressionPlus.prototype), 'clone', _this8).call(_this8, parent);
+                    extras.forEach(function (c) {
+                        return _this8.addChild(c);
+                    });
+                    return {
+                        v: cln
+                    };
+                }();
+
+                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+            } else return _get(ExpressionPlus.prototype.__proto__ || Object.getPrototypeOf(ExpressionPlus.prototype), 'clone', this).call(this, parent);
+        }
+    }]);
+
+    return ExpressionPlus;
+}(Expression);

@@ -20,6 +20,11 @@ var mag = function (_) {
         }
 
         _createClass(Node, [{
+            key: 'hasChild',
+            value: function hasChild(child) {
+                return this.children.indexOf(child) > -1;
+            }
+        }, {
             key: 'addChild',
             value: function addChild(child) {
                 this.children.push(child);

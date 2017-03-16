@@ -139,7 +139,8 @@ var BagExpr = function (_CollectionExpr) {
                 return undefined;
             }
             var bag = this.clone();
-            bag.graphicNode.children = [bag.graphicNode.children[0]];
+            //bag.graphicNode.children = [ bag.graphicNode.children[0] ];
+            //bag.graphicNode.holes = [ bag.graphicNode.children[0] ];
             var items = bag.items;
             bag.items = [];
             var new_items = [];
@@ -186,6 +187,11 @@ var BagExpr = function (_CollectionExpr) {
             //bag.items = new_items;
             return bag;
         }
+    }, {
+        key: 'disableSpill',
+        value: function disableSpill() {
+            this._spillDisabled = true;
+        }
 
         // Spills the entire bag onto the play field.
 
@@ -205,7 +211,7 @@ var BagExpr = function (_CollectionExpr) {
             } else if (this.toolbox) {
                 console.warn('@ BagExpr.spill: Cannot spill bag while it\'s inside the toolbox.');
                 return;
-            }
+            } else if (this._spillDisabled) return;
 
             var stage = this.stage;
             var items = this.items;
@@ -265,14 +271,22 @@ var BagExpr = function (_CollectionExpr) {
     }, {
         key: 'clone',
         value: function clone() {
-            var c = _get(BagExpr.prototype.__proto__ || Object.getPrototypeOf(BagExpr.prototype), 'clone', this).call(this);
-            c._items = this.items;
+            var parent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+            var c = _get(BagExpr.prototype.__proto__ || Object.getPrototypeOf(BagExpr.prototype), 'clone', this).call(this, parent);
+            c._items = [];
+            this.items.forEach(function (i) {
+                return c.addItem(i.clone());
+            });
+            c.graphicNode.update();
             return c;
         }
     }, {
         key: 'value',
         value: function value() {
-            return this.items.slice(); // Arguably should be toString of each expression, but then comparison must be setCompare.
+            return '[' + this.items.reduce(function (str, curr) {
+                return str += ' ' + curr.toString();
+            }, '').trim() + ']'; // Arguably should be toString of each expression, but then comparison must be setCompare.
         }
     }, {
         key: 'toString',
@@ -424,10 +438,23 @@ var BracketArrayExpr = function (_BagExpr) {
         key: 'arrangeNicely',
         value: function arrangeNicely() {}
     }, {
-        key: 'addItem',
+        key: 'clone',
+        value: function clone() {
+            var parent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
+            var c = new BracketArrayExpr(this.pos.x, this.pos.y, this.size.w, this.size.h);
+            c.graphicNode.holes = [c.l_brak, c.r_brak];
+            this.items.forEach(function (i) {
+                if (!(i instanceof TextExpr)) c.addItem(i.clone());
+            });
+            c.graphicNode.update();
+            return c;
+        }
 
         // Adds an item to the bag.
+
+    }, {
+        key: 'addItem',
         value: function addItem(item) {
 
             item.onmouseleave();
@@ -450,7 +477,7 @@ var BracketArrayExpr = function (_BagExpr) {
     }, {
         key: 'popItem',
         value: function popItem() {
-            var item = this._items.pop();
+            var item = this._items.pop();;
             this.graphicNode.removeArg(item);
             if (this._items.length >= 1) {
                 var last_comma_idx = this.graphicNode.holes.length - 2;
@@ -477,6 +504,9 @@ var BracketArrayExpr = function (_BagExpr) {
                 return;
             } else if (this.toolbox) {
                 console.warn('@ BracketArrayExpr.spill: Cannot spill array while it\'s inside the toolbox.');
+                return;
+            } else if (this._spillDisabled) {
+                alert('You can no longer spill collections onto the board.\n\nInstead, try .pop().');
                 return;
             }
 
@@ -589,7 +619,7 @@ var BracketArrayExpr = function (_BagExpr) {
             this._items.forEach(function (item) {
                 return _this10.graphicNode.removeArg(item);
             });
-            this.graphicNode.children = [this.l_brak, this.r_brak];
+            this.graphicNode.holes = [this.l_brak, this.r_brak];
             this._items = [];
             items.forEach(function (item) {
                 _this10.addItem(item);

@@ -291,7 +291,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
                         var orig_exp_str = _this7.parent.toString();
                         var dropped_exp_str = node.toString();
 
-                        _this7.applyExpr(node);
+                        var res = _this7.applyExpr(node);
 
                         // Log the reduction.
                         Logger.log('reduction-lambda', { 'before': orig_exp_str, 'applied': dropped_exp_str, 'after': parent.toString() });
@@ -306,6 +306,8 @@ var LambdaHoleExpr = function (_MissingExpression) {
                             // (b) Remove expression from the parent stage.
                             (parent.parent || parent.stage).remove(parent);
                         } else stage.dumpState();
+
+                        return res;
                     } else {
                         console.warn('ERROR: Cannot perform lambda-substitution: Hole has no parent.');
 
@@ -320,7 +322,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
                     Animate.tween(node, { opacity: 0 }, 400, function (elapsed) {
                         return Math.pow(elapsed, 0.5);
                     }).after(afterDrop);
-                } else afterDrop();
+                } else return afterDrop();
             }
         }
     }, {
@@ -689,6 +691,11 @@ var LambdaExpr = function (_Expression) {
         key: 'body',
         get: function get() {
             return this.takesArgument ? this.holes[1] : null;
+        }
+    }, {
+        key: 'hole',
+        get: function get() {
+            return this.takesArgument ? this.holes[0] : null;
         }
     }]);
 

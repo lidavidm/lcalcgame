@@ -88,7 +88,8 @@ class BagExpr extends CollectionExpr {
             return undefined;
         }
         let bag = this.clone();
-        bag.graphicNode.children = [ bag.graphicNode.children[0] ];
+        //bag.graphicNode.children = [ bag.graphicNode.children[0] ];
+        //bag.graphicNode.holes = [ bag.graphicNode.children[0] ];
         let items = bag.items;
         bag.items = [];
         let new_items = [];
@@ -113,6 +114,10 @@ class BagExpr extends CollectionExpr {
         return bag;
     }
 
+    disableSpill() {
+        this._spillDisabled = true;
+    }
+
     // Spills the entire bag onto the play field.
     spill(logspill=true) {
         if (!this.stage) {
@@ -124,7 +129,7 @@ class BagExpr extends CollectionExpr {
         } else if (this.toolbox) {
             console.warn('@ BagExpr.spill: Cannot spill bag while it\'s inside the toolbox.');
             return;
-        }
+        } else if (this._spillDisabled) return;
 
         let stage = this.stage;
         let items = this.items;
@@ -178,13 +183,15 @@ class BagExpr extends CollectionExpr {
     reduceCompletely() {
         return this;
     }
-    clone() {
-        let c = super.clone();
-        c._items = this.items;
+    clone(parent=null) {
+        let c = super.clone(parent);
+        c._items = [];
+        this.items.forEach((i) => c.addItem(i.clone()));
+        c.graphicNode.update();
         return c;
     }
     value() {
-        return this.items.slice(); // Arguably should be toString of each expression, but then comparison must be setCompare.
+        return '[' + this.items.reduce(((str, curr) => str += ' ' + curr.toString()), '').trim() + ']'; // Arguably should be toString of each expression, but then comparison must be setCompare.
     }
     toString() {
         return '(bag' + this.items.reduce(((str, curr) => str += ' ' + curr.toString()), '') + ')';
@@ -287,7 +294,7 @@ class BracketArrayExpr extends BagExpr {
     get items() { return this._items.slice(); }
     set items(items) {
         this._items.forEach((item) => this.graphicNode.removeArg(item));
-        this.graphicNode.children = [this.l_brak, this.r_brak];
+        this.graphicNode.holes = [this.l_brak, this.r_brak];
         this._items = [];
         items.forEach((item) => {
             this.addItem(item);
@@ -295,6 +302,16 @@ class BracketArrayExpr extends BagExpr {
     }
     arrangeNicely() { }
     get delegateToInner() { return true; }
+    clone(parent=null) {
+        let c = new BracketArrayExpr(this.pos.x, this.pos.y, this.size.w, this.size.h);
+        c.graphicNode.holes = [c.l_brak, c.r_brak];
+        this.items.forEach((i) => {
+            if (!(i instanceof TextExpr))
+                c.addItem(i.clone());
+        });
+        c.graphicNode.update();
+        return c;
+    }
 
     // Adds an item to the bag.
     addItem(item) {
@@ -323,7 +340,7 @@ class BracketArrayExpr extends BagExpr {
 
     // Removes an item from the bag and returns it.
     popItem() {
-        let item = this._items.pop();
+        let item = this._items.pop();;
         this.graphicNode.removeArg(item);
         if(this._items.length >= 1) {
             let last_comma_idx = this.graphicNode.holes.length - 2;
@@ -343,6 +360,9 @@ class BracketArrayExpr extends BagExpr {
             return;
         } else if (this.toolbox) {
             console.warn('@ BracketArrayExpr.spill: Cannot spill array while it\'s inside the toolbox.');
+            return;
+        } else if (this._spillDisabled) {
+            alert('You can no longer spill collections onto the board.\n\nInstead, try .pop().');
             return;
         }
 
