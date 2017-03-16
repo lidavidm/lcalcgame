@@ -125,7 +125,6 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     // spritesheet without some sort of border
     loadImage('toolbox-bg', 'toolbox-bg.png');
 
-    Resource.loadImageAtlas('aliens', 'aliens/aliens.json');
     Resource.loadImageAtlas('assets', 'assets.json');
 
     // Main menu
