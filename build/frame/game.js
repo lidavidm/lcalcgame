@@ -764,7 +764,7 @@ var Level = function () {
                 } else {
                     // Class name. Invoke the instantiator.
                     var op_class = exprs[0];
-                    if (!(op_class instanceof LambdaHoleExpr) && !(op_class instanceof Sequence) && !(op_class instanceof BagExpr) && op_class.length !== exprs.length - 1) {
+                    if (!(op_class instanceof LambdaHoleExpr) && !(op_class instanceof Sequence) && !(op_class instanceof BagExpr) && !(op_class instanceof ArrayObjectExpr) && op_class.length !== exprs.length - 1) {
                         // missing an argument, or there's an extra argument:
                         console.warn('Operator-argument mismatch with exprs: ', exprs);
                         console.warn('Continuing...');
@@ -866,6 +866,7 @@ var Level = function () {
                 'choice': ExprManager.getClass('choice'),
                 'level': ExprManager.getClass('level'),
                 'arrayobj': ExprManager.getClass('arrayobj'),
+                'infinite': ExprManager.getClass('infinite'),
                 'dot': function () {
                     var circ = new CircleExpr(0, 0, 18);
                     circ.color = 'gold';
@@ -1043,6 +1044,16 @@ var ExpressionPattern = function () {
             if (lvl_exprs.length !== es.length) return false;
 
             var compare = function compare(e, f) {
+
+                var isarr = false;
+                if (e instanceof ArrayObjectExpr && e.holes.length === 1) {
+                    e = e.holes[0]; // compare only the underlying array.
+                }
+                if (f instanceof ArrayObjectExpr && f.holes.length === 1) {
+                    f = f.holes[0]; // compare only the underlying array.
+                    console.log(e, f);
+                    isarr = true;
+                }
 
                 //console.log(' comparing ', e, ' to ', f);
 

@@ -17,9 +17,9 @@
             "toolbox": "(star) (rect) (triangle)"
         },
         {
-            "goal": "(bag /true /true /false /rect)",
-            "board": "(arrayobj (__) `map /(λx /(== #x /triangle)))",
-            "toolbox": "(bag) (rect) (rect) (triangle) (triangle) (infinite (arrayobj (__) `push))"
+            "goal": "(bag /rect /triangle)",
+            "board": "(triangle)",
+            "toolbox": "(arrayobj (bag /rect) `push (_)) (arrayobj (bag /star) `push (_))"
         },
         {
             "goal": "star",
@@ -27,20 +27,20 @@
         },
         {
             "goal": "(bag /star /star /star)",
-            "board": "(bag /star) (bag /star) (bag /star)"
+            "board": "(arrayobj (bag /star)) (arrayobj (bag /star)) (arrayobj (bag /star))"
         },
         {
             "goal": "star",
-            "board": "(bag /triangle) (bag /star) (bag /rect)"
+            "board": "(arrayobj (bag /triangle)) (arrayobj (bag /star)) (arrayobj (bag /rect))"
         },
         {
             "goal": "(bag /true /false /true)",
-            "board": "(bag /triangle) (bag /triangle) (bag /rect)",
+            "board": "(arrayobj (bag /triangle)) (arrayobj (bag /triangle)) (arrayobj (bag /rect))",
             "toolbox": "(λx /(== #x /triangle)) (λx /(== #x /rect))"
         },
         {
-            "goal": "(bag /star /star /star /star) (bag /rect /rect)",
-            "board": "(bag /rect) (bag /rect /rect) (bag /rect /rect /rect)",
+            "goal": "(bag /star /star) (bag /rect /rect)",
+            "board": "(arrayobj (bag /rect)) (arrayobj (bag /rect /rect)) (arrayobj (bag /rect /rect /rect))",
             "toolbox": "(λx /triangle) (λx #x) (λx /star)"
         }
     ],

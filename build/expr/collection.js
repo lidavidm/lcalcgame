@@ -284,7 +284,9 @@ var BagExpr = function (_CollectionExpr) {
     }, {
         key: 'value',
         value: function value() {
-            return this.items.slice(); // Arguably should be toString of each expression, but then comparison must be setCompare.
+            return '[' + this.items.reduce(function (str, curr) {
+                return str += ' ' + curr.toString();
+            }, '').trim() + ']'; // Arguably should be toString of each expression, but then comparison must be setCompare.
         }
     }, {
         key: 'toString',

@@ -25,7 +25,7 @@ class ObjectExtensionExpr extends ExpressionPlus {
         // }
 
         let onCellSelect = (cell) => {
-            this.setExtension(cell.children[0].text.split('(')[0], cell.children[0]._reduceMethod);
+            this.setExtension(cell.children[0].text.replace('.', '').split('(')[0], cell.children[0]._reduceMethod);
         };
 
         // Make pullout-drawer:
@@ -102,7 +102,7 @@ class ObjectExtensionExpr extends ExpressionPlus {
         }
 
         // Left text
-        let methodtxt = new TextExpr(methodText + '(');
+        let methodtxt = new TextExpr('.' + methodText + '(');
         methodtxt.fontSize = 22;
         methodtxt._yMultiplier = 3.4;
         methodtxt._xOffset = -15;
@@ -150,7 +150,8 @@ class ArrayObjectExpr extends ObjectExtensionExpr {
               },
                 'push':(arrayExpr, pushedExpr) => {
 
-                    console.log('.push called with ', arrayExpr, pushedExpr);
+                    if (pushedExpr instanceof ArrayObjectExpr)
+                        pushedExpr = pushedExpr.holes[0];
 
                     if (!pushedExpr ||
                         pushedExpr instanceof MissingExpression ||
@@ -171,7 +172,7 @@ class ArrayObjectExpr extends ObjectExtensionExpr {
                     else return arrayExpr;
         }});
 
-        baseArray.disableSpill();
+        if (baseArray instanceof CollectionExpr) baseArray.disableSpill();
         this.color = 'YellowGreen';
 
         if (!defaultMethodCall) {}

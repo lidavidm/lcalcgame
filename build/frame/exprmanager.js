@@ -39,7 +39,8 @@ var ExprManager = function () {
         'repeat': [RepeatLoopExpr],
         'choice': [ChoiceExpr],
         'level': [ReductStageExpr],
-        'arrayobj': [ArrayObjectExpr]
+        'arrayobj': [ArrayObjectExpr],
+        'infinite': [InfiniteExpression]
     };
     var fade_level = {};
     var DEFAULT_FADE_LEVEL = 0;

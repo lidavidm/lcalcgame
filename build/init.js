@@ -186,43 +186,18 @@ function initMainMenu() {
         //
         // EntangledExpr.pairedAnimate(ee, ee2);
 
-        // let obj = new ObjectExtensionExpr(new BracketArrayExpr(0, 0, 44, 44),
-        //                                   { // Reduce methods for the submethods of the object.
-        //                                     'pop':(arrayExpr) => {
-        //                                         if (arrayExpr.items.length === 0) return arrayExpr; // TODO: This should return undefined.
-        //                                         let item = arrayExpr.items[0].clone();
-        //                                         return item;
-        //                                   },
-        //                                     'push':(arrayExpr, pushedExpr) => {
+        // let obj = new ArrayObjectExpr(new BracketArrayExpr(0, 0, 44, 44));
+        // obj.pos = { x:200, y:200 };
+        // stage.add(obj);
         //
-        //                                         if (!pushedExpr ||
-        //                                             pushedExpr instanceof MissingExpression ||
-        //                                             pushedExpr instanceof LambdaVarExpr)
-        //                                             return arrayExpr;
-        //                                         else {
-        //                                             let new_coll = arrayExpr.clone();
-        //                                             new_coll.addItem(pushedExpr.clone()); // add item to bag
-        //                                             return new_coll; // return new bag with item appended
-        //                                         }
-        //
-        //                                   },
-        //                                     'map':(arrayExpr, lambdaExpr) => {
-        //                                         let mapped = arrayExpr.map(lambdaExpr);
-        //                                         if (mapped) return mapped;
-        //                                         else        return arrayExpr;
-        //                                   }});
-        var obj = new ArrayObjectExpr(new BracketArrayExpr(0, 0, 44, 44));
-        obj.pos = { x: 200, y: 200 };
-        stage.add(obj);
+        // stage.add( Level.parse('(λx /(== #x /star))')[0] )
+        // stage.add( Level.parse('rect')[0] )
+        // stage.add( Level.parse('star')[0] )
 
-        stage.add(Level.parse('(λx /(== #x /star))')[0]);
-        stage.add(Level.parse('rect')[0]);
-        stage.add(Level.parse('star')[0]);
-
-        var apply = new ApplyExpr(Level.parse('3')[0], Level.parse('(λx /(+ #x /3))')[0]);
-        apply.pos = { x: 200, y: 400 };
-        stage.add(apply);
-        console.log(apply);
+        // let apply = new ApplyExpr( Level.parse('3')[0], Level.parse('(λx /(+ #x /3))')[0] );
+        // apply.pos = { x:200, y:400 };
+        // stage.add(apply);
+        // console.log(apply);
 
         // let meta = new MetaExpression(stage, Resource.buildLevel(Resource.level[10], stage.canvas));
         // meta.pos = { x:200, y:200 };

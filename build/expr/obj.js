@@ -44,7 +44,7 @@ var ObjectExtensionExpr = function (_ExpressionPlus) {
         // }
 
         var onCellSelect = function onCellSelect(cell) {
-            _this.setExtension(cell.children[0].text.split('(')[0], cell.children[0]._reduceMethod);
+            _this.setExtension(cell.children[0].text.replace('.', '').split('(')[0], cell.children[0]._reduceMethod);
         };
 
         // Make pullout-drawer:
@@ -134,7 +134,7 @@ var ObjectExtensionExpr = function (_ExpressionPlus) {
             }
 
             // Left text
-            var methodtxt = new TextExpr(methodText + '(');
+            var methodtxt = new TextExpr('.' + methodText + '(');
             methodtxt.fontSize = 22;
             methodtxt._yMultiplier = 3.4;
             methodtxt._xOffset = -15;
@@ -203,7 +203,7 @@ var ArrayObjectExpr = function (_ObjectExtensionExpr) {
             },
             'push': function push(arrayExpr, pushedExpr) {
 
-                console.log('.push called with ', arrayExpr, pushedExpr);
+                if (pushedExpr instanceof ArrayObjectExpr) pushedExpr = pushedExpr.holes[0];
 
                 if (!pushedExpr || pushedExpr instanceof MissingExpression || pushedExpr instanceof LambdaVarExpr) return arrayExpr;else {
                     var new_coll = arrayExpr.clone();
@@ -221,7 +221,7 @@ var ArrayObjectExpr = function (_ObjectExtensionExpr) {
                 } else return arrayExpr;
             } }));
 
-        baseArray.disableSpill();
+        if (baseArray instanceof CollectionExpr) baseArray.disableSpill();
         _this2.color = 'YellowGreen';
 
         if (!defaultMethodCall) {} else if (defaultMethodCall in _this2.objMethods) {
