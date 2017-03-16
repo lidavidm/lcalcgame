@@ -317,7 +317,7 @@ class DropdownSelect extends mag.Rect {
 
 class PulloutDrawerHandle extends mag.ImageRect {
     constructor(x, y, w, h, onclick) {
-        super(x, y, w, h, 'handle');
+        super(x, y, w, h, 'pullout-drawer-handle');
         this.onclick = onclick;
     }
 
