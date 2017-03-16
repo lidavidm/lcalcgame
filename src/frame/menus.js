@@ -551,6 +551,12 @@ class PlanetCard extends mag.ImageRect {
         let a = this.absolutePos;
         return {x:a.x, y:a.y - this.absoluteSize.h / 3};
     }
+
+    get relativeLandingPoint() {
+        let a = this.pos;
+        return {x:a.x, y:a.y - this.absoluteSize.h / 3};
+    }
+
     get localLandingPoint() {
         return {x:this.size.w/2.0, y:this.size.h/2.0 / 3};
     }
@@ -809,12 +815,12 @@ class ChapterSelectShip extends mag.RotatableImageRect {
 
         // Hide the local ships and make the world ship
         // the only ship visible.
-        this.pos = startPlanet.landingPoint;
+        this.pos = startPlanet.relativeLandingPoint;
         startPlanet.hideShip();
         endPlanet.hideShip();
 
         const endScale = endPlanet.radius / 120 / 2;
-        let dest = endPlanet.landingPoint;
+        let dest = endPlanet.relativeLandingPoint;
         let aboveOrbitDest = addPos(dest, { x:0, y:-20 });
         let pointing = fromTo(this.pos, aboveOrbitDest);
         let pointAngle = Math.atan2(pointing.y, pointing.x);
@@ -971,12 +977,12 @@ class ChapterSelectMenu extends mag.Stage {
                     newPlanet.onclick = () => {
                         newPlanet.onclick = oldOnClick;
                         newPlanet.removeHighlight();
-                        this.add(ship);
+                        this.planetParent.addChild(ship);
                         let startPlanet = ship.planet || lastActivePlanet;
                         ship.flyToPlanet(startPlanet, newPlanet).then(() => {
                             return new Promise(function(resolve, reject) {
                                 Animate.wait(600).after(() => {
-                                    _this.remove(ship);
+                                    _this.planetParent.removeChild(ship);
                                     resolve();
                                 });
                             });
@@ -1311,7 +1317,7 @@ class ChapterSelectMenu extends mag.Stage {
         trail.stroke.color = '#AAA';
         trail.stroke.lineDash = [3];
         trail.stroke.lineWidth = 2;
-        trail.drawArrowHead = true;
+        trail.drawArrowHead = false;
         trail.ignoreEvents = true;
         this.planetParent.addChild(trail);
         this.trails.push(trail);
