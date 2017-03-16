@@ -354,8 +354,8 @@ class LambdaVarExpr extends ImageExpr {
         return sz;
     }
 
-    get openImage() { return this.name === 'x' ? 'lambda-pipe-open' : 'lambda-pipe-red-open'; }
-    get closedImage() { return this.name === 'x' ? 'lambda-pipe' : 'lambda-pipe-red'; }
+    get openImage() { return this.name === 'x' ? 'lambda-pipe-open' : 'lambda-pipe-white-open'; }
+    get closedImage() { return this.name === 'x' ? 'lambda-pipe' : 'lambda-pipe-white'; }
     get openingAnimation() {
         var anim = new mag.Animation();
         anim.addFrame('lambda-pipe-opening0', 50);
@@ -947,9 +947,6 @@ class InlineEnvironmentDisplay extends SpreadsheetEnvironmentDisplay {
 
 /** Faded lambda variants. */
 class FadedLambdaHoleExpr extends LambdaHoleExpr {
-    get openImage() { return this.name === 'x' ? 'lambda-hole-x' : 'lambda-hole-y'; }
-    get closedImage() { return this.name === 'x' ? 'lambda-hole-x-closed' : 'lambda-hole-y-closed'; }
-
     constructor(varname) {
         super(varname);
         this.padding.left = 5;
@@ -1029,25 +1026,7 @@ class HalfFadedLambdaHoleExpr extends LambdaHoleExpr {
         return size;
     }
 }
-class FadedPythonLambdaHoleExpr extends LambdaHoleExpr {
-    get openImage() { return this.name === 'x' ? 'lambda-hole-x-python' : 'lambda-hole-y'; }
-    get closedImage() { return this.name === 'x' ? 'lambda-hole-x-closed-python' : 'lambda-hole-y-closed'; }
-    get size() {
-        let sz = super.size;
-        sz.w = 120;
-        return sz;
-    }
 
-    // Draw special round rect around term.
-    drawInternal(ctx, pos, boundingSize) {
-        setStrokeStyle(ctx, this.stroke);
-        ctx.fillStyle = this.color;
-        Resource.getImage(this.image).draw(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h);
-        if(this.stroke) {
-            roundRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, 6, false, true, this.stroke.opacity);
-        }
-    }
-}
 class FadedES6LambdaHoleExpr extends LambdaHoleExpr {
     constructor(varname) {
         super(varname);
@@ -1065,9 +1044,6 @@ class FadedES6LambdaHoleExpr extends LambdaHoleExpr {
     get arrow() {
         return this.holes[1];
     }
-
-    get openImage() { return this.name === 'x' ? 'lambda-hole-x-es6' : 'lambda-hole-y'; }
-    get closedImage() { return this.name === 'x' ? 'lambda-hole-x-closed-es6' : 'lambda-hole-y-closed'; }
 
     // Events
     hits(pos, options) {

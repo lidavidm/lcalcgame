@@ -126,7 +126,9 @@ var mag = (function(_) {
         };
         var loadImageAtlas = (alias, filename) => {
             let atlas = new ImageAtlas(alias, __GRAPHICS_PATH + filename, (spriteName, sprite) => {
-                imageRsc[spriteName] = sprite;
+                if (!imageRsc[spriteName]) {
+                    imageRsc[spriteName] = sprite;
+                }
             });
 
             if (currentLoadSequence) {
