@@ -263,7 +263,7 @@ class ReductStage extends mag.Stage {
                 this.scale = 2.4;
             }
             else if (this.md.tablet()) {
-                this.scale = 1.8;
+                this.scale = 1.2;
             }
             else if (this.md.mobile()) {
                 this.scale = 2.0;
