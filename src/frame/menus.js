@@ -934,73 +934,79 @@ class ChapterSelectMenu extends mag.Stage {
     // }
     constructor(canvas, onLevelSelect, flyToChapIdx) {
         super(canvas);
+        this.onLevelSelect = onLevelSelect;
 
-        this.panningEnabled = true;
-        this.trails = [];
+        this.reset = () => {
+            this.nodes = [];
 
-        this.showStarField();
-        this.showChapters(onLevelSelect);
-        this.updateParallax();
+            this.panningEnabled = true;
+            this.trails = [];
 
-        let _this = this;
-        _this.offset = { x:0, y:0 };
-        Animate.wait(100).after(() => {
-            let lastActivePlanet;
-            for (let planet of this.planets) {
-                if (planet.active && level_idx >= planet.startLevelIdx && level_idx <= planet.endLevelIdx) {
-                    lastActivePlanet = planet;
-                    break;
+            this.showStarField();
+            this.showChapters(onLevelSelect);
+            this.updateParallax();
+
+            let _this = this;
+            _this.offset = { x:0, y:0 };
+            Animate.wait(100).after(() => {
+                let lastActivePlanet;
+                for (let planet of this.planets) {
+                    if (planet.active && level_idx >= planet.startLevelIdx && level_idx <= planet.endLevelIdx) {
+                        lastActivePlanet = planet;
+                        break;
+                    }
                 }
-            }
 
-            this.setCameraX(lastActivePlanet.pos.x - 3 * lastActivePlanet.radius);
+                this.setCameraX(lastActivePlanet.pos.x - 3 * lastActivePlanet.radius);
 
-            let ship = new ChapterSelectShip();
-            const shipScale = lastActivePlanet.radius / 120 / 2;
-            ship.scale = { x:shipScale, y:shipScale };
+                let ship = new ChapterSelectShip();
+                const shipScale = lastActivePlanet.radius / 120 / 2;
+                ship.scale = { x:shipScale, y:shipScale };
 
-            if (flyToChapIdx) {
-                ship.attachToPlanet(lastActivePlanet);
+                if (flyToChapIdx) {
+                    ship.attachToPlanet(lastActivePlanet);
 
-                for (let chap of flyToChapIdx) {
-                    let newChapIdx = chap.chapterIdx;
-                    let newPlanet = this.planets[newChapIdx];
-                    newPlanet.highlight();
-                    newPlanet.activate();
-                    newPlanet.deactivateSpots();
-                    let oldOnClick = newPlanet.onclick;
+                    for (let chap of flyToChapIdx) {
+                        let newChapIdx = chap.chapterIdx;
+                        let newPlanet = this.planets[newChapIdx];
+                        newPlanet.highlight();
+                        newPlanet.activate();
+                        newPlanet.deactivateSpots();
+                        let oldOnClick = newPlanet.onclick;
 
-                    let trail = this.makeTrail(lastActivePlanet, newPlanet);
-                    trail.percentDrawn = 0;
-                    Animate.tween(trail, { percentDrawn:1.0 }, 1000);
+                        let trail = this.makeTrail(lastActivePlanet, newPlanet);
+                        trail.percentDrawn = 0;
+                        Animate.tween(trail, { percentDrawn:1.0 }, 1000);
 
-                    newPlanet.onclick = () => {
-                        newPlanet.onclick = oldOnClick;
-                        newPlanet.removeHighlight();
-                        this.planetParent.addChild(ship);
-                        let startPlanet = ship.planet || lastActivePlanet;
-                        ship.flyToPlanet(startPlanet, newPlanet).then(() => {
-                            return new Promise(function(resolve, reject) {
-                                Animate.wait(600).after(() => {
-                                    _this.planetParent.removeChild(ship);
-                                    resolve();
+                        newPlanet.onclick = () => {
+                            newPlanet.onclick = oldOnClick;
+                            newPlanet.removeHighlight();
+                            this.planetParent.addChild(ship);
+                            let startPlanet = ship.planet || lastActivePlanet;
+                            ship.flyToPlanet(startPlanet, newPlanet).then(() => {
+                                return new Promise(function(resolve, reject) {
+                                    Animate.wait(600).after(() => {
+                                        _this.planetParent.removeChild(ship);
+                                        resolve();
+                                    });
                                 });
-                            });
-                        }).then(oldOnClick)
-                            .then(() => {
-                                newPlanet.activateSpots();
-                                // Get level_idx from the chapter
-                                // itself, instead of assuming
-                                // linearity
-                                level_idx = chap.startIdx;
-                                saveProgress();
-                            });
-                    };
+                            }).then(oldOnClick)
+                                .then(() => {
+                                    newPlanet.activateSpots();
+                                    // Get level_idx from the chapter
+                                    // itself, instead of assuming
+                                    // linearity
+                                    level_idx = chap.startIdx;
+                                    saveProgress();
+                                });
+                        };
+                    }
+                } else {
+                    ship.attachToPlanet(lastActivePlanet);
                 }
-            } else {
-                ship.attachToPlanet(lastActivePlanet);
-            }
-        });
+            });
+        };
+        this.reset();
     }
 
     setCameraX(x) {
@@ -1043,6 +1049,12 @@ class ChapterSelectMenu extends mag.Stage {
     onmouseup(pos) {
         super.onmouseup(pos);
         this._dragStart = null;
+    }
+
+    onorientationchange() {
+        // Relayout on change
+        // TODO: preserve scroll
+        this.reset();
     }
 
     updateLevelSpots() {
@@ -1120,13 +1132,17 @@ class ChapterSelectMenu extends mag.Stage {
 
     setPlanetsToDefaultPos(dur) {
         let stage = this;
+        let maxPlanetX = GLOBAL_DEFAULT_SCREENSIZE.width;
+
         Resource.getChapterGraph().then((chapters) => {
             const POS_MAP = layoutPlanets(chapters.transitions, this.boundingSize);
             stage.planets.forEach((p, i) => {
+                maxPlanetX = Math.max(maxPlanetX, p.pos.x + p.radius);
                 p.ignoreEvents = false;
                 if (p.spots) p.spots.forEach((s) => { s.ignoreEvents = true; });
                 if (p.expandFunc) p.onclick = p.expandFunc;
-                if (!stage.has(p)) stage.add(p);
+                if (!stage.planetParent.hasChild(p)) stage.planetParent.addChild(p);
+                if (p.active) p.showText();
                 let rad = POS_MAP[i].r;
                 Animate.tween(p, { pos: {x:POS_MAP[i].x, y:POS_MAP[i].y}, scale:{x:1,y:1}, opacity:1.0 }, dur).after(() => {
                     this.panningEnabled = true;
@@ -1134,6 +1150,8 @@ class ChapterSelectMenu extends mag.Stage {
                 });
             });
         });
+
+        this.maxPlanetX = maxPlanetX;
     }
 
     clear() {
@@ -1191,14 +1209,14 @@ class ChapterSelectMenu extends mag.Stage {
         };
         let hide = (planet) => {
             planet.opacity = 1.0;
+            planet.hideText();
             if (planet.spots) planet.spots.forEach((s) => { s.ignoreEvents = true; });
             Animate.tween(planet, { scale:{x:1, y:1}, opacity:0 }, 500).after(() => {
-                stage.remove(planet);
+                stage.planetParent.removeChild(planet);
             });
         };
 
         // Each chapter is a 'Planet' in Starboy's Universe:
-        //let planetNode = new mag.Rect(0,0,1,1);
         Resource.getChapterGraph().then((chapters) => {
             let planets = [];
             const POS_MAP = layoutPlanets(chapters.transitions, this.boundingSize);
@@ -1274,7 +1292,6 @@ class ChapterSelectMenu extends mag.Stage {
 
             this.planets = planets;
         });
-
     }
 
     makeTrail(planet1, planet2) {
@@ -1432,9 +1449,9 @@ function layoutGroup(group, boundingArea, seededRandom) {
     let xCellMultiplier = 1.0, yCellMultiplier = 1.0;
     if (xCells > 1 && yCells > 1) {
         // Make the first cell slightly larger
-        firstCellMultiplier = 1.1;
-        xCellMultiplier = (xCells - firstCellMultiplier) / (xCells - 1);
-        yCellMultiplier = (yCells - firstCellMultiplier) / (yCells - 1);
+        // firstCellMultiplier = 1.1;
+        // xCellMultiplier = (xCells - firstCellMultiplier) / (xCells - 1);
+        // yCellMultiplier = (yCells - firstCellMultiplier) / (yCells - 1);
     }
 
     let y = boundingArea.y;
@@ -1445,7 +1462,7 @@ function layoutGroup(group, boundingArea, seededRandom) {
         let newCells = [];
         for (let col = 0; col < xCells; col++) {
             let width = cellWidth * (col == 0 ? firstCellMultiplier : xCellMultiplier);
-            let r = seededRandom(0.7, 0.9) * Math.min(width, height) / 2;
+            let r = seededRandom(0.6, 1.0) * Math.min(width, height) / 2;
             let xfudge = 1.2 * (width - 2 * r) / 2.0;
             let yfudge = (height - 2 * r) / 2.0;
             let xf = (col == 0 && row == 0) ? 0 : seededRandom(-xfudge, xfudge);
