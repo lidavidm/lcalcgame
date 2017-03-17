@@ -1,3 +1,6 @@
+const TOOLBOX_HEIGHT = 90;
+const UI_PADDING = 10;
+
 /** A subclass of Stage that assumes Nodes are Expressions
     and allows for saving state. */
 class ReductStage extends mag.Stage {
@@ -5,6 +8,107 @@ class ReductStage extends mag.Stage {
         super(canvas);
         this.stateStack = [];
         this.environment = new Environment();
+        this.md = new MobileDetect(window.navigator.userAgent);
+        this.onorientationchange();
+    }
+
+    buildUI(showEnvironment, envDisplayWidth) {
+        let canvas_screen = this.boundingSize;
+        let UI_PADDING = 10;
+
+        var btn_back = new mag.Button(canvas_screen.w - 64*3 - UI_PADDING, UI_PADDING, 64, 64,
+            { default:'btn-back-default', hover:'btn-back-hover', down:'btn-back-down' },
+            () => {
+            //returnToMenu();
+            prev(); // go back to previous level; see index.html.
+        });
+
+        var btn_reset = new mag.Button(btn_back.pos.x + btn_back.size.w, UI_PADDING, 64, 64,
+            { default:'btn-reset-default', hover:'btn-reset-hover', down:'btn-reset-down' },
+            () => {
+            initBoard(); // reset board state; see index.html.
+        });
+        var btn_next = new mag.Button(btn_reset.pos.x + btn_reset.size.w, UI_PADDING, 64, 64,
+            { default:'btn-next-default', hover:'btn-next-hover', down:'btn-next-down' },
+            () => {
+            next(); // go back to previous level; see index.html.
+        });
+
+        if (__SHOW_DEV_INFO) {
+            this.add(btn_back);
+            this.add(btn_next);
+        }
+        else {
+            btn_reset.pos = btn_next.pos;
+        }
+        this.add(btn_reset);
+
+        // Toolbox
+        var toolbox = new Toolbox(0, canvas_screen.h - TOOLBOX_HEIGHT, canvas_screen.w, TOOLBOX_HEIGHT);
+        this.add(toolbox);
+        this.toolbox = toolbox;
+
+        // Environment
+        let yOffset = btn_reset.absoluteSize.h + btn_reset.absolutePos.y + 20;
+        var env = new (ExprManager.getClass('environment_display'))(canvas_screen.w - envDisplayWidth, yOffset, envDisplayWidth, canvas_screen.h - TOOLBOX_HEIGHT - yOffset);
+        if (showEnvironment) {
+            this.add(env);
+        }
+        this.environmentDisplay = env;
+
+        this.uiNodes = [ btn_back, btn_reset, btn_next, toolbox, env ];
+    }
+
+    layoutUI() {
+        // layoutUI is called through onorientationchange in the
+        // constructor, before we have any UI nodes
+        if (!this.uiNodes) return;
+
+        let canvas_screen = this.boundingSize;
+
+        let btn_back = this.uiNodes[0];
+        let btn_reset = this.uiNodes[1];
+        let btn_next = this.uiNodes[2];
+
+        if (__SHOW_DEV_INFO) {
+            btn_back.pos = {
+                x: canvas_screen.w - 64*3 - UI_PADDING,
+                y: btn_back.pos.y,
+            };
+            btn_reset.pos = {
+                x: canvas_screen.w - 64*2 - UI_PADDING,
+                y: btn_reset.pos.y,
+            };
+            btn_next.pos = {
+                x: canvas_screen.w - 64 - UI_PADDING,
+                y: btn_next.pos.y,
+            };
+        }
+        else {
+            btn_reset.pos = {
+                x: canvas_screen.w - 64 - UI_PADDING,
+                y: btn_reset.pos.y,
+            };
+        }
+
+        this.toolbox.pos = {
+            x: 0,
+            y: canvas_screen.h - TOOLBOX_HEIGHT,
+        };
+        this.toolbox.size = {
+            w: canvas_screen.w,
+            h: TOOLBOX_HEIGHT,
+        };
+
+        let yOffset = btn_reset.absoluteSize.h + btn_reset.absolutePos.y + 20;
+        this.environmentDisplay._pos = {
+            x: canvas_screen.w - this.environmentDisplay.size.w,
+            y: yOffset,
+        };
+        this.environmentDisplay._size = {
+            w: this.environmentDisplay.size.w,
+            h: canvas_screen.h - TOOLBOX_HEIGHT - yOffset,
+        };
     }
 
     finishLoading() {
@@ -151,5 +255,23 @@ class ReductStage extends mag.Stage {
         };
 
         return JSON.stringify(exp);
+    }
+
+    onorientationchange() {
+        if (__IS_MOBILE) {
+            if (this.md.phone()) {
+                this.scale = 2.4;
+            }
+            else if (this.md.tablet()) {
+                this.scale = 1.8;
+            }
+            else if (this.md.mobile()) {
+                this.scale = 2.0;
+            }
+            else {
+                this.scale = 1.0;
+            }
+        }
+        this.layoutUI();
     }
 }

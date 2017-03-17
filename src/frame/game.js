@@ -23,19 +23,6 @@ class Level {
 
         var stage = new ReductStage(canvas);
 
-        // Scaling for mobile devices:
-        if (__IS_MOBILE) {
-            var md = new MobileDetect(window.navigator.userAgent);
-            if (md.phone())
-                stage.scale = 2.4;
-            else if (md.tablet())
-                stage.scale = 1.8;
-            else if (md.mobile())
-                stage.scale = 2.0;
-            else
-                stage.scale = 1.0;
-        }
-
         // Seed the random number generator so that while randomly generated,
         // levels appear the same each time you play.
         Math.seed = 12045;
@@ -77,59 +64,20 @@ class Level {
         stage.goalNodes = goal_node[1].children;
 
         // UI Buttons
-        var ui_padding = 10;
-        var btn_back = new mag.Button(canvas_screen.w - 64*3 - ui_padding, ui_padding, 64, 64,
-            { default:'btn-back-default', hover:'btn-back-hover', down:'btn-back-down' },
-            () => {
-            //returnToMenu();
-            prev(); // go back to previous level; see index.html.
-        });
-
-        var btn_reset = new mag.Button(btn_back.pos.x + btn_back.size.w, ui_padding, 64, 64,
-            { default:'btn-reset-default', hover:'btn-reset-hover', down:'btn-reset-down' },
-            () => {
-            initBoard(); // reset board state; see index.html.
-        });
-        var btn_next = new mag.Button(btn_reset.pos.x + btn_reset.size.w, ui_padding, 64, 64,
-            { default:'btn-next-default', hover:'btn-next-hover', down:'btn-next-down' },
-            () => {
-            next(); // go back to previous level; see index.html.
-        });
-        if (__SHOW_DEV_INFO) {
-            stage.add(btn_back);
-            stage.add(btn_next);
-        }
-        else {
-            btn_reset.pos = btn_next.pos;
-        }
-        stage.add(btn_reset);
-
+        stage.buildUI(showEnvironment, envDisplayWidth);
         // Toolbox
-        const TOOLBOX_HEIGHT = 90;
-        var toolbox = new Toolbox(0, canvas_screen.h - TOOLBOX_HEIGHT, canvas_screen.w, TOOLBOX_HEIGHT);
-        stage.add(toolbox);
         if (this.toolbox) {
             this.toolbox.forEach((item) => {
                 stage.add(item);
-                toolbox.addExpression(item, false);
+                stage.toolbox.addExpression(item, false);
             });
         }
-        stage.toolbox = toolbox;
-
         // Environment
-        let yOffset = goal_node[0].absoluteSize.h + goal_node[0].absolutePos.y + 20;
-        var env = new (ExprManager.getClass('environment_display'))(canvas_screen.w - envDisplayWidth, yOffset, envDisplayWidth, canvas_screen.h - TOOLBOX_HEIGHT - yOffset);
-        if (showEnvironment) {
-            stage.add(env);
-        }
-        stage.environmentDisplay = env;
         if (this.globals) {
             for (let name of this.globals.names()) {
                 stage.environment.update(name, this.globals.lookup(name).clone());
             }
         }
-
-        stage.uiNodes = [ btn_back, btn_reset, btn_next, env, toolbox ];
 
         // Checks if the player has completed the level.
         var goal = this.goal;
