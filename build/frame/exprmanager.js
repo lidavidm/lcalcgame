@@ -31,8 +31,8 @@ var ExprManager = function () {
         'reference': [JumpingChestVarExpr, ChestVarExpr, LabeledChestVarExpr, LabeledVarExpr],
         'reference_display': [DisplayChest, LabeledDisplayChest, SpreadsheetDisplay],
         'environment_display': [EnvironmentDisplay, SpreadsheetEnvironmentDisplay],
-        'hole': [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedLambdaHoleExpr, FadedES6LambdaHoleExpr],
-        'lambda': [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr],
+        'hole': [DelayedLambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedLambdaHoleExpr, FadedES6LambdaHoleExpr, DelayedFadedES6LambdaHoleExpr],
+        'lambda': [DelayedLambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr, DelayedFadedES6LambdaHoleExpr],
         'lambda_abstraction': [LambdaExpr], // TODO: Add back EnvironmentLambdaExpr... I removed it because this is broken with DEFINE currently.
         'assign': [JumpingAssignExpr, AssignExpr, EqualsAssignExpr],
         'sequence': [NotchedSequence, Sequence],

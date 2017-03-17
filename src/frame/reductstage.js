@@ -125,6 +125,13 @@ class ReductStage extends mag.Stage {
         }
     }
 
+    onmousedown(pos) {
+        super.onmousedown(pos);
+        if (this.heldNode && this.keyEventDelegate && this.heldNode != this.keyEventDelegate) {
+            this.keyEventDelegate.blur();
+            this.keyEventDelegate = null;
+        }
+    }
     onmouseclick(pos) {
 
         // Let player click to continue.
@@ -134,6 +141,26 @@ class ReductStage extends mag.Stage {
         }
 
         super.onmouseclick(pos);
+    }
+
+    onkeydown(event) {
+        if (this.keyEventDelegate) {
+            let key = event.keyCode;
+            if (key === 8) { // BACKSPACE
+                this.keyEventDelegate.backspace();
+            }
+        }
+    }
+    onkeypress(event) {
+        if (this.keyEventDelegate) {
+            if (event.keyCode === 13) {
+                this.keyEventDelegate.carriageReturn();
+            }
+            else {
+                let character = event.char;
+                this.keyEventDelegate.type(character);
+            }
+        }
     }
 
     toString() {

@@ -510,6 +510,15 @@ var mag = function (_) {
                 }
             }
         }, {
+            key: 'onkeydown',
+            value: function onkeydown(event) {}
+        }, {
+            key: 'onkeypress',
+            value: function onkeypress(event) {}
+        }, {
+            key: 'onkeyup',
+            value: function onkeyup(event) {}
+        }, {
             key: 'getHitNodes',
             value: function getHitNodes(pos) {
                 var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -669,6 +678,42 @@ var mag = function (_) {
                 return false;
             };
 
+            // Keyboard events
+            var getCBKeyEvent = function getCBKeyEvent(e) {
+                // Cross-browser wrapper for key events.
+                var keycode = e.which || e.keyCode;
+                var character = String.fromCharCode(keycode || e.charCode);
+                return {
+                    keyCode: keycode,
+                    char: character,
+                    shiftKey: e.shiftKey,
+                    ctrlKey: e.ctrlKey,
+                    altKey: e.altKey,
+                    metaKey: e.metaKey
+                };
+            };
+            var onkeydown = function onkeydown(e) {
+                var event = getCBKeyEvent(e);
+                stage.onkeydown(event);
+                if (e.keyCode == 32) {
+                    stage.onkeypress(event);
+                    e.preventDefault();
+                }
+            };
+            var onkeypress = function onkeypress(e) {
+                var event = getCBKeyEvent(e);
+                console.log(event.char);
+                stage.onkeypress(event);
+            };
+            var onkeyup = function onkeyup(e) {
+                var event = getCBKeyEvent(e);
+                stage.onkeyup(event);
+            };
+            window.addEventListener('keydown', onkeydown, false);
+            window.addEventListener('keypress', onkeypress, false);
+            window.addEventListener('keyup', onkeyup, false);
+
+            // Touch events
             var ontouchstart = function ontouchstart(e) {
 
                 var pos = getMousePos(getTouch(e));

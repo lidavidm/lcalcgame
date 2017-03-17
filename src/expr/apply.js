@@ -32,9 +32,12 @@ class ApplyExpr extends Expression {
             let lambda = this.lambdaExpr;
             this.exprToApply.opacity = 1.0;
             this.lambdaExpr.applyExpr(this.exprToApply);
-            (this.parent || stg).swap(this, this.lambdaExpr);
-            //lambda.performReduction();
-            if (stg) stg.draw();
+            (this.parent || stg).swap(this,this.lambdaExpr);
+            this.lambdaExpr.performReduction();
+            if (stg) {
+                stg.update();
+                stg.draw();
+            }
         });
     }
 

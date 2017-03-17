@@ -33,6 +33,7 @@ class CompareExpr extends Expression {
             this.performReduction();
         }
     }
+
     reduce() {
         var cmp = this.compare();
         if (cmp === true)       return new (ExprManager.getClass('true'))();

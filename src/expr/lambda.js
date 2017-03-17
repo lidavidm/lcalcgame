@@ -269,6 +269,26 @@ class LambdaHoleExpr extends MissingExpression {
     toString() { return 'λ' + this.name; }
 }
 
+class DelayedLambdaHoleExpr extends LambdaHoleExpr {
+    ondropped(node, pos) {
+        if (node instanceof LambdaHoleExpr) node = node.parent;
+        // Disallow interaction with nested lambda
+        if (this.parent && this.parent.parent instanceof LambdaExpr) {
+            return null;
+        }
+        console.log(node, this.parent);
+        let parent = this.parent;
+        let stage = this.stage;
+        node.opacity = 1;
+        node.onmouseleave();
+        this.close_opened_subexprs();
+        let res = new ApplyExpr(node.clone(), this.parent.clone());
+        stage.remove(node);
+        (parent.parent || parent.stage).swap(parent, res);
+        return res;
+    }
+}
+
 class LambdaVarExpr extends ImageExpr {
     constructor(varname) {
         super(0, 0, 54*1.2, 70*1.2, 'lambda-pipe');
@@ -851,6 +871,26 @@ class FadedES6LambdaHoleExpr extends FadedPythonLambdaHoleExpr {
         if(this.stroke) {
             roundRect(ctx, pos.x, pos.y, boundingSize.w / 2.0, boundingSize.h, 6, false, true, this.stroke.opacity);
         }
+    }
+}
+
+class DelayedFadedES6LambdaHoleExpr extends FadedES6LambdaHoleExpr {
+    ondropped(node, pos) {
+        if (node instanceof LambdaHoleExpr) node = node.parent;
+        // Disallow interaction with nested lambda
+        if (this.parent && this.parent.parent instanceof LambdaExpr) {
+            return null;
+        }
+        console.log(node, this.parent);
+        let parent = this.parent;
+        let stage = this.stage;
+        node.opacity = 1;
+        node.onmouseleave();
+        this.close_opened_subexprs();
+        let res = new ApplyExpr(node.clone(), this.parent.clone());
+        stage.remove(node);
+        (parent.parent || parent.stage).swap(parent, res);
+        return res;
     }
 }
 

@@ -174,6 +174,15 @@ var ReductStage = function (_mag$Stage) {
             }
         }
     }, {
+        key: 'onmousedown',
+        value: function onmousedown(pos) {
+            _get(ReductStage.prototype.__proto__ || Object.getPrototypeOf(ReductStage.prototype), 'onmousedown', this).call(this, pos);
+            if (this.heldNode && this.keyEventDelegate && this.heldNode != this.keyEventDelegate) {
+                this.keyEventDelegate.blur();
+                this.keyEventDelegate = null;
+            }
+        }
+    }, {
         key: 'onmouseclick',
         value: function onmouseclick(pos) {
 
@@ -184,6 +193,29 @@ var ReductStage = function (_mag$Stage) {
             }
 
             _get(ReductStage.prototype.__proto__ || Object.getPrototypeOf(ReductStage.prototype), 'onmouseclick', this).call(this, pos);
+        }
+    }, {
+        key: 'onkeydown',
+        value: function onkeydown(event) {
+            if (this.keyEventDelegate) {
+                var key = event.keyCode;
+                if (key === 8) {
+                    // BACKSPACE
+                    this.keyEventDelegate.backspace();
+                }
+            }
+        }
+    }, {
+        key: 'onkeypress',
+        value: function onkeypress(event) {
+            if (this.keyEventDelegate) {
+                if (event.keyCode === 13) {
+                    this.keyEventDelegate.carriageReturn();
+                } else {
+                    var character = event.char;
+                    this.keyEventDelegate.type(character);
+                }
+            }
         }
     }, {
         key: 'toString',

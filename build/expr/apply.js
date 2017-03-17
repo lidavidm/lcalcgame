@@ -45,8 +45,11 @@ var ApplyExpr = function (_Expression) {
                 _this2.exprToApply.opacity = 1.0;
                 _this2.lambdaExpr.applyExpr(_this2.exprToApply);
                 (_this2.parent || stg).swap(_this2, _this2.lambdaExpr);
-                //lambda.performReduction();
-                if (stg) stg.draw();
+                _this2.lambdaExpr.performReduction();
+                if (stg) {
+                    stg.update();
+                    stg.draw();
+                }
             });
         }
     }, {
