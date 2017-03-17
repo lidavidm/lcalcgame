@@ -256,8 +256,8 @@ function prepareCanvas() {
 
             // Width 100% and height 100%
             let resizeCanvas = function() {
-                canvas.width = window.outerWidth;
-                canvas.height = window.outerHeight;
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
                 GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
 
                 // Redraw on change

@@ -744,14 +744,19 @@ class PlanetCard extends mag.ImageRect {
                 let pos = spot.absolutePos;
                 let r = spot.absoluteSize.w / 2;
                 let mask = new Mask(pos.x, pos.y, 20 * r);
+                // The scale changes between the menu and stage
+                let posPercent = { x: pos.x / GLOBAL_DEFAULT_SCREENSIZE.width,
+                                   y: pos.y / GLOBAL_DEFAULT_SCREENSIZE.height };
                 this.stage.add(mask);
                 Animate.tween(mask, {
                     opacity: 1.0,
-                    radius: 0.1,
+                    radius: 10,
                     ringControl: 100,
                 }, 500).after(() => {
                     onLevelSelect(levels[0][level_idx], levels[1] + level_idx);
                     window.stage.add(mask);
+                    mask.cx = posPercent.x * GLOBAL_DEFAULT_SCREENSIZE.w;
+                    mask.cy = posPercent.y * GLOBAL_DEFAULT_SCREENSIZE.h;
                     Animate.tween(mask, {
                         radius: Math.max(stage.boundingSize.w, stage.boundingSize.h),
                         ringControl: 150,
@@ -1559,7 +1564,7 @@ class Mask extends mag.Rect {
         ctx.beginPath();
         ctx.arc(this.cx, this.cy, this.radius, 0, 2 * Math.PI);
         let w = GLOBAL_DEFAULT_SCREENSIZE.width || GLOBAL_DEFAULT_SCREENSIZE.w;
-        let h = GLOBAL_DEFAULT_SCREENSIZE.width || GLOBAL_DEFAULT_SCREENSIZE.h;
+        let h = GLOBAL_DEFAULT_SCREENSIZE.height || GLOBAL_DEFAULT_SCREENSIZE.h;
         ctx.rect(w, 0, -w, h);
         ctx.fill();
         ctx.globalAlpha = 1.0;
