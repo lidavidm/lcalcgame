@@ -438,7 +438,8 @@ function next() {
                     let nextPlanets = [];
                     for (let j = 0; j < chapters.length; j++) {
                         if (Resource.isChapterUnlocked(j) &&
-                            chapters[i].transitions.indexOf(chapters[j].key) > -1) {
+                            chapters[i].transitions.indexOf(chapters[j].key) > -1 &&
+                            !completedLevels[chapters[j].startIdx]) {
                             nextPlanets.push({
                                 chapterIdx: j,
                                 startIdx: chapters[j].startIdx,
