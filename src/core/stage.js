@@ -109,6 +109,8 @@ var mag = (function(_) {
             pos = this.transformCoords(pos);
             this._embeddedStage.onmouseup(pos);
         }
+
+        onorientationchange() {}
     }
 
     class Stage {

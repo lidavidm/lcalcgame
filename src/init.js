@@ -256,9 +256,15 @@ function prepareCanvas() {
 
             // Width 100% and height 100%
             let resizeCanvas = function() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
+                canvas.width = window.outerWidth;
+                canvas.height = window.outerHeight;
                 GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
+
+                // Redraw on change
+                if (stage) {
+                    stage.draw();
+                    stage.onorientationchange();
+                }
             };
 
             // Resize canvas during a mobile phone orientation change.
