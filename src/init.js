@@ -247,40 +247,45 @@ function initMainMenu() {
     }
 }
 
-function prepareCanvas() {
-    canvas = document.getElementById('canvas');
-    if (canvas.getContext) {
-        clearStage();
+let prepareCanvas = (function() {
+    var canvas;
 
-        if (__IS_MOBILE) {
-
-            // Width 100% and height 100%
-            let resizeCanvas = function() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
-
-                // Redraw on change
-                if (stage) {
-                    stage.draw();
-                    stage.onorientationchange();
-                }
-            };
-
-            // Resize canvas during a mobile phone orientation change.
-            window.addEventListener('resize', resizeCanvas, false);
-            window.addEventListener('orientationchange', resizeCanvas, false);
-            resizeCanvas();
+    // Width 100% and height 100%
+    let resizeCanvas = function() {
+        if (canvas) {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
         }
 
-        hideHelpText();
-        hideEndGame();
-        updateProgressBar();
+        // Redraw on change
+        if (stage) {
+            stage.draw();
+            stage.onorientationchange();
+        }
+    };
 
-        GLOBAL_DEFAULT_CTX = canvas.getContext('2d');
-        GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
+    if (__IS_MOBILE) {
+        // Resize canvas during a mobile phone orientation change.
+        window.addEventListener('resize', resizeCanvas, false);
+        window.addEventListener('orientationchange', resizeCanvas, false);
     }
-}
+
+    return function() {
+        canvas = document.getElementById('canvas');
+        if (canvas.getContext) {
+            clearStage();
+            resizeCanvas();
+
+            hideHelpText();
+            hideEndGame();
+            updateProgressBar();
+
+            GLOBAL_DEFAULT_CTX = canvas.getContext('2d');
+            GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
+        }
+    };
+})();
 
 function saveProgress() {
     var cookie = getCookie('level_idx');
