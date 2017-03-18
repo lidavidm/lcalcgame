@@ -273,5 +273,23 @@ class ReductStage extends mag.Stage {
             }
         }
         this.layoutUI();
+
+        if (this.expressionNodes) {
+            let bs = this.boundingSize;
+            if (this.environmentDisplay) bs.w -= this.environmentDisplay.size.w;
+            if (this.toolbox) bs.h -= this.toolbox.size.h;
+            for (let node of this.expressionNodes()) {
+                // Check if node offstage or obscured
+                let p = node.pos;
+                let s = node.size;
+                if (p.x > bs.w) {
+                    p.x = bs.w - s.w;
+                }
+                if (p.y > bs.h) {
+                    p.y = bs.h - s.h;
+                }
+                node.pos = p;
+            }
+        }
     }
 }
