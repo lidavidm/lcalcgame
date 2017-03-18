@@ -938,7 +938,6 @@ class ChapterSelectMenu extends mag.Stage {
     constructor(canvas, onLevelSelect, flyToChapIdx) {
         super(canvas);
         this.md = new MobileDetect(window.navigator.userAgent);
-        this.onLevelSelect = onLevelSelect;
 
         this.reset = () => {
             this.nodes = [];
@@ -1149,9 +1148,9 @@ class ChapterSelectMenu extends mag.Stage {
 
     setPlanetsToDefaultPos(dur) {
         let stage = this;
-        let maxPlanetX = this.boundingSize.w;
 
         Resource.getChapterGraph().then((chapters) => {
+            let maxPlanetX = this.boundingSize.w;
             const POS_MAP = layoutPlanets(chapters.transitions, this.boundingSize);
             stage.planets.forEach((p, i) => {
                 maxPlanetX = Math.max(maxPlanetX, p.pos.x + p.radius);
@@ -1166,9 +1165,8 @@ class ChapterSelectMenu extends mag.Stage {
                     if (p.active) p.showText();
                 });
             });
+            this.maxPlanetX = maxPlanetX;
         });
-
-        this.maxPlanetX = maxPlanetX;
     }
 
     clear() {
