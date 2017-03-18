@@ -252,16 +252,18 @@ let prepareCanvas = (function() {
 
     // Width 100% and height 100%
     let resizeCanvas = function() {
-        if (canvas) {
-            canvas.width = window.screen.availWidth;
-            canvas.height = window.screen.availHeight;
-            GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
-        }
+        if (__IS_MOBILE) {
+            if (canvas) {
+                canvas.width = window.screen.availWidth;
+                canvas.height = window.screen.availHeight;
+                GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
+            }
 
-        // Redraw on change
-        if (stage) {
-            stage.draw();
-            stage.onorientationchange();
+            // Redraw on change
+            if (stage) {
+                stage.draw();
+                stage.onorientationchange();
+            }
         }
     };
 
