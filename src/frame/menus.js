@@ -743,22 +743,21 @@ class PlanetCard extends mag.ImageRect {
                 let spot = this.spots[level_idx];
                 let pos = spot.absolutePos;
                 let r = spot.absoluteSize.w / 2;
-                let mask = new Mask(pos.x, pos.y, 20 * r);
                 // The scale changes between the menu and stage
-                let posPercent = { x: pos.x / GLOBAL_DEFAULT_SCREENSIZE.width,
-                                   y: pos.y / GLOBAL_DEFAULT_SCREENSIZE.height };
+                let posPercent = { x: pos.x / this.stage.boundingSize.w,
+                                   y: pos.y / this.stage.boundingSize.h };
+                let mask = new Mask(this, posPercent.x, posPercent.y, 20 * r);
                 this.stage.add(mask);
                 Animate.tween(mask, {
                     opacity: 1.0,
-                    radius: 10,
+                    radius: 0.1,
                     ringControl: 100,
                 }, 500).after(() => {
                     onLevelSelect(levels[0][level_idx], levels[1] + level_idx);
                     window.stage.add(mask);
-                    mask.cx = posPercent.x * GLOBAL_DEFAULT_SCREENSIZE.w;
-                    mask.cy = posPercent.y * GLOBAL_DEFAULT_SCREENSIZE.h;
+                    mask.stage = window.stage;
                     Animate.tween(mask, {
-                        radius: Math.max(stage.boundingSize.w, stage.boundingSize.h),
+                        radius: Math.max(window.stage.boundingSize.w, window.stage.boundingSize.h),
                         ringControl: 150,
                     }, 400).after(() => {
                         window.stage.remove(mask);
@@ -939,6 +938,7 @@ class ChapterSelectMenu extends mag.Stage {
     // }
     constructor(canvas, onLevelSelect, flyToChapIdx) {
         super(canvas);
+        this.md = new MobileDetect(window.navigator.userAgent);
         this.onLevelSelect = onLevelSelect;
 
         this.reset = () => {
@@ -1011,12 +1011,12 @@ class ChapterSelectMenu extends mag.Stage {
                 }
             });
         };
-        this.reset();
+        this.onorientationchange();
     }
 
     setCameraX(x) {
         x = Math.max(x, 0);
-        x = Math.min(x, this.maxPlanetX - GLOBAL_DEFAULT_SCREENSIZE.width);
+        x = Math.min(x, this.maxPlanetX - this.boundingSize.w);
         this.planetParent.pos = {
             x: -x,
             y: this.planetParent.pos.y,
@@ -1027,8 +1027,8 @@ class ChapterSelectMenu extends mag.Stage {
     updateParallax() {
         if (this.maxPlanetX) {
             let cameraX = -Math.min(0, this.planetParent.pos.x);
-            let x = Math.min(1.0, (cameraX / (this.maxPlanetX - GLOBAL_DEFAULT_SCREENSIZE.width)))
-                * 0.5 * GLOBAL_DEFAULT_SCREENSIZE.width;
+            let x = Math.min(1.0, (cameraX / (this.maxPlanetX - this.boundingSize.w)))
+                * 0.5 * this.boundingSize.w;
             x = Math.max(x, 0);
             this.starParent.pos = {
                 x: -x,
@@ -1057,7 +1057,20 @@ class ChapterSelectMenu extends mag.Stage {
     }
 
     onorientationchange() {
-        // Relayout on change
+        if (__IS_MOBILE) {
+            if (this.md.phone()) {
+                this.scale = 2.4;
+            }
+            else if (this.md.tablet()) {
+                this.scale = 1.2;
+            }
+            else if (this.md.mobile()) {
+                this.scale = 2.0;
+            }
+            else {
+                this.scale = 1.0;
+            }
+        }
         // TODO: preserve scroll
         this.reset();
     }
@@ -1096,7 +1109,7 @@ class ChapterSelectMenu extends mag.Stage {
 
     showStarField() {
         const NUM_STARS = 120;
-        let genRandomPt = () => randomPointInRect( {x:0, y:0, w: 1.5*GLOBAL_DEFAULT_SCREENSIZE.width, h:GLOBAL_DEFAULT_SCREENSIZE.height} );
+        let genRandomPt = () => randomPointInRect( {x:0, y:0, w: 1.5*this.boundingSize.w, h: this.boundingSize.h} );
 
         let starParent = new mag.Rect(0, 0, 0, 0);
         let stars = [];
@@ -1137,7 +1150,7 @@ class ChapterSelectMenu extends mag.Stage {
 
     setPlanetsToDefaultPos(dur) {
         let stage = this;
-        let maxPlanetX = GLOBAL_DEFAULT_SCREENSIZE.width;
+        let maxPlanetX = this.boundingSize.w;
 
         Resource.getChapterGraph().then((chapters) => {
             const POS_MAP = layoutPlanets(chapters.transitions, this.boundingSize);
@@ -1193,10 +1206,10 @@ class ChapterSelectMenu extends mag.Stage {
             planet.expandFunc = planet.onclick;
             planet.onclick = null;
             planet.hideText();
-            let r = GLOBAL_DEFAULT_SCREENSIZE.width / 3.0;
+            let r = this.boundingSize.w / 3.0;
             let center = {
-                x: GLOBAL_DEFAULT_SCREENSIZE.width / 2.0,
-                y: GLOBAL_DEFAULT_SCREENSIZE.height / 2.0
+                x: this.boundingSize.w / 2.0,
+                y: this.boundingSize.h / 2.0
             };
             // Account for camera
             center = addPos(center, {
@@ -1227,7 +1240,7 @@ class ChapterSelectMenu extends mag.Stage {
             const POS_MAP = layoutPlanets(chapters.transitions, this.boundingSize);
 
             let planetParent = new mag.Rect(0, 0, 0, 0);
-            let maxPlanetX = GLOBAL_DEFAULT_SCREENSIZE.width;
+            let maxPlanetX = this.boundingSize.w;
 
             chapters.chapters.forEach((chap, i) => {
                 let pos = i < POS_MAP.length ? POS_MAP[i] : { x:0, y:0, r:10 };
@@ -1549,8 +1562,10 @@ function topologicalSort(adjacencyList) {
 }
 
 class Mask extends mag.Rect {
-    constructor(cx, cy, r) {
+    constructor(stage, cx, cy, r) {
         super(0, 0, 0, 0);
+        this.stage = stage;
+        // cx, cy are in % of stage width/height
         this.cx = cx;
         this.cy = cy;
         this.radius = r;
@@ -1559,12 +1574,15 @@ class Mask extends mag.Rect {
     }
 
     drawInternal(ctx, pos, boundingSize) {
+        let w = GLOBAL_DEFAULT_SCREENSIZE.width || this.stage.boundingSize.w;
+        let h = GLOBAL_DEFAULT_SCREENSIZE.height || this.stage.boundingSize.h;
+        let cx = this.cx * w;
+        let cy = this.cy * h;
+
         ctx.globalAlpha = this.opacity;
         ctx.fillStyle = "#594764";
         ctx.beginPath();
-        ctx.arc(this.cx, this.cy, this.radius, 0, 2 * Math.PI);
-        let w = GLOBAL_DEFAULT_SCREENSIZE.width || GLOBAL_DEFAULT_SCREENSIZE.w;
-        let h = GLOBAL_DEFAULT_SCREENSIZE.height || GLOBAL_DEFAULT_SCREENSIZE.h;
+        ctx.arc(cx, cy, this.radius, 0, 2 * Math.PI);
         ctx.rect(w, 0, -w, h);
         ctx.fill();
         ctx.globalAlpha = 1.0;
@@ -1577,7 +1595,7 @@ class Mask extends mag.Rect {
         for (let i = 0; i < numRings; i++) {
             let k = (this.ringControl - i * 20);
             ctx.beginPath();
-            ctx.arc(this.cx, this.cy, 30 * Math.exp(k / 50), 0, 2 * Math.PI);
+            ctx.arc(cx, cy, 30 * Math.exp(k / 50), 0, 2 * Math.PI);
             ctx.globalAlpha = Math.max(0.2, 1 - k / 50);
             ctx.stroke();
         }
