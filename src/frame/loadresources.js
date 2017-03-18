@@ -130,6 +130,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     // Main menu
     Resource.loadImageAtlas('menu', 'starboy/menu-assets.json');
     loadAudio('levelspot-activate', 'popin.wav');
+    loadAudio('levelspot-scan', '361922__lacimarsik__tuning-fork-a4-440hz.wav');
     loadAudio('mainmenu-enter', 'sci-fi-engine-startup.wav');
 
     // Load preset animations from image sequences.

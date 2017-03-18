@@ -432,11 +432,18 @@ class LevelSpot extends mag.Circle {
         const dur = 800;
         this.glow.opacity = 1.0;
         let _this = this;
+        let sound = 0;
         let blink = () => {
             if (_this.cancelBlink) {
                 this.flashing = false;
                 return;
             }
+
+            if (sound == 0 && !this.ignoreEvents) {
+                Resource.play('levelspot-scan');
+            }
+            sound = (sound + 1) % 4;
+
             Animate.tween(this.glow, { opacity:0.1 }, dur, (e) => Math.pow(e, 2)).after(() => {
                 if (_this.cancelBlink) {
                     this.flashing = false;
