@@ -1389,12 +1389,12 @@ function layoutPlanets(adjacencyList, boundingSize) {
 
     let positions = [];
 
-    let startX = 0;
-    let startY = 0;
+    let startX = 20;
+    let startY = 20;
     let subgroups = [];
     for (let group of groups) {
         if (group.length > MAX_GROUP_SIZE) {
-            let numSubgroups = Math.round(group.length / MAX_GROUP_SIZE);
+            let numSubgroups = Math.ceil(group.length / MAX_GROUP_SIZE);
             let subgroupSize = Math.round(group.length / numSubgroups);
             let subgroup = [];
             while (group.length > 0) {
@@ -1416,8 +1416,8 @@ function layoutPlanets(adjacencyList, boundingSize) {
             let boundingArea = {
                 x: startX,
                 y: startY,
-                w: 0.8 * boundingSize.w,
-                h: boundingSize.h,
+                w: subgroup.length > 2 ? boundingSize.w : (0.75 * boundingSize.w),
+                h: boundingSize.h - 40,
             };
 
             let sublayout = layoutGroup(subgroup, boundingArea, seededRandom);
@@ -1456,6 +1456,18 @@ function layoutGroup(group, boundingArea, seededRandom) {
     else {
         yCells = Math.ceil(yCells);
         xCells = Math.ceil(xCells);
+    }
+
+    if (group.length == 3) {
+        xCells = 2;
+        yCells = 2;
+    }
+
+    if (xCells > 1 && yCells > 1 && Math.abs(xCells - yCells) == 1) {
+        let min = Math.min(xCells, yCells);
+        let max = Math.max(xCells, yCells);
+        yCells = min;
+        xCells = max;
     }
 
     let cellWidth = (boundingArea.w - 20) / xCells;
