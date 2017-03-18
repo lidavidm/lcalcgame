@@ -746,7 +746,7 @@ class PlanetCard extends mag.ImageRect {
                 // The scale changes between the menu and stage
                 let posPercent = { x: pos.x / this.stage.boundingSize.w,
                                    y: pos.y / this.stage.boundingSize.h };
-                let mask = new Mask(this, posPercent.x, posPercent.y, 20 * r);
+                let mask = new Mask(posPercent.x, posPercent.y, 20 * r);
                 this.stage.add(mask);
                 Animate.tween(mask, {
                     opacity: 1.0,
@@ -755,7 +755,6 @@ class PlanetCard extends mag.ImageRect {
                 }, 500).after(() => {
                     onLevelSelect(levels[0][level_idx], levels[1] + level_idx);
                     window.stage.add(mask);
-                    mask.stage = window.stage;
                     Animate.tween(mask, {
                         radius: Math.max(window.stage.boundingSize.w, window.stage.boundingSize.h),
                         ringControl: 150,
@@ -1562,10 +1561,9 @@ function topologicalSort(adjacencyList) {
 }
 
 class Mask extends mag.Rect {
-    constructor(stage, cx, cy, r) {
+    constructor(cx, cy, r) {
         super(0, 0, 0, 0);
-        this.stage = stage;
-        // cx, cy are in % of stage width/height
+        // cx, cy are in % of context width/height
         this.cx = cx;
         this.cy = cy;
         this.radius = r;
@@ -1574,8 +1572,12 @@ class Mask extends mag.Rect {
     }
 
     drawInternal(ctx, pos, boundingSize) {
-        let w = GLOBAL_DEFAULT_SCREENSIZE.width || this.stage.boundingSize.w;
-        let h = GLOBAL_DEFAULT_SCREENSIZE.height || this.stage.boundingSize.h;
+        // Do everything in absolute coordinates to avoid any
+        // weirdness with stage scale changing
+        ctx.resetTransform();
+        ctx.scale(1.0, 1.0);
+        let w = ctx.canvas.clientWidth;
+        let h = ctx.canvas.clientHeight;
         let cx = this.cx * w;
         let cy = this.cy * h;
 
