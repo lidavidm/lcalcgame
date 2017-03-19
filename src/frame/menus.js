@@ -822,13 +822,13 @@ class ChapterSelectShip extends mag.RotatableImageRect {
 
     // Fly to another planet. (entire sequence)
     flyToPlanet(startPlanet, endPlanet) {
-
         // Hide the local ships and make the world ship
         // the only ship visible.
         this.pos = startPlanet.relativeLandingPoint;
         startPlanet.hideShip();
         endPlanet.hideShip();
 
+        const startScale = this.scale.x;
         const endScale = endPlanet.radius / 120 / 2;
         let dest = endPlanet.relativeLandingPoint;
         let aboveOrbitDest = addPos(dest, { x:0, y:-20 });
@@ -838,20 +838,54 @@ class ChapterSelectShip extends mag.RotatableImageRect {
         let _this = this;
         this.rotation = -Math.PI / 2.0; // make the ship face upright
 
-        return this.launch().then(() => {
-            this.rotateTo(pointAngle);
-            return this.moveTo(addPos({x:-20, y:-50}, addPos(this.pos, scalarMultiply(pointing, 0.05))));
-        }).then(() => {
-            Animate.tween(this.trail, { opacity:1.0 }, 100);
-            return new Promise((resolve, reject) => {
-                let dur = _this.flyTo(aboveOrbitDest, resolve);
-                Animate.tween(this, { scale:{x:endScale, y:endScale} }, dur);
+        let start = startPlanet.landingPoint;
+        let end = endPlanet.landingPoint;
+        let control1 = {
+            x: start.x + 10,
+            y: start.y - 200,
+        };
+        let control2 = {
+            x: end.x - 10,
+            y: end.y + 200,
+        };
+        end.y -= 30;
+
+        const travelDist = distBetweenPos(this.pos, dest);
+        const duration = travelDist / 100 * 1000;
+
+        return new Promise((resolve, reject) => {
+            let del = 0;
+            Animate.run((e) => {
+                this.trail.opacity = Math.pow(e, 0.2);
+                this.trail.time += (e - del) * 8000;
+                del = e;
+
+                // Smooth out start/end
+                let t = e;
+                if (e < 0.2) {
+                    t = e/2;
+                }
+                else if (e > 0.8) {
+                    t = 0.5 + e/2;
+                }
+                else {
+                    t = (4*e)/3 - 0.16667;
+                }
+                this.pos = cubicBezierPoint(start, end, control1, control2, t);
+                let prevPos = cubicBezierPoint(start, end, control1, control2, t - 0.01);
+                let dy = this.pos.y - prevPos.y;
+                let dx = this.pos.x - prevPos.x;
+                let angle = Math.atan2(dy, dx);
+                this.rotation = angle;
+                console.log(this.pos, dy, dx, angle);
+            }, duration).after(() => {
+                resolve();
             });
         }).then(() => {
-            return _this.land(dest);
+            return this.land(dest);
         }).then(() => {
             this.planet = endPlanet;
-            endPlanet.showShip(_this);
+            endPlanet.showShip(this);
         });
     }
     attachToPlanet(planet) {
@@ -1341,16 +1375,8 @@ class ChapterSelectMenu extends mag.Stage {
             control2.x = end.x;
             control2.y = end.y - Math.abs(factor * dy);
         }
+        let points = cubicBezier(start, end, control1, control2, 100);
         // Cubic bezier curve
-        let points = [];
-        for (let i = 0; i < 101; i++) {
-            let t = i / 100;
-            let x = Math.pow(1-t, 3)*start.x + 3*Math.pow(1-t, 2)*t*control1.x
-                + 3*(1-t)*t*t*control2.x + t*t*t*end.x;
-            let y = Math.pow(1-t, 3)*start.y + 3*Math.pow(1-t, 2)*t*control1.y
-                + 3*(1-t)*t*t*control2.y + t*t*t*end.y;
-            points.push({ x: x, y: y });
-        }
         let trail = new ArrowPath(points);
         trail.percentDrawn = 1;
         trail.stroke.color = '#AAA';
@@ -1363,6 +1389,24 @@ class ChapterSelectMenu extends mag.Stage {
 
         return trail;
     }
+}
+
+function cubicBezierPoint(start, end, control1, control2, t) {
+    let x = Math.pow(1-t, 3)*start.x + 3*Math.pow(1-t, 2)*t*control1.x
+        + 3*(1-t)*t*t*control2.x + t*t*t*end.x;
+    let y = Math.pow(1-t, 3)*start.y + 3*Math.pow(1-t, 2)*t*control1.y
+        + 3*(1-t)*t*t*control2.y + t*t*t*end.y;
+    return { x: x, y: y };
+}
+
+function cubicBezier(start, end, control1, control2, samples) {
+    let points = [];
+    for (let i = 0; i < samples + 1; i++) {
+        let t = i / samples;
+        points.push(cubicBezierPoint(start, end, control1, control2, t));
+    }
+
+    return points;
 }
 
 function layoutPlanets(adjacencyList, boundingSize) {
