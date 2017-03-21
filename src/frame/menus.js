@@ -579,7 +579,7 @@ class PlanetCard extends mag.ImageRect {
 
     showShip(worldShip) {
         // Create ship graphic
-        let ship = new mag.RotatableImageRect('ship-small');
+        let ship = new mag.RotatableImageRect(0, 0, 82, 70, 'ship-large');
         ship.anchor = worldShip.anchor;
         ship.scale = worldShip.absoluteScale;
         ship.rotation = -Math.PI/2.0;
@@ -806,7 +806,7 @@ class PlanetCard extends mag.ImageRect {
 
 class ChapterSelectShip extends mag.RotatableImageRect {
     constructor() {
-        super('ship-small');
+        super(0, 0, 82, 70, 'ship-large');
         this.pointing = { x:1, y:0 };
         this.velocity = { x:0, y:0 };
 
