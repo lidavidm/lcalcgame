@@ -998,6 +998,14 @@ class ChapterSelectMenu extends mag.Stage {
                         break;
                     }
                 }
+                if (!lastActivePlanet) {
+                    for (let planet of this.planets) {
+                        if (planet.active) {
+                            lastActivePlanet = planet;
+                            break;
+                        }
+                    }
+                }
 
                 this.setCameraX(lastActivePlanet.pos.x - 3 * lastActivePlanet.radius);
 
