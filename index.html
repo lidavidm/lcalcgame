@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
         <title>A game to teach code comprehension</title>
 
@@ -152,6 +153,12 @@
             }
             .expr_input {
                 font-family: Consolas, sans-serif;
+            }
+            @media screen and (max-width: 1024px) {
+                body {
+                    min-width: auto;
+                    min-height: auto;
+                }
             }
         </style>
     </head>
