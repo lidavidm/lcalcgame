@@ -985,12 +985,10 @@ class ChapterSelectMenu extends mag.Stage {
             this.panningEnabled = true;
 
             this.showStarField();
-            this.showChapters(onLevelSelect);
-            this.updateParallax();
+            this.showChapters(onLevelSelect).then(() => {
+                this.updateParallax();
 
-            let _this = this;
-            _this.offset = { x:0, y:0 };
-            Animate.wait(100).after(() => {
+                this.offset = { x:0, y:0 };
                 let lastActivePlanet;
                 for (let planet of this.planets) {
                     if (planet.active && level_idx >= planet.startLevelIdx && level_idx <= planet.endLevelIdx) {
@@ -1012,9 +1010,10 @@ class ChapterSelectMenu extends mag.Stage {
                 const shipScale = lastActivePlanet.radius / 120 / 2;
                 ship.scale = { x:shipScale, y:shipScale };
 
-                if (flyToChapIdx) {
+                if (flyToChapIdx && flyToChapIdx.length > 0) {
                     ship.attachToPlanet(lastActivePlanet);
 
+                    let minNewPlanetX = 1000000;
                     for (let chap of flyToChapIdx) {
                         let newChapIdx = chap.chapterIdx;
                         let newPlanet = this.planets[newChapIdx];
@@ -1022,6 +1021,7 @@ class ChapterSelectMenu extends mag.Stage {
                         newPlanet.activate();
                         newPlanet.deactivateSpots();
                         let oldOnClick = newPlanet.onclick;
+                        minNewPlanetX = Math.min(minNewPlanetX, newPlanet.pos.x);
 
                         newPlanet.onclick = () => {
                             newPlanet.onclick = oldOnClick;
@@ -1047,7 +1047,12 @@ class ChapterSelectMenu extends mag.Stage {
                                 });
                         };
                     }
-                } else {
+
+                    if (minNewPlanetX + this.planetParent.pos.x > 0.8 * this.boundingSize.w) {
+                        this.setCameraX(minNewPlanetX - 0.8 * this.boundingSize.w);
+                    }
+                }
+                else {
                     ship.attachToPlanet(lastActivePlanet);
                 }
             });
@@ -1252,7 +1257,7 @@ class ChapterSelectMenu extends mag.Stage {
         };
 
         // Each chapter is a 'Planet' in Starboy's Universe:
-        Resource.getChapterGraph().then((chapters) => {
+        return Resource.getChapterGraph().then((chapters) => {
             let planets = [];
             const POS_MAP = layoutPlanets(chapters.transitions, this.boundingSize);
 
