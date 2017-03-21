@@ -561,7 +561,7 @@ class PlanetCard extends mag.ImageRect {
 
     get relativeLandingPoint() {
         let a = this.pos;
-        return {x:a.x, y:a.y - this.absoluteSize.h / 3};
+        return {x:a.x, y:a.y - this.size.h / 3};
     }
 
     get localLandingPoint() {
@@ -838,8 +838,8 @@ class ChapterSelectShip extends mag.RotatableImageRect {
         let _this = this;
         this.rotation = -Math.PI / 2.0; // make the ship face upright
 
-        let start = startPlanet.landingPoint;
-        let end = endPlanet.landingPoint;
+        let start = startPlanet.relativeLandingPoint;
+        let end = endPlanet.relativeLandingPoint;
         let control1 = {
             x: start.x + 10,
             y: start.y - 200,
@@ -1002,7 +1002,6 @@ class ChapterSelectMenu extends mag.Stage {
                     for (let planet of this.planets) {
                         if (planet.active) {
                             lastActivePlanet = planet;
-                            break;
                         }
                     }
                 }
@@ -1027,12 +1026,13 @@ class ChapterSelectMenu extends mag.Stage {
                         newPlanet.onclick = () => {
                             newPlanet.onclick = oldOnClick;
                             newPlanet.removeHighlight();
+                            this.remove(ship);
                             this.planetParent.addChild(ship);
-                            let startPlanet = ship.planet || lastActivePlanet;
+                            let startPlanet = lastActivePlanet;
                             ship.flyToPlanet(startPlanet, newPlanet).then(() => {
-                                return new Promise(function(resolve, reject) {
+                                return new Promise((resolve, reject) => {
                                     Animate.wait(600).after(() => {
-                                        _this.planetParent.removeChild(ship);
+                                        this.planetParent.removeChild(ship);
                                         resolve();
                                     });
                                 });
