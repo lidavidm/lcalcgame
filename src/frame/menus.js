@@ -776,7 +776,7 @@ class PlanetCard extends mag.ImageRect {
         this.spots = [];
         for (let i = 1; i <= NUM_LVLS; i++) {
             let spotpos = this.path.posAlongPath((i-1) / (NUM_LVLS-1));
-            let spot = new LevelSpot( spotpos.x, spotpos.y, 6 * this.radius / 120, genClickCallback(i-1) );
+            let spot = new LevelSpot( spotpos.x, spotpos.y, 8 * this.radius / 120, genClickCallback(i-1) );
             spot.anchor = { x:0.5, y:0.5 };
             spot.relPosAlongPath = i / NUM_LVLS;
             spot.levelId = levels[1] + i-1;
