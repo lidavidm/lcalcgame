@@ -877,7 +877,6 @@ class ChapterSelectShip extends mag.RotatableImageRect {
                 let dx = this.pos.x - prevPos.x;
                 let angle = Math.atan2(dy, dx);
                 this.rotation = angle;
-                console.log(this.pos, dy, dx, angle);
             }, duration).after(() => {
                 resolve();
             });
@@ -984,7 +983,6 @@ class ChapterSelectMenu extends mag.Stage {
             this.nodes = [];
 
             this.panningEnabled = true;
-            this.trails = [];
 
             this.showStarField();
             this.showChapters(onLevelSelect);
@@ -1017,10 +1015,6 @@ class ChapterSelectMenu extends mag.Stage {
                         newPlanet.activate();
                         newPlanet.deactivateSpots();
                         let oldOnClick = newPlanet.onclick;
-
-                        let trail = this.makeTrail(lastActivePlanet, newPlanet);
-                        trail.percentDrawn = 0;
-                        Animate.tween(trail, { percentDrawn:1.0 }, 1000);
 
                         newPlanet.onclick = () => {
                             newPlanet.onclick = oldOnClick;
@@ -1134,18 +1128,6 @@ class ChapterSelectMenu extends mag.Stage {
         this.ctx.restore();
     }
 
-    showTrails() {
-        this.trails.forEach((trail) => {
-            trail.percentDrawn = 1;
-        });
-    }
-
-    hideTrails() {
-         this.trails.forEach((trail) => {
-            trail.percentDrawn = 0;
-        });
-    }
-
     showStarField() {
         const NUM_STARS = 120;
         let genRandomPt = () => randomPointInRect( {x:0, y:0, w: 1.5*this.boundingSize.w, h: this.boundingSize.h} );
@@ -1161,16 +1143,6 @@ class ChapterSelectMenu extends mag.Stage {
 
             // Find a random position that doesn't intersect other previously created stars.
             let p = genRandomPt();
-            // for (let i = 0; i < stars.length; i++) {
-            //     let s = stars[i];
-            //     let prect = {x:p.x, y:p.y, w:star.size.w, h:star.size.h};
-            //     let srect = {x:s._pos.x, y:s._pos.y, w:s.size.w, h:s.size.h};
-            //     if (intersects(STARBOY_RECT, prect) ||
-            //         intersects(prect, srect)) {
-            //         p = genRandomPt();
-            //         i = 0;
-            //     }
-            // }
 
             // Set star properties
             star.pos = p;
@@ -1225,7 +1197,6 @@ class ChapterSelectMenu extends mag.Stage {
         var btn_back = new mag.Button(10, 10, 50, 50, { default: 'btn-back-default', hover: 'btn-back-hover', down: 'btn-back-down' }, () => {
             grid.hide().after(() => this.remove(grid));
             this.remove(btn_back);
-            this.showTrails();
             this.setPlanetsToDefaultPos(500);
             Resource.play('goback');
         });
@@ -1290,7 +1261,6 @@ class ChapterSelectMenu extends mag.Stage {
                 planet.anchor = { x:0.5, y:0.5 };
                 planet.shadowOffset = 0;
                 planet.onclick = () => {
-                    this.hideTrails();
                     for (let k = 0; k < planets.length; k++) {
                         planets[k].ignoreEvents = true;
                         if (k !== i) hide(planets[k]);
@@ -1334,60 +1304,9 @@ class ChapterSelectMenu extends mag.Stage {
             chapters.chapters.forEach((chap, i) => {
                 transitionMap[chap.key] = i;
             });
-            chapters.chapters.forEach((chap, i) => {
-                let planet1 = planets[i];
-                if (planet1.active) {
-                    for (let t of chap.transitions) {
-                        let planet2 = planets[transitionMap[t]];
-                        if (planet2.active) {
-                            this.makeTrail(planet1, planet2);
-                        }
-                    }
-                }
-            });
 
             this.planets = planets;
         });
-    }
-
-    makeTrail(planet1, planet2) {
-        let path1 = planet1.path.points;
-        let path2 = planet2.path.points;
-        let start = addPos(
-            { x: -planet1.radius, y: -planet1.radius },
-            addPos(planet1.absolutePos, path1[path1.length - 1]));
-        let end = addPos(
-            { x: -planet2.radius, y: -planet2.radius },
-            addPos(planet2.absolutePos, path2[0]));
-        let dx = end.x - start.x;
-        let dy = Math.abs(end.y - start.y);
-        let factor = 0.3;
-
-        let control1 = { x: start.x + factor * dx, y: 0 },
-            control2 = { x: end.x - factor * dx, y: 0 };
-        if (end.y < start.y) {
-            control1.y = start.y + factor * dy;
-            control2.y = end.y - factor * dy;
-        }
-        else {
-            control1.x = start.x;
-            control1.y = start.y + Math.abs(factor * dy);
-            control2.x = end.x;
-            control2.y = end.y - Math.abs(factor * dy);
-        }
-        let points = cubicBezier(start, end, control1, control2, 100);
-        // Cubic bezier curve
-        let trail = new ArrowPath(points);
-        trail.percentDrawn = 1;
-        trail.stroke.color = '#AAA';
-        trail.stroke.lineDash = [3];
-        trail.stroke.lineWidth = 2;
-        trail.drawArrowHead = false;
-        trail.ignoreEvents = true;
-        this.planetParent.addChild(trail);
-        this.trails.push(trail);
-
-        return trail;
     }
 }
 
