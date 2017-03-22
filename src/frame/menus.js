@@ -439,7 +439,7 @@ class LevelSpot extends mag.Circle {
                 return;
             }
 
-            if (sound == 0 && !this.ignoreEvents) {
+            if (sound == 0 && !this.ignoreEvents && (this.stage && !this.stage.invalidated)) {
                 Resource.play('levelspot-scan');
             }
             sound = (sound + 1) % 4;
