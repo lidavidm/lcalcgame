@@ -420,6 +420,13 @@ class LevelSpot extends mag.Circle {
         glow.pos = { x:r, y:r };
         glow.ignoreEvents = true;
         this.glow = glow;
+        this.glow.parent = this;
+    }
+
+    cancelFlash() {
+        this.flashing = false;
+        this.cancelBlink = true;
+        this.color = 'white';
     }
 
     flash() {
@@ -429,6 +436,7 @@ class LevelSpot extends mag.Circle {
         if (this.flashing) return;
 
         this.flashing = true;
+        this.cancelBlink = false;
         const dur = 800;
         this.glow.opacity = 1.0;
         let _this = this;
@@ -723,15 +731,22 @@ class PlanetCard extends mag.ImageRect {
             // completed (level_idx isn't reliable for this when
             // there's multiple branches), or if it's the first spot
             // on the planet
-            if ((!completedLevels[spot.levelId] && completedLevels[spot.levelId - 1]) || i == 0) {
+
+            spot.cancelFlash();
+            spot.disable();
+            if (completedLevels[spot.levelId]) {
+                spot.enable();
+            }
+            // We have not completed the first level of this planet,
+            // but presumably this planet is enabled, so enable the
+            // first level
+            else if (i === 0) {
                 spot.enable();
                 spot.flash();
             }
-            else if (completedLevels[spot.levelId]) {
+            else if (!completedLevels[spot.levelId] && completedLevels[spot.levelId - 1]) {
                 spot.enable();
-            }
-            else {
-                spot.disable();
+                spot.flash();
             }
         });
     }
@@ -760,6 +775,7 @@ class PlanetCard extends mag.ImageRect {
                     radius: 0.1,
                     ringControl: 100,
                 }, 500).after(() => {
+                    this.stage.remove(mask);
                     onLevelSelect(levels[0][level_idx], levels[1] + level_idx);
                     window.stage.add(mask);
                     Animate.tween(mask, {
@@ -782,25 +798,12 @@ class PlanetCard extends mag.ImageRect {
             spot.levelId = levels[1] + i-1;
             spot.stroke.lineWidth = Math.max(this.radius / 120 * 2, 1.5);
             spot.ignoreEvents = true;
-
-            if (completedLevels[spot.levelId]) {
-                spot.enable();
-            }
-            // We have not completed the first level of this planet,
-            // but presumably this planet is enabled, so enable the
-            // first level
-            else if (i === 1) {
-                spot.enable();
-                spot.flash();
-            }
-            else if (!completedLevels[spot.levelId] && completedLevels[spot.levelId - 1]) {
-                spot.enable();
-                spot.flash();
-            }
             this.spots.push(spot);
 
             if (this.active) this.addChild(spot);
         }
+
+        this.updateLevelSpots();
     }
 }
 
@@ -1077,17 +1080,19 @@ class ChapterSelectMenu extends mag.Stage {
     }
 
     reset() {
+        this.panningEnabled = true;
         this.starParent.children = [];
         this.showStarField();
         let lastActivePlanet = this.lastActivePlanet;
         if (!lastActivePlanet) return;
         this.remove(this.btn_back);
-        this.setPlanetsToDefaultPos(0);
-        this.setCameraX(lastActivePlanet.pos.x - 3 * lastActivePlanet.radius);
+        this.setPlanetsToDefaultPos(0).then(() => {
+            this.setCameraX(lastActivePlanet.pos.x - 3 * lastActivePlanet.radius);
 
-        if (this.activePlanet) {
-            this.activatePlanet(this.activePlanet, 0);
-        }
+            if (this.activePlanet) {
+                this.activatePlanet(this.activePlanet, 0);
+            }
+        });
     }
 
     setCameraX(x) {
@@ -1177,7 +1182,7 @@ class ChapterSelectMenu extends mag.Stage {
 
         let starParent = this.starParent;
 
-        let stars = [];
+        let stars = this.stars;
         let n = NUM_STARS;
         while(n-- > 0) {
 
@@ -1203,8 +1208,9 @@ class ChapterSelectMenu extends mag.Stage {
 
     setPlanetsToDefaultPos(dur) {
         let stage = this;
+        this.panningEnabled = true;
 
-        Resource.getChapterGraph().then((chapters) => {
+        return Resource.getChapterGraph().then((chapters) => {
             let maxPlanetX = this.boundingSize.w;
             const POS_MAP = layoutPlanets(chapters.transitions, this.boundingSize);
             stage.planets.forEach((p, i) => {
@@ -1216,7 +1222,6 @@ class ChapterSelectMenu extends mag.Stage {
                 if (p.active) p.showText();
                 let rad = POS_MAP[i].r;
                 Animate.tween(p, { pos: {x:POS_MAP[i].x, y:POS_MAP[i].y}, scale:{x:1,y:1}, opacity:1.0 }, dur).after(() => {
-                    this.panningEnabled = true;
                     if (p.active) p.showText();
                 });
             });
@@ -1235,9 +1240,9 @@ class ChapterSelectMenu extends mag.Stage {
         let stage = this;
 
         this.activePlanet = planet;
+        this.panningEnabled = false;
 
         let expand = (planet) => {
-            this.panningEnabled = false;
             planet.ignoreEvents = false;
             // Make sure the saving of the onclick is idempotent in
             // case we reactivate the same planet (e.g. after an

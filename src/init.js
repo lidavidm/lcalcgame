@@ -124,6 +124,7 @@ function initLevel(levelSelected, levelSelectedIdx) {
         cur_menu = stage;
         cur_menu.invalidate();
     }
+    prepareCanvas();
     $('#lvl_num_visible').text((level_idx+1) + '');
     level_idx = levelSelectedIdx;
     stage = Resource.buildLevel(levelSelected, canvas);
@@ -136,6 +137,7 @@ function returnToMenu() {
         cur_menu.validate();
         console.log(cur_menu);
         cur_menu.updateLevelSpots();
+        cur_menu.reset();
         stage = cur_menu;
         redraw(stage);
     } else {

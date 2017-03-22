@@ -16,11 +16,17 @@ class ReductStage extends mag.Stage {
         let canvas_screen = this.boundingSize;
         let UI_PADDING = 10;
 
-        var btn_back = new mag.Button(canvas_screen.w - 64*3 - UI_PADDING, UI_PADDING, 64, 64,
+        var btn_back = new mag.Button(canvas_screen.w - 64*4 - UI_PADDING, UI_PADDING, 64, 64,
             { default:'btn-back-default', hover:'btn-back-hover', down:'btn-back-down' },
             () => {
             //returnToMenu();
             prev(); // go back to previous level; see index.html.
+        });
+
+        var btn_menu = new mag.Button(canvas_screen.w - 64*3 - UI_PADDING, UI_PADDING, 64, 64,
+            { default:'btn-menu-default', hover:'btn-menu-hover', down:'btn-menu-down' },
+            () => {
+            returnToMenu();
         });
 
         var btn_reset = new mag.Button(btn_back.pos.x + btn_back.size.w, UI_PADDING, 64, 64,
@@ -28,6 +34,7 @@ class ReductStage extends mag.Stage {
             () => {
             initBoard(); // reset board state; see index.html.
         });
+
         var btn_next = new mag.Button(btn_reset.pos.x + btn_reset.size.w, UI_PADDING, 64, 64,
             { default:'btn-next-default', hover:'btn-next-hover', down:'btn-next-down' },
             () => {
@@ -39,8 +46,10 @@ class ReductStage extends mag.Stage {
             this.add(btn_next);
         }
         else {
+            btn_menu.pos = btn_reset.pos;
             btn_reset.pos = btn_next.pos;
         }
+        this.add(btn_menu);
         this.add(btn_reset);
 
         // Toolbox
@@ -56,7 +65,9 @@ class ReductStage extends mag.Stage {
         }
         this.environmentDisplay = env;
 
-        this.uiNodes = [ btn_back, btn_reset, btn_next, toolbox, env ];
+        this.uiNodes = [ btn_back, btn_menu, btn_reset, btn_next, toolbox, env ];
+
+        this.layoutUI();
     }
 
     layoutUI() {
@@ -67,13 +78,18 @@ class ReductStage extends mag.Stage {
         let canvas_screen = this.boundingSize;
 
         let btn_back = this.uiNodes[0];
-        let btn_reset = this.uiNodes[1];
-        let btn_next = this.uiNodes[2];
+        let btn_menu = this.uiNodes[1];
+        let btn_reset = this.uiNodes[2];
+        let btn_next = this.uiNodes[3];
 
         if (__SHOW_DEV_INFO) {
             btn_back.pos = {
-                x: canvas_screen.w - 64*3 - UI_PADDING,
+                x: canvas_screen.w - 64*4 - UI_PADDING,
                 y: btn_back.pos.y,
+            };
+            btn_menu.pos = {
+                x: canvas_screen.w - 64*3 - UI_PADDING,
+                y: btn_reset.pos.y,
             };
             btn_reset.pos = {
                 x: canvas_screen.w - 64*2 - UI_PADDING,
@@ -85,6 +101,10 @@ class ReductStage extends mag.Stage {
             };
         }
         else {
+            btn_reset.pos = {
+                x: canvas_screen.w - 64*2 - UI_PADDING,
+                y: btn_reset.pos.y,
+            };
             btn_reset.pos = {
                 x: canvas_screen.w - 64 - UI_PADDING,
                 y: btn_reset.pos.y,
