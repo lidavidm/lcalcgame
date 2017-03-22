@@ -223,6 +223,8 @@ function initMainMenu() {
         var n = new NewInstanceExpr();
         stage.add(n);
 
+        console.warn(ES6Parser.parse('(x) => x; ("star" == true);'));
+
         /*
         let substage = new mag.StageNode(0, 0, Resource.buildLevel(Resource.level[10], canvas), canvas);
         //substage.scale = { x:0.5, y:0.5 };

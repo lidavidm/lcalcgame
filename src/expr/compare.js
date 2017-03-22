@@ -1,11 +1,3 @@
-
-
-
-
-//
-
-
-
 // A boolean compare function like ==, !=, >, >=, <=, <.
 class CompareExpr extends Expression {
     static operatorMap() {

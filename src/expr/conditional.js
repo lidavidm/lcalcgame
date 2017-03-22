@@ -1,12 +1,3 @@
-
-
-
-
-
-
-
-
-
 // An if statement.
 class IfStatement extends Expression {
     constructor(cond, branch) {

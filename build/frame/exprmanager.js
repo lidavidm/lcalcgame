@@ -69,6 +69,9 @@ var ExprManager = function () {
         DEFAULT_FADE_PROGRESSION[p] = DEFAULT_FADE_PROGRESSION.primitives;
     });
     DEFAULT_FADE_PROGRESSION.primitives = undefined;
+    pub.isPrimitive = function (str) {
+        return primitives.indexOf(str) > -1;
+    };
 
     // Classes that should not show the 'sparkle' when they are faded.
     var FADE_EXCEPTIONS = [JumpingChestVarExpr, JumpingAssignExpr, EnvironmentDisplay];
@@ -127,6 +130,9 @@ var ExprManager = function () {
     };
     pub.fadesAtBorder = true;
 
+    pub.hasClass = function (ename) {
+        return ename in _FADE_MAP;
+    };
     pub.getClass = function (ename) {
         if (ename in _FADE_MAP) {
             return _FADE_MAP[ename][pub.getFadeLevel(ename)];
