@@ -85,11 +85,17 @@ class TypeBox extends mag.Rect {
             'star':'star',
             'rect':'rect'
         };
-        if (txt in input_map)
-            expr_desc = input_map[txt];
-        else return;
 
-        let block = Level.parse(expr_desc)[0];
+        let block;
+        if (txt in input_map) {
+            expr_desc = input_map[txt];
+            block = Level.parse(expr_desc)[0];
+        } else {
+            block = ES6Parser.parse(txt);
+            if (!block) return;
+        }
+
+        block.lockSubexpressions();
         block.update();
         block.pos = this.absolutePos;
         block.anchor = { x:0, y:0 };

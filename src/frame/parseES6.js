@@ -72,12 +72,12 @@ class ES6Parser {
                             'circle':[0,0,22],
                             'diamond':[0,0,44,44]
                         };
-                        return new (ExprManager.getClass(node.value))(...primitiveArgs);
+                        return new (ExprManager.getClass(node.value))(...primitiveArgs[node.value]);
                     }
                     else { // Otherwise this stands for a "string" value.
                         return new StringValueExpr(node.value);
                     }
-                } else if (node.value instanceof Number) {
+                } else if (Number.isNumber(node.value)) {
                     return new NumberExpr(node.value);
                 } else if (node.value === null) {
                     return new NullExpr(0,0,64,64);

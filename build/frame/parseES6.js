@@ -95,12 +95,12 @@ var ES6Parser = function () {
                                 'circle': [0, 0, 22],
                                 'diamond': [0, 0, 44, 44]
                             };
-                            return new (Function.prototype.bind.apply(ExprManager.getClass(node.value), [null].concat(_toConsumableArray(primitiveArgs))))();
+                            return new (Function.prototype.bind.apply(ExprManager.getClass(node.value), [null].concat(_toConsumableArray(primitiveArgs[node.value]))))();
                         } else {
                             // Otherwise this stands for a "string" value.
                             return new StringValueExpr(node.value);
                         }
-                    } else if (node.value instanceof Number) {
+                    } else if (Number.isNumber(node.value)) {
                         return new NumberExpr(node.value);
                     } else if (node.value === null) {
                         return new NullExpr(0, 0, 64, 64);
