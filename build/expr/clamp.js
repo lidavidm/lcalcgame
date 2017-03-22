@@ -128,15 +128,9 @@ var ClampExpr = function (_Expression) {
             this.children = this.holes; // for rendering
         }
     }, {
-        key: "drawInternal",
-        value: function drawInternal(ctx, pos, boundingSize) {
-            ctx.fillStyle = this.shadowColor;
-            setStrokeStyle(ctx, this.stroke);
-            if (this.shadowOffset !== 0) {
-                clampRect(ctx, pos.x, pos.y + this.shadowOffset, boundingSize.w * this.topRatio.x, boundingSize.h * this.topRatio.y, boundingSize.w * this.midRatio.x, boundingSize.h * this.midRatio.y, boundingSize.w * this.botRatio.x, boundingSize.h * this.botRatio.y, this.radius * this.absoluteScale.x, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null);
-            }
-            if (this.color) ctx.fillStyle = this.color;
-            clampRect(ctx, pos.x, pos.y, boundingSize.w * this.topRatio.x, boundingSize.h * this.topRatio.y, boundingSize.w * this.midRatio.x, boundingSize.h * this.midRatio.y, boundingSize.w * this.botRatio.x, boundingSize.h * this.botRatio.y, this.radius * this.absoluteScale.x, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null); // just fill for now
+        key: "drawBaseShape",
+        value: function drawBaseShape(ctx, pos, boundingSize) {
+            clampRect(ctx, pos.x, pos.y, boundingSize.w * this.topRatio.x, boundingSize.h * this.topRatio.y, boundingSize.w * this.midRatio.x, boundingSize.h * this.midRatio.y, boundingSize.w * this.botRatio.x, boundingSize.h * this.botRatio.y, this.radius * this.absoluteScale.x, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null, this.notch ? this.notch : null);
         }
     }, {
         key: "size",

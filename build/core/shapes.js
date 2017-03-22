@@ -93,13 +93,18 @@ var mag = function (_) {
         }, {
             key: 'drawInternal',
             value: function drawInternal(ctx, pos, boundingSize) {
+                this.drawBaseShape(ctx, pos, boundingSize);
+            }
+        }, {
+            key: 'drawBaseShape',
+            value: function drawBaseShape(ctx, pos, size) {
                 setStrokeStyle(ctx, this.stroke);
                 ctx.fillStyle = this.shadowColor;
-                ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h + this.shadowOffset);
-                this.strokeRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h + this.shadowOffset);
+                ctx.fillRect(pos.x, pos.y, size.w, size.h + this.shadowOffset);
+                this.strokeRect(ctx, pos.x, pos.y, size.w, size.h + this.shadowOffset);
                 ctx.fillStyle = this.color;
-                ctx.fillRect(pos.x, pos.y, boundingSize.w, boundingSize.h);
-                this.strokeRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h);
+                ctx.fillRect(pos.x, pos.y, size.w, size.h);
+                this.strokeRect(ctx, pos.x, pos.y, size.w, size.h);
             }
         }, {
             key: 'drawInternalAfterChildren',
@@ -299,15 +304,20 @@ var mag = function (_) {
         }
 
         _createClass(RoundedRect, [{
+            key: 'drawBaseShape',
+            value: function drawBaseShape(ctx, pos, size) {
+                roundRect(ctx, pos.x, pos.y, size.w, size.h, this.radius * this.absoluteScale.x, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null, this.notch ? this.notch : null);
+            }
+        }, {
             key: 'drawInternal',
             value: function drawInternal(ctx, pos, boundingSize) {
                 ctx.fillStyle = this.shadowColor;
                 setStrokeStyle(ctx, this.stroke);
                 if (this.shadowOffset !== 0) {
-                    roundRect(ctx, pos.x, pos.y + this.shadowOffset, boundingSize.w, boundingSize.h, this.radius * this.absoluteScale.x, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null); // just fill for now
+                    this.drawBaseShape(ctx, addPos(pos, { x: 0, y: this.shadowOffset }), boundingSize);
                 }
                 if (this.color) ctx.fillStyle = this.color;
-                roundRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, this.radius * this.absoluteScale.x, this.color !== null, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null); // just fill for now
+                this.drawBaseShape(ctx, pos, boundingSize);
             }
         }]);
 

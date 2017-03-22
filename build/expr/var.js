@@ -381,13 +381,13 @@ var ChestVarExpr = function (_VarExpr2) {
         key: "onmouseenter",
         value: function onmouseenter() {
             _get(ChestVarExpr.prototype.__proto__ || Object.getPrototypeOf(ChestVarExpr.prototype), "onmouseenter", this).call(this);
-            document.querySelector('canvas').style.cursor = 'pointer';
+            SET_CURSOR_STYLE(CONST.CURSOR.HAND);
         }
     }, {
         key: "onmouseleave",
         value: function onmouseleave() {
             _get(ChestVarExpr.prototype.__proto__ || Object.getPrototypeOf(ChestVarExpr.prototype), "onmouseleave", this).call(this);
-            document.querySelector('canvas').style.cursor = 'auto';
+            SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
         }
     }, {
         key: "onmouseclick",

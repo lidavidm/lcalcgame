@@ -354,7 +354,7 @@ class Expression extends mag.RoundedRect {
     }
 
     detach() {
-        if (this.parent) {
+        if (this.parent && !(this.parent instanceof PlayPen)) { // TODO: Make this not rely on class PlayPen.
             var ghost_expr;
             if (this.droppedInClass)
                 ghost_expr = new this.droppedInClass(this);
@@ -459,11 +459,14 @@ class Expression extends mag.RoundedRect {
     onmousedrag(pos) {
         if (this.ignoreEvents) return;
 
+        if (this.parent instanceof PlayPen)
+            pos = fromTo(this.parent.absolutePos, pos);
+
         super.onmousedrag(pos);
 
         const rightX = pos.x + this.absoluteSize.w;
         //if (rightX < GLOBAL_DEFAULT_SCREENSIZE.width) { // Clipping to edges
-            this.pos = pos;
+        this.pos = pos;
         //} else this.pos = { x:GLOBAL_DEFAULT_SCREENSIZE.width - this.absoluteSize.w, y:pos.y };
 
         if (!this.dragging) {

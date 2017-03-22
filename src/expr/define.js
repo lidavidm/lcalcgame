@@ -1,3 +1,14 @@
+// Notch attachment node.
+class NewInstanceExpr extends FadedValueExpr {
+    constructor() {
+        super('+');
+        this.notch = new RectNotch('right', 10, 10, 0.5, false);
+        this.padding.right = 20;
+        this.shadowOffset = 6;
+        this.radius = 3;
+    }
+}
+
 // Acts as a named wrapper for a def'd expression.
 class NamedExpr extends Expression {
     constructor(name, expr, args) {
@@ -75,6 +86,8 @@ class DefineExpr extends ClampExpr {
         this.color = 'OrangeRed';
         this.expr.shadowOffset = -2;
         if (name) this.funcname = name;
+
+        this.notch = new RectNotch('left', 10, 10, 0.8, true);
     }
     get expr() { return this.children[1]; }
     get constructorArgs() { return [ this.expr.clone() ]; }

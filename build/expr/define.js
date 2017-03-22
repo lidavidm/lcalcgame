@@ -8,7 +8,28 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+// Notch attachment node.
+
+var NewInstanceExpr = function (_FadedValueExpr) {
+    _inherits(NewInstanceExpr, _FadedValueExpr);
+
+    function NewInstanceExpr() {
+        _classCallCheck(this, NewInstanceExpr);
+
+        var _this = _possibleConstructorReturn(this, (NewInstanceExpr.__proto__ || Object.getPrototypeOf(NewInstanceExpr)).call(this, '+'));
+
+        _this.notch = new RectNotch('right', 10, 10, 0.5, false);
+        _this.padding.right = 20;
+        _this.shadowOffset = 6;
+        _this.radius = 3;
+        return _this;
+    }
+
+    return NewInstanceExpr;
+}(FadedValueExpr);
+
 // Acts as a named wrapper for a def'd expression.
+
 
 var NamedExpr = function (_Expression) {
     _inherits(NamedExpr, _Expression);
@@ -22,15 +43,15 @@ var NamedExpr = function (_Expression) {
         for (var i = 0; i < args.length; i++) {
             exprs.push(args[i].clone());
         }
-        var _this = _possibleConstructorReturn(this, (NamedExpr.__proto__ || Object.getPrototypeOf(NamedExpr)).call(this, exprs));
+        var _this2 = _possibleConstructorReturn(this, (NamedExpr.__proto__ || Object.getPrototypeOf(NamedExpr)).call(this, exprs));
 
-        _this.color = 'OrangeRed';
-        _this.name = name;
-        _this._args = args.map(function (a) {
+        _this2.color = 'OrangeRed';
+        _this2.name = name;
+        _this2._args = args.map(function (a) {
             return a.clone();
         });
-        _this._wrapped_expr = expr;
-        return _this;
+        _this2._wrapped_expr = expr;
+        return _this2;
     }
 
     _createClass(NamedExpr, [{
@@ -126,13 +147,15 @@ var DefineExpr = function (_ClampExpr) {
         txt_input.radius = 2;
         txt_input.lock();
 
-        var _this2 = _possibleConstructorReturn(this, (DefineExpr.__proto__ || Object.getPrototypeOf(DefineExpr)).call(this, [txt_input, expr]));
+        var _this3 = _possibleConstructorReturn(this, (DefineExpr.__proto__ || Object.getPrototypeOf(DefineExpr)).call(this, [txt_input, expr]));
 
-        _this2.breakIndices = { top: 1, mid: 2, bot: 2 }; // for ClampExpr
-        _this2.color = 'OrangeRed';
-        _this2.expr.shadowOffset = -2;
-        if (name) _this2.funcname = name;
-        return _this2;
+        _this3.breakIndices = { top: 1, mid: 2, bot: 2 }; // for ClampExpr
+        _this3.color = 'OrangeRed';
+        _this3.expr.shadowOffset = -2;
+        if (name) _this3.funcname = name;
+
+        _this3.notch = new RectNotch('left', 10, 10, 0.8, true);
+        return _this3;
     }
 
     _createClass(DefineExpr, [{

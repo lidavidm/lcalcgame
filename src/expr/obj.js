@@ -1,4 +1,145 @@
 /**
+ * An inner 'play area' to mess around and make programs in.
+ * It's a pen because you can't drag expressions _out_!
+ */
+class PlayPenExpr extends ExpressionPlus {
+    constructor(name) {
+        super([]);
+        this.padding = { left:16, top:16, right:2, inner:8 };
+        let pen = new PlayPen(this.padding.left, this.padding.top, 220-this.padding.left*2, 220-this.padding.top*2);
+        this.addChild(pen);
+        this.pen = pen;
+        this.color = 'YellowGreen';
+        this.notch = new RectNotch('left', 10, 10, 0.8, true); // notch in left side near top. 
+    }
+    get size() {
+        return { w:this.pen.size.w + this.padding.left*2, h:this.pen.size.h + this.padding.top*2 };
+    }
+    set size(sz) {
+        super.size = sz;
+        this.pen.size = sz;
+    }
+    hitsBottomRightCorner(pos) {
+        let a = this.absolutePos;
+        let sz = this.size;
+        return pos.x > (a.x + sz.w - this.padding.left*2) &&
+            pos.y > (a.y + sz.h - this.padding.top*2);
+    }
+    onmousehover(pos) {
+        super.onmousehover(pos);
+        if (this.hitsBottomRightCorner(pos)) {
+            this.resizing = true;
+            this._prev_pos = undefined;
+            SET_CURSOR_STYLE(CONST.CURSOR.RESIZE);
+        } else {
+            SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
+            this.resizing = false;
+        }
+    }
+    onmousedrag(pos) {
+        if (this.resizing) {
+            let prev_pos = this._prev_pos || this.pos;
+            let len = fromTo(prev_pos, pos);
+            this._prev_pos = clonePos(pos);
+            this.pen.size = { w:this.pen.size.w + len.x, h:this.pen.size.h+len.y };
+        }
+        else super.onmousedrag(pos);
+    }
+    onmouseleave(pos) {
+        super.onmouseleave(pos);
+        SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
+        this.resizing = false;
+    }
+}
+class PlayPen extends mag.RoundedRect {
+    constructor(x, y, w, h) {
+        super(x, y, w, h, 12);
+        this.color = '#444';
+    }
+
+    // Basically addChild, but with some extra setup.
+    // *Expressions inside the pen cannot be dragged out.*
+    addToPen(expr) {
+
+        let stage = this.stage;
+        if (!stage) {
+            console.error('@ addToPen: PlayPen not member of a Stage.');
+            return;
+        } else if (!expr.stage || expr.stage != stage) {
+            console.error('@ addToPen: Expression has no stage, a different stage than PlayPen.');
+            return;
+        }
+
+        const SCALE = 0.85;
+        expr.scale = { x:SCALE, y:SCALE };
+        expr.pos = fromTo(this.absolutePos, expr.absolutePos);
+        stage.remove(expr);
+
+        this.addChild(expr);
+    }
+
+    // Since this area is contained,
+    // we won't allow child nodes outside of the container bounds to be hit.
+    hits(pos, options) {
+        if (this.hitsWithin(pos))
+            return super.hits(pos, options);
+        else
+            return false;
+    }
+
+    // Clip drawing children to just the inner region.
+    drawInternalAfterChildren(ctx, pos, boundingSize) {
+        ctx.restore();
+        super.drawInternalAfterChildren(ctx, pos, boundingSize);
+    }
+    drawInternal(ctx, pos, boundingSize) {
+        ctx.save();
+        ctx.beginPath();
+        roundRect(ctx,
+                  pos.x, pos.y,
+                  boundingSize.w, boundingSize.h,
+                  this.radius*this.absoluteScale.x, this.color !== null, false,
+                  this.stroke ? this.stroke.opacity : null);
+        ctx.clip();
+        super.drawInternal(ctx, pos, boundingSize);
+    }
+
+    // Graphics
+    toggleHighlight(on=true) {
+        if (on) this.stroke = { color:'cyan', lineWidth:4 };
+        else    this.stroke = null;
+    }
+
+    // Dropping expressions into the area
+    ondropenter(node, pos) {
+        if (node instanceof Expression && !this.hasChild(node))
+            this.toggleHighlight(true);
+    }
+    ondropped(node, pos) {
+        if (node instanceof Expression && !this.hasChild(node)) {
+            this.toggleHighlight(false);
+
+            this.addToPen(node);
+        }
+    }
+    ondropexit(node, pos) {
+        if (node instanceof Expression && !this.hasChild(node))
+            this.toggleHighlight(false);
+    }
+
+    // Dragging container
+    onmouseenter(pos) {
+        super.onmouseenter(pos);
+        if (this.parent)
+            this.parent.onmouseenter(pos);
+    }
+    onmousedrag(pos) {
+        if (this.parent)
+            this.parent.onmousedrag(pos);
+    }
+}
+
+/**
  * Any expression with dot notation '.' properties to access.
  * Properties can themselves return objects...
  */
@@ -324,14 +465,14 @@ class PulloutDrawerHandle extends mag.ImageRect {
     // Events
     onmouseenter(pos) {
         super.onmouseenter(pos);
-        document.querySelector('canvas').style.cursor = 'pointer'; // col-resize is another option
+        SET_CURSOR_STYLE(CONST.CURSOR.HAND); // col-resize is another option
     }
     onmouseclick(pos) {
         if(this.onclick) this.onclick();
     }
     onmouseleave(pos) {
         super.onmouseleave(pos);
-        document.querySelector('canvas').style.cursor = 'auto';
+        SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
     }
 }
 

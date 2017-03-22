@@ -192,6 +192,10 @@ function initMainMenu() {
         let typebox = new TypeBox(200, 200, 80, 40);
         stage.add(typebox);
 
+        let playpen = new PlayPenExpr();
+        playpen.pos = { x:440, y:180 };
+        stage.add(playpen);
+
         // let obj = new ArrayObjectExpr(new BracketArrayExpr(0, 0, 44, 44));
         // obj.pos = { x:200, y:200 };
         // stage.add(obj);
@@ -214,11 +218,13 @@ function initMainMenu() {
         // let inf = new InfiniteExpression( new TrueExpr() );
         // inf.pos = { x:400, y:300 };
         // stage.add(inf);
-        //
-        // let def = new DefineExpr( new MissingExpression(), 'double' );
-        // def.pos = { x:300, y:400 };
-        // stage.add(def);
-        // console.log(def);
+
+        let def = new DefineExpr( new MissingExpression(), 'double' );
+        def.pos = { x:300, y:400 };
+        stage.add(def);
+
+        let n = new NewInstanceExpr();
+        stage.add(n);
 
         /*
         let substage = new mag.StageNode(0, 0, Resource.buildLevel(Resource.level[10], canvas), canvas);

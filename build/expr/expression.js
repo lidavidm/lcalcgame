@@ -404,7 +404,8 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'detach',
         value: function detach() {
-            if (this.parent) {
+            if (this.parent && !(this.parent instanceof PlayPen)) {
+                // TODO: Make this not rely on class PlayPen.
                 var ghost_expr;
                 if (this.droppedInClass) ghost_expr = new this.droppedInClass(this);else ghost_expr = new MissingExpression(this);
 
@@ -519,6 +520,8 @@ var Expression = function (_mag$RoundedRect) {
         key: 'onmousedrag',
         value: function onmousedrag(pos) {
             if (this.ignoreEvents) return;
+
+            if (this.parent instanceof PlayPen) pos = fromTo(this.parent.absolutePos, pos);
 
             _get(Expression.prototype.__proto__ || Object.getPrototypeOf(Expression.prototype), 'onmousedrag', this).call(this, pos);
 
