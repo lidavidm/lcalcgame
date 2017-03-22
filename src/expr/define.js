@@ -6,6 +6,34 @@ class NewInstanceExpr extends FadedValueExpr {
         this.padding.right = 20;
         this.shadowOffset = 6;
         this.radius = 3;
+        this.attachNode = null;
+    }
+    get notchPos() {
+        let upperLeftPos = this.upperLeftPos(this.absolutePos, this.absoluteSize);
+        return { x:upperLeftPos.x + this.size.w, y:upperLeftPos.y + this.size.h * this.notch.relpos };
+    }
+    isAttached() {
+        return this.attachNode ? true : false;
+    }
+    attach(nodeWithNotch) {
+        if (!nodeWithNotch.notchPos) {
+            console.error('@ NewInstanceExpr.attach: Prospective attachment has no notchPos property.');
+            return;
+        }
+        this.attachNode = nodeWithNotch;
+        let notchPos = this.notchPos;
+        let nodeNotchDistY = nodeWithNotch.notchPos.y - nodeWithNotch.pos.y;
+        nodeWithNotch.pos = { x:notchPos.x, y:notchPos.y - nodeNotchDistY };
+        this.stroke = null;
+        Animate.blink(this, 500, [1,0,1], 1);
+        Animate.blink(nodeWithNotch, 500, [1,0,1], 1);
+    }
+    detachAttachment(node) {
+        if (node != this.attachNode) {
+            console.error('@ NewInstanceExpr.detach: Trying to detach node which isn\'t attached to this expression.');
+            return;
+        }
+        this.attachNode = null;
     }
 }
 
@@ -91,6 +119,43 @@ class DefineExpr extends ClampExpr {
     }
     get expr() { return this.children[1]; }
     get constructorArgs() { return [ this.expr.clone() ]; }
+    get notchPos() {
+        return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - this.notch.relpos) };
+    }
+    onmousedrag(pos) {
+        super.onmousedrag(pos);
+
+        if (this._attachNode) {
+            this._attachNode.detachAttachment(this);
+            this._attachNode = null;
+        }
+
+        const ATTACHMENT_THRESHOLD = 20;
+        let notchPos = this.notchPos;
+        let attachmentNodes = this.stage.getRootNodesThatIncludeClass(NewInstanceExpr);
+        attachmentNodes.forEach((node) => {
+            if (!node.isAttached()) {
+                let dist = distBetweenPos(notchPos, node.notchPos);
+                console.log(dist);
+                if (dist < ATTACHMENT_THRESHOLD) {
+                    node.stroke = { color:'magenta', lineWidth:4 };
+                    this._attachProspect = node;
+                } else {
+                    node.stroke = null;
+                    if (this._attachProspect && this._attachProspect == node)
+                        this._attachProspect = null;
+                }
+            }
+        });
+    }
+    onmouseup(pos) {
+        super.onmouseup(pos);
+        if (this._attachProspect) { // Snap this function block into the NewInstanceExpr notch:
+            this._attachProspect.attach(this);
+            this._attachNode = this._attachProspect;
+            this._attachProspect = null;
+        }
+    }
     onmouseclick() {
 
         if (this.funcname) {

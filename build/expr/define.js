@@ -1,5 +1,7 @@
 'use strict';
 
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -22,8 +24,46 @@ var NewInstanceExpr = function (_FadedValueExpr) {
         _this.padding.right = 20;
         _this.shadowOffset = 6;
         _this.radius = 3;
+        _this.attachNode = null;
         return _this;
     }
+
+    _createClass(NewInstanceExpr, [{
+        key: 'isAttached',
+        value: function isAttached() {
+            return this.attachNode ? true : false;
+        }
+    }, {
+        key: 'attach',
+        value: function attach(nodeWithNotch) {
+            if (!nodeWithNotch.notchPos) {
+                console.error('@ NewInstanceExpr.attach: Prospective attachment has no notchPos property.');
+                return;
+            }
+            this.attachNode = nodeWithNotch;
+            var notchPos = this.notchPos;
+            var nodeNotchDistY = nodeWithNotch.notchPos.y - nodeWithNotch.pos.y;
+            nodeWithNotch.pos = { x: notchPos.x, y: notchPos.y - nodeNotchDistY };
+            this.stroke = null;
+            Animate.blink(this, 500, [1, 0, 1], 1);
+            Animate.blink(nodeWithNotch, 500, [1, 0, 1], 1);
+        }
+    }, {
+        key: 'detachAttachment',
+        value: function detachAttachment(node) {
+            if (node != this.attachNode) {
+                console.error('@ NewInstanceExpr.detach: Trying to detach node which isn\'t attached to this expression.');
+                return;
+            }
+            this.attachNode = null;
+        }
+    }, {
+        key: 'notchPos',
+        get: function get() {
+            var upperLeftPos = this.upperLeftPos(this.absolutePos, this.absoluteSize);
+            return { x: upperLeftPos.x + this.size.w, y: upperLeftPos.y + this.size.h * this.notch.relpos };
+        }
+    }]);
 
     return NewInstanceExpr;
 }(FadedValueExpr);
@@ -159,6 +199,46 @@ var DefineExpr = function (_ClampExpr) {
     }
 
     _createClass(DefineExpr, [{
+        key: 'onmousedrag',
+        value: function onmousedrag(pos) {
+            var _this4 = this;
+
+            _get(DefineExpr.prototype.__proto__ || Object.getPrototypeOf(DefineExpr.prototype), 'onmousedrag', this).call(this, pos);
+
+            if (this._attachNode) {
+                this._attachNode.detachAttachment(this);
+                this._attachNode = null;
+            }
+
+            var ATTACHMENT_THRESHOLD = 20;
+            var notchPos = this.notchPos;
+            var attachmentNodes = this.stage.getRootNodesThatIncludeClass(NewInstanceExpr);
+            attachmentNodes.forEach(function (node) {
+                if (!node.isAttached()) {
+                    var dist = distBetweenPos(notchPos, node.notchPos);
+                    console.log(dist);
+                    if (dist < ATTACHMENT_THRESHOLD) {
+                        node.stroke = { color: 'magenta', lineWidth: 4 };
+                        _this4._attachProspect = node;
+                    } else {
+                        node.stroke = null;
+                        if (_this4._attachProspect && _this4._attachProspect == node) _this4._attachProspect = null;
+                    }
+                }
+            });
+        }
+    }, {
+        key: 'onmouseup',
+        value: function onmouseup(pos) {
+            _get(DefineExpr.prototype.__proto__ || Object.getPrototypeOf(DefineExpr.prototype), 'onmouseup', this).call(this, pos);
+            if (this._attachProspect) {
+                // Snap this function block into the NewInstanceExpr notch:
+                this._attachProspect.attach(this);
+                this._attachNode = this._attachProspect;
+                this._attachProspect = null;
+            }
+        }
+    }, {
         key: 'onmouseclick',
         value: function onmouseclick() {
 
@@ -227,6 +307,11 @@ var DefineExpr = function (_ClampExpr) {
         key: 'constructorArgs',
         get: function get() {
             return [this.expr.clone()];
+        }
+    }, {
+        key: 'notchPos',
+        get: function get() {
+            return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - this.notch.relpos) };
         }
     }]);
 
