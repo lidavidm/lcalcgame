@@ -316,6 +316,8 @@ class LambdaHoleExpr extends MissingExpression {
                     } else
                         stage.dumpState();
 
+                    return result;
+
                 } else {
                     console.warn('ERROR: Cannot perform lambda-substitution: Hole has no parent.');
 
@@ -329,11 +331,31 @@ class LambdaHoleExpr extends MissingExpression {
             if (level_idx < 1) {
                 Animate.tween(node, { opacity:0 }, 400, (elapsed) => Math.pow(elapsed, 0.5)).after(afterDrop);
             } else
-                afterDrop();
+                return afterDrop();
         }
     }
 
     toString() { return 'λ' + this.name; }
+}
+
+class DelayedLambdaHoleExpr extends LambdaHoleExpr {
+    ondropped(node, pos) {
+        if (node instanceof LambdaHoleExpr) node = node.parent;
+        // Disallow interaction with nested lambda
+        if (this.parent && this.parent.parent instanceof LambdaExpr) {
+            return null;
+        }
+        console.log(node, this.parent);
+        let parent = this.parent;
+        let stage = this.stage;
+        node.opacity = 1;
+        node.onmouseleave();
+        this.close_opened_subexprs();
+        let res = new ApplyExpr(node.clone(), this.parent.clone());
+        stage.remove(node);
+        (parent.parent || parent.stage).swap(parent, res);
+        return res;
+    }
 }
 
 class LambdaVarExpr extends ImageExpr {
@@ -541,6 +563,7 @@ class LambdaExpr extends Expression {
         return this.takesArgument && mag.Stage.getNodesWithClass(VarExpr, [], true, [this]).length === 0;
     }
     get body() { return this.takesArgument ? this.holes[1] : null; }
+    get hole() { return this.takesArgument ? this.holes[0] : null; }
     updateHole() {
         // Determine whether this LambdaExpr has any MissingExpressions:
         if (this.holes[0].name !== 'x')
@@ -1080,6 +1103,26 @@ class FadedES6LambdaHoleExpr extends LambdaHoleExpr {
                       this.label.absoluteSize.h,
                       6, false, true, this.stroke.opacity);
         }
+    }
+}
+
+class DelayedFadedES6LambdaHoleExpr extends FadedES6LambdaHoleExpr {
+    ondropped(node, pos) {
+        if (node instanceof LambdaHoleExpr) node = node.parent;
+        // Disallow interaction with nested lambda
+        if (this.parent && this.parent.parent instanceof LambdaExpr) {
+            return null;
+        }
+        console.log(node, this.parent);
+        let parent = this.parent;
+        let stage = this.stage;
+        node.opacity = 1;
+        node.onmouseleave();
+        this.close_opened_subexprs();
+        let res = new ApplyExpr(node.clone(), this.parent.clone());
+        stage.remove(node);
+        (parent.parent || parent.stage).swap(parent, res);
+        return res;
     }
 }
 
