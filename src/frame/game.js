@@ -599,6 +599,10 @@ class Goal {
 
     get nodeRepresentation() {
         var exprs = flatten(this.patterns.map((p) => p.exprs)).map((expr) => expr.clone());
+        var bg_accent = new mag.Circle(0, 0, 10);
+        bg_accent.color = "#0e0e7b";
+        bg_accent.shadowOffset = 0;
+        bg_accent.anchor = { x: 0.5, y: 0.5 };
         var bg = new mag.Circle(0, 0, 10);
         bg.color = "#2b1d0e";
         bg.shadowOffset = 0;
@@ -635,9 +639,16 @@ class Goal {
 
         let image = Resource.getImage(this.alien_image);
         let width = (70 / image.naturalHeight) * image.naturalWidth;
-        let alien = new mag.ImageRect(0, 0, width, 70, this.alien_image);
+        let offsetX = 0, offsetY = 0;
+        if (width > 70) {
+            offsetY = 0.25 * (width - 70);
+        }
+        else {
+            offsetX = 0.25 * (70 - width);
+        }
+        let alien = new mag.ImageRect(offsetX, offsetY, width, 70, this.alien_image);
 
-        node.addAll([bg, alien]);
+        node.addAll([bg_accent, bg, alien]);
 
         let lastExpr = exprs[exprs.length - 1];
         let firstExpr = exprs[0];
@@ -653,18 +664,22 @@ class Goal {
 
         bubble.push(bubbleRight);
 
-        let x = alien.pos.x + alien.size.w;
+        let x = alien.pos.x + alien.size.w - 10;
         for (let b of bubble) {
-            b.pos = { x: x, y: -10 };
+            b.pos = { x: x, y: -5 };
             x += b.size.w - 1;
         }
 
         node.addAll(bubble);
 
-        node.pos = { x: 10, y: 10 };
-        exprs_node.pos = { x: bubble[0].absolutePos.x + 0.3 * bubble[0].absoluteSize.w, y:10 };
-        bg.radius = Math.max(10 + alien.absolutePos.x + alien.absoluteSize.w, 70);
-        bg.radius = Math.max(10 + alien.absolutePos.y + alien.absoluteSize.h, bg.radius);
+        node.pos = { x: 5, y: 5 };
+        exprs_node.pos = { x: bubble[0].absolutePos.x + 0.3 * bubble[0].absoluteSize.w, y:15 };
+        bg.radius = Math.max(alien.absolutePos.x + alien.absoluteSize.w, 70);
+        bg.radius = Math.max(alien.absolutePos.y + alien.absoluteSize.h, bg.radius);
+        bg.radius += 10;
+        bg_accent.radius = bg.radius + 10;
+
+        window.test = alien;
 
         return [node, exprs_node];
     }
