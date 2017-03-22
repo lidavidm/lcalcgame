@@ -3,18 +3,6 @@
     "description":"Identity, Destruction, and Replication",
     "levels": [
         {
-            "description":"Test",
-            "board":"(λx /(ifelse (== #x #x) /(match) /(different))) (star)",
-            "goal":"star",
-            "toolbox":""
-        },
-        {
-            "description":"Test2",
-            "board":"(λx #x)(define _)(star)",
-            "goal":"star",
-            "toolbox":""
-        },
-        {
             "description":"Introduces concept: Identity.",
             "board":"(λx #x) (star)",
             "goal":"star",

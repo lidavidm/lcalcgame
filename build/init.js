@@ -32,9 +32,9 @@ function init() {
 
     if (!__SHOW_DEV_INFO) $('#devinfo').hide();
 
-    if (__GET_PARAMS) {
+    if (__GET_PARAMS || true) {
         var start_from = __GET_PARAMS.level;
-        var fade_level = __GET_PARAMS.fade;
+        var fade_level = __GET_PARAMS.fade || 4;
         //var playerId = __GET_PARAMS.player;
         if (start_from) {
             console.log(start_from);
@@ -185,6 +185,9 @@ function initMainMenu() {
         // stage.add(ee2);
         //
         // EntangledExpr.pairedAnimate(ee, ee2);
+
+        var typebox = new TypeBox(200, 200, 80, 40);
+        stage.add(typebox);
 
         // let obj = new ArrayObjectExpr(new BracketArrayExpr(0, 0, 44, 44));
         // obj.pos = { x:200, y:200 };

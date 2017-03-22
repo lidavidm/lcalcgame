@@ -1,7 +1,7 @@
 class TextExpr extends Expression {
     constructor(txt, font='Consolas', fontSize=35) {
         super();
-        this.text = txt;
+        this._text = txt;
         this.font = font;
         this.fontSize = fontSize; // in pixels
         this.color = 'black';
@@ -11,10 +11,20 @@ class TextExpr extends Expression {
         this._xOffset = 0;
         this._sizeOffset = { w:0, h:0 };
     }
+    get text() {
+        return this._text;
+    }
+    set text(txt) {
+        this._text = txt;
+        this._sizeCache = null; // invalidate size
+    }
     get size() {
         var ctx = this.ctx || GLOBAL_DEFAULT_CTX;
-        if (!ctx || !this.text || this.text.length === 0) {
+        if (!ctx) {
             console.error('Cannot size text: No context.');
+            return { w:4+this._sizeOffset.w, h:this.fontSize+this._sizeOffset.h };
+        }
+        else if (!this.text || this.text.length === 0) {
             return { w:4+this._sizeOffset.w, h:this.fontSize+this._sizeOffset.h };
         }
         else if (this.manualWidth) {

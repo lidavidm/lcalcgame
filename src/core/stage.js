@@ -425,6 +425,9 @@ var mag = (function(_) {
                 this.draw();
             }
         }
+        onkeydown(event) {}
+        onkeypress(event) {}
+        onkeyup(event) {}
         getHitNodes(pos, options={}) {
             var hits = [];
             var hitnode = null;
@@ -518,6 +521,41 @@ var mag = (function(_) {
                 return false;
             };
 
+            // Keyboard events
+            var getCBKeyEvent = (e) => { // Cross-browser wrapper for key events.
+                let keycode = e.which || e.keyCode;
+                let character = String.fromCharCode(keycode || e.charCode);
+                return {
+                    keyCode:keycode,
+                    char:character,
+                    shiftKey: e.shiftKey,
+                    ctrlKey: e.ctrlKey,
+                    altKey: e.altKey,
+                    metaKey: e.metaKey
+                };
+            };
+            var onkeydown = (e) => {
+                let event = getCBKeyEvent(e);
+                stage.onkeydown(event);
+                if(e.keyCode == 32) {
+                    stage.onkeypress(event);
+                    e.preventDefault();
+                }
+            };
+            var onkeypress = (e) => {
+                let event = getCBKeyEvent(e);
+                console.log(event.char);
+                stage.onkeypress(event);
+            };
+            var onkeyup = (e) => {
+                let event = getCBKeyEvent(e);
+                stage.onkeyup(event);
+            };
+            window.addEventListener('keydown', onkeydown, false);
+            window.addEventListener('keypress', onkeypress, false);
+            window.addEventListener('keyup', onkeyup, false);
+
+            // Touch events
             var ontouchstart = function(e) {
 
                 var pos = getMousePos( getTouch(e) );
