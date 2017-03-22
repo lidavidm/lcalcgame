@@ -128,7 +128,6 @@ var TypeBox = function (_mag$Rect) {
                 if (!block) return;
             }
 
-            block.lockSubexpressions();
             block.update();
             block.pos = this.absolutePos;
             block.anchor = { x: 0, y: 0 };

@@ -81,7 +81,6 @@ var PlayPenExpr = function (_ExpressionPlus) {
                     attachmentNodes.forEach(function (node) {
                         if (!node.isAttached()) {
                             var dist = distBetweenPos(notchPos, node.notchPos);
-                            console.log(dist);
                             if (dist < ATTACHMENT_THRESHOLD) {
                                 node.stroke = { color: 'magenta', lineWidth: 4 };
                                 _this2._attachProspect = node;

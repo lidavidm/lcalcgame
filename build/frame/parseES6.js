@@ -20,6 +20,14 @@ var ES6Parser = function () {
     }
 
     _createClass(ES6Parser, null, [{
+        key: 'lockFilter',
+        value: function lockFilter(n) {
+            if (n.__remain_unlocked) {
+                n.__remain_unlocked = undefined;
+                return false;
+            } else return true;
+        }
+    }, {
         key: 'parse',
         value: function parse(program) {
             var _this = this;
@@ -47,7 +55,9 @@ var ES6Parser = function () {
             // return a Sequence Expression (representing a multi-line program).
             var statements = AST.body;
             if (statements.length === 1) {
-                return this.parseNode(statements[0]);
+                var expr = this.parseNode(statements[0]);
+                expr.lockSubexpressions(this.lockFilter);
+                return expr;
             } else {
                 var exprs = statements.map(function (n) {
                     return _this.parseNode(n);
@@ -113,6 +123,24 @@ var ES6Parser = function () {
                 /* A single statement like (x == x); or (x) => x; */
                 'ExpressionStatement': function ExpressionStatement(node) {
                     return _this2.parseNode(node.expression);
+                },
+
+                /* A function call of the form f(x) */
+                'CallExpression': function CallExpression(node) {
+                    if (node.callee.type === 'Identifier' && node.callee.name === '$') {
+                        if (node.arguments.length === 0 || node.arguments.length > 1) {
+                            console.error('Malformed unlock expression $ with ' + node.arguments.length + ' arguments.');
+                            return null;
+                        } else {
+                            var unlocked_expr = _this2.parseNode(node.arguments[0]);
+                            unlocked_expr.unlock();
+                            unlocked_expr.__remain_unlocked = true; // When all inner expressions are locked in parse(), this won't be.
+                            return unlocked_expr;
+                        }
+                    } else {
+                        console.error('Call expressions outside of the special $() unlock syntax are currently undefined.');
+                        return null;
+                    }
                 },
 
                 /* Anonymous functions of the form (x) => x */

@@ -60,7 +60,6 @@ class PlayPenExpr extends ExpressionPlus {
             attachmentNodes.forEach((node) => {
                 if (!node.isAttached()) {
                     let dist = distBetweenPos(notchPos, node.notchPos);
-                    console.log(dist);
                     if (dist < ATTACHMENT_THRESHOLD) {
                         node.stroke = { color:'magenta', lineWidth:4 };
                         this._attachProspect = node;

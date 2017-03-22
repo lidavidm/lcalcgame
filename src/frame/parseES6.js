@@ -8,6 +8,13 @@
 
 class ES6Parser {
 
+    static lockFilter(n) {
+        if (n.__remain_unlocked) {
+            n.__remain_unlocked = undefined;
+            return false;
+        } else return true;
+    }
+
     static parse(program) {
         if (!esprima) {
             console.error('Cannot parse ES6 program: Esprima.js not found. \
@@ -30,7 +37,9 @@ class ES6Parser {
         // return a Sequence Expression (representing a multi-line program).
         let statements = AST.body;
         if (statements.length === 1) {
-            return this.parseNode(statements[0]);
+            let expr = this.parseNode(statements[0]);
+            expr.lockSubexpressions(this.lockFilter);
+            return expr;
         } else {
             let exprs = statements.map((n) => this.parseNode(n));
             return new Sequence(...exprs);
@@ -89,6 +98,24 @@ class ES6Parser {
             /* A single statement like (x == x); or (x) => x; */
             'ExpressionStatement': (node) => {
                 return this.parseNode(node.expression);
+            },
+
+            /* A function call of the form f(x) */
+            'CallExpression': (node) => {
+                if (node.callee.type === 'Identifier' && node.callee.name === '$') {
+                    if (node.arguments.length === 0 || node.arguments.length > 1) {
+                        console.error('Malformed unlock expression $ with ' + node.arguments.length + ' arguments.');
+                        return null;
+                    } else {
+                        let unlocked_expr = this.parseNode(node.arguments[0]);
+                        unlocked_expr.unlock(); 
+                        unlocked_expr.__remain_unlocked = true; // When all inner expressions are locked in parse(), this won't be.
+                        return unlocked_expr;
+                    }
+                } else {
+                    console.error('Call expressions outside of the special $() unlock syntax are currently undefined.');
+                    return null;
+                }
             },
 
             /* Anonymous functions of the form (x) => x */
