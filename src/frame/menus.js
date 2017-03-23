@@ -948,7 +948,7 @@ class ChapterSelectShip extends mag.RotatableImageRect {
             let mask = new Mask(0, 0, 0.01, "#FFFFFF");
             this.stage.add(mask);
 
-            let flash = after(100)
+            let flash = after(200)
                 .then(() => promisify(Animate.tween(mask, {
                     opacity: 1.0,
                 }, 100)))

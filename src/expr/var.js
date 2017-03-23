@@ -645,3 +645,88 @@ class EqualsAssignExpr extends AssignExpr {
         this.arrowLabel.text = "=";
     }
 }
+
+class VtableVarExpr extends ObjectExtensionExpr {
+    constructor(name) {
+        super(new LabeledVarExpr(name), {});
+
+        this.removeChild(this.drawer);
+        let drawer = new DynamicPulloutDrawer(this.size.w, this.size.h/2, 8, 32, this, this.drawer.onCellSelect);
+        drawer.anchor = { x:0, y:0.32 };
+        this.addChild(drawer);
+        this.drawer = drawer;
+    }
+
+    get variable() {
+        return this.holes[0];
+    }
+
+    get value() {
+        if (this.variable && this.variable.canReduce()) {
+            return this.getEnvironment().lookup(this.variable.name);
+        }
+        return null;
+    }
+
+    get objMethods() {
+        let value = this.value;
+        if (value) {
+            return value.objMethods;
+        }
+        return {};
+    }
+
+    set objMethods(x) {
+
+    }
+
+    draw(ctx) {
+        let value = this.value;
+        if (value && value.color) {
+            this.color = value.color;
+            this.variable.color = value.color;
+        }
+        super.draw(ctx);
+    }
+
+    reduce() {
+        if (!this.subReduceMethod) return this;
+        let value = this.variable.reduce();
+        if (value instanceof ObjectExtensionExpr) {
+            value = value.holes[0];
+        }
+        this.swap(this.variable, value);
+        value.lock();
+        return super.reduce();
+    }
+}
+
+class DynamicPulloutDrawer extends PulloutDrawer {
+    constructor(x, y, w, h, parent, onCellSelect) {
+        super(x, y, w, h, parent.objMethods, onCellSelect);
+        this.parent = parent;
+    }
+
+    open() {
+        // Generate TextExpr for each property:
+        let txts = [];
+        let propertyTree = this.parent.objMethods;
+        for (var key in propertyTree) {
+            if (propertyTree.hasOwnProperty(key)) {
+                let str = '.' + key;
+                if (typeof propertyTree[key] === 'function' && propertyTree[key].length > 1) {
+                    str += '(..)';
+                } else {
+                    str += '()';
+                }
+                let t = new TextExpr(str);
+                t.ignoreEvents = true;
+                t._reduceMethod = propertyTree[key];
+                txts.push( t );
+            }
+        }
+        this.txts = txts;
+
+        super.open();
+    }
+}
