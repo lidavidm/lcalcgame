@@ -425,7 +425,8 @@ class AssignExpr extends Expression {
     }
 
     canReduce() {
-        return this.value && this.variable && (this.value.canReduce() || this.value.isValue()) && this.variable instanceof VarExpr;
+        return this.value && this.variable && (this.value.canReduce() || this.value.isValue()) &&
+            (this.variable instanceof VarExpr || this.variable instanceof AssignExpr);
     }
 
     reduce() {
@@ -653,8 +654,16 @@ class VtableVarExpr extends ObjectExtensionExpr {
         this.removeChild(this.drawer);
         let drawer = new DynamicPulloutDrawer(this.size.w, this.size.h/2, 8, 32, this, this.drawer.onCellSelect);
         drawer.anchor = { x:0, y:0.32 };
-        this.addChild(drawer);
         this.drawer = drawer;
+        this.addChild(this.drawer);
+        this.hasVtable = false;
+    }
+
+    // Behave like a VarExpr
+    open() {}
+    close() {}
+    get name() {
+        return this.variable.name;
     }
 
     get variable() {
@@ -680,17 +689,34 @@ class VtableVarExpr extends ObjectExtensionExpr {
 
     }
 
-    draw(ctx) {
+    update() {
+        super.update();
+        this.updateVtable();
+    }
+
+    updateVtable() {
         let value = this.value;
-        if (value && value.color) {
-            this.color = value.color;
-            this.variable.color = value.color;
+        if (value) {
+            if (value.color) {
+                this.color = value.color;
+                this.variable.color = value.color;
+            }
+
+            if (value instanceof ObjectExtensionExpr) {
+                this.hasVtable = true;
+            }
+            else {
+                this.hasVtable = false;
+            }
         }
-        super.draw(ctx);
+        else {
+            this.hasVtable = false;
+        }
     }
 
     reduce() {
-        if (!this.subReduceMethod) return this;
+        if (!this.hasVtable) return this.value;
+        if (!this.subReduceMethod) return this.value;
         let value = this.variable.reduce();
         if (value instanceof ObjectExtensionExpr) {
             value = value.holes[0];
@@ -703,7 +729,8 @@ class VtableVarExpr extends ObjectExtensionExpr {
 
 class DynamicPulloutDrawer extends PulloutDrawer {
     constructor(x, y, w, h, parent, onCellSelect) {
-        super(x, y, w, h, parent.objMethods, onCellSelect);
+        // Guard against null parent for cloning
+        super(x, y, w, h, parent ? parent.objMethods : {}, onCellSelect);
         this.parent = parent;
     }
 

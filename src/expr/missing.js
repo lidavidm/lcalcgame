@@ -226,8 +226,13 @@ class MissingChestExpression extends MissingTypedExpression {
         this.label = new TextExpr("xy");
         this.label.color = "#AAA";
         this.addArg(this.label);
+        this.acceptedClasses = [ VarExpr, VtableVarExpr ];
     }
     getClass() { return MissingChestExpression; }
+
+    accepts(expr) {
+        return (expr instanceof VarExpr) || (expr instanceof VtableVarExpr && !expr.subReduceMethod);
+    }
 }
 
 class MissingSequenceExpression extends MissingExpression {

@@ -315,7 +315,7 @@ class BracketArrayExpr extends BagExpr {
 
     // Adds an item to the bag.
     addItem(item) {
-        if (item instanceof VarExpr) {
+        if (item instanceof VarExpr || item instanceof VtableVarExpr) {
             // Reduce variables in our context. This is technically
             // not correct, but at this point, we have no idea what
             // the variable's original context was anymore.

@@ -1182,7 +1182,8 @@ function findNoncapturingVarExpr(lambda, name, skipLambda=false, skipLabel=false
     let queue = [lambda];
     while (queue.length > 0) {
         let node = queue.pop();
-        if (node instanceof VarExpr || node instanceof LambdaVarExpr) {
+        let isVar = node instanceof VarExpr || node instanceof LambdaVarExpr || node instanceof VtableVarExpr;
+        if (isVar) {
             subvarexprs.push(node);
         }
         else if (!skipLabel && (node instanceof DisplayChest || node instanceof LabeledDisplay || node instanceof SpreadsheetDisplay)) {
@@ -1196,7 +1197,7 @@ function findNoncapturingVarExpr(lambda, name, skipLambda=false, skipLabel=false
             continue;
         }
 
-        if (node.children) {
+        if (node.children && !isVar) {
             queue = queue.concat(node.children);
         }
 
