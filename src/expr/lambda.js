@@ -720,7 +720,10 @@ class EnvironmentLambdaExpr extends LambdaExpr {
         // Since the hole isn't removed by our override of removeArg,
         // account for that when deciding whether the lambda is
         // reducible
-        return this.holes.length > 0 && this.holes[0] instanceof LambdaHoleExpr && this.holes[0].isOpen;
+        return this.holes.length > 0 && this.holes[0] instanceof LambdaHoleExpr && !this._originalArg;
+        // We can't check isOpen because that confuses
+        // LambdaExpr#hitsChild (which means that we can't do things
+        // like drag expressions into holes!)
     }
 
     hits(pos, options=undefined) {
@@ -785,9 +788,7 @@ class EnvironmentLambdaExpr extends LambdaExpr {
     }
 
     onmouseclick() {
-        if (!this._animating) {
-            this.performReduction(true);
-        }
+        // Don't let the player manually reduce (whatever that even means)
     }
 
     performReduction(animated=false) {
