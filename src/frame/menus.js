@@ -121,6 +121,13 @@ class MenuStar extends mag.ImageRect {
         };
         blink();
     }
+
+    drawInternal(ctx, pos, boundingSize) {
+        if (this.parent && Number.isNumber(this.parent.opacity)) {
+            ctx.globalAlpha = this.parent.opacity * (this.opacity || 1.0);
+        }
+        super.drawInternal(ctx, pos, boundingSize);
+    }
 }
 
 class MainMenu extends mag.Stage {
@@ -636,6 +643,9 @@ class PlanetCard extends mag.ImageRect {
     }
 
     drawInternal(ctx, pos, boundingSize) {
+        if (this.parent && Number.isNumber(this.parent.opacity)) {
+            ctx.globalAlpha = this.parent.opacity * (this.opacity || 1.0);
+        }
         if (this.highlighted || (this.selected && this.scale.x < 1.1)) {
             this.glow.parent = this;
             this.glow.draw(ctx);
@@ -824,7 +834,7 @@ class ChapterSelectShip extends mag.RotatableImageRect {
     }
 
     // Fly to another planet. (entire sequence)
-    flyToPlanet(startPlanet, endPlanet) {
+    flyToPlanet(stage, startPlanet, endPlanet) {
         // Hide the local ships and make the world ship
         // the only ship visible.
         this.pos = startPlanet.relativeLandingPoint;
@@ -834,7 +844,8 @@ class ChapterSelectShip extends mag.RotatableImageRect {
         const startScale = this.scale.x;
         const endScale = endPlanet.radius / 120 / 2;
         let dest = endPlanet.relativeLandingPoint;
-        let aboveOrbitDest = addPos(dest, { x:0, y:-20 });
+        let aboveOrbitDest = addPos(endPlanet.landingPoint, { x:0, y: -75 });
+        let relativeAboveOrbitDest = addPos(dest, { x:0, y: -75 });
         let pointing = fromTo(this.pos, aboveOrbitDest);
         let pointAngle = Math.atan2(pointing.y, pointing.x);
         this.trail.opacity = 0;
@@ -856,40 +867,184 @@ class ChapterSelectShip extends mag.RotatableImageRect {
         const travelDist = distBetweenPos(this.pos, dest);
         const duration = travelDist / 100 * 1000;
 
-        return new Promise((resolve, reject) => {
-            let del = 0;
-            Animate.run((e) => {
-                this.trail.opacity = Math.pow(e, 0.2);
-                this.trail.time += (e - del) * 8000;
-                del = e;
-
-                // Smooth out start/end
-                let t = e;
-                if (e < 0.2) {
-                    t = e/2;
-                }
-                else if (e > 0.8) {
-                    t = 0.5 + e/2;
-                }
-                else {
-                    t = (4*e)/3 - 0.16667;
-                }
-                this.pos = cubicBezierPoint(start, end, control1, control2, t);
-                let prevPos = cubicBezierPoint(start, end, control1, control2, t - 0.01);
-                let dy = this.pos.y - prevPos.y;
-                let dx = this.pos.x - prevPos.x;
-                let angle = Math.atan2(dy, dx);
-                this.rotation = angle;
-            }, duration).after(() => {
-                resolve();
+        let promisify = (x) => {
+            return new Promise((resolve, reject) => {
+                x.after(resolve);
             });
+        };
+
+        let stars = [];
+        let starParent = new mag.Rect(0, 0, 0, 0);
+        starParent.opacity = 0;
+        stage.add(starParent);
+
+        for (let i = 0; i < 120; i++) {
+            let star = new MenuStar();
+            star.pos = randomPointInRect({ x: 0, y: 0, w: stage.boundingSize.w, h: stage.boundingSize.h });
+            let scale = Math.random() * 0.2 + 0.1;
+            star.scale = { x: scale, y: scale };
+            starParent.addChild(star);
+            stars.push(star);
+        }
+
+        // The initial launch
+        let launch = promisify(Animate.tween(this, {
+            pos: addPos(this.pos, { x: 0, y: -100 }),
+        }, 1000));
+        let del = 0;
+        let launchTrail = promisify(Animate.run((e) => {
+            this.trail.opacity = Math.min(0.4, Math.pow(e, 0.05));
+            this.trail.time += (e - del) * 4000;
+            del = e;
+        }, 1250));
+
+        return launch.then(() => {
+            let p = this.absolutePos;
+            stage.planetParent.removeChild(this);
+            stage.add(this);
+            this.pos = p;
+            this.parent = null;
+
+            let rotate = promisify(Animate.tween(this, {
+                rotation: 0,
+            }, 600));
+
+            // Zoom in on Starchild
+            let zoomShip = promisify(Animate.tween(this, {
+                scale: { x: 5, y: 5 },
+                pos: {
+                    x: (stage.boundingSize.w / 2 - 2.5 * this.size.w),
+                    y: (stage.boundingSize.h / 2 - 2.5*this.size.h),
+                },
+            }, 600));
+
+            stage.starParent.opacity = 1.0;
+            let fadeOutStars = promisify(Animate.tween(stage.starParent, {
+                opacity: 0,
+            }, 400));
+
+            let fadeInStars = promisify(Animate.tween(starParent, {
+                opacity: 0.7,
+            }, 400));
+
+            stage.planetParent.opacity = 1.0;
+            let zoom = promisify(Animate.tween(stage.planetParent, {
+                opacity: 0,
+            }, 600));
+
+            return Promise.all([zoomShip, zoom, launchTrail, fadeOutStars, fadeInStars]);
         }).then(() => {
-            return this.land(dest);
+            // Prepare for ignition
+            this.trail.time = 0;
+            return promisify(Animate.tween(this.trail, {
+                opacity: 0,
+                time: 500,
+            }, 300)).then(() => promisify(Animate.tween(this.trail, {
+                opacity: 1.0,
+                time: 2500,
+            }, 200)));
         }).then(() => {
-            this.planet = endPlanet;
+            // Enter warp space!
+            let mask = new Mask(0, 0, 0.01, "#FFFFFF");
+            this.stage.add(mask);
+
+            let flash = after(100)
+                .then(() => promisify(Animate.tween(mask, {
+                    opacity: 1.0,
+                }, 100)))
+                .then(() => promisify(Animate.tween(mask, {
+                    opacity: 0.0,
+                }, 100)))
+                .then(() => this.stage.remove(mask));
+
+            let jumpForward = promisify(Animate.tween(this, {
+                pos: addPos(this.pos, { x: 300, y: 0 }),
+            }, 300));
+
+            return jumpForward;
+        }).then(() => {
+            // Cruising along
+            let jumpBack = promisify(Animate.tween(this, {
+                pos: addPos(this.pos, { x: -300, y: 0 }),
+            }, 1000));
+
+            const origSize = stars[0].size;
+            let sizer = stars[0].size;
+            stars.forEach((s) => s.size = sizer);
+            let starStretch = promisify(Animate.tween(sizer, {
+                w: 450,
+                h: 6,
+            }, 600));
+
+            const flyingDuration = 6000;
+            const deceleration = 0.75;
+
+            let t0 = 0;
+            let flying = promisify(Animate.run((t1) => {
+                this.trail.time += 8000 * (t1 - t0);
+
+                let dx = 15000 * (t1 - t0);
+                if (t1 > deceleration) dx *= (-4 * t1 + 4);
+                stars.forEach((s) => {
+                    s.pos = addPos(s.pos, { x: -dx, y: 0 });
+                    if (s.pos.x < 0) {
+                        s.pos = { x: stage.boundingSize.w * (0.9 + Math.random() / 5), y: s.pos.y };
+                    }
+                });
+
+                t0 = t1;
+            }, flyingDuration));
+
+            let slowing = after(flyingDuration - 500).then(() => {
+                return promisify(Animate.tween(sizer, origSize, 500));
+            });
+
+            return Promise.all([flying, slowing]);
+        }).then(() => {
+            // Come out of warp space
+            let turnOffEngine = promisify(Animate.tween(this.trail, {
+                opacity: 0,
+            }, 400));
+
+            // Zoom back out
+            let zoomShip = promisify(Animate.tween(this, {
+                scale: { x: endScale, y: endScale },
+                pos: aboveOrbitDest,
+            }, 600));
+
+            let fadeInStars = promisify(Animate.tween(stage.starParent, {
+                opacity: 1.0,
+            }, 400));
+
+            let fadeOutStars = promisify(Animate.tween(starParent, {
+                opacity: 0,
+            }, 400));
+
+            let rotate = after(400).then(() => {
+                return promisify(Animate.tween(this, {
+                    rotation: -Math.PI / 2,
+                }, 600));
+            });
+
+            let zoom = promisify(Animate.tween(stage.planetParent, {
+                opacity: 1,
+            }, 600));
+
+            return Promise.all([turnOffEngine, rotate, zoomShip, zoom, fadeOutStars, fadeInStars]);
+        }).then(() => {
+            stage.remove(this);
+            stage.planetParent.addChild(this);
+            this.pos = relativeAboveOrbitDest;
+            let land = promisify(Animate.tween(this, {
+                pos: dest,
+            }, 1000));
+            return land;
+        }).then(() => {
             endPlanet.showShip(this);
+            stage.remove(starParent);
         });
     }
+
     attachToPlanet(planet) {
         this.pos = planet.landingPoint;
         this.planet = planet;
@@ -970,6 +1125,16 @@ class ChapterSelectShip extends mag.RotatableImageRect {
         // });
         // twn.run();
     }
+
+
+    drawInternal(ctx, pos, boundingSize) {
+        // Need to save pos for later because it gets changed in the middle??
+        this._savedPos = pos;
+    }
+    drawInternalAfterChildren(ctx, pos, boundingSize) {
+        pos = this._savedPos;
+        super.drawInternal(ctx, pos, boundingSize);
+    }
 }
 
 class ChapterSelectMenu extends mag.Stage {
@@ -1032,7 +1197,7 @@ class ChapterSelectMenu extends mag.Stage {
                         this.remove(ship);
                         this.planetParent.addChild(ship);
                         let startPlanet = lastActivePlanet;
-                        ship.flyToPlanet(startPlanet, newPlanet).then(() => {
+                        ship.flyToPlanet(this, startPlanet, newPlanet).then(() => {
                             return new Promise((resolve, reject) => {
                                 Animate.wait(600).after(() => {
                                     this.planetParent.removeChild(ship);
@@ -1587,7 +1752,7 @@ function topologicalSort(adjacencyList) {
 }
 
 class Mask extends mag.Rect {
-    constructor(cx, cy, r) {
+    constructor(cx, cy, r, color="#594764") {
         super(0, 0, 0, 0);
         // cx, cy are in % of context width/height
         this.cx = cx;
@@ -1595,6 +1760,7 @@ class Mask extends mag.Rect {
         this.radius = r;
         this.opacity = 0.0;
         this.ringControl = 0;
+        this.color = color;
     }
 
     drawInternal(ctx, pos, boundingSize) {
@@ -1608,7 +1774,7 @@ class Mask extends mag.Rect {
         let cy = this.cy * h;
 
         ctx.globalAlpha = this.opacity;
-        ctx.fillStyle = "#594764";
+        ctx.fillStyle = this.color;
         ctx.beginPath();
         ctx.arc(cx, cy, this.radius, 0, 2 * Math.PI);
         ctx.rect(w, 0, -w, h);
