@@ -905,6 +905,8 @@ class ChapterSelectShip extends mag.RotatableImageRect {
             this.pos = p;
             this.parent = null;
 
+            this.image = 'ship-large-starboy';
+
             let rotate = promisify(Animate.tween(this, {
                 rotation: 0,
             }, 600));
@@ -1032,6 +1034,7 @@ class ChapterSelectShip extends mag.RotatableImageRect {
 
             return Promise.all([turnOffEngine, rotate, zoomShip, zoom, fadeOutStars, fadeInStars]);
         }).then(() => {
+            this.image = 'ship-large';
             stage.remove(this);
             stage.planetParent.addChild(this);
             this.pos = relativeAboveOrbitDest;
