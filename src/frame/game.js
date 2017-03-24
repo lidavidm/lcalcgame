@@ -598,6 +598,10 @@ class Goal {
     }
 
     get nodeRepresentation() {
+        const md = new MobileDetect(window.navigator.userAgent);
+        const BUBBLE_HEIGHT = (__IS_MOBILE && md.phone()) ? 70 : 80;
+        const ALIEN_HEIGHT = (__IS_MOBILE && md.phone()) ? 50 : 70;
+
         var exprs = flatten(this.patterns.map((p) => p.exprs)).map((expr) => expr.clone());
         var bg_accent = new mag.Circle(0, 0, 10);
         bg_accent.color = "#0e0e7b";
@@ -614,11 +618,11 @@ class Goal {
         let bubbleLeftImage = Resource.getImage('caption-long-left');
         let bubbleRightImage = Resource.getImage('caption-long-right');
         let bubbleMidImage = Resource.getImage('caption-long-mid');
-        let bubbleLeftWidth = (80 / bubbleLeftImage.naturalHeight) * bubbleLeftImage.naturalWidth;
-        let bubbleRightWidth = (80 / bubbleRightImage.naturalHeight) * bubbleRightImage.naturalWidth;
-        let bubbleMidWidth = (80 / bubbleMidImage.naturalHeight) * bubbleMidImage.naturalWidth;
-        let bubbleLeft = new mag.ImageRect(0, 0, bubbleLeftWidth, 80, 'caption-long-left');
-        let bubbleRight = new mag.ImageRect(0, 0, bubbleRightWidth, 80, 'caption-long-right');
+        let bubbleLeftWidth = (BUBBLE_HEIGHT / bubbleLeftImage.naturalHeight) * bubbleLeftImage.naturalWidth;
+        let bubbleRightWidth = (BUBBLE_HEIGHT / bubbleRightImage.naturalHeight) * bubbleRightImage.naturalWidth;
+        let bubbleMidWidth = (BUBBLE_HEIGHT / bubbleMidImage.naturalHeight) * bubbleMidImage.naturalWidth;
+        let bubbleLeft = new mag.ImageRect(0, 0, bubbleLeftWidth, BUBBLE_HEIGHT, 'caption-long-left');
+        let bubbleRight = new mag.ImageRect(0, 0, bubbleRightWidth, BUBBLE_HEIGHT, 'caption-long-right');
 
         var exprs_node = new mag.Rect(0,0,0,0);
         exprs_node.addAll(exprs);
@@ -638,15 +642,15 @@ class Goal {
         }
 
         let image = Resource.getImage(this.alien_image);
-        let width = (70 / image.naturalHeight) * image.naturalWidth;
+        let width = (ALIEN_HEIGHT / image.naturalHeight) * image.naturalWidth;
         let offsetX = 0, offsetY = 0;
-        if (width > 70) {
-            offsetY = 0.25 * (width - 70);
+        if (width > ALIEN_HEIGHT) {
+            offsetY = 0.25 * (width - ALIEN_HEIGHT);
         }
         else {
-            offsetX = 0.25 * (70 - width);
+            offsetX = 0.25 * (ALIEN_HEIGHT - width);
         }
-        let alien = new mag.ImageRect(offsetX, offsetY, width, 70, this.alien_image);
+        let alien = new mag.ImageRect(offsetX, offsetY, width, ALIEN_HEIGHT, this.alien_image);
 
         node.addAll([bg_accent, bg, alien]);
 
@@ -659,7 +663,7 @@ class Goal {
 
         while (exprsWidth > 0) {
             exprsWidth -= bubbleMidWidth - 1;
-            bubble.push(new mag.ImageRect(0, 0, bubbleMidWidth, 80, 'caption-long-mid'));
+            bubble.push(new mag.ImageRect(0, 0, bubbleMidWidth, BUBBLE_HEIGHT, 'caption-long-mid'));
         }
 
         bubble.push(bubbleRight);
@@ -674,7 +678,7 @@ class Goal {
 
         node.pos = { x: 5, y: 5 };
         exprs_node.pos = { x: bubble[0].absolutePos.x + 0.3 * bubble[0].absoluteSize.w, y:15 };
-        bg.radius = Math.max(alien.absolutePos.x + alien.absoluteSize.w, 70);
+        bg.radius = Math.max(alien.absolutePos.x + alien.absoluteSize.w, ALIEN_HEIGHT);
         bg.radius = Math.max(alien.absolutePos.y + alien.absoluteSize.h, bg.radius);
         bg.radius += 10;
         bg_accent.radius = bg.radius + 10;

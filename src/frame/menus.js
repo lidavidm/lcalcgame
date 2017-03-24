@@ -1305,7 +1305,7 @@ class ChapterSelectMenu extends mag.Stage {
     onorientationchange() {
         if (__IS_MOBILE) {
             if (this.md.phone()) {
-                this.scale = 2.4;
+                this.scale = 1.0;
             }
             else if (this.md.tablet()) {
                 this.scale = 1.2;

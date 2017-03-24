@@ -1,4 +1,3 @@
-const TOOLBOX_HEIGHT = 90;
 const UI_PADDING = 10;
 
 /** A subclass of Stage that assumes Nodes are Expressions
@@ -12,9 +11,14 @@ class ReductStage extends mag.Stage {
         this.onorientationchange();
     }
 
+    get toolboxHeight() {
+        return (__IS_MOBILE && this.md.phone()) ? 70 : 90;
+    }
+
     buildUI(showEnvironment, envDisplayWidth) {
+        const TOOLBOX_HEIGHT = this.toolboxHeight;
+
         let canvas_screen = this.boundingSize;
-        let UI_PADDING = 10;
 
         var btn_back = new mag.Button(canvas_screen.w - 64*4 - UI_PADDING, UI_PADDING, 64, 64,
             { default:'btn-back-default', hover:'btn-back-hover', down:'btn-back-down' },
@@ -113,11 +117,11 @@ class ReductStage extends mag.Stage {
 
         this.toolbox.pos = {
             x: 0,
-            y: canvas_screen.h - TOOLBOX_HEIGHT,
+            y: canvas_screen.h - this.toolboxHeight,
         };
         this.toolbox.size = {
             w: canvas_screen.w,
-            h: TOOLBOX_HEIGHT,
+            h: this.toolboxHeight,
         };
 
         let yOffset = btn_reset.absoluteSize.h + btn_reset.absolutePos.y + 20;
@@ -127,7 +131,7 @@ class ReductStage extends mag.Stage {
         };
         this.environmentDisplay._size = {
             w: this.environmentDisplay.size.w,
-            h: canvas_screen.h - TOOLBOX_HEIGHT - yOffset,
+            h: canvas_screen.h - this.toolboxHeight - yOffset,
         };
     }
 
@@ -307,7 +311,7 @@ class ReductStage extends mag.Stage {
     onorientationchange() {
         if (__IS_MOBILE) {
             if (this.md.phone()) {
-                this.scale = 2.4;
+                this.scale = 1.0;
             }
             else if (this.md.tablet()) {
                 this.scale = 1.2;
