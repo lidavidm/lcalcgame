@@ -491,7 +491,9 @@ class Level {
 
         var candidates = [];
         var CANDIDATE_THRESHOLD = 10;
-        while (candidates.length < CANDIDATE_THRESHOLD) {
+        let iterations = 0;
+        while (candidates.length < CANDIDATE_THRESHOLD && iterations < 10000) {
+            iterations++;
 
             // 1. Put the expressions in random places.
             for (let e of es) {
