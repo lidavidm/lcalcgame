@@ -475,6 +475,29 @@ class Expression extends mag.RoundedRect {
             this.stage.bringToFront(this);
             this.dragging = true;
         }
+
+        // Fire notch events
+        if (!this._prev_notch_objs) this._prev_notch_objs = [];
+        let notchEventObjs = this.findCompatibleNotches();
+        if (notchEventObjs.length !== 0 || this._prev_notch_objs.length !== 0) { // If some notch has entered our field of view...
+            console.log(notchEventObjs);
+            // Determine which notches are hovering:
+            notchEventObjs.forEach((o) => { // Prev intersects Curr
+                let hovering = this._prev_notch_objs.filter((a) => (a.notch == o.notch));
+                hovering.forEach((h) => this.onNotchHover(h.otherNotch, h.otherExpr, h.notch));
+            });
+            // Determine which notches entered our view:
+            let entering = notchEventObjs.filter((n) => { // Curr - Prev
+                return this._prev_notch_objs.filter((a) => a.notch == n.notch).length === 0;
+            });
+            entering.forEach((h) => this.onNotchEnter(h.otherNotch, h.otherExpr, h.notch));
+            // Determine which notches left our view:
+            let leaving = this._prev_notch_objs.filter((n) => { // Prev - Curr
+                return notchEventObjs.filter((a) => a.notch == n.notch).length === 0;
+            });
+            leaving.forEach((h) => this.onNotchLeave(h.otherNotch, h.otherExpr, h.notch));
+            this._prev_notch_objs = notchEventObjs.slice();
+        }
     }
     onmouseup(pos) {
         if (this.dragging && this.shell) {
@@ -496,11 +519,126 @@ class Expression extends mag.RoundedRect {
                 }
             }
 
+            // Snap expressions together?
+            if (this._prev_notch_objs && this._prev_notch_objs.length > 0) {
+                let closest = Array.minimum(this._prev_notch_objs, 'dist');
+                this.onSnap(closest.otherNotch, closest.otherExpr, closest.notch);
+            }
+
             Logger.log('moved', {'item':this.toString(), 'prevPos':JSON.stringify(this.posBeforeDrag), 'newPos':JSON.stringify(this.pos)});
         }
         //if (this.toolbox) this.toolbox = null;
         this.dragging = false;
     }
+
+    /*  Special Events */
+    /*  Notch and Snapping events */
+    // Given another expression and one of its notches,
+    // determine whether there's a compatible notch on this expression.
+    getNotchPos(notch) {
+        if (!this.notches) {
+            console.error('@ Expression.getNotchPos: Notch is not on this expression.', notch);
+            return null;
+        }
+        let side = notch.side;
+        if (side === 'left')
+            return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - notch.relpos) };
+        else if (side === 'right')
+            return { x: this.pos.x + this.size.w, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * notch.relpos };
+        else if (side === 'top')
+            return { x: this.pos.x + this.radius + (this.size.w - this.radius * 2) * notch.relpos, y: this.pos.y };
+        else if (side === 'bottom')
+            return { x: this.pos.x + this.radius + (this.size.w - this.radius * 2) * (1 - notch.relpos), y: this.pos.y + this.size.h };
+    }
+    findNearestCompatibleNotch(otherExpr, otherNotch) {
+        let notches = this.notches;
+        if (!notches || notches.length === 0) {
+            return null; // By default, expressions do not have notches.
+        } else if (!otherExpr || !otherNotch) {
+            console.error('@ Expression.findNearestCompatibleNotch: Passed expression or notch is null.');
+            return null;
+        } else if (!otherExpr.notches || otherExpr.notches.length === 0) {
+            return null;
+        }
+
+        // Loop through this expression's notches and
+        // check for ones compatible to the passed notch.
+        // Store the nearest candidate.
+        const MINIMUM_ATTACH_THRESHOLD = 25;
+        let otherPos = otherExpr.getNotchPos(otherNotch);
+        let candidate = null;
+        let prevDist = MINIMUM_ATTACH_THRESHOLD;
+        notches.forEach((notch) => {
+            if (notch.isCompatibleWith(otherNotch)) {
+                let dist = distBetweenPos(this.getNotchPos(notch), otherPos);
+                if (dist < prevDist) {
+                    candidate = notch;
+                    prevDist = dist;
+                }
+            }
+        });
+
+        if (candidate) {
+            return {
+                notch:candidate,
+                dist:prevDist,
+                otherNotch:otherNotch,
+                otherExpr:otherExpr
+            };
+        } else {
+            return null;
+        }
+    }
+    findCompatibleNotches() {
+        let stage = this.stage;
+        if (!stage || !this.notches || this.notches.length === 0) return [];
+
+        let notches = this.notches;
+        let candidates = [];
+        let dups = [];
+        let exprs = stage.getRootNodesThatIncludeClass(Expression, [this]);
+        exprs.forEach((e) => {
+            if (!e.notches || e.notches.length === 0) {
+                return;
+            } else if(dups.indexOf(e) > -1) {
+                console.warn('@ Expression.findCompatibleNotches: Duplicate expression passed.', e);
+                return;
+            } else {
+                let nearest = [];
+                e.notches.forEach((eNotch) => {
+                    let n = this.findNearestCompatibleNotch(e, eNotch);
+                    if (n) nearest.push(n);
+                });
+                if (nearest.length > 0) {
+                    candidates.push(Array.minimum(nearest, 'dist'));
+                    dups.push(e);
+                }
+            }
+        });
+
+        return candidates;
+    }
+
+    // Triggered after a nearest compatible notch is identified,
+    // within some distance threshold.
+    onNotchEnter(otherNotch, otherExpr, thisNotch) {
+        otherExpr.stroke = { color:'magenta', lineWidth:4 };
+    }
+    // When a compatible notch has been identified and the user is
+    // dragging this expression around within the other's snappable-zone,
+    // this event keeps triggering.
+    onNotchHover(otherNotch, otherExpr, thisNotch) {
+    }
+    // Triggered when this expression is dragged away from
+    // the nearest compatible notch's snappable-zone.
+    onNotchLeave(otherNotch, otherExpr, thisNotch) {
+        otherExpr.stroke = null; // TODO: Fix this to use prospectPriorStroke
+    }
+
+    // Triggered when the user released the mouse and
+    // a nearest compatible notch is available
+    // (i.e., onmouseup after onNotchEnter was called and before onNotchLeave)
+    onSnap(otherNotch, otherExpr, thisNotch) { }
 
     // The value (if any) this expression represents.
     value() { return undefined; }

@@ -186,11 +186,11 @@ function initMainMenu() {
         //
         // EntangledExpr.pairedAnimate(ee, ee2);
 
-        var typebox = new TypeBox(200, 200, 80, 40);
+        var typebox = new TypeBox(500, 200, 80, 40);
         stage.add(typebox);
 
         var playpen = new PlayPenExpr();
-        playpen.pos = { x: 440, y: 180 };
+        playpen.pos = { x: 240, y: 180 };
         stage.add(playpen);
 
         // let obj = new ArrayObjectExpr(new BracketArrayExpr(0, 0, 44, 44));
@@ -221,6 +221,7 @@ function initMainMenu() {
         stage.add(def);
 
         var n = new NewInstanceExpr();
+        n.pos = { x: 0, y: 200 };
         stage.add(n);
 
         console.warn(ES6Parser.parse('(x) => x; ("star" == true);'));

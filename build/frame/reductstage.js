@@ -173,6 +173,18 @@ var ReductStage = function (_mag$Stage) {
                 }
             }
         }
+
+        // getExprsWithCompatibleNotch(notch, excludedExprs=[], recursive=true) {
+        //     let exprs = this.expressionNodes();
+        //     let compatible_exprs = [];
+        //     exprs.filter((e) => {
+        //         if (e.notches && e.notches.length > 0 && e.notches.some((n) => n.isCompatibleWith(notch))) {
+        //             compatible_exprs.push(e);
+        //         }
+        //     });
+        //     return compatible_exprs;
+        // }
+
     }, {
         key: 'onmousedown',
         value: function onmousedown(pos) {

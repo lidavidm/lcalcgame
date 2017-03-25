@@ -220,40 +220,12 @@ Number.isNumber = function (n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
 };
 
-// Specifies a 'notch' in a drawn rectangle.
-// left, right, top, or bottom, and relpos is the relative position on that side from 0 to 1, clockwise.
-var RectNotch = function RectNotch() {
-    var side = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'left';
-    var depth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 8;
-    var width = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 16;
-
-    var _this = this;
-
-    var relpos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
-    var inner = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
-
-    this.side = side;
-    this.depth = depth;
-    this.width = width;
-    this.inner = inner; // inner (concave) or outer (convex) notch?
-    if (relpos && relpos <= 1 || relpos >= 0) this.relpos = relpos;else {
-        console.warn('@ new Notch: Relative position outside of unit length.');
-        this.relpos = 0;
-    }
-    this.drawHoriz = function (ctx, x, y, w, dir) {
-        var relpos = _this.relpos;
-        var facing = _this.inner ? 1 : -1;
-        ctx.lineTo(x + dir * (w * relpos - _this.width), y);
-        ctx.lineTo(x + dir * (w * relpos), y + facing * dir * _this.depth);
-        ctx.lineTo(x + dir * (w * relpos + _this.width), y);
-    };
-    this.drawVert = function (ctx, x, y, h, dir) {
-        var relpos = _this.relpos;
-        var facing = _this.inner ? 1 : -1;
-        ctx.lineTo(x, y + dir * (h * relpos - _this.width));
-        ctx.lineTo(x - facing * dir * _this.depth, y + dir * h * relpos);
-        ctx.lineTo(x, y + dir * (h * relpos + _this.width));
-    };
+// Returns the minimum object in an Array, according to one of its properties:
+Array.minimum = function (arr, property) {
+    if (!arr || arr.length === 0) return null;
+    return arr.sort(function (a, b) {
+        return a[property] - b[property];
+    })[0];
 };
 
 /**
@@ -487,7 +459,7 @@ function deBruijn(s) {
  * @param {Boolean} [fill = false] Whether to fill the rectangle.
  * @param {Boolean} [stroke = true] Whether to stroke the rectangle.
  */
-function roundRect(ctx, x, y, width, height, radius, fill, stroke, strokeOpacity, notch) {
+function roundRect(ctx, x, y, width, height, radius, fill, stroke, strokeOpacity, notches) {
     if (typeof stroke == 'undefined') stroke = true;
     if (typeof radius === 'undefined') radius = 5;
     if (typeof radius === 'undefined') radius = 5;
@@ -498,7 +470,7 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke, strokeOpacity
         }
     }
 
-    if (typeof notch === 'undefined' || !notch) {
+    if (typeof notches === 'undefined' || !notches || notches.length === 0) {
         // Draw a simple rounded rect, no notches.
         ctx.beginPath();
         ctx.moveTo(x + radius.tl, y);
@@ -515,6 +487,7 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke, strokeOpacity
         if (stroke) strokeWithOpacity(ctx, strokeOpacity);
     } else {
         // Draw rounded rect with a notch.
+        var notch = notches[0]; // For now, only can draw the first notch. TODO: Make arbitrary.
         ctx.beginPath();
         ctx.moveTo(x + radius.tl, y);
         if (notch.side === 'top') notch.drawHoriz(ctx, x + radius.tl, y, width - radius.tr, 1);
@@ -549,7 +522,7 @@ function hexaRect(ctx, x, y, width, height, fill, stroke, strokeOpacity) {
     if (stroke) strokeWithOpacity(ctx, strokeOpacity);
 }
 
-function clampRect(ctx, x, y, topWidth, topHeight, midWidth, midHeight, botWidth, botHeight, radius, fill, stroke, strokeOpacity, notch) {
+function clampRect(ctx, x, y, topWidth, topHeight, midWidth, midHeight, botWidth, botHeight, radius, fill, stroke, strokeOpacity, notches) {
     if (typeof stroke == 'undefined') stroke = true;
     if (typeof radius === 'undefined') radius = 5;
     if (typeof radius === 'number') radius = { tl: radius, tr: radius, br: radius, bl: radius };else {
@@ -588,9 +561,9 @@ function clampRect(ctx, x, y, topWidth, topHeight, midWidth, midHeight, botWidth
     ctx.quadraticCurveTo(x, y + topHeight + midHeight + botHeight, x, y + topHeight + midHeight + botHeight - radius.bl);
 
     // Bot-left rounded edge
-    if ((typeof notch === 'undefined' ? 'undefined' : _typeof(notch)) !== undefined && notch) {
+    if ((typeof notches === 'undefined' ? 'undefined' : _typeof(notches)) !== undefined && notches.length === 1) {
         // Only 'left' side notches are supported for now.
-        notch.drawVert(ctx, x, y + topHeight + midHeight + botHeight - radius.bl, topHeight + midHeight + botHeight - radius.bl - radius.tl, -1);
+        notches[0].drawVert(ctx, x, y + topHeight + midHeight + botHeight - radius.bl, topHeight + midHeight + botHeight - radius.bl - radius.tl, -1);
     }
     ctx.lineTo(x, y + radius.tl);
     ctx.quadraticCurveTo(x, y, x + radius.tl, y);

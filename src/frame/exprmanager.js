@@ -19,6 +19,7 @@ var ExprManager = (function() {
         '+':        [AddExpr],
         '!=':       [MirrorCompareExpr, FadedCompareExpr],
         'bag':      [BagExpr, BracketArrayExpr],
+        'array':    [BracketArrayExpr],
         'count':    [CountExpr],
         'map':      [SimpleMapFunc, FadedMapFunc],
         'reduce':   [ReduceFunc],

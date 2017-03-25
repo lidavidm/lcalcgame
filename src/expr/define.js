@@ -2,16 +2,16 @@
 class NewInstanceExpr extends FadedValueExpr {
     constructor() {
         super('+');
-        this.notch = new RectNotch('right', 10, 10, 0.5, false);
+        this.notches = [ new WedgeNotch('right', 10, 10, 0.5, false) ];
         this.padding.right = 20;
         this.shadowOffset = 6;
         this.radius = 3;
         this.attachNode = null;
     }
-    get notchPos() {
-        let upperLeftPos = this.upperLeftPos(this.absolutePos, this.absoluteSize);
-        return { x:upperLeftPos.x + this.size.w, y:upperLeftPos.y + this.size.h * this.notch.relpos };
-    }
+    // get notchPos() {
+    //     let upperLeftPos = this.upperLeftPos(this.absolutePos, this.absoluteSize);
+    //     return { x:upperLeftPos.x + this.size.w, y:upperLeftPos.y + this.size.h * this.notch.relpos };
+    // }
     isAttached() {
         return this.attachNode ? true : false;
     }
@@ -115,47 +115,46 @@ class DefineExpr extends ClampExpr {
         this.expr.shadowOffset = -2;
         if (name) this.funcname = name;
 
-        this.notch = new RectNotch('left', 10, 10, 0.8, true);
+        this.notches = [ new WedgeNotch('left', 10, 10, 0.8, true) ];
     }
     get expr() { return this.children[1]; }
     get constructorArgs() { return [ this.expr.clone() ]; }
-    get notchPos() {
-        return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - this.notch.relpos) };
-    }
-    onmousedrag(pos) {
-        super.onmousedrag(pos);
-
-        if (this._attachNode) {
-            this._attachNode.detachAttachment(this);
-            this._attachNode = null;
-        }
-
-        const ATTACHMENT_THRESHOLD = 20;
-        let notchPos = this.notchPos;
-        let attachmentNodes = this.stage.getRootNodesThatIncludeClass(NewInstanceExpr);
-        attachmentNodes.forEach((node) => {
-            if (!node.isAttached()) {
-                let dist = distBetweenPos(notchPos, node.notchPos);
-                console.log(dist);
-                if (dist < ATTACHMENT_THRESHOLD) {
-                    node.stroke = { color:'magenta', lineWidth:4 };
-                    this._attachProspect = node;
-                } else {
-                    node.stroke = null;
-                    if (this._attachProspect && this._attachProspect == node)
-                        this._attachProspect = null;
-                }
-            }
-        });
-    }
-    onmouseup(pos) {
-        super.onmouseup(pos);
-        if (this._attachProspect) { // Snap this function block into the NewInstanceExpr notch:
-            this._attachProspect.attach(this);
-            this._attachNode = this._attachProspect;
-            this._attachProspect = null;
-        }
-    }
+    // get notchPos() {
+    //     return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - this.notch.relpos) };
+    // }
+    // onmousedrag(pos) {
+    //     super.onmousedrag(pos);
+    //
+    //     if (this._attachNode) {
+    //         this._attachNode.detachAttachment(this);
+    //         this._attachNode = null;
+    //     }
+    //
+    //     const ATTACHMENT_THRESHOLD = 20;
+    //     let notchPos = this.notchPos;
+    //     let attachmentNodes = this.stage.getRootNodesThatIncludeClass(NewInstanceExpr);
+    //     attachmentNodes.forEach((node) => {
+    //         if (!node.isAttached()) {
+    //             let dist = distBetweenPos(notchPos, node.notchPos);
+    //             if (dist < ATTACHMENT_THRESHOLD) {
+    //                 node.stroke = { color:'magenta', lineWidth:4 };
+    //                 this._attachProspect = node;
+    //             } else {
+    //                 node.stroke = null;
+    //                 if (this._attachProspect && this._attachProspect == node)
+    //                     this._attachProspect = null;
+    //             }
+    //         }
+    //     });
+    // }
+    // onmouseup(pos) {
+    //     super.onmouseup(pos);
+    //     if (this._attachProspect) { // Snap this function block into the NewInstanceExpr notch:
+    //         this._attachProspect.attach(this);
+    //         this._attachNode = this._attachProspect;
+    //         this._attachProspect = null;
+    //     }
+    // }
     onmouseclick() {
 
         if (this.funcname) {

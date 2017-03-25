@@ -165,7 +165,7 @@
                        size.w, size.h,
                        this.radius*this.absoluteScale.x, true, this.stroke ? true : false,
                        this.stroke ? this.stroke.opacity : null,
-                       this.notch ? this.notch : null);
+                       this.notches ? this.notches : null);
          }
          drawInternal(ctx, pos, boundingSize) {
              ctx.fillStyle = this.shadowColor;

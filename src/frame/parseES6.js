@@ -42,7 +42,9 @@ class ES6Parser {
             return expr;
         } else {
             let exprs = statements.map((n) => this.parseNode(n));
-            return new Sequence(...exprs);
+            let seq = new Sequence(...exprs);
+            seq.lockSubexpressions(this.lockFilter);
+            return seq;
         }
     }
 
@@ -95,6 +97,13 @@ class ES6Parser {
                 }
             },
 
+            /* e.g. [2, true, x] */
+            'ArrayExpression': (node) => {
+                let arr = new (ExprManager.getClass('array'))(0,0,54,54,[]);
+                node.elements.forEach((e) => arr.addItem(this.parseNode(e)));
+                return arr;
+            },
+
             /* A single statement like (x == x); or (x) => x; */
             'ExpressionStatement': (node) => {
                 return this.parseNode(node.expression);
@@ -108,7 +117,7 @@ class ES6Parser {
                         return null;
                     } else {
                         let unlocked_expr = this.parseNode(node.arguments[0]);
-                        unlocked_expr.unlock(); 
+                        unlocked_expr.unlock();
                         unlocked_expr.__remain_unlocked = true; // When all inner expressions are locked in parse(), this won't be.
                         return unlocked_expr;
                     }

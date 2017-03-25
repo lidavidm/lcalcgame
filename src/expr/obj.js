@@ -10,11 +10,11 @@ class PlayPenExpr extends ExpressionPlus {
         this.addChild(pen);
         this.pen = pen;
         this.color = 'YellowGreen';
-        this.notch = new RectNotch('left', 10, 10, 0.8, true); // notch in left side near top.
+        this.notches = [new WedgeNotch('left', 10, 10, 0.8, true)]; // notch in left side near top.
     }
-    get notchPos() {
-        return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - this.notch.relpos) };
-    }
+    // get notchPos() {
+    //     return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - this.notch.relpos) };
+    // }
     get size() {
         return { w:this.pen.size.w + this.padding.left*2, h:this.pen.size.h + this.padding.top*2 };
     }
@@ -49,27 +49,27 @@ class PlayPenExpr extends ExpressionPlus {
         else {
             super.onmousedrag(pos);
 
-            if (this._attachNode) {
-                this._attachNode.detachAttachment(this);
-                this._attachNode = null;
-            }
-
-            const ATTACHMENT_THRESHOLD = 20;
-            let notchPos = this.notchPos;
-            let attachmentNodes = this.stage.getRootNodesThatIncludeClass(NewInstanceExpr);
-            attachmentNodes.forEach((node) => {
-                if (!node.isAttached()) {
-                    let dist = distBetweenPos(notchPos, node.notchPos);
-                    if (dist < ATTACHMENT_THRESHOLD) {
-                        node.stroke = { color:'magenta', lineWidth:4 };
-                        this._attachProspect = node;
-                    } else {
-                        node.stroke = null;
-                        if (this._attachProspect && this._attachProspect == node)
-                            this._attachProspect = null;
-                    }
-                }
-            });
+            // if (this._attachNode) {
+            //     this._attachNode.detachAttachment(this);
+            //     this._attachNode = null;
+            // }
+            //
+            // const ATTACHMENT_THRESHOLD = 20;
+            // let notchPos = this.notchPos;
+            // let attachmentNodes = this.stage.getRootNodesThatIncludeClass(NewInstanceExpr);
+            // attachmentNodes.forEach((node) => {
+            //     if (!node.isAttached()) {
+            //         let dist = distBetweenPos(notchPos, node.notchPos);
+            //         if (dist < ATTACHMENT_THRESHOLD) {
+            //             node.stroke = { color:'magenta', lineWidth:4 };
+            //             this._attachProspect = node;
+            //         } else {
+            //             node.stroke = null;
+            //             if (this._attachProspect && this._attachProspect == node)
+            //                 this._attachProspect = null;
+            //         }
+            //     }
+            // });
         }
     }
     onmouseleave(pos) {
@@ -77,14 +77,14 @@ class PlayPenExpr extends ExpressionPlus {
         SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
         this.resizing = false;
     }
-    onmouseup(pos) {
-        super.onmouseup(pos);
-        if (this._attachProspect) { // Snap this function block into the NewInstanceExpr notch:
-            this._attachProspect.attach(this);
-            this._attachNode = this._attachProspect;
-            this._attachProspect = null;
-        }
-    }
+    // onmouseup(pos) {
+    //     super.onmouseup(pos);
+    //     if (this._attachProspect) { // Snap this function block into the NewInstanceExpr notch:
+    //         this._attachProspect.attach(this);
+    //         this._attachNode = this._attachProspect;
+    //         this._attachProspect = null;
+    //     }
+    // }
 }
 class PlayPen extends mag.RoundedRect {
     constructor(x, y, w, h) {

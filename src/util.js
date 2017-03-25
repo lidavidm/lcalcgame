@@ -195,33 +195,10 @@ Number.isNumber = function(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 };
 
-// Specifies a 'notch' in a drawn rectangle.
-// left, right, top, or bottom, and relpos is the relative position on that side from 0 to 1, clockwise.
-var RectNotch = function (side='left', depth=8, width=16, relpos=0, inner=true) {
-    this.side = side;
-    this.depth = depth;
-    this.width = width;
-    this.inner = inner; // inner (concave) or outer (convex) notch?
-    if (relpos && relpos <= 1 || relpos >= 0)
-        this.relpos = relpos;
-    else {
-        console.warn('@ new Notch: Relative position outside of unit length.');
-        this.relpos = 0;
-    }
-    this.drawHoriz = (ctx, x, y, w, dir) => {
-        let relpos = this.relpos;
-        let facing = this.inner ? 1 : -1;
-        ctx.lineTo(x + dir * (w * relpos - this.width), y);
-        ctx.lineTo(x + dir * (w * relpos), y + facing * dir * this.depth);
-        ctx.lineTo(x + dir * (w * relpos + this.width), y);
-    };
-    this.drawVert = (ctx, x, y, h, dir) => {
-        let relpos = this.relpos;
-        let facing = this.inner ? 1 : -1;
-        ctx.lineTo(x, y + dir * (h * relpos - this.width));
-        ctx.lineTo(x - facing * dir * this.depth, y + dir * h * relpos);
-        ctx.lineTo(x, y + dir * (h * relpos + this.width));
-    };
+// Returns the minimum object in an Array, according to one of its properties:
+Array.minimum = function(arr, property) {
+    if (!arr || arr.length === 0) return null;
+    return arr.sort((a, b) => (a[property] - b[property]))[0];
 };
 
 /**
@@ -467,7 +444,7 @@ function deBruijn(s, varindices={}) {
  * @param {Boolean} [fill = false] Whether to fill the rectangle.
  * @param {Boolean} [stroke = true] Whether to stroke the rectangle.
  */
-function roundRect(ctx, x, y, width, height, radius, fill, stroke, strokeOpacity, notch) {
+function roundRect(ctx, x, y, width, height, radius, fill, stroke, strokeOpacity, notches) {
   if (typeof stroke == 'undefined') stroke = true;
   if (typeof radius === 'undefined') radius = 5;
   if (typeof radius === 'undefined') radius = 5;
@@ -479,7 +456,7 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke, strokeOpacity
     }
   }
 
-  if (typeof notch === 'undefined' || !notch) { // Draw a simple rounded rect, no notches.
+  if (typeof notches === 'undefined' || !notches || notches.length === 0) { // Draw a simple rounded rect, no notches.
       ctx.beginPath();
       ctx.moveTo(x + radius.tl, y);
       ctx.lineTo(x + width - radius.tr, y);
@@ -494,6 +471,7 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke, strokeOpacity
       if (fill) ctx.fill();
       if (stroke) strokeWithOpacity(ctx, strokeOpacity);
   } else { // Draw rounded rect with a notch.
+      var notch = notches[0]; // For now, only can draw the first notch. TODO: Make arbitrary.
       ctx.beginPath();
       ctx.moveTo(x + radius.tl, y);
       if (notch.side === 'top')
@@ -532,7 +510,7 @@ function hexaRect(ctx, x, y, width, height, fill, stroke, strokeOpacity) {
   if (stroke) strokeWithOpacity(ctx, strokeOpacity);
 }
 
-function clampRect(ctx, x, y, topWidth, topHeight, midWidth, midHeight, botWidth, botHeight, radius, fill, stroke, strokeOpacity, notch) {
+function clampRect(ctx, x, y, topWidth, topHeight, midWidth, midHeight, botWidth, botHeight, radius, fill, stroke, strokeOpacity, notches) {
   if (typeof stroke == 'undefined') stroke = true;
   if (typeof radius === 'undefined') radius = 5;
   if (typeof radius === 'number') radius = {tl: radius, tr: radius, br: radius, bl: radius};
@@ -572,8 +550,8 @@ function clampRect(ctx, x, y, topWidth, topHeight, midWidth, midHeight, botWidth
   ctx.quadraticCurveTo(x, y + topHeight + midHeight + botHeight, x, y + topHeight + midHeight + botHeight - radius.bl);
 
   // Bot-left rounded edge
-  if (typeof notch !== undefined && notch) { // Only 'left' side notches are supported for now.
-      notch.drawVert(ctx, x, y + topHeight + midHeight + botHeight - radius.bl, (topHeight + midHeight + botHeight - radius.bl) - radius.tl, -1);
+  if (typeof notches !== undefined && notches.length === 1) { // Only 'left' side notches are supported for now.
+      notches[0].drawVert(ctx, x, y + topHeight + midHeight + botHeight - radius.bl, (topHeight + midHeight + botHeight - radius.bl) - radius.tl, -1);
   }
   ctx.lineTo(x, y + radius.tl);
   ctx.quadraticCurveTo(x, y, x + radius.tl, y);

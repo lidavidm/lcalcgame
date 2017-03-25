@@ -116,7 +116,7 @@ class ClampExpr extends Expression {
                   boundingSize.w*this.botRatio.x, boundingSize.h*this.botRatio.y,
                   this.radius*this.absoluteScale.x, true, this.stroke ? true : false,
                   this.stroke ? this.stroke.opacity : null,
-                  this.notch ? this.notch : null);
+                  this.notches ? this.notches : null);
     }
 
 }

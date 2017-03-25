@@ -306,7 +306,7 @@ var mag = function (_) {
         _createClass(RoundedRect, [{
             key: 'drawBaseShape',
             value: function drawBaseShape(ctx, pos, size) {
-                roundRect(ctx, pos.x, pos.y, size.w, size.h, this.radius * this.absoluteScale.x, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null, this.notch ? this.notch : null);
+                roundRect(ctx, pos.x, pos.y, size.w, size.h, this.radius * this.absoluteScale.x, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null, this.notches ? this.notches : null);
             }
         }, {
             key: 'drawInternal',

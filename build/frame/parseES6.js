@@ -62,7 +62,9 @@ var ES6Parser = function () {
                 var exprs = statements.map(function (n) {
                     return _this.parseNode(n);
                 });
-                return new (Function.prototype.bind.apply(Sequence, [null].concat(_toConsumableArray(exprs))))();
+                var seq = new (Function.prototype.bind.apply(Sequence, [null].concat(_toConsumableArray(exprs))))();
+                seq.lockSubexpressions(this.lockFilter);
+                return seq;
             }
         }
 
@@ -118,6 +120,15 @@ var ES6Parser = function () {
                         // Booleans should be left.
                         return new (ExprManager.getClass(node.raw))();
                     }
+                },
+
+                /* e.g. [2, true, x] */
+                'ArrayExpression': function ArrayExpression(node) {
+                    var arr = new (ExprManager.getClass('array'))(0, 0, 54, 54, []);
+                    node.elements.forEach(function (e) {
+                        return arr.addItem(_this2.parseNode(e));
+                    });
+                    return arr;
                 },
 
                 /* A single statement like (x == x); or (x) => x; */

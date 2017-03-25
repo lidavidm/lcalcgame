@@ -519,6 +519,8 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'onmousedrag',
         value: function onmousedrag(pos) {
+            var _this5 = this;
+
             if (this.ignoreEvents) return;
 
             if (this.parent instanceof PlayPen) pos = fromTo(this.parent.absolutePos, pos);
@@ -535,6 +537,45 @@ var Expression = function (_mag$RoundedRect) {
                 this.posBeforeDrag = this.absolutePos;
                 this.stage.bringToFront(this);
                 this.dragging = true;
+            }
+
+            // Fire notch events
+            if (!this._prev_notch_objs) this._prev_notch_objs = [];
+            var notchEventObjs = this.findCompatibleNotches();
+            if (notchEventObjs.length !== 0 || this._prev_notch_objs.length !== 0) {
+                // If some notch has entered our field of view...
+                console.log(notchEventObjs);
+                // Determine which notches are hovering:
+                notchEventObjs.forEach(function (o) {
+                    // Prev intersects Curr
+                    var hovering = _this5._prev_notch_objs.filter(function (a) {
+                        return a.notch == o.notch;
+                    });
+                    hovering.forEach(function (h) {
+                        return _this5.onNotchHover(h.otherNotch, h.otherExpr, h.notch);
+                    });
+                });
+                // Determine which notches entered our view:
+                var entering = notchEventObjs.filter(function (n) {
+                    // Curr - Prev
+                    return _this5._prev_notch_objs.filter(function (a) {
+                        return a.notch == n.notch;
+                    }).length === 0;
+                });
+                entering.forEach(function (h) {
+                    return _this5.onNotchEnter(h.otherNotch, h.otherExpr, h.notch);
+                });
+                // Determine which notches left our view:
+                var leaving = this._prev_notch_objs.filter(function (n) {
+                    // Prev - Curr
+                    return notchEventObjs.filter(function (a) {
+                        return a.notch == n.notch;
+                    }).length === 0;
+                });
+                leaving.forEach(function (h) {
+                    return _this5.onNotchLeave(h.otherNotch, h.otherExpr, h.notch);
+                });
+                this._prev_notch_objs = notchEventObjs.slice();
             }
         }
     }, {
@@ -559,11 +600,143 @@ var Expression = function (_mag$RoundedRect) {
                     }
                 }
 
+                // Snap expressions together?
+                if (this._prev_notch_objs && this._prev_notch_objs.length > 0) {
+                    var closest = Array.minimum(this._prev_notch_objs, 'dist');
+                    this.onSnap(closest.otherNotch, closest.otherExpr, closest.notch);
+                }
+
                 Logger.log('moved', { 'item': this.toString(), 'prevPos': JSON.stringify(this.posBeforeDrag), 'newPos': JSON.stringify(this.pos) });
             }
             //if (this.toolbox) this.toolbox = null;
             this.dragging = false;
         }
+
+        /*  Special Events */
+        /*  Notch and Snapping events */
+        // Given another expression and one of its notches,
+        // determine whether there's a compatible notch on this expression.
+
+    }, {
+        key: 'getNotchPos',
+        value: function getNotchPos(notch) {
+            if (!this.notches) {
+                console.error('@ Expression.getNotchPos: Notch is not on this expression.', notch);
+                return null;
+            }
+            var side = notch.side;
+            if (side === 'left') return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - notch.relpos) };else if (side === 'right') return { x: this.pos.x + this.size.w, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * notch.relpos };else if (side === 'top') return { x: this.pos.x + this.radius + (this.size.w - this.radius * 2) * notch.relpos, y: this.pos.y };else if (side === 'bottom') return { x: this.pos.x + this.radius + (this.size.w - this.radius * 2) * (1 - notch.relpos), y: this.pos.y + this.size.h };
+        }
+    }, {
+        key: 'findNearestCompatibleNotch',
+        value: function findNearestCompatibleNotch(otherExpr, otherNotch) {
+            var _this6 = this;
+
+            var notches = this.notches;
+            if (!notches || notches.length === 0) {
+                return null; // By default, expressions do not have notches.
+            } else if (!otherExpr || !otherNotch) {
+                    console.error('@ Expression.findNearestCompatibleNotch: Passed expression or notch is null.');
+                    return null;
+                } else if (!otherExpr.notches || otherExpr.notches.length === 0) {
+                    return null;
+                }
+
+            // Loop through this expression's notches and
+            // check for ones compatible to the passed notch.
+            // Store the nearest candidate.
+            var MINIMUM_ATTACH_THRESHOLD = 25;
+            var otherPos = otherExpr.getNotchPos(otherNotch);
+            var candidate = null;
+            var prevDist = MINIMUM_ATTACH_THRESHOLD;
+            notches.forEach(function (notch) {
+                if (notch.isCompatibleWith(otherNotch)) {
+                    var dist = distBetweenPos(_this6.getNotchPos(notch), otherPos);
+                    if (dist < prevDist) {
+                        candidate = notch;
+                        prevDist = dist;
+                    }
+                }
+            });
+
+            if (candidate) {
+                return {
+                    notch: candidate,
+                    dist: prevDist,
+                    otherNotch: otherNotch,
+                    otherExpr: otherExpr
+                };
+            } else {
+                return null;
+            }
+        }
+    }, {
+        key: 'findCompatibleNotches',
+        value: function findCompatibleNotches() {
+            var _this7 = this;
+
+            var stage = this.stage;
+            if (!stage || !this.notches || this.notches.length === 0) return [];
+
+            var notches = this.notches;
+            var candidates = [];
+            var dups = [];
+            var exprs = stage.getRootNodesThatIncludeClass(Expression, [this]);
+            exprs.forEach(function (e) {
+                if (!e.notches || e.notches.length === 0) {
+                    return;
+                } else if (dups.indexOf(e) > -1) {
+                    console.warn('@ Expression.findCompatibleNotches: Duplicate expression passed.', e);
+                    return;
+                } else {
+                    (function () {
+                        var nearest = [];
+                        e.notches.forEach(function (eNotch) {
+                            var n = _this7.findNearestCompatibleNotch(e, eNotch);
+                            if (n) nearest.push(n);
+                        });
+                        if (nearest.length > 0) {
+                            candidates.push(Array.minimum(nearest, 'dist'));
+                            dups.push(e);
+                        }
+                    })();
+                }
+            });
+
+            return candidates;
+        }
+
+        // Triggered after a nearest compatible notch is identified,
+        // within some distance threshold.
+
+    }, {
+        key: 'onNotchEnter',
+        value: function onNotchEnter(otherNotch, otherExpr, thisNotch) {
+            otherExpr.stroke = { color: 'magenta', lineWidth: 4 };
+        }
+        // When a compatible notch has been identified and the user is
+        // dragging this expression around within the other's snappable-zone,
+        // this event keeps triggering.
+
+    }, {
+        key: 'onNotchHover',
+        value: function onNotchHover(otherNotch, otherExpr, thisNotch) {}
+        // Triggered when this expression is dragged away from
+        // the nearest compatible notch's snappable-zone.
+
+    }, {
+        key: 'onNotchLeave',
+        value: function onNotchLeave(otherNotch, otherExpr, thisNotch) {
+            otherExpr.stroke = null; // TODO: Fix this to use prospectPriorStroke
+        }
+
+        // Triggered when the user released the mouse and
+        // a nearest compatible notch is available
+        // (i.e., onmouseup after onNotchEnter was called and before onNotchLeave)
+
+    }, {
+        key: 'onSnap',
+        value: function onSnap(otherNotch, otherExpr, thisNotch) {}
 
         // The value (if any) this expression represents.
 
@@ -594,7 +767,7 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'size',
         get: function get() {
-            var _this5 = this;
+            var _this8 = this;
 
             var padding = this.padding;
             var width = 0;
@@ -610,7 +783,7 @@ var Expression = function (_mag$RoundedRect) {
             if (sizes.length === 0) return { w: this._size.w, h: this._size.h };
 
             sizes.forEach(function (s) {
-                if (_this5._layout.direction == "vertical") {
+                if (_this8._layout.direction == "vertical") {
                     height += s.h;
                     width = Math.max(width, s.w);
                 } else {
@@ -653,7 +826,7 @@ var ExpressionPlus = function (_Expression) {
     _createClass(ExpressionPlus, [{
         key: 'update',
         value: function update() {
-            var _this7 = this;
+            var _this10 = this;
 
             var _this = this;
 
@@ -684,12 +857,12 @@ var ExpressionPlus = function (_Expression) {
                 expr.scale = { x: _this._subexpScale, y: _this._subexpScale };
                 expr.update();
 
-                if (_this7._layout.direction == "vertical") {
+                if (_this10._layout.direction == "vertical") {
                     y += expr.anchor.y * expr.size.h * expr.scale.y;
                     var offset = x;
 
                     // Centering
-                    if (_this7._layout.align == "horizontal") {
+                    if (_this10._layout.align == "horizontal") {
                         var innerWidth = size.w;
                         var scale = expr.scale.x;
                         offset = (innerWidth - scale * expr.size.w) / 2;
@@ -698,7 +871,7 @@ var ExpressionPlus = function (_Expression) {
                     expr.pos = { x: offset, y: y };
 
                     y += (1 - expr.anchor.y) * expr.size.h * expr.scale.y;
-                    if (_this7.padding.between) y += _this7.padding.between;
+                    if (_this10.padding.between) y += _this10.padding.between;
                 } else {
                     x += expr.size.w * expr.scale.x + padding;
                 }
@@ -707,29 +880,29 @@ var ExpressionPlus = function (_Expression) {
     }, {
         key: 'clone',
         value: function clone() {
-            var _this8 = this;
+            var _this11 = this;
 
             var parent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
             if (this.drawer) {
-                var _ret = function () {
+                var _ret2 = function () {
                     var extras = [];
-                    _this8.children.forEach(function (c) {
-                        if (_this8.holes.indexOf(c) === -1) extras.push(c);
+                    _this11.children.forEach(function (c) {
+                        if (_this11.holes.indexOf(c) === -1) extras.push(c);
                     });
                     extras.forEach(function (c) {
-                        return _this8.removeChild(c);
+                        return _this11.removeChild(c);
                     });
-                    var cln = _get(ExpressionPlus.prototype.__proto__ || Object.getPrototypeOf(ExpressionPlus.prototype), 'clone', _this8).call(_this8, parent);
+                    var cln = _get(ExpressionPlus.prototype.__proto__ || Object.getPrototypeOf(ExpressionPlus.prototype), 'clone', _this11).call(_this11, parent);
                     extras.forEach(function (c) {
-                        return _this8.addChild(c);
+                        return _this11.addChild(c);
                     });
                     return {
                         v: cln
                     };
                 }();
 
-                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+                if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
             } else return _get(ExpressionPlus.prototype.__proto__ || Object.getPrototypeOf(ExpressionPlus.prototype), 'clone', this).call(this, parent);
         }
     }]);
