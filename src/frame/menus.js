@@ -1456,7 +1456,9 @@ class ChapterSelectMenu extends mag.Stage {
             }
         }
 
-        Resource.play('zoomin');
+        if (durationMultiplier > 0) {
+            Resource.play('zoomin');
+        }
         Animate.wait(durationMultiplier*500).after(() => {
             this.add(this.btn_back);
         });
