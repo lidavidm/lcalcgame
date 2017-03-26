@@ -1382,7 +1382,7 @@ class ChapterSelectMenu extends mag.Stage {
             let maxPlanetX = this.boundingSize.w;
             const POS_MAP = layoutPlanets(chapters.transitions, this.boundingSize);
             stage.planets.forEach((p, i) => {
-                maxPlanetX = Math.max(maxPlanetX, p.pos.x + p.radius);
+                maxPlanetX = Math.max(maxPlanetX, POS_MAP[i].x + p.radius);
                 p.ignoreEvents = false;
                 if (p.spots) p.spots.forEach((s) => { s.ignoreEvents = true; });
                 if (p.expandFunc) p.onclick = p.expandFunc;
