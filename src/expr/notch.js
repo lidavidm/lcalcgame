@@ -80,3 +80,26 @@ class WedgeNotch extends Notch {
         ctx.lineTo(x, y + dir * (h * relpos + this.width));
     }
 }
+
+class NotchHangerExpr extends Expression {
+    constructor(numNotches, spacing=160) {
+        super([]);
+        const NOTCH_SPACING = spacing;
+        this.radius = 0;
+        this.color = '#594764';
+        this._size = {w:0, h:NOTCH_SPACING * numNotches};
+        this.notches = [];
+        for (let i = 0; i < numNotches; i++) {
+            let notch = new WedgeNotch('right', 10, 10, i / numNotches + 1/numNotches/2, false);
+            this.notches.push(notch);
+        }
+        this.ignoreEvents = true;
+    }
+    set size(sz) {
+        this._size = {w:sz.h, h:sz.h};
+    }
+    get size() {
+        return {w:this._size.w,h:this._size.h};
+    }
+    update() { }
+}

@@ -643,7 +643,7 @@ var Expression = function (_mag$RoundedRect) {
                 return null;
             }
             var side = notch.side;
-            if (side === 'left') return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - notch.relpos) };else if (side === 'right') return { x: this.pos.x + this.size.w, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * notch.relpos };else if (side === 'top') return { x: this.pos.x + this.radius + (this.size.w - this.radius * 2) * notch.relpos, y: this.pos.y };else if (side === 'bottom') return { x: this.pos.x + this.radius + (this.size.w - this.radius * 2) * (1 - notch.relpos), y: this.pos.y + this.size.h };
+            if (side === 'left') return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius) * (1 - notch.relpos) };else if (side === 'right') return { x: this.pos.x + this.size.w, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * notch.relpos };else if (side === 'top') return { x: this.pos.x + this.radius + (this.size.w - this.radius * 2) * notch.relpos, y: this.pos.y };else if (side === 'bottom') return { x: this.pos.x + this.radius + (this.size.w - this.radius * 2) * (1 - notch.relpos), y: this.pos.y + this.size.h };
         }
         // Given another expression and one of its notches,
         // determine whether there's a compatible notch on this expression.

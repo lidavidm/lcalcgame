@@ -1,5 +1,7 @@
 'use strict';
 
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -166,6 +168,78 @@ var NamedExpr = function (_Expression) {
     return NamedExpr;
 }(Expression);
 
+var DragPatch = function (_ImageExpr) {
+    _inherits(DragPatch, _ImageExpr);
+
+    function DragPatch(x, y, w, h) {
+        _classCallCheck(this, DragPatch);
+
+        return _possibleConstructorReturn(this, (DragPatch.__proto__ || Object.getPrototypeOf(DragPatch)).call(this, x, y, w, h, 'drag-patch'));
+    }
+
+    _createClass(DragPatch, [{
+        key: 'draw',
+        value: function draw(ctx) {
+            ctx.save();
+            ctx.globalCompositeOperation = 'screen';
+            _get(DragPatch.prototype.__proto__ || Object.getPrototypeOf(DragPatch.prototype), 'draw', this).call(this, ctx);
+            ctx.restore();
+        }
+    }, {
+        key: 'onmouseenter',
+        value: function onmouseenter(pos) {
+            _get(DragPatch.prototype.__proto__ || Object.getPrototypeOf(DragPatch.prototype), 'onmouseenter', this).call(this, pos);
+            this.parent.stroke = { color: 'white', lineWidth: 2 };
+        }
+    }, {
+        key: 'onmousedrag',
+        value: function onmousedrag(pos) {
+
+            var stage = this.stage;
+            var replacement = this.parent.parent.generateNamedExpr(); // DefineExpr -> NamedExpr
+            var ghosted_name = this.parent.clone();
+            ghosted_name.pos = this.parent.absolutePos;
+            ghosted_name.onmouseenter();
+            ghosted_name.shadowOffset = 0;
+            ghosted_name.opacity = 0.5;
+            ghosted_name.onmouseup = function (pos) {
+                var _this4 = this;
+
+                this.opacity = 1.0;
+                this.shadowOffset = 0;
+
+                replacement.pos = this.upperLeftPos(this.absolutePos, this.absoluteSize);
+                var fx = new ShatterExpressionEffect(this);
+                fx.run(stage, function () {
+                    stage.remove(_this4);
+                    stage.add(replacement);
+                    replacement.update();
+                }, function () {});
+            };
+            stage.add(ghosted_name);
+
+            // This is a special line which tells the stage
+            // to act as if the user was holding the new cloned node,
+            // not the infinite resource.
+            stage.heldNode = ghosted_name;
+            stage.heldNodeOrigOffset = null;
+        }
+    }, {
+        key: 'onmouseleave',
+        value: function onmouseleave(pos) {
+            _get(DragPatch.prototype.__proto__ || Object.getPrototypeOf(DragPatch.prototype), 'onmouseleave', this).call(this, pos);
+            this.parent.stroke = null;
+        }
+    }, {
+        key: 'delegateToInner',
+        get: function get() {
+            return true;
+        }
+    }]);
+
+    return DragPatch;
+}(ImageExpr);
+
 // Analogous to 'define' in Scheme.
 
 
@@ -179,25 +253,34 @@ var DefineExpr = function (_ClampExpr) {
 
         //let txt_define = new TextExpr('define');
         //txt_define.color = 'black';
-        var txt_input = new Expression([new TextExpr(name ? name : 'foo')]); // TODO: Make this text input field (or dropdown menu).
+        var txt_input = new Expression([new TextExpr(name ? name : 'foo'), new DragPatch(0, 0, 42, 52)]); // TODO: Make this text input field (or dropdown menu).
         txt_input.color = 'Salmon';
         txt_input.radius = 2;
         txt_input.lock();
 
-        var _this3 = _possibleConstructorReturn(this, (DefineExpr.__proto__ || Object.getPrototypeOf(DefineExpr)).call(this, [txt_input, expr]));
+        var _this5 = _possibleConstructorReturn(this, (DefineExpr.__proto__ || Object.getPrototypeOf(DefineExpr)).call(this, [txt_input, expr]));
 
-        _this3.breakIndices = { top: 1, mid: 2, bot: 2 }; // for ClampExpr
-        _this3.color = 'OrangeRed';
-        _this3.expr.shadowOffset = -2;
-        if (name) _this3.funcname = name;
+        _this5.breakIndices = { top: 1, mid: 2, bot: 2 }; // for ClampExpr
+        _this5.color = 'OrangeRed';
+        _this5.expr.shadowOffset = -2;
+        if (name) _this5.funcname = name;
 
-        _this3.notches = [new WedgeNotch('left', 10, 10, 0.8, true)];
-        return _this3;
+        _this5.notches = [new WedgeNotch('left', 10, 10, 0.8, true)];
+        return _this5;
     }
 
     _createClass(DefineExpr, [{
-        key: 'onmouseclick',
-
+        key: 'generateNamedExpr',
+        value: function generateNamedExpr() {
+            var funcname = this.funcname;
+            var args = [];
+            var numargs = 0;
+            if (this.expr instanceof LambdaExpr) numargs = this.expr.numOfNestedLambdas();
+            for (var i = 0; i < numargs; i++) {
+                args.push(new MissingExpression());
+            } // Return named function (expression).
+            return new NamedExpr(funcname, this.expr.clone(), args);
+        }
         // get notchPos() {
         //     return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - this.notch.relpos) };
         // }
@@ -234,6 +317,9 @@ var DefineExpr = function (_ClampExpr) {
         //         this._attachProspect = null;
         //     }
         // }
+
+    }, {
+        key: 'onmouseclick',
         value: function onmouseclick() {
 
             if (this.funcname) {

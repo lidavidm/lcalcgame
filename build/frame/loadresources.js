@@ -140,6 +140,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadImage('victory', 'you-win.png');
     loadImage('apply-arrow', 'apply_arrow.png');
     loadImage('handle', 'pullout-drawer-handle.png');
+    loadImage('drag-patch', 'name-drag-patch.png');
 
     // Concreteness faded images.
     loadImage('missing-bracket', 'missing-bracket.png');

@@ -100,12 +100,62 @@ class NamedExpr extends Expression {
     }
 }
 
+class DragPatch extends ImageExpr {
+    constructor(x, y, w, h) {
+        super(x, y, w, h, 'drag-patch');
+    }
+    get delegateToInner() { return true; }
+    draw(ctx) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        super.draw(ctx);
+        ctx.restore();
+    }
+    onmouseenter(pos) {
+        super.onmouseenter(pos);
+        this.parent.stroke = { color:'white', lineWidth:2 };
+    }
+    onmousedrag(pos) {
+
+        let stage = this.stage;
+        let replacement = this.parent.parent.generateNamedExpr(); // DefineExpr -> NamedExpr
+        let ghosted_name = this.parent.clone();
+        ghosted_name.pos = this.parent.absolutePos;
+        ghosted_name.onmouseenter();
+        ghosted_name.shadowOffset = 0;
+        ghosted_name.opacity = 0.5;
+        ghosted_name.onmouseup = function (pos){
+            this.opacity = 1.0;
+            this.shadowOffset = 0;
+
+            replacement.pos = this.upperLeftPos(this.absolutePos, this.absoluteSize);
+            let fx = new ShatterExpressionEffect(this);
+            fx.run(stage, () => {
+                stage.remove(this);
+                stage.add(replacement);
+                replacement.update();
+            }, () => {});
+        };
+        stage.add(ghosted_name);
+
+        // This is a special line which tells the stage
+        // to act as if the user was holding the new cloned node,
+        // not the infinite resource.
+        stage.heldNode = ghosted_name;
+        stage.heldNodeOrigOffset = null;
+    }
+    onmouseleave(pos) {
+        super.onmouseleave(pos);
+        this.parent.stroke = null;
+    }
+}
+
 // Analogous to 'define' in Scheme.
 class DefineExpr extends ClampExpr {
     constructor(expr, name=null) {
         //let txt_define = new TextExpr('define');
         //txt_define.color = 'black';
-        let txt_input = new Expression([ new TextExpr(name ? name : 'foo') ]); // TODO: Make this text input field (or dropdown menu).
+        let txt_input = new Expression([ new TextExpr(name ? name : 'foo'), new DragPatch(0, 0, 42, 52) ]); // TODO: Make this text input field (or dropdown menu).
         txt_input.color = 'Salmon';
         txt_input.radius = 2;
         txt_input.lock();
@@ -119,6 +169,18 @@ class DefineExpr extends ClampExpr {
     }
     get expr() { return this.children[1]; }
     get constructorArgs() { return [ this.expr.clone() ]; }
+    generateNamedExpr() {
+        let funcname = this.funcname;
+        let args = [];
+        let numargs = 0;
+        if (this.expr instanceof LambdaExpr)
+            numargs = this.expr.numOfNestedLambdas();
+        for (let i = 0; i < numargs; i++)
+            args.push( new MissingExpression() );
+
+        // Return named function (expression).
+        return new NamedExpr(funcname, this.expr.clone(), args);
+    }
     // get notchPos() {
     //     return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - this.notch.relpos) };
     // }

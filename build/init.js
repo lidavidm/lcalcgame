@@ -224,6 +224,13 @@ function initMainMenu() {
         n.pos = { x: 0, y: 200 };
         stage.add(n);
 
+        var hanger = new NotchHangerExpr(1);
+        var hanger2 = new NotchHangerExpr(1);
+        hanger.pos = { x: 0, y: 80 };
+        hanger2.pos = { x: 0, y: 280 };
+        stage.add(hanger);
+        stage.add(hanger2);
+
         console.warn(ES6Parser.parse('(x) => x; ("star" == true);'));
 
         /*

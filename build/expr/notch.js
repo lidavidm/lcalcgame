@@ -138,3 +138,42 @@ var WedgeNotch = function (_Notch) {
 
     return WedgeNotch;
 }(Notch);
+
+var NotchHangerExpr = function (_Expression) {
+    _inherits(NotchHangerExpr, _Expression);
+
+    function NotchHangerExpr(numNotches) {
+        var spacing = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 160;
+
+        _classCallCheck(this, NotchHangerExpr);
+
+        var _this2 = _possibleConstructorReturn(this, (NotchHangerExpr.__proto__ || Object.getPrototypeOf(NotchHangerExpr)).call(this, []));
+
+        var NOTCH_SPACING = spacing;
+        _this2.radius = 0;
+        _this2.color = '#594764';
+        _this2._size = { w: 0, h: NOTCH_SPACING * numNotches };
+        _this2.notches = [];
+        for (var i = 0; i < numNotches; i++) {
+            var notch = new WedgeNotch('right', 10, 10, i / numNotches + 1 / numNotches / 2, false);
+            _this2.notches.push(notch);
+        }
+        _this2.ignoreEvents = true;
+        return _this2;
+    }
+
+    _createClass(NotchHangerExpr, [{
+        key: 'update',
+        value: function update() {}
+    }, {
+        key: 'size',
+        set: function set(sz) {
+            this._size = { w: sz.h, h: sz.h };
+        },
+        get: function get() {
+            return { w: this._size.w, h: this._size.h };
+        }
+    }]);
+
+    return NotchHangerExpr;
+}(Expression);
