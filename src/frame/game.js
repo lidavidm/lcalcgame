@@ -679,7 +679,14 @@ class Goal {
         node.addAll(bubble);
 
         node.pos = { x: 5, y: 5 };
-        exprs_node.pos = { x: bubble[0].absolutePos.x + 0.3 * bubble[0].absoluteSize.w, y:15 };
+        let maxExprHeight = 0;
+        for (let expr of exprs) {
+            maxExprHeight = Math.max(maxExprHeight, expr.size.h);
+        }
+        exprs_node.pos = {
+            x: bubble[0].absolutePos.x + 0.3 * bubble[0].absoluteSize.w,
+            y: bubble[0].absolutePos.y + bubble[0].absoluteSize.h / 2 - maxExprHeight / 2,
+        };
         bg.radius = Math.max(alien.absolutePos.x + alien.absoluteSize.w, ALIEN_HEIGHT);
         bg.radius = Math.max(alien.absolutePos.y + alien.absoluteSize.h, bg.radius);
         bg.radius += 10;
