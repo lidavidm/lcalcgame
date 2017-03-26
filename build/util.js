@@ -487,19 +487,27 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke, strokeOpacity
         if (stroke) strokeWithOpacity(ctx, strokeOpacity);
     } else {
         // Draw rounded rect with a notch.
-        var notch = notches[0]; // For now, only can draw the first notch. TODO: Make arbitrary.
+        //var notch = notches[0]; // For now, only can draw the first notch. TODO: Make arbitrary.
         ctx.beginPath();
         ctx.moveTo(x + radius.tl, y);
-        if (notch.side === 'top') notch.drawHoriz(ctx, x + radius.tl, y, width - radius.tr, 1);
+        //if (notch.side === 'top')
+        Notch.drawSequence(notches, 'top', ctx, x + radius.tl, y, width - radius.tr);
+        //    notch.drawHoriz(ctx, x + radius.tl, y, (width - radius.tr), 1);
         ctx.lineTo(x + width - radius.tr, y);
         ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
-        if (notch.side === 'right') notch.drawVert(ctx, x + width, y + radius.tr, height - radius.br - radius.tr, 1);
+        //if (notch.side === 'right')
+        Notch.drawSequence(notches, 'right', ctx, x + width, y + radius.tr, height - radius.br - radius.tr);
+        //    notch.drawVert(ctx, x + width, y + radius.tr, (height - radius.br - radius.tr), 1);
         ctx.lineTo(x + width, y + height - radius.br);
         ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
-        if (notch.side === 'bottom') notch.drawHoriz(ctx, x + width, y, width - radius.bl, -1);
+        //if (notch.side === 'bottom')
+        Notch.drawSequence(notches, 'bottom', ctx, x + width, y, width - radius.bl);
+        //    notch.drawHoriz(ctx, x + width, y, (width - radius.bl), -1);
         ctx.lineTo(x + radius.bl, y + height);
         ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
-        if (notch.side === 'left') notch.drawVert(ctx, x, y + height, height - radius.tl, -1);
+        // if (notch.side === 'left')
+        Notch.drawSequence(notches, 'left', ctx, x, y + height, height - radius.tl);
+        //    notch.drawVert(ctx, x, y + height, (height - radius.tl), -1);
         ctx.lineTo(x, y + radius.tl);
         ctx.quadraticCurveTo(x, y, x + radius.tl, y);
         ctx.closePath();

@@ -51,6 +51,26 @@ var Notch = function () {
             return 'standard';
         } // I would go with just 'type',
 
+    }, {
+        key: 'direction',
+        get: function get() {
+            return this.side === 'left' || this.side === 'bottom' ? -1 : 1;
+        }
+    }], [{
+        key: 'drawSequence',
+        value: function drawSequence(notches, side, ctx, x, y, len) {
+            var seq = notches.filter(function (n) {
+                return n.side === side;
+            }).sort(function (a, b) {
+                return a.relpos - b.relpos;
+            });
+            if (seq.length === 0) return;
+            if (side === 'left' || side === 'right') seq.forEach(function (s) {
+                return s.drawVert(ctx, x, y, len);
+            });else seq.forEach(function (s) {
+                return s.drawHoriz(ctx, x, y, len);
+            });
+        }
     }]);
 
     return Notch;
@@ -72,6 +92,7 @@ var WedgeNotch = function (_Notch) {
     _createClass(WedgeNotch, [{
         key: 'drawHoriz',
         value: function drawHoriz(ctx, x, y, w, dir) {
+            if (!dir) dir = this.direction;
             var relpos = this.relpos;
             var facing = this.inner ? 1 : -1;
             ctx.lineTo(x + dir * (w * relpos - this.width), y);
@@ -81,6 +102,7 @@ var WedgeNotch = function (_Notch) {
     }, {
         key: 'drawVert',
         value: function drawVert(ctx, x, y, h, dir) {
+            if (!dir) dir = this.direction;
             var relpos = this.relpos;
             var facing = this.inner ? 1 : -1;
             ctx.lineTo(x, y + dir * (h * relpos - this.width));

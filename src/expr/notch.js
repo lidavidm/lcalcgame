@@ -29,6 +29,17 @@ class Notch {
     // The type of notch, used for determining compatibility.
     // Obviously a 'hexagonal' notch wouldn't fit a 'wedge' notch, for instance.
     get type() { return 'standard'; } // I would go with just 'type',
+    get direction() { return (this.side === 'left' || this.side === 'bottom') ? -1 : 1; }
+
+    static drawSequence(notches, side, ctx, x, y, len) {
+        let seq = notches.filter((n) => n.side === side)
+                         .sort((a, b) => a.relpos - b.relpos);
+        if (seq.length === 0) return;
+        if (side === 'left' || side === 'right')
+            seq.forEach((s) => s.drawVert(ctx, x, y, len));
+        else
+            seq.forEach((s) => s.drawHoriz(ctx, x, y, len));
+    }
 
 };
 
@@ -36,6 +47,7 @@ class Notch {
 class WedgeNotch extends Notch {
     get type() { return 'wedge'; }
     drawHoriz(ctx, x, y, w, dir) {
+        if (!dir) dir = this.direction;
         let relpos = this.relpos;
         let facing = this.inner ? 1 : -1;
         ctx.lineTo(x + dir * (w * relpos - this.width), y);
@@ -43,6 +55,7 @@ class WedgeNotch extends Notch {
         ctx.lineTo(x + dir * (w * relpos + this.width), y);
     }
     drawVert(ctx, x, y, h, dir) {
+        if (!dir) dir = this.direction;
         let relpos = this.relpos;
         let facing = this.inner ? 1 : -1;
         ctx.lineTo(x, y + dir * (h * relpos - this.width));

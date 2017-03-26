@@ -10,7 +10,9 @@ class PlayPenExpr extends ExpressionPlus {
         this.addChild(pen);
         this.pen = pen;
         this.color = 'YellowGreen';
-        this.notches = [new WedgeNotch('left', 10, 10, 0.8, true)]; // notch in left side near top.
+        this.notches = [new WedgeNotch('left', 10, 10, 0.8, true),
+                        new WedgeNotch('left', 10, 10, 0.2, true),
+                        new WedgeNotch('right', 10, 10, 0.5, false)]; // notch in left side near top.
     }
     // get notchPos() {
     //     return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - this.notch.relpos) };
