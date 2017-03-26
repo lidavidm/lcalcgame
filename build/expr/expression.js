@@ -527,6 +527,11 @@ var Expression = function (_mag$RoundedRect) {
 
             _get(Expression.prototype.__proto__ || Object.getPrototypeOf(Expression.prototype), 'onmousedrag', this).call(this, pos);
 
+            if (this.isSnapped()) {
+                var UNSNAP_THRESHOLD = 30;
+                if (distBetweenPos(this.pos, pos) >= UNSNAP_THRESHOLD) this.disconnectAllNotches();else return;
+            }
+
             var rightX = pos.x + this.absoluteSize.w;
             //if (rightX < GLOBAL_DEFAULT_SCREENSIZE.width) { // Clipping to edges
             this.pos = pos;
@@ -614,9 +619,22 @@ var Expression = function (_mag$RoundedRect) {
 
         /*  Special Events */
         /*  Notch and Snapping events */
-        // Given another expression and one of its notches,
-        // determine whether there's a compatible notch on this expression.
 
+    }, {
+        key: 'isSnapped',
+        value: function isSnapped() {
+            return this.notches && this.notches.some(function (n) {
+                return n.connection;
+            });
+        }
+    }, {
+        key: 'disconnectAllNotches',
+        value: function disconnectAllNotches() {
+            if (!this.notches || this.notches.length === 0) return;
+            this.notches.forEach(function (n) {
+                return n.unpair();
+            });
+        }
     }, {
         key: 'getNotchPos',
         value: function getNotchPos(notch) {
@@ -627,6 +645,9 @@ var Expression = function (_mag$RoundedRect) {
             var side = notch.side;
             if (side === 'left') return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - notch.relpos) };else if (side === 'right') return { x: this.pos.x + this.size.w, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * notch.relpos };else if (side === 'top') return { x: this.pos.x + this.radius + (this.size.w - this.radius * 2) * notch.relpos, y: this.pos.y };else if (side === 'bottom') return { x: this.pos.x + this.radius + (this.size.w - this.radius * 2) * (1 - notch.relpos), y: this.pos.y + this.size.h };
         }
+        // Given another expression and one of its notches,
+        // determine whether there's a compatible notch on this expression.
+
     }, {
         key: 'findNearestCompatibleNotch',
         value: function findNearestCompatibleNotch(otherExpr, otherNotch) {
@@ -736,7 +757,19 @@ var Expression = function (_mag$RoundedRect) {
 
     }, {
         key: 'onSnap',
-        value: function onSnap(otherNotch, otherExpr, thisNotch) {}
+        value: function onSnap(otherNotch, otherExpr, thisNotch) {
+            Notch.pair(thisNotch, this, otherNotch, otherExpr);
+
+            var vec = fromTo(this.getNotchPos(thisNotch), otherExpr.getNotchPos(otherNotch));
+            this.pos = addPos(this.pos, vec);
+
+            //let notchPos = otherExpr.getNotchPos(otherNotch);
+            //let nodeNotchDistY = this.getNotchPos(thisNotch).y - this.pos.y;
+            //this.pos = { x:notchPos.x, y:notchPos.y - nodeNotchDistY };
+            //this.stroke = null;
+            Animate.blink(this, 500, [1, 0, 1], 1);
+            Animate.blink(otherExpr, 500, [1, 0, 1], 1);
+        }
 
         // The value (if any) this expression represents.
 

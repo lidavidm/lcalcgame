@@ -4,7 +4,7 @@ class NewInstanceExpr extends FadedValueExpr {
         super('+');
         this.notches = [ new WedgeNotch('right', 10, 10, 0.5, false) ];
         this.padding.right = 20;
-        this.shadowOffset = 6;
+        //this.shadowOffset = 6;
         this.radius = 3;
         this.attachNode = null;
     }

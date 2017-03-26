@@ -464,6 +464,14 @@ class Expression extends mag.RoundedRect {
 
         super.onmousedrag(pos);
 
+        if (this.isSnapped()) {
+            const UNSNAP_THRESHOLD = 30;
+            if (distBetweenPos(this.pos, pos) >= UNSNAP_THRESHOLD)
+                this.disconnectAllNotches();
+            else
+                return;
+        }
+
         const rightX = pos.x + this.absoluteSize.w;
         //if (rightX < GLOBAL_DEFAULT_SCREENSIZE.width) { // Clipping to edges
         this.pos = pos;
@@ -533,8 +541,13 @@ class Expression extends mag.RoundedRect {
 
     /*  Special Events */
     /*  Notch and Snapping events */
-    // Given another expression and one of its notches,
-    // determine whether there's a compatible notch on this expression.
+    isSnapped() {
+        return this.notches && this.notches.some((n) => n.connection);
+    }
+    disconnectAllNotches() {
+        if (!this.notches || this.notches.length === 0) return;
+        this.notches.forEach((n) => n.unpair());
+    }
     getNotchPos(notch) {
         if (!this.notches) {
             console.error('@ Expression.getNotchPos: Notch is not on this expression.', notch);
@@ -550,6 +563,8 @@ class Expression extends mag.RoundedRect {
         else if (side === 'bottom')
             return { x: this.pos.x + this.radius + (this.size.w - this.radius * 2) * (1 - notch.relpos), y: this.pos.y + this.size.h };
     }
+    // Given another expression and one of its notches,
+    // determine whether there's a compatible notch on this expression.
     findNearestCompatibleNotch(otherExpr, otherNotch) {
         let notches = this.notches;
         if (!notches || notches.length === 0) {
@@ -638,7 +653,19 @@ class Expression extends mag.RoundedRect {
     // Triggered when the user released the mouse and
     // a nearest compatible notch is available
     // (i.e., onmouseup after onNotchEnter was called and before onNotchLeave)
-    onSnap(otherNotch, otherExpr, thisNotch) { }
+    onSnap(otherNotch, otherExpr, thisNotch) {
+        Notch.pair(thisNotch, this, otherNotch, otherExpr);
+
+        let vec = fromTo(this.getNotchPos(thisNotch), otherExpr.getNotchPos(otherNotch));
+        this.pos = addPos(this.pos, vec);
+
+        //let notchPos = otherExpr.getNotchPos(otherNotch);
+        //let nodeNotchDistY = this.getNotchPos(thisNotch).y - this.pos.y;
+        //this.pos = { x:notchPos.x, y:notchPos.y - nodeNotchDistY };
+        //this.stroke = null;
+        Animate.blink(this, 500, [1,0,1], 1);
+        Animate.blink(otherExpr, 500, [1,0,1], 1);
+    }
 
     // The value (if any) this expression represents.
     value() { return undefined; }

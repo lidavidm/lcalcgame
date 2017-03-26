@@ -17,7 +17,8 @@ class Notch {
 
     // Tells you whether two notches 'fit into' one another.
     isCompatibleWith(otherNotch) {
-        return (this.inner !== otherNotch.inner) &&
+        return  (!this.connection) && (!otherNotch.connection) && // notch isn't compatible if its already connected...
+                (this.inner !== otherNotch.inner) &&
                 //(this.width === otherNotch.width && this.depth === otherNotch.depth) && // arguable
                 (this.type === otherNotch.type) &&
                ((this.side === 'left' && otherNotch.side === 'right') ||
@@ -31,6 +32,22 @@ class Notch {
     get type() { return 'standard'; } // I would go with just 'type',
     get direction() { return (this.side === 'left' || this.side === 'bottom') ? -1 : 1; }
 
+    unpair() {
+        if (!this.connection) return;
+        this.connection.notch.connection = null; // disconnect pair'd connection
+        this.connection = null;
+    }
+
+    static pair(notchA, exprA, notchB, exprB) {
+        notchA.connection = {
+            expr:exprB,
+            notch:notchB
+        };
+        notchB.connection = {
+            expr:exprA,
+            notch:notchA
+        };
+    }
     static drawSequence(notches, side, ctx, x, y, len) {
         let seq = notches.filter((n) => n.side === side)
                          .sort((a, b) => a.relpos - b.relpos);

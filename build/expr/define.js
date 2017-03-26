@@ -20,7 +20,7 @@ var NewInstanceExpr = function (_FadedValueExpr) {
 
         _this.notches = [new WedgeNotch('right', 10, 10, 0.5, false)];
         _this.padding.right = 20;
-        _this.shadowOffset = 6;
+        //this.shadowOffset = 6;
         _this.radius = 3;
         _this.attachNode = null;
         return _this;

@@ -37,7 +37,8 @@ var Notch = function () {
     _createClass(Notch, [{
         key: 'isCompatibleWith',
         value: function isCompatibleWith(otherNotch) {
-            return this.inner !== otherNotch.inner &&
+            return !this.connection && !otherNotch.connection && // notch isn't compatible if its already connected...
+            this.inner !== otherNotch.inner &&
             //(this.width === otherNotch.width && this.depth === otherNotch.depth) && // arguable
             this.type === otherNotch.type && (this.side === 'left' && otherNotch.side === 'right' || this.side === 'right' && otherNotch.side === 'left' || this.side === 'top' && otherNotch.side === 'bottom' || this.side === 'bottom' && otherNotch.side === 'top');
         }
@@ -45,6 +46,13 @@ var Notch = function () {
         // The type of notch, used for determining compatibility.
         // Obviously a 'hexagonal' notch wouldn't fit a 'wedge' notch, for instance.
 
+    }, {
+        key: 'unpair',
+        value: function unpair() {
+            if (!this.connection) return;
+            this.connection.notch.connection = null; // disconnect pair'd connection
+            this.connection = null;
+        }
     }, {
         key: 'type',
         get: function get() {
@@ -57,6 +65,18 @@ var Notch = function () {
             return this.side === 'left' || this.side === 'bottom' ? -1 : 1;
         }
     }], [{
+        key: 'pair',
+        value: function pair(notchA, exprA, notchB, exprB) {
+            notchA.connection = {
+                expr: exprB,
+                notch: notchB
+            };
+            notchB.connection = {
+                expr: exprA,
+                notch: notchA
+            };
+        }
+    }, {
         key: 'drawSequence',
         value: function drawSequence(notches, side, ctx, x, y, len) {
             var seq = notches.filter(function (n) {

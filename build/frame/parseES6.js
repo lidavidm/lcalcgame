@@ -182,6 +182,19 @@ var ES6Parser = function () {
                 /*  Ternary expression ?:  */
                 'ConditionalExpression': function ConditionalExpression(node) {
                     return new (ExprManager.getClass('ifelse'))(_this2.parseNode(node.test), _this2.parseNode(node.consequent), _this2.parseNode(node.alternate));
+                },
+
+                /* A JS ES6 Class.
+                   In Reduct, an Object container.
+                   * TODO: Methods with the name _ should define unfilled 'notches' on the side of the object. *
+                */
+                'ClassDeclaration': function ClassDeclaration(node) {
+                    var obj = new PlayPenExpr(node.id.name);
+                    var methods = node.body.body.map(function (e) {
+                        return _this2.parseNode(e);
+                    });
+                    // TODO: Predefined methods, notches, floating exprs, etc.
+                    return obj;
                 }
             };
 

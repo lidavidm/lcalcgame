@@ -158,6 +158,17 @@ class ES6Parser {
             /*  Ternary expression ?:  */
             'ConditionalExpression': (node) => {
                 return new (ExprManager.getClass('ifelse'))(this.parseNode(node.test), this.parseNode(node.consequent), this.parseNode(node.alternate));
+            },
+
+            /* A JS ES6 Class.
+               In Reduct, an Object container.
+               * TODO: Methods with the name _ should define unfilled 'notches' on the side of the object. *
+            */
+            'ClassDeclaration': (node) => {
+                let obj = new PlayPenExpr(node.id.name);
+                let methods = node.body.body.map((e) => this.parseNode(e));
+                // TODO: Predefined methods, notches, floating exprs, etc.
+                return obj;
             }
         }
 
