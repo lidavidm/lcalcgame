@@ -798,11 +798,17 @@ class PlanetCard extends mag.ImageRect {
             };
         };
 
+        let md = new MobileDetect(window.navigator.userAgent);
+
         // Level spots
         this.spots = [];
         for (let i = 1; i <= NUM_LVLS; i++) {
             let spotpos = this.path.posAlongPath((i-1) / (NUM_LVLS-1));
-            let spot = new LevelSpot( spotpos.x, spotpos.y, 8 * this.radius / 120, genClickCallback(i-1) );
+            let r = 8 * this.radius / 120;
+            if (__IS_MOBILE && md.phone()) {
+                r = 10 * this.radius / 120;
+            }
+            let spot = new LevelSpot( spotpos.x, spotpos.y, r, genClickCallback(i-1) );
             spot.anchor = { x:0.5, y:0.5 };
             spot.relPosAlongPath = i / NUM_LVLS;
             spot.levelId = levels[1] + i-1;
@@ -1418,7 +1424,7 @@ class ChapterSelectMenu extends mag.Stage {
             if (planet.onclick) planet.expandFunc = planet.onclick;
             planet.onclick = null;
             planet.hideText();
-            let r = Math.min(this.boundingSize.w / 3.0, this.boundingSize.h / 2.2);
+            let r = Math.min(this.boundingSize.w / 2.2, this.boundingSize.h / 2.2);
             let center = {
                 x: this.boundingSize.w / 2.0,
                 y: this.boundingSize.h / 2.0
