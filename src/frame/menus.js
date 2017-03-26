@@ -1418,7 +1418,7 @@ class ChapterSelectMenu extends mag.Stage {
             if (planet.onclick) planet.expandFunc = planet.onclick;
             planet.onclick = null;
             planet.hideText();
-            let r = this.boundingSize.w / 3.0;
+            let r = Math.min(this.boundingSize.w / 3.0, this.boundingSize.h / 2.2);
             let center = {
                 x: this.boundingSize.w / 2.0,
                 y: this.boundingSize.h / 2.0
