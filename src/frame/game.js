@@ -366,7 +366,7 @@ class Level {
         };
 
         if (Number.isNumber(arg)) {
-            let numexpr = new NumberExpr(parseInt(arg));
+            let numexpr = new (ExprManager.getClass('number'))(parseInt(arg));
             lock(numexpr, locked);
             return numexpr;
         }

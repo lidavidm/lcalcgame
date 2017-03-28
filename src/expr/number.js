@@ -30,6 +30,15 @@ class NumberExpr extends Expression {
     }
 }
 
+class FadedNumberExpr extends NumberExpr {
+    constructor(num) {
+        super(num);
+        this.children = [];
+        this.holes = [];
+        this.addArg(new TextExpr(num.toString()));
+    }
+}
+
 class AddExpr extends Expression {
     constructor(left, right) {
         let op = new TextExpr("+");
@@ -53,7 +62,7 @@ class AddExpr extends Expression {
 
     reduce() {
         if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {
-            return new NumberExpr(this.leftExpr.value() + this.rightExpr.value());
+            return new (ExprManager.getClass('number'))(this.leftExpr.value() + this.rightExpr.value());
         }
         else {
             return this;

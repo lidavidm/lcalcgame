@@ -14,6 +14,7 @@ var ExprManager = (function() {
         '_b':       [MissingKeyExpression, MissingBooleanExpression],
         'true':     [KeyTrueExpr, TrueExpr],
         'false':    [KeyFalseExpr, FalseExpr],
+        'number':   [NumberExpr, FadedNumberExpr],
         'cmp':      [MirrorCompareExpr, FadedCompareExpr],
         '==':       [MirrorCompareExpr, FadedCompareExpr],
         '+':        [AddExpr],
