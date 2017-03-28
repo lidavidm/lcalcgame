@@ -168,6 +168,20 @@ class LambdaHoleExpr extends MissingExpression {
     }
 
     // Events
+    onmousedown(pos) {
+        if (this.parent) {
+            pos = addPos(pos, fromTo(this.absolutePos, this.parent.absolutePos));
+            this.parent.onmousedown(pos);
+        }
+    }
+
+    onmouseup(pos) {
+        if (this.parent) {
+            pos = addPos(pos, fromTo(this.absolutePos, this.parent.absolutePos));
+            this.parent.onmouseup(pos);
+        }
+    }
+
     onmousedrag(pos) {
         if (this.parent) {
             pos = addPos(pos, fromTo(this.absolutePos, this.parent.absolutePos));
