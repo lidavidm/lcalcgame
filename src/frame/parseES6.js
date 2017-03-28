@@ -29,7 +29,12 @@ class ES6Parser {
         // * if we reach here, we can assume single program...
 
         // Parse into AST using Esprima.js.
-        let AST = esprima.parse(program);
+        let AST;
+        try {
+            AST = esprima.parse(program);
+        } catch (e) {
+            return null;
+        }
 
         // If program has only one statement (;-separated code)
         // just parse and return that Expression.
@@ -61,6 +66,9 @@ class ES6Parser {
                 // Check if node is a Reduct reserved identifier (MissingExpression)
                 if (node.name === '_' || node.name === '_b' || node.name === '__')
                     return new (ExprManager.getClass(node.name))();
+                else if (node.name.substring(0, 2) === '_t') {
+                    return TypeInTextExpr.fromExprCode(node.name);
+                }
 
                 // Otherwise, treat this as a variable name...
                 return new (ExprManager.getClass('var'))(node.name);

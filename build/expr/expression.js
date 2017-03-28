@@ -529,7 +529,10 @@ var Expression = function (_mag$RoundedRect) {
 
             if (this.isSnapped()) {
                 var UNSNAP_THRESHOLD = 30;
-                if (distBetweenPos(this.pos, pos) >= UNSNAP_THRESHOLD) this.disconnectAllNotches();else return;
+                if (distBetweenPos(this.pos, pos) >= UNSNAP_THRESHOLD) {
+                    this.disconnectAllNotches();
+                    this.onDisconnect();
+                } else return;
             }
 
             var rightX = pos.x + this.absoluteSize.w;
@@ -770,6 +773,9 @@ var Expression = function (_mag$RoundedRect) {
             Animate.blink(this, 500, [1, 0, 1], 1);
             Animate.blink(otherExpr, 500, [1, 0, 1], 1);
         }
+    }, {
+        key: 'onDisconnect',
+        value: function onDisconnect() {}
 
         // The value (if any) this expression represents.
 

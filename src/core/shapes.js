@@ -163,7 +163,7 @@
              roundRect(ctx,
                        pos.x, pos.y,
                        size.w, size.h,
-                       this.radius*this.absoluteScale.x, true, this.stroke ? true : false,
+                       this.radius*this.absoluteScale.x, this.color ? true : false, this.stroke ? true : false,
                        this.stroke ? this.stroke.opacity : null,
                        this.notches ? this.notches : null);
          }

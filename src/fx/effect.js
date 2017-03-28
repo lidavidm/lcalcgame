@@ -1,3 +1,32 @@
+class ShapeExpandEffect {
+    static run(node, dur=500, smoothFunc=(e)=>e, color='white') {
+
+        if (!node.stage) {
+            console.warn('@ ShapeExpandEffect: Node is not member of stage.');
+            return;
+        }
+
+        // Store stage context.
+        let stage = node.stage;
+
+        let sz = node.absoluteSize;
+        let pos = node.upperLeftPos(node.absolutePos, sz);
+        pos.x += sz.w/2.0; pos.y += sz.h/2.0; // absolute center position
+        let rect = new mag.RoundedRect(pos.x, pos.y, sz.w, sz.h, node.radius);
+        rect.color = null; // no fill
+        rect.stroke = { color:color, lineWidth:2 };
+        rect.opacity = 1.0;
+        rect.anchor = { x:0.5, y:0.5 };
+        stage.add(rect);
+
+        // Expand and fadeout effect
+        Animate.tween(rect, { scale:{x:4, y:4}, opacity:0.0 }, dur, smoothFunc).after(() => {
+            stage.remove(rect);
+        });
+
+    }
+}
+
 // Node disappears and is replaced by a firework-like particle explosion.
 class SplosionEffect {
     static run(node) {
@@ -91,7 +120,7 @@ class SparkleTrigger {
 
                 size = node.absoluteSize;
                 if (size.w === 0) size = { w:50, h:50 };
-                
+
                 let vec = { x:(Math.random() - 0.5) * size.w * 1.2,
                             y:(Math.random() - 0.5) * size.h * 1.2 - part.size.h / 2.0 };
 

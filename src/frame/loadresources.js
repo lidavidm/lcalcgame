@@ -69,6 +69,11 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAudio('define-convert', 'convert.wav');
     loadAudio('drawer-open', 'drawer_close.wav');
     loadAudio('drawer-close', 'drawer_open.wav');
+    loadAudio('carriage-return', 'carriage-return.wav');
+    loadAudio('key-press-1', 'key-press-1.wav');
+    loadAudio('key-press-2', 'key-press-2.wav');
+    loadAudio('key-press-3', 'key-press-3.wav');
+    loadAudio('key-press-4', 'key-press-4.wav');
 
     loadImage('bag-background', 'bg-stars.png');
     loadImage('infinity-symbol', 'infinity_symbol.png');

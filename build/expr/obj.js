@@ -32,7 +32,14 @@ var PlayPenExpr = function (_ExpressionPlus) {
         _this.addChild(pen);
         _this.pen = pen;
         _this.color = 'YellowGreen';
-        _this.notches = [new WedgeNotch('left', 10, 10, 0.8, true), new WedgeNotch('left', 10, 10, 0.2, true), new WedgeNotch('right', 10, 10, 0.5, false)]; // notch in left side near top.
+        _this.notches = [new WedgeNotch('left', 10, 10, 0.8, true)]; // notch in left side near top.
+        //new WedgeNotch('left', 10, 10, 0.2, true),
+        //new WedgeNotch('right', 10, 10, 0.5, false)];  // for testing
+
+        var inner_hanger = new NotchHangerExpr(2);
+        inner_hanger.pos = { x: _this.padding.left, y: 0 };
+        inner_hanger.color = _this.color;
+        pen.addToPen(inner_hanger);
         return _this;
     }
     // get notchPos() {
@@ -144,19 +151,16 @@ var PlayPen = function (_mag$RoundedRect) {
         key: 'addToPen',
         value: function addToPen(expr) {
 
-            var stage = this.stage;
-            if (!stage) {
-                console.error('@ addToPen: PlayPen not member of a Stage.');
-                return;
-            } else if (!expr.stage || expr.stage != stage) {
-                console.error('@ addToPen: Expression has no stage, a different stage than PlayPen.');
-                return;
-            }
-
             var SCALE = 0.75;
             expr.scale = { x: SCALE, y: SCALE };
             expr.pos = fromTo(this.absolutePos, expr.absolutePos);
-            stage.remove(expr);
+
+            var stage = this.stage;
+            if (!stage) {
+                console.warn('@ addToPen: PlayPen not member of a Stage.');
+            } else if (!expr.stage || expr.stage != stage) {
+                console.warn('@ addToPen: Expression has no stage, a different stage than PlayPen.');
+            } else stage.remove(expr);
 
             this.addChild(expr);
         }

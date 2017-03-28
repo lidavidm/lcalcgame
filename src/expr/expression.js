@@ -466,9 +466,10 @@ class Expression extends mag.RoundedRect {
 
         if (this.isSnapped()) {
             const UNSNAP_THRESHOLD = 30;
-            if (distBetweenPos(this.pos, pos) >= UNSNAP_THRESHOLD)
+            if (distBetweenPos(this.pos, pos) >= UNSNAP_THRESHOLD) {
                 this.disconnectAllNotches();
-            else
+                this.onDisconnect();
+            } else
                 return;
         }
 
@@ -665,6 +666,9 @@ class Expression extends mag.RoundedRect {
         //this.stroke = null;
         Animate.blink(this, 500, [1,0,1], 1);
         Animate.blink(otherExpr, 500, [1,0,1], 1);
+    }
+    onDisconnect() {
+
     }
 
     // The value (if any) this expression represents.

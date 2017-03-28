@@ -10,9 +10,14 @@ class PlayPenExpr extends ExpressionPlus {
         this.addChild(pen);
         this.pen = pen;
         this.color = 'YellowGreen';
-        this.notches = [new WedgeNotch('left', 10, 10, 0.8, true),
-                        new WedgeNotch('left', 10, 10, 0.2, true),
-                        new WedgeNotch('right', 10, 10, 0.5, false)]; // notch in left side near top.
+        this.notches = [new WedgeNotch('left', 10, 10, 0.8, true)]; // notch in left side near top.
+                        //new WedgeNotch('left', 10, 10, 0.2, true),
+                        //new WedgeNotch('right', 10, 10, 0.5, false)];  // for testing
+
+        let inner_hanger = new NotchHangerExpr(2);
+        inner_hanger.pos = { x:this.padding.left, y:0 };
+        inner_hanger.color = this.color;
+        pen.addToPen(inner_hanger);
     }
     // get notchPos() {
     //     return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - this.notch.relpos) };
@@ -98,19 +103,17 @@ class PlayPen extends mag.RoundedRect {
     // *Expressions inside the pen cannot be dragged out.*
     addToPen(expr) {
 
-        let stage = this.stage;
-        if (!stage) {
-            console.error('@ addToPen: PlayPen not member of a Stage.');
-            return;
-        } else if (!expr.stage || expr.stage != stage) {
-            console.error('@ addToPen: Expression has no stage, a different stage than PlayPen.');
-            return;
-        }
-
         const SCALE = 0.75;
         expr.scale = { x:SCALE, y:SCALE };
         expr.pos = fromTo(this.absolutePos, expr.absolutePos);
-        stage.remove(expr);
+
+        let stage = this.stage;
+        if (!stage) {
+            console.warn('@ addToPen: PlayPen not member of a Stage.');
+        } else if (!expr.stage || expr.stage != stage) {
+            console.warn('@ addToPen: Expression has no stage, a different stage than PlayPen.');
+        }
+        else stage.remove(expr);
 
         this.addChild(expr);
     }

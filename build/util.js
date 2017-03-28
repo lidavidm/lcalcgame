@@ -7,6 +7,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
  */
 var __IS_MOBILE = /Mobi/.test(navigator.userAgent);
 
+// The current language parser. This won't change --yet!
+var __PARSER = ES6Parser;
+
 // Cursor graphic setting
 function SET_CURSOR_STYLE(style) {
     document.querySelector('canvas').style.cursor = style;
@@ -67,7 +70,9 @@ var CONST = {
     CURSOR: {
         HAND: 'pointer',
         DEFAULT: 'auto',
-        RESIZE: 'nwse-resize'
+        RESIZE: 'nwse-resize',
+        GRAB: /Chrome|Safari/.test(navigator.userAgent) ? '-webkit-grab' : 'grab',
+        GRABBING: /Chrome|Safari/.test(navigator.userAgent) ? '-webkit-grabbing' : 'grabbing'
     }
 };
 function clonePos(pos) {

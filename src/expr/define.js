@@ -103,6 +103,7 @@ class NamedExpr extends Expression {
 class DragPatch extends ImageExpr {
     constructor(x, y, w, h) {
         super(x, y, w, h, 'drag-patch');
+        this.padding = {left:0, right:0, inner:0};
     }
     get delegateToInner() { return true; }
     draw(ctx) {
@@ -114,8 +115,19 @@ class DragPatch extends ImageExpr {
     onmouseenter(pos) {
         super.onmouseenter(pos);
         this.parent.stroke = { color:'white', lineWidth:2 };
+        SET_CURSOR_STYLE(CONST.CURSOR.GRAB);
+    }
+    onmousedown(pos) {
+        super.onmousedown(pos);
+        SET_CURSOR_STYLE(CONST.CURSOR.GRABBING);
+    }
+    onmouseup(pos) {
+        super.onmouseup(pos);
+        SET_CURSOR_STYLE(CONST.CURSOR.GRAB);
     }
     onmousedrag(pos) {
+
+        SET_CURSOR_STYLE(CONST.CURSOR.GRABBING);
 
         let stage = this.stage;
         let replacement = this.parent.parent.generateNamedExpr(); // DefineExpr -> NamedExpr
@@ -127,6 +139,7 @@ class DragPatch extends ImageExpr {
         ghosted_name.onmouseup = function (pos){
             this.opacity = 1.0;
             this.shadowOffset = 0;
+            SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
 
             replacement.pos = this.upperLeftPos(this.absolutePos, this.absoluteSize);
             let fx = new ShatterExpressionEffect(this);
@@ -147,6 +160,7 @@ class DragPatch extends ImageExpr {
     onmouseleave(pos) {
         super.onmouseleave(pos);
         this.parent.stroke = null;
+        SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
     }
 }
 
@@ -155,7 +169,7 @@ class DefineExpr extends ClampExpr {
     constructor(expr, name=null) {
         //let txt_define = new TextExpr('define');
         //txt_define.color = 'black';
-        let txt_input = new Expression([ new TextExpr(name ? name : 'foo'), new DragPatch(0, 0, 42, 52) ]); // TODO: Make this text input field (or dropdown menu).
+        let txt_input = new Expression([ new TextExpr(name ? name : 'foo') ]); // TODO: Make this text input field (or dropdown menu).
         txt_input.color = 'Salmon';
         txt_input.radius = 2;
         txt_input.lock();
@@ -166,6 +180,19 @@ class DefineExpr extends ClampExpr {
         if (name) this.funcname = name;
 
         this.notches = [ new WedgeNotch('left', 10, 10, 0.8, true) ];
+    }
+    onSnap(otherNotch, otherExpr, thisNotch) {
+        super.onSnap(otherNotch, otherExpr, thisNotch);
+        if (this.children[0].holes.length === 1) {
+            let drag_patch = new DragPatch(0, 0, 42, 52);
+            this.children[0].addChild(drag_patch);
+            this.children[0].update();
+        }
+    }
+    onDisconnect() {
+        if (this.children[0].holes.length > 1) {
+            this.children[0].removeChild(this.children[0].children[1]);
+        }
     }
     get expr() { return this.children[1]; }
     get constructorArgs() { return [ this.expr.clone() ]; }

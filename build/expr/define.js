@@ -174,7 +174,10 @@ var DragPatch = function (_ImageExpr) {
     function DragPatch(x, y, w, h) {
         _classCallCheck(this, DragPatch);
 
-        return _possibleConstructorReturn(this, (DragPatch.__proto__ || Object.getPrototypeOf(DragPatch)).call(this, x, y, w, h, 'drag-patch'));
+        var _this3 = _possibleConstructorReturn(this, (DragPatch.__proto__ || Object.getPrototypeOf(DragPatch)).call(this, x, y, w, h, 'drag-patch'));
+
+        _this3.padding = { left: 0, right: 0, inner: 0 };
+        return _this3;
     }
 
     _createClass(DragPatch, [{
@@ -190,10 +193,25 @@ var DragPatch = function (_ImageExpr) {
         value: function onmouseenter(pos) {
             _get(DragPatch.prototype.__proto__ || Object.getPrototypeOf(DragPatch.prototype), 'onmouseenter', this).call(this, pos);
             this.parent.stroke = { color: 'white', lineWidth: 2 };
+            SET_CURSOR_STYLE(CONST.CURSOR.GRAB);
+        }
+    }, {
+        key: 'onmousedown',
+        value: function onmousedown(pos) {
+            _get(DragPatch.prototype.__proto__ || Object.getPrototypeOf(DragPatch.prototype), 'onmousedown', this).call(this, pos);
+            SET_CURSOR_STYLE(CONST.CURSOR.GRABBING);
+        }
+    }, {
+        key: 'onmouseup',
+        value: function onmouseup(pos) {
+            _get(DragPatch.prototype.__proto__ || Object.getPrototypeOf(DragPatch.prototype), 'onmouseup', this).call(this, pos);
+            SET_CURSOR_STYLE(CONST.CURSOR.GRAB);
         }
     }, {
         key: 'onmousedrag',
         value: function onmousedrag(pos) {
+
+            SET_CURSOR_STYLE(CONST.CURSOR.GRABBING);
 
             var stage = this.stage;
             var replacement = this.parent.parent.generateNamedExpr(); // DefineExpr -> NamedExpr
@@ -207,6 +225,7 @@ var DragPatch = function (_ImageExpr) {
 
                 this.opacity = 1.0;
                 this.shadowOffset = 0;
+                SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
 
                 replacement.pos = this.upperLeftPos(this.absolutePos, this.absoluteSize);
                 var fx = new ShatterExpressionEffect(this);
@@ -229,6 +248,7 @@ var DragPatch = function (_ImageExpr) {
         value: function onmouseleave(pos) {
             _get(DragPatch.prototype.__proto__ || Object.getPrototypeOf(DragPatch.prototype), 'onmouseleave', this).call(this, pos);
             this.parent.stroke = null;
+            SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
         }
     }, {
         key: 'delegateToInner',
@@ -253,7 +273,7 @@ var DefineExpr = function (_ClampExpr) {
 
         //let txt_define = new TextExpr('define');
         //txt_define.color = 'black';
-        var txt_input = new Expression([new TextExpr(name ? name : 'foo'), new DragPatch(0, 0, 42, 52)]); // TODO: Make this text input field (or dropdown menu).
+        var txt_input = new Expression([new TextExpr(name ? name : 'foo')]); // TODO: Make this text input field (or dropdown menu).
         txt_input.color = 'Salmon';
         txt_input.radius = 2;
         txt_input.lock();
@@ -270,6 +290,23 @@ var DefineExpr = function (_ClampExpr) {
     }
 
     _createClass(DefineExpr, [{
+        key: 'onSnap',
+        value: function onSnap(otherNotch, otherExpr, thisNotch) {
+            _get(DefineExpr.prototype.__proto__ || Object.getPrototypeOf(DefineExpr.prototype), 'onSnap', this).call(this, otherNotch, otherExpr, thisNotch);
+            if (this.children[0].holes.length === 1) {
+                var drag_patch = new DragPatch(0, 0, 42, 52);
+                this.children[0].addChild(drag_patch);
+                this.children[0].update();
+            }
+        }
+    }, {
+        key: 'onDisconnect',
+        value: function onDisconnect() {
+            if (this.children[0].holes.length > 1) {
+                this.children[0].removeChild(this.children[0].children[1]);
+            }
+        }
+    }, {
         key: 'generateNamedExpr',
         value: function generateNamedExpr() {
             var funcname = this.funcname;

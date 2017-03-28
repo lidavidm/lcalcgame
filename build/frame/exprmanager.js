@@ -14,6 +14,7 @@ var ExprManager = function () {
         '_': [MissingExpression],
         '__': [MissingBagExpression, MissingBracketExpression],
         '_b': [MissingKeyExpression, MissingBooleanExpression],
+        '_t': [TypeInTextExpr],
         'true': [KeyTrueExpr, TrueExpr],
         'false': [KeyFalseExpr, FalseExpr],
         'cmp': [MirrorCompareExpr, FadedCompareExpr],

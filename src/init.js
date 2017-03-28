@@ -189,8 +189,20 @@ function initMainMenu() {
         //
         // EntangledExpr.pairedAnimate(ee, ee2);
 
-        let typebox = new TypeBox(500, 200, 80, 40);
+        let typebox = new SummoningTypeBox(500, 200, 80, 40);
         stage.add(typebox);
+
+        let textype = Level.parse('(== /pear /apple)')[0];
+        textype.holes[1] = new TypeInTextExpr((str) => {
+            return str === '==' || str === '!=';
+        }, (finalText) => {
+            textype.funcName = finalText;
+        }, 6);
+        //let textype = new Expression([new TypeInTextExpr(() => true, 6)]);
+        //textype.holes[0].color = 'gold';
+        //textype.children[0].color = 'OrangeRed';
+        textype.pos = { x:300, y:200 };
+        stage.add(textype);
 
         let playpen = new PlayPenExpr();
         playpen.pos = { x:240, y:180 };
