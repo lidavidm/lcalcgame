@@ -186,6 +186,7 @@ class BagExpr extends CollectionExpr {
     clone(parent=null) {
         let c = super.clone(parent);
         c._items = [];
+        c.graphicNode.removeAllItems();
         this.items.forEach((i) => c.addItem(i.clone()));
         c.graphicNode.update();
         return c;
