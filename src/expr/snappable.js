@@ -236,16 +236,16 @@ class Snappable extends Expression {
 
     drawInternalAfterChildren(ctx, pos, boundingSize) {
         let radius = this.radius * this.absoluteScale.x;
-        const leftMargin = 15 * this.scale.x;
+        const rightMargin = 15 * this.scale.x;
         ctx.fillStyle = "#fff";
         roundRect(ctx,
-                  pos.x, pos.y,
-                  leftMargin, boundingSize.h,
+                  pos.x + boundingSize.w - rightMargin, pos.y,
+                  rightMargin, boundingSize.h,
                   {
-                      tl: radius,
-                      bl: radius,
-                      tr: 0,
-                      br: 0,
+                      tl: 0,
+                      bl: 0,
+                      tr: radius,
+                      br: radius,
                   }, true, false,
                   null);
     }

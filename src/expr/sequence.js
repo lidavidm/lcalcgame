@@ -141,23 +141,23 @@ class Sequence extends Expression {
 class NotchedSequence extends Sequence {
     constructor(...exprs) {
         super(...exprs);
-        this.padding.left = 17.5;
+        this.padding.right = 17.5;
         this._reductionIndicatorStart = 0;
     }
 
     drawInternal(ctx, pos, boundingSize) {
         super.drawInternal(ctx, pos, boundingSize);
         const radius = this.radius*this.absoluteScale.x;
-        const leftMargin = 15 * this.scale.x;
+        const rightMargin = 15 * this.scale.x;
         ctx.fillStyle = "#fff";
         roundRect(ctx,
-                  pos.x, pos.y,
-                  leftMargin, boundingSize.h,
+                  pos.x + boundingSize.w - rightMargin, pos.y,
+                  rightMargin, boundingSize.h,
                   {
-                      tl: radius,
-                      bl: radius,
-                      tr: 0,
-                      br: 0,
+                      tl: 0,
+                      bl: 0,
+                      tr: radius,
+                      br: radius,
                   }, true, false,
                   null);
 
@@ -170,14 +170,14 @@ class NotchedSequence extends Sequence {
             let expr2y = expr2.absolutePos.y;
             let tickPos = expr1y + (expr2y - expr1y) / 2;
             ctx.beginPath();
-            ctx.moveTo(pos.x, expr1y);
-            ctx.lineTo(pos.x + 15 * this.scale.x, expr1y);
+            ctx.moveTo(pos.x + boundingSize.w - 15 * this.scale.x, expr1y);
+            ctx.lineTo(pos.x + boundingSize.w, expr1y);
             ctx.stroke();
         }
 
         if (this._animating) {
-            const rad = leftMargin / 3;
-            const indicatorX = pos.x + leftMargin / 2 - rad;
+            const rad = rightMargin / 3;
+            const indicatorX = pos.x + boundingSize.w - rightMargin / 2 - rad;
             const verticalDistance = boundingSize.h - 2 * radius;
             const verticalOffset = 0.5 * (1.0 + Math.sin((Date.now() - this._reductionIndicatorStart) / 250)) * verticalDistance;
             drawCircle(ctx, indicatorX, pos.y + radius + verticalOffset, rad, "#000", null);
