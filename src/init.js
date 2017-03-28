@@ -260,8 +260,9 @@ let prepareCanvas = (function() {
         if (__IS_MOBILE) {
             let changed = false;
             if (canvas) {
-                let newWidth = window.screen.availWidth;
-                let newHeight = window.screen.availHeight;
+                // Account for mobile status bars/address bar/Android navbar/etc
+                let newWidth = Math.min(window.screen.availWidth, window.innerWidth);
+                let newHeight = Math.min(window.screen.availHeight, window.innerHeight);
                 if (canvas.width != newWidth || canvas.height != newHeight) {
                     changed = true;
                 }
