@@ -195,3 +195,44 @@ class NotchedSequence extends Sequence {
         return result;
     }
 }
+
+class SemicolonNotchedSequence extends NotchedSequence {
+    constructor(...exprs) {
+        super(...exprs);
+        this.padding.right = 15;
+    }
+
+    drawInternal(ctx, pos, boundingSize) {
+        super.drawInternal(ctx, pos, boundingSize);
+        const radius = this.radius*this.absoluteScale.x;
+        const rightMargin = 15 * this.scale.x;
+
+        ctx.fillStyle = "black";
+        let fontSize = 35 * this.scale.y * 0.85;
+        ctx.font = `${fontSize}px Consolas, monospace`;
+        for (let i = 0; i < this.holes.length; i++) {
+            let expr1 = this.holes[i];
+            let expr1y = expr1.absolutePos.y; // - expr1.anchor.y * expr1.absoluteSize.h;
+            expr1y += (expr1.absoluteSize.h - fontSize) / 2;
+            ctx.fillText(";", pos.x + boundingSize.w - rightMargin, expr1y);
+        }
+    }
+}
+
+class SemicolonSequence extends Sequence {
+    drawInternal(ctx, pos, boundingSize) {
+        super.drawInternal(ctx, pos, boundingSize);
+        const radius = this.radius*this.absoluteScale.x;
+        const rightMargin = 15 * this.scale.x;
+
+        ctx.fillStyle = "black";
+        let fontSize = 35 * this.scale.y * 0.85;
+        ctx.font = `${fontSize}px Consolas, monospace`;
+        for (let i = 0; i < this.holes.length; i++) {
+            let expr1 = this.holes[i];
+            let expr1y = expr1.absolutePos.y; // - expr1.anchor.y * expr1.absoluteSize.h;
+            expr1y += (expr1.absoluteSize.h - fontSize) / 2;
+            ctx.fillText(";", pos.x + boundingSize.w - rightMargin, expr1y);
+        }
+    }
+}
