@@ -73,7 +73,7 @@ var NewInstanceExpr = function (_FadedValueExpr) {
 var NamedExpr = function (_Expression) {
     _inherits(NamedExpr, _Expression);
 
-    function NamedExpr(name, expr, args) {
+    function NamedExpr(name, refDefineExpr, args) {
         _classCallCheck(this, NamedExpr);
 
         var txt_name = new TextExpr(name);
@@ -89,7 +89,7 @@ var NamedExpr = function (_Expression) {
         _this2._args = args.map(function (a) {
             return a.clone();
         });
-        _this2._wrapped_expr = expr;
+        _this2._wrapped_ref = refDefineExpr;
         return _this2;
     }
 
@@ -101,7 +101,19 @@ var NamedExpr = function (_Expression) {
     }, {
         key: 'reduce',
         value: function reduce() {
-            if (!this.expr || this.expr instanceof MissingExpression) return this;else {
+            var expr = this.expr;
+            if (!expr || expr instanceof MissingExpression) return this;else {
+
+                var incomplete_exprs = mag.Stage.getNodesWithClass(MissingExpression, [], true, [expr]).filter(function (e) {
+                    return !(e instanceof LambdaHoleExpr);
+                });
+                if (incomplete_exprs.length > 0) {
+                    console.log(incomplete_exprs);
+                    incomplete_exprs.forEach(function (e) {
+                        return Animate.blink(e, 1000, [1, 0, 0], 2);
+                    });
+                    return this;
+                }
 
                 // This should 'reduce' by applying the arguments to the wrapped expression.
                 // First, let's check that we HAVE arguments...
@@ -118,16 +130,22 @@ var NamedExpr = function (_Expression) {
                     // true if all args valid
 
                     // All the arguments check out. Now we need to apply them.
-                    var expr = this.expr;
-                    console.log(expr);
+                    var _expr = this.expr;
+                    console.log(_expr);
 
-                    if (args.length > 0) expr = args.reduce(function (lambdaExpr, arg) {
+                    if (args.length > 0) _expr = args.reduce(function (lambdaExpr, arg) {
                         return lambdaExpr.applyExpr(arg);
-                    }, expr); // Chains application to inner lambda expressions.
+                    }, _expr); // Chains application to inner lambda expressions.
 
                     Resource.play('define-convert');
 
-                    return expr.clone(); // to be safe we'll clone it.
+                    // Disable editing the DefineExpr after its been used once.
+                    this._wrapped_ref.lockSubexpressions(function (e) {
+                        return !(e instanceof DragPatch);
+                    });
+                    this._wrapped_ref.lock();
+
+                    return _expr.clone(); // to be safe we'll clone it.
                 }
             }
 
@@ -149,7 +167,7 @@ var NamedExpr = function (_Expression) {
     }, {
         key: 'expr',
         get: function get() {
-            return this._wrapped_expr.clone();
+            return this._wrapped_ref.expr.clone();
         }
     }, {
         key: 'args',
@@ -316,7 +334,7 @@ var DefineExpr = function (_ClampExpr) {
             for (var i = 0; i < numargs; i++) {
                 args.push(new MissingExpression());
             } // Return named function (expression).
-            return new NamedExpr(funcname, this.expr.clone(), args);
+            return new NamedExpr(funcname, this, args);
         }
         // get notchPos() {
         //     return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - this.notch.relpos) };
@@ -358,6 +376,7 @@ var DefineExpr = function (_ClampExpr) {
     }, {
         key: 'onmouseclick',
         value: function onmouseclick() {
+            return; // disable for now;
 
             if (this.funcname) {
                 this.performReduction();

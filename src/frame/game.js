@@ -171,11 +171,24 @@ class Level {
                     n.constructor.name === 'ImageRect' ||
                     !(n instanceof Expression) ||
                     n.fadingOut ||
-                    n.toolbox) continue;
+                    n.toolbox || n.isSnapped()) continue;
+                else if (n instanceof NotchHangerExpr)
+                    continue;
                 nodes.push(n);
             }
             return nodes;
         }.bind(stage);
+        stage.notchHangers = (function() {
+            let hangers = [];
+            for (let n of this.nodes) {
+                if (n instanceof NotchHangerExpr) {
+                    n.pos = { x:0, y:80 + 160*hangers.length };
+                    n.anchor = {x:0, y:0};
+                    hangers.push(n);
+                }
+            }
+            return hangers;
+        }.bind(stage))();
         stage.toolboxNodes = function() {
             return this.nodes.filter((n) => n.toolbox && n.toolbox instanceof Toolbox && !n.fadingOut);
         }.bind(stage);
@@ -350,6 +363,10 @@ class Level {
                     for (let i = 1; i < exprs.length; i++) { lexp.addArg(exprs[i]); }
                     return lock(lexp, toplevel_lock);
                 }
+                else if (op_class instanceof NotchHangerExpr) {
+                    op_class.pos = {x:0, y:80};
+                    return op_class;
+                }
                 else if (op_class instanceof BagExpr) {
                     let bag = op_class;
                     let sz = bag.graphicNode.size;
@@ -423,6 +440,7 @@ class Level {
             'level':ExprManager.getClass('level'),
             'arrayobj':ExprManager.getClass('arrayobj'),
             'infinite':ExprManager.getClass('infinite'),
+            'notch':new (ExprManager.getClass('notch'))(1),
             'dot':(() => {
                 let circ = new CircleExpr(0,0,18);
                 circ.color = 'gold';

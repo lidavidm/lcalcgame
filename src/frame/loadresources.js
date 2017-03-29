@@ -10,13 +10,19 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     var levels = [];
     var chapters = [];
     var markChapter = (json, prev_levels) => {
-        var d = { name:json.chapterName, description:json.description, startIdx:prev_levels.length };
+        var d = {
+            name:json.chapterName,
+            description:json.description,
+            language:(json.language || "reduct-scheme"),
+            startIdx:prev_levels.length };
         if (json.resources) d.resources = json.resources;
         chapters.push(d);
     };
     var pushChapter = (json) => {
         markChapter(json, levels);
+        var lang = json.language || "reduct-scheme";
         json.levels.forEach((lvl) => {
+            lvl.language = lang;
             levels.push(lvl);
         });
     };
@@ -189,7 +195,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAnimation('poof', [0, 4], 120); // Cloud 'poof' animation for destructor piece.
 
     // Add levels here: (for now)
-    var chapter_load_prom = loadChaptersFromFiles( ['intro_obj', 'intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map', 'define', 'assign', 'sequence'] );
+    var chapter_load_prom = loadChaptersFromFiles( ['define', 'intro_obj', 'intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map', 'assign', 'sequence'] );
 
     Resource.startChapter = (chapterName, canvas) => {
         for (let i = 0; i < chapters.length; i++) {

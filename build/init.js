@@ -145,130 +145,132 @@ function initChapterSelectMenu(flyToChapIdx) {
     }
 }
 
+function __DEBUG_TESTBED(stage) {
+    // let dropdown = new DropdownSelect( 200, 100, 120, 40, [ "A", "B", "C" ], null, "YellowGreen", "Green", "PaleGreen", false );
+    // stage.add(dropdown);
+    // Animate.wait(1000).after(() => dropdown.expand(true));
+
+    // let drawer = new PulloutDrawer(200, 260, 14, 44, { 'pop':true, 'push':true, 'map':true });
+    // stage.add(drawer);
+
+    // let ee = new EntangledExpr( Level.parse('(2) (3) (4) (5)'), true );
+    // ee.pos = { x:300, y:230 };
+    // stage.add(ee);
+    //
+    // let ee2 = new EntangledExpr( Level.parse('(1) (2) (3) (4)'), false );
+    // ee2.pos = { x:300, y:280 };
+    // stage.add(ee2);
+    //
+    // EntangledExpr.pairedAnimate(ee, ee2);
+
+    var typebox = new SummoningTypeBox(500, 200, 80, 40);
+    stage.add(typebox);
+
+    var textype = Level.parse('(== /pear /apple)')[0];
+    textype.holes[1] = new TypeInTextExpr(function (str) {
+        return str === '==' || str === '!=';
+    }, function (finalText) {
+        textype.funcName = finalText;
+    }, 6);
+    //let textype = new Expression([new TypeInTextExpr(() => true, 6)]);
+    //textype.holes[0].color = 'gold';
+    //textype.children[0].color = 'OrangeRed';
+    textype.pos = { x: 300, y: 200 };
+    stage.add(textype);
+
+    var playpen = new PlayPenExpr();
+    playpen.pos = { x: 240, y: 180 };
+    stage.add(playpen);
+
+    // let obj = new ArrayObjectExpr(new BracketArrayExpr(0, 0, 44, 44));
+    // obj.pos = { x:200, y:200 };
+    // stage.add(obj);
+    //
+    // stage.add( Level.parse('(λx /(== #x /star))')[0] )
+    // stage.add( Level.parse('rect')[0] )
+    // stage.add( Level.parse('star')[0] )
+
+    // let apply = new ApplyExpr( Level.parse('3')[0], Level.parse('(λx /(+ #x /3))')[0] );
+    // apply.pos = { x:200, y:400 };
+    // stage.add(apply);
+    // console.log(apply);
+
+    // let meta = new MetaExpression(stage, Resource.buildLevel(Resource.level[10], stage.canvas));
+    // meta.pos = { x:200, y:200 };
+    // stage.add(meta);
+
+    //let inf = new InfiniteExpression( new (ExprManager.getClass('star'))(0,0,25,5) );
+
+    // let inf = new InfiniteExpression( new TrueExpr() );
+    // inf.pos = { x:400, y:300 };
+    // stage.add(inf);
+
+    var def = new DefineExpr(new MissingExpression(), 'double');
+    def.pos = { x: 300, y: 400 };
+    stage.add(def);
+
+    var n = new NewInstanceExpr();
+    n.pos = { x: 0, y: 200 };
+    stage.add(n);
+
+    var hanger = new NotchHangerExpr(1);
+    var hanger2 = new NotchHangerExpr(1);
+    hanger.pos = { x: 0, y: 80 };
+    hanger2.pos = { x: 0, y: 280 };
+    stage.add(hanger);
+    stage.add(hanger2);
+
+    console.warn(ES6Parser.parse('(x) => x; ("star" == true);'));
+
+    /*
+    let substage = new mag.StageNode(0, 0, Resource.buildLevel(Resource.level[10], canvas), canvas);
+    //substage.scale = { x:0.5, y:0.5 };
+    substage.anchor = { x:0.5, y:0.5 };
+    substage.pos = { x:stage.boundingSize.w/2, y:stage.boundingSize.h/2 };
+    stage.add(substage);
+    substage.canvas = null;
+    stage.canvas = null;
+    stage.canvas = canvas;*/
+}
+
 function initMainMenu() {
 
     canvas = document.getElementById('canvas');
 
     if (canvas.getContext) {
-        (function () {
 
-            prepareCanvas();
-            $(canvas).css('background-color', '#EEE');
+        prepareCanvas();
+        $(canvas).css('background-color', '#EEE');
 
-            //stage = new MainMenu(canvas, initChapterSelectMenu);
+        //stage = new MainMenu(canvas, initChapterSelectMenu);
 
-            // stage = new MainMenu(canvas, () => {
-            //
-            //     //Clicks 'play' button. Transition to chapter select screen.
-            //stage = new ChapterSelectMenu(canvas, initLevel);
-            //redraw(stage);
-            //
-            // });
-            //}, () => {
-            // Clicked 'settings' button. Transition to settings screen.
-            //});
+        // stage = new MainMenu(canvas, () => {
+        //
+        //     //Clicks 'play' button. Transition to chapter select screen.
+        //stage = new ChapterSelectMenu(canvas, initLevel);
+        //redraw(stage);
+        //
+        // });
+        //}, () => {
+        // Clicked 'settings' button. Transition to settings screen.
+        //});
 
-            initBoard();
+        initBoard();
 
-            // let dropdown = new DropdownSelect( 200, 100, 120, 40, [ "A", "B", "C" ], null, "YellowGreen", "Green", "PaleGreen", false );
-            // stage.add(dropdown);
-            // Animate.wait(1000).after(() => dropdown.expand(true));
+        //__DEBUG_TESTBED(stage);
 
-            // let drawer = new PulloutDrawer(200, 260, 14, 44, { 'pop':true, 'push':true, 'map':true });
-            // stage.add(drawer);
+        //substage.clip = { l:0.14, r:0.22, t:0, b:0.11 };
 
-            // let ee = new EntangledExpr( Level.parse('(2) (3) (4) (5)'), true );
-            // ee.pos = { x:300, y:230 };
-            // stage.add(ee);
-            //
-            // let ee2 = new EntangledExpr( Level.parse('(1) (2) (3) (4)'), false );
-            // ee2.pos = { x:300, y:280 };
-            // stage.add(ee2);
-            //
-            // EntangledExpr.pairedAnimate(ee, ee2);
+        redraw(stage);
 
-            var typebox = new SummoningTypeBox(500, 200, 80, 40);
-            stage.add(typebox);
+        //Animate.tween(substage, { scale:{x:0.5, y:0.5} }, 1000);
 
-            var textype = Level.parse('(== /pear /apple)')[0];
-            textype.holes[1] = new TypeInTextExpr(function (str) {
-                return str === '==' || str === '!=';
-            }, function (finalText) {
-                textype.funcName = finalText;
-            }, 6);
-            //let textype = new Expression([new TypeInTextExpr(() => true, 6)]);
-            //textype.holes[0].color = 'gold';
-            //textype.children[0].color = 'OrangeRed';
-            textype.pos = { x: 300, y: 200 };
-            stage.add(textype);
+        //Animate.tween(substage, { clip:{ l:0.14, r:0.22, t:0, b:0.11 } }, 1000, (e) => Math.pow(e, 2)).after(() => {
+        //    Animate.tween(substage, { clip:{ l:0, r:1, t:0, b:1 } }, 1000, (e) => Math.pow(e, 2));
+        //});
 
-            var playpen = new PlayPenExpr();
-            playpen.pos = { x: 240, y: 180 };
-            stage.add(playpen);
-
-            // let obj = new ArrayObjectExpr(new BracketArrayExpr(0, 0, 44, 44));
-            // obj.pos = { x:200, y:200 };
-            // stage.add(obj);
-            //
-            // stage.add( Level.parse('(λx /(== #x /star))')[0] )
-            // stage.add( Level.parse('rect')[0] )
-            // stage.add( Level.parse('star')[0] )
-
-            // let apply = new ApplyExpr( Level.parse('3')[0], Level.parse('(λx /(+ #x /3))')[0] );
-            // apply.pos = { x:200, y:400 };
-            // stage.add(apply);
-            // console.log(apply);
-
-            // let meta = new MetaExpression(stage, Resource.buildLevel(Resource.level[10], stage.canvas));
-            // meta.pos = { x:200, y:200 };
-            // stage.add(meta);
-
-            //let inf = new InfiniteExpression( new (ExprManager.getClass('star'))(0,0,25,5) );
-
-            // let inf = new InfiniteExpression( new TrueExpr() );
-            // inf.pos = { x:400, y:300 };
-            // stage.add(inf);
-
-            var def = new DefineExpr(new MissingExpression(), 'double');
-            def.pos = { x: 300, y: 400 };
-            stage.add(def);
-
-            var n = new NewInstanceExpr();
-            n.pos = { x: 0, y: 200 };
-            stage.add(n);
-
-            var hanger = new NotchHangerExpr(1);
-            var hanger2 = new NotchHangerExpr(1);
-            hanger.pos = { x: 0, y: 80 };
-            hanger2.pos = { x: 0, y: 280 };
-            stage.add(hanger);
-            stage.add(hanger2);
-
-            console.warn(ES6Parser.parse('(x) => x; ("star" == true);'));
-
-            /*
-            let substage = new mag.StageNode(0, 0, Resource.buildLevel(Resource.level[10], canvas), canvas);
-            //substage.scale = { x:0.5, y:0.5 };
-            substage.anchor = { x:0.5, y:0.5 };
-            substage.pos = { x:stage.boundingSize.w/2, y:stage.boundingSize.h/2 };
-            stage.add(substage);
-            substage.canvas = null;
-            stage.canvas = null;
-            stage.canvas = canvas;*/
-
-            //substage.clip = { l:0.14, r:0.22, t:0, b:0.11 };
-
-            redraw(stage);
-
-            //Animate.tween(substage, { scale:{x:0.5, y:0.5} }, 1000);
-
-            //Animate.tween(substage, { clip:{ l:0.14, r:0.22, t:0, b:0.11 } }, 1000, (e) => Math.pow(e, 2)).after(() => {
-            //    Animate.tween(substage, { clip:{ l:0, r:1, t:0, b:1 } }, 1000, (e) => Math.pow(e, 2));
-            //});
-
-            //Animate.tween(substage, { clip:{ l:0.14, r:0.22, t:0, b:0.11 },
-            //    pos:{x:stage.boundingSize.w/2 - stage.boundingSize.w*0.14 + stage.boundingSize.w/2, y:stage.boundingSize.h*(1-0.11/2)} }, 1000);
-        })();
+        //Animate.tween(substage, { clip:{ l:0.14, r:0.22, t:0, b:0.11 },
+        //    pos:{x:stage.boundingSize.w/2 - stage.boundingSize.w*0.14 + stage.boundingSize.w/2, y:stage.boundingSize.h*(1-0.11/2)} }, 1000);
     }
 }
 

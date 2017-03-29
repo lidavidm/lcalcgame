@@ -489,7 +489,6 @@ class Expression extends mag.RoundedRect {
         if (!this._prev_notch_objs) this._prev_notch_objs = [];
         let notchEventObjs = this.findCompatibleNotches();
         if (notchEventObjs.length !== 0 || this._prev_notch_objs.length !== 0) { // If some notch has entered our field of view...
-            console.log(notchEventObjs);
             // Determine which notches are hovering:
             notchEventObjs.forEach((o) => { // Prev intersects Curr
                 let hovering = this._prev_notch_objs.filter((a) => (a.notch == o.notch));
@@ -555,14 +554,15 @@ class Expression extends mag.RoundedRect {
             return null;
         }
         let side = notch.side;
+        let pos = this.upperLeftPos( this.pos, this.size );
         if (side === 'left')
-            return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius) * (1 - notch.relpos) };
+            return { x: pos.x, y: pos.y + this.radius + (this.size.h - this.radius) * (1 - notch.relpos) };
         else if (side === 'right')
-            return { x: this.pos.x + this.size.w, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * notch.relpos };
+            return { x: pos.x + this.size.w, y: pos.y + this.radius + (this.size.h - this.radius * 2) * notch.relpos };
         else if (side === 'top')
-            return { x: this.pos.x + this.radius + (this.size.w - this.radius * 2) * notch.relpos, y: this.pos.y };
+            return { x: pos.x + this.radius + (this.size.w - this.radius * 2) * notch.relpos, y: pos.y };
         else if (side === 'bottom')
-            return { x: this.pos.x + this.radius + (this.size.w - this.radius * 2) * (1 - notch.relpos), y: this.pos.y + this.size.h };
+            return { x: pos.x + this.radius + (this.size.w - this.radius * 2) * (1 - notch.relpos), y: pos.y + this.size.h };
     }
     // Given another expression and one of its notches,
     // determine whether there's a compatible notch on this expression.
@@ -657,6 +657,7 @@ class Expression extends mag.RoundedRect {
     onSnap(otherNotch, otherExpr, thisNotch) {
         Notch.pair(thisNotch, this, otherNotch, otherExpr);
 
+        this.anchor = { x:0, y:0 };
         let vec = fromTo(this.getNotchPos(thisNotch), otherExpr.getNotchPos(otherNotch));
         this.pos = addPos(this.pos, vec);
 

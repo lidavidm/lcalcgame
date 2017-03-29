@@ -40,7 +40,8 @@ var ExprManager = (function() {
         'choice':   [ChoiceExpr],
         'level':    [ReductStageExpr],
         'arrayobj': [ArrayObjectExpr],
-        'infinite': [InfiniteExpression]
+        'infinite': [InfiniteExpression],
+        'notch':    [NotchHangerExpr]
     };
     var fade_level = {};
     var DEFAULT_FADE_LEVEL = 0;

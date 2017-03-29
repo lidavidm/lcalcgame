@@ -39,7 +39,7 @@ class NewInstanceExpr extends FadedValueExpr {
 
 // Acts as a named wrapper for a def'd expression.
 class NamedExpr extends Expression {
-    constructor(name, expr, args) {
+    constructor(name, refDefineExpr, args) {
         let txt_name = new TextExpr(name);
         txt_name.color = 'black';
         let exprs = [ txt_name ];
@@ -49,9 +49,9 @@ class NamedExpr extends Expression {
         this.color = 'OrangeRed';
         this.name = name;
         this._args = args.map((a) => a.clone());
-        this._wrapped_expr = expr;
+        this._wrapped_ref = refDefineExpr;
     }
-    get expr() { return this._wrapped_expr.clone(); }
+    get expr() { return this._wrapped_ref.expr.clone(); }
     get args() { return this.holes.slice(1).map((a) => a.clone()); }
     get constructorArgs() {
         return [ this.name, this.expr.clone(), this.args ];
@@ -61,10 +61,17 @@ class NamedExpr extends Expression {
         this.performReduction();
     }
     reduce() {
-        if (!this.expr ||
-            this.expr instanceof MissingExpression)
+        let expr = this.expr;
+        if (!expr || expr instanceof MissingExpression)
             return this;
         else {
+
+            let incomplete_exprs = mag.Stage.getNodesWithClass(MissingExpression, [], true, [expr]).filter((e) => (!(e instanceof LambdaHoleExpr)));
+            if (incomplete_exprs.length > 0) {
+                console.log(incomplete_exprs);
+                incomplete_exprs.forEach((e) => Animate.blink(e, 1000, [1,0,0], 2));
+                return this;
+            }
 
             // This should 'reduce' by applying the arguments to the wrapped expression.
             // First, let's check that we HAVE arguments...
@@ -81,6 +88,10 @@ class NamedExpr extends Expression {
                     expr = args.reduce((lambdaExpr, arg) => lambdaExpr.applyExpr(arg), expr); // Chains application to inner lambda expressions.
 
                 Resource.play('define-convert');
+
+                // Disable editing the DefineExpr after its been used once.
+                this._wrapped_ref.lockSubexpressions((e) => (!(e instanceof DragPatch)));
+                this._wrapped_ref.lock();
 
                 return expr.clone(); // to be safe we'll clone it.
             }
@@ -206,7 +217,7 @@ class DefineExpr extends ClampExpr {
             args.push( new MissingExpression() );
 
         // Return named function (expression).
-        return new NamedExpr(funcname, this.expr.clone(), args);
+        return new NamedExpr(funcname, this, args);
     }
     // get notchPos() {
     //     return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - this.notch.relpos) };
@@ -245,6 +256,7 @@ class DefineExpr extends ClampExpr {
     //     }
     // }
     onmouseclick() {
+        return; // disable for now;
 
         if (this.funcname) {
             this.performReduction();

@@ -1,7 +1,7 @@
 {
     "chapterName":"Intro to Typing",
     "description":"It's like magic!",
-    "parser":"ES6Parser",
+    "language":"JavaScript",
     "levels": [
         {
             "goal": "true",

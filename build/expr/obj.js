@@ -33,6 +33,7 @@ var PlayPenExpr = function (_ExpressionPlus) {
         _this.pen = pen;
         _this.color = 'YellowGreen';
         _this.notches = [new WedgeNotch('left', 10, 10, 0.8, true)]; // notch in left side near top.
+
         //new WedgeNotch('left', 10, 10, 0.2, true),
         //new WedgeNotch('right', 10, 10, 0.5, false)];  // for testing
 
