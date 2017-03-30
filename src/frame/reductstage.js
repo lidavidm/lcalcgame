@@ -1,4 +1,4 @@
-const UI_PADDING = 10;
+const UI_PADDING = __IS_MOBILE ? 2.5 : 10;
 
 /** A subclass of Stage that assumes Nodes are Expressions
     and allows for saving state. */
@@ -45,16 +45,65 @@ class ReductStage extends mag.Stage {
             next(); // go back to previous level; see index.html.
         });
 
-        if (__SHOW_DEV_INFO) {
-            this.add(btn_back);
-            this.add(btn_next);
+        let buttonsVisible = false;
+        let background = new mag.Rect(0, 0, 0, 0);
+        background.color = "white";
+        background.ignoreEvents = true;
+
+        let showButtons = () => {
+            if (__IS_MOBILE) {
+                // Make sure hamburger button is visible
+                this.remove(btn_hamburger);
+                this.add(background);
+                this.add(btn_hamburger);
+            }
+
+            if (__SHOW_DEV_INFO) {
+                this.add(btn_back);
+                this.add(btn_next);
+            }
+
+            this.add(btn_reset);
+            this.add(btn_menu);
+        };
+        let hideButtons = () => {
+            this.remove(background);
+            this.remove(btn_back);
+            this.remove(btn_next);
+            this.remove(btn_reset);
+            this.remove(btn_menu);
+        };
+
+        this.buttonBackground = background;
+
+        var btn_hamburger = new mag.Button(btn_next.pos.x + btn_next.size.w, UI_PADDING, 64, 64,
+            { default:'btn-hamburger-default', hover:'btn-hamburger-hover', down:'btn-hamburger-down' },
+            () => {
+                if (buttonsVisible) {
+                    hideButtons();
+                }
+                else {
+                    showButtons();
+                }
+
+                buttonsVisible = !buttonsVisible;
+        });
+
+        if (__IS_MOBILE) {
+            this.add(btn_hamburger);
         }
         else {
-            btn_menu.pos = btn_reset.pos;
-            btn_reset.pos = btn_next.pos;
+            if (__SHOW_DEV_INFO) {
+                this.add(btn_back);
+                this.add(btn_next);
+            }
+            else {
+                btn_menu.pos = btn_reset.pos;
+                btn_reset.pos = btn_next.pos;
+            }
+            this.add(btn_menu);
+            this.add(btn_reset);
         }
-        this.add(btn_menu);
-        this.add(btn_reset);
 
         // Toolbox
         var toolbox = new Toolbox(0, canvas_screen.h - TOOLBOX_HEIGHT, canvas_screen.w, TOOLBOX_HEIGHT);
@@ -69,7 +118,7 @@ class ReductStage extends mag.Stage {
         }
         this.environmentDisplay = env;
 
-        this.uiNodes = [ btn_back, btn_menu, btn_reset, btn_next, toolbox, env ];
+        this.uiNodes = [ btn_back, btn_menu, btn_reset, btn_next, btn_hamburger, toolbox, env ];
 
         this.layoutUI();
     }
@@ -85,35 +134,21 @@ class ReductStage extends mag.Stage {
         let btn_menu = this.uiNodes[1];
         let btn_reset = this.uiNodes[2];
         let btn_next = this.uiNodes[3];
+        let btn_hamburger = this.uiNodes[4];
 
-        if (__SHOW_DEV_INFO) {
-            btn_back.pos = {
-                x: canvas_screen.w - 64*4 - UI_PADDING,
-                y: btn_back.pos.y,
-            };
-            btn_menu.pos = {
-                x: canvas_screen.w - 64*3 - UI_PADDING,
-                y: btn_reset.pos.y,
-            };
-            btn_reset.pos = {
-                x: canvas_screen.w - 64*2 - UI_PADDING,
-                y: btn_reset.pos.y,
-            };
-            btn_next.pos = {
-                x: canvas_screen.w - 64 - UI_PADDING,
-                y: btn_next.pos.y,
+        const NUM_BUTTONS = (__IS_MOBILE ? 3 : 2) + (__SHOW_DEV_INFO ? 2 : 0);
+
+        for (let i = 0; i < NUM_BUTTONS; i++) {
+            this.uiNodes[i].pos = {
+                x: canvas_screen.w - 64*(NUM_BUTTONS - i) - UI_PADDING,
+                y: this.uiNodes[i].pos.y,
             };
         }
-        else {
-            btn_reset.pos = {
-                x: canvas_screen.w - 64*2 - UI_PADDING,
-                y: btn_reset.pos.y,
-            };
-            btn_reset.pos = {
-                x: canvas_screen.w - 64 - UI_PADDING,
-                y: btn_reset.pos.y,
-            };
-        }
+
+        this.buttonBackground.size = {
+            w: this.boundingSize.w,
+            h: btn_back.size.h + 2 * UI_PADDING,
+        };
 
         this.toolbox.pos = {
             x: 0,
