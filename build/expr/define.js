@@ -90,6 +90,7 @@ var NamedExpr = function (_Expression) {
             return a.clone();
         });
         _this2._wrapped_ref = refDefineExpr;
+        _this2.scale = refDefineExpr.scale;
         return _this2;
     }
 
@@ -234,6 +235,7 @@ var DragPatch = function (_ImageExpr) {
             var stage = this.stage;
             var replacement = this.parent.parent.generateNamedExpr(); // DefineExpr -> NamedExpr
             var ghosted_name = this.parent.clone();
+            ghosted_name.scale = this.parent.absoluteScale;
             ghosted_name.pos = this.parent.absolutePos;
             ghosted_name.onmouseenter();
             ghosted_name.shadowOffset = 0;

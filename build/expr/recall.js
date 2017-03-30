@@ -69,7 +69,7 @@ var TypeBox = function (_mag$Rect) {
             this.addChild(this.cursor);
             this.cursor.startBlinking();
             this.stroke = { color: 'cyan', lineWidth: 2 };
-            this.stage.keyEventDelegate = this;
+            if (this.stage) this.stage.keyEventDelegate = this;
         }
     }, {
         key: 'blur',
@@ -78,7 +78,7 @@ var TypeBox = function (_mag$Rect) {
             this.cursor.stopBlinking();
             this.removeChild(this.cursor);
             this.stroke = null;
-            if (this.stage.keyEventDelegate == this) this.stage.keyEventDelegate = null;
+            if (this.stage && this.stage.keyEventDelegate == this) this.stage.keyEventDelegate = null;
         }
     }, {
         key: 'updateCursorPosition',
@@ -114,7 +114,7 @@ var TypeBox = function (_mag$Rect) {
             // Solidify block (if possible)
             if (this.onCarriageReturn) this.onCarriageReturn();
             this.blur();
-            this.stage.update();
+            if (this.stage) this.stage.update();
         }
     }, {
         key: 'text',
@@ -262,7 +262,7 @@ var TypeInTextExpr = function (_TextExpr) {
         // There's also a special token, the operator >>>, which
         // means _t_equiv.
         */
-        value: function fromExprCode(code) {
+        value: function fromExprCode(code, afterCommit) {
             code = code.replace('_t_', ''); // remove prepend
             var validators = {
                 'string': function string(txt) {
@@ -277,10 +277,14 @@ var TypeInTextExpr = function (_TextExpr) {
                 },
                 'equiv': function equiv(txt) {
                     return txt === '==' || txt === '!=' || txt === '===' || txt === '!==';
+                },
+                'single': function single(txt) {
+                    var res = __PARSER.parse(txt);
+                    return res && !(res instanceof Sequence);
                 }
             };
             if (code in validators) {
-                return new TypeInTextExpr(validators[code]);
+                return new TypeInTextExpr(validators[code], afterCommit);
             } else {
                 console.error('@ TypeInTextExpr.fromExprCode: Code ' + code + ' doesn\'t match any known validator.');
                 return null;
@@ -298,6 +302,20 @@ var TypeInTextExpr = function (_TextExpr) {
         _classCallCheck(this, TypeInTextExpr);
 
         var _this6 = _possibleConstructorReturn(this, (TypeInTextExpr.__proto__ || Object.getPrototypeOf(TypeInTextExpr)).call(this, " "));
+
+        if (!afterCommit) {
+            afterCommit = function afterCommit(txt) {
+                var expr = __PARSER.parse(txt);
+                if (!expr) return;
+                var parent = _this6.parent || _this6.stage;
+                parent.swap(_this6, expr);
+                expr.lockSubexpressions(function (e) {
+                    return !(e instanceof LambdaHoleExpr);
+                });
+                if (!(parent instanceof mag.Stage)) expr.lock();
+                expr.update();
+            };
+        }
 
         var _thisTextExpr = _this6;
         var onCommit = function onCommit() {
@@ -343,9 +361,39 @@ var TypeInTextExpr = function (_TextExpr) {
             });
         }
     }, {
+        key: 'isCommitted',
+        value: function isCommitted() {
+            return this.typeBox === null;
+        }
+    }, {
         key: 'hits',
         value: function hits(pos, options) {
             return this.hitsChild(pos, options);
+        }
+    }, {
+        key: 'focus',
+        value: function focus() {
+            this.typeBox.focus();this.typeBox.onmouseleave();
+        }
+    }, {
+        key: 'blur',
+        value: function blur() {
+            this.typeBox.blur();
+        }
+    }, {
+        key: 'isValue',
+        value: function isValue() {
+            return false;
+        }
+    }, {
+        key: 'canReduce',
+        value: function canReduce() {
+            return false;
+        }
+    }, {
+        key: 'value',
+        value: function value() {
+            return undefined;
         }
     }, {
         key: 'size',

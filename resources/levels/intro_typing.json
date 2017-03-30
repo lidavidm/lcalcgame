@@ -5,7 +5,7 @@
     "levels": [
         {
             "goal": "true",
-            "board": "_t_string == 'star'",
+            "board": "_t_string == 'type'",
             "toolbox": ""
         },
         {
@@ -34,8 +34,8 @@
             "toolbox": ""
         },
         {
-            "goal": ["star"],
-            "board": ["(x) => x x", "_t_single", "star"],
+            "goal": ["'star'"],
+            "board": ["(x) => xx", "_t_single", "'star'"],
             "toolbox": ""
         }
     ],

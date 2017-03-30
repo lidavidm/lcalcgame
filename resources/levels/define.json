@@ -54,11 +54,6 @@
             "board": "(define /(λx /(+ #x _)) `???) (notch)",
             "goal": "6",
             "toolbox": "(2) (1)"
-        },
-        {
-            "board": "(define /(λx (level (+ #x #x) (+ _ _) (#_x))) `double) (notch)",
-            "goal": "6",
-            "toolbox": "(1) (2) (3) (4)"
         }
     ],
     "resources":{

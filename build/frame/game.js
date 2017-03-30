@@ -686,47 +686,67 @@ var Level = function () {
         }
     }], [{
         key: 'make',
-        value: function make(expr_descs, goal_descs, toolbox_descs, globals_descs) {
-            var lvl = new Level(Level.parse(expr_descs), new Goal(new ExpressionPattern(Level.parse(goal_descs))), toolbox_descs ? Level.parse(toolbox_descs) : null, Environment.parse(globals_descs));
+        value: function make(level_desc) {
+            var lvl = new Level(Level.parse(level_desc.board, level_desc.language), new Goal(new ExpressionPattern(Level.parse(level_desc.goal, level_desc.language))), level_desc.toolbox ? Level.parse(level_desc.toolbox, level_desc.language) : null, Environment.parse(level_desc.globals));
             return lvl;
         }
     }, {
         key: 'parse',
         value: function parse(desc) {
+            var language = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "reduct-scheme";
+
             if (desc.length === 0) return [];
 
-            function splitParen(s) {
-                s = s.trim();
-                var depth = 0;
-                var paren_idx = 0;
-                var expr_descs = [];
-                for (var i = 0; i < s.length; i++) {
-                    if (s[i] === '(') {
-                        if (depth === 0) paren_idx = i + 1;
-                        depth++;
-                    } else if (s[i] === ')') {
-                        depth--;
-                        if (depth === 0) expr_descs.push(s.substring(paren_idx, i));
-                    }
-                }
-                if (expr_descs.length === 0) expr_descs.push(s);
-                return expr_descs;
+            if (language === "JavaScript") {
+                // Use ES6 parser
+                if (Array.isArray(desc)) return desc.map(function (d) {
+                    return ES6Parser.parse(d);
+                });else return [ES6Parser.parse(desc)];
+            } else if (language === "reduct-scheme" || !language) {
+                var descs;
+
+                var _ret = function () {
+                    var splitParen = function splitParen(s) {
+                        s = s.trim();
+                        var depth = 0;
+                        var paren_idx = 0;
+                        var expr_descs = [];
+                        for (var i = 0; i < s.length; i++) {
+                            if (s[i] === '(') {
+                                if (depth === 0) paren_idx = i + 1;
+                                depth++;
+                            } else if (s[i] === ')') {
+                                depth--;
+                                if (depth === 0) expr_descs.push(s.substring(paren_idx, i));
+                            }
+                        }
+                        if (expr_descs.length === 0) expr_descs.push(s);
+                        return expr_descs;
+                    };
+
+                    // Split string by top-level parentheses.
+
+
+                    descs = splitParen(desc);
+                    //console.log('descs', descs);
+
+                    // Parse expressions recursively.
+
+                    var es = descs.map(function (expr_desc) {
+                        return Level.parseExpr(expr_desc);
+                    });
+                    var LambdaClass = ExprManager.getClass('lambda_abstraction');
+                    es = es.map(function (e) {
+                        return e instanceof LambdaHoleExpr ? new LambdaClass([e]) : e;
+                    });
+                    //console.log('exprs', es);
+                    return {
+                        v: es
+                    };
+                }();
+
+                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
             }
-
-            // Split string by top-level parentheses.
-            var descs = splitParen(desc);
-            //console.log('descs', descs);
-
-            // Parse expressions recursively.
-            var es = descs.map(function (expr_desc) {
-                return Level.parseExpr(expr_desc);
-            });
-            var LambdaClass = ExprManager.getClass('lambda_abstraction');
-            es = es.map(function (e) {
-                return e instanceof LambdaHoleExpr ? new LambdaClass([e]) : e;
-            });
-            //console.log('exprs', es);
-            return es;
         }
     }, {
         key: 'parseExpr',
@@ -824,7 +844,7 @@ var Level = function () {
                         op_class.pos = { x: 0, y: 80 };
                         return op_class;
                     } else if (op_class instanceof BagExpr) {
-                        var _ret = function () {
+                        var _ret2 = function () {
                             var bag = op_class;
                             var sz = bag.graphicNode.size;
                             var topsz = bag.graphicNode.topSize ? bag.graphicNode.topSize(sz.w / 2.0) : { w: 0, h: 0 };
@@ -850,7 +870,7 @@ var Level = function () {
                             };
                         }();
 
-                        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+                        if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
                     } else if (args[0] in CompareExpr.operatorMap()) {
                         // op name is supported comparison operation like ==, !=, etc
                         //console.log('constructing comparator ' + args[0] + ' with exprs ', exprs.slice(1));

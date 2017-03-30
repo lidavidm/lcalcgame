@@ -444,7 +444,7 @@ class LambdaExpr extends Expression {
     get fullyDefined() {
         // If one arg is MissingExpression, this will be false.
         if (this.holes.length < 2) return true;
-        return this.holes.slice(1).reduce(((prev,arg) => (prev && !(arg instanceof MissingExpression))), true);
+        return this.holes.slice(1).reduce(((prev,arg) => (prev && !(arg instanceof MissingExpression) && !(arg instanceof TypeInTextExpr))), true);
     }
     get isConstantFunction() {
         return this.takesArgument && mag.Stage.getNodesWithClass(LambdaVarExpr, [], true, [this]).length === 0;

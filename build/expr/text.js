@@ -12,7 +12,7 @@ var TextExpr = function (_ExpressionPlus) {
     _inherits(TextExpr, _ExpressionPlus);
 
     function TextExpr(txt) {
-        var font = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Consolas';
+        var font = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Consolas, Monaco, monospace';
         var fontSize = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 35;
 
         _classCallCheck(this, TextExpr);

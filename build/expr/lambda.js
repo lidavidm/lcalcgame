@@ -712,7 +712,7 @@ var LambdaExpr = function (_Expression) {
             // If one arg is MissingExpression, this will be false.
             if (this.holes.length < 2) return true;
             return this.holes.slice(1).reduce(function (prev, arg) {
-                return prev && !(arg instanceof MissingExpression);
+                return prev && !(arg instanceof MissingExpression) && !(arg instanceof TypeInTextExpr);
             }, true);
         }
     }, {

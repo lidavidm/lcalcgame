@@ -50,6 +50,7 @@ class NamedExpr extends Expression {
         this.name = name;
         this._args = args.map((a) => a.clone());
         this._wrapped_ref = refDefineExpr;
+        this.scale = refDefineExpr.scale;
     }
     get expr() { return this._wrapped_ref.expr.clone(); }
     get args() { return this.holes.slice(1).map((a) => a.clone()); }
@@ -143,6 +144,7 @@ class DragPatch extends ImageExpr {
         let stage = this.stage;
         let replacement = this.parent.parent.generateNamedExpr(); // DefineExpr -> NamedExpr
         let ghosted_name = this.parent.clone();
+        ghosted_name.scale = this.parent.absoluteScale;
         ghosted_name.pos = this.parent.absolutePos;
         ghosted_name.onmouseenter();
         ghosted_name.shadowOffset = 0;

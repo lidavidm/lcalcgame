@@ -185,6 +185,9 @@ function __DEBUG_TESTBED(stage) {
     playpen.pos = { x:240, y:180 };
     stage.add(playpen);
 
+    // let pen = new PlayPenRect(300, 300, 200, 200);
+    // stage.add(pen);
+
     // let obj = new ArrayObjectExpr(new BracketArrayExpr(0, 0, 44, 44));
     // obj.pos = { x:200, y:200 };
     // stage.add(obj);
@@ -261,8 +264,6 @@ function initMainMenu() {
         initBoard();
 
         //__DEBUG_TESTBED(stage);
-
-        //substage.clip = { l:0.14, r:0.22, t:0, b:0.11 };
 
         redraw(stage);
 

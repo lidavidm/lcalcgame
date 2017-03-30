@@ -34,7 +34,7 @@ var ShapeExpandEffect = function () {
             var sz = node.absoluteSize;
             var pos = node.upperLeftPos(node.absolutePos, sz);
             pos.x += sz.w / 2.0;pos.y += sz.h / 2.0; // absolute center position
-            var rect = new mag.RoundedRect(pos.x, pos.y, sz.w, sz.h, node.radius);
+            var rect = new mag.RoundedRect(pos.x, pos.y, sz.w, sz.h, node.radius / 2.0);
             rect.color = null; // no fill
             rect.stroke = { color: color, lineWidth: 2 };
             rect.opacity = 1.0;

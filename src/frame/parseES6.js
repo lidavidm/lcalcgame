@@ -23,9 +23,8 @@ class ES6Parser {
             return null;
         }
 
-        if (program.split('|').length > 1) {
-            return program.split('|').map((p) => this.parse(p));
-        }
+        if (program.trim().length === 0)
+            return null;
         // * if we reach here, we can assume single program...
 
         // Parse into AST using Esprima.js.
@@ -140,8 +139,15 @@ class ES6Parser {
                 if (node.params.length === 1 && node.params[0].type === 'Identifier') {
                     // Return new Lambda expression (anonymous function) at current stage of concreteness.
                     let lambda = new (ExprManager.getClass('lambda_abstraction'))([ new (ExprManager.getClass('hole'))(node.params[0].name) ]);
-                    let body = this.parseNode(node.body);
-                    lambda.addArg(body);
+                    if (node.body.type === 'Identifier' && node.body.name === 'xx') {
+                        lambda.addArg(this.parseNode( {type:'Identifier',name:'x'} ));
+                        lambda.addArg(this.parseNode( {type:'Identifier',name:'x'} ));
+                    }
+                    else {
+                        let body = this.parseNode(node.body);
+                        lambda.addArg(body);
+                    }
+                    lambda.hole.__remain_unlocked = true;
                     return lambda;
                 } else {
                     console.warn('Lambda expessions with more than one input are currently undefined.');
@@ -154,7 +160,14 @@ class ES6Parser {
                 '&' | '==' | '!=' | '===' | '!==' | '<' | '>' | '<=' | '<<' | '>>' | '>>>'
             */
             'BinaryExpression': (node) => {
-                if (ExprManager.hasClass(node.operator)) {
+                if (node.operator === '>>>') { // Special typing-operators expression:
+                    let comp = new (ExprManager.getClass('=='))(this.parseNode(node.left), this.parseNode(node.right), '>>>');
+                    comp.holes[1] = TypeInTextExpr.fromExprCode('_t_equiv', (finalText) => {
+                        comp.funcName = finalText;
+                    }); // give it a nonexistent funcName
+                    return comp;
+                }
+                else if (ExprManager.hasClass(node.operator)) {
                     let BinaryExprClass = ExprManager.getClass(node.operator);
                     if (node.operator in CompareExpr.operatorMap())
                         return new BinaryExprClass(this.parseNode(node.left), this.parseNode(node.right), node.operator);

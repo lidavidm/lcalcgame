@@ -53,14 +53,14 @@ class TypeBox extends mag.Rect {
         this.addChild(this.cursor);
         this.cursor.startBlinking();
         this.stroke = { color:'cyan', lineWidth:2 };
-        this.stage.keyEventDelegate = this;
+        if (this.stage) this.stage.keyEventDelegate = this;
     }
     blur() {
         if (!this.isFocused()) return;
         this.cursor.stopBlinking();
         this.removeChild(this.cursor);
         this.stroke = null;
-        if (this.stage.keyEventDelegate == this)
+        if (this.stage && this.stage.keyEventDelegate == this)
             this.stage.keyEventDelegate = null;
     }
     updateCursorPosition() {
@@ -88,7 +88,7 @@ class TypeBox extends mag.Rect {
         if (this.onCarriageReturn)
             this.onCarriageReturn();
         this.blur();
-        this.stage.update();
+        if (this.stage) this.stage.update();
     }
 }
 
@@ -179,7 +179,7 @@ class TypeInTextExpr extends TextExpr {
     // There's also a special token, the operator >>>, which
     // means _t_equiv.
     */
-    static fromExprCode(code) {
+    static fromExprCode(code, afterCommit) {
         code = code.replace('_t_', ''); // remove prepend
         let validators = {
             'string':(txt) => (__PARSER.parse(txt) instanceof StringValueExpr),
@@ -188,10 +188,14 @@ class TypeInTextExpr extends TextExpr {
                 return (!Number.isNaN(i) && i >= 0);
             },
             'int':(txt) => (!Number.isNaN(Number.parseInt(txt, 10))),
-            'equiv':(txt) => (txt === '==' || txt === '!=' || txt === '===' || txt === '!==')
+            'equiv':(txt) => (txt === '==' || txt === '!=' || txt === '===' || txt === '!=='),
+            'single':(txt) => {
+                let res = __PARSER.parse(txt);
+                return res && !(res instanceof Sequence);
+            }
         };
         if (code in validators) {
-            return new TypeInTextExpr(validators[code]);
+            return new TypeInTextExpr(validators[code], afterCommit);
         } else {
             console.error('@ TypeInTextExpr.fromExprCode: Code ' + code + ' doesn\'t match any known validator.');
             return null;
@@ -202,6 +206,19 @@ class TypeInTextExpr extends TextExpr {
     // and returning true if valid and false if rejected.
     constructor(validator, afterCommit, charLimit=1) {
         super(" ");
+
+        if (!afterCommit) {
+            afterCommit = (txt) => {
+                let expr = __PARSER.parse(txt);
+                if (!expr) return;
+                let parent = (this.parent || this.stage);
+                parent.swap(this, expr);
+                expr.lockSubexpressions((e) => (!(e instanceof LambdaHoleExpr)));
+                if (!(parent instanceof mag.Stage))
+                    expr.lock();
+                expr.update();
+            };
+        }
 
         let _thisTextExpr = this;
         let onCommit = function() {
@@ -244,7 +261,13 @@ class TypeInTextExpr extends TextExpr {
         ShapeExpandEffect.run(this, 350, (e) => Math.pow(e, 0.9));
         ShapeExpandEffect.run(this, 500, (e) => Math.pow(e, 0.8));
     }
+    isCommitted() { return this.typeBox === null; }
     hits(pos, options) {
         return this.hitsChild(pos, options);
     }
+    focus() { this.typeBox.focus(); this.typeBox.onmouseleave(); }
+    blur() { this.typeBox.blur(); }
+    isValue() { return false; }
+    canReduce() { return false; }
+    value() { return undefined; }
 }

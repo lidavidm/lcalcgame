@@ -237,43 +237,52 @@ class Level {
     // * In Scheme-esque format, with _ for holes:
     // * '(if _ triangle star) (== triangle _) (rect)'
     // NOTE: This does not do error checking! Make sure your desc is correct.
-    static make(expr_descs, goal_descs, toolbox_descs, globals_descs) {
-        var lvl = new Level(Level.parse(expr_descs), new Goal(new ExpressionPattern(Level.parse(goal_descs))),
-            toolbox_descs ? Level.parse(toolbox_descs) : null, Environment.parse(globals_descs));
+    static make(level_desc) {
+        var lvl = new Level(Level.parse(level_desc.board, level_desc.language),
+                            new Goal(new ExpressionPattern(Level.parse(level_desc.goal, level_desc.language))),
+                            level_desc.toolbox ? Level.parse(level_desc.toolbox, level_desc.language) : null,
+                            Environment.parse(level_desc.globals));
         return lvl;
     }
-    static parse(desc) {
+    static parse(desc, language="reduct-scheme") {
         if (desc.length === 0) return [];
 
-        function splitParen(s) {
-            s = s.trim();
-            var depth = 0;
-            var paren_idx = 0;
-            var expr_descs = [];
-            for (let i = 0; i < s.length; i++) {
-                if (s[i] === '(') {
-                    if (depth === 0) paren_idx = i + 1;
-                    depth++;
-                }
-                else if (s[i] === ')') {
-                    depth--;
-                    if (depth === 0) expr_descs.push(s.substring(paren_idx, i));
-                }
-            }
-            if (expr_descs.length === 0) expr_descs.push(s);
-            return expr_descs;
+        if (language === "JavaScript") {
+            // Use ES6 parser
+            if (Array.isArray(desc)) return desc.map((d) => ES6Parser.parse(d));
+            else                     return [ES6Parser.parse(desc)];
         }
+        else if (language === "reduct-scheme" || !language) {
+            function splitParen(s) {
+                s = s.trim();
+                var depth = 0;
+                var paren_idx = 0;
+                var expr_descs = [];
+                for (let i = 0; i < s.length; i++) {
+                    if (s[i] === '(') {
+                        if (depth === 0) paren_idx = i + 1;
+                        depth++;
+                    }
+                    else if (s[i] === ')') {
+                        depth--;
+                        if (depth === 0) expr_descs.push(s.substring(paren_idx, i));
+                    }
+                }
+                if (expr_descs.length === 0) expr_descs.push(s);
+                return expr_descs;
+            }
 
-        // Split string by top-level parentheses.
-        var descs = splitParen(desc);
-        //console.log('descs', descs);
+            // Split string by top-level parentheses.
+            var descs = splitParen(desc);
+            //console.log('descs', descs);
 
-        // Parse expressions recursively.
-        let es = descs.map((expr_desc) => Level.parseExpr(expr_desc));
-        let LambdaClass = ExprManager.getClass('lambda_abstraction');
-        es = es.map((e) => e instanceof LambdaHoleExpr ? new LambdaClass([e]) : e);
-        //console.log('exprs', es);
-        return es;
+            // Parse expressions recursively.
+            let es = descs.map((expr_desc) => Level.parseExpr(expr_desc));
+            let LambdaClass = ExprManager.getClass('lambda_abstraction');
+            es = es.map((e) => e instanceof LambdaHoleExpr ? new LambdaClass([e]) : e);
+            //console.log('exprs', es);
+            return es;
+        }
     }
     static parseExpr(desc) {
 

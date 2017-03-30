@@ -12,10 +12,15 @@ class ReductStage extends mag.Stage {
         innerStages.forEach((stg) => {
             stg.build();
         });
+        let textboxes = this.getNodesWithClass(TypeInTextExpr);
+        if (textboxes.length > 0) { // If one text box is on the screen, focus it!
+            textboxes[0].focus();
+        }
     }
 
     // Save state of game board and push onto undo stack.
     saveState() {
+        if (!this.expressionNodes) return;
         // TODO: DML save and restore the environment as well.
         var board = this.expressionNodes().map((n) => n.clone());
         board = board.filter((n) => !(n instanceof ExpressionEffect));
@@ -25,6 +30,7 @@ class ReductStage extends mag.Stage {
 
     // Restore previous state of game board.
     restoreState() {
+        if (!this.expressionNodes) return;
         if (this.stateStack.length > 0) {
             //this.nodes = this.stateStack.pop();
 
@@ -175,6 +181,8 @@ class ReductStage extends mag.Stage {
     }
 
     toString() {
+        if (!this.expressionNodes) return "[stage]";
+
         let stringify = (nodes) => nodes.reduce((prev, curr) => {
             let s = curr.toString();
             if (s === '()') return prev; // Skip empty expressions.

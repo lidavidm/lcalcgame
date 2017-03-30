@@ -195,7 +195,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAnimation('poof', [0, 4], 120); // Cloud 'poof' animation for destructor piece.
 
     // Add levels here: (for now)
-    var chapter_load_prom = loadChaptersFromFiles( ['define', 'intro_obj', 'intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map', 'assign', 'sequence'] );
+    var chapter_load_prom = loadChaptersFromFiles( ['define', 'intro_typing', 'intro_obj', 'intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map', 'assign', 'sequence'] );
 
     Resource.startChapter = (chapterName, canvas) => {
         for (let i = 0; i < chapters.length; i++) {
@@ -230,9 +230,9 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         if (fadedBorders.length > 0) {
 
             ExprManager.fadesAtBorder = false;
-            let unfaded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
+            let unfaded = Level.make(level_desc).build(canvas);
             ExprManager.fadesAtBorder = true;
-            let faded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
+            let faded = Level.make(level_desc).build(canvas);
 
             let unfaded_exprs = unfaded.nodes;
             let faded_exprs   = faded.nodes;
@@ -314,7 +314,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             return faded;
         }
         else {
-            return Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
+            return Level.make(level_desc).build(canvas);
         }
     };
     Resource.level = levels;

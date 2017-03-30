@@ -25,22 +25,56 @@ var mag = function (_) {
             _classCallCheck(this, StageNode);
 
             stageToEmbed._canvas = canvas; // if we try this normally, it's going to try to delegate the mouse, which we dont want.
-            var sz = stageToEmbed.boundingSize;
+            if (canvas) {
+                var sz = stageToEmbed.boundingSize;
 
-            var _this = _possibleConstructorReturn(this, (StageNode.__proto__ || Object.getPrototypeOf(StageNode)).call(this, x, y, sz.w, sz.h));
-
+                var _this = _possibleConstructorReturn(this, (StageNode.__proto__ || Object.getPrototypeOf(StageNode)).call(this, x, y, sz.w, sz.h));
+            } else {
+                var _this = _possibleConstructorReturn(this, (StageNode.__proto__ || Object.getPrototypeOf(StageNode)).call(this, x, y, 0, 0));
+            }
             _this._embeddedStage = stageToEmbed;
             _this._embeddedStage.draw = function () {
                 _this.draw(_this._embeddedStage.ctx);
             };
             _this._clip = { l: 0, t: 0, r: 1, b: 1 };
-            return _this;
+            return _possibleConstructorReturn(_this);
         }
 
-        // Clipping regions of the underlying stage.
-
-
         _createClass(StageNode, [{
+            key: 'setup',
+            value: function setup(stageToEmbed, canvas) {
+                var _this2 = this;
+
+                console.log('setup called with ', canvas);
+                stageToEmbed._canvas = canvas;
+                stageToEmbed.ctx = canvas.getContext('2d');
+                var stage_size = this.embeddedStage.boundingSize;
+                this._clip = { l: 0, t: 0, r: this._size.w / stage_size.w, b: this._size.h / stage_size.h };
+                this.size = stage_size;
+                this._embeddedStage = stageToEmbed;
+                this._embeddedStage.draw = function () {
+                    _this2.draw(_this2._embeddedStage.ctx);
+                };
+            }
+        }, {
+            key: 'setClipWithSize',
+            value: function setClipWithSize(sz) {
+                var stage_size = this.embeddedStage.boundingSize;
+                this._clip = { l: 0, t: 0, r: sz.w / stage_size.w, b: sz.h / stage_size.h };
+            }
+        }, {
+            key: 'hitsWithin',
+            value: function hitsWithin(pos) {
+                var boundingSize = this.absoluteSize;
+                boundingSize.w *= this._clip.r - this._clip.l;
+                boundingSize.h *= this._clip.b - this._clip.t;
+                var upperLeftPos = this.upperLeftPos(this.absolutePos, boundingSize);
+                if (pointInRect(pos, rectFromPosAndSize(upperLeftPos, boundingSize))) return this;else return null;
+            }
+
+            // Clipping regions of the underlying stage.
+
+        }, {
             key: 'update',
             value: function update() {
                 this._embeddedStage.update();
@@ -48,6 +82,11 @@ var mag = function (_) {
         }, {
             key: 'drawInternal',
             value: function drawInternal(ctx, pos, boundingSize) {
+                if (!this._embeddedStage || !this._embeddedStage.canvas) {
+                    console.error('nblah');
+                    return;
+                }
+
                 var bz = this._embeddedStage.boundingSize;
                 var scaleRatio = { x: boundingSize.w / bz.w, y: boundingSize.h / bz.h };
                 this._embeddedStage.ctx = ctx;
@@ -58,8 +97,6 @@ var mag = function (_) {
                 // Clip drawing to only the stage (and possibly a subregion)
                 var r = this.clip;
                 ctx.translate((r.r - r.l) * boundingSize.w * this.anchor.x - boundingSize.w * r.l, (r.b - r.t) * boundingSize.h * this.anchor.y - boundingSize.h * r.t);
-                //ctx.translate((boundingSize.w / 2 - boundingSize.w * r.l) - (r.r - r.l) * boundingSize.w * this.anchor.x,
-                //              (boundingSize.h / 2 - boundingSize.h * r.t) - (r.b - r.t) * boundingSize.h * this.anchor.y);
                 ctx.rect(boundingSize.w * r.l, boundingSize.h * r.t, boundingSize.w * (r.r - r.l), boundingSize.h * (r.b - r.t));
                 ctx.clip();
 
@@ -184,7 +221,12 @@ var mag = function (_) {
         }, {
             key: 'clear',
             value: function clear() {
-                this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (this.color) {
+                    this.ctx.fillStyle = this.color;
+                    this.ctx.fillRect(0, 0, canvas.width, canvas.height);
+                } else {
+                    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
             }
         }, {
             key: 'has',
@@ -202,10 +244,10 @@ var mag = function (_) {
         }, {
             key: 'addAll',
             value: function addAll(nodes) {
-                var _this2 = this;
+                var _this3 = this;
 
                 nodes.forEach(function (n) {
-                    return _this2.add(n);
+                    return _this3.add(n);
                 });
             }
         }, {
@@ -348,7 +390,7 @@ var mag = function (_) {
         }, {
             key: 'draw',
             value: function draw() {
-                var _this3 = this;
+                var _this4 = this;
 
                 // To avoid redundant draws, when someone calls draw, we
                 // instead try to schedule an actual redraw. Another
@@ -359,8 +401,8 @@ var mag = function (_) {
                 if (!this.requested) {
                     this.requested = true;
                     window.requestAnimationFrame(function () {
-                        _this3.drawImpl();
-                        _this3.requested = false;
+                        _this4.drawImpl();
+                        _this4.requested = false;
                     });
                 }
             }
@@ -571,7 +613,7 @@ var mag = function (_) {
             value: function getNodesWithClass(Class) {
                 var excludedNodes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
-                var _this4 = this;
+                var _this5 = this;
 
                 var recursive = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
                 var nodes = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
@@ -585,7 +627,7 @@ var mag = function (_) {
                     });
                     if (excluded) return;else if (n instanceof Class) rt.push(n);
                     if (recursive && n.children.length > 0) {
-                        var childs = _this4.getNodesWithClass(Class, excludedNodes, true, n.children);
+                        var childs = _this5.getNodesWithClass(Class, excludedNodes, true, n.children);
                         childs.forEach(function (c) {
                             return rt.push(c);
                         });

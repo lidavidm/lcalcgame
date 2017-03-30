@@ -141,8 +141,8 @@ var CompareExpr = function (_Expression) {
             } else if (this.funcName === '!=') {
                 return this.leftExpr.value() !== this.rightExpr.value();
             } else {
-                console.warn('Compare function "' + this.funcName + '" not implemented.');
-                return false;
+                //console.warn('Compare function "' + this.funcName + '" not implemented.');
+                return undefined;
             }
         }
     }, {
@@ -170,6 +170,11 @@ var CompareExpr = function (_Expression) {
         key: 'leftExpr',
         get: function get() {
             return this.holes[0];
+        }
+    }, {
+        key: 'operatorExpr',
+        get: function get() {
+            return this.holes[1];
         }
     }, {
         key: 'rightExpr',
