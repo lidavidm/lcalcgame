@@ -847,6 +847,8 @@ class ChapterSelectShip extends mag.RotatableImageRect {
         startPlanet.hideShip();
         endPlanet.hideShip();
 
+        stage.planetParent.ignoreEvents = true;
+
         const startScale = this.scale.x;
         const endScale = endPlanet.radius / 120 / 2;
         let dest = endPlanet.relativeLandingPoint;
@@ -1049,6 +1051,7 @@ class ChapterSelectShip extends mag.RotatableImageRect {
             }, 1000));
             return land;
         }).then(() => {
+            stage.planetParent.ignoreEvents = false;
             endPlanet.showShip(this);
             stage.remove(starParent);
         });
