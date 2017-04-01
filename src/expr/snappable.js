@@ -248,6 +248,13 @@ class Snappable extends Expression {
                       br: radius,
                   }, true, false,
                   null);
+
+        const fontSize = 35 * this.scale.y * 0.85;
+        let y = pos.y + (boundingSize.h - fontSize) / 2;
+        ctx.fillStyle = "black";
+        ctx.font = `${fontSize}px Consolas, monospace`;
+        ctx.textBaseline = "top";
+        ctx.fillText(";", pos.x + boundingSize.w - rightMargin, y);
     }
 
     onmouseclick() {
