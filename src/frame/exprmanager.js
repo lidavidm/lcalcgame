@@ -63,9 +63,10 @@ var ExprManager = (function() {
         '__'    : [51],
         'primitives' : [66, 72],
         'map'   : [61],
-        'repeat': [146],
-        'sequence': [118, 144],
-        'snappable': [144],
+        'repeat': [147],
+        'sequence': [118, 145],
+        'snappable': [145],
+        'number': [129],
     };
     const primitives = ['triangle', 'rect', 'star', 'circle', 'diamond'];
     primitives.forEach((p) => {
