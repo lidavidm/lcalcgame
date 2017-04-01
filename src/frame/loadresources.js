@@ -147,7 +147,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         'map': ['assign'],
         'assign': ['sequence'],
         'sequence': ['loops'],
-        'loops': [],
+        'loops': ['mystery'],
+        'mystery': [],
     };
 
     // Add levels here: (for now)

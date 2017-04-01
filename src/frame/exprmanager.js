@@ -63,7 +63,7 @@ var ExprManager = (function() {
         '__'    : [51],
         'primitives' : [66, 72],
         'map'   : [61],
-        'repeat': [145],
+        'repeat': [143],
     };
     const primitives = ['triangle', 'rect', 'star', 'circle', 'diamond'];
     primitives.forEach((p) => {
