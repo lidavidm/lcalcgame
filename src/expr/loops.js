@@ -335,7 +335,7 @@ class FadedRepeatLoopExpr extends Expression {
             maxTopHeight = Math.max(maxTopHeight, size.h);
         });
         let width = Math.max(topWidth, middle.w + 50, bottom.w) + padding.left + padding.right;
-        let height = maxTopHeight + middle.h + bottom.h + padding.inner;
+        let height = maxTopHeight + middle.h + bottom.h + 4 * padding.inner;
 
         return { w:width, h: height };
     }
@@ -345,10 +345,11 @@ class FadedRepeatLoopExpr extends Expression {
 
         this.holes.forEach((expr) => this.addChild(expr));
         this.holes.forEach((expr) => {
-            expr.anchor = { x:0, y:0.5 };
+            expr.anchor = { x:0, y:0 };
             expr.scale = { x:0.85, y:0.85 };
             if (expr instanceof TextExpr) {
                 expr.scale = { x: 0.6, y: 0.6 };
+                expr._baseline = "top";
             }
             expr.update();
         });
@@ -366,12 +367,13 @@ class FadedRepeatLoopExpr extends Expression {
         });
 
         top.forEach((expr) => {
-            expr.pos = { x:x, y: maxTopHeight / 2 };
+            let height = (expr instanceof TextExpr) ? expr.fontSize * expr.scale.y : expr.size.h;
+            expr.pos = { x:x, y: this.padding.inner / 2 + (maxTopHeight - height) / 2 };
             x += expr.size.w * expr.scale.x;
         });
 
-        middle.pos = { x: this.padding.left + 50, y: size.h / 2 };
-        bottom.pos = { x: this.padding.left, y: size.h - (bottom.size.h / 2) };
+        middle.pos = { x: this.padding.left + 50, y: maxTopHeight + this.padding.inner };
+        bottom.pos = { x: this.padding.left, y: middle.pos.y + middle.size.h + this.padding.inner };
 
         this.children = this.holes;
     }
