@@ -426,7 +426,7 @@ class AssignExpr extends Expression {
 
     canReduce() {
         return this.value && this.variable && (this.value.canReduce() || this.value.isValue()) &&
-            (this.variable instanceof VarExpr || this.variable instanceof AssignExpr);
+            (this.variable instanceof VarExpr || this.variable instanceof VtableVarExpr);
     }
 
     reduce() {
@@ -657,6 +657,10 @@ class VtableVarExpr extends ObjectExtensionExpr {
         this.drawer = drawer;
         this.addChild(this.drawer);
         this.hasVtable = false;
+    }
+
+    canReduce() {
+        return this.getEnvironment() && (this.parent || this.stage) && this.getEnvironment().lookup(this.name);
     }
 
     // Behave like a VarExpr
