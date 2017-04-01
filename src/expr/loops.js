@@ -340,6 +340,11 @@ class FadedRepeatLoopExpr extends Expression {
         return { w:width, h: height };
     }
 
+    canReduce() {
+        return this.timesExpr && (this.timesExpr.canReduce() || this.timesExpr.isValue()) &&
+            this.bodyExpr && !(this.bodyExpr instanceof MissingExpression);
+    }
+
     update() {
         this.children = [];
 
@@ -378,19 +383,25 @@ class FadedRepeatLoopExpr extends Expression {
         this.children = this.holes;
     }
 
-    reduce() {
-        if (this.timesExpr && this.bodyExpr) {
-            let missing = [];
-            for (let i = 0; i < this.timesExpr.number; i++) {
-                missing.push(this.bodyExpr.clone());
-            }
+    performReduction() {
+        if (this.canReduce()) {
+            return this.performSubReduction(this.timesExpr).then(() => {
+                let missing = [];
+                for (let i = 0; i < this.timesExpr.number; i++) {
+                    missing.push(this.bodyExpr.clone());
+                }
 
-            let template = new (ExprManager.getClass('sequence'))(...missing);
-            template.lockSubexpressions();
-            return template;
+                let template = new (ExprManager.getClass('sequence'))(...missing);
+                template.lockSubexpressions();
+
+                (this.parent || this.stage).swap(this, template);
+                template.update();
+
+                return template;
+            });
         }
         else {
-            return this;
+            return Promise.reject();
         }
     }
 
