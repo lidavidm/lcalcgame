@@ -34,7 +34,7 @@ var ExprManager = (function() {
         'lambda':   [DelayedLambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr, DelayedFadedES6LambdaHoleExpr],
         'lambda_abstraction':   [LambdaExpr], // TODO: Add back EnvironmentLambdaExpr... I removed it because this is broken with DEFINE currently.
         'assign':   [JumpingAssignExpr, AssignExpr, EqualsAssignExpr],
-        'sequence': [NotchedSequence, Sequence],
+        'sequence': [NotchedSequence, SemicolonNotchedSequence],
         'repeat':   [RepeatLoopExpr, FadedRepeatLoopExpr],
         'choice':   [ChoiceExpr],
         'snappable':[Snappable],
@@ -64,6 +64,7 @@ var ExprManager = (function() {
         'primitives' : [66, 72],
         'map'   : [61],
         'repeat': [143],
+        'sequence': [118],
     };
     const primitives = ['triangle', 'rect', 'star', 'circle', 'diamond'];
     primitives.forEach((p) => {
