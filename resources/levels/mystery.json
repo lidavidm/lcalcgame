@@ -121,8 +121,37 @@
             }
         },
         {
+            "description": "Snappables with loops",
+            "board": "(snappable /(assign /$x /(+ /$x /(1)))) (snappable /(assign /$y /(+ /$y /(1))))",
+            "goal": "(2) (3)",
+            "toolbox": "($x) ($y) (repeat /(2) _)",
+            "globals": {
+                "x": "(1)",
+                "y": "(0)"
+            }
+        },
+        {
+            "description": "Fade sequences",
+            "board": "(if /$x /(star)) (snappable /(assign /$x /(== /$y /(triangle)))) (snappable /(assign /$y _))",
+            "goal": "(star)",
+            "toolbox": "(triangle) (diamond)",
+            "globals": {
+                "x": "(false)"
+            }
+        },
+        {
+            "description": "Force snappable usage with loops",
+            "board": "(snappable /(assign /$x /(if /(== /$y /(3)) /(true)))) (snappable /(assign /$y /(+ /$y /(1))))",
+            "goal": "(true)",
+            "toolbox": "($x) (repeat /(3) _)",
+            "globals": {
+                "x": "(false)",
+                "y": "(0)"
+            }
+        },
+        {
             "description": "Fade repeat",
-            "board": "($x) (repeat /(2) /(assign /$x /(+ /$x /1)))",
+            "board": "($x) (repeat /(2) /(sequence /(assign /$x /(+ /$x /1))))",
             "goal": "(3)",
             "toolbox": "",
             "globals": {
