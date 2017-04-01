@@ -28,9 +28,11 @@ class MissingExpression extends Expression {
         }
     }
     ondropenter(node, pos) {
+        if (node instanceof ChoiceExpr || node instanceof Snappable) return;
         this.onmouseenter(pos);
     }
     ondropexit(node, pos) {
+        if (node instanceof ChoiceExpr || node instanceof Snappable) return;
         this.onmouseleave(pos);
     }
     ondropped(node, pos) {
@@ -42,8 +44,8 @@ class MissingExpression extends Expression {
                 && !(this.parent instanceof DefineExpr) && !(this.parent instanceof ObjectExtensionExpr))
                 return;
 
-            // Should not be able to use choice exprs, ever
-            if (node instanceof ChoiceExpr) return;
+            // Should not be able to use choice exprs or snappables, ever
+            if (node instanceof ChoiceExpr || node instanceof Snappable) return;
 
             let stage = this.stage;
             let beforeState = stage.toString();
