@@ -705,9 +705,9 @@ class LambdaExpr extends Expression {
 
     toString() {
         if (this.holes.length === 1 && this.holes[0] instanceof LambdaHoleExpr)
-            return '(' + super.toString() + ')';
+            return (this.locked ? '/' : '') + '(' + super.toString() + ')';
         else
-            return super.toString();
+            return (this.locked ? '/' : '') + super.toString();
     }
 }
 

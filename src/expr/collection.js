@@ -195,7 +195,7 @@ class BagExpr extends CollectionExpr {
         return '[' + this.items.reduce(((str, curr) => str += ' ' + curr.toString()), '').trim() + ']'; // Arguably should be toString of each expression, but then comparison must be setCompare.
     }
     toString() {
-        return '(bag' + this.items.reduce(((str, curr) => str += ' ' + curr.toString()), '') + ')';
+        return (this.locked ? '/' : '') + '(bag' + this.items.reduce(((str, curr) => str += ' ' + curr.toString().replace('/', '')), '') + ')';
     }
 
     onmouseclick(pos) {

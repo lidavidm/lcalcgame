@@ -161,6 +161,11 @@ var NotchHangerExpr = function (_Expression) {
         key: 'update',
         value: function update() {}
     }, {
+        key: 'toString',
+        value: function toString() {
+            return '(notch)';
+        }
+    }, {
         key: 'size',
         set: function set(sz) {
             this._size = { w: sz.h, h: sz.h };

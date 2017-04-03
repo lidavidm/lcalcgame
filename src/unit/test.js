@@ -40,6 +40,7 @@ var UnitTest = (function() {
                                     (lvl) => flatten( [arrayify(lvl.board), arrayify(lvl.goal), arrayify(lvl.toolbox)] )
                                 )
                         );
+        console.log(levels, all_exprs);
         return new Set(all_exprs);
     }
 

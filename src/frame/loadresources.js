@@ -151,6 +151,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
 
     // Add levels here:
     const chapterDigraph = {
+        //'intro_obj2': ['define'],
         'define': ['intro'],
         'intro': ['booleans'],
         'booleans': ['conditionals'],

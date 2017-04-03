@@ -125,6 +125,11 @@ var VarExpr = function (_Expression) {
         value: function onmouseclick() {
             this.performReduction();
         }
+    }, {
+        key: "toString",
+        value: function toString() {
+            return '$' + (this.ignoreEvents ? '' : '_') + this.name;
+        }
     }]);
 
     return VarExpr;

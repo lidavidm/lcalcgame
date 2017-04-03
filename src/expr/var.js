@@ -85,6 +85,10 @@ class VarExpr extends Expression {
     onmouseclick() {
         this.performReduction();
     }
+
+    toString() {
+        return '$' + (this.ignoreEvents ? '' : '_') + this.name;
+    }
 }
 
 class LabeledVarExpr extends VarExpr {

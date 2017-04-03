@@ -923,7 +923,7 @@ var LambdaExpr = function (_Expression) {
     }, {
         key: 'toString',
         value: function toString() {
-            if (this.holes.length === 1 && this.holes[0] instanceof LambdaHoleExpr) return '(' + _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'toString', this).call(this) + ')';else return _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'toString', this).call(this);
+            if (this.holes.length === 1 && this.holes[0] instanceof LambdaHoleExpr) return (this.locked ? '/' : '') + '(' + _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'toString', this).call(this) + ')';else return (this.locked ? '/' : '') + _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'toString', this).call(this);
         }
     }, {
         key: 'isParentheses',

@@ -292,8 +292,8 @@ var BagExpr = function (_CollectionExpr) {
     }, {
         key: 'toString',
         value: function toString() {
-            return '(bag' + this.items.reduce(function (str, curr) {
-                return str += ' ' + curr.toString();
+            return (this.locked ? '/' : '') + '(bag' + this.items.reduce(function (str, curr) {
+                return str += ' ' + curr.toString().replace('/', '');
             }, '') + ')';
         }
     }, {
