@@ -136,6 +136,10 @@ class Sequence extends Expression {
             this.performReduction();
         }
     }
+
+    toString() {
+        return `${this.locked ? '/' : ''}(sequence ${this.subexpressions.map((x) => x.toString()).join(" ")})`;
+    }
 }
 
 class NotchedSequence extends Sequence {

@@ -174,12 +174,12 @@ class MirrorExpr extends ImageExpr {
 
 /** Faded variants. */
 class FadedValueExpr extends Expression {
-    constructor(name) {
+    constructor(name, primitiveName=null) {
         let txt = new TextExpr(name);
         super([txt]);
         txt.color = "OrangeRed";
         this.color = "gold";
-        this.primitiveName = name;
+        this.primitiveName = primitiveName || name;
     }
     get graphicNode() { return this.holes[0]; }
     reduceCompletely() { return this; }
@@ -198,20 +198,20 @@ class FadedRectExpr extends FadedValueExpr {
     constructor() { super('rect'); }
 }
 class FadedTriangleExpr extends FadedValueExpr {
-    constructor() { super('tri'); }
+    constructor() { super('tri', 'triangle'); }
 }
 class FadedCircleExpr extends FadedValueExpr {
-    constructor() { super('dot'); }
+    constructor() { super('dot', 'circle'); }
 }
 
 class StringValueExpr extends Expression {
-    constructor(name) {
+    constructor(name, primitiveName=null) {
         let text = new TextExpr('"' + name + '"');
         super([text]);
         this.primitiveName = name;
         text.color = "OrangeRed";
         this.color = "gold";
-        this.primitiveName = name;
+        this.primitiveName = primitiveName || name;
     }
 
     get graphicNode() { return this.holes[0]; }
@@ -231,8 +231,8 @@ class StringRectExpr extends StringValueExpr {
     constructor() { super('rect'); }
 }
 class StringTriangleExpr extends StringValueExpr {
-    constructor() { super('tri'); }
+    constructor() { super('tri', 'triangle'); }
 }
 class StringCircleExpr extends StringValueExpr {
-    constructor() { super('dot'); }
+    constructor() { super('dot', 'circle'); }
 }

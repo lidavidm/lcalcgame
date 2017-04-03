@@ -297,6 +297,12 @@ class RepeatLoopExpr extends Expression {
             this.performReduction();
         }
     }
+
+    toString() {
+        let times = this.timesExpr.toString();
+        let body = this.bodyExpr.toString();
+        return `${this.locked ? '/' : ''}(repeat ${times} ${body})`;
+    }
 }
 
 class FadedRepeatLoopExpr extends Expression {

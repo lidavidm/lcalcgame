@@ -1,6 +1,7 @@
 class Snappable extends Expression {
     constructor(expr, next=null) {
         super([expr]);
+        this.origNext = next;
         this.topDivotStroke = this.bottomDivotStroke = null;
         this.divotHeight = 6;
         this.prev = null;
@@ -282,6 +283,14 @@ class Snappable extends Expression {
         }
 
         stage.swap(this, new (ExprManager.getClass('sequence'))(...body));
+    }
+
+    toString() {
+        let next = "";
+        if (this.origNext) {
+            next = " " + this.origNext.toString();
+        }
+        return `(snappable ${this.contents.toString()}${next})`;
     }
 }
 

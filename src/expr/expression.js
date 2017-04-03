@@ -556,7 +556,7 @@ class Expression extends mag.RoundedRect {
         let side = notch.side;
         let pos = this.upperLeftPos( this.pos, this.size );
         if (side === 'left')
-            return { x: pos.x, y: pos.y + this.radius  + (this.size.h - this.radius) * (1 - notch.relpos)) * this.scale.y };
+            return { x: pos.x, y: pos.y + this.radius  + (this.size.h - this.radius) * (1 - notch.relpos) * this.scale.y };
         else if (side === 'right')
             return { x: pos.x + this.size.w * this.scale.x, y: pos.y + (this.radius + (this.size.h - this.radius * 2) * notch.relpos)*this.scale.y };
         else if (side === 'top')
