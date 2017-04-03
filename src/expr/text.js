@@ -1,5 +1,5 @@
-class TextExpr extends Expression {
-    constructor(txt, font='Consolas', fontSize=35) {
+class TextExpr extends ExpressionPlus {
+    constructor(txt, font='Consolas, Monaco, monospace', fontSize=35) {
         super();
         this._text = txt;
         this.font = font;

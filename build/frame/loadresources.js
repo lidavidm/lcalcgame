@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
@@ -14,13 +14,19 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     var levels = [];
     var chapters = [];
     var markChapter = function markChapter(json, prev_levels) {
-        var d = { name: json.chapterName, description: json.description, startIdx: prev_levels.length };
+        var d = {
+            name: json.chapterName,
+            description: json.description,
+            language: json.language || "reduct-scheme",
+            startIdx: prev_levels.length };
         if (json.resources) d.resources = json.resources;
         chapters.push(d);
     };
     var pushChapter = function pushChapter(json) {
         markChapter(json, levels);
+        var lang = json.language || "reduct-scheme";
         json.levels.forEach(function (lvl) {
+            lvl.language = lang;
             levels.push(lvl);
         });
     };
@@ -78,6 +84,11 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAudio('define-convert', 'convert.wav');
     loadAudio('drawer-open', 'drawer_close.wav');
     loadAudio('drawer-close', 'drawer_open.wav');
+    loadAudio('carriage-return', 'carriage-return.wav');
+    loadAudio('key-press-1', 'key-press-1.wav');
+    loadAudio('key-press-2', 'key-press-2.wav');
+    loadAudio('key-press-3', 'key-press-3.wav');
+    loadAudio('key-press-4', 'key-press-4.wav');
 
     loadImage('bag-background', 'bg-stars.png');
     loadImage('infinity-symbol', 'infinity_symbol.png');
@@ -140,6 +151,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadImage('victory', 'you-win.png');
     loadImage('apply-arrow', 'apply_arrow.png');
     loadImage('handle', 'pullout-drawer-handle.png');
+    loadImage('drag-patch', 'name-drag-patch.png');
 
     // Concreteness faded images.
     loadImage('missing-bracket', 'missing-bracket.png');
@@ -192,7 +204,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAnimation('poof', [0, 4], 120); // Cloud 'poof' animation for destructor piece.
 
     // Add levels here: (for now)
-    var chapter_load_prom = loadChaptersFromFiles(['intro_obj', 'intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map', 'define', 'assign', 'sequence']);
+    var chapter_load_prom = loadChaptersFromFiles(['define', 'intro_typing', 'intro_obj', 'intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map', 'assign', 'sequence']);
 
     Resource.startChapter = function (chapterName, canvas) {
         for (var i = 0; i < chapters.length; i++) {
@@ -226,9 +238,9 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             var _ret = function () {
 
                 ExprManager.fadesAtBorder = false;
-                var unfaded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
+                var unfaded = Level.make(level_desc).build(canvas);
                 ExprManager.fadesAtBorder = true;
-                var faded = Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
+                var faded = Level.make(level_desc).build(canvas);
 
                 var unfaded_exprs = unfaded.nodes;
                 var faded_exprs = faded.nodes;
@@ -272,7 +284,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
 
                             if (unfaded_root.fadingOut) {
                                 //    console.log('sdasdads');
-                                return 'continue';
+                                return "continue";
                             }
 
                             unfaded_root.fadingOut = true;
@@ -285,7 +297,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                             if (ExprManager.isExcludedFromFadingAnimation(unfaded_root)) {
                                 faded.remove(unfaded_root);
                                 root.opacity = 1;
-                                return 'continue';
+                                return "continue";
                             }
 
                             Animate.wait(500).after(function () {
@@ -318,7 +330,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                         for (var r = 0; r < faded_roots.length; r++) {
                             var _ret2 = _loop(r);
 
-                            if (_ret2 === 'continue') continue;
+                            if (_ret2 === "continue") continue;
                         }
                     }
                 } catch (err) {
@@ -341,9 +353,9 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                 };
             }();
 
-            if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+            if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
         } else {
-            return Level.make(level_desc.board, level_desc.goal, level_desc.toolbox, level_desc.globals).build(canvas);
+            return Level.make(level_desc).build(canvas);
         }
     };
     Resource.level = levels;

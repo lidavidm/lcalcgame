@@ -35,6 +35,11 @@ var ReductStage = function (_mag$Stage) {
             innerStages.forEach(function (stg) {
                 stg.build();
             });
+            var textboxes = this.getNodesWithClass(TypeInTextExpr);
+            if (textboxes.length > 0) {
+                // If one text box is on the screen, focus it!
+                textboxes[0].focus();
+            }
         }
 
         // Save state of game board and push onto undo stack.
@@ -42,6 +47,7 @@ var ReductStage = function (_mag$Stage) {
     }, {
         key: 'saveState',
         value: function saveState() {
+            if (!this.expressionNodes) return;
             // TODO: DML save and restore the environment as well.
             var board = this.expressionNodes().map(function (n) {
                 return n.clone();
@@ -62,6 +68,7 @@ var ReductStage = function (_mag$Stage) {
         value: function restoreState() {
             var _this2 = this;
 
+            if (!this.expressionNodes) return;
             if (this.stateStack.length > 0) {
                 //this.nodes = this.stateStack.pop();
 
@@ -173,6 +180,18 @@ var ReductStage = function (_mag$Stage) {
                 }
             }
         }
+
+        // getExprsWithCompatibleNotch(notch, excludedExprs=[], recursive=true) {
+        //     let exprs = this.expressionNodes();
+        //     let compatible_exprs = [];
+        //     exprs.filter((e) => {
+        //         if (e.notches && e.notches.length > 0 && e.notches.some((n) => n.isCompatibleWith(notch))) {
+        //             compatible_exprs.push(e);
+        //         }
+        //     });
+        //     return compatible_exprs;
+        // }
+
     }, {
         key: 'onmousedown',
         value: function onmousedown(pos) {
@@ -220,6 +239,8 @@ var ReductStage = function (_mag$Stage) {
     }, {
         key: 'toString',
         value: function toString() {
+            if (!this.expressionNodes) return "[stage]";
+
             var stringify = function stringify(nodes) {
                 return nodes.reduce(function (prev, curr) {
                     var s = curr.toString();

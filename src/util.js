@@ -2,6 +2,15 @@
  * Internal utils (author, me)
  */
 var __IS_MOBILE = /Mobi/.test(navigator.userAgent);
+
+// The current language parser. This won't change --yet!
+const __PARSER = ES6Parser;
+
+// Cursor graphic setting
+function SET_CURSOR_STYLE(style) {
+    document.querySelector('canvas').style.cursor = style;
+}
+
  var CONST = {
      POS: {
          UNITSQUARE: {
@@ -27,6 +36,13 @@ var __IS_MOBILE = /Mobi/.test(navigator.userAgent);
              },
              CENTER: () => ( {x:0.5, y:0.5} )
          }
+     },
+     CURSOR: {
+         HAND: 'pointer',
+         DEFAULT: 'auto',
+         RESIZE: 'nwse-resize',
+         GRAB: /Chrome|Safari/.test(navigator.userAgent) ? '-webkit-grab' : 'grab',
+         GRABBING: /Chrome|Safari/.test(navigator.userAgent) ? '-webkit-grabbing' : 'grabbing'
      }
  };
  function clonePos(pos) {
@@ -182,6 +198,12 @@ function setCompare(arr1, arr2, compareFunc) {
     http://stackoverflow.com/a/9716515 */
 Number.isNumber = function(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
+};
+
+// Returns the minimum object in an Array, according to one of its properties:
+Array.minimum = function(arr, property) {
+    if (!arr || arr.length === 0) return null;
+    return arr.sort((a, b) => (a[property] - b[property]))[0];
 };
 
 /**
@@ -427,8 +449,9 @@ function deBruijn(s, varindices={}) {
  * @param {Boolean} [fill = false] Whether to fill the rectangle.
  * @param {Boolean} [stroke = true] Whether to stroke the rectangle.
  */
-function roundRect(ctx, x, y, width, height, radius, fill, stroke, strokeOpacity) {
+function roundRect(ctx, x, y, width, height, radius, fill, stroke, strokeOpacity, notches) {
   if (typeof stroke == 'undefined') stroke = true;
+  if (typeof radius === 'undefined') radius = 5;
   if (typeof radius === 'undefined') radius = 5;
   if (typeof radius === 'number') radius = {tl: radius, tr: radius, br: radius, bl: radius};
   else {
@@ -437,19 +460,49 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke, strokeOpacity
       radius[side] = radius[side] || defaultRadius[side];
     }
   }
-  ctx.beginPath();
-  ctx.moveTo(x + radius.tl, y);
-  ctx.lineTo(x + width - radius.tr, y);
-  ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
-  ctx.lineTo(x + width, y + height - radius.br);
-  ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
-  ctx.lineTo(x + radius.bl, y + height);
-  ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
-  ctx.lineTo(x, y + radius.tl);
-  ctx.quadraticCurveTo(x, y, x + radius.tl, y);
-  ctx.closePath();
-  if (fill) ctx.fill();
-  if (stroke) strokeWithOpacity(ctx, strokeOpacity);
+
+  if (typeof notches === 'undefined' || !notches || notches.length === 0) { // Draw a simple rounded rect, no notches.
+      ctx.beginPath();
+      ctx.moveTo(x + radius.tl, y);
+      ctx.lineTo(x + width - radius.tr, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+      ctx.lineTo(x + width, y + height - radius.br);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+      ctx.lineTo(x + radius.bl, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+      ctx.lineTo(x, y + radius.tl);
+      ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) strokeWithOpacity(ctx, strokeOpacity);
+  } else { // Draw rounded rect with a notch.
+      //var notch = notches[0]; // For now, only can draw the first notch. TODO: Make arbitrary.
+      ctx.beginPath();
+      ctx.moveTo(x + radius.tl, y);
+      //if (notch.side === 'top')
+      Notch.drawSequence(notches, 'top', ctx, x + radius.tl, y, (width - radius.tr));
+        //    notch.drawHoriz(ctx, x + radius.tl, y, (width - radius.tr), 1);
+      ctx.lineTo(x + width - radius.tr, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+      //if (notch.side === 'right')
+      Notch.drawSequence(notches, 'right', ctx, x + width, y + radius.tr, (height - radius.br - radius.tr));
+    //    notch.drawVert(ctx, x + width, y + radius.tr, (height - radius.br - radius.tr), 1);
+      ctx.lineTo(x + width, y + height - radius.br);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+      //if (notch.side === 'bottom')
+      Notch.drawSequence(notches, 'bottom', ctx, x + width, y, (width - radius.bl));
+    //    notch.drawHoriz(ctx, x + width, y, (width - radius.bl), -1);
+      ctx.lineTo(x + radius.bl, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+     // if (notch.side === 'left')
+      Notch.drawSequence(notches, 'left', ctx, x, y + height, (height - radius.tl));
+    //    notch.drawVert(ctx, x, y + height, (height - radius.tl), -1);
+      ctx.lineTo(x, y + radius.tl);
+      ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) strokeWithOpacity(ctx, strokeOpacity);
+  }
 }
 function hexaRect(ctx, x, y, width, height, fill, stroke, strokeOpacity) {
   if (typeof stroke == 'undefined') stroke = true;
@@ -466,7 +519,7 @@ function hexaRect(ctx, x, y, width, height, fill, stroke, strokeOpacity) {
   if (stroke) strokeWithOpacity(ctx, strokeOpacity);
 }
 
-function clampRect(ctx, x, y, topWidth, topHeight, midWidth, midHeight, botWidth, botHeight, radius, fill, stroke, strokeOpacity) {
+function clampRect(ctx, x, y, topWidth, topHeight, midWidth, midHeight, botWidth, botHeight, radius, fill, stroke, strokeOpacity, notches) {
   if (typeof stroke == 'undefined') stroke = true;
   if (typeof radius === 'undefined') radius = 5;
   if (typeof radius === 'number') radius = {tl: radius, tr: radius, br: radius, bl: radius};
@@ -506,6 +559,9 @@ function clampRect(ctx, x, y, topWidth, topHeight, midWidth, midHeight, botWidth
   ctx.quadraticCurveTo(x, y + topHeight + midHeight + botHeight, x, y + topHeight + midHeight + botHeight - radius.bl);
 
   // Bot-left rounded edge
+  if (typeof notches !== undefined && notches.length === 1) { // Only 'left' side notches are supported for now.
+      notches[0].drawVert(ctx, x, y + topHeight + midHeight + botHeight - radius.bl, (topHeight + midHeight + botHeight - radius.bl) - radius.tl, -1);
+  }
   ctx.lineTo(x, y + radius.tl);
   ctx.quadraticCurveTo(x, y, x + radius.tl, y);
 

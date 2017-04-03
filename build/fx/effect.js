@@ -8,7 +8,51 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var ShapeExpandEffect = function () {
+    function ShapeExpandEffect() {
+        _classCallCheck(this, ShapeExpandEffect);
+    }
+
+    _createClass(ShapeExpandEffect, null, [{
+        key: 'run',
+        value: function run(node) {
+            var dur = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 500;
+            var smoothFunc = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function (e) {
+                return e;
+            };
+            var color = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'white';
+
+
+            if (!node.stage) {
+                console.warn('@ ShapeExpandEffect: Node is not member of stage.');
+                return;
+            }
+
+            // Store stage context.
+            var stage = node.stage;
+
+            var sz = node.absoluteSize;
+            var pos = node.upperLeftPos(node.absolutePos, sz);
+            pos.x += sz.w / 2.0;pos.y += sz.h / 2.0; // absolute center position
+            var rect = new mag.RoundedRect(pos.x, pos.y, sz.w, sz.h, node.radius / 2.0);
+            rect.color = null; // no fill
+            rect.stroke = { color: color, lineWidth: 2 };
+            rect.opacity = 1.0;
+            rect.anchor = { x: 0.5, y: 0.5 };
+            stage.add(rect);
+
+            // Expand and fadeout effect
+            Animate.tween(rect, { scale: { x: 4, y: 4 }, opacity: 0.0 }, dur, smoothFunc).after(function () {
+                stage.remove(rect);
+            });
+        }
+    }]);
+
+    return ShapeExpandEffect;
+}();
+
 // Node disappears and is replaced by a firework-like particle explosion.
+
 
 var SplosionEffect = function () {
     function SplosionEffect() {

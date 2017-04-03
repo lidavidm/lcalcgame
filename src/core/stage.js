@@ -10,13 +10,42 @@ var mag = (function(_) {
     class StageNode extends mag.Rect {
         constructor(x, y, stageToEmbed, canvas) {
             stageToEmbed._canvas = canvas; // if we try this normally, it's going to try to delegate the mouse, which we dont want.
-            let sz = stageToEmbed.boundingSize;
-            super(x, y, sz.w, sz.h);
+            if (canvas) {
+                let sz = stageToEmbed.boundingSize;
+                super(x, y, sz.w, sz.h);
+            } else {
+                super(x, y, 0, 0);
+            }
             this._embeddedStage = stageToEmbed;
             this._embeddedStage.draw = () => {
                 this.draw(this._embeddedStage.ctx);
             };
             this._clip = { l:0, t:0, r:1, b:1 };
+        }
+        setup(stageToEmbed, canvas) {
+            console.log('setup called with ', canvas);
+            stageToEmbed._canvas = canvas;
+            stageToEmbed.ctx = canvas.getContext('2d');
+            let stage_size = this.embeddedStage.boundingSize;
+            this._clip = { l:0, t:0, r:this._size.w / stage_size.w, b:this._size.h / stage_size.h };
+            this.size = stage_size;
+            this._embeddedStage = stageToEmbed;
+            this._embeddedStage.draw = () => {
+                this.draw(this._embeddedStage.ctx);
+            };
+        }
+        setClipWithSize(sz) {
+            let stage_size = this.embeddedStage.boundingSize;
+            this._clip = { l:0, t:0, r:sz.w / stage_size.w, b:sz.h / stage_size.h };
+        }
+
+        hitsWithin(pos) {
+            var boundingSize = this.absoluteSize;
+            boundingSize.w *= (this._clip.r - this._clip.l);
+            boundingSize.h *= (this._clip.b - this._clip.t);
+            var upperLeftPos = this.upperLeftPos(this.absolutePos, boundingSize);
+            if (pointInRect(pos, rectFromPosAndSize(upperLeftPos, boundingSize))) return this;
+            else return null;
         }
 
         // Clipping regions of the underlying stage.
@@ -44,6 +73,11 @@ var mag = (function(_) {
         }
 
         drawInternal(ctx, pos, boundingSize) {
+            if (!this._embeddedStage || !this._embeddedStage.canvas) {
+                console.error('nblah');
+                return;
+            }
+
             let bz = this._embeddedStage.boundingSize;
             let scaleRatio = { x:boundingSize.w / bz.w, y:boundingSize.h / bz.h };
             this._embeddedStage.ctx = ctx;
@@ -55,8 +89,6 @@ var mag = (function(_) {
             let r = this.clip;
             ctx.translate((r.r - r.l) * boundingSize.w * this.anchor.x - (boundingSize.w * r.l),
                           (r.b - r.t) * boundingSize.h * this.anchor.y - (boundingSize.h * r.t));
-            //ctx.translate((boundingSize.w / 2 - boundingSize.w * r.l) - (r.r - r.l) * boundingSize.w * this.anchor.x,
-            //              (boundingSize.h / 2 - boundingSize.h * r.t) - (r.b - r.t) * boundingSize.h * this.anchor.y);
             ctx.rect( boundingSize.w * r.l, boundingSize.h * r.t, boundingSize.w * (r.r - r.l), boundingSize.h * (r.b - r.t) );
             ctx.clip();
 
@@ -149,7 +181,13 @@ var mag = (function(_) {
         finishLoading() { }
 
         clear() {
-            this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (this.color) {
+                this.ctx.fillStyle = this.color;
+                this.ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            else {
+                this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
         }
         has(node) {
             return node && node.stage == this && this.nodes.indexOf(node) > -1;

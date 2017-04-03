@@ -14,6 +14,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         var d = {
             name:json.chapterName,
             description:json.description,
+            language:(json.language || "reduct-scheme"),
             startIdx:prev_levels.length,
             endIdx: prev_levels.length + json.levels.length - 1,
             key: json_filename,
@@ -23,7 +24,9 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     };
     var pushChapter = (json, json_filename) => {
         markChapter(json, json_filename, levels);
+        var lang = json.language || "reduct-scheme";
         json.levels.forEach((lvl) => {
+            lvl.language = lang;
             levels.push(lvl);
         });
     };
@@ -117,6 +120,11 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAudio('define-convert', 'convert.wav');
     loadAudio('drawer-open', 'drawer_close.wav');
     loadAudio('drawer-close', 'drawer_open.wav');
+    loadAudio('carriage-return', 'carriage-return.wav');
+    loadAudio('key-press-1', 'key-press-1.wav');
+    loadAudio('key-press-2', 'key-press-2.wav');
+    loadAudio('key-press-3', 'key-press-3.wav');
+    loadAudio('key-press-4', 'key-press-4.wav');
 
     // This is used as a tiled texture, thus it can't be part of the spritesheet
     loadImage('shinewrap', 'shinewrap.png');
@@ -126,6 +134,11 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadImage('toolbox-bg', 'toolbox-bg.png');
 
     Resource.loadImageAtlas('assets', 'assets.json');
+    //loadImage('die', 'die.png');
+
+    //loadImage('apply-arrow', 'apply_arrow.png');
+    //loadImage('handle', 'pullout-drawer-handle.png');
+    //loadImage('drag-patch', 'name-drag-patch.png');
 
     // Main menu
     Resource.loadImageAtlas('menu', 'starboy/menu-assets.json');
@@ -136,6 +149,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     // Load preset animations from image sequences.
     loadAnimation('poof', [0, 4], 120); // Cloud 'poof' animation for destructor piece.
 
+    // Add levels here:
     const chapterDigraph = {
         'define': ['intro'],
         'intro': ['booleans'],
@@ -151,7 +165,6 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         'mystery': [],
     };
 
-    // Add levels here: (for now)
     let chapter_load_prom = loadChaptersFromDigraph(chapterDigraph);
 
     Resource.startChapter = (chapterName, canvas) => {

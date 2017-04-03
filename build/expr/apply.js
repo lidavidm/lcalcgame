@@ -2,6 +2,8 @@
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -20,7 +22,12 @@ var ApplyExpr = function (_Expression) {
         _this.exprToApply.pos = addPos(_this.lambdaExpr.pos, { x: -exprToApply.size.w, y: -exprToApply.size.h / 2 });
 
         _this.shadowOffset = 2;
-        _this.color = '#ddd';
+
+        var applyDepth = function applyDepth(n, expr) {
+            if (expr instanceof ApplyExpr) return applyDepth(n + 1, expr.exprToApply);else return n;
+        };
+        var levels_deep = applyDepth(0, _this.exprToApply);
+        _this.color = colorFrom255(Math.max(0, 180 + levels_deep * 40));
 
         _this.exprToApply.lock();
         _this.lambdaExpr.lock();
@@ -29,6 +36,20 @@ var ApplyExpr = function (_Expression) {
         arrow.lock();
         _this.arrow = arrow;
         _this.arrow.opacity = 1;
+
+        // Brackets
+        var lbrak = new TextExpr('[');
+        lbrak.color = '#fff';
+        var rbrak = lbrak.clone();
+        rbrak.text = ']';
+        _this.lbrak = lbrak;
+        _this.rbrak = rbrak;
+
+        // Bg
+        var bg = new mag.Rect(0, 0, _this.exprToApply.size.w, _this.exprToApply.size.h);
+        bg.shadowOffset = 0;
+        bg.color = 'pink';
+        _this.bg = bg;
         return _this;
     }
 
@@ -58,10 +79,29 @@ var ApplyExpr = function (_Expression) {
             return null;
         }
     }, {
+        key: 'drawInternal',
+        value: function drawInternal(ctx, pos, boundingSize) {
+
+            _get(ApplyExpr.prototype.__proto__ || Object.getPrototypeOf(ApplyExpr.prototype), 'drawInternal', this).call(this, ctx, pos, boundingSize);
+
+            // this.bg.parent = this;
+            // this.bg.pos = { x:this.lbrak.size.w/2.0, y:this.rbrak.size.h*0.35/2.0 };
+            // this.bg.size = { w:this.exprToApply.size.w-this.lbrak.size.w/2.0, h:this.rbrak.size.h*0.65 };
+            // this.bg.draw(ctx);
+
+            this.lbrak.parent = this;
+            this.lbrak.pos = { x: 0, y: this.lbrak.size.h / 1.4 };
+            this.lbrak.draw(ctx);
+
+            this.rbrak.parent = this;
+            this.rbrak.pos = { x: this.exprToApply.size.w * this.exprToApply.scale.x, y: this.lbrak.pos.y };
+            this.rbrak.draw(ctx);
+        }
+    }, {
         key: 'drawInternalAfterChildren',
         value: function drawInternalAfterChildren(ctx, pos, boundingSize) {
             this.arrow.parent = this;
-            this.arrow.pos = { x: this.exprToApply.pos.x + this.exprToApply.size.w / 2, y: -8 };
+            this.arrow.pos = { x: this.lambdaExpr.pos.x - this.lambdaExpr.hole.absoluteSize.w / 3, y: -16 };
             this.arrow.draw(ctx);
         }
 

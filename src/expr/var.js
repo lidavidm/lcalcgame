@@ -307,12 +307,12 @@ class ChestVarExpr extends VarExpr {
 
     onmouseenter() {
         super.onmouseenter();
-        document.querySelector('canvas').style.cursor = 'pointer';
+        SET_CURSOR_STYLE(CONST.CURSOR.HAND);
     }
 
     onmouseleave() {
         super.onmouseleave();
-        document.querySelector('canvas').style.cursor = 'auto';
+        SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
     }
 
     onmouseclick() {

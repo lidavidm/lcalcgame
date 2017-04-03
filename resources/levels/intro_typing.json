@@ -1,59 +1,42 @@
 {
-    "chapterName":"Define",
-    "description":"Defining functions to add numbers",
+    "chapterName":"Intro to Typing",
+    "description":"It's like magic!",
+    "language":"JavaScript",
     "levels": [
         {
-            "board": "(define /star `star) (notch)",
-            "goal": "(star) (star) (star)"
-        },
-        {
-            "board": "(define /rect `rect) (define /triangle `triangle) (notch) (notch)",
-            "goal": "(triangle) (rect) (triangle)"
-        },
-        {
-            "description": "Deceptive naming",
-            "board": "(define /star `rect) (define /rect `star) (notch) (notch)",
-            "goal": "(star) (star)"
-        },
-        {
-            "board": "(define _ `???) (notch)",
-            "goal": "(rect) (rect) (rect)",
-            "toolbox": "(star) (triangle) (rect)"
-        },
-        {
-            "board": "(+ _ _)",
-            "goal": "3",
-            "toolbox": "(1) (2) (3)"
-        },
-        {
-            "board": "(λx /(+ #x 2))",
-            "goal": "4",
-            "toolbox": "(1) (2) (3)"
-        },
-        {
-            "board": "(λx /(+ #x #x))",
-            "goal": "4",
-            "toolbox": "(1) (2) (3)"
-        },
-        {
-            "board": "(λx /(+ #x #x))",
-            "goal": "5",
-            "toolbox": "(+ _ _) (1) (1) (1) (+ _ _)"
-        },
-        {
-            "board": "(define /(λx /(+ #x #x)) `double) (notch)",
-            "goal": "4",
-            "toolbox": "(1)"
-        },
-        {
-            "board": "(define /(λx /(+ #x #x)) `double) (== 6 _) (notch)",
             "goal": "true",
-            "toolbox": "(1) (2) (3)"
+            "board": "_t_string == 'type'",
+            "toolbox": ""
         },
         {
-            "board": "(define /(λx /(+ #x _)) `???) (notch)",
-            "goal": "6",
-            "toolbox": "(2) (1)"
+            "goal": "4",
+            "board": "_t_int + _t_int",
+            "toolbox": ""
+        },
+        {
+            "goal": ["true","false"],
+            "board": ["'mango' != 'pear'", "_t_string != 'apple'"],
+            "toolbox": ""
+        },
+        {
+            "goal": ["true","false"],
+            "board": ["'rect' != 'rect'", "'star' >>> 'star'"],
+            "toolbox": ""
+        },
+        {
+            "goal": ["true","true"],
+            "board": ["'A' >>> 'B'", "'C' >>> 'C'"],
+            "toolbox": ""
+        },
+        {
+            "goal": ["true","true"],
+            "board": ["(x) => _t_single", "(x) => (x == 'cat')", "'cat'", "'dog'"],
+            "toolbox": ""
+        },
+        {
+            "goal": ["'star'"],
+            "board": ["(x) => xx", "_t_single", "'star'"],
+            "toolbox": ""
         }
     ],
     "resources":{

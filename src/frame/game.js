@@ -91,11 +91,24 @@ class Level {
                     n.constructor.name === 'ImageRect' ||
                     !(n instanceof Expression) ||
                     n.fadingOut ||
-                    n.toolbox) continue;
+                    n.toolbox || n.isSnapped()) continue;
+                else if (n instanceof NotchHangerExpr)
+                    continue;
                 nodes.push(n);
             }
             return nodes;
         }.bind(stage);
+        stage.notchHangers = (function() {
+            let hangers = [];
+            for (let n of this.nodes) {
+                if (n instanceof NotchHangerExpr) {
+                    n.pos = { x:0, y:80 + 160*hangers.length };
+                    n.anchor = {x:0, y:0};
+                    hangers.push(n);
+                }
+            }
+            return hangers;
+        }.bind(stage))();
         stage.toolboxNodes = function() {
             return this.nodes.filter((n) => n.toolbox && n.toolbox instanceof Toolbox && !n.fadingOut);
         }.bind(stage);
@@ -153,48 +166,56 @@ class Level {
             toolbox: toolbox_descs,
             globals: globals_descs,
             resources: resources,
+            language: language,
         } = desc;
 
         var lvl = new Level(
-            Level.parse(expr_descs),
-            new Goal(new ExpressionPattern(Level.parse(goal_descs)), resources.aliens),
-            toolbox_descs ? Level.parse(toolbox_descs) : null,
+            Level.parse(expr_descs, language),
+            new Goal(new ExpressionPattern(Level.parse(goal_descs, language)), resources.aliens),
+            toolbox_descs ? Level.parse(toolbox_descs, language) : null,
             Environment.parse(globals_descs)
         );
         return lvl;
     }
-    static parse(desc) {
+    static parse(desc, language="reduct-scheme") {
         if (desc.length === 0) return [];
 
-        function splitParen(s) {
-            s = s.trim();
-            var depth = 0;
-            var paren_idx = 0;
-            var expr_descs = [];
-            for (let i = 0; i < s.length; i++) {
-                if (s[i] === '(') {
-                    if (depth === 0) paren_idx = i + 1;
-                    depth++;
-                }
-                else if (s[i] === ')') {
-                    depth--;
-                    if (depth === 0) expr_descs.push(s.substring(paren_idx, i));
-                }
-            }
-            if (expr_descs.length === 0) expr_descs.push(s);
-            return expr_descs;
+        if (language === "JavaScript") {
+            // Use ES6 parser
+            if (Array.isArray(desc)) return desc.map((d) => ES6Parser.parse(d));
+            else                     return [ES6Parser.parse(desc)];
         }
+        else if (language === "reduct-scheme" || !language) {
+            function splitParen(s) {
+                s = s.trim();
+                var depth = 0;
+                var paren_idx = 0;
+                var expr_descs = [];
+                for (let i = 0; i < s.length; i++) {
+                    if (s[i] === '(') {
+                        if (depth === 0) paren_idx = i + 1;
+                        depth++;
+                    }
+                    else if (s[i] === ')') {
+                        depth--;
+                        if (depth === 0) expr_descs.push(s.substring(paren_idx, i));
+                    }
+                }
+                if (expr_descs.length === 0) expr_descs.push(s);
+                return expr_descs;
+            }
 
-        // Split string by top-level parentheses.
-        var descs = splitParen(desc);
-        //console.log('descs', descs);
+            // Split string by top-level parentheses.
+            var descs = splitParen(desc);
+            //console.log('descs', descs);
 
-        // Parse expressions recursively.
-        let es = descs.map((expr_desc) => Level.parseExpr(expr_desc));
-        let LambdaClass = ExprManager.getClass('lambda_abstraction');
-        es = es.map((e) => e instanceof LambdaHoleExpr ? new LambdaClass([e]) : e);
-        //console.log('exprs', es);
-        return es;
+            // Parse expressions recursively.
+            let es = descs.map((expr_desc) => Level.parseExpr(expr_desc));
+            let LambdaClass = ExprManager.getClass('lambda_abstraction');
+            es = es.map((e) => e instanceof LambdaHoleExpr ? new LambdaClass([e]) : e);
+            //console.log('exprs', es);
+            return es;
+        }
     }
     static parseExpr(desc) {
 
@@ -284,6 +305,10 @@ class Level {
                     for (let i = 1; i < exprs.length; i++) { lexp.addArg(exprs[i]); }
                     return lock(lexp, toplevel_lock);
                 }
+                else if (op_class instanceof NotchHangerExpr) {
+                    op_class.pos = {x:0, y:80};
+                    return op_class;
+                }
                 else if (op_class instanceof BagExpr) {
                     let bag = op_class;
                     let sz = bag.graphicNode.size;
@@ -358,6 +383,7 @@ class Level {
             'level':ExprManager.getClass('level'),
             'arrayobj':ExprManager.getClass('arrayobj'),
             'infinite':ExprManager.getClass('infinite'),
+            'notch':new (ExprManager.getClass('notch'))(1),
             'dot':(() => {
                 let circ = new CircleExpr(0,0,18);
                 circ.color = 'gold';

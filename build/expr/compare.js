@@ -12,8 +12,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-//
-
 // A boolean compare function like ==, !=, >, >=, <=, <.
 
 var CompareExpr = function (_Expression) {
@@ -143,8 +141,8 @@ var CompareExpr = function (_Expression) {
             } else if (this.funcName === '!=') {
                 return this.leftExpr.value() !== this.rightExpr.value();
             } else {
-                console.warn('Compare function "' + this.funcName + '" not implemented.');
-                return false;
+                //console.warn('Compare function "' + this.funcName + '" not implemented.');
+                return undefined;
             }
         }
     }, {
@@ -172,6 +170,11 @@ var CompareExpr = function (_Expression) {
         key: 'leftExpr',
         get: function get() {
             return this.holes[0];
+        }
+    }, {
+        key: 'operatorExpr',
+        get: function get() {
+            return this.holes[1];
         }
     }, {
         key: 'rightExpr',

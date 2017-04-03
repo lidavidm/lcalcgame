@@ -1,11 +1,3 @@
-
-
-
-
-//
-
-
-
 // A boolean compare function like ==, !=, >, >=, <=, <.
 class CompareExpr extends Expression {
     static operatorMap() {
@@ -26,6 +18,7 @@ class CompareExpr extends Expression {
     }
     get constructorArgs() { return [this.holes[0].clone(), this.holes[2].clone(), this.funcName]; }
     get leftExpr() { return this.holes[0]; }
+    get operatorExpr() { return this.holes[1]; }
     get rightExpr() { return this.holes[2]; }
     onmouseclick(pos) {
         console.log('Expressions are equal: ', this.compare());
@@ -108,8 +101,8 @@ class CompareExpr extends Expression {
         } else if (this.funcName === '!=') {
             return this.leftExpr.value() !== this.rightExpr.value();
         } else {
-            console.warn('Compare function "' + this.funcName + '" not implemented.');
-            return false;
+            //console.warn('Compare function "' + this.funcName + '" not implemented.');
+            return undefined;
         }
     }
 

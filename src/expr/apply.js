@@ -8,7 +8,15 @@ class ApplyExpr extends Expression {
             { x:-exprToApply.size.w, y:-exprToApply.size.h/2 });
 
         this.shadowOffset = 2;
-        this.color = '#ddd';
+
+        let applyDepth = (n, expr) => {
+            if (expr instanceof ApplyExpr)
+                return applyDepth(n+1, expr.exprToApply);
+            else
+                return n;
+        };
+        let levels_deep = applyDepth(0, this.exprToApply);
+        this.color = colorFrom255(Math.max(0, 180 + levels_deep*40))
 
         this.exprToApply.lock();
         this.lambdaExpr.lock();
@@ -17,6 +25,20 @@ class ApplyExpr extends Expression {
         arrow.lock();
         this.arrow = arrow;
         this.arrow.opacity = 1;
+
+        // Brackets
+        let lbrak = new TextExpr('[');
+        lbrak.color = '#fff';
+        let rbrak = lbrak.clone();
+        rbrak.text = ']';
+        this.lbrak = lbrak;
+        this.rbrak = rbrak;
+
+        // Bg
+        let bg = new mag.Rect(0, 0, this.exprToApply.size.w, this.exprToApply.size.h);
+        bg.shadowOffset = 0;
+        bg.color = 'pink';
+        this.bg = bg;
     }
 
     get constructorArgs() { return [ this.exprToApply.clone(), this.lambdaExpr.clone() ]; }
@@ -43,9 +65,27 @@ class ApplyExpr extends Expression {
 
     hitsChild() { return null; }
 
+    drawInternal(ctx, pos, boundingSize) {
+
+        super.drawInternal(ctx, pos, boundingSize);
+
+        // this.bg.parent = this;
+        // this.bg.pos = { x:this.lbrak.size.w/2.0, y:this.rbrak.size.h*0.35/2.0 };
+        // this.bg.size = { w:this.exprToApply.size.w-this.lbrak.size.w/2.0, h:this.rbrak.size.h*0.65 };
+        // this.bg.draw(ctx);
+
+        this.lbrak.parent = this;
+        this.lbrak.pos = { x:0, y:this.lbrak.size.h/1.4 };
+        this.lbrak.draw(ctx);
+
+        this.rbrak.parent = this;
+        this.rbrak.pos = { x:this.exprToApply.size.w*this.exprToApply.scale.x, y:this.lbrak.pos.y };
+        this.rbrak.draw(ctx);
+    }
+
     drawInternalAfterChildren(ctx, pos, boundingSize) {
         this.arrow.parent = this;
-        this.arrow.pos = { x:this.exprToApply.pos.x + this.exprToApply.size.w/2, y:-8 };
+        this.arrow.pos = { x:this.lambdaExpr.pos.x - this.lambdaExpr.hole.absoluteSize.w / 3, y:-16 };
         this.arrow.draw(ctx);
     }
 

@@ -1,4 +1,270 @@
 /**
+ * An inner 'play area' to mess around and make programs in.
+ * It's a pen because you can't drag expressions _out_!
+ */
+class PlayPenExpr extends ExpressionPlus {
+    constructor(name) {
+
+        let txt_input = new Expression([ new TextExpr(name ? name : 'obj') ]); // TODO: Make this text input field (or dropdown menu).
+        txt_input.color = '#B3E389';
+        txt_input.radius = 2;
+        txt_input.lock();
+        super([txt_input]);
+
+        this.padding = { left:16, top:txt_input.size.h + 4, right:2, bottom:10, inner:8 };
+
+        let pen = new PlayPen(this.padding.left, this.padding.top, 220-this.padding.left*2, 220-this.padding.top*2);
+        this.addChild(pen);
+        this.pen = pen;
+
+        this.color = 'YellowGreen';
+        this.notches = [new WedgeNotch('left', 10, 10, 0.8, true)]; // notch in left side near top.
+
+                        //new WedgeNotch('left', 10, 10, 0.2, true),
+                        //new WedgeNotch('right', 10, 10, 0.5, false)];  // for testing
+
+        let inner_hanger = new NotchHangerExpr(2);
+        inner_hanger.pos = { x:this.padding.left, y:30 };
+        inner_hanger.color = this.color;
+
+        pen.addToPen(inner_hanger);
+
+        this.update();
+    }
+
+    get size() {
+        return { w:this.pen.size.w + this.padding.left*2, h:this.pen.size.h + this.padding.top + this.padding.bottom };
+    }
+    set size(sz) {
+        super.size = sz;
+        this.pen.size = sz;
+    }
+    update() {
+        super.update();
+        this.pen.update();
+        this.holes[0].pos = { x:this.holes[0].pos.x, y:this.holes[0].size.h/2.0+2 };
+    }
+    hitsBottomRightCorner(pos) {
+        let a = this.absolutePos;
+        let sz = this.size;
+        return pos.x > (a.x + sz.w - this.padding.left*2) &&
+            pos.y > (a.y + sz.h - this.padding.top*2);
+    }
+    onmousehover(pos) {
+        super.onmousehover(pos);
+        if (this.hitsBottomRightCorner(pos)) {
+            this.resizing = true;
+            this._prev_pos = undefined;
+            SET_CURSOR_STYLE(CONST.CURSOR.RESIZE);
+        } else {
+            SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
+            this.resizing = false;
+        }
+    }
+    onmousedrag(pos) {
+        if (this.resizing) {
+            let prev_pos = this._prev_pos || this.pos;
+            let len = fromTo(prev_pos, pos);
+            this._prev_pos = clonePos(pos);
+            this.pen.size = { w:this.pen.size.w + len.x, h:this.pen.size.h+len.y };
+        }
+        else {
+            super.onmousedrag(pos);
+
+            // if (this._attachNode) {
+            //     this._attachNode.detachAttachment(this);
+            //     this._attachNode = null;
+            // }
+            //
+            // const ATTACHMENT_THRESHOLD = 20;
+            // let notchPos = this.notchPos;
+            // let attachmentNodes = this.stage.getRootNodesThatIncludeClass(NewInstanceExpr);
+            // attachmentNodes.forEach((node) => {
+            //     if (!node.isAttached()) {
+            //         let dist = distBetweenPos(notchPos, node.notchPos);
+            //         if (dist < ATTACHMENT_THRESHOLD) {
+            //             node.stroke = { color:'magenta', lineWidth:4 };
+            //             this._attachProspect = node;
+            //         } else {
+            //             node.stroke = null;
+            //             if (this._attachProspect && this._attachProspect == node)
+            //                 this._attachProspect = null;
+            //         }
+            //     }
+            // });
+        }
+    }
+    onmouseleave(pos) {
+        super.onmouseleave(pos);
+        SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
+        this.resizing = false;
+    }
+    // onmouseup(pos) {
+    //     super.onmouseup(pos);
+    //     if (this._attachProspect) { // Snap this function block into the NewInstanceExpr notch:
+    //         this._attachProspect.attach(this);
+    //         this._attachNode = this._attachProspect;
+    //         this._attachProspect = null;
+    //     }
+    // }
+}
+
+class PlayPenStage extends mag.StageNode {
+    constructor(x, y, w, h) {
+        super(x, y, new ReductStage(null), null);
+        this._size = { w:w, h:h };
+        this._isCanvasSetup= false;
+        this.embeddedStage.color = "gray";
+        this.shadowOffset = 0;
+    }
+    update() {
+        if (!this._isCanvasSetup) {
+            if (this.stage) {
+                this.setup(this.embeddedStage, this.stage.canvas);
+                this._isCanvasSetup = true;
+            }
+        } else {
+            super.update();
+        }
+    }
+
+    // Event bubbling
+    ondropenter(node, pos) {
+        if (this.parent)
+            this.parent.ondropenter(node, pos);
+    }
+    ondropped(node, pos) {
+        if (this.parent)
+            this.parent.ondropped(node, pos);
+    }
+    ondropexit(node, pos) {
+        if (this.parent)
+            this.parent.ondropexit(node, pos);
+    }
+    onmouseenter(pos) {
+        super.onmouseenter(pos);
+        if (this.parent)
+            this.parent.onmouseenter(pos);
+    }
+    onmouseleave(pos) {
+        super.onmouseleave(pos);
+        if (this.parent)
+            this.parent.onmouseleave(pos);
+    }
+}
+
+class PlayPenRect extends mag.Rect {
+    constructor(x, y, w, h) {
+        super(x, y, w, h);
+        this.color = '#444';
+        this.addChild(new PlayPenStage(0, 0, w/2, h/2));
+    }
+}
+
+class PlayPen extends mag.RoundedRect {
+    constructor(x, y, w, h) {
+        super(x, y, w, h, 12);
+        this.color = '#444';
+        this.shadowOffset = -2;
+
+        let pps = new PlayPenStage(0, 0, 200, 200);
+        pps.embeddedStage.color = this.color;
+        this.addChild(pps);
+        this.pps = pps;
+        this.innerStage = pps.embeddedStage;
+    }
+    get size() {
+        return super.size;
+    }
+    set size(sz) {
+        super.size = sz;
+        this.pps.setClipWithSize({ w:sz.w, h:sz.h });
+    }
+
+    // Basically addChild, but with some extra setup.
+    // *Expressions inside the pen cannot be dragged out.*
+    addToPen(expr) {
+
+        const SCALE = 0.75;
+        expr.scale = { x:SCALE, y:SCALE };
+        expr.pos = fromTo(this.absolutePos, expr.absolutePos);
+
+        let stage = this.stage;
+        if (!stage) {
+            console.warn('@ addToPen: PlayPen not member of a Stage.');
+        } else if (!expr.stage || expr.stage != stage) {
+            console.warn('@ addToPen: Expression has no stage, a different stage than PlayPen.');
+        }
+        else stage.remove(expr);
+
+        this.innerStage.add(expr);
+    }
+
+    // Since this area is contained,
+    // we won't allow child nodes outside of the container bounds to be hit.
+    hits(pos, options) {
+        if (this.hitsWithin(pos)) {
+            return super.hits(pos, options);
+        } else
+            return false;
+    }
+
+    // Clip drawing children to just the inner region.
+    drawInternalAfterChildren(ctx, pos, boundingSize) {
+        ctx.restore();
+        super.drawInternalAfterChildren(ctx, pos, boundingSize);
+    }
+    drawInternal(ctx, pos, boundingSize) {
+        super.drawInternal(ctx, pos, boundingSize);
+        ctx.save();
+        roundRect(ctx,
+                  pos.x, pos.y,
+                  boundingSize.w, boundingSize.h,
+                  this.radius*this.absoluteScale.x, this.color !== null, false,
+                  this.stroke ? this.stroke.opacity : null);
+        ctx.clip();
+    }
+
+    // Graphics
+    toggleHighlight(on=true) {
+        if (on) this.stroke = { color:'cyan', lineWidth:4 };
+        else    this.stroke = null;
+    }
+
+    // Dropping expressions into the area
+    ondropenter(node, pos) {
+        if (node instanceof Expression && !this.hasChild(node))
+            this.toggleHighlight(true);
+    }
+    ondropped(node, pos) {
+        if (node instanceof Expression && !this.hasChild(node)) {
+            this.toggleHighlight(false);
+
+            this.addToPen(node);
+        }
+    }
+    ondropexit(node, pos) {
+        if (node instanceof Expression && !this.hasChild(node))
+            this.toggleHighlight(false);
+    }
+
+    // Dragging container
+    // onmouseenter(pos) {
+    //     super.onmouseenter(pos);
+    //     if (this.parent)
+    //         this.parent.onmouseenter(pos);
+    // }
+    // onmousedrag(pos) {
+    //     if (this.parent)
+    //         this.parent.onmousedrag(pos);
+    // }
+    // onmouseup(pos) {
+    //     if (this.parent)
+    //         this.parent.onmouseup(pos);
+    // }
+}
+
+/**
  * Any expression with dot notation '.' properties to access.
  * Properties can themselves return objects...
  */
@@ -324,14 +590,14 @@ class PulloutDrawerHandle extends mag.ImageRect {
     // Events
     onmouseenter(pos) {
         super.onmouseenter(pos);
-        document.querySelector('canvas').style.cursor = 'pointer'; // col-resize is another option
+        SET_CURSOR_STYLE(CONST.CURSOR.HAND); // col-resize is another option
     }
     onmouseclick(pos) {
         if(this.onclick) this.onclick();
     }
     onmouseleave(pos) {
         super.onmouseleave(pos);
-        document.querySelector('canvas').style.cursor = 'auto';
+        SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
     }
 }
 

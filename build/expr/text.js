@@ -8,11 +8,11 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var TextExpr = function (_Expression) {
-    _inherits(TextExpr, _Expression);
+var TextExpr = function (_ExpressionPlus) {
+    _inherits(TextExpr, _ExpressionPlus);
 
     function TextExpr(txt) {
-        var font = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Consolas';
+        var font = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'Consolas, Monaco, monospace';
         var fontSize = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 35;
 
         _classCallCheck(this, TextExpr);
@@ -102,4 +102,4 @@ var TextExpr = function (_Expression) {
     }]);
 
     return TextExpr;
-}(Expression);
+}(ExpressionPlus);

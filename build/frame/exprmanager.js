@@ -14,6 +14,7 @@ var ExprManager = function () {
         '_': [MissingExpression],
         '__': [MissingBagExpression, MissingBracketExpression],
         '_b': [MissingKeyExpression, MissingBooleanExpression],
+        '_t': [TypeInTextExpr],
         'true': [KeyTrueExpr, TrueExpr],
         'false': [KeyFalseExpr, FalseExpr],
         'cmp': [MirrorCompareExpr, FadedCompareExpr],
@@ -21,6 +22,7 @@ var ExprManager = function () {
         '+': [AddExpr],
         '!=': [MirrorCompareExpr, FadedCompareExpr],
         'bag': [BagExpr, BracketArrayExpr],
+        'array': [BracketArrayExpr],
         'count': [CountExpr],
         'map': [SimpleMapFunc, FadedMapFunc],
         'reduce': [ReduceFunc],
@@ -40,7 +42,8 @@ var ExprManager = function () {
         'choice': [ChoiceExpr],
         'level': [ReductStageExpr],
         'arrayobj': [ArrayObjectExpr],
-        'infinite': [InfiniteExpression]
+        'infinite': [InfiniteExpression],
+        'notch': [NotchHangerExpr]
     };
     var fade_level = {};
     var DEFAULT_FADE_LEVEL = 0;
@@ -69,6 +72,9 @@ var ExprManager = function () {
         DEFAULT_FADE_PROGRESSION[p] = DEFAULT_FADE_PROGRESSION.primitives;
     });
     DEFAULT_FADE_PROGRESSION.primitives = undefined;
+    pub.isPrimitive = function (str) {
+        return primitives.indexOf(str) > -1;
+    };
 
     // Classes that should not show the 'sparkle' when they are faded.
     var FADE_EXCEPTIONS = [JumpingChestVarExpr, JumpingAssignExpr, EnvironmentDisplay];
@@ -127,6 +133,9 @@ var ExprManager = function () {
     };
     pub.fadesAtBorder = true;
 
+    pub.hasClass = function (ename) {
+        return ename in _FADE_MAP;
+    };
     pub.getClass = function (ename) {
         if (ename in _FADE_MAP) {
             return _FADE_MAP[ename][pub.getFadeLevel(ename)];
