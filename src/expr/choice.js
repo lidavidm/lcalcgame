@@ -35,19 +35,26 @@ class ChoiceExpr extends Expression {
         if (this._state === "closed") {
             return super.size;
         }
+        else if (this._state === "opening" || this._state === "closing") {
+            return this._size;
+        }
         else if (this._state === "open") {
-            var padding = this.padding;
-            if (this.getHoleSizes().length === 0) return { w:this._size.w, h:this._size.h };
-
-            let { w: boxW, h: boxH } = this.cellSize;
-            let width = this.padding.left + this.rowSize * boxW + this.padding.right;
-            let height = this.padding.inner * 2 + Math.ceil(this.choices.length / this.rowSize) * boxH;
-
-            return { w:width, h: height };
+            return this.openSize;
         }
         else {
             throw "Invalid state";
         }
+    }
+
+    get openSize() {
+        var padding = this.padding;
+        if (this.getHoleSizes().length === 0) return { w:this._size.w, h:this._size.h };
+
+        let { w: boxW, h: boxH } = this.cellSize;
+        let width = this.padding.left + this.rowSize * boxW + this.padding.right;
+        let height = this.padding.inner * 2 + Math.ceil(this.choices.length / this.rowSize) * boxH;
+
+        return { w:width, h: height };
     }
 
     /** The size of a single cell in our grid layout. */
@@ -132,34 +139,88 @@ class ChoiceExpr extends Expression {
 
     drawInternal(ctx, pos, boundingSize) {
         let gradient = ctx.createLinearGradient(pos.x, pos.y, pos.x + boundingSize.w, pos.y + boundingSize.h);
-        gradient.addColorStop(0, 'purple');
-        gradient.addColorStop(0.5, 'green');
-        gradient.addColorStop(1, 'blue');
+        gradient.addColorStop(0, 'green');
+        gradient.addColorStop(0.4, 'blue');
+        gradient.addColorStop(0.6, 'purple');
+        gradient.addColorStop(1.0, 'red');
         this.color = gradient;
-        if (this._state === "closed") {
-            super.drawInternal(ctx, pos, boundingSize);
-        }
-        else if (this._state === "open") {
-            super.drawInternal(ctx, pos, boundingSize);
-        }
+        super.drawInternal(ctx, pos, boundingSize);
     }
 
     /** Pretend to be a Toolbox so we can use the same API. */
     removeExpression(expr) {
-        Animate.poof(this);
-        this.cleanup();
-        (this.parent || this.stage).swap(this, null);
+        this.holes.splice(0, this.holes.length);
+        this._state = "closing";
+        this.update();
+        Animate.tween(this, {
+            _size: {
+                w: 0,
+                h: 0,
+            },
+            opacity: 0.5,
+            scale: {
+                x: 0.5,
+                y: 0.5,
+            },
+        }, 200).after(() => {
+            this.cleanup();
+            (this.parent || this.stage).swap(this, null);
+        });
+        expr.onmouseenter = expr._onmouseenter;
+        expr.toolbox = null;
     }
 
     onmouseclick() {
         if (this._state === "closed") {
             this.removeArg(this.label);
+
+            this._state = "open";
             this.choices.forEach((c) => {
                 let choice = c.clone();
                 choice.toolbox = this;
                 this.holes.push(choice);
             });
-            this._state = "open";
+            this.update();
+            let size = this.openSize;
+            this._state = "opening";
+            this.holes.splice(0, this.holes.length);
+            this.update();
+
+            Animate.tween(this, {
+                _size: size,
+            }, 300).after(() => {
+                this.choices.forEach((c) => {
+                    let choice = c.clone();
+                    choice.toolbox = this;
+
+                    choice._onmouseenter = choice.onmouseenter;
+                    choice.onmouseenter = function() {
+                        this.opacity = 1.0;
+                    }.bind(choice);
+
+                    this.holes.push(choice);
+                });
+                this._state = "open";
+                this.update();
+            });
+        }
+    }
+
+    onmouseleave() {
+        super.onmouseleave();
+        if (this._state === "open") {
+            this.holes.forEach((expr) => {
+                expr.opacity = 0.4;
+            });
+        }
+    }
+
+    onmouseenter() {
+        super.onmouseenter();
+        if (this._state === "open") {
+            this.holes.forEach((expr) => {
+                expr.opacity = 1;
+            });
         }
     }
 

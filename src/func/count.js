@@ -1,7 +1,7 @@
- 
- 
- 
- 
+
+
+
+
 
 class CountExpr extends Expression {
     constructor(collectionExpr) {
@@ -20,7 +20,7 @@ class CountExpr extends Expression {
     reduce() {
         console.log(this.holes[1]);
         if (this.holes[1] instanceof MissingExpression) return this;
-        else if (this.holes[1] instanceof BagExpr)      return [new NumberExpr(this.holes[1].items.length), this.holes[1]];
+        else if (this.holes[1] instanceof BagExpr)      return [new (ExprManager.getClass('number'))(this.holes[1].items.length), this.holes[1]];
         else                                            return this;
     }
 }

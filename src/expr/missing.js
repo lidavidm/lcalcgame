@@ -19,11 +19,20 @@ class MissingExpression extends Expression {
     }
     isComplete() { return false; }
     getClass() { return MissingExpression; }
-    onmousedrag(pos) { } // disable drag
+    onmousedrag(pos) {
+        // disable drag
+        // forward it to parent
+        if (this.parent) {
+            pos = addPos(pos, fromTo(this.absolutePos, this.parent.absolutePos));
+            this.parent.onmousedrag(pos);
+        }
+    }
     ondropenter(node, pos) {
+        if (node instanceof ChoiceExpr || node instanceof Snappable) return;
         this.onmouseenter(pos);
     }
     ondropexit(node, pos) {
+        if (node instanceof ChoiceExpr || node instanceof Snappable) return;
         this.onmouseleave(pos);
     }
     ondropped(node, pos) {
@@ -35,9 +44,18 @@ class MissingExpression extends Expression {
                 && !(this.parent instanceof DefineExpr) && !(this.parent instanceof ObjectExtensionExpr))
                 return;
 
+            // Should not be able to use choice exprs or snappables, ever
+            if (node instanceof ChoiceExpr || node instanceof Snappable) return;
+
             let stage = this.stage;
             let beforeState = stage.toString();
             let droppedExp = node.toString();
+
+            // Unset toolbox flag even when dragging directly to a hole
+            if (node.toolbox) {
+                node.toolbox.removeExpression(node);
+                node.toolbox = null;
+            }
 
             Resource.play('pop');
             node.stage.remove(node);
@@ -58,7 +76,7 @@ class MissingExpression extends Expression {
 
             // Blink blue if reduction is possible with this config.
             var try_reduce = node.parent.reduceCompletely();
-            if (try_reduce != node.parent && try_reduce !== undefined) {
+            if ((try_reduce != node.parent && try_reduce !== undefined) || node.parent.isComplete()) {
                 Animate.blink(node.parent, 1000, [1,1,0], 1);
             }
         }
@@ -210,8 +228,13 @@ class MissingChestExpression extends MissingTypedExpression {
         this.label = new TextExpr("xy");
         this.label.color = "#AAA";
         this.addArg(this.label);
+        this.acceptedClasses = [ VarExpr, VtableVarExpr ];
     }
     getClass() { return MissingChestExpression; }
+
+    accepts(expr) {
+        return (expr instanceof VarExpr) || (expr instanceof VtableVarExpr && !expr.subReduceMethod);
+    }
 }
 
 class MissingSequenceExpression extends MissingExpression {

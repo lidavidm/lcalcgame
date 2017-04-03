@@ -1,3 +1,5 @@
+const UI_PADDING = __IS_MOBILE ? 2.5 : 10;
+
 /** A subclass of Stage that assumes Nodes are Expressions
     and allows for saving state. */
 class ReductStage extends mag.Stage {
@@ -5,6 +7,167 @@ class ReductStage extends mag.Stage {
         super(canvas);
         this.stateStack = [];
         this.environment = new Environment();
+        this.md = new MobileDetect(window.navigator.userAgent);
+        this.onorientationchange();
+    }
+
+    get toolboxHeight() {
+        return (__IS_MOBILE && this.md.phone()) ? 70 : 90;
+    }
+
+    buildUI(showEnvironment, envDisplayWidth) {
+        const TOOLBOX_HEIGHT = this.toolboxHeight;
+
+        let canvas_screen = this.boundingSize;
+
+        var btn_back = new mag.Button(canvas_screen.w - 64*4 - UI_PADDING, UI_PADDING, 64, 64,
+            { default:'btn-back-default', hover:'btn-back-hover', down:'btn-back-down' },
+            () => {
+            //returnToMenu();
+            prev(); // go back to previous level; see index.html.
+        });
+
+        var btn_menu = new mag.Button(canvas_screen.w - 64*3 - UI_PADDING, UI_PADDING, 64, 64,
+            { default:'btn-menu-default', hover:'btn-menu-hover', down:'btn-menu-down' },
+            () => {
+            returnToMenu();
+        });
+
+        var btn_reset = new mag.Button(btn_back.pos.x + btn_back.size.w, UI_PADDING, 64, 64,
+            { default:'btn-reset-default', hover:'btn-reset-hover', down:'btn-reset-down' },
+            () => {
+            initBoard(); // reset board state; see index.html.
+        });
+
+        var btn_next = new mag.Button(btn_reset.pos.x + btn_reset.size.w, UI_PADDING, 64, 64,
+            { default:'btn-next-default', hover:'btn-next-hover', down:'btn-next-down' },
+            () => {
+            next(); // go back to previous level; see index.html.
+        });
+
+        let buttonsVisible = false;
+        let background = new mag.Rect(0, 0, 0, 0);
+        background.color = "white";
+        background.ignoreEvents = true;
+
+        let showButtons = () => {
+            if (__IS_MOBILE) {
+                // Make sure hamburger button is visible
+                this.remove(btn_hamburger);
+                this.add(background);
+                this.add(btn_hamburger);
+            }
+
+            if (__SHOW_DEV_INFO) {
+                this.add(btn_back);
+                this.add(btn_next);
+            }
+
+            this.add(btn_reset);
+            this.add(btn_menu);
+        };
+        let hideButtons = () => {
+            this.remove(background);
+            this.remove(btn_back);
+            this.remove(btn_next);
+            this.remove(btn_reset);
+            this.remove(btn_menu);
+        };
+
+        this.buttonBackground = background;
+
+        var btn_hamburger = new mag.Button(btn_next.pos.x + btn_next.size.w, UI_PADDING, 64, 64,
+            { default:'btn-hamburger-default', hover:'btn-hamburger-hover', down:'btn-hamburger-down' },
+            () => {
+                if (buttonsVisible) {
+                    hideButtons();
+                }
+                else {
+                    showButtons();
+                }
+
+                buttonsVisible = !buttonsVisible;
+        });
+
+        if (__IS_MOBILE) {
+            this.add(btn_hamburger);
+        }
+        else {
+            if (__SHOW_DEV_INFO) {
+                this.add(btn_back);
+                this.add(btn_next);
+            }
+            else {
+                btn_menu.pos = btn_reset.pos;
+                btn_reset.pos = btn_next.pos;
+            }
+            this.add(btn_menu);
+            this.add(btn_reset);
+        }
+
+        // Toolbox
+        var toolbox = new Toolbox(0, canvas_screen.h - TOOLBOX_HEIGHT, canvas_screen.w, TOOLBOX_HEIGHT);
+        this.add(toolbox);
+        this.toolbox = toolbox;
+
+        // Environment
+        let yOffset = btn_reset.absoluteSize.h + btn_reset.absolutePos.y + 20;
+        var env = new (ExprManager.getClass('environment_display'))(canvas_screen.w - envDisplayWidth, yOffset, envDisplayWidth, canvas_screen.h - TOOLBOX_HEIGHT - yOffset);
+        if (showEnvironment) {
+            this.add(env);
+        }
+        this.environmentDisplay = env;
+
+        this.uiNodes = [ btn_back, btn_menu, btn_reset, btn_next, btn_hamburger, toolbox, env ];
+
+        this.layoutUI();
+    }
+
+    layoutUI() {
+        // layoutUI is called through onorientationchange in the
+        // constructor, before we have any UI nodes
+        if (!this.uiNodes) return;
+
+        let canvas_screen = this.boundingSize;
+
+        let btn_back = this.uiNodes[0];
+        let btn_menu = this.uiNodes[1];
+        let btn_reset = this.uiNodes[2];
+        let btn_next = this.uiNodes[3];
+        let btn_hamburger = this.uiNodes[4];
+
+        const NUM_BUTTONS = (__IS_MOBILE ? 3 : 2) + (__SHOW_DEV_INFO ? 2 : 0);
+
+        for (let i = 0; i < NUM_BUTTONS; i++) {
+            this.uiNodes[i].pos = {
+                x: canvas_screen.w - 64*(NUM_BUTTONS - i) - UI_PADDING,
+                y: this.uiNodes[i].pos.y,
+            };
+        }
+
+        this.buttonBackground.size = {
+            w: this.boundingSize.w,
+            h: btn_back.size.h + 2 * UI_PADDING,
+        };
+
+        this.toolbox.pos = {
+            x: 0,
+            y: canvas_screen.h - this.toolboxHeight,
+        };
+        this.toolbox.size = {
+            w: canvas_screen.w,
+            h: this.toolboxHeight,
+        };
+
+        let yOffset = btn_reset.absoluteSize.h + btn_reset.absolutePos.y + 20;
+        this.environmentDisplay._pos = {
+            x: canvas_screen.w - this.environmentDisplay.size.w,
+            y: yOffset,
+        };
+        this.environmentDisplay._size = {
+            w: this.environmentDisplay.size.w,
+            h: canvas_screen.h - this.toolboxHeight - yOffset,
+        };
     }
 
     finishLoading() {
@@ -197,5 +360,41 @@ class ReductStage extends mag.Stage {
         };
 
         return JSON.stringify(exp);
+    }
+
+    onorientationchange() {
+        if (__IS_MOBILE) {
+            if (this.md.phone()) {
+                this.scale = 1.0;
+            }
+            else if (this.md.tablet()) {
+                this.scale = 1.2;
+            }
+            else if (this.md.mobile()) {
+                this.scale = 2.0;
+            }
+            else {
+                this.scale = 1.0;
+            }
+        }
+        this.layoutUI();
+
+        if (this.expressionNodes) {
+            let bs = this.boundingSize;
+            if (this.environmentDisplay) bs.w -= this.environmentDisplay.size.w;
+            if (this.toolbox) bs.h -= this.toolbox.size.h;
+            for (let node of this.expressionNodes()) {
+                // Check if node offstage or obscured
+                let p = node.pos;
+                let s = node.size;
+                if (p.x > bs.w) {
+                    p.x = bs.w - s.w;
+                }
+                if (p.y > bs.h) {
+                    p.y = bs.h - s.h;
+                }
+                node.pos = p;
+            }
+        }
     }
 }

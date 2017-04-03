@@ -15,6 +15,7 @@ var ExprManager = (function() {
         '_t':       [TypeInTextExpr],
         'true':     [KeyTrueExpr, TrueExpr],
         'false':    [KeyFalseExpr, FalseExpr],
+        'number':   [NumberExpr, FadedNumberExpr],
         'cmp':      [MirrorCompareExpr, FadedCompareExpr],
         '==':       [MirrorCompareExpr, FadedCompareExpr],
         '+':        [AddExpr],
@@ -35,9 +36,10 @@ var ExprManager = (function() {
         'lambda':   [DelayedLambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr, DelayedFadedES6LambdaHoleExpr],
         'lambda_abstraction':   [LambdaExpr], // TODO: Add back EnvironmentLambdaExpr... I removed it because this is broken with DEFINE currently.
         'assign':   [JumpingAssignExpr, AssignExpr, EqualsAssignExpr],
-        'sequence': [NotchedSequence, Sequence],
-        'repeat':   [RepeatLoopExpr],
+        'sequence': [NotchedSequence, SemicolonNotchedSequence, SemicolonSequence],
+        'repeat':   [RepeatLoopExpr, FadedRepeatLoopExpr],
         'choice':   [ChoiceExpr],
+        'snappable':[Snappable, FadedSnappable],
         'level':    [ReductStageExpr],
         'arrayobj': [ArrayObjectExpr],
         'infinite': [InfiniteExpression],
@@ -63,7 +65,11 @@ var ExprManager = (function() {
         'bag'   : [51],
         '__'    : [51],
         'primitives' : [66, 72],
-        'map'   : [61]
+        'map'   : [61],
+        'repeat': [147],
+        'sequence': [118, 145],
+        'snappable': [145],
+        'number': [129],
     };
     const primitives = ['triangle', 'rect', 'star', 'circle', 'diamond'];
     primitives.forEach((p) => {

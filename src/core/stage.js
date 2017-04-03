@@ -141,6 +141,8 @@ var mag = (function(_) {
             pos = this.transformCoords(pos);
             this._embeddedStage.onmouseup(pos);
         }
+
+        onorientationchange() {}
     }
 
     class Stage {
@@ -249,7 +251,7 @@ var mag = (function(_) {
 
                 // Can't duplicate horizontally or we'll go off-screen.
                 // So, duplicate vertically.
-                if (total_width > GLOBAL_DEFAULT_SCREENSIZE.width) {
+                if (origpos.x + total_width > this.boundingSize.w) {
                     pos = clonePos(origpos);
                     anotherNode.forEach((n) => {
                         let p = n.pos;
@@ -258,8 +260,8 @@ var mag = (function(_) {
                         pos = addPos({x:0, y:an.size.h + 6}, pos);
                     });
                 }
-                if (pos.x > GLOBAL_DEFAULT_SCREENSIZE.width) {
-                    let offset = pos.x - GLOBAL_DEFAULT_SCREENSIZE.width;
+                if (pos.x > this.boundingSize.w) {
+                    let offset = pos.x - this.boundingSize.w;
                     anotherNode.forEach((n) => {
                         let p = n.pos;
                         n.pos = { x:p.x - offset, y:p.y };
@@ -624,10 +626,23 @@ var mag = (function(_) {
             };
 
             // TOUCH EVENTS (MOBILE)
+            if (canvas.listeners) {
+                // Remove prior listeners to prevent events from being
+                // fired multiple times
+                for (let key of Object.keys(canvas.listeners)) {
+                    canvas.removeEventListener(key, canvas.listeners[key], false);
+                }
+            }
             canvas.addEventListener('touchstart', ontouchstart, false);
             canvas.addEventListener('touchmove', ontouchmove, false);
             canvas.addEventListener('touchend', ontouchend, false);
             canvas.addEventListener('touchcancel', ontouchcancel, false);
+            canvas.listeners = {
+                'touchstart': ontouchstart,
+                'touchmove': ontouchmove,
+                'touchend': ontouchend,
+                'touchcancel': ontouchcancel,
+            };
 
         } else {
             canvas.onmousedown = null;

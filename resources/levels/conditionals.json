@@ -59,6 +59,7 @@
     ],
     "resources":{
         "planet":"planet-conditionabo",
+        "aliens":["alien-conditional-1", "alien-conditional-2", "alien-conditional-3", "alien-conditional-4"],
         "curve":[
             {"x":0.14881960053675952, "y":-0.6159570146687476},
             {"x":0.14881960053675952, "y":-0.6159570146687476},
