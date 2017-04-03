@@ -535,7 +535,7 @@ class Expression extends mag.RoundedRect {
 
             Logger.log('moved', {'item':this.toString(), 'prevPos':JSON.stringify(this.posBeforeDrag), 'newPos':JSON.stringify(this.pos)});
         }
-        //if (this.toolbox) this.toolbox = null;
+
         this.dragging = false;
     }
 

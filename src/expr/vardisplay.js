@@ -54,7 +54,7 @@ class DisplayChest extends Expression {
         let size = this._size;
         let scale = this.absoluteScale;
         let offsetX = (boundingSize.w - size.w * scale.x) / 2;
-        ctx.drawImage(ChestImages.lidOpen(this.name), pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
+        ChestImages.lidOpen(this.name).draw(ctx, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
         this.holes[0].pos = {
             x: this.childPos.x,
             y: this.childPos.y,
@@ -65,7 +65,7 @@ class DisplayChest extends Expression {
         let size = this._size;
         let scale = this.absoluteScale;
         let offsetX = (boundingSize.w - size.w * scale.x) / 2;
-        ctx.drawImage(ChestImages.base(this.name), pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
+        ChestImages.base(this.name).draw(ctx, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
     }
 }
 

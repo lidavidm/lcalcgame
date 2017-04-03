@@ -186,6 +186,7 @@ class BagExpr extends CollectionExpr {
     clone(parent=null) {
         let c = super.clone(parent);
         c._items = [];
+        c.graphicNode.removeAllItems();
         this.items.forEach((i) => c.addItem(i.clone()));
         c.graphicNode.update();
         return c;
@@ -315,6 +316,13 @@ class BracketArrayExpr extends BagExpr {
 
     // Adds an item to the bag.
     addItem(item) {
+        if (item instanceof VarExpr || item instanceof VtableVarExpr) {
+            // Reduce variables in our context. This is technically
+            // not correct, but at this point, we have no idea what
+            // the variable's original context was anymore.
+            item.parent = this;
+            item = item.reduce();
+        }
 
         item.onmouseleave();
         item.lock();
@@ -438,10 +446,6 @@ class BracketArrayExpr extends BagExpr {
         let n = node.clone();
         let before_str = this.toString();
         this.addItem(n);
-
-        if (n instanceof VarExpr) {
-            n.performReduction();
-        }
 
         Logger.log('bag-add', {'before':before_str, 'after':this.toString(), 'item':n.toString()});
 

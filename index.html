@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
         <title>A game to teach code comprehension</title>
 
@@ -65,12 +66,13 @@
         <script src="build/expr/number.js" charset="utf-8"></script>
         <script src="build/expr/text.js" charset="utf-8"></script>
         <script src="build/expr/recall.js" charset="utf-8"></script>
-        <script src="build/expr/var.js" charset="utf-8"></script>
         <script src="build/expr/obj.js" charset="utf-8"></script>
+        <script src="build/expr/var.js" charset="utf-8"></script>
         <script src="build/expr/vardisplay.js" charset="utf-8"></script>
         <script src="build/expr/sequence.js" charset="utf-8"></script>
         <script src="build/expr/loops.js" charset="utf-8"></script>
         <script src="build/expr/choice.js" charset="utf-8"></script>
+        <script src="build/expr/snappable.js" charset="utf-8"></script>
         <script src="build/fx/effect.js" charset="utf-8"></script>
         <script src="build/func/func.js" charset="utf-8"></script>
         <script src="build/func/map.js" charset="utf-8"></script>
@@ -158,6 +160,17 @@
             .expr_input {
                 font-family: Consolas, sans-serif;
             }
+            @media screen and (max-width: 1024px) {
+                body {
+                    min-width: auto;
+                    min-height: auto;
+                    margin: 0;
+                }
+
+                #devinfo {
+                    overflow: scroll;
+                }
+            }
         </style>
     </head>
 
@@ -188,11 +201,21 @@
             / 72
         </div>
 
+        <div class="centered">
+            <button onclick="toggleMute()">Mute</button>
+        </div>
+
         <div id="devinfo">
 
             <div id="duplicate_buttons" class="centered">
                 <button onclick="prev()">Prev</button>
                 <button onclick="initBoard()">Reset</button>
+                <button onclick="resetToLevel(0); initMainMenu()">Reset Completely</button>
+            </div>
+
+            <div class="centered">
+              <select id="chapterSelect">
+              </select>
             </div>
 
             <div id="explanation" class="centered">
@@ -209,7 +232,7 @@
 
             <br> <br>
 
-            <div class="centered" style="width:400px">
+            <div class="centered" style="max-width:400px">
                 Privacy disclaimer: We will use your usage statistics to further the improvement of the game (for science!). <br> <a href="#" onclick="toggleLogging()" id="toggleLogLink" class="blendedlink">Click here you'd prefer to turn data logging off.</a>
             </div>
 

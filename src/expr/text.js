@@ -10,6 +10,7 @@ class TextExpr extends ExpressionPlus {
         this._yMultiplier = 2.2;
         this._xOffset = 0;
         this._sizeOffset = { w:0, h:0 };
+        this._baseline = "alphabetic";
     }
     get text() {
         return this._text;
@@ -60,6 +61,7 @@ class TextExpr extends ExpressionPlus {
             ctx.fillText(this.text, (pos.x + this._xOffset) / abs_scale.x, pos.y / abs_scale.y + this._yMultiplier * this.fontSize * this.anchor.y);
             ctx.restore();
         }
+        ctx.textBaseline = this._baseline;
         ctx.fillText(this.text, (pos.x + this._xOffset) / abs_scale.x, pos.y / abs_scale.y + this._yMultiplier * this.fontSize * this.anchor.y);
         ctx.restore();
     }

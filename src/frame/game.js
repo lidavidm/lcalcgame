@@ -23,19 +23,6 @@ class Level {
 
         var stage = new ReductStage(canvas);
 
-        // Scaling for mobile devices:
-        if (__IS_MOBILE) {
-            var md = new MobileDetect(window.navigator.userAgent);
-            if (md.phone())
-                stage.scale = 2.4;
-            else if (md.tablet())
-                stage.scale = 1.8;
-            else if (md.mobile())
-                stage.scale = 2.0;
-            else
-                stage.scale = 1.0;
-        }
-
         // Seed the random number generator so that while randomly generated,
         // levels appear the same each time you play.
         Math.seed = 12045;
@@ -46,30 +33,25 @@ class Level {
         const varNodesInToolbox = mag.Stage.getNodesWithClass(VarExpr, [], true, this.toolbox);
         const showEnvironment = this.globals &&
               (Object.keys(this.globals.bindings).length > 0
-              || (varNodesOnBoard && varNodesOnBoard.length > 0)
-              || (varNodesInToolbox && varNodesInToolbox.length > 0));
-        const envDisplayWidth = 0.20 * canvas_screen.w;
+               || (varNodesOnBoard && varNodesOnBoard.length > 0)
+               || (varNodesInToolbox && varNodesInToolbox.length > 0));
+        const envDisplayWidth = showEnvironment ? 0.20 * canvas_screen.w : 0;
 
         GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
 
-        const usableWidth = canvas_screen.w - (showEnvironment ? envDisplayWidth : 0);
-        const screenOffsetX = usableWidth * (1 - 1/1.4) / 2.0;
         var screen = {
-            height: canvas_screen.h/1.2 - 90,
-            width: showEnvironment ? usableWidth - 2 * screenOffsetX : usableWidth/1.4,
-            y: canvas_screen.h*0.2,
-            x: showEnvironment ? screenOffsetX : ((usableWidth*(1-1/1.4)) / 2.0),
+            height:canvas_screen.h/1.4,
+            width:(canvas_screen.w - envDisplayWidth)/1.4,
+            y:canvas_screen.h*(1-1/1.4) / 2.0,
+            x:(canvas_screen.w*(1-1/1.4) / 2.0)
         };
         var board_packing = this.findBestPacking(this.exprs, screen);
         stage.addAll(board_packing); // add expressions to the stage
 
         // TODO: Offload this onto second stage?
         var goal_node = this.goal.nodeRepresentation;
-        goal_node[0].pos = { x:20, y:10 };
-        goal_node[1].pos = { x:110, y:10 };
         goal_node[1].ignoreGetClassInstance = true;
         var lastChild = goal_node[1].children[goal_node[1].children.length-1];
-        goal_node[0].children[0].size = { w:110+lastChild.pos.x+lastChild.size.w, h:70 };
         stage.add(goal_node[0]);
         stage.add(goal_node[1]);
 
@@ -82,82 +64,20 @@ class Level {
         stage.goalNodes = goal_node[1].children;
 
         // UI Buttons
-        var ui_padding = 10;
-        var btn_back = new mag.Button(canvas_screen.w - 64*4 - ui_padding, ui_padding, 64, 64,
-            { default:'btn-back-default', hover:'btn-back-hover', down:'btn-back-down' },
-            () => {
-            //returnToMenu();
-            prev(); // go back to previous level; see index.html.
-        });
-
-        let mute_images = { default:'btn-mute-default', hover:'btn-mute-hover', down:'btn-mute-down' };
-        let unmute_images = { default:'btn-unmute-default', hover:'btn-unmute-hover', down:'btn-unmute-down' };
-        var btn_mute = new mag.Button(btn_back.pos.x + btn_back.size.w, ui_padding, 64, 64,
-            Resource.isMuted() ? unmute_images : mute_images,
-            function() {
-                if (this.muted) {
-                    Resource.unmute();
-                    this.muted = false;
-                    this.images = mute_images;
-                }
-                else {
-                    Resource.mute();
-                    this.muted = true;
-                    this.images = unmute_images;
-                }
-                this.onmouseenter();
-        });
-        btn_mute.muted = Resource.isMuted();
-        var btn_reset = new mag.Button(btn_mute.pos.x + btn_mute.size.w, ui_padding, 64, 64,
-            { default:'btn-reset-default', hover:'btn-reset-hover', down:'btn-reset-down' },
-            () => {
-            initBoard(); // reset board state; see index.html.
-        });
-        var btn_next = new mag.Button(btn_reset.pos.x + btn_reset.size.w, ui_padding, 64, 64,
-            { default:'btn-next-default', hover:'btn-next-hover', down:'btn-next-down' },
-            () => {
-            next(); // go back to previous level; see index.html.
-        });
-        if (__SHOW_DEV_INFO) {
-            stage.add(btn_back);
-            stage.add(btn_next);
-        }
-        else {
-            btn_mute.pos = {
-                x: canvas_screen.w - 64 * 2 - ui_padding,
-                y: btn_mute.pos.y,
-            };
-            btn_reset.pos = btn_next.pos;
-        }
-        stage.add(btn_mute);
-        stage.add(btn_reset);
-
+        stage.buildUI(showEnvironment, envDisplayWidth);
         // Toolbox
-        const TOOLBOX_HEIGHT = 90;
-        var toolbox = new Toolbox(0, canvas_screen.h - TOOLBOX_HEIGHT, canvas_screen.w, TOOLBOX_HEIGHT);
-        stage.add(toolbox);
         if (this.toolbox) {
             this.toolbox.forEach((item) => {
                 stage.add(item);
-                toolbox.addExpression(item, false);
+                stage.toolbox.addExpression(item, false);
             });
         }
-        stage.toolbox = toolbox;
-
         // Environment
-        let yOffset = goal_node[0].absoluteSize.h + goal_node[0].absolutePos.y + 20;
-        var env = new (ExprManager.getClass('environment_display'))(canvas_screen.w - envDisplayWidth, yOffset, envDisplayWidth, canvas_screen.h - TOOLBOX_HEIGHT - yOffset);
-        if (showEnvironment) {
-            stage.add(env);
-        }
-        stage.environmentDisplay = env;
         if (this.globals) {
             for (let name of this.globals.names()) {
                 stage.environment.update(name, this.globals.lookup(name).clone());
             }
         }
-
-        stage.uiNodes = [ btn_back, btn_reset, btn_next, env, toolbox ];
 
         // Checks if the player has completed the level.
         var goal = this.goal;
@@ -209,6 +129,8 @@ class Level {
         stage.expressionNodes().forEach((n) => {
             n.scale = { x:0.5, y:0.5 };
             n.anchor = { x:0.5, y:0.5 };
+            // Adjust positions to account for the new anchor
+            n.pos = { x: n.pos.x + 0.5 * n.size.w, y: n.pos.y + 0.5 * n.size.h };
             Animate.tween(n, { scale:{x:1,y:1} }, 500, (elapsed) => Math.pow(elapsed, 0.3));
         });
         stage.goalNodes.forEach((n) => {
@@ -237,11 +159,22 @@ class Level {
     // * In Scheme-esque format, with _ for holes:
     // * '(if _ triangle star) (== triangle _) (rect)'
     // NOTE: This does not do error checking! Make sure your desc is correct.
-    static make(level_desc) {
-        var lvl = new Level(Level.parse(level_desc.board, level_desc.language),
-                            new Goal(new ExpressionPattern(Level.parse(level_desc.goal, level_desc.language))),
-                            level_desc.toolbox ? Level.parse(level_desc.toolbox, level_desc.language) : null,
-                            Environment.parse(level_desc.globals));
+    static make(desc) {
+        let {
+            board: expr_descs,
+            goal: goal_descs,
+            toolbox: toolbox_descs,
+            globals: globals_descs,
+            resources: resources,
+            language: language,
+        } = desc;
+
+        var lvl = new Level(
+            Level.parse(expr_descs, language),
+            new Goal(new ExpressionPattern(Level.parse(goal_descs, language)), resources.aliens),
+            toolbox_descs ? Level.parse(toolbox_descs, language) : null,
+            Environment.parse(globals_descs)
+        );
         return lvl;
     }
     static parse(desc, language="reduct-scheme") {
@@ -446,6 +379,7 @@ class Level {
             'sequence':ExprManager.getClass('sequence'),
             'repeat':ExprManager.getClass('repeat'),
             'choice':ExprManager.getClass('choice'),
+            'snappable':ExprManager.getClass('snappable'),
             'level':ExprManager.getClass('level'),
             'arrayobj':ExprManager.getClass('arrayobj'),
             'infinite':ExprManager.getClass('infinite'),
@@ -458,7 +392,7 @@ class Level {
         };
 
         if (Number.isNumber(arg)) {
-            let numexpr = new NumberExpr(parseInt(arg));
+            let numexpr = new (ExprManager.getClass('number'))(parseInt(arg));
             lock(numexpr, locked);
             return numexpr;
         }
@@ -573,10 +507,6 @@ class Level {
         if (!Array.isArray(es))
             es = [es];
 
-        if (es.length >= 5) {
-            return this.findFastPacking(es, screen);
-        }
-
         // Bounds cache seems to greatly destroy performance
         var sizeCache = {};
         var getSize = function(e) {
@@ -587,7 +517,9 @@ class Level {
 
         var candidates = [];
         var CANDIDATE_THRESHOLD = 10;
-        while (candidates.length < CANDIDATE_THRESHOLD) {
+        let iterations = 0;
+        while (candidates.length < CANDIDATE_THRESHOLD && iterations < 10000) {
+            iterations++;
 
             // 1. Put the expressions in random places.
             for (let e of es) {
@@ -598,7 +530,9 @@ class Level {
                     y = Math.seededRandom() * (screen.height - size.h) + screen.y;
                 }
 
-                e.pos = { x:Math.seededRandom() * (screen.width - size.w) + screen.x,
+                let x = Math.max(Math.seededRandom() * (screen.width - size.w) + screen.x, screen.x);
+
+                e.pos = { x:x,
                           y:y };
             }
 
@@ -684,28 +618,44 @@ class Level {
 */
 class Goal {
 
-    constructor(accepted_patterns) {
+    constructor(accepted_patterns, alien_images=['alien-function-1']) {
         if (!Array.isArray(accepted_patterns)) accepted_patterns = [accepted_patterns];
         this.patterns = accepted_patterns;
+        // Choose a random alien to serve as our "goal person"
+        this.alien_image = alien_images[Math.floor(Math.random() * alien_images.length)];
     }
 
     get nodeRepresentation() {
+        const md = new MobileDetect(window.navigator.userAgent);
+        const BUBBLE_HEIGHT = (__IS_MOBILE && md.phone()) ? 70 : 80;
+        const ALIEN_HEIGHT = (__IS_MOBILE && md.phone()) ? 50 : 70;
+
         var exprs = flatten(this.patterns.map((p) => p.exprs)).map((expr) => expr.clone());
-        var bg = new mag.Rect(-20,-10,200,80);
-        bg.color = "#444";
+        var bg_accent = new mag.Circle(0, 0, 10);
+        bg_accent.color = "#0e0e7b";
+        bg_accent.shadowOffset = 0;
+        bg_accent.anchor = { x: 0.5, y: 0.5 };
+        var bg = new mag.Circle(0, 0, 10);
+        bg.color = "#2b1d0e";
         bg.shadowOffset = 0;
-        var txt = new TextExpr('Goal: ', 'Georgia');
+        bg.anchor = { x: 0.5, y: 0.5 };
         var node = new mag.Rect(0,0,100,50);
         node.color = null;
         node.ignoreEvents = true;
-        txt.pos = { x:0, y:node.size.h/2 };
-        txt.anchor = { x:0, y:0.5 };
-        txt.color = "#EEE";
+
+        let bubbleLeftImage = Resource.getImage('caption-long-left');
+        let bubbleRightImage = Resource.getImage('caption-long-right');
+        let bubbleMidImage = Resource.getImage('caption-long-mid');
+        let bubbleLeftWidth = (BUBBLE_HEIGHT / bubbleLeftImage.naturalHeight) * bubbleLeftImage.naturalWidth;
+        let bubbleRightWidth = (BUBBLE_HEIGHT / bubbleRightImage.naturalHeight) * bubbleRightImage.naturalWidth;
+        let bubbleMidWidth = (BUBBLE_HEIGHT / bubbleMidImage.naturalHeight) * bubbleMidImage.naturalWidth;
+        let bubbleLeft = new mag.ImageRect(0, 0, bubbleLeftWidth, BUBBLE_HEIGHT, 'caption-long-left');
+        let bubbleRight = new mag.ImageRect(0, 0, bubbleRightWidth, BUBBLE_HEIGHT, 'caption-long-right');
 
         var exprs_node = new mag.Rect(0,0,0,0);
         exprs_node.addAll(exprs);
 
-        exprs[0].pos = { x:0, y:0 };
+        exprs[0].pos = { x:bubbleLeft.size.w / 4, y:0 };
 
         // TODO: Fix the need for this hack.
         if (exprs[0] instanceof BagExpr) {
@@ -719,7 +669,57 @@ class Goal {
             exprs[i].ignoreEvents = true;
         }
 
-        node.addAll([bg, txt]);
+        let image = Resource.getImage(this.alien_image);
+        let width = (ALIEN_HEIGHT / image.naturalHeight) * image.naturalWidth;
+        let offsetX = 0, offsetY = 0;
+        if (width > ALIEN_HEIGHT) {
+            offsetY = 0.25 * (width - ALIEN_HEIGHT);
+        }
+        else {
+            offsetX = 0.25 * (ALIEN_HEIGHT - width);
+        }
+        let alien = new mag.ImageRect(offsetX, offsetY, width, ALIEN_HEIGHT, this.alien_image);
+
+        node.addAll([bg_accent, bg, alien]);
+
+        let lastExpr = exprs[exprs.length - 1];
+        let firstExpr = exprs[0];
+        let exprsWidth = lastExpr.absolutePos.x + lastExpr.absoluteSize.w - firstExpr.absolutePos.x;
+
+        exprsWidth -= 0.6 * (bubbleLeftWidth + bubbleRightWidth);
+        let bubble = [bubbleLeft];
+
+        while (exprsWidth > 0) {
+            exprsWidth -= bubbleMidWidth - 1;
+            bubble.push(new mag.ImageRect(0, 0, bubbleMidWidth, BUBBLE_HEIGHT, 'caption-long-mid'));
+        }
+
+        bubble.push(bubbleRight);
+
+        let x = alien.pos.x + alien.size.w - 10;
+        for (let b of bubble) {
+            b.pos = { x: x, y: -5 };
+            x += b.size.w - 1;
+        }
+
+        node.addAll(bubble);
+
+        node.pos = { x: 5, y: 5 };
+        let maxExprHeight = 0;
+        for (let expr of exprs) {
+            maxExprHeight = Math.max(maxExprHeight, expr.size.h);
+        }
+        exprs_node.pos = {
+            x: bubble[0].absolutePos.x + 0.3 * bubble[0].absoluteSize.w,
+            y: bubble[0].absolutePos.y + bubble[0].absoluteSize.h / 2 - maxExprHeight / 2,
+        };
+        bg.radius = Math.max(alien.absolutePos.x + alien.absoluteSize.w, ALIEN_HEIGHT);
+        bg.radius = Math.max(alien.absolutePos.y + alien.absoluteSize.h, bg.radius);
+        bg.radius += 10;
+        bg_accent.radius = bg.radius + 10;
+
+        window.test = alien;
+
         return [node, exprs_node];
     }
 
@@ -768,6 +768,39 @@ class ExpressionPattern {
             }
 
             //console.log(' comparing ', e, ' to ', f);
+            let valuesMatch = true;
+            // If both are values, check that their reported values
+            // match. This is for things like number expressions,
+            // which are otherwise structurally equal. The check here
+            // is recursive, for cases like bags, where the value can
+            // itself contain expressions.
+            if (e instanceof Expression && f instanceof Expression && e.isValue() && f.isValue()) {
+                let ev = e.value();
+                let fv = f.value();
+
+                if ((!ev && fv) || (ev && !fv)) {
+                    valuesMatch = false;
+                }
+                else if (Array.isArray(ev) && Array.isArray(fv)) {
+                    if (ev.length != fv.length) {
+                        valuesMatch = false;
+                    }
+                    else {
+                        for (let i = 0; i < ev.length; i++) {
+                            if (!compare(ev[i], fv[i])) {
+                                valuesMatch = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                else {
+                    valuesMatch = ev === fv && e.isValue() && f.isValue();
+                }
+            }
+            else {
+                valuesMatch = true;
+            }
 
             // Compares two expressions.
             // Right now this just checks if their class tree is the same.
@@ -775,8 +808,7 @@ class ExpressionPattern {
                 //console.log(' > Constructors don\'t match.');
                 return false; // expressions don't match
             }
-            else if (e instanceof Expression && f instanceof Expression &&
-                     (e.isValue() != f.isValue() || e.value() !== f.value())) {
+            else if (e instanceof Expression && f instanceof Expression && (e.isValue() != f.isValue() || !valuesMatch)) {
                 return false;
             }
             else { // Check whether the expressions at this level have the same # of children. If so, do one-to-one comparison.
