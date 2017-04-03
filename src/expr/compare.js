@@ -125,7 +125,7 @@ class CompareExpr extends Expression {
     }
 
     toString() {
-        return '(' + this.funcName + ' ' + this.leftExpr.toString() + ' ' + this.rightExpr.toString() + ')';
+        return (this.locked ? '/' : '') + '(' + this.funcName + ' ' + this.leftExpr.toString() + ' ' + this.rightExpr.toString() + ')';
     }
 }
 

@@ -19,7 +19,7 @@ class NumberExpr extends Expression {
         return true;
     }
     toString() {
-        return this.number.toString();
+        return (this.locked ? '/' : '') + this.number.toString();
     }
 
     onmouseclick(pos) {
@@ -95,6 +95,10 @@ class AddExpr extends Expression {
         if (!this._animating) {
             this.performReduction();
         }
+    }
+
+    toString() {
+        return (this.locked ? '/' : '') + '(+ ' + this.leftExpr.toString() + ' ' + this.rightExpr.toString() + ')';
     }
 }
 

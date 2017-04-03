@@ -122,7 +122,7 @@ class IfStatement extends Expression {
         return undefined;
     }
     toString() {
-        return '(if ' + this.cond.toString() + ' ' + this.branch.toString() + ')';
+        return (this.locked ? '/' : '') + '(if ' + this.cond.toString() + ' ' + this.branch.toString() + ')';
     }
 }
 
@@ -161,7 +161,7 @@ class IfElseStatement extends IfStatement {
     }
 
     toString() {
-        return '(if ' + this.cond.toString() + ' ' + this.branch.toString() + ' ' + this.elseBranch.toString() + ')';
+        return (this.locked ? '/' : '') + '(if ' + this.cond.toString() + ' ' + this.branch.toString() + ' ' + this.elseBranch.toString() + ')';
     }
 }
 

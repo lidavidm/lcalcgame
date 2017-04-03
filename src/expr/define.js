@@ -313,5 +313,5 @@ class DefineExpr extends ClampExpr {
             return this; // cancel
         }
     }
-    toString() { return '(define ' + this.expr.toString() + ')'; }
+    toString() { return '(define ' + this.expr.toString() + ' `' + this.funcname + ')'; }
 }

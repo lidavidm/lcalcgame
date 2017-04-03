@@ -151,7 +151,7 @@ var IfStatement = function (_Expression) {
     }, {
         key: 'toString',
         value: function toString() {
-            return '(if ' + this.cond.toString() + ' ' + this.branch.toString() + ')';
+            return (this.locked ? '/' : '') + '(if ' + this.cond.toString() + ' ' + this.branch.toString() + ')';
         }
     }, {
         key: 'cond',
@@ -244,7 +244,7 @@ var IfElseStatement = function (_IfStatement2) {
     }, {
         key: 'toString',
         value: function toString() {
-            return '(if ' + this.cond.toString() + ' ' + this.branch.toString() + ' ' + this.elseBranch.toString() + ')';
+            return (this.locked ? '/' : '') + '(if ' + this.cond.toString() + ' ' + this.branch.toString() + ' ' + this.elseBranch.toString() + ')';
         }
     }, {
         key: 'elseBranch',

@@ -39,7 +39,7 @@ var NumberExpr = function (_Expression) {
     }, {
         key: 'toString',
         value: function toString() {
-            return this.number.toString();
+            return (this.locked ? '/' : '') + this.number.toString();
         }
     }, {
         key: 'onmouseclick',
@@ -133,6 +133,11 @@ var AddExpr = function (_Expression2) {
             if (!this._animating) {
                 this.performReduction();
             }
+        }
+    }, {
+        key: 'toString',
+        value: function toString() {
+            return (this.locked ? '/' : '') + '(+ ' + this.leftExpr.toString() + ' ' + this.rightExpr.toString() + ')';
         }
     }, {
         key: 'leftExpr',

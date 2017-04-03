@@ -638,8 +638,29 @@ var Level = function () {
             return lvl;
         }
     }, {
+        key: 'splitParen',
+        value: function splitParen(s) {
+            s = s.trim();
+            var depth = 0;
+            var paren_idx = 0;
+            var expr_descs = [];
+            for (var i = 0; i < s.length; i++) {
+                if (s[i] === '(') {
+                    if (depth === 0) paren_idx = i + 1;
+                    depth++;
+                } else if (s[i] === ')') {
+                    depth--;
+                    if (depth === 0) expr_descs.push(s.substring(paren_idx, i));
+                }
+            }
+            if (expr_descs.length === 0) expr_descs.push(s);
+            return expr_descs;
+        }
+    }, {
         key: 'parse',
         value: function parse(desc) {
+            var _this3 = this;
+
             var language = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "reduct-scheme";
 
             if (desc.length === 0) return [];
@@ -653,28 +674,9 @@ var Level = function () {
                 var descs;
 
                 var _ret = function () {
-                    var splitParen = function splitParen(s) {
-                        s = s.trim();
-                        var depth = 0;
-                        var paren_idx = 0;
-                        var expr_descs = [];
-                        for (var i = 0; i < s.length; i++) {
-                            if (s[i] === '(') {
-                                if (depth === 0) paren_idx = i + 1;
-                                depth++;
-                            } else if (s[i] === ')') {
-                                depth--;
-                                if (depth === 0) expr_descs.push(s.substring(paren_idx, i));
-                            }
-                        }
-                        if (expr_descs.length === 0) expr_descs.push(s);
-                        return expr_descs;
-                    };
 
                     // Split string by top-level parentheses.
-
-
-                    descs = splitParen(desc);
+                    descs = _this3.splitParen(desc);
                     //console.log('descs', descs);
 
                     // Parse expressions recursively.
@@ -764,16 +766,16 @@ var Level = function () {
                 } else {
                     // Class name. Invoke the instantiator.
                     var op_class = exprs[0];
-                    if (!(op_class instanceof LambdaHoleExpr) && !(op_class instanceof Sequence) && !(op_class instanceof BagExpr) && !(op_class instanceof ArrayObjectExpr) && op_class.length !== exprs.length - 1) {
-                        // missing an argument, or there's an extra argument:
-                        console.warn('Operator-argument mismatch with exprs: ', exprs);
-                        console.warn('Continuing...');
+                    if (!(op_class instanceof LambdaHoleExpr) && !(op_class instanceof Sequence) && !(op_class instanceof BagExpr) && !(op_class instanceof ArrayObjectExpr) && op_class.length !== exprs.length - 1) {// missing an argument, or there's an extra argument:
+                        //console.warn('Operator-argument mismatch with exprs: ', exprs);
+                        //console.warn('Continuing...');
                     }
                     for (var i = 1; i < exprs.length; i++) {
                         // Cast the other arguments into expressions.
                         if (Array.isArray(exprs[i])) exprs[i] = new Expression(exprs[i]); // wrap in paren
                         else if (isClass(exprs[i])) {
-                                if (exprs[i].length > 0) console.warn('Instantiating expression class ', exprs[i], ' with 0 arguments when it expects ' + exprs[i].length + '.');
+                                //if (exprs[i].length > 0)
+                                //    console.warn('Instantiating expression class ', exprs[i], ' with 0 arguments when it expects ' + exprs[i].length + '.');
                                 exprs[i] = constructClassInstance(exprs[i], null);
                             } else if (isInstanceOfClass(exprs[i], Expression)) {} // Nothing to fix.
                             else {
@@ -991,7 +993,7 @@ var Goal = function () {
                 return expr.clone();
             });
             var bg_accent = new mag.Circle(0, 0, 10);
-            bg_accent.color = "#0e0e7b";
+            bg_accent.color = "#cccccc"; //"#CD853F"; <-- light brown
             bg_accent.shadowOffset = 0;
             bg_accent.anchor = { x: 0.5, y: 0.5 };
             var bg = new mag.Circle(0, 0, 10);
@@ -1117,8 +1119,8 @@ var Goal = function () {
             };
             bg.radius = Math.max(alien.absolutePos.x + alien.absoluteSize.w, ALIEN_HEIGHT);
             bg.radius = Math.max(alien.absolutePos.y + alien.absoluteSize.h, bg.radius);
-            bg.radius += 10;
-            bg_accent.radius = bg.radius + 10;
+            bg.radius += 20;
+            bg_accent.radius = bg.radius + 40;
 
             window.test = alien;
 

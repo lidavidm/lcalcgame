@@ -35,8 +35,9 @@
         <script src="build/frame/parseES6.js"></script>
 
         <!-- Game dependencies -->
-        <script src="build/util.js" charset="utf-8"></script>
-        <script src="build/log/logger.js" charset="utf-8"></script>
+        <script src="build/util.js" charset="utf-8"></script> <!-- shared utility functions -->
+        <script src="build/log/logger.js" charset="utf-8"></script> <!-- data logging -->
+        <script src="build/unit/test.js" charset="utf-8"></script> <!-- unit testing -->
         <script src="build/core/node.js" charset="utf-8"></script>
         <script src="build/core/shapes.js" charset="utf-8"></script>
         <script src="build/core/image.js" charset="utf-8"></script>
@@ -211,6 +212,7 @@
                 <button onclick="prev()">Prev</button>
                 <button onclick="initBoard()">Reset</button>
                 <button onclick="resetToLevel(0); initMainMenu()">Reset Completely</button>
+                <button onclick="UnitTest.testStringBijection()">Run Unit Tests</button>
             </div>
 
             <div class="centered">

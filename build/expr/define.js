@@ -434,7 +434,7 @@ var DefineExpr = function (_ClampExpr) {
     }, {
         key: 'toString',
         value: function toString() {
-            return '(define ' + this.expr.toString() + ')';
+            return '(define ' + this.expr.toString() + ' `' + this.funcname + ')';
         }
     }, {
         key: 'name',

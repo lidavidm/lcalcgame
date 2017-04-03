@@ -46,31 +46,31 @@ class StarExpr extends GraphicValueExpr {
     constructor(x, y, rad, pts=5) {
         super(new mag.Star(x, y, rad, pts));
     }
-    toString() { return 'star'; }
+    toString() { return (this.locked ? '/' : '') + 'star'; }
 }
 class CircleExpr extends GraphicValueExpr {
     constructor(x, y, rad) {
         super(new mag.Circle(x, y, rad));
     }
-    toString() { return 'circle'; }
+    toString() { return (this.locked ? '/' : '') + 'circle'; }
 }
 class PipeExpr extends GraphicValueExpr {
     constructor(x, y, w, h) {
         super(new mag.Pipe(x, y, w, h-12));
     }
-    toString() { return 'pipe'; }
+    toString() { return (this.locked ? '/' : '') + 'pipe'; }
 }
 class TriangleExpr extends GraphicValueExpr {
     constructor(x, y, w, h) {
         super(new mag.Triangle(x, y, w, h));
     }
-    toString() { return 'triangle'; }
+    toString() { return (this.locked ? '/' : '') + 'triangle'; }
 }
 class RectExpr extends GraphicValueExpr {
     constructor(x, y, w, h) {
         super(new mag.Rect(x, y, w, h));
     }
-    toString() { return 'diamond'; }
+    toString() { return (this.locked ? '/' : '') + 'rect'; }
 }
 class ImageExpr extends GraphicValueExpr {
     constructor(x, y, w, h, resource_key) {
@@ -189,7 +189,7 @@ class FadedValueExpr extends Expression {
     toString() {
         return this.primitiveName;
     }
-    value() { return this.toString(); }
+    value() { return (this.locked ? '/' : '') + this.toString(); }
 }
 class FadedStarExpr extends FadedValueExpr {
     constructor() { super('star'); }
@@ -220,7 +220,7 @@ class StringValueExpr extends Expression {
     canReduce() { return false; }
     isValue() { return true; }
     toString() {
-        return this.primitiveName;
+        return (this.locked ? '/' : '') + this.primitiveName;
     }
     value() { return this.primitiveName; }
 }

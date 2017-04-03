@@ -39,14 +39,14 @@ class TrueExpr extends BooleanPrimitive {
         super('true');
     }
     value() { return true; }
-    toString() { return 'true'; }
+    toString() { return (this.locked ? '/' : '') + 'true'; }
 }
 class FalseExpr extends BooleanPrimitive {
     constructor() {
         super('false');
     }
     value() { return false; }
-    toString() { return 'false'; }
+    toString() { return (this.locked ? '/' : '') + 'false'; }
 }
 
 /** Faded bool variants. */

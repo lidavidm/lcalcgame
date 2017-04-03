@@ -128,7 +128,7 @@ var StarExpr = function (_GraphicValueExpr) {
     _createClass(StarExpr, [{
         key: 'toString',
         value: function toString() {
-            return 'star';
+            return (this.locked ? '/' : '') + 'star';
         }
     }]);
 
@@ -147,7 +147,7 @@ var CircleExpr = function (_GraphicValueExpr2) {
     _createClass(CircleExpr, [{
         key: 'toString',
         value: function toString() {
-            return 'circle';
+            return (this.locked ? '/' : '') + 'circle';
         }
     }]);
 
@@ -166,7 +166,7 @@ var PipeExpr = function (_GraphicValueExpr3) {
     _createClass(PipeExpr, [{
         key: 'toString',
         value: function toString() {
-            return 'pipe';
+            return (this.locked ? '/' : '') + 'pipe';
         }
     }]);
 
@@ -185,7 +185,7 @@ var TriangleExpr = function (_GraphicValueExpr4) {
     _createClass(TriangleExpr, [{
         key: 'toString',
         value: function toString() {
-            return 'triangle';
+            return (this.locked ? '/' : '') + 'triangle';
         }
     }]);
 
@@ -204,7 +204,7 @@ var RectExpr = function (_GraphicValueExpr5) {
     _createClass(RectExpr, [{
         key: 'toString',
         value: function toString() {
-            return 'diamond';
+            return (this.locked ? '/' : '') + 'rect';
         }
     }]);
 
@@ -440,7 +440,7 @@ var FadedValueExpr = function (_Expression2) {
     }, {
         key: 'value',
         value: function value() {
-            return this.toString();
+            return (this.locked ? '/' : '') + this.toString();
         }
     }, {
         key: 'graphicNode',
@@ -540,7 +540,7 @@ var StringValueExpr = function (_Expression3) {
     }, {
         key: 'toString',
         value: function toString() {
-            return this.primitiveName;
+            return (this.locked ? '/' : '') + this.primitiveName;
         }
     }, {
         key: 'value',

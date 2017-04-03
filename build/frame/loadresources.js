@@ -235,6 +235,11 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         }
         return [];
     };
+    Resource.chaptersWithLanguage = function (lang) {
+        return chapters.filter(function (c) {
+            return c.language === lang;
+        });
+    };
     Resource.buildLevel = function (level_desc, canvas) {
         ExprManager.clearFadeLevels();
         if ('fade' in level_desc) {

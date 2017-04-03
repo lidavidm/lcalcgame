@@ -159,7 +159,7 @@ var CompareExpr = function (_Expression) {
     }, {
         key: 'toString',
         value: function toString() {
-            return '(' + this.funcName + ' ' + this.leftExpr.toString() + ' ' + this.rightExpr.toString() + ')';
+            return (this.locked ? '/' : '') + '(' + this.funcName + ' ' + this.leftExpr.toString() + ' ' + this.rightExpr.toString() + ')';
         }
     }, {
         key: 'constructorArgs',
