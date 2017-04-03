@@ -47,7 +47,7 @@
             "description": "The choice block",
             "board": "(assign /$x /(+ /$x /1))",
             "goal": "(3)",
-            "toolbox": "($x) (2) (choice (assign _ _) (repeat _ _))",
+            "toolbox": "($x) (choice (2) (+ /$x /1)) (choice (assign /$x _) (repeat _ _))",
             "globals": {
                 "x": "(1)"
             }
