@@ -153,15 +153,12 @@ var ChoiceExpr = function (_Expression) {
         key: "drawInternal",
         value: function drawInternal(ctx, pos, boundingSize) {
             var gradient = ctx.createLinearGradient(pos.x, pos.y, pos.x + boundingSize.w, pos.y + boundingSize.h);
-            gradient.addColorStop(0, 'purple');
-            gradient.addColorStop(0.5, 'green');
-            gradient.addColorStop(1, 'blue');
+            gradient.addColorStop(0, 'green');
+            gradient.addColorStop(0.4, 'blue');
+            gradient.addColorStop(0.6, 'purple');
+            gradient.addColorStop(1.0, 'red');
             this.color = gradient;
-            if (this._state === "closed") {
-                _get(ChoiceExpr.prototype.__proto__ || Object.getPrototypeOf(ChoiceExpr.prototype), "drawInternal", this).call(this, ctx, pos, boundingSize);
-            } else if (this._state === "open") {
-                _get(ChoiceExpr.prototype.__proto__ || Object.getPrototypeOf(ChoiceExpr.prototype), "drawInternal", this).call(this, ctx, pos, boundingSize);
-            }
+            _get(ChoiceExpr.prototype.__proto__ || Object.getPrototypeOf(ChoiceExpr.prototype), "drawInternal", this).call(this, ctx, pos, boundingSize);
         }
 
         /** Pretend to be a Toolbox so we can use the same API. */
@@ -169,23 +166,85 @@ var ChoiceExpr = function (_Expression) {
     }, {
         key: "removeExpression",
         value: function removeExpression(expr) {
-            Animate.poof(this);
-            this.cleanup();
-            (this.parent || this.stage).swap(this, null);
+            var _this3 = this;
+
+            this.holes.splice(0, this.holes.length);
+            this._state = "closing";
+            this.update();
+            Animate.tween(this, {
+                _size: {
+                    w: 0,
+                    h: 0
+                },
+                opacity: 0.5,
+                scale: {
+                    x: 0.5,
+                    y: 0.5
+                }
+            }, 200).after(function () {
+                _this3.cleanup();
+                (_this3.parent || _this3.stage).swap(_this3, null);
+            });
+            expr.onmouseenter = expr._onmouseenter;
+            expr.toolbox = null;
         }
     }, {
         key: "onmouseclick",
         value: function onmouseclick() {
-            var _this3 = this;
+            var _this4 = this;
 
             if (this._state === "closed") {
                 this.removeArg(this.label);
+
+                this._state = "open";
                 this.choices.forEach(function (c) {
                     var choice = c.clone();
-                    choice.toolbox = _this3;
-                    _this3.holes.push(choice);
+                    choice.toolbox = _this4;
+                    _this4.holes.push(choice);
                 });
-                this._state = "open";
+                this.update();
+                var size = this.openSize;
+                this._state = "opening";
+                this.holes.splice(0, this.holes.length);
+                this.update();
+
+                Animate.tween(this, {
+                    _size: size
+                }, 300).after(function () {
+                    _this4.choices.forEach(function (c) {
+                        var choice = c.clone();
+                        choice.toolbox = _this4;
+
+                        choice._onmouseenter = choice.onmouseenter;
+                        choice.onmouseenter = function () {
+                            this.opacity = 1.0;
+                        }.bind(choice);
+
+                        _this4.holes.push(choice);
+                    });
+                    _this4._state = "open";
+                    _this4.update();
+                });
+            }
+        }
+    }, {
+        key: "onmouseleave",
+        value: function onmouseleave() {
+            _get(ChoiceExpr.prototype.__proto__ || Object.getPrototypeOf(ChoiceExpr.prototype), "onmouseleave", this).call(this);
+            if (this._state === "open") {
+                this.holes.forEach(function (expr) {
+                    expr.opacity = 0.4;
+                });
+            }
+        }
+    }, {
+        key: "onmouseenter",
+        value: function onmouseenter() {
+            _get(ChoiceExpr.prototype.__proto__ || Object.getPrototypeOf(ChoiceExpr.prototype), "onmouseenter", this).call(this);
+            if (this._state === "open") {
+                this.holes.forEach(function (expr) {
+                    expr.opacity = 1;
+                });
             }
         }
     }, {
@@ -202,7 +261,7 @@ var ChoiceExpr = function (_Expression) {
     }, {
         key: "sparkle",
         value: function sparkle() {
-            var _this4 = this;
+            var _this5 = this;
 
             // Derived from SparkleTrigger
             this._sparkling = true;
@@ -223,25 +282,25 @@ var ChoiceExpr = function (_Expression) {
 
             var _loop = function _loop(i) {
                 var part = new mag.SparkleStar(center.x, center.y, Math.floor(minRad + (maxRad - minRad) * Math.random()));
-                _this4._sparkles.push(part);
+                _this5._sparkles.push(part);
 
                 var ghostySparkle = function ghostySparkle() {
-                    size = _this4.absoluteSize;
+                    size = _this5.absoluteSize;
                     if (size.w === 0) size = { w: 50, h: 50 };
 
                     var vec = { x: (Math.random() - 0.5) * size.w * 1.5,
                         y: (Math.random() - 0.5) * size.h * 1.5 - part.size.h / 2.0 };
 
-                    part.pos = addPos(_this4.centerPos(), vec);
+                    part.pos = addPos(_this5.centerPos(), vec);
                     part.color = colorFunc(part);
                     part.shadowOffset = 0;
                     part.opacity = 1.0;
-                    _this4.stage.add(part);
+                    _this5.stage.add(part);
                     part.anim = Animate.tween(part, { opacity: 0.0 }, Math.max(2000 * Math.random(), 1000), function (elapsed) {
                         return elapsed;
                     }, false).after(function () {
-                        _this4.stage.remove(part);
-                        if (_this4._sparkling) {
+                        _this5.stage.remove(part);
+                        if (_this5._sparkling) {
                             ghostySparkle();
                         }
                     });
@@ -253,7 +312,7 @@ var ChoiceExpr = function (_Expression) {
                 _loop(i);
             }
             Animate.drawUntil(this.stage, function () {
-                return !_this4._sparkling;
+                return !_this5._sparkling;
             });
         }
     }, {
@@ -301,21 +360,28 @@ var ChoiceExpr = function (_Expression) {
         get: function get() {
             if (this._state === "closed") {
                 return _get(ChoiceExpr.prototype.__proto__ || Object.getPrototypeOf(ChoiceExpr.prototype), "size", this);
+            } else if (this._state === "opening" || this._state === "closing") {
+                return this._size;
             } else if (this._state === "open") {
-                var padding = this.padding;
-                if (this.getHoleSizes().length === 0) return { w: this._size.w, h: this._size.h };
-
-                var _cellSize2 = this.cellSize;
-                var boxW = _cellSize2.w;
-                var boxH = _cellSize2.h;
-
-                var width = this.padding.left + this.rowSize * boxW + this.padding.right;
-                var height = this.padding.inner * 2 + Math.ceil(this.choices.length / this.rowSize) * boxH;
-
-                return { w: width, h: height };
+                return this.openSize;
             } else {
                 throw "Invalid state";
             }
+        }
+    }, {
+        key: "openSize",
+        get: function get() {
+            var padding = this.padding;
+            if (this.getHoleSizes().length === 0) return { w: this._size.w, h: this._size.h };
+
+            var _cellSize2 = this.cellSize;
+            var boxW = _cellSize2.w;
+            var boxH = _cellSize2.h;
+
+            var width = this.padding.left + this.rowSize * boxW + this.padding.right;
+            var height = this.padding.inner * 2 + Math.ceil(this.choices.length / this.rowSize) * boxH;
+
+            return { w: width, h: height };
         }
 
         /** The size of a single cell in our grid layout. */

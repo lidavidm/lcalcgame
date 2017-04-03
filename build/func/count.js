@@ -36,7 +36,7 @@ var CountExpr = function (_Expression) {
         key: 'reduce',
         value: function reduce() {
             console.log(this.holes[1]);
-            if (this.holes[1] instanceof MissingExpression) return this;else if (this.holes[1] instanceof BagExpr) return [new NumberExpr(this.holes[1].items.length), this.holes[1]];else return this;
+            if (this.holes[1] instanceof MissingExpression) return this;else if (this.holes[1] instanceof BagExpr) return [new (ExprManager.getClass('number'))(this.holes[1].items.length), this.holes[1]];else return this;
         }
     }]);
 

@@ -40,12 +40,6 @@ var Level = function () {
 
             var stage = new ReductStage(canvas);
 
-            // Scaling for mobile devices:
-            if (__IS_MOBILE) {
-                var md = new MobileDetect(window.navigator.userAgent);
-                if (md.phone()) stage.scale = 2.4;else if (md.tablet()) stage.scale = 1.8;else if (md.mobile()) stage.scale = 2.0;else stage.scale = 1.0;
-            }
-
             // Seed the random number generator so that while randomly generated,
             // levels appear the same each time you play.
             Math.seed = 12045;
@@ -55,28 +49,23 @@ var Level = function () {
             var varNodesOnBoard = mag.Stage.getNodesWithClass(VarExpr, [], true, this.exprs);
             var varNodesInToolbox = mag.Stage.getNodesWithClass(VarExpr, [], true, this.toolbox);
             var showEnvironment = this.globals && (Object.keys(this.globals.bindings).length > 0 || varNodesOnBoard && varNodesOnBoard.length > 0 || varNodesInToolbox && varNodesInToolbox.length > 0);
-            var envDisplayWidth = 0.20 * canvas_screen.w;
+            var envDisplayWidth = showEnvironment ? 0.20 * canvas_screen.w : 0;
 
             GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
 
-            var usableWidth = canvas_screen.w - (showEnvironment ? envDisplayWidth : 0);
-            var screenOffsetX = usableWidth * (1 - 1 / 1.4) / 2.0;
             var screen = {
-                height: canvas_screen.h / 1.2 - 90,
-                width: showEnvironment ? usableWidth - 2 * screenOffsetX : usableWidth / 1.4,
-                y: canvas_screen.h * 0.2,
-                x: showEnvironment ? screenOffsetX : usableWidth * (1 - 1 / 1.4) / 2.0
+                height: canvas_screen.h / 1.4,
+                width: (canvas_screen.w - envDisplayWidth) / 1.4,
+                y: canvas_screen.h * (1 - 1 / 1.4) / 2.0,
+                x: canvas_screen.w * (1 - 1 / 1.4) / 2.0
             };
             var board_packing = this.findBestPacking(this.exprs, screen);
             stage.addAll(board_packing); // add expressions to the stage
 
             // TODO: Offload this onto second stage?
             var goal_node = this.goal.nodeRepresentation;
-            goal_node[0].pos = { x: 20, y: 10 };
-            goal_node[1].pos = { x: 110, y: 10 };
             goal_node[1].ignoreGetClassInstance = true;
             var lastChild = goal_node[1].children[goal_node[1].children.length - 1];
-            goal_node[0].children[0].size = { w: 110 + lastChild.pos.x + lastChild.size.w, h: 70 };
             stage.add(goal_node[0]);
             stage.add(goal_node[1]);
 
@@ -89,65 +78,15 @@ var Level = function () {
             stage.goalNodes = goal_node[1].children;
 
             // UI Buttons
-            var ui_padding = 10;
-            var btn_back = new mag.Button(canvas_screen.w - 64 * 4 - ui_padding, ui_padding, 64, 64, { default: 'btn-back-default', hover: 'btn-back-hover', down: 'btn-back-down' }, function () {
-                //returnToMenu();
-                prev(); // go back to previous level; see index.html.
-            });
-
-            var mute_images = { default: 'btn-mute-default', hover: 'btn-mute-hover', down: 'btn-mute-down' };
-            var unmute_images = { default: 'btn-unmute-default', hover: 'btn-unmute-hover', down: 'btn-unmute-down' };
-            var btn_mute = new mag.Button(btn_back.pos.x + btn_back.size.w, ui_padding, 64, 64, Resource.isMuted() ? unmute_images : mute_images, function () {
-                if (this.muted) {
-                    Resource.unmute();
-                    this.muted = false;
-                    this.images = mute_images;
-                } else {
-                    Resource.mute();
-                    this.muted = true;
-                    this.images = unmute_images;
-                }
-                this.onmouseenter();
-            });
-            btn_mute.muted = Resource.isMuted();
-            var btn_reset = new mag.Button(btn_mute.pos.x + btn_mute.size.w, ui_padding, 64, 64, { default: 'btn-reset-default', hover: 'btn-reset-hover', down: 'btn-reset-down' }, function () {
-                initBoard(); // reset board state; see index.html.
-            });
-            var btn_next = new mag.Button(btn_reset.pos.x + btn_reset.size.w, ui_padding, 64, 64, { default: 'btn-next-default', hover: 'btn-next-hover', down: 'btn-next-down' }, function () {
-                next(); // go back to previous level; see index.html.
-            });
-            if (__SHOW_DEV_INFO) {
-                stage.add(btn_back);
-                stage.add(btn_next);
-            } else {
-                btn_mute.pos = {
-                    x: canvas_screen.w - 64 * 2 - ui_padding,
-                    y: btn_mute.pos.y
-                };
-                btn_reset.pos = btn_next.pos;
-            }
-            stage.add(btn_mute);
-            stage.add(btn_reset);
-
+            stage.buildUI(showEnvironment, envDisplayWidth);
             // Toolbox
-            var TOOLBOX_HEIGHT = 90;
-            var toolbox = new Toolbox(0, canvas_screen.h - TOOLBOX_HEIGHT, canvas_screen.w, TOOLBOX_HEIGHT);
-            stage.add(toolbox);
             if (this.toolbox) {
                 this.toolbox.forEach(function (item) {
                     stage.add(item);
-                    toolbox.addExpression(item, false);
+                    stage.toolbox.addExpression(item, false);
                 });
             }
-            stage.toolbox = toolbox;
-
             // Environment
-            var yOffset = goal_node[0].absoluteSize.h + goal_node[0].absolutePos.y + 20;
-            var env = new (ExprManager.getClass('environment_display'))(canvas_screen.w - envDisplayWidth, yOffset, envDisplayWidth, canvas_screen.h - TOOLBOX_HEIGHT - yOffset);
-            if (showEnvironment) {
-                stage.add(env);
-            }
-            stage.environmentDisplay = env;
             if (this.globals) {
                 var _iteratorNormalCompletion = true;
                 var _didIteratorError = false;
@@ -174,8 +113,6 @@ var Level = function () {
                     }
                 }
             }
-
-            stage.uiNodes = [btn_back, btn_reset, btn_next, env, toolbox];
 
             // Checks if the player has completed the level.
             var goal = this.goal;
@@ -273,6 +210,8 @@ var Level = function () {
             stage.expressionNodes().forEach(function (n) {
                 n.scale = { x: 0.5, y: 0.5 };
                 n.anchor = { x: 0.5, y: 0.5 };
+                // Adjust positions to account for the new anchor
+                n.pos = { x: n.pos.x + 0.5 * n.size.w, y: n.pos.y + 0.5 * n.size.h };
                 Animate.tween(n, { scale: { x: 1, y: 1 } }, 500, function (elapsed) {
                     return Math.pow(elapsed, 0.3);
                 });
@@ -481,10 +420,6 @@ var Level = function () {
             var _this = this;
             if (!Array.isArray(es)) es = [es];
 
-            if (es.length >= 5) {
-                return this.findFastPacking(es, screen);
-            }
-
             // Bounds cache seems to greatly destroy performance
             var sizeCache = {};
             var getSize = function getSize(e) {
@@ -495,7 +430,9 @@ var Level = function () {
 
             var candidates = [];
             var CANDIDATE_THRESHOLD = 10;
-            while (candidates.length < CANDIDATE_THRESHOLD) {
+            var iterations = 0;
+            while (candidates.length < CANDIDATE_THRESHOLD && iterations < 10000) {
+                iterations++;
 
                 // 1. Put the expressions in random places.
                 var _iteratorNormalCompletion8 = true;
@@ -513,7 +450,9 @@ var Level = function () {
                             y = Math.seededRandom() * (screen.height - size.h) + screen.y;
                         }
 
-                        e.pos = { x: Math.seededRandom() * (screen.width - size.w) + screen.x,
+                        var x = Math.max(Math.seededRandom() * (screen.width - size.w) + screen.x, screen.x);
+
+                        e.pos = { x: x,
                             y: y };
                     }
 
@@ -686,8 +625,16 @@ var Level = function () {
         }
     }], [{
         key: 'make',
-        value: function make(level_desc) {
-            var lvl = new Level(Level.parse(level_desc.board, level_desc.language), new Goal(new ExpressionPattern(Level.parse(level_desc.goal, level_desc.language))), level_desc.toolbox ? Level.parse(level_desc.toolbox, level_desc.language) : null, Environment.parse(level_desc.globals));
+        value: function make(desc) {
+            var expr_descs = desc.board;
+            var goal_descs = desc.goal;
+            var toolbox_descs = desc.toolbox;
+            var globals_descs = desc.globals;
+            var resources = desc.resources;
+            var language = desc.language;
+
+
+            var lvl = new Level(Level.parse(expr_descs, language), new Goal(new ExpressionPattern(Level.parse(goal_descs, language)), resources.aliens), toolbox_descs ? Level.parse(toolbox_descs, language) : null, Environment.parse(globals_descs));
             return lvl;
         }
     }, {
@@ -920,6 +867,7 @@ var Level = function () {
                 'sequence': ExprManager.getClass('sequence'),
                 'repeat': ExprManager.getClass('repeat'),
                 'choice': ExprManager.getClass('choice'),
+                'snappable': ExprManager.getClass('snappable'),
                 'level': ExprManager.getClass('level'),
                 'arrayobj': ExprManager.getClass('arrayobj'),
                 'infinite': ExprManager.getClass('infinite'),
@@ -932,7 +880,7 @@ var Level = function () {
             };
 
             if (Number.isNumber(arg)) {
-                var numexpr = new NumberExpr(parseInt(arg));
+                var numexpr = new (ExprManager.getClass('number'))(parseInt(arg));
                 lock(numexpr, locked);
                 return numexpr;
             } else if (arg in op_mappings) {
@@ -984,10 +932,14 @@ var Level = function () {
 
 var Goal = function () {
     function Goal(accepted_patterns) {
+        var alien_images = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ['alien-function-1'];
+
         _classCallCheck(this, Goal);
 
         if (!Array.isArray(accepted_patterns)) accepted_patterns = [accepted_patterns];
         this.patterns = accepted_patterns;
+        // Choose a random alien to serve as our "goal person"
+        this.alien_image = alien_images[Math.floor(Math.random() * alien_images.length)];
     }
 
     _createClass(Goal, [{
@@ -1029,26 +981,40 @@ var Goal = function () {
     }, {
         key: 'nodeRepresentation',
         get: function get() {
+            var md = new MobileDetect(window.navigator.userAgent);
+            var BUBBLE_HEIGHT = __IS_MOBILE && md.phone() ? 70 : 80;
+            var ALIEN_HEIGHT = __IS_MOBILE && md.phone() ? 50 : 70;
+
             var exprs = flatten(this.patterns.map(function (p) {
                 return p.exprs;
             })).map(function (expr) {
                 return expr.clone();
             });
-            var bg = new mag.Rect(-20, -10, 200, 80);
-            bg.color = "#444";
+            var bg_accent = new mag.Circle(0, 0, 10);
+            bg_accent.color = "#0e0e7b";
+            bg_accent.shadowOffset = 0;
+            bg_accent.anchor = { x: 0.5, y: 0.5 };
+            var bg = new mag.Circle(0, 0, 10);
+            bg.color = "#2b1d0e";
             bg.shadowOffset = 0;
-            var txt = new TextExpr('Goal: ', 'Georgia');
+            bg.anchor = { x: 0.5, y: 0.5 };
             var node = new mag.Rect(0, 0, 100, 50);
             node.color = null;
             node.ignoreEvents = true;
-            txt.pos = { x: 0, y: node.size.h / 2 };
-            txt.anchor = { x: 0, y: 0.5 };
-            txt.color = "#EEE";
+
+            var bubbleLeftImage = Resource.getImage('caption-long-left');
+            var bubbleRightImage = Resource.getImage('caption-long-right');
+            var bubbleMidImage = Resource.getImage('caption-long-mid');
+            var bubbleLeftWidth = BUBBLE_HEIGHT / bubbleLeftImage.naturalHeight * bubbleLeftImage.naturalWidth;
+            var bubbleRightWidth = BUBBLE_HEIGHT / bubbleRightImage.naturalHeight * bubbleRightImage.naturalWidth;
+            var bubbleMidWidth = BUBBLE_HEIGHT / bubbleMidImage.naturalHeight * bubbleMidImage.naturalWidth;
+            var bubbleLeft = new mag.ImageRect(0, 0, bubbleLeftWidth, BUBBLE_HEIGHT, 'caption-long-left');
+            var bubbleRight = new mag.ImageRect(0, 0, bubbleRightWidth, BUBBLE_HEIGHT, 'caption-long-right');
 
             var exprs_node = new mag.Rect(0, 0, 0, 0);
             exprs_node.addAll(exprs);
 
-            exprs[0].pos = { x: 0, y: 0 };
+            exprs[0].pos = { x: bubbleLeft.size.w / 4, y: 0 };
 
             // TODO: Fix the need for this hack.
             if (exprs[0] instanceof BagExpr) {
@@ -1062,7 +1028,100 @@ var Goal = function () {
                 exprs[i].ignoreEvents = true;
             }
 
-            node.addAll([bg, txt]);
+            var image = Resource.getImage(this.alien_image);
+            var width = ALIEN_HEIGHT / image.naturalHeight * image.naturalWidth;
+            var offsetX = 0,
+                offsetY = 0;
+            if (width > ALIEN_HEIGHT) {
+                offsetY = 0.25 * (width - ALIEN_HEIGHT);
+            } else {
+                offsetX = 0.25 * (ALIEN_HEIGHT - width);
+            }
+            var alien = new mag.ImageRect(offsetX, offsetY, width, ALIEN_HEIGHT, this.alien_image);
+
+            node.addAll([bg_accent, bg, alien]);
+
+            var lastExpr = exprs[exprs.length - 1];
+            var firstExpr = exprs[0];
+            var exprsWidth = lastExpr.absolutePos.x + lastExpr.absoluteSize.w - firstExpr.absolutePos.x;
+
+            exprsWidth -= 0.6 * (bubbleLeftWidth + bubbleRightWidth);
+            var bubble = [bubbleLeft];
+
+            while (exprsWidth > 0) {
+                exprsWidth -= bubbleMidWidth - 1;
+                bubble.push(new mag.ImageRect(0, 0, bubbleMidWidth, BUBBLE_HEIGHT, 'caption-long-mid'));
+            }
+
+            bubble.push(bubbleRight);
+
+            var x = alien.pos.x + alien.size.w - 10;
+            var _iteratorNormalCompletion14 = true;
+            var _didIteratorError14 = false;
+            var _iteratorError14 = undefined;
+
+            try {
+                for (var _iterator14 = bubble[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
+                    var b = _step14.value;
+
+                    b.pos = { x: x, y: -5 };
+                    x += b.size.w - 1;
+                }
+            } catch (err) {
+                _didIteratorError14 = true;
+                _iteratorError14 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion14 && _iterator14.return) {
+                        _iterator14.return();
+                    }
+                } finally {
+                    if (_didIteratorError14) {
+                        throw _iteratorError14;
+                    }
+                }
+            }
+
+            node.addAll(bubble);
+
+            node.pos = { x: 5, y: 5 };
+            var maxExprHeight = 0;
+            var _iteratorNormalCompletion15 = true;
+            var _didIteratorError15 = false;
+            var _iteratorError15 = undefined;
+
+            try {
+                for (var _iterator15 = exprs[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
+                    var expr = _step15.value;
+
+                    maxExprHeight = Math.max(maxExprHeight, expr.size.h);
+                }
+            } catch (err) {
+                _didIteratorError15 = true;
+                _iteratorError15 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion15 && _iterator15.return) {
+                        _iterator15.return();
+                    }
+                } finally {
+                    if (_didIteratorError15) {
+                        throw _iteratorError15;
+                    }
+                }
+            }
+
+            exprs_node.pos = {
+                x: bubble[0].absolutePos.x + 0.3 * bubble[0].absoluteSize.w,
+                y: bubble[0].absolutePos.y + bubble[0].absoluteSize.h / 2 - maxExprHeight / 2
+            };
+            bg.radius = Math.max(alien.absolutePos.x + alien.absoluteSize.w, ALIEN_HEIGHT);
+            bg.radius = Math.max(alien.absolutePos.y + alien.absoluteSize.h, bg.radius);
+            bg.radius += 10;
+            bg_accent.radius = bg.radius + 10;
+
+            window.test = alien;
+
             return [node, exprs_node];
         }
     }]);
@@ -1113,13 +1172,42 @@ var ExpressionPattern = function () {
                 }
 
                 //console.log(' comparing ', e, ' to ', f);
+                var valuesMatch = true;
+                // If both are values, check that their reported values
+                // match. This is for things like number expressions,
+                // which are otherwise structurally equal. The check here
+                // is recursive, for cases like bags, where the value can
+                // itself contain expressions.
+                if (e instanceof Expression && f instanceof Expression && e.isValue() && f.isValue()) {
+                    var ev = e.value();
+                    var fv = f.value();
+
+                    if (!ev && fv || ev && !fv) {
+                        valuesMatch = false;
+                    } else if (Array.isArray(ev) && Array.isArray(fv)) {
+                        if (ev.length != fv.length) {
+                            valuesMatch = false;
+                        } else {
+                            for (var i = 0; i < ev.length; i++) {
+                                if (!compare(ev[i], fv[i])) {
+                                    valuesMatch = false;
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        valuesMatch = ev === fv && e.isValue() && f.isValue();
+                    }
+                } else {
+                    valuesMatch = true;
+                }
 
                 // Compares two expressions.
                 // Right now this just checks if their class tree is the same.
                 if (e.constructor.name !== f.constructor.name) {
                     //console.log(' > Constructors don\'t match.');
                     return false; // expressions don't match
-                } else if (e instanceof Expression && f instanceof Expression && (e.isValue() != f.isValue() || e.value() !== f.value())) {
+                } else if (e instanceof Expression && f instanceof Expression && (e.isValue() != f.isValue() || !valuesMatch)) {
                         return false;
                     } else {
                         // Check whether the expressions at this level have the same # of children. If so, do one-to-one comparison.
@@ -1129,8 +1217,8 @@ var ExpressionPattern = function () {
                             //console.log(' > Length of child array doesn\'t match.');
                             return false;
                         } else {
-                            for (var i = 0; i < e_children.length; i++) {
-                                if (!compare(e_children[i], f_children[i])) {
+                            for (var _i4 = 0; _i4 < e_children.length; _i4++) {
+                                if (!compare(e_children[_i4], f_children[_i4])) {
                                     //console.log(' > Children don\'t match.');
                                     return false;
                                 }
@@ -1142,13 +1230,13 @@ var ExpressionPattern = function () {
                 return true;
             };
 
-            var _iteratorNormalCompletion14 = true;
-            var _didIteratorError14 = false;
-            var _iteratorError14 = undefined;
+            var _iteratorNormalCompletion16 = true;
+            var _didIteratorError16 = false;
+            var _iteratorError16 = undefined;
 
             try {
-                for (var _iterator14 = lvl_exprs[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
-                    var lvl_e = _step14.value;
+                for (var _iterator16 = lvl_exprs[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
+                    var lvl_e = _step16.value;
 
                     var valid = -1;
                     for (var i = 0; i < es.length; i++) {
@@ -1167,16 +1255,16 @@ var ExpressionPattern = function () {
                     } else return false;
                 }
             } catch (err) {
-                _didIteratorError14 = true;
-                _iteratorError14 = err;
+                _didIteratorError16 = true;
+                _iteratorError16 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion14 && _iterator14.return) {
-                        _iterator14.return();
+                    if (!_iteratorNormalCompletion16 && _iterator16.return) {
+                        _iterator16.return();
                     }
                 } finally {
-                    if (_didIteratorError14) {
-                        throw _iteratorError14;
+                    if (_didIteratorError16) {
+                        throw _iteratorError16;
                     }
                 }
             }

@@ -867,7 +867,7 @@ var PulloutDrawerHandle = function (_mag$ImageRect) {
     function PulloutDrawerHandle(x, y, w, h, onclick) {
         _classCallCheck(this, PulloutDrawerHandle);
 
-        var _this13 = _possibleConstructorReturn(this, (PulloutDrawerHandle.__proto__ || Object.getPrototypeOf(PulloutDrawerHandle)).call(this, x, y, w, h, 'handle'));
+        var _this13 = _possibleConstructorReturn(this, (PulloutDrawerHandle.__proto__ || Object.getPrototypeOf(PulloutDrawerHandle)).call(this, x, y, w, h, 'pullout-drawer-handle'));
 
         _this13.onclick = onclick;
         return _this13;

@@ -183,6 +183,9 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         }
         return [];
     };
+    Resource.chaptersWithLanguage = (lang) => {
+        return chapters.filter((c) => c.language === lang);
+    };
     Resource.buildLevel = (level_desc, canvas) => {
         ExprManager.clearFadeLevels();
         if ('fade' in level_desc) {

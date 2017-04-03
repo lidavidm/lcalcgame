@@ -469,7 +469,7 @@ var mag = function (_) {
                     ctx.clip();
 
                     if (this.clipBackground) {
-                        ctx.drawImage(Resource.getImage(this.clipBackground), pos.x, pos.y);
+                        Resource.getImage(this.clipBackground).draw(ctx, pos.x, pos.y);
                     }
                 }
             }

@@ -284,11 +284,11 @@ var ChestVarExpr = function (_VarExpr2) {
             var scale = this.absoluteScale;
             var adjustedSize = this.absoluteSize;
             var offset = Math.max(2, (adjustedSize.w - size.w) / 2);
-            ctx.drawImage(ChestImages.base(this.name), pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
+            ChestImages.base(this.name).draw(ctx, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
             if (this._opened) {
-                ctx.drawImage(ChestImages.lidOpen(this.name), pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
+                ChestImages.lidOpen(this.name).draw(ctx, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
             } else {
-                ctx.drawImage(ChestImages.lidClosed(this.name), pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
+                ChestImages.lidClosed(this.name).draw(ctx, pos.x + offset, pos.y + offset, size.w * scale.x - 2 * offset, size.h * scale.y - 2 * offset);
             }
             if (this.stroke) {
                 ctx.save();
@@ -541,7 +541,7 @@ var AssignExpr = function (_Expression2) {
     _createClass(AssignExpr, [{
         key: "canReduce",
         value: function canReduce() {
-            return this.value && this.variable && (this.value.canReduce() || this.value.isValue()) && this.variable instanceof VarExpr;
+            return this.value && this.variable && (this.value.canReduce() || this.value.isValue()) && (this.variable instanceof VarExpr || this.variable instanceof VtableVarExpr);
         }
     }, {
         key: "reduce",
@@ -702,6 +702,7 @@ var AssignExpr = function (_Expression2) {
         value: function onmouseclick(pos) {
             if (this.parent) {
                 this.parent.onmouseclick(pos);
+                return;
             }
 
             if (!this._animating) {
@@ -811,3 +812,148 @@ var EqualsAssignExpr = function (_AssignExpr2) {
 
     return EqualsAssignExpr;
 }(AssignExpr);
+
+var VtableVarExpr = function (_ObjectExtensionExpr) {
+    _inherits(VtableVarExpr, _ObjectExtensionExpr);
+
+    function VtableVarExpr(name) {
+        _classCallCheck(this, VtableVarExpr);
+
+        var _this19 = _possibleConstructorReturn(this, (VtableVarExpr.__proto__ || Object.getPrototypeOf(VtableVarExpr)).call(this, new LabeledVarExpr(name), {}));
+
+        _this19.removeChild(_this19.drawer);
+        var drawer = new DynamicPulloutDrawer(_this19.size.w, _this19.size.h / 2, 8, 32, _this19, _this19.drawer.onCellSelect);
+        drawer.anchor = { x: 0, y: 0.32 };
+        _this19.drawer = drawer;
+        _this19.addChild(_this19.drawer);
+        _this19.hasVtable = false;
+        return _this19;
+    }
+
+    _createClass(VtableVarExpr, [{
+        key: "canReduce",
+        value: function canReduce() {
+            return this.getEnvironment() && (this.parent || this.stage) && this.getEnvironment().lookup(this.name);
+        }
+
+        // Behave like a VarExpr
+
+    }, {
+        key: "open",
+        value: function open() {}
+    }, {
+        key: "close",
+        value: function close() {}
+    }, {
+        key: "update",
+        value: function update() {
+            _get(VtableVarExpr.prototype.__proto__ || Object.getPrototypeOf(VtableVarExpr.prototype), "update", this).call(this);
+            this.updateVtable();
+        }
+    }, {
+        key: "updateVtable",
+        value: function updateVtable() {
+            var value = this.value;
+            if (value) {
+                if (value.color) {
+                    this.color = value.color;
+                    this.variable.color = value.color;
+                }
+
+                if (value instanceof ObjectExtensionExpr) {
+                    this.hasVtable = true;
+                } else {
+                    this.hasVtable = false;
+                }
+            } else {
+                this.hasVtable = false;
+            }
+        }
+    }, {
+        key: "reduce",
+        value: function reduce() {
+            if (!this.hasVtable) return this.value;
+            if (!this.subReduceMethod) return this.value;
+            var value = this.variable.reduce();
+            if (value instanceof ObjectExtensionExpr) {
+                value = value.holes[0];
+            }
+            this.swap(this.variable, value);
+            value.lock();
+            return _get(VtableVarExpr.prototype.__proto__ || Object.getPrototypeOf(VtableVarExpr.prototype), "reduce", this).call(this);
+        }
+    }, {
+        key: "name",
+        get: function get() {
+            return this.variable.name;
+        }
+    }, {
+        key: "variable",
+        get: function get() {
+            return this.holes[0];
+        }
+    }, {
+        key: "value",
+        get: function get() {
+            if (this.variable && this.variable.canReduce()) {
+                return this.getEnvironment().lookup(this.variable.name);
+            }
+            return null;
+        }
+    }, {
+        key: "objMethods",
+        get: function get() {
+            var value = this.value;
+            if (value) {
+                return value.objMethods;
+            }
+            return {};
+        },
+        set: function set(x) {}
+    }]);
+
+    return VtableVarExpr;
+}(ObjectExtensionExpr);
+
+var DynamicPulloutDrawer = function (_PulloutDrawer) {
+    _inherits(DynamicPulloutDrawer, _PulloutDrawer);
+
+    function DynamicPulloutDrawer(x, y, w, h, parent, onCellSelect) {
+        _classCallCheck(this, DynamicPulloutDrawer);
+
+        var _this20 = _possibleConstructorReturn(this, (DynamicPulloutDrawer.__proto__ || Object.getPrototypeOf(DynamicPulloutDrawer)).call(this, x, y, w, h, parent ? parent.objMethods : {}, onCellSelect));
+        // Guard against null parent for cloning
+
+
+        _this20.parent = parent;
+        return _this20;
+    }
+
+    _createClass(DynamicPulloutDrawer, [{
+        key: "open",
+        value: function open() {
+            // Generate TextExpr for each property:
+            var txts = [];
+            var propertyTree = this.parent.objMethods;
+            for (var key in propertyTree) {
+                if (propertyTree.hasOwnProperty(key)) {
+                    var str = '.' + key;
+                    if (typeof propertyTree[key] === 'function' && propertyTree[key].length > 1) {
+                        str += '(..)';
+                    } else {
+                        str += '()';
+                    }
+                    var t = new TextExpr(str);
+                    t.ignoreEvents = true;
+                    t._reduceMethod = propertyTree[key];
+                    txts.push(t);
+                }
+            }
+            this.txts = txts;
+
+            _get(DynamicPulloutDrawer.prototype.__proto__ || Object.getPrototypeOf(DynamicPulloutDrawer.prototype), "open", this).call(this);
+        }
+    }]);
+
+    return DynamicPulloutDrawer;
+}(PulloutDrawer);

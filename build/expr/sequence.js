@@ -217,9 +217,13 @@ var Sequence = function (_Expression) {
 
                                 _this2.update();
                                 if (newExpr instanceof Expression) newExpr.lock();
-                                after(800).then(function () {
-                                    return nextStep();
-                                });
+                                if (newHoles.length > 0) {
+                                    after(800).then(function () {
+                                        return nextStep();
+                                    });
+                                } else {
+                                    nextStep();
+                                }
                             };
                             if (result instanceof Promise) {
                                 result.then(delay, function () {
@@ -267,7 +271,7 @@ var NotchedSequence = function (_Sequence) {
 
         var _this3 = _possibleConstructorReturn(this, (_ref = NotchedSequence.__proto__ || Object.getPrototypeOf(NotchedSequence)).call.apply(_ref, [this].concat(exprs)));
 
-        _this3.padding.left = 17.5;
+        _this3.padding.right = 17.5;
         _this3._reductionIndicatorStart = 0;
         return _this3;
     }
@@ -277,13 +281,13 @@ var NotchedSequence = function (_Sequence) {
         value: function drawInternal(ctx, pos, boundingSize) {
             _get(NotchedSequence.prototype.__proto__ || Object.getPrototypeOf(NotchedSequence.prototype), "drawInternal", this).call(this, ctx, pos, boundingSize);
             var radius = this.radius * this.absoluteScale.x;
-            var leftMargin = 15 * this.scale.x;
+            var rightMargin = 15 * this.scale.x;
             ctx.fillStyle = "#fff";
-            roundRect(ctx, pos.x, pos.y, leftMargin, boundingSize.h, {
-                tl: radius,
-                bl: radius,
-                tr: 0,
-                br: 0
+            roundRect(ctx, pos.x + boundingSize.w - rightMargin, pos.y, rightMargin, boundingSize.h, {
+                tl: 0,
+                bl: 0,
+                tr: radius,
+                br: radius
             }, true, false, null);
 
             ctx.strokeStyle = '#000';
@@ -295,14 +299,14 @@ var NotchedSequence = function (_Sequence) {
                 var expr2y = expr2.absolutePos.y;
                 var tickPos = expr1y + (expr2y - expr1y) / 2;
                 ctx.beginPath();
-                ctx.moveTo(pos.x, expr1y);
-                ctx.lineTo(pos.x + 15, expr1y);
+                ctx.moveTo(pos.x + boundingSize.w - 15 * this.scale.x, expr1y);
+                ctx.lineTo(pos.x + boundingSize.w, expr1y);
                 ctx.stroke();
             }
 
             if (this._animating) {
-                var rad = leftMargin / 3;
-                var indicatorX = pos.x + leftMargin / 2 - rad;
+                var rad = rightMargin / 3;
+                var indicatorX = pos.x + boundingSize.w - rightMargin / 2 - rad;
                 var verticalDistance = boundingSize.h - 2 * radius;
                 var verticalOffset = 0.5 * (1.0 + Math.sin((Date.now() - this._reductionIndicatorStart) / 250)) * verticalDistance;
                 drawCircle(ctx, indicatorX, pos.y + radius + verticalOffset, rad, "#000", null);
@@ -325,4 +329,75 @@ var NotchedSequence = function (_Sequence) {
     }]);
 
     return NotchedSequence;
+}(Sequence);
+
+var SemicolonNotchedSequence = function (_NotchedSequence) {
+    _inherits(SemicolonNotchedSequence, _NotchedSequence);
+
+    function SemicolonNotchedSequence() {
+        var _ref2;
+
+        _classCallCheck(this, SemicolonNotchedSequence);
+
+        for (var _len3 = arguments.length, exprs = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+            exprs[_key3] = arguments[_key3];
+        }
+
+        var _this5 = _possibleConstructorReturn(this, (_ref2 = SemicolonNotchedSequence.__proto__ || Object.getPrototypeOf(SemicolonNotchedSequence)).call.apply(_ref2, [this].concat(exprs)));
+
+        _this5.padding.right = 15;
+        return _this5;
+    }
+
+    _createClass(SemicolonNotchedSequence, [{
+        key: "drawInternal",
+        value: function drawInternal(ctx, pos, boundingSize) {
+            _get(SemicolonNotchedSequence.prototype.__proto__ || Object.getPrototypeOf(SemicolonNotchedSequence.prototype), "drawInternal", this).call(this, ctx, pos, boundingSize);
+            var radius = this.radius * this.absoluteScale.x;
+            var rightMargin = 15 * this.scale.x;
+
+            ctx.fillStyle = "black";
+            var fontSize = 35 * this.scale.y * 0.85;
+            ctx.font = fontSize + "px Consolas, monospace";
+            for (var i = 0; i < this.holes.length; i++) {
+                var expr1 = this.holes[i];
+                var expr1y = expr1.absolutePos.y; // - expr1.anchor.y * expr1.absoluteSize.h;
+                expr1y += (expr1.absoluteSize.h - fontSize) / 2;
+                ctx.fillText(";", pos.x + boundingSize.w - rightMargin, expr1y);
+            }
+        }
+    }]);
+
+    return SemicolonNotchedSequence;
+}(NotchedSequence);
+
+var SemicolonSequence = function (_Sequence2) {
+    _inherits(SemicolonSequence, _Sequence2);
+
+    function SemicolonSequence() {
+        _classCallCheck(this, SemicolonSequence);
+
+        return _possibleConstructorReturn(this, (SemicolonSequence.__proto__ || Object.getPrototypeOf(SemicolonSequence)).apply(this, arguments));
+    }
+
+    _createClass(SemicolonSequence, [{
+        key: "drawInternal",
+        value: function drawInternal(ctx, pos, boundingSize) {
+            _get(SemicolonSequence.prototype.__proto__ || Object.getPrototypeOf(SemicolonSequence.prototype), "drawInternal", this).call(this, ctx, pos, boundingSize);
+            var radius = this.radius * this.absoluteScale.x;
+            var rightMargin = 15 * this.scale.x;
+
+            ctx.fillStyle = "black";
+            var fontSize = 35 * this.scale.y * 0.85;
+            ctx.font = fontSize + "px Consolas, monospace";
+            for (var i = 0; i < this.holes.length; i++) {
+                var expr1 = this.holes[i];
+                var expr1y = expr1.absolutePos.y; // - expr1.anchor.y * expr1.absoluteSize.h;
+                expr1y += (expr1.absoluteSize.h - fontSize) / 2;
+                ctx.fillText(";", pos.x + boundingSize.w - rightMargin, expr1y);
+            }
+        }
+    }]);
+
+    return SemicolonSequence;
 }(Sequence);

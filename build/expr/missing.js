@@ -38,16 +38,24 @@ var MissingExpression = function (_Expression) {
         }
     }, {
         key: 'onmousedrag',
-        value: function onmousedrag(pos) {} // disable drag
-
+        value: function onmousedrag(pos) {
+            // disable drag
+            // forward it to parent
+            if (this.parent) {
+                pos = addPos(pos, fromTo(this.absolutePos, this.parent.absolutePos));
+                this.parent.onmousedrag(pos);
+            }
+        }
     }, {
         key: 'ondropenter',
         value: function ondropenter(node, pos) {
+            if (node instanceof ChoiceExpr || node instanceof Snappable) return;
             this.onmouseenter(pos);
         }
     }, {
         key: 'ondropexit',
         value: function ondropexit(node, pos) {
+            if (node instanceof ChoiceExpr || node instanceof Snappable) return;
             this.onmouseleave(pos);
         }
     }, {
@@ -60,9 +68,18 @@ var MissingExpression = function (_Expression) {
                 // Should not be able to stick lambdas in MissingExpression holes (exception of Map and Define)
                 if (node instanceof LambdaExpr && !(this.parent instanceof MapFunc) && !(this.parent instanceof DefineExpr) && !(this.parent instanceof ObjectExtensionExpr)) return;
 
+                // Should not be able to use choice exprs or snappables, ever
+                if (node instanceof ChoiceExpr || node instanceof Snappable) return;
+
                 var stage = this.stage;
                 var beforeState = stage.toString();
                 var droppedExp = node.toString();
+
+                // Unset toolbox flag even when dragging directly to a hole
+                if (node.toolbox) {
+                    node.toolbox.removeExpression(node);
+                    node.toolbox = null;
+                }
 
                 Resource.play('pop');
                 node.stage.remove(node);
@@ -83,7 +100,7 @@ var MissingExpression = function (_Expression) {
 
                 // Blink blue if reduction is possible with this config.
                 var try_reduce = node.parent.reduceCompletely();
-                if (try_reduce != node.parent && try_reduce !== undefined) {
+                if (try_reduce != node.parent && try_reduce !== undefined || node.parent.isComplete()) {
                     Animate.blink(node.parent, 1000, [1, 1, 0], 1);
                 }
             }
@@ -364,6 +381,7 @@ var MissingChestExpression = function (_MissingTypedExpressi3) {
         _this7.label = new TextExpr("xy");
         _this7.label.color = "#AAA";
         _this7.addArg(_this7.label);
+        _this7.acceptedClasses = [VarExpr, VtableVarExpr];
         return _this7;
     }
 
@@ -371,6 +389,11 @@ var MissingChestExpression = function (_MissingTypedExpressi3) {
         key: 'getClass',
         value: function getClass() {
             return MissingChestExpression;
+        }
+    }, {
+        key: 'accepts',
+        value: function accepts(expr) {
+            return expr instanceof VarExpr || expr instanceof VtableVarExpr && !expr.subReduceMethod;
         }
     }]);
 

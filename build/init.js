@@ -9,6 +9,10 @@ var stage;
 var canvas;
 
 var level_idx = getCookie('level_idx') || 0;
+var completedLevels = {};
+if (window.localStorage["completedLevels"]) {
+    completedLevels = JSON.parse(window.localStorage["completedLevels"]);
+}
 if (level_idx !== 0) level_idx = parseInt(level_idx);
 var cur_menu = null;
 
@@ -117,6 +121,8 @@ function initLevel(levelSelected, levelSelectedIdx) {
         cur_menu = stage;
         cur_menu.invalidate();
     }
+    prepareCanvas();
+    $('#lvl_num_visible').text(level_idx + 1 + '');
     level_idx = levelSelectedIdx;
     stage = Resource.buildLevel(levelSelected, canvas);
     redraw(stage);
@@ -128,6 +134,7 @@ function returnToMenu() {
         cur_menu.validate();
         console.log(cur_menu);
         cur_menu.updateLevelSpots();
+        cur_menu.reset();
         stage = cur_menu;
         redraw(stage);
     } else {
@@ -273,40 +280,61 @@ function initMainMenu() {
     }
 }
 
-function prepareCanvas() {
-    canvas = document.getElementById('canvas');
-    if (canvas.getContext) {
-        clearStage();
+var prepareCanvas = function () {
+    var canvas;
 
+    // Width 100% and height 100%
+    var resizeCanvas = function resizeCanvas() {
         if (__IS_MOBILE) {
-
-            // Width 100% and height 100%
-            var resizeCanvas = function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
+            var changed = false;
+            if (canvas) {
+                // Account for mobile status bars/address bar/Android navbar/etc
+                var newWidth = Math.min(window.screen.availWidth, window.innerWidth);
+                var newHeight = Math.min(window.screen.availHeight, window.innerHeight);
+                if (canvas.width != newWidth || canvas.height != newHeight) {
+                    changed = true;
+                }
+                canvas.width = newWidth;
+                canvas.height = newHeight;
                 GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
-            };
+            }
 
-            // Resize canvas during a mobile phone orientation change.
-            window.addEventListener('resize', resizeCanvas, false);
-            window.addEventListener('orientationchange', resizeCanvas, false);
-            resizeCanvas();
+            // Redraw on change
+            if (changed && stage) {
+                stage.draw();
+                stage.onorientationchange();
+            }
         }
+    };
 
-        hideHelpText();
-        hideEndGame();
-        updateProgressBar();
-
-        GLOBAL_DEFAULT_CTX = canvas.getContext('2d');
-        GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
+    if (__IS_MOBILE) {
+        // Resize canvas during a mobile phone orientation change.
+        window.addEventListener('resize', resizeCanvas, false);
+        window.addEventListener('orientationchange', resizeCanvas, false);
     }
-}
+
+    return function () {
+        canvas = document.getElementById('canvas');
+        if (canvas.getContext) {
+            clearStage();
+            resizeCanvas();
+
+            hideHelpText();
+            hideEndGame();
+            updateProgressBar();
+
+            GLOBAL_DEFAULT_CTX = canvas.getContext('2d');
+            GLOBAL_DEFAULT_SCREENSIZE = canvas.getBoundingClientRect();
+        }
+    };
+}();
 
 function saveProgress() {
     var cookie = getCookie('level_idx');
     if (cookie.length === 0 || level_idx > parseInt(cookie)) {
         setCookie('level_idx', level_idx);
     }
+    window.localStorage["completedLevels"] = JSON.stringify(completedLevels);
 }
 
 function initBoard() {
@@ -441,20 +469,33 @@ function next() {
     if (level_idx === Resource.level.length - 1) {
         initEndGame();
     } else {
-        level_idx++;
+        Resource.getChapterGraph().then(function (graph) {
+            var chapters = graph.chapters;
+            var transitions = graph.transitions;
 
-        Resource.getChapters().then(function (chapters) {
+            completedLevels[level_idx] = true;
+            saveProgress();
+
             for (var i = 0; i < chapters.length; i++) {
-                if (chapters[i].startIdx === level_idx) {
+                if (chapters[i].endIdx === level_idx) {
                     // Fly to the next planet,
                     // instead of going to the next level.
-                    level_idx--;
-                    initChapterSelectMenu(i);
+                    var nextPlanets = [];
+                    for (var j = 0; j < chapters.length; j++) {
+                        if (Resource.isChapterUnlocked(j) && chapters[i].transitions.indexOf(chapters[j].key) > -1 && !completedLevels[chapters[j].startIdx]) {
+                            nextPlanets.push({
+                                chapterIdx: j,
+                                startIdx: chapters[j].startIdx
+                            });
+                        }
+                    }
+                    initChapterSelectMenu(nextPlanets);
                     return;
                 }
             }
 
             // Otherwise...
+            level_idx++;
             initBoard();
         });
     }
@@ -465,21 +506,43 @@ function undo() {
 }
 
 function loadChapterSelect() {
-    /*var sel = document.getElementById("chapterSelect");
-    removeOptions(sel); // clear old options.
-    return Resource.getChapters().then( function(chapters) {
-        chapters.forEach(function (chap) {
+    var sel = document.getElementById("chapterSelect");
+    sel.onchange = gotoChapter;
+    // removeOptions(sel); // clear old options.
+    return Resource.getChapters().then(function (chapters) {
+        chapters.forEach(function (chap, i) {
             var option = document.createElement("option");
-            option.text = chap.description;
+            option.text = (i + 1).toString() + " - " + chap.name + ": " + chap.description;
             option.value = chap.name;
             sel.add(option);
-        });*/
-    return Resource.getChapters();
-    //} );
+        });
+        return Resource.getChapters();
+    });
 }
 function gotoChapter() {
     var sel = document.getElementById('chapterSelect');
     var selected_chapter = sel.options[sel.selectedIndex].value;
     level_idx = Resource.getChapter(selected_chapter).startIdx;
+    resetToLevel(level_idx);
     initBoard();
+}
+
+function resetToLevel(idx) {
+    window.completedLevels = {};
+    level_idx = idx;
+
+    for (var i = 0; i < idx; i++) {
+        window.completedLevels[i] = true;
+    }
+
+    saveProgress();
+    document.cookie = "level_idx=" + level_idx.toString();
+}
+
+function toggleMute() {
+    if (Resource.isMuted()) {
+        Resource.unmute();
+    } else {
+        Resource.mute();
+    }
 }

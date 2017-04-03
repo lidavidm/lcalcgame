@@ -35,7 +35,7 @@ var EnvironmentDisplay = function (_Expression) {
         value: function updateBinding(name, expr) {
             var display = this.bindings[name];
             if (!display) {
-                display = new (ExprManager.getClass('reference_display'))(name, new MissingExpression(new Expression()));
+                display = new this.displayClass(name, new MissingExpression(new Expression()));
                 this.bindings[name] = display;
             }
             display.ignoreEvents = true;
@@ -178,6 +178,11 @@ var EnvironmentDisplay = function (_Expression) {
         get: function get() {
             return _get(EnvironmentDisplay.prototype.__proto__ || Object.getPrototypeOf(EnvironmentDisplay.prototype), "size", this);
         }
+    }, {
+        key: "displayClass",
+        get: function get() {
+            return ExprManager.getClass('reference_display');
+        }
     }]);
 
     return EnvironmentDisplay;
@@ -196,6 +201,9 @@ var SpreadsheetEnvironmentDisplay = function (_EnvironmentDisplay) {
         _this3.maxLabelSize = 30;
         return _this3;
     }
+
+    // This display is -only- compatible with SpreadsheetDisplay.
+
 
     _createClass(SpreadsheetEnvironmentDisplay, [{
         key: "updateBindings",
@@ -247,6 +255,11 @@ var SpreadsheetEnvironmentDisplay = function (_EnvironmentDisplay) {
             ctx.lineTo(this.absolutePos.x + this.maxLabelSize, this.absolutePos.y + this.absoluteSize.h);
             ctx.stroke();
             ctx.restore();
+        }
+    }, {
+        key: "displayClass",
+        get: function get() {
+            return SpreadsheetDisplay;
         }
     }]);
 

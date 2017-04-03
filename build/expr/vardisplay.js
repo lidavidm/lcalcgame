@@ -89,7 +89,7 @@ var DisplayChest = function (_Expression) {
             var size = this._size;
             var scale = this.absoluteScale;
             var offsetX = (boundingSize.w - size.w * scale.x) / 2;
-            ctx.drawImage(ChestImages.lidOpen(this.name), pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
+            ChestImages.lidOpen(this.name).draw(ctx, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
             this.holes[0].pos = {
                 x: this.childPos.x,
                 y: this.childPos.y
@@ -101,7 +101,7 @@ var DisplayChest = function (_Expression) {
             var size = this._size;
             var scale = this.absoluteScale;
             var offsetX = (boundingSize.w - size.w * scale.x) / 2;
-            ctx.drawImage(ChestImages.base(this.name), pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
+            ChestImages.base(this.name).draw(ctx, pos.x + offsetX, pos.y, size.w * scale.x, size.h * scale.y);
         }
     }]);
 

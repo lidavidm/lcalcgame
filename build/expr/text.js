@@ -28,6 +28,7 @@ var TextExpr = function (_ExpressionPlus) {
         _this._yMultiplier = 2.2;
         _this._xOffset = 0;
         _this._sizeOffset = { w: 0, h: 0 };
+        _this._baseline = "alphabetic";
         return _this;
     }
 
@@ -48,6 +49,7 @@ var TextExpr = function (_ExpressionPlus) {
                 ctx.fillText(this.text, (pos.x + this._xOffset) / abs_scale.x, pos.y / abs_scale.y + this._yMultiplier * this.fontSize * this.anchor.y);
                 ctx.restore();
             }
+            ctx.textBaseline = this._baseline;
             ctx.fillText(this.text, (pos.x + this._xOffset) / abs_scale.x, pos.y / abs_scale.y + this._yMultiplier * this.fontSize * this.anchor.y);
             ctx.restore();
         }

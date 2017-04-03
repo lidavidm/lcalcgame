@@ -168,6 +168,9 @@ var mag = function (_) {
                 this._embeddedStage.onmouseup(pos);
             }
         }, {
+            key: 'onorientationchange',
+            value: function onorientationchange() {}
+        }, {
             key: 'clip',
             get: function get() {
                 var c = this._clip;
@@ -262,6 +265,8 @@ var mag = function (_) {
         }, {
             key: 'swap',
             value: function swap(node, anotherNodeOrNodes) {
+                var _this4 = this;
+
                 var i = this.nodes.indexOf(node);
                 if (i > -1) {
 
@@ -302,7 +307,7 @@ var mag = function (_) {
 
                     // Can't duplicate horizontally or we'll go off-screen.
                     // So, duplicate vertically.
-                    if (total_width > GLOBAL_DEFAULT_SCREENSIZE.width) {
+                    if (origpos.x + total_width > this.boundingSize.w) {
                         pos = clonePos(origpos);
                         anotherNode.forEach(function (n) {
                             var p = n.pos;
@@ -311,9 +316,9 @@ var mag = function (_) {
                             pos = addPos({ x: 0, y: an.size.h + 6 }, pos);
                         });
                     }
-                    if (pos.x > GLOBAL_DEFAULT_SCREENSIZE.width) {
+                    if (pos.x > this.boundingSize.w) {
                         (function () {
-                            var offset = pos.x - GLOBAL_DEFAULT_SCREENSIZE.width;
+                            var offset = pos.x - _this4.boundingSize.w;
                             anotherNode.forEach(function (n) {
                                 var p = n.pos;
                                 n.pos = { x: p.x - offset, y: p.y };
@@ -390,7 +395,7 @@ var mag = function (_) {
         }, {
             key: 'draw',
             value: function draw() {
-                var _this4 = this;
+                var _this5 = this;
 
                 // To avoid redundant draws, when someone calls draw, we
                 // instead try to schedule an actual redraw. Another
@@ -401,8 +406,8 @@ var mag = function (_) {
                 if (!this.requested) {
                     this.requested = true;
                     window.requestAnimationFrame(function () {
-                        _this4.drawImpl();
-                        _this4.requested = false;
+                        _this5.drawImpl();
+                        _this5.requested = false;
                     });
                 }
             }
@@ -613,7 +618,7 @@ var mag = function (_) {
             value: function getNodesWithClass(Class) {
                 var excludedNodes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
-                var _this5 = this;
+                var _this6 = this;
 
                 var recursive = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
                 var nodes = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
@@ -627,7 +632,7 @@ var mag = function (_) {
                     });
                     if (excluded) return;else if (n instanceof Class) rt.push(n);
                     if (recursive && n.children.length > 0) {
-                        var childs = _this5.getNodesWithClass(Class, excludedNodes, true, n.children);
+                        var childs = _this6.getNodesWithClass(Class, excludedNodes, true, n.children);
                         childs.forEach(function (c) {
                             return rt.push(c);
                         });
@@ -788,10 +793,44 @@ var mag = function (_) {
             };
 
             // TOUCH EVENTS (MOBILE)
+            if (canvas.listeners) {
+                // Remove prior listeners to prevent events from being
+                // fired multiple times
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
+
+                try {
+                    for (var _iterator = Object.keys(canvas.listeners)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        var key = _step.value;
+
+                        canvas.removeEventListener(key, canvas.listeners[key], false);
+                    }
+                } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion && _iterator.return) {
+                            _iterator.return();
+                        }
+                    } finally {
+                        if (_didIteratorError) {
+                            throw _iteratorError;
+                        }
+                    }
+                }
+            }
             canvas.addEventListener('touchstart', ontouchstart, false);
             canvas.addEventListener('touchmove', ontouchmove, false);
             canvas.addEventListener('touchend', ontouchend, false);
             canvas.addEventListener('touchcancel', ontouchcancel, false);
+            canvas.listeners = {
+                'touchstart': ontouchstart,
+                'touchmove': ontouchmove,
+                'touchend': ontouchend,
+                'touchcancel': ontouchcancel
+            };
         } else {
             canvas.onmousedown = null;
             canvas.onmouseup = null;

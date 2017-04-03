@@ -275,6 +275,7 @@ var BagExpr = function (_CollectionExpr) {
 
             var c = _get(BagExpr.prototype.__proto__ || Object.getPrototypeOf(BagExpr.prototype), 'clone', this).call(this, parent);
             c._items = [];
+            c.graphicNode.removeAllItems();
             this.items.forEach(function (i) {
                 return c.addItem(i.clone());
             });
@@ -456,6 +457,13 @@ var BracketArrayExpr = function (_BagExpr) {
     }, {
         key: 'addItem',
         value: function addItem(item) {
+            if (item instanceof VarExpr || item instanceof VtableVarExpr) {
+                // Reduce variables in our context. This is technically
+                // not correct, but at this point, we have no idea what
+                // the variable's original context was anymore.
+                item.parent = this;
+                item = item.reduce();
+            }
 
             item.onmouseleave();
             item.lock();
@@ -592,10 +600,6 @@ var BracketArrayExpr = function (_BagExpr) {
             var n = node.clone();
             var before_str = this.toString();
             this.addItem(n);
-
-            if (n instanceof VarExpr) {
-                n.performReduction();
-            }
 
             Logger.log('bag-add', { 'before': before_str, 'after': this.toString(), 'item': n.toString() });
 

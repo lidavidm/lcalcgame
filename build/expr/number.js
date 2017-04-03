@@ -59,6 +59,23 @@ var NumberExpr = function (_Expression) {
     return NumberExpr;
 }(Expression);
 
+var FadedNumberExpr = function (_NumberExpr) {
+    _inherits(FadedNumberExpr, _NumberExpr);
+
+    function FadedNumberExpr(num) {
+        _classCallCheck(this, FadedNumberExpr);
+
+        var _this2 = _possibleConstructorReturn(this, (FadedNumberExpr.__proto__ || Object.getPrototypeOf(FadedNumberExpr)).call(this, num));
+
+        _this2.children = [];
+        _this2.holes = [];
+        _this2.addArg(new TextExpr(num.toString()));
+        return _this2;
+    }
+
+    return FadedNumberExpr;
+}(NumberExpr);
+
 var AddExpr = function (_Expression2) {
     _inherits(AddExpr, _Expression2);
 
@@ -80,7 +97,7 @@ var AddExpr = function (_Expression2) {
         key: 'reduce',
         value: function reduce() {
             if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {
-                return new NumberExpr(this.leftExpr.value() + this.rightExpr.value());
+                return new (ExprManager.getClass('number'))(this.leftExpr.value() + this.rightExpr.value());
             } else {
                 return this;
             }
@@ -88,23 +105,23 @@ var AddExpr = function (_Expression2) {
     }, {
         key: 'performReduction',
         value: function performReduction() {
-            var _this3 = this;
+            var _this4 = this;
 
             this._animating = true;
             return this.performSubReduction(this.leftExpr).then(function (left) {
                 if (!(left instanceof NumberExpr)) {
-                    _this3._animating = false;
+                    _this4._animating = false;
                     return Promise.reject();
                 }
-                return _this3.performSubReduction(_this3.rightExpr).then(function (right) {
+                return _this4.performSubReduction(_this4.rightExpr).then(function (right) {
                     if (!(right instanceof NumberExpr)) {
-                        _this3._animating = false;
+                        _this4._animating = false;
                         return Promise.reject();
                     }
 
-                    var stage = _this3.stage;
+                    var stage = _this4.stage;
 
-                    var val = _get(AddExpr.prototype.__proto__ || Object.getPrototypeOf(AddExpr.prototype), 'performReduction', _this3).call(_this3);
+                    var val = _get(AddExpr.prototype.__proto__ || Object.getPrototypeOf(AddExpr.prototype), 'performReduction', _this4).call(_this4);
                     stage.update();
                     return val;
                 });
@@ -167,13 +184,13 @@ var DiceNumber = function (_mag$Rect) {
 
         _classCallCheck(this, DiceNumber);
 
-        var _this4 = _possibleConstructorReturn(this, (DiceNumber.__proto__ || Object.getPrototypeOf(DiceNumber)).call(this, 0, 0, 44, 44));
+        var _this5 = _possibleConstructorReturn(this, (DiceNumber.__proto__ || Object.getPrototypeOf(DiceNumber)).call(this, 0, 0, 44, 44));
 
-        _this4.number = num;
-        _this4.circlePos = DiceNumber.drawPositionsFor(num);
-        _this4.radius = radius;
-        _this4.color = 'black';
-        return _this4;
+        _this5.number = num;
+        _this5.circlePos = DiceNumber.drawPositionsFor(num);
+        _this5.radius = radius;
+        _this5.color = 'black';
+        return _this5;
     }
 
     _createClass(DiceNumber, [{
@@ -184,15 +201,15 @@ var DiceNumber = function (_mag$Rect) {
     }, {
         key: 'drawInternal',
         value: function drawInternal(ctx, pos, boundingSize) {
-            var _this5 = this;
+            var _this6 = this;
 
             if (this.circlePos && this.circlePos.length > 0) {
                 (function () {
 
-                    var rad = _this5.radius * boundingSize.w / _this5.size.w;
-                    var fill = _this5.color;
-                    var stroke = _this5.stroke;
-                    _this5.circlePos.forEach(function (relpos) {
+                    var rad = _this6.radius * boundingSize.w / _this6.size.w;
+                    var fill = _this6.color;
+                    var stroke = _this6.stroke;
+                    _this6.circlePos.forEach(function (relpos) {
                         var drawpos = { x: pos.x + boundingSize.w * relpos.x - rad, y: pos.y + boundingSize.h * relpos.y - rad };
                         drawCircle(ctx, drawpos.x, drawpos.y, rad, fill, stroke);
                     });
