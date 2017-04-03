@@ -233,7 +233,7 @@ var DragPatch = function (_ImageExpr) {
             SET_CURSOR_STYLE(CONST.CURSOR.GRABBING);
 
             var stage = this.stage;
-            var replacement = this.parent.parent.generateNamedExpr(); // DefineExpr -> NamedExpr
+            var replacement = this.parent.parent.generateNamedExpr(); // DefineExpr -> NamedExpr, or PlayPenExpr -> ObjectExtensionExpr
             var ghosted_name = this.parent.clone();
             ghosted_name.scale = this.parent.absoluteScale;
             ghosted_name.pos = this.parent.absolutePos;
@@ -435,6 +435,11 @@ var DefineExpr = function (_ClampExpr) {
         key: 'toString',
         value: function toString() {
             return '(define ' + this.expr.toString() + ')';
+        }
+    }, {
+        key: 'name',
+        get: function get() {
+            return this.funcname;
         }
     }, {
         key: 'expr',

@@ -86,8 +86,12 @@ var ES6Parser = function () {
                 'Identifier': function Identifier(node) {
 
                     // Check if node is a Reduct reserved identifier (MissingExpression)
-                    if (node.name === '_' || node.name === '_b' || node.name === '__') return new (ExprManager.getClass(node.name))();else if (node.name.substring(0, 2) === '_t') {
-                        return TypeInTextExpr.fromExprCode(node.name);
+                    if (node.name === '_' || node.name === '_b' || node.name === '__') {
+                        var missing = new (ExprManager.getClass(node.name))();
+                        missing.__remain_unlocked = true;
+                        return missing;
+                    } else if (node.name.substring(0, 2) === '_t') return TypeInTextExpr.fromExprCode(node.name);else if (node.name === '_notch') {
+                        return new (ExprManager.getClass('notch'))(1);
                     }
 
                     // Otherwise, treat this as a variable name...
@@ -214,11 +218,33 @@ var ES6Parser = function () {
                 */
                 'ClassDeclaration': function ClassDeclaration(node) {
                     var obj = new PlayPenExpr(node.id.name);
-                    var methods = node.body.body.map(function (e) {
+                    var funcs = node.body.body.map(function (e) {
                         return _this2.parseNode(e);
                     });
+                    obj.setMethods(funcs);
                     // TODO: Predefined methods, notches, floating exprs, etc.
                     return obj;
+                },
+                'MethodDefinition': function MethodDefinition(node) {
+                    // This wraps a FunctionExpression for classes:
+                    if (node.key.name === '_notch') // extra notches inside objects
+                        return _this2.parseNode(node.key);
+                    node.value.id = node.key.name; // So that the FunctionExpression node parser knows the name of the function...
+                    return _this2.parseNode(node.value);
+                },
+                'FunctionExpression': function FunctionExpression(node) {
+                    return new DefineExpr(_this2.parseNode(node.body), node.id ? node.id : '???');
+                },
+                'FunctionDeclaration': function FunctionDeclaration(node) {
+                    return new DefineExpr(_this2.parseNode(node.body), node.id ? node.id.name : '???');
+                },
+                'BlockStatement': function BlockStatement(node) {
+                    if (node.body.length === 1 && node.body[0].type === 'ReturnStatement') {
+                        return _this2.parseNode(node.body[0].argument);
+                    } else {
+                        console.error('Block expressions longer than a single return are not yet supported.');
+                        return null;
+                    }
                 }
             };
 

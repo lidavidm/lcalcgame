@@ -142,7 +142,7 @@ class DragPatch extends ImageExpr {
         SET_CURSOR_STYLE(CONST.CURSOR.GRABBING);
 
         let stage = this.stage;
-        let replacement = this.parent.parent.generateNamedExpr(); // DefineExpr -> NamedExpr
+        let replacement = this.parent.parent.generateNamedExpr(); // DefineExpr -> NamedExpr, or PlayPenExpr -> ObjectExtensionExpr
         let ghosted_name = this.parent.clone();
         ghosted_name.scale = this.parent.absoluteScale;
         ghosted_name.pos = this.parent.absolutePos;
@@ -207,6 +207,7 @@ class DefineExpr extends ClampExpr {
             this.children[0].removeChild(this.children[0].children[1]);
         }
     }
+    get name() { return this.funcname; }
     get expr() { return this.children[1]; }
     get constructorArgs() { return [ this.expr.clone() ]; }
     generateNamedExpr() {

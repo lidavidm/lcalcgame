@@ -40,6 +40,7 @@ var ReductStage = function (_mag$Stage) {
                 // If one text box is on the screen, focus it!
                 textboxes[0].focus();
             }
+            this.update();
         }
 
         // Save state of game board and push onto undo stack.

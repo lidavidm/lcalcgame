@@ -55,7 +55,7 @@ class Level {
         const usableWidth = canvas_screen.w - (showEnvironment ? envDisplayWidth : 0);
         const screenOffsetX = usableWidth * (1 - 1/1.4) / 2.0;
         var screen = {
-            height: canvas_screen.h/1.4 - 90,
+            height: canvas_screen.h/1.2 - 90,
             width: showEnvironment ? usableWidth - 2 * screenOffsetX : usableWidth/1.4,
             y: canvas_screen.h*0.2,
             x: showEnvironment ? screenOffsetX : ((usableWidth*(1-1/1.4)) / 2.0),

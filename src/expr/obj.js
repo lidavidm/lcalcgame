@@ -3,7 +3,7 @@
  * It's a pen because you can't drag expressions _out_!
  */
 class PlayPenExpr extends ExpressionPlus {
-    constructor(name) {
+    constructor(name, numNotches=2) {
 
         let txt_input = new Expression([ new TextExpr(name ? name : 'obj') ]); // TODO: Make this text input field (or dropdown menu).
         txt_input.color = '#B3E389';
@@ -13,23 +13,88 @@ class PlayPenExpr extends ExpressionPlus {
 
         this.padding = { left:16, top:txt_input.size.h + 4, right:2, bottom:10, inner:8 };
 
-        let pen = new PlayPen(this.padding.left, this.padding.top, 220-this.padding.left*2, 220-this.padding.top*2);
+        let pen = new PlayPen(this.padding.left, this.padding.top, 220-this.padding.left*2, 120+100*numNotches-this.padding.top*2);
         this.addChild(pen);
         this.pen = pen;
 
         this.color = 'YellowGreen';
         this.notches = [new WedgeNotch('left', 10, 10, 0.8, true)]; // notch in left side near top.
+        this._origNotchLen = 0.25 * (this.size.h-this.radius*2);
 
                         //new WedgeNotch('left', 10, 10, 0.2, true),
                         //new WedgeNotch('right', 10, 10, 0.5, false)];  // for testing
 
-        let inner_hanger = new NotchHangerExpr(2);
+        if (!numNotches || numNotches <= 0) numNotches = 2;
+
+        let inner_hanger = new NotchHangerExpr(numNotches);
         inner_hanger.pos = { x:this.padding.left, y:30 };
         inner_hanger.color = this.color;
+        this.hanger = inner_hanger;
 
         pen.addToPen(inner_hanger);
 
         this.update();
+    }
+
+    // 'Define'ing by connecting to notch.
+    get nameExpr() { return this.children[0]; }
+    get methods() {
+        let defined = this.pen.innerStage.getNodesWithClass(DefineExpr).filter((e) => (e.isSnapped()));
+        let res = {};
+        for (let i = 0; i < defined.length; i++) {
+            let e = defined[i];
+            let reduce = (obj) => {
+                this.lock();
+                return e.generateNamedExpr().reduce();
+            };
+            res[defined[i].name] = reduce; // for now
+        }
+        return res;
+    }
+    setMethods(defineExprs) { // Used during parse setup, if there's preset methods to attach.
+        if (!defineExprs || defineExprs.length === 0) return;
+        // Make sure # of notches in hanger matches is enough to attach the number of predefined methods.
+        let addedNotchCount = defineExprs.filter((e) => (e instanceof NotchHangerExpr)).length;
+        this.hanger.numNotches = defineExprs.length + addedNotchCount;
+        defineExprs = defineExprs.filter((e) => (e instanceof DefineExpr));
+        let lastDef = null;
+        defineExprs.forEach((e, i) => {
+            if (!e) {
+                console.warn('@ PlayPenExpr.setMethods: Expression is ', e, ' (Continuing....)');
+            } else {
+                this.pen.addToPen(e); // Add the DefineExpr to the stage.
+                e.onSnap(this.hanger.notches[i], this.hanger, e.notches[0], false); // Artifically snap together, and don't animate.
+                e.lock();
+                e.lockSubexpressions();
+                lastDef = e;
+            }
+        });
+        this.update();
+    }
+    onSnap(otherNotch, otherExpr, thisNotch) {
+        super.onSnap(otherNotch, otherExpr, thisNotch);
+        if (this.nameExpr.holes.length === 1) {
+            let drag_patch = new DragPatch(0, 0, 42, 52);
+            this.nameExpr.addChild(drag_patch);
+            this.nameExpr.update();
+        }
+    }
+    onDisconnect() {
+        if (this.nameExpr.holes.length > 1) {
+            this.nameExpr.removeChild(this.nameExpr.children[1]);
+        }
+    }
+    generateNamedExpr() {
+        let funcname = this.nameExpr.children[0].text;
+        let txt = this.nameExpr.children[0].clone();
+        txt.fontSize = 22;
+        txt._yMultiplier = 3.2;
+        txt._xOffset = 10;
+
+        // Return named object (expression).
+        let obj = new ObjectExtensionExpr(txt, this.methods);
+        obj.color = 'YellowGreen';
+        return obj;
     }
 
     get size() {
@@ -67,6 +132,7 @@ class PlayPenExpr extends ExpressionPlus {
             let len = fromTo(prev_pos, pos);
             this._prev_pos = clonePos(pos);
             this.pen.size = { w:this.pen.size.w + len.x, h:this.pen.size.h+len.y };
+            this.notches[0].relpos = 1.0 - this._origNotchLen / this.size.h;
         }
         else {
             super.onmousedrag(pos);
@@ -525,7 +591,7 @@ class DropdownSelect extends mag.Rect {
     }
 
     expand(animated=false) {
-        if (this.cells.length <= 1) return;
+        if (this.cells.length <= 1) { }
         else if (animated) {
             const FADE_TIME = 100;
             let waittime = 0;
@@ -551,12 +617,14 @@ class DropdownSelect extends mag.Rect {
             this.resize();
             this.stage.draw();
         }
+        this._expanded = true;
     }
     close() {
         this.children = this.cells.slice(0, 1);
         this.resize();
         this.relayoutCells();
         this.stage.draw();
+        this._expanded = false;
     }
 
     clicked(cell) {
@@ -564,7 +632,7 @@ class DropdownSelect extends mag.Rect {
         if (cellIdx < 0 || cellIdx >= this.cells.length) {
             console.error('@ DropdownSelect: Cell index out of range.');
             return;
-        } else if (this.children.length === 1) { // closed. do nothing
+        } else if (!this._expanded) { // closed. do nothing
             this.expand(false);
             return;
         }

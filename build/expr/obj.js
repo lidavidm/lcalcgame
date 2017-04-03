@@ -2,9 +2,9 @@
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
 var _set = function set(object, property, value, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent !== null) { set(parent, property, value, receiver); } } else if ("value" in desc && desc.writable) { desc.value = value; } else { var setter = desc.set; if (setter !== undefined) { setter.call(receiver, value); } } return value; };
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
@@ -23,6 +23,8 @@ var PlayPenExpr = function (_ExpressionPlus) {
     _inherits(PlayPenExpr, _ExpressionPlus);
 
     function PlayPenExpr(name) {
+        var numNotches = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
+
         _classCallCheck(this, PlayPenExpr);
 
         var txt_input = new Expression([new TextExpr(name ? name : 'obj')]); // TODO: Make this text input field (or dropdown menu).
@@ -34,19 +36,23 @@ var PlayPenExpr = function (_ExpressionPlus) {
 
         _this.padding = { left: 16, top: txt_input.size.h + 4, right: 2, bottom: 10, inner: 8 };
 
-        var pen = new PlayPen(_this.padding.left, _this.padding.top, 220 - _this.padding.left * 2, 220 - _this.padding.top * 2);
+        var pen = new PlayPen(_this.padding.left, _this.padding.top, 220 - _this.padding.left * 2, 120 + 100 * numNotches - _this.padding.top * 2);
         _this.addChild(pen);
         _this.pen = pen;
 
         _this.color = 'YellowGreen';
         _this.notches = [new WedgeNotch('left', 10, 10, 0.8, true)]; // notch in left side near top.
+        _this._origNotchLen = 0.25 * (_this.size.h - _this.radius * 2);
 
         //new WedgeNotch('left', 10, 10, 0.2, true),
         //new WedgeNotch('right', 10, 10, 0.5, false)];  // for testing
 
-        var inner_hanger = new NotchHangerExpr(2);
+        if (!numNotches || numNotches <= 0) numNotches = 2;
+
+        var inner_hanger = new NotchHangerExpr(numNotches);
         inner_hanger.pos = { x: _this.padding.left, y: 30 };
         inner_hanger.color = _this.color;
+        _this.hanger = inner_hanger;
 
         pen.addToPen(inner_hanger);
 
@@ -54,7 +60,70 @@ var PlayPenExpr = function (_ExpressionPlus) {
         return _this;
     }
 
+    // 'Define'ing by connecting to notch.
+
+
     _createClass(PlayPenExpr, [{
+        key: 'setMethods',
+        value: function setMethods(defineExprs) {
+            var _this2 = this;
+
+            // Used during parse setup, if there's preset methods to attach.
+            if (!defineExprs || defineExprs.length === 0) return;
+            // Make sure # of notches in hanger matches is enough to attach the number of predefined methods.
+            var addedNotchCount = defineExprs.filter(function (e) {
+                return e instanceof NotchHangerExpr;
+            }).length;
+            this.hanger.numNotches = defineExprs.length + addedNotchCount;
+            defineExprs = defineExprs.filter(function (e) {
+                return e instanceof DefineExpr;
+            });
+            var lastDef = null;
+            defineExprs.forEach(function (e, i) {
+                if (!e) {
+                    console.warn('@ PlayPenExpr.setMethods: Expression is ', e, ' (Continuing....)');
+                } else {
+                    _this2.pen.addToPen(e); // Add the DefineExpr to the stage.
+                    e.onSnap(_this2.hanger.notches[i], _this2.hanger, e.notches[0], false); // Artifically snap together, and don't animate.
+                    e.lock();
+                    e.lockSubexpressions();
+                    lastDef = e;
+                }
+            });
+            this.update();
+        }
+    }, {
+        key: 'onSnap',
+        value: function onSnap(otherNotch, otherExpr, thisNotch) {
+            _get(PlayPenExpr.prototype.__proto__ || Object.getPrototypeOf(PlayPenExpr.prototype), 'onSnap', this).call(this, otherNotch, otherExpr, thisNotch);
+            if (this.nameExpr.holes.length === 1) {
+                var drag_patch = new DragPatch(0, 0, 42, 52);
+                this.nameExpr.addChild(drag_patch);
+                this.nameExpr.update();
+            }
+        }
+    }, {
+        key: 'onDisconnect',
+        value: function onDisconnect() {
+            if (this.nameExpr.holes.length > 1) {
+                this.nameExpr.removeChild(this.nameExpr.children[1]);
+            }
+        }
+    }, {
+        key: 'generateNamedExpr',
+        value: function generateNamedExpr() {
+            var funcname = this.nameExpr.children[0].text;
+            var txt = this.nameExpr.children[0].clone();
+            txt.fontSize = 22;
+            txt._yMultiplier = 3.2;
+            txt._xOffset = 10;
+
+            // Return named object (expression).
+            var obj = new ObjectExtensionExpr(txt, this.methods);
+            obj.color = 'YellowGreen';
+            return obj;
+        }
+    }, {
         key: 'update',
         value: function update() {
             _get(PlayPenExpr.prototype.__proto__ || Object.getPrototypeOf(PlayPenExpr.prototype), 'update', this).call(this);
@@ -89,6 +158,7 @@ var PlayPenExpr = function (_ExpressionPlus) {
                 var len = fromTo(prev_pos, pos);
                 this._prev_pos = clonePos(pos);
                 this.pen.size = { w: this.pen.size.w + len.x, h: this.pen.size.h + len.y };
+                this.notches[0].relpos = 1.0 - this._origNotchLen / this.size.h;
             } else {
                 _get(PlayPenExpr.prototype.__proto__ || Object.getPrototypeOf(PlayPenExpr.prototype), 'onmousedrag', this).call(this, pos);
 
@@ -132,6 +202,35 @@ var PlayPenExpr = function (_ExpressionPlus) {
         // }
 
     }, {
+        key: 'nameExpr',
+        get: function get() {
+            return this.children[0];
+        }
+    }, {
+        key: 'methods',
+        get: function get() {
+            var _this3 = this;
+
+            var defined = this.pen.innerStage.getNodesWithClass(DefineExpr).filter(function (e) {
+                return e.isSnapped();
+            });
+            var res = {};
+
+            var _loop = function _loop(i) {
+                var e = defined[i];
+                var reduce = function reduce(obj) {
+                    _this3.lock();
+                    return e.generateNamedExpr().reduce();
+                };
+                res[defined[i].name] = reduce; // for now
+            };
+
+            for (var i = 0; i < defined.length; i++) {
+                _loop(i);
+            }
+            return res;
+        }
+    }, {
         key: 'size',
         get: function get() {
             return { w: this.pen.size.w + this.padding.left * 2, h: this.pen.size.h + this.padding.top + this.padding.bottom };
@@ -151,13 +250,13 @@ var PlayPenStage = function (_mag$StageNode) {
     function PlayPenStage(x, y, w, h) {
         _classCallCheck(this, PlayPenStage);
 
-        var _this2 = _possibleConstructorReturn(this, (PlayPenStage.__proto__ || Object.getPrototypeOf(PlayPenStage)).call(this, x, y, new ReductStage(null), null));
+        var _this4 = _possibleConstructorReturn(this, (PlayPenStage.__proto__ || Object.getPrototypeOf(PlayPenStage)).call(this, x, y, new ReductStage(null), null));
 
-        _this2._size = { w: w, h: h };
-        _this2._isCanvasSetup = false;
-        _this2.embeddedStage.color = "gray";
-        _this2.shadowOffset = 0;
-        return _this2;
+        _this4._size = { w: w, h: h };
+        _this4._isCanvasSetup = false;
+        _this4.embeddedStage.color = "gray";
+        _this4.shadowOffset = 0;
+        return _this4;
     }
 
     _createClass(PlayPenStage, [{
@@ -213,11 +312,11 @@ var PlayPenRect = function (_mag$Rect) {
     function PlayPenRect(x, y, w, h) {
         _classCallCheck(this, PlayPenRect);
 
-        var _this3 = _possibleConstructorReturn(this, (PlayPenRect.__proto__ || Object.getPrototypeOf(PlayPenRect)).call(this, x, y, w, h));
+        var _this5 = _possibleConstructorReturn(this, (PlayPenRect.__proto__ || Object.getPrototypeOf(PlayPenRect)).call(this, x, y, w, h));
 
-        _this3.color = '#444';
-        _this3.addChild(new PlayPenStage(0, 0, w / 2, h / 2));
-        return _this3;
+        _this5.color = '#444';
+        _this5.addChild(new PlayPenStage(0, 0, w / 2, h / 2));
+        return _this5;
     }
 
     return PlayPenRect;
@@ -229,17 +328,17 @@ var PlayPen = function (_mag$RoundedRect) {
     function PlayPen(x, y, w, h) {
         _classCallCheck(this, PlayPen);
 
-        var _this4 = _possibleConstructorReturn(this, (PlayPen.__proto__ || Object.getPrototypeOf(PlayPen)).call(this, x, y, w, h, 12));
+        var _this6 = _possibleConstructorReturn(this, (PlayPen.__proto__ || Object.getPrototypeOf(PlayPen)).call(this, x, y, w, h, 12));
 
-        _this4.color = '#444';
-        _this4.shadowOffset = -2;
+        _this6.color = '#444';
+        _this6.shadowOffset = -2;
 
         var pps = new PlayPenStage(0, 0, 200, 200);
-        pps.embeddedStage.color = _this4.color;
-        _this4.addChild(pps);
-        _this4.pps = pps;
-        _this4.innerStage = pps.embeddedStage;
-        return _this4;
+        pps.embeddedStage.color = _this6.color;
+        _this6.addChild(pps);
+        _this6.pps = pps;
+        _this6.innerStage = pps.embeddedStage;
+        return _this6;
     }
 
     _createClass(PlayPen, [{
@@ -365,14 +464,14 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
     function ObjectExtensionExpr(baseExpr, objMethods) {
         _classCallCheck(this, ObjectExtensionExpr);
 
-        var _this5 = _possibleConstructorReturn(this, (ObjectExtensionExpr.__proto__ || Object.getPrototypeOf(ObjectExtensionExpr)).call(this, [baseExpr]));
+        var _this7 = _possibleConstructorReturn(this, (ObjectExtensionExpr.__proto__ || Object.getPrototypeOf(ObjectExtensionExpr)).call(this, [baseExpr]));
 
-        _this5.padding = { left: 0, inner: 0, right: 0 }; // don't pad the base expression
+        _this7.padding = { left: 0, inner: 0, right: 0 }; // don't pad the base expression
         baseExpr.lock();
 
-        _this5._subexpScale = 1.0; // don't scale subexpressions
-        _this5.radius = 8;
-        _this5.update();
+        _this7._subexpScale = 1.0; // don't scale subexpressions
+        _this7.radius = 8;
+        _this7.update();
 
         // objDefinition follows the format:
         // ---------------------------------
@@ -386,18 +485,18 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
         // }
 
         var onCellSelect = function onCellSelect(cell) {
-            _this5.setExtension(cell.children[0].text.replace('.', '').split('(')[0], cell.children[0]._reduceMethod);
+            _this7.setExtension(cell.children[0].text.replace('.', '').split('(')[0], cell.children[0]._reduceMethod);
         };
 
         // Make pullout-drawer:
-        var drawer = new PulloutDrawer(_this5.size.w, _this5.size.h / 2, 8, 32, objMethods, onCellSelect);
+        var drawer = new PulloutDrawer(_this7.size.w, _this7.size.h / 2, 8, 32, objMethods, onCellSelect);
         drawer.anchor = { x: 0, y: 0.32 };
-        _this5.addChild(drawer);
-        _this5.drawer = drawer;
-        _this5.objMethods = objMethods;
+        _this7.addChild(drawer);
+        _this7.drawer = drawer;
+        _this7.objMethods = objMethods;
         // TBI
 
-        return _this5;
+        return _this7;
     }
 
     _createClass(ObjectExtensionExpr, [{
@@ -537,7 +636,7 @@ var ArrayObjectExpr = function (_ObjectExtensionExpr) {
 
         _classCallCheck(this, ArrayObjectExpr);
 
-        var _this6 = _possibleConstructorReturn(this, (ArrayObjectExpr.__proto__ || Object.getPrototypeOf(ArrayObjectExpr)).call(this, baseArray, { // Reduce methods for the submethods of the object.
+        var _this8 = _possibleConstructorReturn(this, (ArrayObjectExpr.__proto__ || Object.getPrototypeOf(ArrayObjectExpr)).call(this, baseArray, { // Reduce methods for the submethods of the object.
             'pop': function pop(arrayExpr) {
                 if (arrayExpr.items.length === 0) return arrayExpr; // TODO: This should return undefined.
                 var item = arrayExpr.items[0].clone();
@@ -564,17 +663,17 @@ var ArrayObjectExpr = function (_ObjectExtensionExpr) {
             } }));
 
         if (baseArray instanceof CollectionExpr) baseArray.disableSpill();
-        _this6.color = 'YellowGreen';
+        _this8.color = 'YellowGreen';
 
-        if (!defaultMethodCall) {} else if (defaultMethodCall in _this6.objMethods) {
-            _this6.setExtension(defaultMethodCall); // TODO: method args
+        if (!defaultMethodCall) {} else if (defaultMethodCall in _this8.objMethods) {
+            _this8.setExtension(defaultMethodCall); // TODO: method args
         } else {
                 console.error('@ ArrayObjectExpr: Method call ' + defaultMethodCall + ' not a possible member of the object.');
             }
 
-        _this6.defaultMethodCall = defaultMethodCall;
-        _this6.defaultMethodArgs = defaultMethodArgs;
-        return _this6;
+        _this8.defaultMethodCall = defaultMethodCall;
+        _this8.defaultMethodArgs = defaultMethodArgs;
+        return _this8;
     }
 
     _createClass(ArrayObjectExpr, [{
@@ -602,21 +701,21 @@ var DropdownCell = function (_mag$Rect2) {
     function DropdownCell(x, y, w, h, subexpr, onclick, color, highlightColor) {
         _classCallCheck(this, DropdownCell);
 
-        var _this7 = _possibleConstructorReturn(this, (DropdownCell.__proto__ || Object.getPrototypeOf(DropdownCell)).call(this, x, y, w, h));
+        var _this9 = _possibleConstructorReturn(this, (DropdownCell.__proto__ || Object.getPrototypeOf(DropdownCell)).call(this, x, y, w, h));
 
-        _this7.shadowOffset = 0;
-        _this7.color = color;
-        _this7.origColor = color;
-        _this7.highlightColor = highlightColor;
+        _this9.shadowOffset = 0;
+        _this9.color = color;
+        _this9.origColor = color;
+        _this9.highlightColor = highlightColor;
         if (subexpr instanceof Expression) {
             if (subexpr instanceof TextExpr) {
                 subexpr.pos = { x: w / 20, y: h / 2 + 22 / 4 };
                 subexpr.fontSize = 22;
             }
-            _this7.addChild(subexpr);
+            _this9.addChild(subexpr);
         }
-        _this7.onclick = onclick;
-        return _this7;
+        _this9.onclick = onclick;
+        return _this9;
     }
 
     _createClass(DropdownCell, [{
@@ -647,39 +746,39 @@ var DropdownSelect = function (_mag$Rect3) {
 
         _classCallCheck(this, DropdownSelect);
 
-        var _this8 = _possibleConstructorReturn(this, (DropdownSelect.__proto__ || Object.getPrototypeOf(DropdownSelect)).call(this, x, y, cellW, startExpanded ? cellH * exprs.length : cellH));
+        var _this10 = _possibleConstructorReturn(this, (DropdownSelect.__proto__ || Object.getPrototypeOf(DropdownSelect)).call(this, x, y, cellW, startExpanded ? cellH * exprs.length : cellH));
 
-        _this8.highColor = highColor;
-        _this8.lowColor = lowColor;
+        _this10.highColor = highColor;
+        _this10.lowColor = lowColor;
 
         // Create cells + add:
-        _this8.cells = [];
+        _this10.cells = [];
         var cellX = 0;
         var cellY = 0;
         for (var i = 0; i < exprs.length; i++) {
             var cellColor = i % 2 === 0 ? lowColor : highColor;
             var onclick = function onclick(cell) {
-                return _this8.clicked(cell);
+                return _this10.clicked(cell);
             };
             var cell = new DropdownCell(cellX, cellY, cellW, cellH, exprs[i], onclick, cellColor, highlightColor);
-            _this8.cells.push(cell);
-            if (startExpanded || i === 0) _this8.addChild(cell);
+            _this10.cells.push(cell);
+            if (startExpanded || i === 0) _this10.addChild(cell);
             cellY += cellH;
         }
 
-        _this8.onCellClick = onCellClick;
-        return _this8;
+        _this10.onCellClick = onCellClick;
+        return _this10;
     }
 
     _createClass(DropdownSelect, [{
         key: 'relayoutCells',
         value: function relayoutCells() {
-            var _this9 = this;
+            var _this11 = this;
 
             var cellX = 0;
             var cellY = 0;
             this.cells.forEach(function (c, i) {
-                c.origColor = c.color = i % 2 === 0 ? _this9.lowColor : _this9.highColor;
+                c.origColor = c.color = i % 2 === 0 ? _this11.lowColor : _this11.highColor;
                 c.pos = { x: cellX, y: cellY };
                 cellY += c.size.h;
             });
@@ -693,28 +792,28 @@ var DropdownSelect = function (_mag$Rect3) {
     }, {
         key: 'expand',
         value: function expand() {
-            var _this10 = this;
+            var _this12 = this;
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-            if (this.cells.length <= 1) return;else if (animated) {
+            if (this.cells.length <= 1) {} else if (animated) {
                 (function () {
                     var FADE_TIME = 100;
                     var waittime = 0;
-                    _this10.cells.slice(1).forEach(function (c, i) {
+                    _this12.cells.slice(1).forEach(function (c, i) {
                         c.opacity = 0;
                         Animate.wait(waittime).after(function () {
                             Animate.tween(c, { opacity: 1.0 }, FADE_TIME, function (e) {
-                                _this10.stage.draw();
+                                _this12.stage.draw();
                                 return e;
                             }).after(function () {
                                 c.opacity = 1.0;
-                                _this10.resize();
-                                _this10.stage.draw();
+                                _this12.resize();
+                                _this12.stage.draw();
                             });
                         });
                         waittime += FADE_TIME;
-                        _this10.children[i + 1] = c;
+                        _this12.children[i + 1] = c;
                     });
                 })();
             } else {
@@ -723,6 +822,7 @@ var DropdownSelect = function (_mag$Rect3) {
                 this.resize();
                 this.stage.draw();
             }
+            this._expanded = true;
         }
     }, {
         key: 'close',
@@ -731,6 +831,7 @@ var DropdownSelect = function (_mag$Rect3) {
             this.resize();
             this.relayoutCells();
             this.stage.draw();
+            this._expanded = false;
         }
     }, {
         key: 'clicked',
@@ -739,7 +840,7 @@ var DropdownSelect = function (_mag$Rect3) {
             if (cellIdx < 0 || cellIdx >= this.cells.length) {
                 console.error('@ DropdownSelect: Cell index out of range.');
                 return;
-            } else if (this.children.length === 1) {
+            } else if (!this._expanded) {
                 // closed. do nothing
                 this.expand(false);
                 return;
@@ -766,10 +867,10 @@ var PulloutDrawerHandle = function (_mag$ImageRect) {
     function PulloutDrawerHandle(x, y, w, h, onclick) {
         _classCallCheck(this, PulloutDrawerHandle);
 
-        var _this11 = _possibleConstructorReturn(this, (PulloutDrawerHandle.__proto__ || Object.getPrototypeOf(PulloutDrawerHandle)).call(this, x, y, w, h, 'handle'));
+        var _this13 = _possibleConstructorReturn(this, (PulloutDrawerHandle.__proto__ || Object.getPrototypeOf(PulloutDrawerHandle)).call(this, x, y, w, h, 'handle'));
 
-        _this11.onclick = onclick;
-        return _this11;
+        _this13.onclick = onclick;
+        return _this13;
     }
 
     // Events
@@ -803,23 +904,23 @@ var PulloutDrawer = function (_mag$Rect4) {
     function PulloutDrawer(x, y, w, h, propertyTree, onCellSelect) {
         _classCallCheck(this, PulloutDrawer);
 
-        var _this12 = _possibleConstructorReturn(this, (PulloutDrawer.__proto__ || Object.getPrototypeOf(PulloutDrawer)).call(this, x, y, w, h));
+        var _this14 = _possibleConstructorReturn(this, (PulloutDrawer.__proto__ || Object.getPrototypeOf(PulloutDrawer)).call(this, x, y, w, h));
 
-        _this12.color = null;
+        _this14.color = null;
 
         var onclick = function onclick() {
-            if (_this12.isOpen) _this12.close();else _this12.open();
+            if (_this14.isOpen) _this14.close();else _this14.open();
         };
 
         var cellBg = new mag.Rect(0, 0, 0, h);
         cellBg.color = "Green";
         cellBg.ignoreEvents = true;
-        _this12.addChild(cellBg);
-        _this12.cellBg = cellBg;
+        _this14.addChild(cellBg);
+        _this14.cellBg = cellBg;
 
         var handle = new PulloutDrawerHandle(0, 0, w, h, onclick);
-        _this12.addChild(handle);
-        _this12.handle = handle;
+        _this14.addChild(handle);
+        _this14.handle = handle;
 
         // Generate TextExpr for each property:
         var txts = [];
@@ -837,9 +938,9 @@ var PulloutDrawer = function (_mag$Rect4) {
                 txts.push(t);
             }
         }
-        _this12.txts = txts;
-        _this12.onCellSelect = onCellSelect;
-        return _this12;
+        _this14.txts = txts;
+        _this14.onCellSelect = onCellSelect;
+        return _this14;
     }
 
     // Open the drawer
@@ -848,7 +949,7 @@ var PulloutDrawer = function (_mag$Rect4) {
     _createClass(PulloutDrawer, [{
         key: 'open',
         value: function open() {
-            var _this13 = this;
+            var _this15 = this;
 
             var DUR = 300;
             var W = 130;
@@ -861,9 +962,9 @@ var PulloutDrawer = function (_mag$Rect4) {
             Animate.wait(DUR).after(function () {
 
                 // Open the dropdown box.
-                var dropdown = new DropdownSelect(0, 0, W, cellsize.h, _this13.txts, _this13.onCellSelect, "YellowGreen", "MediumSeaGreen", "PaleGreen", false);
-                _this13.addChild(dropdown);
-                _this13.dropdown = dropdown;
+                var dropdown = new DropdownSelect(0, 0, W, cellsize.h, _this15.txts, _this15.onCellSelect, "YellowGreen", "MediumSeaGreen", "PaleGreen", false);
+                _this15.addChild(dropdown);
+                _this15.dropdown = dropdown;
                 dropdown.expand(true);
             });
             Resource.play('drawer-open');

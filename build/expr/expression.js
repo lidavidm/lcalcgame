@@ -646,7 +646,7 @@ var Expression = function (_mag$RoundedRect) {
             }
             var side = notch.side;
             var pos = this.upperLeftPos(this.pos, this.size);
-            if (side === 'left') return { x: pos.x, y: pos.y + this.radius + (this.size.h - this.radius) * (1 - notch.relpos) };else if (side === 'right') return { x: pos.x + this.size.w, y: pos.y + this.radius + (this.size.h - this.radius * 2) * notch.relpos };else if (side === 'top') return { x: pos.x + this.radius + (this.size.w - this.radius * 2) * notch.relpos, y: pos.y };else if (side === 'bottom') return { x: pos.x + this.radius + (this.size.w - this.radius * 2) * (1 - notch.relpos), y: pos.y + this.size.h };
+            if (side === 'left') return { x: pos.x, y: pos.y + (this.radius + (this.size.h - this.radius) * (1 - notch.relpos)) * this.scale.y };else if (side === 'right') return { x: pos.x + this.size.w * this.scale.x, y: pos.y + (this.radius + (this.size.h - this.radius * 2) * notch.relpos) * this.scale.y };else if (side === 'top') return { x: pos.x + this.radius + (this.size.w - this.radius * 2) * notch.relpos, y: pos.y };else if (side === 'bottom') return { x: pos.x + this.radius + (this.size.w - this.radius * 2) * (1 - notch.relpos), y: pos.y + this.size.h };
         }
         // Given another expression and one of its notches,
         // determine whether there's a compatible notch on this expression.
@@ -761,6 +761,8 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'onSnap',
         value: function onSnap(otherNotch, otherExpr, thisNotch) {
+            var animated = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+
             Notch.pair(thisNotch, this, otherNotch, otherExpr);
 
             this.anchor = { x: 0, y: 0 };
@@ -771,8 +773,10 @@ var Expression = function (_mag$RoundedRect) {
             //let nodeNotchDistY = this.getNotchPos(thisNotch).y - this.pos.y;
             //this.pos = { x:notchPos.x, y:notchPos.y - nodeNotchDistY };
             //this.stroke = null;
-            Animate.blink(this, 500, [1, 0, 1], 1);
-            Animate.blink(otherExpr, 500, [1, 0, 1], 1);
+            if (animated) {
+                Animate.blink(this, 500, [1, 0, 1], 1);
+                Animate.blink(otherExpr, 500, [1, 0, 1], 1);
+            }
         }
     }, {
         key: 'onDisconnect',

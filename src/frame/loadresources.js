@@ -195,7 +195,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAnimation('poof', [0, 4], 120); // Cloud 'poof' animation for destructor piece.
 
     // Add levels here: (for now)
-    var chapter_load_prom = loadChaptersFromFiles( ['define', 'intro_typing', 'intro_obj', 'intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map', 'assign', 'sequence'] );
+    var chapter_load_prom = loadChaptersFromFiles( ['define2', 'intro_obj2', 'intro_typing', 'intro_obj', 'intro', 'booleans', 'conditionals', 'bindings', 'bags', 'combination', 'map', 'assign', 'sequence'] );
 
     Resource.startChapter = (chapterName, canvas) => {
         for (let i = 0; i < chapters.length; i++) {

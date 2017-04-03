@@ -215,18 +215,16 @@ function __DEBUG_TESTBED(stage) {
     def.pos = { x:300, y:400 };
     stage.add(def);
 
-    let n = new NewInstanceExpr();
-    n.pos = { x:0, y:200 };
-    stage.add(n);
+    // let n = new NewInstanceExpr();
+    // n.pos = { x:0, y:200 };
+    // stage.add(n);
 
-    let hanger = new NotchHangerExpr(1);
-    let hanger2 = new NotchHangerExpr(1);
-    hanger.pos = { x:0, y:80 };
-    hanger2.pos = { x:0, y:280 };
-    stage.add(hanger);
-    stage.add(hanger2);
-
-    console.warn(ES6Parser.parse('(x) => x; ("star" == true);'));
+    // let hanger = new NotchHangerExpr(1);
+    // let hanger2 = new NotchHangerExpr(1);
+    // hanger.pos = { x:0, y:80 };
+    // hanger2.pos = { x:0, y:280 };
+    // stage.add(hanger);
+    // stage.add(hanger2);
 
     /*
     let substage = new mag.StageNode(0, 0, Resource.buildLevel(Resource.level[10], canvas), canvas);

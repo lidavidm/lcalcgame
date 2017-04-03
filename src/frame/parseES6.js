@@ -63,10 +63,14 @@ class ES6Parser {
             'Identifier': (node) => {
 
                 // Check if node is a Reduct reserved identifier (MissingExpression)
-                if (node.name === '_' || node.name === '_b' || node.name === '__')
-                    return new (ExprManager.getClass(node.name))();
-                else if (node.name.substring(0, 2) === '_t') {
+                if (node.name === '_' || node.name === '_b' || node.name === '__') {
+                    let missing = new (ExprManager.getClass(node.name))();
+                    missing.__remain_unlocked = true;
+                    return missing;
+                } else if (node.name.substring(0, 2) === '_t')
                     return TypeInTextExpr.fromExprCode(node.name);
+                else if (node.name === '_notch') {
+                    return new (ExprManager.getClass('notch'))(1);
                 }
 
                 // Otherwise, treat this as a variable name...
@@ -187,9 +191,30 @@ class ES6Parser {
             */
             'ClassDeclaration': (node) => {
                 let obj = new PlayPenExpr(node.id.name);
-                let methods = node.body.body.map((e) => this.parseNode(e));
+                let funcs = node.body.body.map((e) => this.parseNode(e));
+                obj.setMethods(funcs);
                 // TODO: Predefined methods, notches, floating exprs, etc.
                 return obj;
+            },
+            'MethodDefinition': (node) => { // This wraps a FunctionExpression for classes:
+                if (node.key.name === '_notch') // extra notches inside objects
+                    return this.parseNode(node.key);
+                node.value.id = node.key.name; // So that the FunctionExpression node parser knows the name of the function...
+                return this.parseNode(node.value);
+            },
+            'FunctionExpression': (node) => {
+                return new DefineExpr(this.parseNode(node.body), node.id ? node.id : '???');
+            },
+            'FunctionDeclaration': (node) => {
+                return new DefineExpr(this.parseNode(node.body), node.id ? node.id.name : '???');
+            },
+            'BlockStatement': (node) => {
+                if (node.body.length === 1 && node.body[0].type === 'ReturnStatement') {
+                    return this.parseNode(node.body[0].argument);
+                } else {
+                    console.error('Block expressions longer than a single return are not yet supported.');
+                    return null;
+                }
             }
         }
 
