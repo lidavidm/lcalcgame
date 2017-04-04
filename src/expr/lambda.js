@@ -805,6 +805,11 @@ class EnvironmentLambdaExpr extends LambdaExpr {
         // Don't let the player manually reduce (whatever that even means)
     }
 
+    reduceCompletely() {
+        // Do not allow reduction under the lambda!
+        return this;
+    }
+
     performReduction(animated=false) {
         // If we don't have all our arguments, refuse to evaluate.
         if (this.takesArgument) {

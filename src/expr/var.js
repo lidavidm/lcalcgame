@@ -738,9 +738,16 @@ class VtableVarExpr extends ObjectExtensionExpr {
         if (value instanceof ObjectExtensionExpr) {
             value = value.holes[0];
         }
-        this.swap(this.variable, value);
-        value.lock();
-        return super.reduce();
+
+        // TODO: don't duplicate superclass logic
+        let r;
+        let args = this.methodArgs;
+        console.log(args);
+        if (args.length > 0) // Add arguments to method call.
+            r = this.subReduceMethod(value, ...args);
+        else r = this.subReduceMethod(value); // Method doesn't take arguments.
+        if (r == value) return this;
+        else return r;
     }
 }
 

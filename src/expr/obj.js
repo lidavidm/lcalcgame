@@ -491,7 +491,7 @@ class ArrayObjectExpr extends ObjectExtensionExpr {
                         return arrayExpr;
                     else {
                         let new_coll = arrayExpr.clone();
-                        new_coll.addItem(pushedExpr.clone()); // add item to bag
+                        new_coll.addItem(pushedExpr.reduce().clone()); // add item to bag
                         return new_coll; // return new bag with item appended
                     }
               },
