@@ -279,4 +279,9 @@ class ChoiceExpr extends Expression {
             return !this._sparkling;
         });
     }
+
+    toString() {
+        let children = this.choices.map((x) => x.toString()).join(" ");
+        return `(choice ${children})`;
+    }
 }

@@ -4,33 +4,33 @@
     "levels": [
         {
             "description": "Sequence operator",
-            "board": "(sequence /(assign /($x) _) /(assign /($y) /($x))) ($y)",
-            "goal": "(diamond)",
-            "toolbox": "(star) (diamond) (triangle)"
+            "board": "(sequence /(assign $x _) /(assign $y $x)) ($y)",
+            "goal": "(rect)",
+            "toolbox": "(star) (rect) (triangle)"
         },
         {
             "description": "Bigger sequence",
-            "board": "(sequence /(assign /($x) /(triangle)) /(assign /($y) _) /(assign /($z) /(== /($x) /($y)))) ($z)",
+            "board": "(sequence /(assign $x /triangle) /(assign $y _) /(assign $z /(== $x $y))) ($z)",
             "goal": "(false)",
             "toolbox": "(star) (triangle)"
         },
         {
             "description": "Bigger sequence",
-            "board": "(sequence /(assign /($x) _) /(assign /($y) _) /(assign /($z) /(== /($x) /($y)))) ($z)",
+            "board": "(sequence /(assign $x _) /(assign $y _) /(assign $z /(== $x $y))) ($z)",
             "goal": "(true)",
             "toolbox": "(star) (star) (triangle) (triangle)"
         },
         {
             "description": "Fill in the blank",
-            "board": "(sequence /(assign /($z) _) _ /(assign /($y) /($x)))",
+            "board": "(sequence /(assign $z _) _ /(assign $y $x))",
             "goal": "(star)",
             "toolbox": "(star) (assign _ _) ($x) ($y) ($z)"
         },
         {
             "description": "Swap the variables",
-            "board": "(sequence /(assign /($z) /($x)) _ _ /(assign /$z /(diamond)))",
+            "board": "(sequence /(assign $z $x) _ _ /(assign $z /rect))",
             "goal": "(star)",
-            "toolbox": "($y) (assign /($x) /$y) /(assign /($y) /$z)",
+            "toolbox": "($y) (assign $x $y) /(assign $y $z)",
             "globals": {
                 "x": "(star)",
                 "y": "(triangle)"
@@ -38,9 +38,9 @@
         },
         {
             "description": "Unlock the conditional",
-            "board": "(sequence /(assign /($y) _) /(assign /($c) /(== /($y) /(diamond))) /(assign /($y) /(if /$c /$x))) ($y)",
+            "board": "(sequence /(assign $y _) /(assign $c /(== $y /rect)) /(assign $y /(if $c $x))) ($y)",
             "goal": "(star)",
-            "toolbox": "(triangle) (diamond)",
+            "toolbox": "(triangle) (rect)",
             "globals": {
                 "x": "(star)"
             }

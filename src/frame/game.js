@@ -421,6 +421,8 @@ class Level {
             return lambdavar;
         } else if (arg.indexOf('$') > -1) {
             let varname = arg.replace('$', '').replace('_', '');
+            // Lock unless there is an underscore in the name
+            locked = !(arg.indexOf('_') > -1);
             return lock(new (ExprManager.getClass('reference'))(varname), locked);
         } else {
             console.error('Unknown argument: ', arg);

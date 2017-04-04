@@ -581,6 +581,12 @@ class AssignExpr extends Expression {
             this.performReduction();
         }
     }
+
+    toString() {
+        let variable = this.variable ? this.variable.toString() : '_';
+        let value = this.value ? this.value.toString() : '_';
+        return `${this.locked ? '/' : ''}(assign ${variable} ${value})`;
+    }
 }
 
 class JumpingAssignExpr extends AssignExpr {

@@ -4,81 +4,81 @@
     "levels": [
         {
             "description": "Introducing string values",
-            "board": "(== /(star) _)",
-            "toolbox": "(star) (diamond) (triangle)",
+            "board": "(== /star _)",
+            "toolbox": "(star) (rect) (triangle)",
             "goal": "(false)"
         },
         {
             "description": "Reducing a variable.",
             "board": "($_x)",
-            "goal": "(diamond)",
+            "goal": "(rect)",
             "globals": {
-                "x": "(diamond)"
+                "x": "(rect)"
             }
         },
         {
             "description": "Variables can be reduced multiple times.",
             "board": "($_x) ($_x)",
-            "goal": "(diamond) (diamond)",
+            "goal": "(rect) (rect)",
             "globals": {
-                "x": "(diamond)"
+                "x": "(rect)"
             }
         },
         {
             "description": "Multiple variables can be reduced.",
             "board": "($_x) ($_apple)",
-            "goal": "(diamond) (star)",
+            "goal": "(rect) (star)",
             "globals": {
-                "x": "(diamond)",
+                "x": "(rect)",
                 "apple": "(star)"
             }
         },
         {
             "description": "Assign to a variable.",
-            "board": "(assign /$x /star) ($_x)",
+            "board": "(assign $x /star) ($_x)",
             "goal": "(star)",
             "globals": {
-                "x": "(diamond)"
+                "x": "(rect)"
             }
         },
         {
             "description": "Choose what to assign.",
-            "board": "(assign /$_x _) ($_x)",
+            "board": "(assign $x _) ($_x)",
             "goal": "(star)",
             "toolbox": "(triangle) (star)",
             "globals": {
-                "x": "(diamond)"
+                "x": "(rect)"
             }
         },
         {
             "description": "Assign to an undefined variable.",
-            "board": "(assign /$y _) ($_y)",
+            "board": "(assign $y _) ($_y)",
             "goal": "(star)",
-            "toolbox": "(diamond) (star)"
+            "toolbox": "(rect) (star)"
         },
         {
             "description": "Multiple assignment.",
-            "board": "(assign /$x _) ($_x) (assign /$y _) ($_y)",
+            "board": "(assign $x _) ($_x) (assign $y _) ($_y)",
             "goal": "(star) (triangle)",
             "toolbox": "(triangle) (star)",
             "globals": {
-                "x": "(diamond)"
+                "x": "(rect)"
             }
         },
         {
             "description": "Assignment order matters.",
-            "board": "(assign /$x /$y) (assign /$y /star) ($_x)",
+            "board": "(assign $x $y) (assign $y /star) ($_x)",
             "goal": "(star)",
             "globals": {
-                "x": "(diamond)"
+                "x": "(rect)"
             }
         },
         {
             "description": "Assignment order still matters.",
-            "board": "(assign /$x /$y) (assign /$y /star) ($_x) ($_y)",
+            "board": "(assign $x $y) (assign $y /star) ($_x) ($_y)",
             "goal": "(star) (triangle)",
             "globals": {
-                "x": "(diamond)",
+                "x": "(rect)",
                 "y": "(triangle)"
             }
         },
@@ -88,25 +88,25 @@
             "goal": "(star) (triangle)",
             "toolbox": "($_x) ($_x) ($_y) ($_y)",
             "globals": {
-                "x": "(diamond)",
+                "x": "(rect)",
                 "y": "(triangle)"
             }
         },
         {
             "description": "Equality with a variable",
-            "board": "(== /$x /(diamond))",
+            "board": "(== $x /rect)",
             "goal": "(true)",
             "globals": {
-                "x": "(diamond)"
+                "x": "(rect)"
             }
         },
         {
             "description": "Equality with a variable II",
-            "board": "(== _ /(diamond))",
+            "board": "(== _ /rect)",
             "goal": "(true)",
             "toolbox": "($x) ($y)",
             "globals": {
-                "x": "(diamond)",
+                "x": "(rect)",
                 "y": "(triangle)"
             }
         },
@@ -116,32 +116,32 @@
             "goal": "(true)",
             "toolbox": "(triangle) (star) ($x) ($y)",
             "globals": {
-                "x": "(diamond)",
-                "y": "(diamond)"
+                "x": "(rect)",
+                "y": "(rect)"
             }
         },
         {
             "description": "Make things equal first",
-            "board": "(== /$x /$y)",
+            "board": "(== $x $y)",
             "goal": "(true)",
             "toolbox": "(assign _ _) ($x) ($y)",
             "globals": {
-                "x": "(diamond)",
+                "x": "(rect)",
                 "y": "(triangle)"
             }
         },
         {
             "description": "Booleans can go in variables, too!",
-            "board": "(assign /$c /(== _ _)) ($_c)",
+            "board": "(assign $c /(== _ _)) ($_c)",
             "goal": "(true)",
-            "toolbox": "($x) (diamond) (star)",
+            "toolbox": "($x) (rect) (star)",
             "globals": {
-                "x": "(diamond)"
+                "x": "(rect)"
             }
         },
         {
             "description": "Variable as value of conditional",
-            "board": "(if _b /$x)",
+            "board": "(if _b $x)",
             "goal": "(star)",
             "toolbox": "(true) (false)",
             "globals": {
@@ -150,8 +150,8 @@
         },
         {
             "description": "Variable as conditional of conditional",
-            "board": "(if _ /(diamond))",
-            "goal": "(diamond)",
+            "board": "(if _ /rect)",
+            "goal": "(rect)",
             "toolbox": "($c) ($x)",
             "globals": {
                 "c": "(true)",
@@ -160,17 +160,17 @@
         },
         {
             "description": "Unlock the conditional",
-            "board": "(if /$c /(diamond))",
-            "goal": "(diamond)",
-            "toolbox": "(assign /$c _ ) (true) (false)",
+            "board": "(if $c /rect)",
+            "goal": "(rect)",
+            "toolbox": "(assign $c _) (true) (false)",
             "globals": {
             }
         },
         {
             "description": "Unlock the conditional",
-            "board": "(if /$c /(diamond))",
-            "goal": "(diamond)",
-            "toolbox": "(assign /$c /(== _ _)) ($x) (star) (triangle)",
+            "board": "(if $c /rect)",
+            "goal": "(rect)",
+            "toolbox": "(assign $c /(== _ _)) ($x) (star) (triangle)",
             "globals": {
                 "x": "(star)"
             }
@@ -178,24 +178,24 @@
         {
             "description": "Building bags",
             "board": "(bag) ($x)",
-            "goal": "(bag diamond)",
+            "goal": "(bag rect)",
             "globals": {
-                "x": "(diamond)"
+                "x": "(rect)"
             }
         },
         {
             "description": "Bags can go in variables",
             "board": "",
-            "goal": "(bag star diamond)",
+            "goal": "(bag star rect)",
             "toolbox": "($x) ($y)",
             "globals": {
                 "x": "(bag star)",
-                "y": "(diamond)"
+                "y": "(rect)"
             }
         },
         {
             "description": "Comparing bags",
-            "board": "(== /$x /$y)",
+            "board": "(== $x $y)",
             "goal": "(true)",
             "toolbox": "(assign _ _) ($x) ($y)",
             "globals": {
@@ -204,16 +204,16 @@
         },
         {
             "description": "Constructing bags",
-            "board": "(if /(== /($x) /(star)) /(bag /(star)))",
+            "board": "(if /(== $x /star) /(bag star))",
             "goal": "(bag star)",
-            "toolbox": "(assign /($x) _) (diamond) (star)",
+            "toolbox": "(assign $x _) (rect) (star)",
             "globals": {
                 "x": "(triangle)"
             }
         },
         {
             "description": "Fade out variables",
-            "board": "(assign /$x /$y) (assign /$y /(triangle))",
+            "board": "(assign $x $y) (assign $y /triangle)",
             "goal": "(triangle)",
             "toolbox": "($x)",
             "globals": {
@@ -222,70 +222,70 @@
         },
         {
             "description": "Fade out variables II",
-            "board": "(if /$x /$y)",
-            "goal": "(diamond)",
-            "toolbox": "(assign _ _) ($x) ($y) (diamond) (star)",
+            "board": "(if $x $y)",
+            "goal": "(rect)",
+            "toolbox": "(assign _ _) ($x) ($y) (rect) (star)",
             "globals": {
                 "x": "(true)"
             }
         },
         {
             "description": "Basic lambdas work.",
-            "board": "(λx /$x)",
+            "board": "(λx $x)",
             "goal": "(star)",
-            "toolbox": "(diamond) (star)",
+            "toolbox": "(rect) (star)",
             "globals": {}
         },
         {
             "description": "Lambdas can produce comparisons based on input",
-            "board": "(λx /(== /$x /(triangle)))",
+            "board": "(λx /(== $x /triangle))",
             "goal": "(false)",
-            "toolbox": "(diamond) (star) (triangle)"
+            "toolbox": "(rect) (star) (triangle)"
         },
         {
             "description": "Lambdas can produce conditionals based on input",
-            "board": "(λx /(if /$x /(triangle)))",
+            "board": "(λx /(if $x /triangle))",
             "goal": "(triangle)",
             "toolbox": "(true) (false)"
         },
         {
             "description": "Lambdas can produce bags based on input",
-            "board": "(λx /(bag /$x))",
+            "board": "(λx /(bag $x))",
             "goal": "(bag triangle)",
-            "toolbox": "(diamond) (star) (triangle)"
+            "toolbox": "(rect) (star) (triangle)"
         },
         {
             "description": "Lambdas can produce comparisons based on input II",
-            "board": "(λx /(λy /(== /$x /$y)))",
+            "board": "(λx /(λy /(== $x $y)))",
             "goal": "(true)",
             "toolbox": "(star) (star) (triangle)"
         },
         {
             "description": "Lambdas can produce comparisons based on input III",
-            "board": "(λx /(λy /(== /$x /$y))) (λx /(if /$x /(diamond)))",
-            "goal": "(diamond)",
+            "board": "(λx /(λy /(== $x $y))) (λx /(if $x /rect))",
+            "goal": "(rect)",
             "toolbox": "(triangle) (star) (triangle)"
         },
         {
             "description": "Lambdas can read outside their environment.",
-            "board": "(λx /$y) ($y)",
+            "board": "(λx $y) ($y)",
             "goal": "(star) (star)",
-            "toolbox": "(diamond)",
+            "toolbox": "(rect)",
             "globals": {
                 "y": "(star)"
             }
         },
         {
             "description": "Outside changes are reflected in the lambda.",
-            "board": "(λx /$y) (assign /$y _)",
+            "board": "(λx $y) (assign $y _)",
             "goal": "(triangle)",
-            "toolbox": "(diamond) (star) (triangle)"
+            "toolbox": "(rect) (star) (triangle)"
         },
         {
             "description": "Outside changes are reflected in the lambda.",
-            "board": "(λx /$y)",
+            "board": "(λx $y)",
             "goal": "(triangle)",
-            "toolbox": "(diamond) (star) (triangle) (assign /$y _)",
+            "toolbox": "(rect) (star) (triangle) (assign $y _)",
             "globals": {
                 "y": "(star)"
             }
