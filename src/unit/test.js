@@ -88,7 +88,7 @@ var UnitTest = (function() {
     // Test anonymous functions:
     pub.testLambdas = function(stage) {
 
-        ExprManager.setDefaultFadeLevel(0);
+        ExprManager.setDefaultFadeLevel(100);
 
         // TODO: Test identity and star.
         // Tested expression, Sequence of input expressions, Event on test expr applying input expr, expected output
@@ -99,7 +99,7 @@ var UnitTest = (function() {
             let expr = Level.parse(desc)[0];
             stage.add(lambda);
             stage.add(expr);
-            let res = lambda.hole.ondropped(expr);
+            let res = lambda.applyExpr(expr);
             if (res instanceof ApplyExpr)
                 res = res.performApply();
             let passed = (res && (res instanceof Expression) && compare(res.toString(), desc));
