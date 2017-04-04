@@ -198,7 +198,7 @@ class LambdaHoleExpr extends MissingExpression {
     ondropenter(node, pos) {
         if (node instanceof LambdaHoleExpr) node = node.parent;
         // Variables must be reduced before application
-        if (node instanceof VarExpr || node instanceof AssignExpr) return;
+        if (node instanceof VarExpr || node instanceof AssignExpr || node instanceof VtableVarExpr) return;
         // Disallow interaction with nested lambdas
         if (this.parent && this.parent.parent instanceof LambdaExpr) return;
         super.ondropenter(node, pos);
@@ -246,7 +246,7 @@ class LambdaHoleExpr extends MissingExpression {
     }
     ondropexit(node, pos) {
         if (node instanceof LambdaHoleExpr) node = node.parent;
-        if (node instanceof VarExpr || node instanceof AssignExpr) return;
+        if (node instanceof VarExpr || node instanceof AssignExpr || node instanceof VtableVarExpr) return;
         if (this.parent && this.parent.parent instanceof LambdaExpr) return;
 
         super.ondropexit(node, pos);
@@ -256,7 +256,7 @@ class LambdaHoleExpr extends MissingExpression {
         // }
 
         if (node) node.opacity = 1.0;
-        this.close_opened_subexprs();
+        if (this.close_opened_subexprs) this.close_opened_subexprs();
     }
     ondropped(node, pos) {
         if (node instanceof LambdaHoleExpr) node = node.parent;
@@ -264,6 +264,9 @@ class LambdaHoleExpr extends MissingExpression {
         if (this.parent && this.parent.parent instanceof LambdaExpr) {
             return null;
         }
+
+        // Disallow dropping non-values
+        if (node instanceof VarExpr || node instanceof AssignExpr || node instanceof VtableVarExpr) return null;
 
         if (node.dragging) { // Make sure node is being dragged by the user.
 
@@ -359,12 +362,14 @@ class DelayedLambdaHoleExpr extends LambdaHoleExpr {
         if (this.parent && this.parent.parent instanceof LambdaExpr) {
             return null;
         }
+        // Disallow applying to non values
+        if (node instanceof VarExpr || node instanceof AssignExpr || node instanceof VtableVarExpr) return null;
         console.log(node, this.parent);
         let parent = this.parent;
         let stage = this.stage;
         node.opacity = 1;
         node.onmouseleave();
-        this.close_opened_subexprs();
+        if (this.close_opened_subexprs) this.close_opened_subexprs();
         let res = new ApplyExpr(node.clone(), this.parent.clone());
         stage.remove(node);
         (parent.parent || parent.stage).swap(parent, res);
@@ -1133,12 +1138,15 @@ class DelayedFadedES6LambdaHoleExpr extends FadedES6LambdaHoleExpr {
         if (this.parent && this.parent.parent instanceof LambdaExpr) {
             return null;
         }
+        // Disallow applying to non values
+        if (node instanceof VarExpr || node instanceof AssignExpr || node instanceof VtableVarExpr) return null;
         console.log(node, this.parent);
         let parent = this.parent;
         let stage = this.stage;
         node.opacity = 1;
         node.onmouseleave();
-        this.close_opened_subexprs();
+
+        if (this.close_opened_subexprs) this.close_opened_subexprs();
         let res = new ApplyExpr(node.clone(), this.parent.clone());
         stage.remove(node);
         (parent.parent || parent.stage).swap(parent, res);
