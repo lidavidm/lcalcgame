@@ -311,6 +311,7 @@ class BracketArrayExpr extends BagExpr {
                 c.addItem(i.clone());
         });
         c.graphicNode.update();
+        if (this.locked) c.lock();
         return c;
     }
 
