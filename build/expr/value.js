@@ -400,6 +400,8 @@ var FadedValueExpr = function (_Expression2) {
     _inherits(FadedValueExpr, _Expression2);
 
     function FadedValueExpr(name) {
+        var primitiveName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
         _classCallCheck(this, FadedValueExpr);
 
         var txt = new TextExpr(name);
@@ -408,7 +410,7 @@ var FadedValueExpr = function (_Expression2) {
 
         txt.color = "OrangeRed";
         _this12.color = "gold";
-        _this12.primitiveName = name;
+        _this12.primitiveName = primitiveName || name;
         return _this12;
     }
 
@@ -482,7 +484,7 @@ var FadedTriangleExpr = function (_FadedValueExpr3) {
     function FadedTriangleExpr() {
         _classCallCheck(this, FadedTriangleExpr);
 
-        return _possibleConstructorReturn(this, (FadedTriangleExpr.__proto__ || Object.getPrototypeOf(FadedTriangleExpr)).call(this, 'tri'));
+        return _possibleConstructorReturn(this, (FadedTriangleExpr.__proto__ || Object.getPrototypeOf(FadedTriangleExpr)).call(this, 'tri', 'triangle'));
     }
 
     return FadedTriangleExpr;
@@ -494,7 +496,7 @@ var FadedCircleExpr = function (_FadedValueExpr4) {
     function FadedCircleExpr() {
         _classCallCheck(this, FadedCircleExpr);
 
-        return _possibleConstructorReturn(this, (FadedCircleExpr.__proto__ || Object.getPrototypeOf(FadedCircleExpr)).call(this, 'dot'));
+        return _possibleConstructorReturn(this, (FadedCircleExpr.__proto__ || Object.getPrototypeOf(FadedCircleExpr)).call(this, 'dot', 'circle'));
     }
 
     return FadedCircleExpr;
@@ -504,6 +506,8 @@ var StringValueExpr = function (_Expression3) {
     _inherits(StringValueExpr, _Expression3);
 
     function StringValueExpr(name) {
+        var primitiveName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
         _classCallCheck(this, StringValueExpr);
 
         var text = new TextExpr('"' + name + '"');
@@ -513,7 +517,7 @@ var StringValueExpr = function (_Expression3) {
         _this17.primitiveName = name;
         text.color = "OrangeRed";
         _this17.color = "gold";
-        _this17.primitiveName = name;
+        _this17.primitiveName = primitiveName || name;
         return _this17;
     }
 
@@ -587,7 +591,7 @@ var StringTriangleExpr = function (_StringValueExpr3) {
     function StringTriangleExpr() {
         _classCallCheck(this, StringTriangleExpr);
 
-        return _possibleConstructorReturn(this, (StringTriangleExpr.__proto__ || Object.getPrototypeOf(StringTriangleExpr)).call(this, 'tri'));
+        return _possibleConstructorReturn(this, (StringTriangleExpr.__proto__ || Object.getPrototypeOf(StringTriangleExpr)).call(this, 'tri', 'triangle'));
     }
 
     return StringTriangleExpr;
@@ -599,7 +603,7 @@ var StringCircleExpr = function (_StringValueExpr4) {
     function StringCircleExpr() {
         _classCallCheck(this, StringCircleExpr);
 
-        return _possibleConstructorReturn(this, (StringCircleExpr.__proto__ || Object.getPrototypeOf(StringCircleExpr)).call(this, 'dot'));
+        return _possibleConstructorReturn(this, (StringCircleExpr.__proto__ || Object.getPrototypeOf(StringCircleExpr)).call(this, 'dot', 'circle'));
     }
 
     return StringCircleExpr;

@@ -715,6 +715,13 @@ var AssignExpr = function (_Expression2) {
             }
         }
     }, {
+        key: "toString",
+        value: function toString() {
+            var variable = this.variable ? this.variable.toString() : '_';
+            var value = this.value ? this.value.toString() : '_';
+            return (this.locked ? '/' : '') + "(assign " + variable + " " + value + ")";
+        }
+    }, {
         key: "variable",
         get: function get() {
             return this.holes[0] instanceof MissingExpression ? null : this.holes[0];

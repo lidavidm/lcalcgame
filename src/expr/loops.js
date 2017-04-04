@@ -414,6 +414,12 @@ class FadedRepeatLoopExpr extends Expression {
     onmouseclick() {
         this.performReduction();
     }
+
+    toString() {
+        let times = this.timesExpr.toString();
+        let body = this.bodyExpr.toString();
+        return `${this.locked ? '/' : ''}(repeat ${times} ${body})`;
+    }
 }
 
 function drawPointsAround(ctx, centerX, centerY, points, rotation) {

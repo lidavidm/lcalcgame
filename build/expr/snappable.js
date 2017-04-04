@@ -20,6 +20,7 @@ var Snappable = function (_Expression) {
 
         var _this = _possibleConstructorReturn(this, (Snappable.__proto__ || Object.getPrototypeOf(Snappable)).call(this, [expr]));
 
+        _this.origNext = next;
         _this.topDivotStroke = _this.bottomDivotStroke = null;
         _this.divotHeight = 6;
         _this.prev = null;
@@ -315,6 +316,15 @@ var Snappable = function (_Expression) {
             }
 
             stage.swap(this, new (Function.prototype.bind.apply(ExprManager.getClass('sequence'), [null].concat(body)))());
+        }
+    }, {
+        key: 'toString',
+        value: function toString() {
+            var next = "";
+            if (this.origNext) {
+                next = " " + this.origNext.toString();
+            }
+            return '(snappable ' + this.contents.toString() + next + ')';
         }
     }, {
         key: 'contents',

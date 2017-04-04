@@ -316,6 +316,14 @@ var ChoiceExpr = function (_Expression) {
             });
         }
     }, {
+        key: "toString",
+        value: function toString() {
+            var children = this.choices.map(function (x) {
+                return x.toString();
+            }).join(" ");
+            return "(choice " + children + ")";
+        }
+    }, {
         key: "rowSize",
         get: function get() {
             var hasRectangular = false;

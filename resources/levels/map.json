@@ -108,7 +108,7 @@
             "description": "Filter with one line missing. Must understand function in order to win.",
             "board": "(map /(λx /(if /(== #x _) #x)) __) (star) (diamond) (star)",
             "goal": "star",
-            "toolbox": "(bag (triangle) (triangle) (circle))"
+            "toolbox": "(bag triangle triangle circle)"
         }
     ],
     "resources":{

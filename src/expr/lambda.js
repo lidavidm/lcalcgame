@@ -359,12 +359,11 @@ class DelayedLambdaHoleExpr extends LambdaHoleExpr {
         if (this.parent && this.parent.parent instanceof LambdaExpr) {
             return null;
         }
-        console.log(node, this.parent);
         let parent = this.parent;
         let stage = this.stage;
         node.opacity = 1;
         node.onmouseleave();
-        this.close_opened_subexprs();
+        if (this.close_opened_subexprs) this.close_opened_subexprs();
         let res = new ApplyExpr(node.clone(), this.parent.clone());
         stage.remove(node);
         (parent.parent || parent.stage).swap(parent, res);
@@ -1128,12 +1127,11 @@ class DelayedFadedES6LambdaHoleExpr extends FadedES6LambdaHoleExpr {
         if (this.parent && this.parent.parent instanceof LambdaExpr) {
             return null;
         }
-        console.log(node, this.parent);
         let parent = this.parent;
         let stage = this.stage;
         node.opacity = 1;
         node.onmouseleave();
-        this.close_opened_subexprs();
+        if (this.close_opened_subexprs) this.close_opened_subexprs();
         let res = new ApplyExpr(node.clone(), this.parent.clone());
         stage.remove(node);
         (parent.parent || parent.stage).swap(parent, res);

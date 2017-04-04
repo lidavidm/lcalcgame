@@ -46,19 +46,24 @@ class ApplyExpr extends Expression {
     get exprToApply() { return this.children[0]; }
     get lambdaExpr()  { return this.children[1]; }
 
+    performApply() {
+        let stg = this.stage;
+        let lambda = this.lambdaExpr;
+        this.exprToApply.opacity = 1.0;
+        this.lambdaExpr.applyExpr(this.exprToApply);
+        (this.parent || stg).swap(this, this.lambdaExpr);
+        let res = this.lambdaExpr.clone();
+        this.lambdaExpr.performReduction();
+        return res;
+    }
     onmouseclick() {
         this.lambdaExpr.hole.ondropenter(this.exprToApply);
         //Animate.tween( this.arrow, {opacity:0}, 200 );
         Animate.wait(500).after(() => {
-            let stg = this.stage;
-            let lambda = this.lambdaExpr;
-            this.exprToApply.opacity = 1.0;
-            this.lambdaExpr.applyExpr(this.exprToApply);
-            (this.parent || stg).swap(this,this.lambdaExpr);
-            this.lambdaExpr.performReduction();
-            if (stg) {
-                stg.update();
-                stg.draw();
+            this.performApply();
+            if (this.stage) {
+                this.stage.update();
+                this.stage.draw();
             }
         });
     }

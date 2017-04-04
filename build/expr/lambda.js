@@ -464,12 +464,11 @@ var DelayedLambdaHoleExpr = function (_LambdaHoleExpr) {
             if (this.parent && this.parent.parent instanceof LambdaExpr) {
                 return null;
             }
-            console.log(node, this.parent);
             var parent = this.parent;
             var stage = this.stage;
             node.opacity = 1;
             node.onmouseleave();
-            this.close_opened_subexprs();
+            if (this.close_opened_subexprs) this.close_opened_subexprs();
             var res = new ApplyExpr(node.clone(), this.parent.clone());
             stage.remove(node);
             (parent.parent || parent.stage).swap(parent, res);
@@ -1505,12 +1504,11 @@ var DelayedFadedES6LambdaHoleExpr = function (_FadedES6LambdaHoleEx) {
             if (this.parent && this.parent.parent instanceof LambdaExpr) {
                 return null;
             }
-            console.log(node, this.parent);
             var parent = this.parent;
             var stage = this.stage;
             node.opacity = 1;
             node.onmouseleave();
-            this.close_opened_subexprs();
+            if (this.close_opened_subexprs) this.close_opened_subexprs();
             var res = new ApplyExpr(node.clone(), this.parent.clone());
             stage.remove(node);
             (parent.parent || parent.stage).swap(parent, res);
