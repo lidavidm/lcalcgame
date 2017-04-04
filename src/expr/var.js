@@ -725,6 +725,9 @@ class VtableVarExpr extends ObjectExtensionExpr {
         }
         else {
             this.hasVtable = false;
+            if (this.variable.color) {
+                this.color = this.variable.color;
+            }
         }
     }
 
@@ -769,5 +772,15 @@ class DynamicPulloutDrawer extends PulloutDrawer {
         this.txts = txts;
 
         super.open();
+    }
+
+    draw(ctx) {
+        // Don't draw ourselves if the parent var does not have a
+        // vtable or is nested
+        if (this.parent && (!this.parent.hasVtable || this.parent.parent)) {
+            return;
+        }
+
+        super.draw(ctx);
     }
 }
