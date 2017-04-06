@@ -718,7 +718,7 @@ class Goal {
         bg.radius = Math.max(alien.absolutePos.x + alien.absoluteSize.w, ALIEN_HEIGHT);
         bg.radius = Math.max(alien.absolutePos.y + alien.absoluteSize.h, bg.radius);
         bg.radius += 20;
-        bg_accent.radius = bg.radius + 40;
+        bg_accent.radius = bg.radius + 10;
 
         window.test = alien;
 
