@@ -731,9 +731,41 @@ class VtableVarExpr extends ObjectExtensionExpr {
         }
     }
 
+    performReduction() {
+        if (!this.hasVtable || !this.subReduceMethod) {
+            if (!this.variable.canReduce()) {
+                // Play the ? animation
+                this.variable.performReduction();
+                return Promise.reject(`${this.name} is undefined.`);
+            }
+            else {
+                let value = this.variable.reduce().clone();
+                (this.parent || this.stage).swap(this, value);
+                return Promise.resolve(value);
+            }
+        }
+        else {
+            return super.performReduction();
+        }
+    }
+
+    reduceCompletely() {
+        if (!this.hasVtable || !this.subReduceMethod) {
+            if (!this.variable.canReduce()) {
+                return this;
+            }
+            else {
+                let value = this.variable.reduce().clone();
+                return value;
+            }
+        }
+        else {
+            return this.reduce();
+        }
+    }
+
     reduce() {
         if ((!this.hasVtable || !this.subReduceMethod) && !this.variable.canReduce()) {
-            this.variable.performReduction();
             return this;
         }
         if (!this.hasVtable) return this.value;
@@ -747,6 +779,16 @@ class VtableVarExpr extends ObjectExtensionExpr {
         let r;
         let args = this.methodArgs;
         console.log(args);
+        for (let i = 0; i < args.length; i++) {
+            let arg = args[i];
+            if (arg.canReduce()) {
+                args[i] = arg.reduceCompletely();
+            }
+            else if (!arg.isValue()) {
+                console.warn("Can't call method; argument cannot reduce");
+                return this;
+            }
+        }
         if (args.length > 0) // Add arguments to method call.
             r = this.subReduceMethod(value, ...args);
         else r = this.subReduceMethod(value); // Method doesn't take arguments.
