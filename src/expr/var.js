@@ -732,6 +732,10 @@ class VtableVarExpr extends ObjectExtensionExpr {
     }
 
     reduce() {
+        if ((!this.hasVtable || !this.subReduceMethod) && !this.variable.canReduce()) {
+            this.variable.performReduction();
+            return this;
+        }
         if (!this.hasVtable) return this.value;
         if (!this.subReduceMethod) return this.value;
         let value = this.variable.reduce();
