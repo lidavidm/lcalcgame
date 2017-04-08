@@ -745,7 +745,9 @@ class VtableVarExpr extends ObjectExtensionExpr {
             }
         }
         else {
-            return super.performReduction();
+            let result = this.reduce();
+            (this.parent || this.stage).swap(this, result);
+            return result;
         }
     }
 
@@ -770,30 +772,23 @@ class VtableVarExpr extends ObjectExtensionExpr {
         }
         if (!this.hasVtable) return this.value;
         if (!this.subReduceMethod) return this.value;
-        let value = this.variable.reduce();
+
+        // Use a surrogate to do the actual reduction, so that (1) we
+        // can use the actual object's reduce() method (this is
+        // important for ArrayObjectExpr which does some
+        // post-processing on the result) and (2) we can reduce()
+        // without mutating ourselves
+        let value = this.variable.reduce().clone();
+        let surrogate = this;
         if (value instanceof ObjectExtensionExpr) {
+            surrogate = value;
             value = value.holes[0];
         }
 
-        // TODO: don't duplicate superclass logic
-        let r;
-        let args = this.methodArgs;
-        console.log(args);
-        for (let i = 0; i < args.length; i++) {
-            let arg = args[i];
-            if (arg.canReduce()) {
-                args[i] = arg.reduceCompletely();
-            }
-            else if (!arg.isValue()) {
-                console.warn("Can't call method; argument cannot reduce");
-                return this;
-            }
-        }
-        if (args.length > 0) // Add arguments to method call.
-            r = this.subReduceMethod(value, ...args);
-        else r = this.subReduceMethod(value); // Method doesn't take arguments.
-        if (r == value) return this;
-        else return r;
+        surrogate.parent = this;  // In case the surrogate needs our environment
+        surrogate.setExtension("", this.subReduceMethod, this.methodArgs);
+
+        return surrogate.reduce();
     }
 }
 

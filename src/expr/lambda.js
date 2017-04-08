@@ -536,6 +536,9 @@ class LambdaExpr extends Expression {
         txt.color = 'gray'
         this.addArg(txt);*/
     }
+    isValue() {
+        return true;
+    }
     getEnvironment() {
         let env = super.getEnvironment();
         if (!env.parent && this.stage) {

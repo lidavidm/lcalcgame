@@ -413,6 +413,17 @@ class ObjectExtensionExpr extends ExpressionPlus {
             let r;
             let args = this.methodArgs;
             console.log(args);
+            // Reduce the args before calling (call-by-value)
+            for (let i = 0; i < args.length; i++) {
+                let arg = args[i];
+                if (arg.canReduce()) {
+                    args[i] = arg.reduceCompletely();
+                }
+                else if (!arg.isValue()) {
+                    console.warn("Can't call method; argument cannot reduce");
+                    return this;
+                }
+            }
             if (args.length > 0) // Add arguments to method call.
                 r = this.subReduceMethod(this.holes[0], ...args);
             else r = this.subReduceMethod(this.holes[0]); // Method doesn't take arguments.
@@ -494,7 +505,7 @@ class ArrayObjectExpr extends ObjectExtensionExpr {
                         return arrayExpr;
                     else {
                         let new_coll = arrayExpr.clone();
-                        new_coll.addItem(pushedExpr.reduce().clone()); // add item to bag
+                        new_coll.addItem(pushedExpr.clone()); // add item to bag
                         return new_coll; // return new bag with item appended
                     }
               },
