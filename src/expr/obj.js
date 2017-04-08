@@ -356,8 +356,11 @@ class ObjectExtensionExpr extends ExpressionPlus {
         //      }
         // }
 
-        let onCellSelect = (cell) => {
-            this.setExtension(cell.children[0].text.replace('.', '').split('(')[0], cell.children[0]._reduceMethod);
+        let onCellSelect = (self, cell) => {
+            // 'this' needs to be late-bound, or else cloning an
+            // ObjectExtensionExpr means methods will be called on the
+            // wrong object
+            self.setExtension(cell.children[0].text.replace('.', '').split('(')[0], cell.children[0]._reduceMethod);
         };
 
         // Make pullout-drawer:
@@ -645,7 +648,7 @@ class DropdownSelect extends mag.Rect {
         this.close();
 
         // Fire callback
-        if (this.onCellClick) this.onCellClick(cell);
+        if (this.onCellClick) this.onCellClick(this.parent.parent, cell);
     }
 }
 
