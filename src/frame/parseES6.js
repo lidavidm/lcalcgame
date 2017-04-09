@@ -46,7 +46,7 @@ class ES6Parser {
             return expr;
         } else {
             let exprs = statements.map((n) => this.parseNode(n));
-            let seq = new Sequence(...exprs);
+            let seq = new (ExprManager.getClass('sequence'))(...exprs);
             seq.lockSubexpressions(this.lockFilter);
             return seq;
         }
