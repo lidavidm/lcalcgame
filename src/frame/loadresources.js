@@ -163,7 +163,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         'assign': ['sequence'],
         'sequence': ['loops'],
         'loops': ['mystery'],
-        'mystery': [],
+        'mystery': ['variables_obj'],
+        'variables_obj': [],
     };
 
     let chapter_load_prom = loadChaptersFromDigraph(chapterDigraph);
