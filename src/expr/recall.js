@@ -192,7 +192,11 @@ class TypeInTextExpr extends TextExpr {
             'single':(txt) => {
                 let res = __PARSER.parse(txt);
                 return res && !(res instanceof Sequence);
-            }
+            },
+            'variable': (txt) => {
+                let result = __PARSER.parse(txt);
+                return (result instanceof VarExpr) || (result instanceof VtableVarExpr);
+            },
         };
         if (code in validators) {
             return new TypeInTextExpr(validators[code], afterCommit);
