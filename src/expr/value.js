@@ -208,10 +208,10 @@ class StringValueExpr extends Expression {
     constructor(name, primitiveName=null) {
         let text = new TextExpr('"' + name + '"');
         super([text]);
-        this.primitiveName = name;
+        this.name = name;
+        this.primitiveName = primitiveName || name;
         text.color = "OrangeRed";
         this.color = "gold";
-        this.primitiveName = primitiveName || name;
     }
 
     get graphicNode() { return this.holes[0]; }
@@ -222,7 +222,7 @@ class StringValueExpr extends Expression {
     toString() {
         return (this.locked ? '/' : '') + this.primitiveName;
     }
-    value() { return this.primitiveName; }
+    value() { return this.name; }
 }
 class StringStarExpr extends StringValueExpr {
     constructor() { super('star'); }
