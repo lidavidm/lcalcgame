@@ -159,6 +159,14 @@ class ES6Parser {
                 }
             },
 
+            'AssignmentExpression': (node) => {
+                let result = new (ExprManager.getClass('assign'))(this.parseNode(node.left), this.parseNode(node.right));
+                mag.Stage.getNodesWithClass(MissingExpression, [], true, [result]).forEach((n) => {
+                    n.__remain_unlocked = true;
+                });
+                return result;
+            },
+
             /*  BinaryExpression includes the operators:
                 'instanceof' | 'in' | '+' | '-' | '*' | '/' | '%' | '**' | '|' | '^' |
                 '&' | '==' | '!=' | '===' | '!==' | '<' | '>' | '<=' | '<<' | '>>' | '>>>'
