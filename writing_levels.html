@@ -5,7 +5,9 @@
         <title>Level writing tutorial</title>
     </head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
-    <script src="build/resource.js" charset="utf-8"></script>
+    <script src="build/util.js" charset="utf-8"></script>
+    <script src="build/core/resource.js" charset="utf-8"></script>
+    <script src="build/frame/loadresources.js" charset="utf-8"></script>
     <style media="screen">
         .levels td {
             width:400px;
@@ -22,6 +24,9 @@
         }
         p {
             width:60%;
+        }
+        a:link {
+            text-decoration: none;
         }
     </style>
     <script type="text/javascript">
@@ -108,31 +113,37 @@
 
         function init() {
 
-            var table_primitives = document.getElementById('primitives');
-            var table_operators  = document.getElementById('operators');
-            var table_iterables  = document.getElementById('iterables');
-            var table_lambdas    = document.getElementById('lambdas');
+            Resource.setCurrentLoadSequence('init');
+            LOAD_REDUCT_RESOURCES(Resource);
+            Resource.afterLoadSequence('init', () => {
 
-            constructTable(table_primitives, primitives);
-            constructTable(table_operators, operators);
-            constructTable(table_iterables, iterables);
-            constructTable(table_lambdas, lambdas);
+                var table_primitives = document.getElementById('primitives');
+                var table_operators  = document.getElementById('operators');
+                var table_iterables  = document.getElementById('iterables');
+                var table_lambdas    = document.getElementById('lambdas');
 
-            var div_levels = document.getElementById('level_tables');
-            Resource.getChapters().then((chapters) => {
-                var all_levels = Resource.level;
+                constructTable(table_primitives, primitives);
+                constructTable(table_operators, operators);
+                constructTable(table_iterables, iterables);
+                constructTable(table_lambdas, lambdas);
 
-                for (var c = 0; c < chapters.length; c++) {
-                    var name = chapters[c].name;
-                    var desc = chapters[c].description;
-                    var idx = chapters[c].startIdx;
-                    var next_idx = ((c < chapters.length - 1) ? chapters[c+1].startIdx : all_levels.length);
+                var div_levels = document.getElementById('level_tables');
+                Resource.getChapters().then((chapters) => {
+                    var all_levels = Resource.level;
 
-                    var table = document.createElement('table');
-                    constructLevelsTable(name, desc, table, all_levels.slice(idx, next_idx), idx);
-                    div_levels.appendChild(table);
-                    div_levels.appendChild(document.createElement('p'));
-                }
+                    for (var c = 0; c < chapters.length; c++) {
+                        var name = chapters[c].name;
+                        var desc = chapters[c].description;
+                        var idx = chapters[c].startIdx;
+                        var next_idx = ((c < chapters.length - 1) ? chapters[c+1].startIdx : all_levels.length);
+
+                        var table = document.createElement('table');
+                        constructLevelsTable(name, desc, table, all_levels.slice(idx, next_idx), idx);
+                        div_levels.appendChild(table);
+                        div_levels.appendChild(document.createElement('p'));
+                    }
+                });
+
             });
         }
 

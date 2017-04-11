@@ -4,7 +4,7 @@
 var __IS_MOBILE = /Mobi/.test(navigator.userAgent);
 
 // The current language parser. This won't change --yet!
-const __PARSER = ES6Parser;
+const __PARSER = window.ES6Parser ? window.ES6Parser : null;
 
 // Cursor graphic setting
 function SET_CURSOR_STYLE(style) {

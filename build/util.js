@@ -8,7 +8,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 var __IS_MOBILE = /Mobi/.test(navigator.userAgent);
 
 // The current language parser. This won't change --yet!
-var __PARSER = ES6Parser;
+var __PARSER = window.ES6Parser ? window.ES6Parser : null;
 
 // Cursor graphic setting
 function SET_CURSOR_STYLE(style) {

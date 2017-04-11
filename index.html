@@ -239,6 +239,34 @@
             </div>
         </div>
 
+        <div class="centered">
+            <p>
+                <button id="writeALevel">Write your own level!</button>
+            </p>
+
+            <div id="write-level-form" title="Write a level" style="display:none;">
+              <p class="validateTips">Refer to <a href="writing_levels.html" target="blank">this sheet</a> for more info.</p>
+
+              <form>
+                <fieldset>
+                  <label for="name">Level:</label>
+                  <input type="text" name="name" id="level_expr_input" value="(λx #x) (star)" class="expr_input" size="45"> <br />
+                  <label for="email">Goal:</label>
+                  <input type="text" name="email" id="goal_expr_input" value="(star)" class="expr_input" size="45">
+
+                  <!-- Allow form submission with keyboard without duplicating the dialog button -->
+                  <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+                </fieldset>
+              </form>
+
+              <p>
+                  Or upload a JSON spec for a new chapter:
+              </p>
+              <input id="add_chapter_json" value="asdad" type="file" />
+
+            </div>
+        </div>
+
         <div id="footer">
 
             <span style="color:#777;">If you encounter a bug, you can click <a href="#" onclick="next()" class="blendedlink">here</a> to skip to the next level.</span>

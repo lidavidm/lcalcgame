@@ -84,7 +84,7 @@ var mag = function (_) {
 
         var loadAudio = function loadAudio(alias, filename) {
             if (!audioEngineLoaded) {
-                if (lowLag) {
+                if (window.lowLag) {
                     try {
                         lowLag.init({ 'sm2url': 'lib/sm2/swf/', 'debug': 'none' });
                         audioEngine = 'lowLag';
@@ -103,7 +103,7 @@ var mag = function (_) {
             audioRsc[alias] = audio;
 
             // Cross-browser low-latency audio.
-            lowLag.load([__AUDIO_PATH + filename], alias);
+            if (window.lowLag) window.lowLag.load([__AUDIO_PATH + filename], alias);
         };
         var loadImage = function loadImage(alias, filename) {
             var img = new ImageProxy(alias, __GRAPHICS_PATH + filename);

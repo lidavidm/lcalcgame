@@ -32,6 +32,8 @@ function init() {
     //     }
     // });
 
+    setWriteALevelPopup("writeALevel", 'write-level-form');
+
     Resource.setCurrentLoadSequence('init');
     LOAD_REDUCT_RESOURCES(Resource);
 
