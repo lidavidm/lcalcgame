@@ -779,7 +779,7 @@ var Level = function () {
                                 exprs[i] = constructClassInstance(exprs[i], null);
                             } else if (isInstanceOfClass(exprs[i], Expression)) {} // Nothing to fix.
                             else {
-                                    console.error("Expression ", exprs[i], ' not of known type.');
+                                    //console.error("Expression ", exprs[i], ' not of known type.');
                                 }
                     }
                     if (op_class instanceof LambdaHoleExpr) {
@@ -910,6 +910,8 @@ var Level = function () {
                 return lambdavar;
             } else if (arg.indexOf('$') > -1) {
                 var _varname2 = arg.replace('$', '').replace('_', '');
+                // Lock unless there is an underscore in the name
+                locked = !(arg.indexOf('_') > -1);
                 return lock(new (ExprManager.getClass('reference'))(_varname2), locked);
             } else {
                 console.error('Unknown argument: ', arg);

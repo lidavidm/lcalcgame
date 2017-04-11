@@ -404,6 +404,9 @@ var DefineExpr = function (_ClampExpr) {
     }, {
         key: 'reduce',
         value: function reduce() {
+
+            return this; // can't reduce a DefineExpr.
+
             if (!this.expr || this.expr instanceof MissingExpression) return this;else {
 
                 if (this.funcname) {

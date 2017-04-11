@@ -296,7 +296,7 @@ class Level {
                     }
                     else if (isInstanceOfClass(exprs[i], Expression)) { } // Nothing to fix.
                     else {
-                        console.error("Expression ", exprs[i], ' not of known type.');
+                        //console.error("Expression ", exprs[i], ' not of known type.');
                     }
                 }
                 if (op_class instanceof LambdaHoleExpr) {

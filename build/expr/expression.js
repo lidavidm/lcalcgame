@@ -615,7 +615,7 @@ var Expression = function (_mag$RoundedRect) {
 
                 Logger.log('moved', { 'item': this.toString(), 'prevPos': JSON.stringify(this.posBeforeDrag), 'newPos': JSON.stringify(this.pos) });
             }
-            //if (this.toolbox) this.toolbox = null;
+
             this.dragging = false;
         }
 
@@ -646,7 +646,7 @@ var Expression = function (_mag$RoundedRect) {
             }
             var side = notch.side;
             var pos = this.upperLeftPos(this.pos, this.size);
-            if (side === 'left') return { x: pos.x, y: pos.y + (this.radius + (this.size.h - this.radius) * (1 - notch.relpos)) * this.scale.y };else if (side === 'right') return { x: pos.x + this.size.w * this.scale.x, y: pos.y + (this.radius + (this.size.h - this.radius * 2) * notch.relpos) * this.scale.y };else if (side === 'top') return { x: pos.x + this.radius + (this.size.w - this.radius * 2) * notch.relpos, y: pos.y };else if (side === 'bottom') return { x: pos.x + this.radius + (this.size.w - this.radius * 2) * (1 - notch.relpos), y: pos.y + this.size.h };
+            if (side === 'left') return { x: pos.x, y: pos.y + this.radius + (this.size.h - this.radius) * (1 - notch.relpos) * this.scale.y };else if (side === 'right') return { x: pos.x + this.size.w * this.scale.x, y: pos.y + (this.radius + (this.size.h - this.radius * 2) * notch.relpos) * this.scale.y };else if (side === 'top') return { x: pos.x + this.radius + (this.size.w - this.radius * 2) * notch.relpos, y: pos.y };else if (side === 'bottom') return { x: pos.x + this.radius + (this.size.w - this.radius * 2) * (1 - notch.relpos), y: pos.y + this.size.h };
         }
         // Given another expression and one of its notches,
         // determine whether there's a compatible notch on this expression.

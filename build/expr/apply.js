@@ -54,6 +54,18 @@ var ApplyExpr = function (_Expression) {
     }
 
     _createClass(ApplyExpr, [{
+        key: 'performApply',
+        value: function performApply() {
+            var stg = this.stage;
+            var lambda = this.lambdaExpr;
+            this.exprToApply.opacity = 1.0;
+            this.lambdaExpr.applyExpr(this.exprToApply);
+            (this.parent || stg).swap(this, this.lambdaExpr);
+            var res = this.lambdaExpr.clone();
+            this.lambdaExpr.performReduction();
+            return res;
+        }
+    }, {
         key: 'onmouseclick',
         value: function onmouseclick() {
             var _this2 = this;
@@ -61,15 +73,10 @@ var ApplyExpr = function (_Expression) {
             this.lambdaExpr.hole.ondropenter(this.exprToApply);
             //Animate.tween( this.arrow, {opacity:0}, 200 );
             Animate.wait(500).after(function () {
-                var stg = _this2.stage;
-                var lambda = _this2.lambdaExpr;
-                _this2.exprToApply.opacity = 1.0;
-                _this2.lambdaExpr.applyExpr(_this2.exprToApply);
-                (_this2.parent || stg).swap(_this2, _this2.lambdaExpr);
-                _this2.lambdaExpr.performReduction();
-                if (stg) {
-                    stg.update();
-                    stg.draw();
+                _this2.performApply();
+                if (_this2.stage) {
+                    _this2.stage.update();
+                    _this2.stage.draw();
                 }
             });
         }

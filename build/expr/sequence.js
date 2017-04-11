@@ -248,6 +248,13 @@ var Sequence = function (_Expression) {
             }
         }
     }, {
+        key: "toString",
+        value: function toString() {
+            return (this.locked ? '/' : '') + "(sequence " + this.subexpressions.map(function (x) {
+                return x.toString();
+            }).join(" ") + ")";
+        }
+    }, {
         key: "subexpressions",
         get: function get() {
             return this.holes;

@@ -364,7 +364,6 @@ class DelayedLambdaHoleExpr extends LambdaHoleExpr {
         }
         // Disallow applying to non values
         if (node instanceof VarExpr || node instanceof AssignExpr || node instanceof VtableVarExpr) return null;
-        console.log(node, this.parent);
         let parent = this.parent;
         let stage = this.stage;
         node.opacity = 1;
@@ -1143,7 +1142,6 @@ class DelayedFadedES6LambdaHoleExpr extends FadedES6LambdaHoleExpr {
         }
         // Disallow applying to non values
         if (node instanceof VarExpr || node instanceof AssignExpr || node instanceof VtableVarExpr) return null;
-        console.log(node, this.parent);
         let parent = this.parent;
         let stage = this.stage;
         node.opacity = 1;

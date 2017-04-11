@@ -281,6 +281,9 @@ class DefineExpr extends ClampExpr {
     }
     reduceCompletely() { return this; }
     reduce() {
+
+        return this; // can't reduce a DefineExpr.
+
         if (!this.expr ||
             this.expr instanceof MissingExpression)
             return this;
