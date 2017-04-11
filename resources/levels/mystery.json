@@ -28,7 +28,7 @@
         },
         {
             "description": "The choice block",
-            "board": "(== _ _) (choice star false) (choice 2 3 $x)",
+            "board": "(== _ _) (choice star false) (choice 2 3 $_x)",
             "goal": "(true)",
             "toolbox": "",
             "globals": {
@@ -178,7 +178,7 @@
         },
         {
             "description": "Fade repeat",
-            "board": "($x) (repeat /2 _) (choice (assign $x /(+ $x _)) (assign $y /(+ $y _))) (choice 0 1 $x $y)",
+            "board": "($x) (repeat /2 _) (choice (assign $x /(+ $x _)) (assign $y /(+ $y _))) (choice 0 1 $_x $_y)",
             "goal": "(4)",
             "toolbox": "",
             "globals": {
