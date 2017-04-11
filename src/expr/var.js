@@ -725,19 +725,70 @@ class VtableVarExpr extends ObjectExtensionExpr {
         }
         else {
             this.hasVtable = false;
+            if (this.variable.color) {
+                this.color = this.variable.color;
+            }
+        }
+    }
+
+    performReduction() {
+        if (!this.hasVtable || !this.subReduceMethod) {
+            if (!this.variable.canReduce()) {
+                // Play the ? animation
+                this.variable.performReduction();
+                return Promise.reject(`${this.name} is undefined.`);
+            }
+            else {
+                let value = this.variable.reduce().clone();
+                (this.parent || this.stage).swap(this, value);
+                return Promise.resolve(value);
+            }
+        }
+        else {
+            let result = this.reduce();
+            (this.parent || this.stage).swap(this, result);
+            return result;
+        }
+    }
+
+    reduceCompletely() {
+        if (!this.hasVtable || !this.subReduceMethod) {
+            if (!this.variable.canReduce()) {
+                return this;
+            }
+            else {
+                let value = this.variable.reduce().clone();
+                return value;
+            }
+        }
+        else {
+            return this.reduce();
         }
     }
 
     reduce() {
+        if ((!this.hasVtable || !this.subReduceMethod) && !this.variable.canReduce()) {
+            return this;
+        }
         if (!this.hasVtable) return this.value;
         if (!this.subReduceMethod) return this.value;
-        let value = this.variable.reduce();
+
+        // Use a surrogate to do the actual reduction, so that (1) we
+        // can use the actual object's reduce() method (this is
+        // important for ArrayObjectExpr which does some
+        // post-processing on the result) and (2) we can reduce()
+        // without mutating ourselves
+        let value = this.variable.reduce().clone();
+        let surrogate = this;
         if (value instanceof ObjectExtensionExpr) {
+            surrogate = value;
             value = value.holes[0];
         }
-        this.swap(this.variable, value);
-        value.lock();
-        return super.reduce();
+
+        surrogate.parent = this;  // In case the surrogate needs our environment
+        surrogate.setExtension("", this.subReduceMethod, this.methodArgs);
+
+        return surrogate.reduce();
     }
 }
 
@@ -769,5 +820,15 @@ class DynamicPulloutDrawer extends PulloutDrawer {
         this.txts = txts;
 
         super.open();
+    }
+
+    draw(ctx) {
+        // Don't draw ourselves if the parent var does not have a
+        // vtable or is nested
+        if (this.parent && (!this.parent.hasVtable || this.parent.parent)) {
+            return;
+        }
+
+        super.draw(ctx);
     }
 }

@@ -690,6 +690,21 @@ class Expression extends mag.RoundedRect {
 // A base Expression which does not equate .holes and .children.
 // -> TODO: Remove the need for this by merging it with the base class.
 class ExpressionPlus extends Expression {
+    swap(arg, anotherArg) {
+        super.swap(arg, anotherArg);
+
+        // Now remove it from the children as well
+        if (arg && anotherArg) {
+            let i = this.children.indexOf(arg);
+            if (i > -1) {
+                // Don't add it again: it was already added when
+                // Expression#swap called our #update().
+                this.children.splice(i, 1);
+                this.update();
+            }
+        }
+    }
+
     update() {
         var _this = this;
 

@@ -356,8 +356,11 @@ class ObjectExtensionExpr extends ExpressionPlus {
         //      }
         // }
 
-        let onCellSelect = (cell) => {
-            this.setExtension(cell.children[0].text.replace('.', '').split('(')[0], cell.children[0]._reduceMethod);
+        let onCellSelect = (self, cell) => {
+            // 'this' needs to be late-bound, or else cloning an
+            // ObjectExtensionExpr means methods will be called on the
+            // wrong object
+            self.setExtension(cell.children[0].text.replace('.', '').split('(')[0], cell.children[0]._reduceMethod);
         };
 
         // Make pullout-drawer:
@@ -410,6 +413,17 @@ class ObjectExtensionExpr extends ExpressionPlus {
             let r;
             let args = this.methodArgs;
             console.log(args);
+            // Reduce the args before calling (call-by-value)
+            for (let i = 0; i < args.length; i++) {
+                let arg = args[i];
+                if (arg.canReduce()) {
+                    args[i] = arg.reduceCompletely();
+                }
+                else if (!arg.isValue()) {
+                    console.warn("Can't call method; argument cannot reduce");
+                    return this;
+                }
+            }
             if (args.length > 0) // Add arguments to method call.
                 r = this.subReduceMethod(this.holes[0], ...args);
             else r = this.subReduceMethod(this.holes[0]); // Method doesn't take arguments.
@@ -645,7 +659,7 @@ class DropdownSelect extends mag.Rect {
         this.close();
 
         // Fire callback
-        if (this.onCellClick) this.onCellClick(cell);
+        if (this.onCellClick) this.onCellClick(this.parent.parent, cell);
     }
 }
 

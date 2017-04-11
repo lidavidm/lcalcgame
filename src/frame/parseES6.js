@@ -46,7 +46,7 @@ class ES6Parser {
             return expr;
         } else {
             let exprs = statements.map((n) => this.parseNode(n));
-            let seq = new Sequence(...exprs);
+            let seq = new (ExprManager.getClass('sequence'))(...exprs);
             seq.lockSubexpressions(this.lockFilter);
             return seq;
         }
@@ -157,6 +157,14 @@ class ES6Parser {
                     console.warn('Lambda expessions with more than one input are currently undefined.');
                     return null;
                 }
+            },
+
+            'AssignmentExpression': (node) => {
+                let result = new (ExprManager.getClass('assign'))(this.parseNode(node.left), this.parseNode(node.right));
+                mag.Stage.getNodesWithClass(MissingExpression, [], true, [result]).forEach((n) => {
+                    n.__remain_unlocked = true;
+                });
+                return result;
             },
 
             /*  BinaryExpression includes the operators:
