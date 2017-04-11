@@ -637,9 +637,9 @@ var ArrayObjectExpr = function (_ObjectExtensionExpr) {
         _classCallCheck(this, ArrayObjectExpr);
 
         var _this8 = _possibleConstructorReturn(this, (ArrayObjectExpr.__proto__ || Object.getPrototypeOf(ArrayObjectExpr)).call(this, baseArray, { // Reduce methods for the submethods of the object.
-            'shift': function shift(arrayExpr) {
+            'pop': function pop(arrayExpr) {
                 if (arrayExpr.items.length === 0) return arrayExpr; // TODO: This should return undefined.
-                var item = arrayExpr.items[0].clone();
+                var item = arrayExpr.items[arrayExpr.items.length - 1].clone();
                 return item;
             },
             'push': function push(arrayExpr, pushedExpr) {

@@ -475,9 +475,9 @@ class ArrayObjectExpr extends ObjectExtensionExpr {
         super(baseArray,
 
               { // Reduce methods for the submethods of the object.
-                'shift':(arrayExpr) => {
+                'pop':(arrayExpr) => {
                     if (arrayExpr.items.length === 0) return arrayExpr; // TODO: This should return undefined.
-                    let item = arrayExpr.items[0].clone();
+                    let item = arrayExpr.items[arrayExpr.items.length-1].clone();
                     return item;
               },
                 'push':(arrayExpr, pushedExpr) => {

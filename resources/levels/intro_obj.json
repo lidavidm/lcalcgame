@@ -4,12 +4,12 @@
     "levels": [
         {
             "goal": "(star) (rect)",
-            "board": "(arrayobj (bag /star /rect /circle) `shift) (arrayobj (bag /rect /star /triangle) `shift)"
+            "board": "(arrayobj (bag /rect /circle /star) `pop) (arrayobj (bag /triangle /star /rect) `pop)"
         },
         {
             "goal": "true",
             "board": "(== _ /triangle)",
-            "toolbox": "(arrayobj (bag /star /rect) `shift) (arrayobj (bag /triangle /star) `shift) (arrayobj (bag /rect /triangle) `shift)"
+            "toolbox": "(arrayobj (bag /rect /star) `pop) (arrayobj (bag /star /triangle) `pop) (arrayobj (bag /triangle /rect) `pop)"
         },
         {
             "goal": "(bag /star /star /rect)",
@@ -23,7 +23,7 @@
         },
         {
             "goal": "star",
-            "board": "(arrayobj (bag /star /rect /triangle))"
+            "board": "(arrayobj (bag /rect /triangle /star))"
         },
         {
             "goal": "(bag /star /star /star)",
