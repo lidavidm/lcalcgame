@@ -1,15 +1,15 @@
 {
     "chapterName":"Intro to Objects",
-    "description":"Array as an Object, and Entangled Goals",
+    "description":"Array as an Object",
     "levels": [
         {
             "goal": "(star) (rect)",
-            "board": "(arrayobj (bag /star /rect /circle) `pop) (arrayobj (bag /rect /star /triangle) `pop)"
+            "board": "(arrayobj (bag /star /rect /circle) `shift) (arrayobj (bag /rect /star /triangle) `shift)"
         },
         {
             "goal": "true",
             "board": "(== _ /triangle)",
-            "toolbox": "(arrayobj (bag /star /rect) `pop) (arrayobj (bag /triangle /star) `pop) (arrayobj (bag /rect /triangle) `pop)"
+            "toolbox": "(arrayobj (bag /star /rect) `shift) (arrayobj (bag /triangle /star) `shift) (arrayobj (bag /rect /triangle) `shift)"
         },
         {
             "goal": "(bag /star /star /rect)",

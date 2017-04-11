@@ -2,6 +2,7 @@
 
 var __SHOW_DEV_INFO = true;
 var __COND = 'unknown';
+var __SHOW_MAINMENU_NAV = false;
 
 var GLOBAL_DEFAULT_CTX = null;
 var GLOBAL_DEFAULT_SCREENSIZE = null;
@@ -66,7 +67,10 @@ function init() {
                 if (userinfo.cond) {
                     __COND = userinfo.cond;
 
-                    if (userinfo.cond === 'B') ExprManager.setDefaultFadeLevel(100);
+                    if (userinfo.cond === 'B') {
+                        ExprManager.setDefaultFadeLevel(100);
+                        $('#fade_status').text('OFF');
+                    }
                 }
 
                 return loadChapterSelect();
@@ -123,6 +127,7 @@ function initLevel(levelSelected, levelSelectedIdx) {
     }
     prepareCanvas();
     $('#lvl_num_visible').text(level_idx + 1 + '');
+    $('#chap_name').text(Resource.chapterForLevelIdx(levelSelectedIdx).name);
     level_idx = levelSelectedIdx;
     stage = Resource.buildLevel(levelSelected, canvas);
     redraw(stage);
@@ -350,6 +355,8 @@ function initBoard() {
         // New: saves progress upon reload.
         saveProgress();
         $('#lvl_num_visible').text(level_idx + 1 + '');
+        $('#chap_name').text(Resource.chapterForLevelIdx(level_idx).name);
+        $('#lvl_max_num_visible').text(Resource.level.length);
 
         stage = Resource.buildLevel(Resource.level[level_idx], canvas);
 
@@ -465,6 +472,7 @@ function prev() {
         initBoard();
     }
 }
+
 function next() {
     if (!Logger.sessionBegan()) return;
     if (level_idx === Resource.level.length - 1) {
@@ -477,21 +485,23 @@ function next() {
             completedLevels[level_idx] = true;
             saveProgress();
 
-            for (var i = 0; i < chapters.length; i++) {
-                if (chapters[i].endIdx === level_idx) {
-                    // Fly to the next planet,
-                    // instead of going to the next level.
-                    var nextPlanets = [];
-                    for (var j = 0; j < chapters.length; j++) {
-                        if (Resource.isChapterUnlocked(j) && chapters[i].transitions.indexOf(chapters[j].key) > -1 && !completedLevels[chapters[j].startIdx]) {
-                            nextPlanets.push({
-                                chapterIdx: j,
-                                startIdx: chapters[j].startIdx
-                            });
+            if (__SHOW_MAINMENU_NAV === true) {
+                for (var i = 0; i < chapters.length; i++) {
+                    if (chapters[i].endIdx === level_idx) {
+                        // Fly to the next planet,
+                        // instead of going to the next level.
+                        var nextPlanets = [];
+                        for (var j = 0; j < chapters.length; j++) {
+                            if (Resource.isChapterUnlocked(j) && chapters[i].transitions.indexOf(chapters[j].key) > -1 && !completedLevels[chapters[j].startIdx]) {
+                                nextPlanets.push({
+                                    chapterIdx: j,
+                                    startIdx: chapters[j].startIdx
+                                });
+                            }
                         }
+                        initChapterSelectMenu(nextPlanets);
+                        return;
                     }
-                    initChapterSelectMenu(nextPlanets);
-                    return;
                 }
             }
 
@@ -546,4 +556,15 @@ function toggleMute() {
     } else {
         Resource.mute();
     }
+}
+
+function toggleFading() {
+    if ($('#fade_status').text() === 'OFF') {
+        ExprManager.setDefaultFadeLevel(0);
+        $('#fade_status').text('ON');
+    } else {
+        ExprManager.setDefaultFadeLevel(100);
+        $('#fade_status').text('OFF');
+    }
+    initBoard();
 }

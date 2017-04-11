@@ -109,6 +109,9 @@
             #lvl_num_visible_box {
                 color:gray;
             }
+            #chap_name_box {
+                color:lightgray;
+            }
             #progressBar {
                 display: block;
                 width:5px;
@@ -199,11 +202,20 @@
 
         <div class="centered" id="lvl_num_visible_box">
             Level #<span id="lvl_num_visible">1</span>
-            / 72
+            / <span id="lvl_max_num_visible"></span>
+        </div>
+
+        <div class="centered" id="chap_name_box">
+            Chapter: <span id="chap_name"></span>
         </div>
 
         <div class="centered">
-            <button onclick="toggleMute()">Mute</button>
+          <select id="chapterSelect">
+          </select>
+        </div>
+
+        <div class="centered">
+            <p></p>
         </div>
 
         <div id="devinfo">
@@ -212,12 +224,11 @@
                 <button onclick="prev()">Prev</button>
                 <button onclick="initBoard()">Reset</button>
                 <button onclick="resetToLevel(0); initMainMenu()">Reset Completely</button>
-                <button onclick="UnitTest.run(stage)">Run Unit Tests</button>
+                <button onclick="toggleMute()">Mute</button>
             </div>
-
             <div class="centered">
-              <select id="chapterSelect">
-              </select>
+                <button onclick="toggleFading()">Fading: <span id="fade_status">ON</span></button>
+                <button onclick="UnitTest.run(stage)">Run Unit Tests</button>
             </div>
 
             <div id="explanation" class="centered">

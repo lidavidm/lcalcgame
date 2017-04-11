@@ -205,15 +205,16 @@ function LOAD_REDUCT_RESOURCES(Resource) {
 
     // Add levels here:
     var chapterDigraph = {
-        //'intro_obj2': ['define'],
-        'define': ['intro'],
         'intro': ['booleans'],
         'booleans': ['conditionals'],
         'conditionals': ['bindings', 'bags'],
         'bindings': ['combination'],
         'bags': ['combination'],
         'combination': ['map'],
-        'map': ['assign'],
+        'map': ['define'],
+        'define': ['intro_obj'],
+        'intro_obj': ['intro_obj2'],
+        'intro_obj2': ['assign'],
         'assign': ['sequence'],
         'sequence': ['loops'],
         'loops': ['mystery'],
@@ -235,6 +236,12 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             }
         }
         return [];
+    };
+    Resource.chapterForLevelIdx = function (idx) {
+        for (var i = 0; i < chapters.length - 1; i++) {
+            if (chapters[i].startIdx <= idx && chapters[i + 1].startIdx > idx) return chapters[i];
+        }
+        return null;
     };
     Resource.chaptersWithLanguage = function (lang) {
         return chapters.filter(function (c) {
