@@ -47,6 +47,9 @@
             "toolbox": "($x) ($y)",
             "globals": {
                 "x": "(2)"
+            },
+            "fade": {
+                "sequence": 1
             }
         },
         {
