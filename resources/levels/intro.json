@@ -63,7 +63,10 @@
             "description":"Tests knowledge of all concepts in this chapter.",
             "board":"(diamond) (λx #x #x)",
             "goal":"(star) (diamond)",
-            "toolbox":"(star) (λx #x)"
+            "toolbox":"(star) (λx #x)",
+            "fade":{
+                "lambda":2
+            }
         }
     ],
     "resources":{

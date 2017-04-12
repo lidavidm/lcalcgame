@@ -54,7 +54,10 @@
             "description": "Teaching partial binding with choice.",
             "board": "(== _ _) (λx #x #x) (star) (star) (diamond)",
             "goal": "(true) (false)",
-            "toolbox": ""
+            "toolbox": "",
+            "fade": {
+                "==":1
+            }
         },
         {
             "description": "Our favorite hard level :)",

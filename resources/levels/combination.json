@@ -12,7 +12,10 @@
             "board":"(if _b /star) (if _b /rect)",
             "goal":"star",
             "toolbox":"(true) (false)",
-            "description":"Teaching if and true and false."
+            "description":"Teaching if and true and false.",
+            "fade": {
+                "if":1
+            }
         },
         {
             "board":"(== /(bag star star) _) (== /(bag) _)",
@@ -42,7 +45,10 @@
             "board":"(bag) (star)",
             "goal":"(bag star)",
             "toolbox":"",
-            "description":"Faded bag."
+            "description":"Faded bag.",
+            "fade": {
+                "bag":1
+            }
         },
         {
             "board":"(bag star star)",

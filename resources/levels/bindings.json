@@ -12,7 +12,10 @@
             "description": "Fades lambdas.",
             "board": "(λx /(== #x /star)) (λx #x) (rect)",
             "goal": "false",
-            "toolbox": ""
+            "toolbox": "",
+            "fade": {
+                "lambda":3
+            }
         },
         {
             "description": "Reinforces concept: Pipes outside of pure lambdas.",

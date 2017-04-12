@@ -34,8 +34,8 @@ var ExprManager = function () {
         'reference': [JumpingChestVarExpr, ChestVarExpr, LabeledChestVarExpr, LabeledVarExpr],
         'reference_display': [DisplayChest, LabeledDisplayChest, SpreadsheetDisplay],
         'environment_display': [EnvironmentDisplay, SpreadsheetEnvironmentDisplay],
-        'hole': [LambdaHoleExpr, DelayedLambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedLambdaHoleExpr, FadedES6LambdaHoleExpr, DelayedFadedES6LambdaHoleExpr],
-        'lambda': [LambdaHoleExpr, DelayedLambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr, DelayedFadedES6LambdaHoleExpr],
+        'hole': [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedLambdaHoleExpr, FadedES6LambdaHoleExpr, DelayedFadedES6LambdaHoleExpr],
+        'lambda': [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr, DelayedFadedES6LambdaHoleExpr],
         'lambda_abstraction': [LambdaExpr], // TODO: Add back EnvironmentLambdaExpr... I removed it because this is broken with DEFINE currently.
         'assign': [JumpingAssignExpr, AssignExpr, EqualsAssignExpr],
         'sequence': [NotchedSequence, SemicolonNotchedSequence, SemicolonSequence],
@@ -77,11 +77,11 @@ var ExprManager = function () {
     //     'snappable': [145],
     //     'number': [129],
     // };
-    // const primitives = ['triangle', 'rect', 'star', 'circle', 'diamond'];
     // primitives.forEach((p) => {
     //     DEFAULT_FADE_PROGRESSION[p] = DEFAULT_FADE_PROGRESSION.primitives;
     // });
     // DEFAULT_FADE_PROGRESSION.primitives = undefined;
+    var primitives = ['triangle', 'rect', 'star', 'circle', 'diamond'];
     pub.isPrimitive = function (str) {
         return primitives.indexOf(str) > -1;
     };
@@ -171,7 +171,6 @@ var ExprManager = function () {
                     cur_level = o.fade_level;
                 }
             }
-            if (ename === 'lambda') console.log(cur_level);
             if (DEFAULT_FADE_LEVEL > cur_level) return pub.getDefaultFadeLevel(ename);else return cur_level;
         } else return pub.getDefaultFadeLevel(ename);
     };
