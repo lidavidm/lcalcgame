@@ -196,14 +196,34 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     Resource.chaptersWithLanguage = (lang) => {
         return chapters.filter((c) => c.language === lang);
     };
-    Resource.buildLevel = (level_desc, canvas) => {
-        ExprManager.clearFadeLevels();
-        if ('fade' in level_desc) {
-            for (let key in level_desc.fade) {
-                console.log(key);
-                ExprManager.setFadeLevel(key, level_desc.fade[key]);
+    Resource.compileFadeLevels = () => {
+        let progression = {};
+        for (let i = 0; i < levels.length; i++) {
+            let level_desc = levels[i];
+            if ('fade' in level_desc) {
+                for (var ename in level_desc.fade) {
+                    let o = {
+                        level_idx: i,
+                        fade_level: level_desc.fade[ename]
+                    };
+                    if (ename in progression)
+                        progression[ename].push(o);
+                    else
+                        progression[ename] = [ o ];
+                }
             }
         }
+        ExprManager.clearFadeLevels();
+        ExprManager.setFadeLevelMap(progression);
+    };
+    Resource.buildLevel = (level_desc, canvas) => {
+        Resource.compileFadeLevels();
+
+        // if ('fade' in level_desc) {
+        //     for (let key in level_desc.fade) {
+        //         ExprManager.setFadeLevel(key, level_desc.fade[key]);
+        //     }
+        // }
 
         if (!level_desc["globals"]) {
             level_desc.globals = {};
@@ -213,8 +233,10 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         if (fadedBorders.length > 0) {
 
             ExprManager.fadesAtBorder = false;
+            console.log('Making unfaded level...');
             let unfaded = Level.make(level_desc).build(canvas);
             ExprManager.fadesAtBorder = true;
+            console.log('Making faded level...');
             let faded = Level.make(level_desc).build(canvas);
 
             let unfaded_exprs = unfaded.nodes;
@@ -234,7 +256,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                 let faded_roots   = faded.getRootNodesThatIncludeClass(border.fadedClass);
 
                 if (unfaded_roots.length !== faded_roots.length) {
-                    console.error('Cannot fade border ', border, ': Different # of root expressions.', unfaded_roots, faded_roots);
+                    console.error('Cannot fade border ', border, ': Different # of root expressions.', unfaded_roots, faded_roots, unfaded.nodes, faded.nodes);
                     continue;
                 }
 

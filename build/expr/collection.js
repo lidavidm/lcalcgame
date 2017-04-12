@@ -449,6 +449,7 @@ var BracketArrayExpr = function (_BagExpr) {
                 if (!(i instanceof TextExpr)) c.addItem(i.clone());
             });
             c.graphicNode.update();
+            if (this.locked) c.lock();
             return c;
         }
 

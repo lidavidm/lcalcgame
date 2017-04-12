@@ -868,6 +868,22 @@ var ExpressionPlus = function (_Expression) {
     }
 
     _createClass(ExpressionPlus, [{
+        key: 'swap',
+        value: function swap(arg, anotherArg) {
+            _get(ExpressionPlus.prototype.__proto__ || Object.getPrototypeOf(ExpressionPlus.prototype), 'swap', this).call(this, arg, anotherArg);
+
+            // Now remove it from the children as well
+            if (arg && anotherArg) {
+                var i = this.children.indexOf(arg);
+                if (i > -1) {
+                    // Don't add it again: it was already added when
+                    // Expression#swap called our #update().
+                    this.children.splice(i, 1);
+                    this.update();
+                }
+            }
+        }
+    }, {
         key: 'update',
         value: function update() {
             var _this10 = this;

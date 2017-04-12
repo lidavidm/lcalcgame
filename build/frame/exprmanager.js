@@ -47,37 +47,41 @@ var ExprManager = function () {
         'infinite': [InfiniteExpression],
         'notch': [NotchHangerExpr]
     };
-    var fade_level = {};
+    var fade_levels = {};
     var DEFAULT_FADE_LEVEL = 0;
 
-    var DEFAULT_FADE_PROGRESSION = {
-        'var': [[19, 30], 30, 42], // should be 9 (along with 'hole' below)
-        'reference': [79, 80, 96],
-        'reference_display': [80, 96],
-        'environment_display': [96],
-        //'lambda_abstraction': [98],
-        'lambda_abstraction': [1000000],
-        'assign': [79, 96],
-        'hole': [[19, 30], 30, 42],
-        'if': [26, 45],
-        '_b': [34],
-        '==': [1], //[24],
-        'true': [1], //[46],
-        'false': [1], //[46],
-        'bag': [51],
-        '__': [51],
-        'primitives': [66, 72],
-        'map': [61],
-        'repeat': [147],
-        'sequence': [118, 145],
-        'snappable': [145],
-        'number': [129]
+    pub.setFadeLevelMap = function (lvls) {
+        fade_levels = lvls;
     };
-    var primitives = ['triangle', 'rect', 'star', 'circle', 'diamond'];
-    primitives.forEach(function (p) {
-        DEFAULT_FADE_PROGRESSION[p] = DEFAULT_FADE_PROGRESSION.primitives;
-    });
-    DEFAULT_FADE_PROGRESSION.primitives = undefined;
+
+    // var DEFAULT_FADE_PROGRESSION = {
+    //     'var'   : [[19, 30], 30, 42], // should be 9 (along with 'hole' below)
+    //     'reference': [79, 80, 96],
+    //     'reference_display': [80, 96],
+    //     'environment_display': [96],
+    //     //'lambda_abstraction': [98],
+    //     'lambda_abstraction': [1000000],
+    //     'assign': [79, 96],
+    //     'hole'  : [[19, 30], 30, 42],
+    //     'if'    : [26, 45],
+    //     '_b'    : [34],
+    //     '=='    : [1], //[24],
+    //     'true'  : [1], //[46],
+    //     'false' : [1], //[46],
+    //     'bag'   : [51],
+    //     '__'    : [51],
+    //     'primitives' : [66, 72],
+    //     'map'   : [61],
+    //     'repeat': [147],
+    //     'sequence': [118, 145],
+    //     'snappable': [145],
+    //     'number': [129],
+    // };
+    // const primitives = ['triangle', 'rect', 'star', 'circle', 'diamond'];
+    // primitives.forEach((p) => {
+    //     DEFAULT_FADE_PROGRESSION[p] = DEFAULT_FADE_PROGRESSION.primitives;
+    // });
+    // DEFAULT_FADE_PROGRESSION.primitives = undefined;
     pub.isPrimitive = function (str) {
         return primitives.indexOf(str) > -1;
     };
@@ -117,18 +121,14 @@ var ExprManager = function () {
     pub.fadeBordersAt = function (lvl) {
         if (DEFAULT_FADE_LEVEL >= 4) return [];
 
-        var prog = DEFAULT_FADE_PROGRESSION;
+        var prog = fade_levels;
         var borders = [];
         for (var t in prog) {
             if (t === 'primitives') continue;
-            var ranges = prog[t];
-            for (var i = 0; i < ranges.length; i++) {
-                var r = ranges[i];
-                if (Array.isArray(r)) {
-                    if (r[0] === lvl) borders.push([t, i, i + 1, true]);else if (r[1] === lvl) borders.push([t, i + 1, i, false]);
-                } else if (r === lvl) {
-                    borders.push([t, i, i + 1, true]);
-                }
+
+            var fade_lvl_obj = prog[t];
+            for (var i = 0; i < fade_lvl_obj.length; i++) {
+                if (fade_lvl_obj[i].level_idx === lvl) borders.push([t, pub.getFadeLevel(t, lvl - 1), pub.getFadeLevel(t, lvl), true]);
             }
         }
         return borders.map(function (b) {
@@ -150,23 +150,29 @@ var ExprManager = function () {
             return undefined;
         }
     };
-    pub.getFadeLevel = function (ename) {
+    pub.getFadeLevel = function (ename, lvl) {
+        if (typeof lvl === 'undefined') lvl = level_idx;
 
-        var is_primitive = primitives.indexOf(ename) > -1;
+        //let is_primitive = primitives.indexOf(ename) > -1;
 
-        if (ename in fade_level) return fade_level[ename];else if ((ename === 'var' || ename === 'hole') && 'lambda' in fade_level) return fade_level.lambda;else if (ename in DEFAULT_FADE_PROGRESSION || is_primitive && "primitives" in DEFAULT_FADE_PROGRESSION) {
+        if ((ename === 'var' || ename === 'hole') && 'lambda' in fade_levels) {
+            var max = pub.getNumOfFadeLevels(ename) - 1;
+            var fl = pub.getFadeLevel('lambda');
+            if (fl > max) return max;else return fl;
+        } else if (ename in fade_levels) {
 
-            var lvl_map = DEFAULT_FADE_PROGRESSION[ename];
-            var fadeclass_idx = 0;
+            var lvl_map = fade_levels[ename];
+            var cur_level = 0;
             for (var i = 0; i < lvl_map.length; i++) {
-                var range = lvl_map[i];
-                if (Array.isArray(range)) {
-                    if (level_idx >= range[0] && level_idx < range[1]) {
-                        if (!pub.fadesAtBorder && level_idx === range[0]) fadeclass_idx = i;else fadeclass_idx = i + 1;
-                    }
-                } else if (!pub.fadesAtBorder && level_idx === range) fadeclass_idx = i;else if (level_idx >= range) fadeclass_idx = i + 1;
+                var o = lvl_map[i];
+                if (ExprManager.fadesAtBorder === false && o.level_idx < lvl) {
+                    cur_level = o.fade_level;
+                } else if (ExprManager.fadesAtBorder === true && o.level_idx <= lvl) {
+                    cur_level = o.fade_level;
+                }
             }
-            if (DEFAULT_FADE_LEVEL > fadeclass_idx) return pub.getDefaultFadeLevel(ename);else return fadeclass_idx;
+            if (ename === 'lambda') console.log(cur_level);
+            if (DEFAULT_FADE_LEVEL > cur_level) return pub.getDefaultFadeLevel(ename);else return cur_level;
         } else return pub.getDefaultFadeLevel(ename);
     };
     pub.getDefaultFadeLevel = function (ename) {
@@ -187,13 +193,13 @@ var ExprManager = function () {
             console.warn('Expression type ' + ename + ' has only ' + pub.getNumOfFadeLevels(ename) + ' fade levels. (' + index + 'exceeds)');
             index = pub.getNumOfFadeLevels(ename) - 1; // Set to max fade.
         }
-        fade_level[ename] = index;
+        fade_levels[ename] = index;
     };
     pub.setDefaultFadeLevel = function (index) {
         if (index >= 0) DEFAULT_FADE_LEVEL = index;
     };
     pub.clearFadeLevels = function () {
-        fade_level = {};
+        fade_levels = {};
     };
 
     return pub;

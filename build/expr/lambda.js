@@ -267,7 +267,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
 
             if (node instanceof LambdaHoleExpr) node = node.parent;
             // Variables must be reduced before application
-            if (node instanceof VarExpr || node instanceof AssignExpr) return;
+            if (node instanceof VarExpr || node instanceof AssignExpr || node instanceof VtableVarExpr) return;
             // Disallow interaction with nested lambdas
             if (this.parent && this.parent.parent instanceof LambdaExpr) return;
             _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'ondropenter', this).call(this, node, pos);
@@ -318,7 +318,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
         key: 'ondropexit',
         value: function ondropexit(node, pos) {
             if (node instanceof LambdaHoleExpr) node = node.parent;
-            if (node instanceof VarExpr || node instanceof AssignExpr) return;
+            if (node instanceof VarExpr || node instanceof AssignExpr || node instanceof VtableVarExpr) return;
             if (this.parent && this.parent.parent instanceof LambdaExpr) return;
 
             _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'ondropexit', this).call(this, node, pos);
@@ -328,7 +328,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
             // }
 
             if (node) node.opacity = 1.0;
-            this.close_opened_subexprs();
+            if (this.close_opened_subexprs) this.close_opened_subexprs();
         }
     }, {
         key: 'ondropped',
@@ -340,6 +340,9 @@ var LambdaHoleExpr = function (_MissingExpression) {
             if (this.parent && this.parent.parent instanceof LambdaExpr) {
                 return null;
             }
+
+            // Disallow dropping non-values
+            if (node instanceof VarExpr || node instanceof AssignExpr || node instanceof VtableVarExpr) return null;
 
             if (node.dragging) {
                 // Make sure node is being dragged by the user.
@@ -464,6 +467,8 @@ var DelayedLambdaHoleExpr = function (_LambdaHoleExpr) {
             if (this.parent && this.parent.parent instanceof LambdaExpr) {
                 return null;
             }
+            // Disallow applying to non values
+            if (node instanceof VarExpr || node instanceof AssignExpr || node instanceof VtableVarExpr) return null;
             var parent = this.parent;
             var stage = this.stage;
             node.opacity = 1;
@@ -696,6 +701,11 @@ var LambdaExpr = function (_Expression) {
     }
 
     _createClass(LambdaExpr, [{
+        key: 'isValue',
+        value: function isValue() {
+            return true;
+        }
+    }, {
         key: 'getEnvironment',
         value: function getEnvironment() {
             var env = _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'getEnvironment', this).call(this);
@@ -1062,6 +1072,12 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
         key: 'onmouseclick',
         value: function onmouseclick() {
             // Don't let the player manually reduce (whatever that even means)
+        }
+    }, {
+        key: 'reduceCompletely',
+        value: function reduceCompletely() {
+            // Do not allow reduction under the lambda!
+            return this;
         }
     }, {
         key: 'performReduction',
@@ -1504,10 +1520,13 @@ var DelayedFadedES6LambdaHoleExpr = function (_FadedES6LambdaHoleEx) {
             if (this.parent && this.parent.parent instanceof LambdaExpr) {
                 return null;
             }
+            // Disallow applying to non values
+            if (node instanceof VarExpr || node instanceof AssignExpr || node instanceof VtableVarExpr) return null;
             var parent = this.parent;
             var stage = this.stage;
             node.opacity = 1;
             node.onmouseleave();
+
             if (this.close_opened_subexprs) this.close_opened_subexprs();
             var res = new ApplyExpr(node.clone(), this.parent.clone());
             stage.remove(node);

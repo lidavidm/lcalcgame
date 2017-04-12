@@ -72,7 +72,7 @@ var CompareExpr = function (_Expression) {
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
-            if (this.leftExpr && this.rightExpr && this.leftExpr instanceof VarExpr && !this._animating) {
+            if (this.leftExpr && this.rightExpr && !this.leftExpr.isValue() && !this._animating) {
                 var _ret = function () {
                     var before = _this2.leftExpr;
                     _this2._animating = true;
@@ -89,7 +89,7 @@ var CompareExpr = function (_Expression) {
                 if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
             }
 
-            if (this.leftExpr && this.rightExpr && this.rightExpr instanceof VarExpr && !this._animating) {
+            if (this.leftExpr && this.rightExpr && !this.rightExpr.isValue() && !this._animating) {
                 var _ret2 = function () {
                     _this2._animating = true;
                     var before = _this2.rightExpr;

@@ -65,7 +65,7 @@ var ES6Parser = function () {
                 var exprs = statements.map(function (n) {
                     return _this.parseNode(n);
                 });
-                var seq = new (Function.prototype.bind.apply(Sequence, [null].concat(_toConsumableArray(exprs))))();
+                var seq = new (Function.prototype.bind.apply(ExprManager.getClass('sequence'), [null].concat(_toConsumableArray(exprs))))();
                 seq.lockSubexpressions(this.lockFilter);
                 return seq;
             }
@@ -181,6 +181,14 @@ var ES6Parser = function () {
                         console.warn('Lambda expessions with more than one input are currently undefined.');
                         return null;
                     }
+                },
+
+                'AssignmentExpression': function AssignmentExpression(node) {
+                    var result = new (ExprManager.getClass('assign'))(_this2.parseNode(node.left), _this2.parseNode(node.right));
+                    mag.Stage.getNodesWithClass(MissingExpression, [], true, [result]).forEach(function (n) {
+                        n.__remain_unlocked = true;
+                    });
+                    return result;
                 },
 
                 /*  BinaryExpression includes the operators:

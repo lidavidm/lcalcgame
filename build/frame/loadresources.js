@@ -218,7 +218,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         'assign': ['sequence'],
         'sequence': ['loops'],
         'loops': ['mystery'],
-        'mystery': []
+        'mystery': ['variables_obj'],
+        'variables_obj': []
     };
 
     var chapter_load_prom = loadChaptersFromDigraph(chapterDigraph);
@@ -248,14 +249,31 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             return c.language === lang;
         });
     };
-    Resource.buildLevel = function (level_desc, canvas) {
-        ExprManager.clearFadeLevels();
-        if ('fade' in level_desc) {
-            for (var key in level_desc.fade) {
-                console.log(key);
-                ExprManager.setFadeLevel(key, level_desc.fade[key]);
+    Resource.compileFadeLevels = function () {
+        var progression = {};
+        for (var i = 0; i < levels.length; i++) {
+            var level_desc = levels[i];
+            if ('fade' in level_desc) {
+                for (var ename in level_desc.fade) {
+                    var o = {
+                        level_idx: i,
+                        fade_level: level_desc.fade[ename]
+                    };
+                    if (ename in progression) progression[ename].push(o);else progression[ename] = [o];
+                }
             }
         }
+        ExprManager.clearFadeLevels();
+        ExprManager.setFadeLevelMap(progression);
+    };
+    Resource.buildLevel = function (level_desc, canvas) {
+        Resource.compileFadeLevels();
+
+        // if ('fade' in level_desc) {
+        //     for (let key in level_desc.fade) {
+        //         ExprManager.setFadeLevel(key, level_desc.fade[key]);
+        //     }
+        // }
 
         if (!level_desc["globals"]) {
             level_desc.globals = {};
@@ -266,8 +284,10 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             var _ret = function () {
 
                 ExprManager.fadesAtBorder = false;
+                console.log('Making unfaded level...');
                 var unfaded = Level.make(level_desc).build(canvas);
                 ExprManager.fadesAtBorder = true;
+                console.log('Making faded level...');
                 var faded = Level.make(level_desc).build(canvas);
 
                 var unfaded_exprs = unfaded.nodes;
@@ -296,7 +316,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                         var faded_roots = faded.getRootNodesThatIncludeClass(border.fadedClass);
 
                         if (unfaded_roots.length !== faded_roots.length) {
-                            console.error('Cannot fade border ', border, ': Different # of root expressions.', unfaded_roots, faded_roots);
+                            console.error('Cannot fade border ', border, ': Different # of root expressions.', unfaded_roots, faded_roots, unfaded.nodes, faded.nodes);
                             continue;
                         }
 

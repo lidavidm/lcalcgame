@@ -514,10 +514,10 @@ var StringValueExpr = function (_Expression3) {
 
         var _this17 = _possibleConstructorReturn(this, (StringValueExpr.__proto__ || Object.getPrototypeOf(StringValueExpr)).call(this, [text]));
 
-        _this17.primitiveName = name;
+        _this17.name = name;
+        _this17.primitiveName = primitiveName || name;
         text.color = "OrangeRed";
         _this17.color = "gold";
-        _this17.primitiveName = primitiveName || name;
         return _this17;
     }
 
@@ -549,7 +549,7 @@ var StringValueExpr = function (_Expression3) {
     }, {
         key: 'value',
         value: function value() {
-            return this.primitiveName;
+            return this.name;
         }
     }, {
         key: 'graphicNode',

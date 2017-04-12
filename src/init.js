@@ -40,7 +40,7 @@ function init() {
 
     if (__GET_PARAMS || true) {
         var start_from = __GET_PARAMS.level;
-        var fade_level = __GET_PARAMS.fade || 4;
+        var fade_level = __GET_PARAMS.fade;
         //var playerId = __GET_PARAMS.player;
         if (start_from) {
             console.log(start_from);

@@ -281,6 +281,10 @@ var TypeInTextExpr = function (_TextExpr) {
                 'single': function single(txt) {
                     var res = __PARSER.parse(txt);
                     return res && !(res instanceof Sequence);
+                },
+                'variable': function variable(txt) {
+                    var result = __PARSER.parse(txt);
+                    return result instanceof VarExpr || result instanceof VtableVarExpr;
                 }
             };
             if (code in validators) {
