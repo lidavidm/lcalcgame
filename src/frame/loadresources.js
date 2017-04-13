@@ -187,8 +187,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         return [];
     };
     Resource.chapterForLevelIdx = (idx) => {
-        for (let i = 0; i < chapters.length-1; i++) {
-            if (chapters[i].startIdx <= idx && chapters[i+1].startIdx > idx)
+        for (let i = 0; i < chapters.length; i++) {
+            if (chapters[i].startIdx <= idx && (!chapters[i+1] || chapters[i+1].startIdx > idx))
                 return chapters[i];
         }
         return null;
