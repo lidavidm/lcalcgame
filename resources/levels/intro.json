@@ -9,12 +9,6 @@
             "toolbox":""
         },
         {
-            "description":"Introduces concept: Identity.",
-            "board":"(λx #x) (λx #x) (λx #x) (star)",
-            "goal":"star",
-            "toolbox":""
-        },
-        {
             "description":"Introduces concept: Constant functions.",
             "board":"(λx /star) (rect) (star)",
             "goal":"(star) (star)",
@@ -36,27 +30,9 @@
             "toolbox":""
         },
         {
-            "description":"Toolbox can hold expressions.",
-            "board":"",
-            "goal":"(diamond) (diamond)",
-            "toolbox":"(star) (diamond) (λx #x #x)"
-        },
-        {
-            "description": "Replication with free binding.",
-            "board": "(λx _ _) (#_x) (#_x)",
-            "goal": "(triangle) (triangle)",
-            "toolbox": "(triangle) (star) (rect)"
-        },
-        {
             "description":"Functions are first-class.",
             "board":"(λx #x) (λx #x #x)",
             "goal":"(λx #x) (λx #x)",
-            "toolbox":""
-        },
-        {
-            "description":"Functions are first-class!",
-            "board":"(λx #x #x #x) (λx #x) (star)",
-            "goal":"star",
             "toolbox":""
         },
         {
@@ -66,6 +42,93 @@
             "toolbox":"(star) (λx #x)",
             "fade":{
                 "lambda":2
+            }
+        },
+        {
+            "description": "Introduces concept: Reduction; Boolean comparison.",
+            "board": "(== /star /star)",
+            "goal": "true",
+            "toolbox": ""
+        },
+        {
+            "description": "Introduces concept: Holes.",
+            "board": "(== /star _) (star)",
+            "goal": "true",
+            "toolbox": ""
+        },
+        {
+            "description": "Introduces false.",
+            "board": "(== /star /diamond)",
+            "goal": "false",
+            "toolbox": ""
+        },
+        {
+            "description": "Partial application.",
+            "board": "(== /star _) (λx #x #x) (diamond) (diamond)",
+            "goal": "(false) (false)",
+            "toolbox": ""
+        },
+        {
+            "description": "Writing a boolean expression from scratch.",
+            "board": "(star)",
+            "goal": "true",
+            "toolbox": "(== _ _) (λx #x #x) (diamond) (λx #x)"
+        },
+        {
+            "description": "Teaching partial binding with choice.",
+            "board": "(== _ _) (λx #x #x) (star) (star) (diamond)",
+            "goal": "(true) (false)",
+            "toolbox": "",
+            "fade": {
+                "==":1
+            }
+        },
+        {
+            "description": "Our favorite hard level :)",
+            "board": "(== _ _) (λx #x #x) (λx #x #x) (star) (diamond)",
+            "goal": "(true) (false)",
+            "toolbox": ""
+        },
+        {
+            "description": "intro to if; true",
+            "board": "(true) (if _b /star)",
+            "goal": "star",
+            "toolbox": ""
+        },
+        {
+            "description": "intro to if; false",
+            "board": "(false) (if _b /star) (rect)",
+            "goal": "rect",
+            "toolbox": ""
+        },
+        {
+            "description": "intro to if; if as selective destruction",
+            "board": "(if /false /star) (if /false _) (star) (rect)",
+            "goal": "rect",
+            "toolbox": ""
+        },
+        {
+            "description":"Choice of boolean",
+            "board":"(if _b /star) ",
+            "goal":"(star)",
+            "toolbox":"(true) (false)",
+            "fade": {
+                "if": 1
+            }
+        },
+        {
+            "description": "intro to if; selective destruction + replication",
+            "board": "(if _b _) (true) (false) (λx #x #x) (star)",
+            "goal": "star",
+            "toolbox": ""
+        },
+        {
+            "description": "conditionals inside booleans; i.e. ternary operator",
+            "board": "(== /star _) (if _b /star) (true)",
+            "goal": "true",
+            "toolbox": "",
+            "fade": {
+                "if": 2
             }
         }
     ],

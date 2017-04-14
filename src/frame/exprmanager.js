@@ -32,7 +32,7 @@ var ExprManager = (function() {
         'reference':[JumpingChestVarExpr, ChestVarExpr, LabeledChestVarExpr, LabeledVarExpr, VtableVarExpr],
         'reference_display':[DisplayChest, LabeledDisplayChest, SpreadsheetDisplay],
         'environment_display':[EnvironmentDisplay, SpreadsheetEnvironmentDisplay],
-        'hole':     [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedLambdaHoleExpr, FadedES6LambdaHoleExpr, DelayedFadedES6LambdaHoleExpr],
+        'hole':     [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr, DelayedFadedES6LambdaHoleExpr],
         'lambda':   [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr, DelayedFadedES6LambdaHoleExpr],
         'lambda_abstraction':   [LambdaExpr, EnvironmentLambdaExpr],
         'assign':   [JumpingAssignExpr, AssignExpr, EqualsAssignExpr],

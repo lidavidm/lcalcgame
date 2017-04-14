@@ -1,6 +1,6 @@
 var __SHOW_DEV_INFO = true;
 var __COND = 'unknown';
-const __SHOW_MAINMENU_NAV = false;
+const __SHOW_MAINMENU_NAV = true;
 
 var GLOBAL_DEFAULT_CTX = null;
 var GLOBAL_DEFAULT_SCREENSIZE = null;
