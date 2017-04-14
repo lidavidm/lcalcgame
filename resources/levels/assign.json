@@ -6,7 +6,10 @@
             "description": "Introducing string values",
             "board": "(== /star _)",
             "toolbox": "(star) (rect) (triangle)",
-            "goal": "(false)"
+            "goal": "(false)",
+            "fade": {
+                "primitives": 1
+            }
         },
         {
             "description": "Reducing a variable.",
@@ -63,6 +66,10 @@
             "toolbox": "(triangle) (star)",
             "globals": {
                 "x": "(rect)"
+            },
+            "fade": {
+                "assign": 1,
+                "reference": 1
             }
         },
         {
@@ -71,6 +78,11 @@
             "goal": "(star)",
             "globals": {
                 "x": "(rect)"
+            },
+            "fade": {
+                "assign": 2,
+                "reference": 2,
+                "reference_display": 1
             }
         },
         {
@@ -218,6 +230,12 @@
             "toolbox": "($x)",
             "globals": {
                 "y": "(star)"
+            },
+            "fade": {
+                "reference": 3,
+                "assign": 2,
+                "reference_display": 2,
+                "environment_display": 1
             }
         },
         {
@@ -234,7 +252,10 @@
             "board": "(λx $x)",
             "goal": "(star)",
             "toolbox": "(rect) (star)",
-            "globals": {}
+            "globals": {},
+            "fade": {
+                "lambda_abstraction": 1
+            }
         },
         {
             "description": "Lambdas can produce comparisons based on input",

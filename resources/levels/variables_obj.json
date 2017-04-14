@@ -1,16 +1,27 @@
 {
-    "chapterName":"Objects with Variables",
-    "description":"mindblowing",
+    "chapterName":"Typing and Variables",
+    "description":"Free Form Input with Mutable State",
     "language": "JavaScript",
     "levels": [
         {
-            "goal": "'triangle'",
-            "board": ["x", "y", "z", "(z) => z", "a"],
-            "toolbox": "",
+            "goal": "'rect'",
+            "board": [],
+            "toolbox": ["x", "y"],
             "globals": {
-                "x": "(arrayobj /(bag /star))",
-                "y": "(2)",
-                "a": "(snappable /(assign $x /star))"
+                "x": "(arrayobj /(bag /triangle /star))",
+                "y": "(arrayobj /(bag /star /rect))"
+            }
+        },
+        {
+            "goal": "'rect'",
+            "board": [],
+            "toolbox": ["x", "y"],
+            "globals": {
+                "x": "(arrayobj /(bag /triangle /star))",
+                "y": "(arrayobj /(bag /star /rect))"
+            },
+            "fade": {
+                "reference": 4
             }
         },
         {
@@ -31,23 +42,28 @@
         },
         {
             "goal": "'star'",
-            "board": ["x = _t_string; y = x", "y"],
+            "board": ["x = _t_any; y = x", "y"],
             "toolbox": "",
             "globals": {
             }
         },
         {
             "goal": "true",
-            "board": ["_t_variable = _t_string; _t_variable = 'triangle'; answer = x == y", "answer"],
+            "board": ["_t_variable = _t_any; _t_variable = 'triangle'; answer = x == y", "answer"],
             "toolbox": "",
             "globals": {
             }
         },
         {
-            "goal": "'triangle'",
-            "board": ["z = _t_string; x = ['star', z]; y = x", "y"],
-            "toolbox": "",
+            "goal": "'rect'",
+            "board": ["_t_any"],
+            "toolbox": [],
             "globals": {
+                "x": "(arrayobj /(bag /triangle /star))",
+                "y": "(arrayobj /(bag /star /rect))"
+            },
+            "fade": {
+                "reference": 4
             }
         }
     ],

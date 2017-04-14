@@ -589,6 +589,14 @@ var mag = (function(_) {
                 let event = getCBKeyEvent(e);
                 stage.onkeyup(event);
             };
+            // Keep track of listeners so we can unregister them
+            window.listeners = window.listeners || {};
+            for (let key of Object.keys(window.listeners)) {
+                window.removeEventListener(key, window.listeners[key], false);
+            }
+            window.listeners.keydown = onkeydown;
+            window.listeners.keypress = onkeypress;
+            window.listeners.keyup = onkeyup;
             window.addEventListener('keydown', onkeydown, false);
             window.addEventListener('keypress', onkeypress, false);
             window.addEventListener('keyup', onkeyup, false);

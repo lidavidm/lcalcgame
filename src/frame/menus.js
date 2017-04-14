@@ -1285,7 +1285,7 @@ class ChapterSelectMenu extends mag.Stage {
     updateParallax() {
         if (this.maxPlanetX) {
             let cameraX = -Math.min(0, this.planetParent.pos.x);
-            let x = Math.min(1.0, (cameraX / (this.maxPlanetX - this.boundingSize.w)))
+            let x = Math.min(1.0, (cameraX / (1 + this.maxPlanetX - this.boundingSize.w)))
                 * 0.5 * this.boundingSize.w;
             x = Math.max(x, 0);
             this.starParent.pos = {
