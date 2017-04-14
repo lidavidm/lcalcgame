@@ -265,6 +265,9 @@ var TypeInTextExpr = function (_TextExpr) {
         value: function fromExprCode(code, afterCommit) {
             code = code.replace('_t_', ''); // remove prepend
             var validators = {
+                'any': function any() {
+                    return true;
+                },
                 'string': function string(txt) {
                     return __PARSER.parse(txt) instanceof StringValueExpr;
                 },

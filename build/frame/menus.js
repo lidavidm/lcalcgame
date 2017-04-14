@@ -1585,7 +1585,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
         value: function updateParallax() {
             if (this.maxPlanetX) {
                 var cameraX = -Math.min(0, this.planetParent.pos.x);
-                var x = Math.min(1.0, cameraX / (this.maxPlanetX - this.boundingSize.w)) * 0.5 * this.boundingSize.w;
+                var x = Math.min(1.0, cameraX / (1 + this.maxPlanetX - this.boundingSize.w)) * 0.5 * this.boundingSize.w;
                 x = Math.max(x, 0);
                 this.starParent.pos = {
                     x: -x,

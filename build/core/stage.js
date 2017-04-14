@@ -756,6 +756,36 @@ var mag = function (_) {
                 var event = getCBKeyEvent(e);
                 stage.onkeyup(event);
             };
+            // Keep track of listeners so we can unregister them
+            window.listeners = window.listeners || {};
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = Object.keys(window.listeners)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var _key = _step.value;
+
+                    window.removeEventListener(_key, window.listeners[_key], false);
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+
+            window.listeners.keydown = onkeydown;
+            window.listeners.keypress = onkeypress;
+            window.listeners.keyup = onkeyup;
             window.addEventListener('keydown', onkeydown, false);
             window.addEventListener('keypress', onkeypress, false);
             window.addEventListener('keyup', onkeyup, false);
@@ -796,27 +826,27 @@ var mag = function (_) {
             if (canvas.listeners) {
                 // Remove prior listeners to prevent events from being
                 // fired multiple times
-                var _iteratorNormalCompletion = true;
-                var _didIteratorError = false;
-                var _iteratorError = undefined;
+                var _iteratorNormalCompletion2 = true;
+                var _didIteratorError2 = false;
+                var _iteratorError2 = undefined;
 
                 try {
-                    for (var _iterator = Object.keys(canvas.listeners)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                        var key = _step.value;
+                    for (var _iterator2 = Object.keys(canvas.listeners)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                        var key = _step2.value;
 
                         canvas.removeEventListener(key, canvas.listeners[key], false);
                     }
                 } catch (err) {
-                    _didIteratorError = true;
-                    _iteratorError = err;
+                    _didIteratorError2 = true;
+                    _iteratorError2 = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion && _iterator.return) {
-                            _iterator.return();
+                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                            _iterator2.return();
                         }
                     } finally {
-                        if (_didIteratorError) {
-                            throw _iteratorError;
+                        if (_didIteratorError2) {
+                            throw _iteratorError2;
                         }
                     }
                 }

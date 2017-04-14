@@ -240,8 +240,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         return [];
     };
     Resource.chapterForLevelIdx = function (idx) {
-        for (var i = 0; i < chapters.length - 1; i++) {
-            if (chapters[i].startIdx <= idx && chapters[i + 1].startIdx > idx) return chapters[i];
+        for (var i = 0; i < chapters.length; i++) {
+            if (chapters[i].startIdx <= idx && (!chapters[i + 1] || chapters[i + 1].startIdx > idx)) return chapters[i];
         }
         return null;
     };

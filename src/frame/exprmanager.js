@@ -39,7 +39,7 @@ var ExprManager = (function() {
         'sequence': [NotchedSequence, SemicolonNotchedSequence, SemicolonSequence],
         'repeat':   [RepeatLoopExpr, FadedRepeatLoopExpr],
         'choice':   [ChoiceExpr],
-        'snappable':[Snappable, FadedSnappable, NotchSnappable],
+        'snappable':[Snappable, FadedSnappable],//, NotchSnappable],
         'level':    [ReductStageExpr],
         'arrayobj': [ArrayObjectExpr],
         'infinite': [InfiniteExpression],

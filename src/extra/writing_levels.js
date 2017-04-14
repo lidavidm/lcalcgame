@@ -75,6 +75,10 @@ function constructGanttChart(table, chapters) {
             'color': rgb(40, 200, 40),
             'matches': [ 'arrayobj' ]
         },
+        'Object define':{
+            'color': rgb(154,205,50),
+            'matches': [ 'class' ]
+        },
         'Numbers':{
             'color': rgb(160, 160, 160),
             'matches': [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '+' ]
@@ -85,7 +89,7 @@ function constructGanttChart(table, chapters) {
         },
         'Typing': {
             'color': rgb(240,230,140),
-            'matches': [ '_t_' ]
+            'matches': [ '_t_', '>>>' ]
         },
         'Variables':{
             'color': rgb(80, 120, 244),
