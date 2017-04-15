@@ -578,9 +578,7 @@ class AssignExpr extends Expression {
             return;
         }
 
-        if (!this._animating) {
-            this.performReduction();
-        }
+        this.performUserReduction();
     }
 
     toString() {

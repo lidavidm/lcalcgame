@@ -22,7 +22,7 @@ class IfStatement extends Expression {
     get constructorArgs() { return [this.cond.clone(), this.branch.clone()]; }
 
     onmouseclick(pos) {
-        this.performReduction();
+        this.performUserReduction();
     }
 
     reduce() {

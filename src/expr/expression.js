@@ -291,8 +291,8 @@ class Expression extends mag.RoundedRect {
             this.stroke = {
                 lineWidth: 3,
                 color: "lightblue",
-                lineDash: [5, 5],
-                lineDashOffset: this._reducingTime / 500,
+                lineDash: [5, 10],
+                lineDashOffset: this._reducingTime,
             };
         }
     }
@@ -302,7 +302,7 @@ class Expression extends mag.RoundedRect {
         if (!this._reducing) {
             if (!this.canReduce()) {
                 mag.Stage.getAllNodes([this]).forEach((n) => {
-                    if (n.isPlaceholder()) {
+                    if (n instanceof Expression && n.isPlaceholder()) {
                         n.animatePlaceholderStatus();
                     }
                 });
@@ -328,6 +328,10 @@ class Expression extends mag.RoundedRect {
     // Try and reduce the given child expression before continuing with our reduction
     performSubReduction(expr, animated=true) {
         return new Promise((resolve, reject) => {
+            if (expr.isValue() || !expr.canReduce()) {
+                resolve(expr);
+                return;
+            }
             let result = expr.performReduction(animated);
             if (result instanceof Promise) {
                 result.then((result) => {

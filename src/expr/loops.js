@@ -34,6 +34,11 @@ class RepeatLoopExpr extends Expression {
         this.holes[1] = expr;
     }
 
+    canReduce() {
+        return this.timesExpr && (this.timesExpr.canReduce() || this.timesExpr.isValue()) &&
+            this.bodyExpr && this.bodyExpr.isComplete();
+    }
+
     update() {
         super.update();
 
@@ -177,21 +182,11 @@ class RepeatLoopExpr extends Expression {
     }
 
     performReduction() {
-        if (!this.bodyExpr.isComplete()) {
-            const incomplete = mag.Stage.getNodesWithClass(MissingExpression, [], true, [this.bodyExpr]);
-            incomplete.forEach((expr) => {
-                Animate.blink(expr, 1000, [1.0, 0.0, 0.0]);
-            });
-            return Promise.reject("RepeatLoopExpr: missing body!");
-        }
-
         this._cachedSize = this.size;
-        this._animating = true;
 
         return this.performSubReduction(this.timesExpr).then((num) => {
             if (!(num instanceof NumberExpr) || !this.bodyExpr || this.bodyExpr instanceof MissingExpression) {
                 Animate.blink(this.timesExpr, 1000, [1.0, 0.0, 0.0]);
-                this._animating = false;
                 return Promise.reject("RepeatLoopExpr incomplete!");
             }
 
@@ -293,10 +288,10 @@ class RepeatLoopExpr extends Expression {
     }
 
     onmouseclick() {
-        if (!this._animating) {
-            this.performReduction();
-        }
+        this.performUserReduction();
     }
+
+    drawReductionIndicator(ctx, pos, boundingSize) {}
 
     toString() {
         let times = this.timesExpr.toString();
@@ -344,11 +339,6 @@ class FadedRepeatLoopExpr extends Expression {
         let height = maxTopHeight + middle.h + bottom.h + 4 * padding.inner;
 
         return { w:width, h: height };
-    }
-
-    canReduce() {
-        return this.timesExpr && (this.timesExpr.canReduce() || this.timesExpr.isValue()) &&
-            this.bodyExpr && !(this.bodyExpr instanceof MissingExpression);
     }
 
     update() {
