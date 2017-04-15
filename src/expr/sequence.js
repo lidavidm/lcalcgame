@@ -23,7 +23,6 @@ class Sequence extends Expression {
 
     canReduce() {
         for (let expr of this.holes) {
-            if (expr instanceof MissingExpression) return false;
             if (!expr.isComplete()) return false;
         }
         return true;
@@ -46,9 +45,10 @@ class Sequence extends Expression {
 
     performReduction() {
         if (!this.canReduce()) {
-            // TODO: this should be overridable
-            mag.Stage.getNodesWithClass(MissingExpression, [], true, [this]).forEach((node) => {
-                Animate.blink(node);
+            mag.Stage.getAllNodes([this]).forEach((n) => {
+                if (n.isPlaceholder()) {
+                    n.animatePlaceholderStatus();
+                }
             });
             return Promise.reject("Sequence is incomplete");
         }

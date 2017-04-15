@@ -248,12 +248,23 @@ class Expression extends mag.RoundedRect {
 
     // Is this expression missing any subexpressions?
     isComplete() {
+        if (this.isPlaceholder()) return false;
         for (let child of this.holes) {
-            if (child instanceof MissingExpression || (child instanceof Expression && !child.isComplete())) {
+            if (child instanceof Expression && !child.isComplete()) {
                 return false;
             }
         }
         return true;
+    }
+
+    // Is this expression a placeholder for something else?
+    isPlaceholder() {
+        return false;
+    }
+
+    // Play an animation to remind the user that this is a placeholder.
+    animatePlaceholderStatus() {
+        Animate.blink(this);
     }
 
     // Reduce this expression to another.

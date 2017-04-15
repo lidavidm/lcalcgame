@@ -34,6 +34,10 @@ class TypeBox extends mag.Rect {
         this.textExpr.fontSize = fs;
     }
 
+    isPlaceholder() {
+        return true;
+    }
+
     onmouseenter(pos) {
         //this.focus();
         this.stroke = { color:'blue', lineWidth:2 };
