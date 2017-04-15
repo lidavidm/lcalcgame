@@ -21,6 +21,7 @@ class Expression extends mag.RoundedRect {
         this._layout = { 'direction': 'horizontal', 'align': 'vertical' };
         this.lockedInteraction = false;
         this._subexpScale = DEFAULT_SUBEXPR_SCALE;
+        this._reducing = false;
 
         if (this.holes) {
             var _this = this;
@@ -265,6 +266,57 @@ class Expression extends mag.RoundedRect {
     // Play an animation to remind the user that this is a placeholder.
     animatePlaceholderStatus() {
         Animate.blink(this);
+    }
+
+    // Play an animation to remind the user that this is currently reducing.
+    animateReducingStatus() {
+        this._reducingTime = 0;
+        let twn = new mag.IndefiniteTween((t) => {
+            stage.draw();
+
+            this._reducingTime += t;
+
+            if (!this._reducing || !this.stage) twn.cancel();
+        });
+        twn.run();
+    }
+
+    drawInternalAfterChildren(ctx, pos, boundingSize) {
+        super.drawInternalAfterChildren(ctx, pos, boundingSize);
+        this.drawReductionIndicator(ctx, pos, boundingSize);
+    }
+
+    drawReductionIndicator(ctx, pos, boundingSize) {
+        if (this._reducing) {
+            this.stroke = {
+                lineWidth: 3,
+                color: "lightblue",
+                lineDash: [5, 5],
+                lineDashOffset: this._reducingTime / 500,
+            };
+        }
+    }
+
+    // Wrapper for performReduction intended for interactive use
+    performUserReduction() {
+        if (!this._reducing) {
+            if (!this.canReduce()) {
+                mag.Stage.getAllNodes([this]).forEach((n) => {
+                    if (n.isPlaceholder()) {
+                        n.animatePlaceholderStatus();
+                    }
+                });
+                return Promise.reject("Expression: expression cannot reduce");
+            }
+
+            this.animateReducingStatus();
+
+            this._reducing = this.performReduction(true);
+            this._reducing.then(() => {
+                this._reducing = false;
+            });
+        }
+        return this._reducing;
     }
 
     // Reduce this expression to another.

@@ -22,9 +22,7 @@ class CompareExpr extends Expression {
     get rightExpr() { return this.holes[2]; }
     onmouseclick(pos) {
         console.log('Expressions are equal: ', this.compare());
-        if (!this._animating) {
-            this.performReduction();
-        }
+        this.performUserReduction();
     }
 
     reduce() {
@@ -41,11 +39,9 @@ class CompareExpr extends Expression {
     }
 
     performReduction(animated=true) {
-        if (this.leftExpr && this.rightExpr && !this.leftExpr.isValue() && !this._animating) {
+        if (this.leftExpr && this.rightExpr && !this.leftExpr.isValue() && !this._reducing) {
             let before = this.leftExpr;
-            this._animating = true;
             return this.performSubReduction(this.leftExpr, true).then(() => {
-                this._animating = false;
                 if (this.leftExpr != before) {
                     return this.performReduction();
                 }
@@ -53,11 +49,9 @@ class CompareExpr extends Expression {
             });
         }
 
-        if (this.leftExpr && this.rightExpr && !this.rightExpr.isValue() && !this._animating) {
-            this._animating = true;
+        if (this.leftExpr && this.rightExpr && !this.rightExpr.isValue() && !this._reducing) {
             let before = this.rightExpr;
             return this.performSubReduction(this.rightExpr, true).then(() => {
-                this._animating = false;
                 if (this.rightExpr != before) {
                     return this.performReduction();
                 }
