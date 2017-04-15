@@ -46,10 +46,11 @@ class Sequence extends Expression {
 
     performReduction() {
         if (!this.canReduce()) {
+            // TODO: this should be overridable
             mag.Stage.getNodesWithClass(MissingExpression, [], true, [this]).forEach((node) => {
                 Animate.blink(node);
             });
-            return null;
+            return Promise.reject("Sequence is incomplete");
         }
 
         this._animating = true;

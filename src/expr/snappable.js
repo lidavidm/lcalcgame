@@ -264,8 +264,7 @@ class Snappable extends Expression {
 
     performReduction() {
         if (this.prev) {
-            this.prev.performReduction();
-            return;
+            return this.prev.performReduction();
         }
 
         // Save stage since it gets erased down the line
@@ -283,6 +282,7 @@ class Snappable extends Expression {
         }
 
         stage.swap(this, new (ExprManager.getClass('sequence'))(...body));
+        return Promise.resolve(null);
     }
 
     toString() {

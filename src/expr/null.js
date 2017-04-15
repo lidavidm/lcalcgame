@@ -15,7 +15,7 @@ class NullExpr extends ImageExpr {
     }
     performReduction() {
         Animate.poof(this);
-        super.performReduction();
+        return super.performReduction();
     }
     onmousehover() {
         this.image = 'null-circle-highlight';

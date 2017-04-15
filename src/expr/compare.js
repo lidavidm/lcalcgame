@@ -49,6 +49,7 @@ class CompareExpr extends Expression {
                 if (this.leftExpr != before) {
                     return this.performReduction();
                 }
+                return Promise.reject("Left expression did not reduce!");
             });
         }
 
@@ -60,6 +61,7 @@ class CompareExpr extends Expression {
                 if (this.rightExpr != before) {
                     return this.performReduction();
                 }
+                return Promise.reject("Right expression did not reduce!");
             });
         }
 
@@ -76,7 +78,7 @@ class CompareExpr extends Expression {
             }
             else super.performReduction();
         }
-        return null;
+        return Promise.reject("Cannot reduce!");
     }
     compare() {
         if (this.funcName === '==') {
@@ -180,15 +182,20 @@ class MirrorCompareExpr extends CompareExpr {
 
     // Animation effects
     performReduction() {
-        if (!this.isReducing && this.reduce() != this) {
-            var stage = this.stage;
-            var shatter = new MirrorShatterEffect(this.mirror);
-            shatter.run(stage, (() => {
-                this.ignoreEvents = false;
-                super.performReduction(false);
-            }).bind(this));
-            this.ignoreEvents = true;
-            this.isReducing = true;
-        }
+        return new Promise((resolve, reject) => {
+            if (!this.isReducing && this.reduce() != this) {
+                var stage = this.stage;
+                var shatter = new MirrorShatterEffect(this.mirror);
+                shatter.run(stage, (() => {
+                    this.ignoreEvents = false;
+                    resolve(super.performReduction(false));
+                }).bind(this));
+                this.ignoreEvents = true;
+                this.isReducing = true;
+            }
+            else {
+                reject();
+            }
+        });
     }
 }

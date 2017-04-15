@@ -138,7 +138,7 @@ class LabeledVarExpr extends VarExpr {
             value = value.clone();
             let parent = this.parent ? this.parent : this.stage;
             parent.swap(this, value);
-            return value;
+            return Promise.resolve(value);
         }
         else {
             let wat = new TextExpr("?");
@@ -156,7 +156,7 @@ class LabeledVarExpr extends VarExpr {
                 this.stage.draw();
                 this.stage.update();
             }, 500);
-            return null;
+            return Promise.reject("Cannot reduce undefined variable");
         }
     }
 }
@@ -237,14 +237,15 @@ class ChestVarExpr extends VarExpr {
     }
 
     performReduction(animated=true) {
-        if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return null;
+        if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this)
+            return Promise.reject("Cannot reduce LHS of assignment");
 
         let value = this.reduce();
         if (value != this) {
             if (!animated) {
                 let parent = this.parent ? this.parent : this.stage;
                 parent.swap(this, value);
-                return null;
+                return Promise.resolve(value);
             }
             this._animating = true;
             return this.animateReduction(value, true);
@@ -259,9 +260,8 @@ class ChestVarExpr extends VarExpr {
                     this.stage.update();
                 }, 500);
             });
-            return null;
         }
-        return null;
+        return Promise.reject("Cannot reduce undefined variable");
     }
 
     animateReduction(value, destroy) {
@@ -328,7 +328,8 @@ class ChestVarExpr extends VarExpr {
 
 class JumpingChestVarExpr extends ChestVarExpr {
     performReduction(animated=true) {
-        if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return null;
+        if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this)
+            return Promise.reject("Cannot reduce LHS of assignment");
 
         if (!animated || !this.stage) {
             return super.performReduction(animated);
@@ -542,7 +543,7 @@ class AssignExpr extends Expression {
             this.getEnvironment().update(this.variable.name, value);
             this.stage.environmentDisplay.update();
             this.stage.draw();
-            return null;
+            return Promise.resolve(null);
         }
 
         this._animating = true;

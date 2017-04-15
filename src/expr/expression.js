@@ -300,7 +300,7 @@ class Expression extends mag.RoundedRect {
 
             console.warn('performReduction with ', this, reduced_expr);
 
-            if (!this.stage) return;
+            if (!this.stage) return Promise.reject();
 
             this.stage.saveState();
             Logger.log('state-save', this.stage.toString());
@@ -329,8 +329,9 @@ class Expression extends mag.RoundedRect {
             if (reduced_expr)
                 reduced_expr.update();
 
-            return reduced_expr;
+            return Promise.resolve(reduced_expr);
         }
+        return Promise.resolve(this);
     }
     reduceCompletely() { // Try to reduce this expression and its subexpressions as completely as possible.
         var e = this;

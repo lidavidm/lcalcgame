@@ -626,6 +626,7 @@ class LambdaExpr extends Expression {
         } else return super.reduce();
     }
     performReduction(animated=false) {
+        // TODO: need to convert performReductions here
         // If we don't have all our arguments, refuse to evaluate.
         if (this.takesArgument) {
             return this;

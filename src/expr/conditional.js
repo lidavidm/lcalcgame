@@ -59,7 +59,7 @@ class IfStatement extends Expression {
         else if (this.cond && !this.cond.isValue() && !this.cond.canReduce()) {
             // Try and play any animation anyways
             this.cond.performReduction();
-            return null;
+            return Promise.reject("IfExpr: cannot reduce condition");
         }
 
         if (this.branch && this.branch.canReduce()) {
