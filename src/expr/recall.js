@@ -216,6 +216,8 @@ class TypeInTextExpr extends TextExpr {
     constructor(validator, afterCommit, charLimit=1) {
         super(" ");
 
+        this.validator = validator;
+
         if (!afterCommit) {
             afterCommit = (txt) => {
                 let expr = __PARSER.parse(txt);
@@ -261,6 +263,15 @@ class TypeInTextExpr extends TextExpr {
             return super.size;
         }
     }
+
+    reduce() {
+        let txt = this.typeBox.text.trim();
+        if (this.validator(txt)) {
+            return __PARSER.parse(txt);
+        }
+        return this;
+    }
+
     commit(renderedText) {
         this.text = renderedText; // this is the underlying text in the TextExpr
         this.removeChild(this.typeBox);
@@ -277,6 +288,9 @@ class TypeInTextExpr extends TextExpr {
     focus() { this.typeBox.focus(); this.typeBox.onmouseleave(); }
     blur() { this.typeBox.blur(); }
     isValue() { return false; }
-    canReduce() { return false; }
+    canReduce() {
+        let txt = this.typeBox.text.trim();
+        return this.validator(txt);
+    }
     value() { return undefined; }
 }

@@ -431,7 +431,8 @@ class AssignExpr extends Expression {
 
     canReduce() {
         return this.value && this.variable && (this.value.canReduce() || this.value.isValue()) &&
-            (this.variable instanceof VarExpr || this.variable instanceof VtableVarExpr);
+            (this.variable instanceof VarExpr || this.variable instanceof VtableVarExpr
+             || (this.variable instanceof TypeInTextExpr && this.variable.canReduce()));
     }
 
     reduce() {
@@ -537,22 +538,27 @@ class AssignExpr extends Expression {
             return Promise.reject("AssignExpr: incomplete");
         }
 
-        if (!animated) {
-            this.value.performReduction(false);
-            let value = this.value.clone();
-            this.getEnvironment().update(this.variable.name, value);
-            this.stage.environmentDisplay.update();
-            this.stage.draw();
-            return Promise.resolve(null);
+        let starter = Promise.resolve();
+        if (this.variable instanceof TypeInTextExpr) {
+            starter = this.performSubReduction(this.variable, animated);
         }
 
-        this._animating = true;
+        return starter.then(() => {
+            if (!animated) {
+                this.value.performReduction(false);
+                let value = this.value.clone();
+                this.getEnvironment().update(this.variable.name, value);
+                this.stage.environmentDisplay.update();
+                this.stage.draw();
+                return Promise.resolve(null);
+            }
 
-        return this.performSubReduction(this.value, true).then((value) => {
-            this.value = value;
-            this.update();
-            if (this.stage) this.stage.draw();
-            return after(500).then(() => this.animateReduction());
+            return this.performSubReduction(this.value, true).then((value) => {
+                this.value = value;
+                this.update();
+                if (this.stage) this.stage.draw();
+                return after(500).then(() => this.animateReduction());
+            });
         });
     }
 

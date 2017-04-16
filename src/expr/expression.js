@@ -314,6 +314,8 @@ class Expression extends mag.RoundedRect {
             this._reducing = this.performReduction(true);
             this._reducing.then(() => {
                 this._reducing = false;
+            }, () => {
+                this._reducing = false;
             });
         }
         return this._reducing;
