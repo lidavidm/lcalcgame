@@ -133,6 +133,8 @@ function SET_CURSOR_STYLE(style) {
          if (stroke.lineDash)
              ctx.setLineDash(stroke.lineDash);
          else ctx.setLineDash([]);
+
+         ctx.lineDashOffset = stroke.lineDashOffset || 0;
      }
  }
  function strokeWithOpacity(ctx, opacity) {
