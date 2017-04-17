@@ -189,7 +189,7 @@ class TypeInTextExpr extends TextExpr {
                 return (!Number.isNaN(i) && i >= 0);
             },
             'int':(txt) => (!Number.isNaN(Number.parseInt(txt, 10))),
-            'equiv':(txt) => (txt === '==' || txt === '!=' || txt === '===' || txt === '!=='),
+            'equiv':(txt) => (['==','!=','===','!==', 'or', 'and', 'or not', 'and not'].indexOf(txt) > -1),
             'single':(txt) => {
                 let res = __PARSER.parse(txt);
                 return res && !(res instanceof Sequence);

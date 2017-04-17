@@ -249,10 +249,12 @@
 
               <form>
                 <fieldset>
-                  <label for="name">Level:</label>
+                  <label for="name">Board:</label>
                   <input type="text" name="name" id="level_expr_input" value="(λx #x) (star)" class="expr_input" size="45"> <br />
                   <label for="email">Goal:</label>
-                  <input type="text" name="email" id="goal_expr_input" value="(star)" class="expr_input" size="45">
+                  <input type="text" name="email" id="goal_expr_input" value="(star)" class="expr_input" size="45"><br />
+                  <label for="toolbox">Toolbox:</label>
+                  <input type="text" name="toolbox" id="toolbox_expr_input" value="" class="expr_input" size="45">
 
                   <!-- Allow form submission with keyboard without duplicating the dialog button -->
                   <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
@@ -260,9 +262,8 @@
               </form>
 
               <p>
-                  Or upload a JSON spec for a new chapter:
+                  Or upload a JSON spec for a new chapter: <input id="add_chapter_json" value="" type="file" />
               </p>
-              <input id="add_chapter_json" value="asdad" type="file" />
 
             </div>
         </div>

@@ -140,6 +140,24 @@ var CompareExpr = function (_Expression) {
                 });else return lval === rval;
             } else if (this.funcName === '!=') {
                 return this.leftExpr.value() !== this.rightExpr.value();
+            } else if (this.funcName === 'and' || this.funcName === 'or') {
+                if (!this.rightExpr || !this.leftExpr) return undefined;
+
+                var lval = this.leftExpr.value();
+                var rval = this.rightExpr.value();
+
+                if (lval === undefined || rval === undefined) return undefined;
+
+                // Variables that are equal reduce to TRUE, regardless of whether they are bound!!
+                if (!lval && !rval && this.leftExpr instanceof LambdaVarExpr && this.rightExpr instanceof LambdaVarExpr) return this.leftExpr.name === this.rightExpr.name;
+
+                //console.log('leftexpr', this.leftExpr.constructor.name, this.leftExpr instanceof LambdaVarExpr, lval);
+                //console.log('rightexpr', this.rightExpr.constructor.name, rval);
+
+                if (this.funcName === 'and') return lval === true && rval === true;else if (this.funcName === 'or') return lval === true || rval === true;else {
+                    console.warn('Logical operator "' + this.funcName + '" not implemented.');
+                    return undefined;
+                }
             } else {
                 //console.warn('Compare function "' + this.funcName + '" not implemented.');
                 return undefined;
@@ -206,6 +224,129 @@ var FadedCompareExpr = function (_CompareExpr) {
     return FadedCompareExpr;
 }(CompareExpr);
 
+/* Defines the NOT unary operator, '!' */
+
+
+var UnaryOpExpr = function (_Expression2) {
+    _inherits(UnaryOpExpr, _Expression2);
+
+    function UnaryOpExpr(b) {
+        var unaryOpName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'not';
+
+        _classCallCheck(this, UnaryOpExpr);
+
+        var compare_text = new TextExpr(unaryOpName);
+        compare_text.color = 'black';
+
+        var _this4 = _possibleConstructorReturn(this, (UnaryOpExpr.__proto__ || Object.getPrototypeOf(UnaryOpExpr)).call(this, [compare_text, b]));
+
+        _this4.funcName = unaryOpName;
+        _this4.color = "HotPink";
+        _this4.padding = { left: 20, inner: 10, right: 30 };
+        return _this4;
+    }
+
+    _createClass(UnaryOpExpr, [{
+        key: 'onmouseclick',
+        value: function onmouseclick(pos) {
+            if (!this._animating) {
+                this.performReduction();
+            }
+        }
+    }, {
+        key: 'reduce',
+        value: function reduce() {
+
+            if (!this.rightExpr) return this;
+
+            var rval = this.rightExpr.value();
+            if (rval === undefined) return this;
+
+            if (rval === true) return new (ExprManager.getClass('false'))();else if (rval === false) return new (ExprManager.getClass('true'))();else {
+                console.log('@ UnaryOpExpr.reduce: Non-boolean values cannot be negated at this time.');
+                return this;
+            }
+        }
+    }, {
+        key: 'canReduce',
+        value: function canReduce() {
+            return this.rightExpr && (this.rightExpr.canReduce() || this.rightExpr.isValue());
+        }
+    }, {
+        key: 'performReduction',
+        value: function performReduction() {
+            var _this5 = this;
+
+            var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+
+            if (this.rightExpr && !this.rightExpr.isValue() && !this._animating) {
+                var _ret3 = function () {
+                    _this5._animating = true;
+                    var before = _this5.rightExpr;
+                    return {
+                        v: _this5.performSubReduction(_this5.rightExpr, true).then(function () {
+                            _this5._animating = false;
+                            if (_this5.rightExpr != before) {
+                                return _this5.performReduction();
+                            }
+                        })
+                    };
+                }();
+
+                if ((typeof _ret3 === 'undefined' ? 'undefined' : _typeof(_ret3)) === "object") return _ret3.v;
+            }
+
+            if (this.reduce() != this) {
+                if (animated) {
+                    return new Promise(function (resolve, _reject) {
+                        var shatter = new ShatterExpressionEffect(_this5);
+                        shatter.run(stage, function () {
+                            _this5.ignoreEvents = false;
+                            resolve(_get(UnaryOpExpr.prototype.__proto__ || Object.getPrototypeOf(UnaryOpExpr.prototype), 'performReduction', _this5).call(_this5));
+                        }.bind(_this5));
+                        _this5.ignoreEvents = true;
+                    });
+                } else _get(UnaryOpExpr.prototype.__proto__ || Object.getPrototypeOf(UnaryOpExpr.prototype), 'performReduction', this).call(this);
+            }
+            return null;
+        }
+    }, {
+        key: 'drawInternal',
+        value: function drawInternal(ctx, pos, boundingSize) {
+            ctx.fillStyle = 'black';
+            setStrokeStyle(ctx, this.stroke);
+            if (this.shadowOffset !== 0) {
+                hexaRect(ctx, pos.x, pos.y + this.shadowOffset, boundingSize.w, boundingSize.h, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null);
+            }
+            ctx.fillStyle = this.color;
+            hexaRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null);
+        }
+    }, {
+        key: 'toString',
+        value: function toString() {
+            return (this.locked ? '/' : '') + '(' + this.funcName + ' ' + this.rightExpr.toString() + ')';
+        }
+    }, {
+        key: 'constructorArgs',
+        get: function get() {
+            return [this.rightExpr.clone(), this.funcName];
+        }
+    }, {
+        key: 'operatorExpr',
+        get: function get() {
+            return this.holes[0];
+        }
+    }, {
+        key: 'rightExpr',
+        get: function get() {
+            return this.holes[1];
+        }
+    }]);
+
+    return UnaryOpExpr;
+}(Expression);
+
 var MirrorCompareExpr = function (_CompareExpr2) {
     _inherits(MirrorCompareExpr, _CompareExpr2);
 
@@ -214,21 +355,21 @@ var MirrorCompareExpr = function (_CompareExpr2) {
 
         _classCallCheck(this, MirrorCompareExpr);
 
-        var _this4 = _possibleConstructorReturn(this, (MirrorCompareExpr.__proto__ || Object.getPrototypeOf(MirrorCompareExpr)).call(this, b1, b2, compareFuncName));
+        var _this6 = _possibleConstructorReturn(this, (MirrorCompareExpr.__proto__ || Object.getPrototypeOf(MirrorCompareExpr)).call(this, b1, b2, compareFuncName));
 
-        _this4.children = [];
-        _this4.holes = [];
-        _this4.padding = { left: 20, inner: 0, right: 40 };
+        _this6.children = [];
+        _this6.holes = [];
+        _this6.padding = { left: 20, inner: 0, right: 40 };
 
-        _this4.addArg(b1);
+        _this6.addArg(b1);
 
         // Mirror graphic
         var mirror = new MirrorExpr(0, 0, 86, 86);
         mirror.exprInMirror = b2.clone();
-        _this4.addArg(mirror);
+        _this6.addArg(mirror);
 
-        _this4.addArg(b2);
-        return _this4;
+        _this6.addArg(b2);
+        return _this6;
     }
 
     _createClass(MirrorCompareExpr, [{
@@ -257,14 +398,14 @@ var MirrorCompareExpr = function (_CompareExpr2) {
     }, {
         key: 'performReduction',
         value: function performReduction() {
-            var _this5 = this;
+            var _this7 = this;
 
             if (!this.isReducing && this.reduce() != this) {
                 var stage = this.stage;
                 var shatter = new MirrorShatterEffect(this.mirror);
                 shatter.run(stage, function () {
-                    _this5.ignoreEvents = false;
-                    _get(MirrorCompareExpr.prototype.__proto__ || Object.getPrototypeOf(MirrorCompareExpr.prototype), 'performReduction', _this5).call(_this5, false);
+                    _this7.ignoreEvents = false;
+                    _get(MirrorCompareExpr.prototype.__proto__ || Object.getPrototypeOf(MirrorCompareExpr.prototype), 'performReduction', _this7).call(_this7, false);
                 }.bind(this));
                 this.ignoreEvents = true;
                 this.isReducing = true;

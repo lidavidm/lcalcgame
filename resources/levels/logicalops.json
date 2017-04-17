@@ -1,45 +1,102 @@
 {
-    "chapterName":"Intro to Typing",
-    "description":"It's like magic!",
+    "chapterName":"Logical Operators",
+    "description":"'and', 'or', + 'not'",
     "language":"JavaScript",
     "levels": [
         {
             "goal": "true",
-            "board": "_t_string == 'type'",
+            "board": "(star == star) && (rect == rect)",
             "toolbox": "",
             "fade":{
                 "==":1,
-                "!=":1
+                "!=":1,
+                "true":1,
+                "false":1
             }
         },
         {
-            "goal": "4",
-            "board": "_t_int + _t_int",
+            "goal": "false",
+            "board": "_b && _b",
+            "toolbox": ["true","false","true","false"]
+        },
+        {
+            "goal": ["true", "false"],
+            "board": ["true && _b", "false && _b"],
+            "toolbox": ["true","false","true","false"]
+        },
+        {
+            "goal": "true",
+            "board": ["_b && _b", "true && _b"],
+            "toolbox": ["star == _", "star", "rect", "rect == _"]
+        },
+        {
+            "goal": "true",
+            "board": "_b && _b",
+            "toolbox": ["star == rect", "rect == rect", "triangle == triangle"]
+        },
+        {
+            "goal": "true",
+            "board": ["false == _"],
+            "toolbox": ["true", "false"]
+        },
+        {
+            "goal": "true",
+            "board": ["_ == _", "_ == _", "_ == _"],
+            "toolbox": ["rect", "triangle", "star", "circle", "star"]
+        },
+        {
+            "goal": "true",
+            "board": "(star == rect) || (star == star)",
             "toolbox": ""
         },
         {
-            "goal": ["true","false"],
-            "board": ["'mango' != 'pear'", "_t_string != 'apple'"],
+            "goal": "true",
+            "board": "_b || _b",
+            "toolbox": ["'apple' == 'pear'", "'maple' == 'maple'", "'berry' == 'grape'"]
+        },
+        {
+            "goal": "false",
+            "board": "(star == rect) || (triangle == circle)",
             "toolbox": ""
         },
         {
-            "goal": ["true","false"],
-            "board": ["'rect' != 'rect'", "'star' >>> 'star'"],
+            "goal": "false",
+            "board": "_b || _b",
+            "toolbox": ["'alice' == 'bob'", "'bob' == 'bob'", "'alice' == 'daisy'"]
+        },
+        {
+            "goal": "true",
+            "board": "_b || _b",
+            "toolbox": ["_ == _", "_ == _", "'a'", "'p'", "'p'", "'l'", "'e'"]
+        },
+        {
+            "goal": "true",
+            "board": ["_b || _b", "'ninja' == _t_string", "'A' == 'B'"],
             "toolbox": ""
         },
         {
-            "goal": ["true","true"],
-            "board": ["'A' >>> 'B'", "'C' >>> 'C'"],
+            "goal": "true",
+            "board": "true >>> false",
             "toolbox": ""
         },
         {
-            "goal": ["true","true"],
-            "board": ["(x) => _t_single", "(x) => (x == 'cat')", "'cat'", "'dog'"],
+            "goal": "false",
+            "board": "(star == star) >>> (rect == triangle)",
             "toolbox": ""
         },
         {
-            "goal": ["'star'"],
-            "board": ["(x) => xx", "_t_single", "'star'"],
+            "goal": "true",
+            "board": ["false >>> _b", "false >>> _b"],
+            "toolbox": ["star", "rect", "triangle", "_ == _"]
+        },
+        {
+            "goal": "true",
+            "board": "!false",
+            "toolbox": ""
+        },
+        {
+            "goal": "false",
+            "board": "true >>> true",
             "toolbox": ""
         }
     ],

@@ -33,6 +33,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     var loadChapterFromFile = (json_filename) => {
         return new Promise(function(resolve, reject) {
             $.getJSON(__LEVELS_PATH + json_filename + '.json', function(json) {
+
                 // Copy the planet's aliens to the individual level
                 // definitions, so that buildLevel has access to
                 // them. Provide a default alien when not specified.
@@ -151,6 +152,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
 
     // Add levels here:
     const chapterDigraph = {
+        'logicalops' : ['intro'],
         'intro': ['booleans'],
         'booleans': ['conditionals'],
         'conditionals': ['bindings', 'bags'],

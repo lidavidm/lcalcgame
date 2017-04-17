@@ -81,8 +81,8 @@ function init() {
     });
 }
 
-function loadCustomLevel(lvl_desc, goal_desc) {
-    stage = Resource.buildLevel({ board: lvl_desc, goal: goal_desc, toolbox: "" }, canvas);
+function loadCustomLevel(lvl_desc, goal_desc, toolbox_desc) {
+    stage = Resource.buildLevel({ board: lvl_desc, goal: goal_desc, toolbox: toolbox_desc.trim(), resources: ["alien-function-1"] }, canvas);
     stage.update();
     stage.draw();
 }
@@ -520,6 +520,7 @@ function undo() {
 
 function loadChapterSelect() {
     var sel = document.getElementById("chapterSelect");
+    $(sel).empty();
     sel.onchange = gotoChapter;
     // removeOptions(sel); // clear old options.
     return Resource.getChapters().then(function (chapters) {

@@ -30,6 +30,18 @@ var ES6Parser = function () {
             } else return true;
         }
     }, {
+        key: 'makePrimitive',
+        value: function makePrimitive(prim) {
+            var primitiveArgs = {
+                'triangle': [0, 0, 44, 44],
+                'rect': [0, 0, 44, 44],
+                'star': [0, 0, 25, 5],
+                'circle': [0, 0, 22],
+                'diamond': [0, 0, 44, 44]
+            };
+            return new (Function.prototype.bind.apply(ExprManager.getClass(prim), [null].concat(_toConsumableArray(primitiveArgs[prim]))))();
+        }
+    }, {
         key: 'parse',
         value: function parse(program) {
             var _this = this;
@@ -90,9 +102,8 @@ var ES6Parser = function () {
                         var missing = new (ExprManager.getClass(node.name))();
                         missing.__remain_unlocked = true;
                         return missing;
-                    } else if (node.name.substring(0, 2) === '_t') return TypeInTextExpr.fromExprCode(node.name);else if (node.name === '_notch') {
-                        return new (ExprManager.getClass('notch'))(1);
-                    }
+                    } else if (node.name.substring(0, 2) === '_t') return TypeInTextExpr.fromExprCode(node.name);else if (node.name === '_notch') return new (ExprManager.getClass('notch'))(1);else if (ExprManager.isPrimitive(node.name)) // If this is the name of a Reduct primitive (like 'star')...
+                        return _this2.makePrimitive(node.name);
 
                     // Otherwise, treat this as a variable name...
                     return new (ExprManager.getClass('var'))(node.name);
@@ -109,14 +120,7 @@ var ES6Parser = function () {
                     } else if (typeof node.value === 'string' || node.value instanceof String) {
                         if (ExprManager.isPrimitive(node.value)) {
                             // If this is the name of a Reduct primitive (like 'star')...
-                            var primitiveArgs = {
-                                'triangle': [0, 0, 44, 44],
-                                'rect': [0, 0, 44, 44],
-                                'star': [0, 0, 25, 5],
-                                'circle': [0, 0, 22],
-                                'diamond': [0, 0, 44, 44]
-                            };
-                            return new (Function.prototype.bind.apply(ExprManager.getClass(node.value), [null].concat(_toConsumableArray(primitiveArgs[node.value]))))();
+                            return _this2.makePrimitive(node.value);
                         } else {
                             // Otherwise this stands for a "string" value.
                             return new StringValueExpr(node.value);
@@ -212,6 +216,22 @@ var ES6Parser = function () {
                     } else if (ExprManager.hasClass(node.operator)) {
                         var BinaryExprClass = ExprManager.getClass(node.operator);
                         if (node.operator in CompareExpr.operatorMap()) return new BinaryExprClass(_this2.parseNode(node.left), _this2.parseNode(node.right), node.operator);else return new BinaryExprClass(_this2.parseNode(node.left), _this2.parseNode(node.right));
+                    }
+                },
+
+                /*  LogicalExpression includes && and || */
+                'LogicalExpression': function LogicalExpression(node) {
+                    var map = { '&&': 'and', '||': 'or' };
+                    var op = map[node.operator];
+                    return new (ExprManager.getClass(op))(_this2.parseNode(node.left), _this2.parseNode(node.right), op);
+                },
+
+                'UnaryExpression': function UnaryExpression(node) {
+                    if (node.operator === '!') {
+                        return new (ExprManager.getClass('not'))(_this2.parseNode(node.argument), 'not');
+                    } else {
+                        console.warn('Unknown unary expression ' + node.operator + ' not supported at this time.');
+                        return null;
                     }
                 },
 

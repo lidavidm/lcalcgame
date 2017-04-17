@@ -279,7 +279,7 @@ var TypeInTextExpr = function (_TextExpr) {
                     return !Number.isNaN(Number.parseInt(txt, 10));
                 },
                 'equiv': function equiv(txt) {
-                    return txt === '==' || txt === '!=' || txt === '===' || txt === '!==';
+                    return ['==', '!=', '===', '!==', 'or', 'and', 'or not', 'and not'].indexOf(txt) > -1;
                 },
                 'single': function single(txt) {
                     var res = __PARSER.parse(txt);

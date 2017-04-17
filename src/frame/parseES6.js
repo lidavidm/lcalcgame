@@ -14,6 +14,16 @@ class ES6Parser {
             return false;
         } else return true;
     }
+    static makePrimitive(prim) {
+        const primitiveArgs = {
+            'triangle':[0,0,44,44],
+            'rect':[0,0,44,44],
+            'star':[0,0,25,5],
+            'circle':[0,0,22],
+            'diamond':[0,0,44,44]
+        };
+        return new (ExprManager.getClass(prim))(...primitiveArgs[prim]);
+    }
 
     static parse(program) {
         if (!esprima) {
@@ -67,11 +77,13 @@ class ES6Parser {
                     let missing = new (ExprManager.getClass(node.name))();
                     missing.__remain_unlocked = true;
                     return missing;
-                } else if (node.name.substring(0, 2) === '_t')
-                    return TypeInTextExpr.fromExprCode(node.name);
-                else if (node.name === '_notch') {
-                    return new (ExprManager.getClass('notch'))(1);
                 }
+                else if (node.name.substring(0, 2) === '_t')
+                    return TypeInTextExpr.fromExprCode(node.name);
+                else if (node.name === '_notch')
+                    return new (ExprManager.getClass('notch'))(1);
+                else if (ExprManager.isPrimitive(node.name)) // If this is the name of a Reduct primitive (like 'star')...
+                    return this.makePrimitive(node.name);
 
                 // Otherwise, treat this as a variable name...
                 return new (ExprManager.getClass('var'))(node.name);
@@ -87,14 +99,7 @@ class ES6Parser {
                     return null;
                 } else if (typeof node.value === 'string' || node.value instanceof String) {
                     if (ExprManager.isPrimitive(node.value)) { // If this is the name of a Reduct primitive (like 'star')...
-                        const primitiveArgs = {
-                            'triangle':[0,0,44,44],
-                            'rect':[0,0,44,44],
-                            'star':[0,0,25,5],
-                            'circle':[0,0,22],
-                            'diamond':[0,0,44,44]
-                        };
-                        return new (ExprManager.getClass(node.value))(...primitiveArgs[node.value]);
+                        return this.makePrimitive(node.value);
                     }
                     else { // Otherwise this stands for a "string" value.
                         return new StringValueExpr(node.value);
@@ -185,6 +190,22 @@ class ES6Parser {
                         return new BinaryExprClass(this.parseNode(node.left), this.parseNode(node.right), node.operator);
                     else
                         return new BinaryExprClass(this.parseNode(node.left), this.parseNode(node.right));
+                }
+            },
+
+            /*  LogicalExpression includes && and || */
+            'LogicalExpression': (node) => {
+                const map = { '&&':'and', '||':'or' };
+                const op = map[node.operator];
+                return new (ExprManager.getClass(op))(this.parseNode(node.left), this.parseNode(node.right), op);
+            },
+
+            'UnaryExpression': (node) => {
+                if (node.operator === '!') {
+                    return new (ExprManager.getClass('not'))(this.parseNode(node.argument), 'not');
+                } else {
+                    console.warn('Unknown unary expression ' + node.operator + ' not supported at this time.');
+                    return null;
                 }
             },
 
