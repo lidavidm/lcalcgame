@@ -270,9 +270,10 @@ class ChestVarExpr extends VarExpr {
         value = value.clone();
         stage.add(value);
         value.scale = { x: 0.1, y: 0.1 };
+        value.anchor = { x: 0.5, y: 0.5 };
         value.update();
         value.pos = {
-            x: this.absolutePos.x + 0.5 * this.size.w - 0.5 * value.absoluteSize.w,
+            x: this.absolutePos.x - this.anchor.x * this.size.w + 0.5 * this.size.w,
             y: this.absolutePos.y + 30,
         };
 
