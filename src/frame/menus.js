@@ -223,6 +223,7 @@ class MainMenu extends mag.Stage {
         let starboy = new mag.Button(0, 0, 298/1.8, 385/1.8,
                                     {default:'mainmenu-starboy', hover:'mainmenu-starboy-glow', down:'mainmenu-starboy-glow'},
                                     () => {
+                                        resetToLevel(0);
                                         if (_this.title) _this.remove(_this.title);
                                         Resource.play('mainmenu-enter');
                                         starboy.cancelFloat = true;

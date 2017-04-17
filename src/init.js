@@ -147,7 +147,7 @@ function returnToMenu() {
         stage = cur_menu;
         redraw(stage);
     } else {
-        initMainMenu();
+        initChapterSelectMenu();
     }
 }
 
@@ -260,7 +260,7 @@ function initMainMenu() {
         prepareCanvas();
         $(canvas).css('background-color','#EEE');
 
-        //stage = new MainMenu(canvas, initChapterSelectMenu);
+        stage = new MainMenu(canvas, initChapterSelectMenu);
 
         // stage = new MainMenu(canvas, () => {
         //
@@ -273,7 +273,7 @@ function initMainMenu() {
             // Clicked 'settings' button. Transition to settings screen.
         //});
 
-        initBoard();
+        // initBoard();
 
         //__DEBUG_TESTBED(stage);
 
