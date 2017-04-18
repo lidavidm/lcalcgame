@@ -1801,7 +1801,6 @@ class Mask extends mag.Rect {
     drawInternal(ctx, pos, boundingSize) {
         // Do everything in absolute coordinates to avoid any
         // weirdness with stage scale changing
-        ctx.resetTransform();
         ctx.scale(1.0, 1.0);
         let w = ctx.canvas.clientWidth;
         let h = ctx.canvas.clientHeight;
