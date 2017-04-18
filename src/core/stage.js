@@ -483,6 +483,7 @@ var mag = (function(_) {
         onkeydown(event) {}
         onkeypress(event) {}
         onkeyup(event) {}
+        onorientationchange(event) {}
         getHitNodes(pos, options={}) {
             var hits = [];
             var hitnode = null;
