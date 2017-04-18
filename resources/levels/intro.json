@@ -9,15 +9,6 @@
             "toolbox":""
         },
         {
-            "description":"Introduces concept: Constant functions.",
-            "board":"(λx /star) (rect) (star)",
-            "goal":"(star) (star)",
-            "toolbox":"",
-            "fade":{
-                "lambda":1
-            }
-        },
-        {
             "description":"Introduces concept: Toolbox. (*used to be deletion)",
             "board":"",
             "goal":"star",
@@ -28,6 +19,15 @@
             "board":"(λx #x #x) (star)",
             "goal":"(star) (star)",
             "toolbox":""
+        },
+        {
+            "description":"Introduces concept: Constant functions.",
+            "board":"(λx /star) (rect) (star)",
+            "goal":"(star) (star)",
+            "toolbox":"",
+            "fade":{
+                "lambda":1
+            }
         },
         {
             "description":"Functions are first-class.",
@@ -105,22 +105,25 @@
             "description": "intro to if; if as selective destruction",
             "board": "(if /false /star) (if /false _) (star) (rect)",
             "goal": "rect",
-            "toolbox": ""
-        },
-        {
-            "description":"Choice of boolean",
-            "board":"(if _b /star) ",
-            "goal":"(star)",
-            "toolbox":"(true) (false)",
+            "toolbox": "",
             "fade": {
                 "if": 1
             }
         },
         {
+            "description":"Choice of boolean",
+            "board":"(if _b /star) ",
+            "goal":"(star)",
+            "toolbox":"(true) (false)"
+        },
+        {
             "description": "intro to if; selective destruction + replication",
             "board": "(if _b _) (true) (false) (λx #x #x) (star)",
             "goal": "star",
-            "toolbox": ""
+            "toolbox": "",
+            "fade": {
+                "if": 2
+            }
         },
         {
             "description": "conditionals inside booleans; i.e. ternary operator",
@@ -128,7 +131,9 @@
             "goal": "true",
             "toolbox": "",
             "fade": {
-                "if": 2
+                "true": 1,
+                "false": 1,
+                "_b": 1
             }
         }
     ],

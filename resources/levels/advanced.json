@@ -6,7 +6,7 @@
             "description": "Faded numbers",
             "board": "(1) (2) (2) (1)",
             "goal": "(6)",
-            "toolbox": "(+ _ _) (+ _ _)",
+            "toolbox": "(+ _ _) (+ _ _) (+ _ _)",
             "globals": {},
             "fade": {
                 "number": 1

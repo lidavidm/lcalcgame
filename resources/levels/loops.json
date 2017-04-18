@@ -24,18 +24,19 @@
             }
         },
         {
-            "description": "Order matters",
-            "board": "($x) ($x) (assign $x /(+ $x /1)) (assign $x /4)",
-            "goal": "(3) (4)",
-            "globals": {
-                "x": "(2)"
-            }
-        },
-        {
             "description": "Increment things",
             "board": "(sequence _ _)",
             "goal": "(3)",
-            "toolbox": "$x (assign $x /(+ $x /1)) (assign $x /(+ $x /1))",
+            "toolbox": "($x) (assign $x /(+ $x /1)) (assign $x /(+ $x /1))",
+            "globals": {
+                "x": "(1)"
+            }
+        },
+        {
+            "description": "Increment things with repeat",
+            "board": "($x) (repeat /(2) /(assign $x /(+ $x /1)))",
+            "goal": "(3)",
+            "toolbox": "",
             "globals": {
                 "x": "(1)"
             }
