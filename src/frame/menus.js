@@ -165,12 +165,17 @@ class MainMenu extends mag.Stage {
 
             // Find a random position that doesn't intersect other previously created stars.
             let p = genRandomPt();
+
+            // Limit how many times we try (mobile optimization)
+            let tries = 0;
+
             for (let i = 0; i < stars.length; i++) {
                 let s = stars[i];
                 let prect = {x:p.x, y:p.y, w:star.size.w, h:star.size.h};
                 let srect = {x:s._pos.x, y:s._pos.y, w:s.size.w, h:s.size.h};
-                if (intersects(STARBOY_RECT, prect) ||
-                    intersects(prect, srect)) {
+                tries++;
+                if ((intersects(STARBOY_RECT, prect) ||
+                     intersects(prect, srect)) && tries < 100) {
                     p = genRandomPt();
                     i = 0;
                 }
@@ -261,6 +266,8 @@ class MainMenu extends mag.Stage {
             if (starboy.cancelFloat) twn.cancel();
         });
         twn.run();
+
+        this.starboy = starboy;
     }
 
     showTitle() {
@@ -290,6 +297,14 @@ class MainMenu extends mag.Stage {
                                'Purple', 'lightgray', 'Indigo', 'Purple');
         b.anchor = { x:0.5, y:0.5 };
         this.add(b);
+    }
+
+    onorientationchange() {
+        this.starboy.pos = { x:GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y:GLOBAL_DEFAULT_SCREENSIZE.height / 2.1 };
+        this.title.pos = { x:GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y:GLOBAL_DEFAULT_SCREENSIZE.height / 1.2 };
+        this.bg.size = {
+            w: GLOBAL_DEFAULT_SCREENSIZE.width, h: GLOBAL_DEFAULT_SCREENSIZE.height
+        };
     }
 }
 
