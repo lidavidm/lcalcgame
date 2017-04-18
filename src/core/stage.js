@@ -604,9 +604,25 @@ var mag = (function(_) {
             window.addEventListener('keypress', onkeypress, false);
             window.addEventListener('keyup', onkeyup, false);
 
+            let requested = false;
+            let checkFullscreen = () => {
+                if (__IS_MOBILE && !requested) {
+                    requested = true;
+                    let canvas = document.querySelector("canvas");
+                    if (canvas.requestFullscreen) {
+                        canvas.requestFullscreen();
+                    }
+                    else if (canvas.webkitRequestFullscreen) {
+                        canvas.webkitRequestFullscreen();
+                    }
+                    else if (canvas.mozRequestFullscreen) {
+                        canvas.mozRequestFullscreen();
+                    }
+                }
+            };
+
             // Touch events
             var ontouchstart = function(e) {
-
                 var pos = getMousePos( getTouch(e) );
 
                 stage.onmousehover(pos);
@@ -623,6 +639,7 @@ var mag = (function(_) {
                 e.preventDefault();
             };
             var ontouchend = function(e) {
+                checkFullscreen();
 
                 var pos = getMousePos( getTouch(e) );
 
