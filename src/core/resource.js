@@ -199,7 +199,8 @@ class ImageAtlas {
             this.img.alt = alias;
             this.img.onload = () => {
                 // Parse the atlas and add all the images
-                for (let [frameName, frame] of Object.entries(atlas.frames)) {
+                for (let frameName of Object.keys(atlas.frames)) {
+                    let frame = atlas.frames[frameName];
                     // Convert resource-name.png to resource-name
                     let resourceName = frameName.split(".")[0];
                     let resource = new ImageAtlasProxy(resourceName, this, frame.frame);

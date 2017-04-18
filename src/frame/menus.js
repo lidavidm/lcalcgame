@@ -1735,7 +1735,8 @@ function topologicalSort(adjacencyList) {
         dependencies[src] = {};
     }
 
-    for (let [src, dsts] of Object.entries(adjacencyList)) {
+    for (let src of Object.keys(adjacencyList)) {
+        let dsts = adjacencyList[src];
         for (let dst of dsts) {
             dependencies[dst][src] = true;
         }
@@ -1743,7 +1744,8 @@ function topologicalSort(adjacencyList) {
 
     while (true) {
         let found = [];
-        for (let [dst, deps] of Object.entries(dependencies)) {
+        for (let dst of Object.keys(dependencies)) {
+            let deps = dependencies[dst];
             if (Object.keys(deps).length === 0) {
                 found.push(dst);
             }
@@ -1752,7 +1754,8 @@ function topologicalSort(adjacencyList) {
         if (found.length === 0) break;
 
         for (let dst of found) {
-            for (let [_, deps] of Object.entries(dependencies)) {
+            for (let key of Object.keys(dependencies)) {
+                let deps = dependencies[key];
                 delete deps[dst];
             }
             delete dependencies[dst];
