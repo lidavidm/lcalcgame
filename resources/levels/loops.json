@@ -56,7 +56,7 @@
             "description": "Increment things",
             "board": "(sequence _ _)",
             "goal": "(3)",
-            "toolbox": "$x (assign $x /(+ $x /1)) (assign $x /(+ $x /1))",
+            "toolbox": "($x) (assign $x /(+ $x /1)) (assign $x /(+ $x /1))",
             "globals": {
                 "x": "(1)"
             }

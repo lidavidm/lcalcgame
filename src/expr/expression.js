@@ -21,6 +21,7 @@ class Expression extends mag.RoundedRect {
         this._layout = { 'direction': 'horizontal', 'align': 'vertical' };
         this.lockedInteraction = false;
         this._subexpScale = DEFAULT_SUBEXPR_SCALE;
+        this._reducing = false;
 
         if (this.holes) {
             var _this = this;
@@ -248,12 +249,76 @@ class Expression extends mag.RoundedRect {
 
     // Is this expression missing any subexpressions?
     isComplete() {
+        if (this.isPlaceholder()) return false;
         for (let child of this.holes) {
-            if (child instanceof MissingExpression || (child instanceof Expression && !child.isComplete())) {
+            if (child instanceof Expression && !child.isComplete()) {
                 return false;
             }
         }
         return true;
+    }
+
+    // Is this expression a placeholder for something else?
+    isPlaceholder() {
+        return false;
+    }
+
+    // Play an animation to remind the user that this is a placeholder.
+    animatePlaceholderStatus() {
+        Animate.blink(this);
+    }
+
+    // Play an animation to remind the user that this is currently reducing.
+    animateReducingStatus() {
+        this._reducingTime = 0;
+        let twn = new mag.IndefiniteTween((t) => {
+            stage.draw();
+
+            this._reducingTime += t;
+
+            if (!this._reducing || !this.stage) twn.cancel();
+        });
+        twn.run();
+    }
+
+    drawInternalAfterChildren(ctx, pos, boundingSize) {
+        super.drawInternalAfterChildren(ctx, pos, boundingSize);
+        this.drawReductionIndicator(ctx, pos, boundingSize);
+    }
+
+    drawReductionIndicator(ctx, pos, boundingSize) {
+        if (this._reducing) {
+            this.stroke = {
+                lineWidth: 3,
+                color: "lightblue",
+                lineDash: [5, 10],
+                lineDashOffset: this._reducingTime,
+            };
+        }
+    }
+
+    // Wrapper for performReduction intended for interactive use
+    performUserReduction() {
+        if (!this._reducing) {
+            if (!this.canReduce()) {
+                mag.Stage.getAllNodes([this]).forEach((n) => {
+                    if (n instanceof Expression && n.isPlaceholder()) {
+                        n.animatePlaceholderStatus();
+                    }
+                });
+                return Promise.reject("Expression: expression cannot reduce");
+            }
+
+            this.animateReducingStatus();
+
+            this._reducing = this.performReduction(true);
+            this._reducing.then(() => {
+                this._reducing = false;
+            }, () => {
+                this._reducing = false;
+            });
+        }
+        return this._reducing;
     }
 
     // Reduce this expression to another.
@@ -265,6 +330,10 @@ class Expression extends mag.RoundedRect {
     // Try and reduce the given child expression before continuing with our reduction
     performSubReduction(expr, animated=true) {
         return new Promise((resolve, reject) => {
+            if (expr.isValue() || !expr.canReduce()) {
+                resolve(expr);
+                return;
+            }
             let result = expr.performReduction(animated);
             if (result instanceof Promise) {
                 result.then((result) => {
@@ -300,7 +369,7 @@ class Expression extends mag.RoundedRect {
 
             console.warn('performReduction with ', this, reduced_expr);
 
-            if (!this.stage) return;
+            if (!this.stage) return Promise.reject();
 
             this.stage.saveState();
             Logger.log('state-save', this.stage.toString());
@@ -329,8 +398,9 @@ class Expression extends mag.RoundedRect {
             if (reduced_expr)
                 reduced_expr.update();
 
-            return reduced_expr;
+            return Promise.resolve(reduced_expr);
         }
+        return Promise.resolve(this);
     }
     reduceCompletely() { // Try to reduce this expression and its subexpressions as completely as possible.
         var e = this;

@@ -310,6 +310,23 @@ var mag = (function(_) {
             return rt;
         }
 
+        static getAllNodes(nodes, excludedNodes=[], recursive=true) {
+            let result = [];
+
+            nodes.forEach((n) => {
+                if (excludedNodes.indexOf(n) > -1) return;
+                else {
+                    result.push(n);
+                }
+
+                if (recursive && n.children.length > 0) {
+                    result = result.concat(Stage.getAllNodes(n.children, excludedNodes, true));
+                }
+            });
+
+            return result;
+        }
+
         /** Invalidates this stage, so that it won't draw to canvas or receive events. */
         invalidate() {
             this.invalidated = true;

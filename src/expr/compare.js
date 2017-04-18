@@ -22,9 +22,7 @@ class CompareExpr extends Expression {
     get rightExpr() { return this.holes[2]; }
     onmouseclick(pos) {
         console.log('Expressions are equal: ', this.compare());
-        if (!this._animating) {
-            this.performReduction();
-        }
+        this.performUserReduction();
     }
 
     reduce() {
@@ -41,25 +39,23 @@ class CompareExpr extends Expression {
     }
 
     performReduction(animated=true) {
-        if (this.leftExpr && this.rightExpr && !this.leftExpr.isValue() && !this._animating) {
+        if (this.leftExpr && this.rightExpr && !this.leftExpr.isValue() && !this._reducing) {
             let before = this.leftExpr;
-            this._animating = true;
             return this.performSubReduction(this.leftExpr, true).then(() => {
-                this._animating = false;
                 if (this.leftExpr != before) {
                     return this.performReduction();
                 }
+                return Promise.reject("Left expression did not reduce!");
             });
         }
 
-        if (this.leftExpr && this.rightExpr && !this.rightExpr.isValue() && !this._animating) {
-            this._animating = true;
+        if (this.leftExpr && this.rightExpr && !this.rightExpr.isValue() && !this._reducing) {
             let before = this.rightExpr;
             return this.performSubReduction(this.rightExpr, true).then(() => {
-                this._animating = false;
                 if (this.rightExpr != before) {
                     return this.performReduction();
                 }
+                return Promise.reject("Right expression did not reduce!");
             });
         }
 
@@ -76,7 +72,7 @@ class CompareExpr extends Expression {
             }
             else super.performReduction();
         }
-        return null;
+        return Promise.reject("Cannot reduce!");
     }
     compare() {
         if (this.funcName === '==') {
@@ -307,15 +303,20 @@ class MirrorCompareExpr extends CompareExpr {
 
     // Animation effects
     performReduction() {
-        if (!this.isReducing && this.reduce() != this) {
-            var stage = this.stage;
-            var shatter = new MirrorShatterEffect(this.mirror);
-            shatter.run(stage, (() => {
-                this.ignoreEvents = false;
-                super.performReduction(false);
-            }).bind(this));
-            this.ignoreEvents = true;
-            this.isReducing = true;
-        }
+        return new Promise((resolve, reject) => {
+            if (!this.isReducing && this.reduce() != this) {
+                var stage = this.stage;
+                var shatter = new MirrorShatterEffect(this.mirror);
+                shatter.run(stage, (() => {
+                    this.ignoreEvents = false;
+                    resolve(super.performReduction(false));
+                }).bind(this));
+                this.ignoreEvents = true;
+                this.isReducing = true;
+            }
+            else {
+                reject();
+            }
+        });
     }
 }

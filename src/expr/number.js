@@ -70,15 +70,12 @@ class AddExpr extends Expression {
     }
 
     performReduction() {
-        this._animating = true;
         return this.performSubReduction(this.leftExpr).then((left) => {
             if (!(left instanceof NumberExpr)) {
-                this._animating = false;
                 return Promise.reject();
             }
             return this.performSubReduction(this.rightExpr).then((right) => {
                 if (!(right instanceof NumberExpr)) {
-                    this._animating = false;
                     return Promise.reject();
                 }
 
@@ -92,9 +89,7 @@ class AddExpr extends Expression {
     }
 
     onmouseclick() {
-        if (!this._animating) {
-            this.performReduction();
-        }
+        this.performUserReduction();
     }
 
     toString() {

@@ -23,7 +23,6 @@ class Sequence extends Expression {
 
     canReduce() {
         for (let expr of this.holes) {
-            if (expr instanceof MissingExpression) return false;
             if (!expr.isComplete()) return false;
         }
         return true;
@@ -45,15 +44,6 @@ class Sequence extends Expression {
     }
 
     performReduction() {
-        if (!this.canReduce()) {
-            mag.Stage.getNodesWithClass(MissingExpression, [], true, [this]).forEach((node) => {
-                Animate.blink(node);
-            });
-            return null;
-        }
-
-        this._animating = true;
-
         let cleanup = () => {
             this._animating = false;
             while (this.holes.length > 0 && this.holes[0] instanceof MissingExpression) {
@@ -70,7 +60,6 @@ class Sequence extends Expression {
                 if (this.holes.length === 0) {
                     Animate.poof(this);
                     (this.parent || this.stage).swap(this, null);
-                    this._animating = false;
                     resolve(null);
                 }
                 else {
@@ -132,8 +121,19 @@ class Sequence extends Expression {
     }
 
     onmouseclick() {
-        if (!this._animating) {
-            this.performReduction();
+        this.performUserReduction();
+    }
+
+    drawReductionIndicator(ctx, pos, boundingSize) {
+        if (this._reducing) {
+            const radius = this.radius*this.absoluteScale.x;
+            const rightMargin = 15 * this.scale.x;
+
+            const rad = rightMargin / 3;
+            const indicatorX = pos.x + boundingSize.w - rightMargin / 2 - rad;
+            const verticalDistance = boundingSize.h - 2 * this.radius;
+            const verticalOffset = 0.5 * (1.0 + Math.sin(this._reducingTime / 250)) * verticalDistance;
+            drawCircle(ctx, indicatorX, pos.y + radius + verticalOffset, rad, "lightblue", null);
         }
     }
 
@@ -178,25 +178,6 @@ class NotchedSequence extends Sequence {
             ctx.lineTo(pos.x + boundingSize.w, expr1y);
             ctx.stroke();
         }
-
-        if (this._animating) {
-            const rad = rightMargin / 3;
-            const indicatorX = pos.x + boundingSize.w - rightMargin / 2 - rad;
-            const verticalDistance = boundingSize.h - 2 * radius;
-            const verticalOffset = 0.5 * (1.0 + Math.sin((Date.now() - this._reductionIndicatorStart) / 250)) * verticalDistance;
-            drawCircle(ctx, indicatorX, pos.y + radius + verticalOffset, rad, "#000", null);
-        }
-    }
-
-    performReduction() {
-        let result = super.performReduction();
-
-        Animate.drawUntil(this.stage, () => {
-            return !this._animating || !this.stage;
-        });
-        this._reductionIndicatorStart = Date.now();
-
-        return result;
     }
 }
 
