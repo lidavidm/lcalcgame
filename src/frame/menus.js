@@ -1360,7 +1360,6 @@ class ChapterSelectMenu extends mag.Stage {
         this.ctx.save();
         this.ctx.scale(this._scale, this._scale);
         this.clear();
-        this.ctx.translate(this.offset.x, this.offset.y);
         const len = this.nodes.length;
         for (let i = 0; i < len; i++) {
             this.nodes[i].draw(this.ctx);
@@ -1729,9 +1728,12 @@ function layoutGroup(group, boundingArea, seededRandom) {
             let lastCell = extraCells.pop();
             let cellAboveIndex = xCells * yCells - 2;
             let cellAbove = gridCells[cellAboveIndex];
-            gridCells[cellAboveIndex] = lastCell;
-            lastCell.x = 0.5 * lastCell.x + 0.5 * cellAbove.x;
-            lastCell.y = 0.7 * lastCell.y + 0.3 * cellAbove.y;
+            // Sometimes, the cell above us is part of extraCells and no longer usable
+            if (cellAbove) {
+                gridCells[cellAboveIndex] = lastCell;
+                lastCell.x = 0.5 * lastCell.x + 0.5 * cellAbove.x;
+                lastCell.y = 0.7 * lastCell.y + 0.3 * cellAbove.y;
+            }
         }
     }
 
