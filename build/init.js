@@ -161,6 +161,9 @@ function initChapterSelectMenu(flyToChapIdx) {
 
 function __DEBUG_TESTBED(stage) {
 
+    console.log(ErrorExpr);
+    ErrorEffect.run(stage, { x: 300, y: 250 });
+
     // let dropdown = new DropdownSelect( 200, 100, 120, 40, [ "A", "B", "C" ], null, "YellowGreen", "Green", "PaleGreen", false );
     // stage.add(dropdown);
     // Animate.wait(1000).after(() => dropdown.expand(true));
@@ -178,24 +181,21 @@ function __DEBUG_TESTBED(stage) {
     //
     // EntangledExpr.pairedAnimate(ee, ee2);
 
-    var typebox = new SummoningTypeBox(500, 200, 80, 40);
-    stage.add(typebox);
-
-    var textype = Level.parse('(== /pear /apple)')[0];
-    textype.holes[1] = new TypeInTextExpr(function (str) {
-        return str === '==' || str === '!=';
-    }, function (finalText) {
-        textype.funcName = finalText;
-    }, 6);
-    //let textype = new Expression([new TypeInTextExpr(() => true, 6)]);
-    //textype.holes[0].color = 'gold';
-    //textype.children[0].color = 'OrangeRed';
-    textype.pos = { x: 300, y: 200 };
-    stage.add(textype);
-
-    var playpen = new PlayPenExpr();
-    playpen.pos = { x: 240, y: 180 };
-    stage.add(playpen);
+    // let typebox = new SummoningTypeBox(500, 200, 80, 40);
+    // stage.add(typebox);
+    //
+    // let textype = Level.parse('(== /pear /apple)')[0];
+    // textype.holes[1] = new TypeInTextExpr((str) => {
+    //     return str === '==' || str === '!=';
+    // }, (finalText) => {
+    //     textype.funcName = finalText;
+    // }, 6);
+    // textype.pos = { x:300, y:200 };
+    // stage.add(textype);
+    //
+    // let playpen = new PlayPenExpr();
+    // playpen.pos = { x:240, y:180 };
+    // stage.add(playpen);
 
     // let pen = new PlayPenRect(300, 300, 200, 200);
     // stage.add(pen);
@@ -223,9 +223,9 @@ function __DEBUG_TESTBED(stage) {
     // inf.pos = { x:400, y:300 };
     // stage.add(inf);
 
-    var def = new DefineExpr(new MissingExpression(), 'double');
-    def.pos = { x: 300, y: 400 };
-    stage.add(def);
+    // let def = new DefineExpr( new MissingExpression(), 'double' );
+    // def.pos = { x:300, y:400 };
+    // stage.add(def);
 
     // let n = new NewInstanceExpr();
     // n.pos = { x:0, y:200 };
@@ -273,7 +273,7 @@ function initMainMenu() {
 
         initBoard();
 
-        //__DEBUG_TESTBED(stage);
+        __DEBUG_TESTBED(stage);
 
         redraw(stage);
 

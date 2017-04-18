@@ -11,6 +11,7 @@ class TextExpr extends ExpressionPlus {
         this._xOffset = 0;
         this._sizeOffset = { w:0, h:0 };
         this._baseline = "alphabetic";
+        this.stroke = null;
     }
     get text() {
         return this._text;
@@ -62,7 +63,13 @@ class TextExpr extends ExpressionPlus {
             ctx.restore();
         }
         ctx.textBaseline = this._baseline;
-        ctx.fillText(this.text, (pos.x + this._xOffset) / abs_scale.x, pos.y / abs_scale.y + this._yMultiplier * this.fontSize * this.anchor.y);
+        let x = (pos.x + this._xOffset) / abs_scale.x
+        let y = pos.y / abs_scale.y + this._yMultiplier * this.fontSize * this.anchor.y;
+        if (this.stroke) {
+            setStrokeStyle(ctx, this.stroke);
+            ctx.strokeText(this.text, x, y);
+        }
+        ctx.fillText(this.text, x, y);
         ctx.restore();
     }
     hits(pos, options) { return false; } // disable mouse events

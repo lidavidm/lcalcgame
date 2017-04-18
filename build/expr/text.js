@@ -29,6 +29,7 @@ var TextExpr = function (_ExpressionPlus) {
         _this._xOffset = 0;
         _this._sizeOffset = { w: 0, h: 0 };
         _this._baseline = "alphabetic";
+        _this.stroke = null;
         return _this;
     }
 
@@ -50,7 +51,13 @@ var TextExpr = function (_ExpressionPlus) {
                 ctx.restore();
             }
             ctx.textBaseline = this._baseline;
-            ctx.fillText(this.text, (pos.x + this._xOffset) / abs_scale.x, pos.y / abs_scale.y + this._yMultiplier * this.fontSize * this.anchor.y);
+            var x = (pos.x + this._xOffset) / abs_scale.x;
+            var y = pos.y / abs_scale.y + this._yMultiplier * this.fontSize * this.anchor.y;
+            if (this.stroke) {
+                setStrokeStyle(ctx, this.stroke);
+                ctx.strokeText(this.text, x, y);
+            }
+            ctx.fillText(this.text, x, y);
             ctx.restore();
         }
     }, {

@@ -1,6 +1,6 @@
 {
     "chapterName":"Logical Operators",
-    "description":"'and', 'or', + 'not'",
+    "description":"'and', 'or', 'not', '>', and '<'",
     "language":"JavaScript",
     "levels": [
         {
@@ -11,7 +11,9 @@
                 "==":1,
                 "!=":1,
                 "true":1,
-                "false":1
+                "false":1,
+                "lambda":3,
+                "number":1
             }
         },
         {
@@ -36,7 +38,7 @@
         },
         {
             "goal": "true",
-            "board": ["false == _"],
+            "board": ["false == _b"],
             "toolbox": ["true", "false"]
         },
         {
@@ -52,7 +54,7 @@
         {
             "goal": "true",
             "board": "_b || _b",
-            "toolbox": ["'apple' == 'pear'", "'maple' == 'maple'", "'berry' == 'grape'"]
+            "toolbox": ["'I' == 'you'", "'us' == 'us'", "'you' == 'me'"]
         },
         {
             "goal": "false",
@@ -97,6 +99,76 @@
         {
             "goal": "false",
             "board": "true >>> true",
+            "toolbox": ""
+        },
+        {
+            "goal": "true",
+            "board": "6 > 1",
+            "toolbox": ""
+        },
+        {
+            "goal": "true",
+            "board": "_n > 1",
+            "toolbox": ["1", "2", "3", "4", "5", "6"]
+        },
+        {
+            "goal": "true",
+            "board": "_t_int < _t_int",
+            "toolbox": ""
+        },
+        {
+            "goal": ["true", "true", "true"],
+            "board": ["(x) => xxx", "(x) => (x > _n)"],
+            "toolbox": ["1", "2", "3", "4", "5"]
+        },
+        {
+            "goal": ["false"],
+            "board": ["_n > _n", "_n < _n", "_b || _b"],
+            "toolbox": ["1", "2", "3", "4", "5", "6"]
+        },
+        {
+            "goal": ["true"],
+            "board": ["_n + _n", "_n > 6"],
+            "toolbox": ["1", "2", "3", "4", "5", "6"]
+        },
+        {
+            "goal": ["true"],
+            "board": ["(x) => (x > 3 && x < 5)", "_t_single"],
+            "toolbox": ""
+        },
+        {
+            "goal": ["9001"],
+            "board": ["(x) => x + _t_int"],
+            "toolbox": ["7000", "8000"]
+        },
+        {
+            "goal": ["true"],
+            "board": ["(x) => (x < 2 >>> x > 6000)", "_t_single"],
+            "toolbox": ""
+        },
+        {
+            "goal": "[true, false, true]",
+            "board": ["__.map((x) => x < 3)", "[]"],
+            "toolbox": ["1", "2", "3", "4", "5", "6"]
+        },
+        {
+            "goal": "[false, false, true]",
+            "board": ["__.map((x) => x.length > 2)", "[]"],
+            "toolbox": ["_t_string", "_t_string", "_t_string"]
+        },
+        {
+            "goal": "[2, 3, 4]",
+            "board": "[1, 2, 3].map((x) => _t_single)",
+            "toolbox": ""
+        },
+        {
+            "goal": "[true, false, true]",
+            "board": "[10, 20, 30].map((x) => _t_single)",
+            "toolbox": ""
+        },
+        {
+            "goal": "[true, false, true, false]",
+            "board": ["__.map((x) => _t_single)", "_t_single", "3"],
             "toolbox": ""
         }
     ],

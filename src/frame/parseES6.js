@@ -73,7 +73,7 @@ class ES6Parser {
             'Identifier': (node) => {
 
                 // Check if node is a Reduct reserved identifier (MissingExpression)
-                if (node.name === '_' || node.name === '_b' || node.name === '__') {
+                if (node.name === '_' || node.name === '_b' || node.name === '__' || node.name === '_n') {
                     let missing = new (ExprManager.getClass(node.name))();
                     missing.__remain_unlocked = true;
                     return missing;
@@ -149,6 +149,11 @@ class ES6Parser {
                     // Return new Lambda expression (anonymous function) at current stage of concreteness.
                     let lambda = new (ExprManager.getClass('lambda_abstraction'))([ new (ExprManager.getClass('hole'))(node.params[0].name) ]);
                     if (node.body.type === 'Identifier' && node.body.name === 'xx') {
+                        lambda.addArg(this.parseNode( {type:'Identifier',name:'x'} ));
+                        lambda.addArg(this.parseNode( {type:'Identifier',name:'x'} ));
+                    }
+                    else if (node.body.type === 'Identifier' && node.body.name === 'xxx') {
+                        lambda.addArg(this.parseNode( {type:'Identifier',name:'x'} ));
                         lambda.addArg(this.parseNode( {type:'Identifier',name:'x'} ));
                         lambda.addArg(this.parseNode( {type:'Identifier',name:'x'} ));
                     }

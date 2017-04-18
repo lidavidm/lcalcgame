@@ -20,7 +20,7 @@ var CompareExpr = function (_Expression) {
     _createClass(CompareExpr, null, [{
         key: 'operatorMap',
         value: function operatorMap() {
-            return { '==': 'is', '!=': 'is not' };
+            return { '==': 'is', '!=': 'is not', '>': '>', '<': '<' };
         }
     }, {
         key: 'textForFuncName',
@@ -148,9 +148,6 @@ var CompareExpr = function (_Expression) {
 
                 if (lval === undefined || rval === undefined) return undefined;
 
-                // Variables that are equal reduce to TRUE, regardless of whether they are bound!!
-                if (!lval && !rval && this.leftExpr instanceof LambdaVarExpr && this.rightExpr instanceof LambdaVarExpr) return this.leftExpr.name === this.rightExpr.name;
-
                 //console.log('leftexpr', this.leftExpr.constructor.name, this.leftExpr instanceof LambdaVarExpr, lval);
                 //console.log('rightexpr', this.rightExpr.constructor.name, rval);
 
@@ -158,6 +155,17 @@ var CompareExpr = function (_Expression) {
                     console.warn('Logical operator "' + this.funcName + '" not implemented.');
                     return undefined;
                 }
+            } else if (this.funcName === '>' || this.funcName === '<') {
+
+                if (!this.rightExpr || !this.leftExpr) return undefined;
+
+                var lval = this.leftExpr.value();
+                var rval = this.rightExpr.value();
+
+                if (lval === undefined || rval === undefined) return undefined;else if (typeof lval !== 'number' || typeof rval !== 'number') {
+                    console.warn('Operand for ' + this.funcName + ' does not reduce to a number value.', lval, rval);
+                    return undefined;
+                } else if (this.funcName === '>') return lval > rval;else if (this.funcName === '<') return lval < rval;
             } else {
                 //console.warn('Compare function "' + this.funcName + '" not implemented.');
                 return undefined;
