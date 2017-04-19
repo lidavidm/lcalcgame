@@ -151,10 +151,17 @@ function LOAD_REDUCT_RESOURCES(Resource) {
 
     // Add levels here:
     const chapterDigraph = {
-        'intro': ['variables'],
-        'variables': ['loops'],
-        'loops': ['advanced'],
-        'advanced': [],
+        'intro': ['booleans'],
+        'booleans': ['conditionals'],
+        'conditionals': ['bindings', 'bags'],
+        'bindings': ['combination'],
+        'bags': ['combination'],
+        'combination': ['map'],
+        'map': ['assign'],
+        'assign': ['sequence'],
+        'sequence': ['loops'],
+        'loops': ['mystery'],
+        'mystery': [],
     };
 
     let chapter_load_prom = loadChaptersFromDigraph(chapterDigraph);
