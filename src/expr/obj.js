@@ -339,9 +339,13 @@ class ObjectExtensionExpr extends ExpressionPlus {
 
         super([baseExpr]);
         this.padding = { left:0, inner:0, right:0 }; // don't pad the base expression
-        baseExpr.lock();
 
-        this._subexpScale = 1.0; // don't scale subexpressions
+        if (!(baseExpr instanceof MissingExpression))
+            baseExpr.lock();
+        else
+            baseExpr.shadowOffset = -2;
+
+        //this._subexpScale = 1.0; // don't scale subexpressions
         this.radius = 8;
         this.update();
 
@@ -399,6 +403,10 @@ class ObjectExtensionExpr extends ExpressionPlus {
         else return args.reduce((p, a) => (p && !(a instanceof MissingExpression)), true)
     }
     update() {
+        // if (this.holes.length > 0)
+        //     this.holes[0].scale = { x:1, y:1 };
+        // if (this._argumentExpressions)
+        //     this._argumentExpressions.forEach((e) => {e.scale = {x:0.85, y:0.85}; });
         super.update();
         if (this.drawer) {
             this.drawer.pos = { x:this.size.w, y:this.drawer.pos.y };
@@ -409,6 +417,7 @@ class ObjectExtensionExpr extends ExpressionPlus {
     }
     reduce() {
         console.log('reduce');
+        if (this.holes[0] instanceof MissingExpression) return this;
         if (this.subReduceMethod) {
             let r;
             let args = this.methodArgs;
@@ -445,18 +454,22 @@ class ObjectExtensionExpr extends ExpressionPlus {
                 argExprs.push(me);
                 numArgs--;
             }
-        }
+        } else if (!Array.isArray(argExprs))
+            argExprs = [ argExprs ];
 
         // Left text
         let methodtxt = new TextExpr('.' + methodText + '(');
-        methodtxt.fontSize = 22;
-        methodtxt._yMultiplier = 3.4;
-        methodtxt._xOffset = -15;
-        methodtxt._sizeOffset = {w:-10, h:0};
+        methodtxt.fontSize = 25;
+        methodtxt._yMultiplier = 2.85;
+        if (!(this.holes[0] instanceof MissingExpression)) {
+            methodtxt._xOffset = -15;
+            methodtxt._sizeOffset = {w:-10, h:0};
+        } else this.holes[0].unlock();
         this.subReduceMethod = subReduceMethod;
         this.addArg(methodtxt);
 
         // Arguments / closing parentheses
+        this._argumentExpressions = argExprs.slice();
         if (argExprs && argExprs.length > 0) {
 
             this.addArg(argExprs[0]);
@@ -481,6 +494,17 @@ class ObjectExtensionExpr extends ExpressionPlus {
 
         this.removeChild(this.drawer);
         this.drawer = null;
+    }
+
+    _setHoleScales() {
+        this.holes.forEach((expr) => {
+            if (this._argumentExpressions && this._argumentExpressions.some((e) => (e == expr)))
+                expr.scale = { x:0.7225, y:0.7225 };
+            else
+                expr.scale = { x:this._subexpScale, y:this._subexpScale };
+            expr.anchor = { x:0, y:0.5 };
+            expr.update();
+        });
     }
 }
 
@@ -523,7 +547,7 @@ class ArrayObjectExpr extends ObjectExtensionExpr {
 
         if (!defaultMethodCall) {}
         else if (defaultMethodCall in this.objMethods) {
-            this.setExtension(defaultMethodCall); // TODO: method args
+            this.setExtension(defaultMethodCall, null, defaultMethodArgs); // TODO: method args
         } else {
             console.error('@ ArrayObjectExpr: Method call ' + defaultMethodCall + ' not a possible member of the object.');
         }

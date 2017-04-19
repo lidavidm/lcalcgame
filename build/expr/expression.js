@@ -42,6 +42,7 @@ var Expression = function (_mag$RoundedRect) {
         _this2._layout = { 'direction': 'horizontal', 'align': 'vertical' };
         _this2.lockedInteraction = false;
         _this2._subexpScale = DEFAULT_SUBEXPR_SCALE;
+        _this2._reducing = false;
 
         if (_this2.holes) {
             var _this = _this2;
@@ -260,6 +261,7 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'isComplete',
         value: function isComplete() {
+            if (this.isPlaceholder()) return false;
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
             var _iteratorError = undefined;
@@ -268,7 +270,7 @@ var Expression = function (_mag$RoundedRect) {
                 for (var _iterator = this.holes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                     var child = _step.value;
 
-                    if (child instanceof MissingExpression || child instanceof Expression && !child.isComplete()) {
+                    if (child instanceof Expression && !child.isComplete()) {
                         return false;
                     }
                 }
@@ -290,6 +292,87 @@ var Expression = function (_mag$RoundedRect) {
             return true;
         }
 
+        // Is this expression a placeholder for something else?
+
+    }, {
+        key: 'isPlaceholder',
+        value: function isPlaceholder() {
+            return false;
+        }
+
+        // Play an animation to remind the user that this is a placeholder.
+
+    }, {
+        key: 'animatePlaceholderStatus',
+        value: function animatePlaceholderStatus() {
+            Animate.blink(this);
+        }
+
+        // Play an animation to remind the user that this is currently reducing.
+
+    }, {
+        key: 'animateReducingStatus',
+        value: function animateReducingStatus() {
+            var _this4 = this;
+
+            this._reducingTime = 0;
+            var twn = new mag.IndefiniteTween(function (t) {
+                stage.draw();
+
+                _this4._reducingTime += t;
+
+                if (!_this4._reducing || !_this4.stage) twn.cancel();
+            });
+            twn.run();
+        }
+    }, {
+        key: 'drawInternalAfterChildren',
+        value: function drawInternalAfterChildren(ctx, pos, boundingSize) {
+            _get(Expression.prototype.__proto__ || Object.getPrototypeOf(Expression.prototype), 'drawInternalAfterChildren', this).call(this, ctx, pos, boundingSize);
+            this.drawReductionIndicator(ctx, pos, boundingSize);
+        }
+    }, {
+        key: 'drawReductionIndicator',
+        value: function drawReductionIndicator(ctx, pos, boundingSize) {
+            if (this._reducing) {
+                this.stroke = {
+                    lineWidth: 3,
+                    color: "lightblue",
+                    lineDash: [5, 10],
+                    lineDashOffset: this._reducingTime
+                };
+            }
+        }
+
+        // Wrapper for performReduction intended for interactive use
+
+    }, {
+        key: 'performUserReduction',
+        value: function performUserReduction() {
+            var _this5 = this;
+
+            if (!this._reducing) {
+                if (!this.canReduce()) {
+                    mag.Stage.getAllNodes([this]).forEach(function (n) {
+                        if (n instanceof Expression && n.isPlaceholder()) {
+                            n.animatePlaceholderStatus();
+                        }
+                    });
+                    return Promise.reject("Expression: expression cannot reduce");
+                }
+
+                this.animateReducingStatus();
+
+                this._reducing = this.performReduction(true);
+                this._reducing.then(function () {
+                    _this5._reducing = false;
+                }, function () {
+                    _this5._reducing = false;
+                });
+            }
+            return this._reducing;
+        }
+
         // Reduce this expression to another.
         // * Returns the newly built expression. Leaves this expression unchanged.
 
@@ -306,24 +389,28 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'performSubReduction',
         value: function performSubReduction(expr) {
-            var _this4 = this;
+            var _this6 = this;
 
             var animated = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
             return new Promise(function (resolve, reject) {
+                if (expr.isValue() || !expr.canReduce()) {
+                    resolve(expr);
+                    return;
+                }
                 var result = expr.performReduction(animated);
                 if (result instanceof Promise) {
                     result.then(function (result) {
-                        if (_this4.stage) _this4.stage.draw();
+                        if (_this6.stage) _this6.stage.draw();
                         if (result instanceof Expression) result.lock();
 
                         after(400).then(function () {
-                            if (_this4.stage) _this4.stage.draw();
+                            if (_this6.stage) _this6.stage.draw();
                             return resolve(result);
                         });
                     });
                 } else {
-                    if (_this4.stage) _this4.stage.draw();
+                    if (_this6.stage) _this6.stage.draw();
                     var delay = 400;
                     if (!result) {
                         result = expr;
@@ -331,7 +418,7 @@ var Expression = function (_mag$RoundedRect) {
                     }
                     if (result instanceof Expression && !(result instanceof MissingExpression)) result.lock();
                     after(400).then(function () {
-                        if (_this4.stage) _this4.stage.draw();
+                        if (_this6.stage) _this6.stage.draw();
                         return resolve(result);
                     });
                 }
@@ -349,7 +436,7 @@ var Expression = function (_mag$RoundedRect) {
 
                 console.warn('performReduction with ', this, reduced_expr);
 
-                if (!this.stage) return;
+                if (!this.stage) return Promise.reject();
 
                 this.stage.saveState();
                 Logger.log('state-save', this.stage.toString());
@@ -375,8 +462,9 @@ var Expression = function (_mag$RoundedRect) {
 
                 if (reduced_expr) reduced_expr.update();
 
-                return reduced_expr;
+                return Promise.resolve(reduced_expr);
             }
+            return Promise.resolve(this);
         }
     }, {
         key: 'reduceCompletely',
@@ -409,20 +497,20 @@ var Expression = function (_mag$RoundedRect) {
                 var ghost_expr;
                 if (this.droppedInClass) ghost_expr = new this.droppedInClass(this);else ghost_expr = new MissingExpression(this);
 
-                var stage = this.parent.stage;
-                var beforeState = stage.toString();
+                var _stage = this.parent.stage;
+                var beforeState = _stage.toString();
                 var detachedExp = this.toString();
                 var parent = this.parent;
 
                 parent.swap(this, ghost_expr);
 
                 this.parent = null;
-                stage.add(this);
-                stage.bringToFront(this);
+                _stage.add(this);
+                _stage.bringToFront(this);
 
-                var afterState = stage.toString();
+                var afterState = _stage.toString();
                 Logger.log('detached-expr', { 'before': beforeState, 'after': afterState, 'item': detachedExp });
-                stage.saveState();
+                _stage.saveState();
                 Logger.log('state-save', afterState);
 
                 this.shell = ghost_expr;
@@ -519,7 +607,7 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'onmousedrag',
         value: function onmousedrag(pos) {
-            var _this5 = this;
+            var _this7 = this;
 
             if (this.ignoreEvents) return;
 
@@ -555,22 +643,22 @@ var Expression = function (_mag$RoundedRect) {
                 // Determine which notches are hovering:
                 notchEventObjs.forEach(function (o) {
                     // Prev intersects Curr
-                    var hovering = _this5._prev_notch_objs.filter(function (a) {
+                    var hovering = _this7._prev_notch_objs.filter(function (a) {
                         return a.notch == o.notch;
                     });
                     hovering.forEach(function (h) {
-                        return _this5.onNotchHover(h.otherNotch, h.otherExpr, h.notch);
+                        return _this7.onNotchHover(h.otherNotch, h.otherExpr, h.notch);
                     });
                 });
                 // Determine which notches entered our view:
                 var entering = notchEventObjs.filter(function (n) {
                     // Curr - Prev
-                    return _this5._prev_notch_objs.filter(function (a) {
+                    return _this7._prev_notch_objs.filter(function (a) {
                         return a.notch == n.notch;
                     }).length === 0;
                 });
                 entering.forEach(function (h) {
-                    return _this5.onNotchEnter(h.otherNotch, h.otherExpr, h.notch);
+                    return _this7.onNotchEnter(h.otherNotch, h.otherExpr, h.notch);
                 });
                 // Determine which notches left our view:
                 var leaving = this._prev_notch_objs.filter(function (n) {
@@ -580,7 +668,7 @@ var Expression = function (_mag$RoundedRect) {
                     }).length === 0;
                 });
                 leaving.forEach(function (h) {
-                    return _this5.onNotchLeave(h.otherNotch, h.otherExpr, h.notch);
+                    return _this7.onNotchLeave(h.otherNotch, h.otherExpr, h.notch);
                 });
                 this._prev_notch_objs = notchEventObjs.slice();
             }
@@ -654,7 +742,7 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'findNearestCompatibleNotch',
         value: function findNearestCompatibleNotch(otherExpr, otherNotch) {
-            var _this6 = this;
+            var _this8 = this;
 
             var notches = this.notches;
             if (!notches || notches.length === 0) {
@@ -675,7 +763,7 @@ var Expression = function (_mag$RoundedRect) {
             var prevDist = MINIMUM_ATTACH_THRESHOLD;
             notches.forEach(function (notch) {
                 if (notch.isCompatibleWith(otherNotch)) {
-                    var dist = distBetweenPos(_this6.getNotchPos(notch), otherPos);
+                    var dist = distBetweenPos(_this8.getNotchPos(notch), otherPos);
                     if (dist < prevDist) {
                         candidate = notch;
                         prevDist = dist;
@@ -697,7 +785,7 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'findCompatibleNotches',
         value: function findCompatibleNotches() {
-            var _this7 = this;
+            var _this9 = this;
 
             var stage = this.stage;
             if (!stage || !this.notches || this.notches.length === 0) return [];
@@ -716,7 +804,7 @@ var Expression = function (_mag$RoundedRect) {
                     (function () {
                         var nearest = [];
                         e.notches.forEach(function (eNotch) {
-                            var n = _this7.findNearestCompatibleNotch(e, eNotch);
+                            var n = _this9.findNearestCompatibleNotch(e, eNotch);
                             if (n) nearest.push(n);
                         });
                         if (nearest.length > 0) {
@@ -811,7 +899,7 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'size',
         get: function get() {
-            var _this8 = this;
+            var _this10 = this;
 
             var padding = this.padding;
             var width = 0;
@@ -827,7 +915,7 @@ var Expression = function (_mag$RoundedRect) {
             if (sizes.length === 0) return { w: this._size.w, h: this._size.h };
 
             sizes.forEach(function (s) {
-                if (_this8._layout.direction == "vertical") {
+                if (_this10._layout.direction == "vertical") {
                     height += s.h;
                     width = Math.max(width, s.w);
                 } else {
@@ -884,9 +972,20 @@ var ExpressionPlus = function (_Expression) {
             }
         }
     }, {
+        key: '_setHoleScales',
+        value: function _setHoleScales() {
+            var _this12 = this;
+
+            this.holes.forEach(function (expr) {
+                expr.anchor = { x: 0, y: 0.5 };
+                expr.scale = { x: _this12._subexpScale, y: _this12._subexpScale };
+                expr.update();
+            });
+        }
+    }, {
         key: 'update',
         value: function update() {
-            var _this10 = this;
+            var _this13 = this;
 
             var _this = this;
 
@@ -897,12 +996,9 @@ var ExpressionPlus = function (_Expression) {
             // size to be stable. So we first set the scale on our
             // children, then compute our size once to lay out the
             // children.
-            this.holes.forEach(function (expr) {
-                expr.anchor = { x: 0, y: 0.5 };
-                expr.scale = { x: _this._subexpScale, y: _this._subexpScale };
-                expr.update();
-            });
+            this._setHoleScales();
             var size = this.size;
+
             var padding = this.padding.inner;
             var x = this.padding.left;
             var y = this.size.h / 2.0 + (this.exprOffsetY ? this.exprOffsetY : 0);
@@ -912,17 +1008,15 @@ var ExpressionPlus = function (_Expression) {
 
             this.holes.forEach(function (expr) {
                 // Update hole expression positions.
-                expr.anchor = { x: 0, y: 0.5 };
                 expr.pos = { x: x, y: y };
-                expr.scale = { x: _this._subexpScale, y: _this._subexpScale };
                 expr.update();
 
-                if (_this10._layout.direction == "vertical") {
+                if (_this13._layout.direction == "vertical") {
                     y += expr.anchor.y * expr.size.h * expr.scale.y;
                     var offset = x;
 
                     // Centering
-                    if (_this10._layout.align == "horizontal") {
+                    if (_this13._layout.align == "horizontal") {
                         var innerWidth = size.w;
                         var scale = expr.scale.x;
                         offset = (innerWidth - scale * expr.size.w) / 2;
@@ -931,7 +1025,7 @@ var ExpressionPlus = function (_Expression) {
                     expr.pos = { x: offset, y: y };
 
                     y += (1 - expr.anchor.y) * expr.size.h * expr.scale.y;
-                    if (_this10.padding.between) y += _this10.padding.between;
+                    if (_this13.padding.between) y += _this13.padding.between;
                 } else {
                     x += expr.size.w * expr.scale.x + padding;
                 }
@@ -940,22 +1034,22 @@ var ExpressionPlus = function (_Expression) {
     }, {
         key: 'clone',
         value: function clone() {
-            var _this11 = this;
+            var _this14 = this;
 
             var parent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
             if (this.drawer) {
                 var _ret2 = function () {
                     var extras = [];
-                    _this11.children.forEach(function (c) {
-                        if (_this11.holes.indexOf(c) === -1) extras.push(c);
+                    _this14.children.forEach(function (c) {
+                        if (_this14.holes.indexOf(c) === -1) extras.push(c);
                     });
                     extras.forEach(function (c) {
-                        return _this11.removeChild(c);
+                        return _this14.removeChild(c);
                     });
-                    var cln = _get(ExpressionPlus.prototype.__proto__ || Object.getPrototypeOf(ExpressionPlus.prototype), 'clone', _this11).call(_this11, parent);
+                    var cln = _get(ExpressionPlus.prototype.__proto__ || Object.getPrototypeOf(ExpressionPlus.prototype), 'clone', _this14).call(_this14, parent);
                     extras.forEach(function (c) {
-                        return _this11.addChild(c);
+                        return _this14.addChild(c);
                     });
                     return {
                         v: cln

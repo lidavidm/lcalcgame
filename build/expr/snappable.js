@@ -297,8 +297,7 @@ var Snappable = function (_Expression) {
         key: 'performReduction',
         value: function performReduction() {
             if (this.prev) {
-                this.prev.performReduction();
-                return;
+                return this.prev.performReduction();
             }
 
             // Save stage since it gets erased down the line
@@ -316,6 +315,7 @@ var Snappable = function (_Expression) {
             }
 
             stage.swap(this, new (Function.prototype.bind.apply(ExprManager.getClass('sequence'), [null].concat(body)))());
+            return Promise.resolve(null);
         }
     }, {
         key: 'toString',

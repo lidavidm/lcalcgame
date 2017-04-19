@@ -39,9 +39,13 @@ class BagExpr extends CollectionExpr {
         super.lock();
         this.graphicNode.shadowOffset = this.shadowOffset;
     }
+    lockSubexpressions(filterFunc=null) { }
     unlock() {
         super.unlock();
         this.graphicNode.shadowOffset = this.shadowOffset;
+        if (this.graphicNode instanceof Expression) {
+            this.graphicNode.unlock();
+        }
     }
     get delegateToInner() { return true; }
 
@@ -279,6 +283,7 @@ class BracketArrayExpr extends BagExpr {
         this.holes = [];
         this.children = [];
 
+        // This becomes graphicNode.
         this.addArg(new Expression());
 
         this._items = holding;

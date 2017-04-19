@@ -47,7 +47,7 @@ var NullExpr = function (_ImageExpr) {
         key: 'performReduction',
         value: function performReduction() {
             Animate.poof(this);
-            _get(NullExpr.prototype.__proto__ || Object.getPrototypeOf(NullExpr.prototype), 'performReduction', this).call(this);
+            return _get(NullExpr.prototype.__proto__ || Object.getPrototypeOf(NullExpr.prototype), 'performReduction', this).call(this);
         }
     }, {
         key: 'onmousehover',

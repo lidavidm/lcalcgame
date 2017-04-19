@@ -83,8 +83,8 @@ var AddExpr = function (_Expression2) {
         _classCallCheck(this, AddExpr);
 
         var op = new TextExpr("+");
-        if (left instanceof MissingExpression) left = new MissingNumberExpression();
-        if (right instanceof MissingExpression) right = new MissingNumberExpression();
+        if (left instanceof MissingExpression && !(left instanceof MissingNumberExpression)) left = new MissingNumberExpression();
+        if (right instanceof MissingExpression && !(right instanceof MissingNumberExpression)) right = new MissingNumberExpression();
         return _possibleConstructorReturn(this, (AddExpr.__proto__ || Object.getPrototypeOf(AddExpr)).call(this, [left, op, right]));
     }
 
@@ -107,15 +107,12 @@ var AddExpr = function (_Expression2) {
         value: function performReduction() {
             var _this4 = this;
 
-            this._animating = true;
             return this.performSubReduction(this.leftExpr).then(function (left) {
                 if (!(left instanceof NumberExpr)) {
-                    _this4._animating = false;
                     return Promise.reject();
                 }
                 return _this4.performSubReduction(_this4.rightExpr).then(function (right) {
                     if (!(right instanceof NumberExpr)) {
-                        _this4._animating = false;
                         return Promise.reject();
                     }
 
@@ -130,9 +127,7 @@ var AddExpr = function (_Expression2) {
     }, {
         key: 'onmouseclick',
         value: function onmouseclick() {
-            if (!this._animating) {
-                this.performReduction();
-            }
+            this.performUserReduction();
         }
     }, {
         key: 'toString',

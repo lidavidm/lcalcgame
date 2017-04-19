@@ -275,7 +275,7 @@ function initMainMenu() {
 
         initBoard();
 
-        __DEBUG_TESTBED(stage);
+        //__DEBUG_TESTBED(stage);
 
         redraw(stage);
 

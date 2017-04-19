@@ -39,6 +39,11 @@ var RepeatLoopExpr = function (_Expression) {
     }
 
     _createClass(RepeatLoopExpr, [{
+        key: 'canReduce',
+        value: function canReduce() {
+            return this.timesExpr && (this.timesExpr.canReduce() || this.timesExpr.isValue()) && this.bodyExpr && this.bodyExpr.isComplete();
+        }
+    }, {
         key: 'update',
         value: function update() {
             _get(RepeatLoopExpr.prototype.__proto__ || Object.getPrototypeOf(RepeatLoopExpr.prototype), 'update', this).call(this);
@@ -181,21 +186,11 @@ var RepeatLoopExpr = function (_Expression) {
         value: function performReduction() {
             var _this3 = this;
 
-            if (!this.bodyExpr.isComplete()) {
-                var incomplete = mag.Stage.getNodesWithClass(MissingExpression, [], true, [this.bodyExpr]);
-                incomplete.forEach(function (expr) {
-                    Animate.blink(expr, 1000, [1.0, 0.0, 0.0]);
-                });
-                return Promise.reject("RepeatLoopExpr: missing body!");
-            }
-
             this._cachedSize = this.size;
-            this._animating = true;
 
             return this.performSubReduction(this.timesExpr).then(function (num) {
                 if (!(num instanceof NumberExpr) || !_this3.bodyExpr || _this3.bodyExpr instanceof MissingExpression) {
                     Animate.blink(_this3.timesExpr, 1000, [1.0, 0.0, 0.0]);
-                    _this3._animating = false;
                     return Promise.reject("RepeatLoopExpr incomplete!");
                 }
 
@@ -299,10 +294,11 @@ var RepeatLoopExpr = function (_Expression) {
     }, {
         key: 'onmouseclick',
         value: function onmouseclick() {
-            if (!this._animating) {
-                this.performReduction();
-            }
+            this.performUserReduction();
         }
+    }, {
+        key: 'drawReductionIndicator',
+        value: function drawReductionIndicator(ctx, pos, boundingSize) {}
     }, {
         key: 'toString',
         value: function toString() {
@@ -341,11 +337,6 @@ var FadedRepeatLoopExpr = function (_Expression2) {
     }
 
     _createClass(FadedRepeatLoopExpr, [{
-        key: 'canReduce',
-        value: function canReduce() {
-            return this.timesExpr && (this.timesExpr.canReduce() || this.timesExpr.isValue()) && this.bodyExpr && !(this.bodyExpr instanceof MissingExpression);
-        }
-    }, {
         key: 'update',
         value: function update() {
             var _this5 = this;

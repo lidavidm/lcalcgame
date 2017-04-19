@@ -41,6 +41,11 @@ var TypeBox = function (_mag$Rect) {
     }
 
     _createClass(TypeBox, [{
+        key: 'isPlaceholder',
+        value: function isPlaceholder() {
+            return true;
+        }
+    }, {
         key: 'onmouseenter',
         value: function onmouseenter(pos) {
             //this.focus();
@@ -310,6 +315,8 @@ var TypeInTextExpr = function (_TextExpr) {
 
         var _this6 = _possibleConstructorReturn(this, (TypeInTextExpr.__proto__ || Object.getPrototypeOf(TypeInTextExpr)).call(this, " "));
 
+        _this6.validator = validator;
+
         if (!afterCommit) {
             afterCommit = function afterCommit(txt) {
                 var expr = __PARSER.parse(txt);
@@ -351,6 +358,15 @@ var TypeInTextExpr = function (_TextExpr) {
     }
 
     _createClass(TypeInTextExpr, [{
+        key: 'reduce',
+        value: function reduce() {
+            var txt = this.typeBox.text.trim();
+            if (this.validator(txt)) {
+                return __PARSER.parse(txt);
+            }
+            return this;
+        }
+    }, {
         key: 'commit',
         value: function commit(renderedText) {
             this.text = renderedText; // this is the underlying text in the TextExpr
@@ -395,7 +411,8 @@ var TypeInTextExpr = function (_TextExpr) {
     }, {
         key: 'canReduce',
         value: function canReduce() {
-            return false;
+            var txt = this.typeBox.text.trim();
+            return this.validator(txt);
         }
     }, {
         key: 'value',

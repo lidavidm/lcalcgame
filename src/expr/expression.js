@@ -775,6 +775,14 @@ class ExpressionPlus extends Expression {
         }
     }
 
+    _setHoleScales() {
+        this.holes.forEach((expr) => {
+            expr.anchor = { x:0, y:0.5 };
+            expr.scale = { x:this._subexpScale, y:this._subexpScale };
+            expr.update();
+        });
+    }
+
     update() {
         var _this = this;
 
@@ -785,12 +793,9 @@ class ExpressionPlus extends Expression {
         // size to be stable. So we first set the scale on our
         // children, then compute our size once to lay out the
         // children.
-        this.holes.forEach((expr) => {
-            expr.anchor = { x:0, y:0.5 };
-            expr.scale = { x:_this._subexpScale, y:_this._subexpScale };
-            expr.update();
-        });
+        this._setHoleScales();
         var size = this.size;
+
         var padding = this.padding.inner;
         var x = this.padding.left;
         var y = this.size.h / 2.0 + (this.exprOffsetY ? this.exprOffsetY : 0);
@@ -799,9 +804,7 @@ class ExpressionPlus extends Expression {
         }
 
         this.holes.forEach((expr) => { // Update hole expression positions.
-            expr.anchor = { x:0, y:0.5 };
             expr.pos = { x:x, y:y };
-            expr.scale = { x:_this._subexpScale, y:_this._subexpScale };
             expr.update();
 
             if (this._layout.direction == "vertical") {

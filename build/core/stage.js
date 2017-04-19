@@ -640,6 +640,26 @@ var mag = function (_) {
                 });
                 return rt;
             }
+        }, {
+            key: 'getAllNodes',
+            value: function getAllNodes(nodes) {
+                var excludedNodes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+                var recursive = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+
+                var result = [];
+
+                nodes.forEach(function (n) {
+                    if (excludedNodes.indexOf(n) > -1) return;else {
+                        result.push(n);
+                    }
+
+                    if (recursive && n.children.length > 0) {
+                        result = result.concat(Stage.getAllNodes(n.children, excludedNodes, true));
+                    }
+                });
+
+                return result;
+            }
         }]);
 
         return Stage;

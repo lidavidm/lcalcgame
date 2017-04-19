@@ -13,7 +13,9 @@
                 "true":1,
                 "false":1,
                 "lambda":3,
-                "number":1
+                "number":1,
+                "map":1,
+                "__":1
             }
         },
         {
@@ -150,11 +152,6 @@
             "goal": "[true, false, true]",
             "board": ["__.map((x) => x < 3)", "[]"],
             "toolbox": ["1", "2", "3", "4", "5", "6"]
-        },
-        {
-            "goal": "[false, false, true]",
-            "board": ["__.map((x) => x.length > 2)", "[]"],
-            "toolbox": ["_t_string", "_t_string", "_t_string"]
         },
         {
             "goal": "[2, 3, 4]",

@@ -72,6 +72,7 @@ var ES6Parser = function () {
             if (statements.length === 1) {
                 var expr = this.parseNode(statements[0]);
                 expr.lockSubexpressions(this.lockFilter);
+                expr.unlock();
                 return expr;
             } else {
                 var exprs = statements.map(function (n) {
@@ -126,7 +127,7 @@ var ES6Parser = function () {
                             return new StringValueExpr(node.value);
                         }
                     } else if (Number.isNumber(node.value)) {
-                        return new NumberExpr(node.value);
+                        return new (ExprManager.getClass('number'))(node.value);
                     } else if (node.value === null) {
                         return new NullExpr(0, 0, 64, 64);
                     } else {
@@ -161,10 +162,14 @@ var ES6Parser = function () {
                             unlocked_expr.__remain_unlocked = true; // When all inner expressions are locked in parse(), this won't be.
                             return unlocked_expr;
                         }
+                    } else if (node.callee.type === 'MemberExpression' && node.callee.property.name === 'map') {
+                        console.log(node.callee);
+                        return new (ExprManager.getClass('arrayobj'))(_this2.parseNode(node.callee.object), 'map', _this2.parseNode(node.arguments[0]));
+                        //return new (ExprManager.getClass('map'))(this.parseNode(node.arguments[0]), this.parseNode(node.callee.object));
                     } else {
-                        console.error('Call expressions outside of the special $() unlock syntax are currently undefined.');
-                        return null;
-                    }
+                            console.error('Call expressions outside of the special $() unlock syntax are currently undefined.');
+                            return null;
+                        }
                 },
 
                 /* Anonymous functions of the form (x) => x */

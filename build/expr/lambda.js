@@ -805,6 +805,7 @@ var LambdaExpr = function (_Expression) {
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
+            // TODO: need to convert performReductions here
             // If we don't have all our arguments, refuse to evaluate.
             if (this.takesArgument) {
                 return this;

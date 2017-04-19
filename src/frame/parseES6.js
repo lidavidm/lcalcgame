@@ -53,6 +53,7 @@ class ES6Parser {
         if (statements.length === 1) {
             let expr = this.parseNode(statements[0]);
             expr.lockSubexpressions(this.lockFilter);
+            expr.unlock();
             return expr;
         } else {
             let exprs = statements.map((n) => this.parseNode(n));
@@ -105,7 +106,7 @@ class ES6Parser {
                         return new StringValueExpr(node.value);
                     }
                 } else if (Number.isNumber(node.value)) {
-                    return new NumberExpr(node.value);
+                    return new (ExprManager.getClass('number'))(node.value);
                 } else if (node.value === null) {
                     return new NullExpr(0,0,64,64);
                 } else { // Booleans should be left.
@@ -137,6 +138,10 @@ class ES6Parser {
                         unlocked_expr.__remain_unlocked = true; // When all inner expressions are locked in parse(), this won't be.
                         return unlocked_expr;
                     }
+                } else if (node.callee.type === 'MemberExpression' && node.callee.property.name === 'map') {
+                    console.log(node.callee);
+                    return new (ExprManager.getClass('arrayobj'))(this.parseNode(node.callee.object), 'map', this.parseNode(node.arguments[0]));
+                    //return new (ExprManager.getClass('map'))(this.parseNode(node.arguments[0]), this.parseNode(node.callee.object));
                 } else {
                     console.error('Call expressions outside of the special $() unlock syntax are currently undefined.');
                     return null;

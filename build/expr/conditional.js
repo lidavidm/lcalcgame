@@ -39,7 +39,7 @@ var IfStatement = function (_Expression) {
     _createClass(IfStatement, [{
         key: 'onmouseclick',
         value: function onmouseclick(pos) {
-            this.performReduction();
+            this.performUserReduction();
         }
     }, {
         key: 'reduce',
@@ -84,7 +84,7 @@ var IfStatement = function (_Expression) {
             } else if (this.cond && !this.cond.isValue() && !this.cond.canReduce()) {
                 // Try and play any animation anyways
                 this.cond.performReduction();
-                return null;
+                return Promise.reject("IfExpr: cannot reduce condition");
             }
 
             if (this.branch && this.branch.canReduce()) {

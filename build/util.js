@@ -151,6 +151,8 @@ function setStrokeStyle(ctx, stroke) {
         ctx.lineWidth = stroke.lineWidth;
         ctx.strokeStyle = stroke.color;
         if (stroke.lineDash) ctx.setLineDash(stroke.lineDash);else ctx.setLineDash([]);
+
+        ctx.lineDashOffset = stroke.lineDashOffset || 0;
     }
 }
 function strokeWithOpacity(ctx, opacity) {

@@ -50,9 +50,14 @@ var CompareExpr = function (_Expression) {
         key: 'onmouseclick',
         value: function onmouseclick(pos) {
             console.log('Expressions are equal: ', this.compare());
-            if (!this._animating) {
-                this.performReduction();
-            }
+            this.performUserReduction();
+        }
+    }, {
+        key: 'update',
+        value: function update() {
+            _get(CompareExpr.prototype.__proto__ || Object.getPrototypeOf(CompareExpr.prototype), 'update', this).call(this);
+            if (this.rightExpr instanceof BooleanPrimitive) this.rightExpr.color = '#ff90d1';
+            if (this.leftExpr instanceof BooleanPrimitive) this.leftExpr.color = '#ff90d1';
         }
     }, {
         key: 'reduce',
@@ -72,16 +77,15 @@ var CompareExpr = function (_Expression) {
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
-            if (this.leftExpr && this.rightExpr && !this.leftExpr.isValue() && !this._animating) {
+            if (this.leftExpr && this.rightExpr && !this.leftExpr.isValue() && !this._reducing) {
                 var _ret = function () {
                     var before = _this2.leftExpr;
-                    _this2._animating = true;
                     return {
                         v: _this2.performSubReduction(_this2.leftExpr, true).then(function () {
-                            _this2._animating = false;
                             if (_this2.leftExpr != before) {
                                 return _this2.performReduction();
                             }
+                            return Promise.reject("Left expression did not reduce!");
                         })
                     };
                 }();
@@ -89,16 +93,15 @@ var CompareExpr = function (_Expression) {
                 if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
             }
 
-            if (this.leftExpr && this.rightExpr && !this.rightExpr.isValue() && !this._animating) {
+            if (this.leftExpr && this.rightExpr && !this.rightExpr.isValue() && !this._reducing) {
                 var _ret2 = function () {
-                    _this2._animating = true;
                     var before = _this2.rightExpr;
                     return {
                         v: _this2.performSubReduction(_this2.rightExpr, true).then(function () {
-                            _this2._animating = false;
                             if (_this2.rightExpr != before) {
                                 return _this2.performReduction();
                             }
+                            return Promise.reject("Right expression did not reduce!");
                         })
                     };
                 }();
@@ -118,7 +121,7 @@ var CompareExpr = function (_Expression) {
                     });
                 } else _get(CompareExpr.prototype.__proto__ || Object.getPrototypeOf(CompareExpr.prototype), 'performReduction', this).call(this);
             }
-            return null;
+            return Promise.reject("Cannot reduce!");
         }
     }, {
         key: 'compare',
@@ -408,16 +411,20 @@ var MirrorCompareExpr = function (_CompareExpr2) {
         value: function performReduction() {
             var _this7 = this;
 
-            if (!this.isReducing && this.reduce() != this) {
-                var stage = this.stage;
-                var shatter = new MirrorShatterEffect(this.mirror);
-                shatter.run(stage, function () {
-                    _this7.ignoreEvents = false;
-                    _get(MirrorCompareExpr.prototype.__proto__ || Object.getPrototypeOf(MirrorCompareExpr.prototype), 'performReduction', _this7).call(_this7, false);
-                }.bind(this));
-                this.ignoreEvents = true;
-                this.isReducing = true;
-            }
+            return new Promise(function (resolve, reject) {
+                if (!_this7.isReducing && _this7.reduce() != _this7) {
+                    var stage = _this7.stage;
+                    var shatter = new MirrorShatterEffect(_this7.mirror);
+                    shatter.run(stage, function () {
+                        _this7.ignoreEvents = false;
+                        resolve(_get(MirrorCompareExpr.prototype.__proto__ || Object.getPrototypeOf(MirrorCompareExpr.prototype), 'performReduction', _this7).call(_this7, false));
+                    }.bind(_this7));
+                    _this7.ignoreEvents = true;
+                    _this7.isReducing = true;
+                } else {
+                    reject();
+                }
+            });
         }
     }, {
         key: 'constructorArgs',

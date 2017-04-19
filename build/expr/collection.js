@@ -74,10 +74,18 @@ var BagExpr = function (_CollectionExpr) {
             this.graphicNode.shadowOffset = this.shadowOffset;
         }
     }, {
+        key: 'lockSubexpressions',
+        value: function lockSubexpressions() {
+            var filterFunc = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+        }
+    }, {
         key: 'unlock',
         value: function unlock() {
             _get(BagExpr.prototype.__proto__ || Object.getPrototypeOf(BagExpr.prototype), 'unlock', this).call(this);
             this.graphicNode.shadowOffset = this.shadowOffset;
+            if (this.graphicNode instanceof Expression) {
+                this.graphicNode.unlock();
+            }
         }
     }, {
         key: 'isValue',
@@ -420,6 +428,7 @@ var BracketArrayExpr = function (_BagExpr) {
         _this8.holes = [];
         _this8.children = [];
 
+        // This becomes graphicNode.
         _this8.addArg(new Expression());
 
         _this8._items = holding;

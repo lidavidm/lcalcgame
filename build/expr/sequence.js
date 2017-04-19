@@ -51,7 +51,6 @@ var Sequence = function (_Expression) {
                 for (var _iterator = this.holes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                     var expr = _step.value;
 
-                    if (expr instanceof MissingExpression) return false;
                     if (!expr.isComplete()) return false;
                 }
             } catch (err) {
@@ -136,15 +135,6 @@ var Sequence = function (_Expression) {
         value: function performReduction() {
             var _this2 = this;
 
-            if (!this.canReduce()) {
-                mag.Stage.getNodesWithClass(MissingExpression, [], true, [this]).forEach(function (node) {
-                    Animate.blink(node);
-                });
-                return null;
-            }
-
-            this._animating = true;
-
             var cleanup = function cleanup() {
                 _this2._animating = false;
                 while (_this2.holes.length > 0 && _this2.holes[0] instanceof MissingExpression) {
@@ -161,7 +151,6 @@ var Sequence = function (_Expression) {
                     if (_this2.holes.length === 0) {
                         Animate.poof(_this2);
                         (_this2.parent || _this2.stage).swap(_this2, null);
-                        _this2._animating = false;
                         resolve(null);
                     } else {
                         (function () {
@@ -243,8 +232,20 @@ var Sequence = function (_Expression) {
     }, {
         key: "onmouseclick",
         value: function onmouseclick() {
-            if (!this._animating) {
-                this.performReduction();
+            this.performUserReduction();
+        }
+    }, {
+        key: "drawReductionIndicator",
+        value: function drawReductionIndicator(ctx, pos, boundingSize) {
+            if (this._reducing) {
+                var radius = this.radius * this.absoluteScale.x;
+                var rightMargin = 15 * this.scale.x;
+
+                var rad = rightMargin / 3;
+                var indicatorX = pos.x + boundingSize.w - rightMargin / 2 - rad;
+                var verticalDistance = boundingSize.h - 2 * this.radius;
+                var verticalOffset = 0.5 * (1.0 + Math.sin(this._reducingTime / 250)) * verticalDistance;
+                drawCircle(ctx, indicatorX, pos.y + radius + verticalOffset, rad, "lightblue", null);
             }
         }
     }, {
@@ -310,28 +311,6 @@ var NotchedSequence = function (_Sequence) {
                 ctx.lineTo(pos.x + boundingSize.w, expr1y);
                 ctx.stroke();
             }
-
-            if (this._animating) {
-                var rad = rightMargin / 3;
-                var indicatorX = pos.x + boundingSize.w - rightMargin / 2 - rad;
-                var verticalDistance = boundingSize.h - 2 * radius;
-                var verticalOffset = 0.5 * (1.0 + Math.sin((Date.now() - this._reductionIndicatorStart) / 250)) * verticalDistance;
-                drawCircle(ctx, indicatorX, pos.y + radius + verticalOffset, rad, "#000", null);
-            }
-        }
-    }, {
-        key: "performReduction",
-        value: function performReduction() {
-            var _this4 = this;
-
-            var result = _get(NotchedSequence.prototype.__proto__ || Object.getPrototypeOf(NotchedSequence.prototype), "performReduction", this).call(this);
-
-            Animate.drawUntil(this.stage, function () {
-                return !_this4._animating || !_this4.stage;
-            });
-            this._reductionIndicatorStart = Date.now();
-
-            return result;
         }
     }]);
 
@@ -350,10 +329,10 @@ var SemicolonNotchedSequence = function (_NotchedSequence) {
             exprs[_key3] = arguments[_key3];
         }
 
-        var _this5 = _possibleConstructorReturn(this, (_ref2 = SemicolonNotchedSequence.__proto__ || Object.getPrototypeOf(SemicolonNotchedSequence)).call.apply(_ref2, [this].concat(exprs)));
+        var _this4 = _possibleConstructorReturn(this, (_ref2 = SemicolonNotchedSequence.__proto__ || Object.getPrototypeOf(SemicolonNotchedSequence)).call.apply(_ref2, [this].concat(exprs)));
 
-        _this5.padding.right = 15;
-        return _this5;
+        _this4.padding.right = 15;
+        return _this4;
     }
 
     _createClass(SemicolonNotchedSequence, [{

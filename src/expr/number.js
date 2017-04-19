@@ -42,8 +42,10 @@ class FadedNumberExpr extends NumberExpr {
 class AddExpr extends Expression {
     constructor(left, right) {
         let op = new TextExpr("+");
-        if (left instanceof MissingExpression) left = new MissingNumberExpression();
-        if (right instanceof MissingExpression) right = new MissingNumberExpression();
+        if (left instanceof MissingExpression && !(left instanceof MissingNumberExpression))
+            left = new MissingNumberExpression();
+        if (right instanceof MissingExpression && !(right instanceof MissingNumberExpression))
+            right = new MissingNumberExpression();
         super([left, op, right]);
     }
 

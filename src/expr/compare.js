@@ -25,6 +25,14 @@ class CompareExpr extends Expression {
         this.performUserReduction();
     }
 
+    update() {
+        super.update();
+        if (this.rightExpr instanceof BooleanPrimitive)
+            this.rightExpr.color = '#ff90d1';
+        if (this.leftExpr instanceof BooleanPrimitive)
+            this.leftExpr.color = '#ff90d1';
+    }
+
     reduce() {
         var cmp = this.compare();
         if (cmp === true)       return new (ExprManager.getClass('true'))();

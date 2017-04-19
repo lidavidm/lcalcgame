@@ -198,7 +198,7 @@ var LabeledVarExpr = function (_VarExpr) {
                 value = value.clone();
                 var _parent = this.parent ? this.parent : this.stage;
                 _parent.swap(this, value);
-                return value;
+                return Promise.resolve(value);
             } else {
                 var _ret2 = function () {
                     var wat = new TextExpr("?");
@@ -217,7 +217,7 @@ var LabeledVarExpr = function (_VarExpr) {
                         _this4.stage.update();
                     }, 500);
                     return {
-                        v: null
+                        v: Promise.reject("Cannot reduce undefined variable")
                     };
                 }();
 
@@ -310,14 +310,14 @@ var ChestVarExpr = function (_VarExpr2) {
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
-            if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return null;
+            if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return Promise.reject("Cannot reduce LHS of assignment");
 
             var value = this.reduce();
             if (value != this) {
                 if (!animated) {
                     var _parent2 = this.parent ? this.parent : this.stage;
                     _parent2.swap(this, value);
-                    return null;
+                    return Promise.resolve(value);
                 }
                 this._animating = true;
                 return this.animateReduction(value, true);
@@ -331,9 +331,8 @@ var ChestVarExpr = function (_VarExpr2) {
                         _this6.stage.update();
                     }, 500);
                 });
-                return null;
             }
-            return null;
+            return Promise.reject("Cannot reduce undefined variable");
         }
     }, {
         key: "animateReduction",
@@ -432,7 +431,7 @@ var JumpingChestVarExpr = function (_ChestVarExpr) {
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
-            if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return null;
+            if (this.parent && this.parent instanceof AssignExpr && this.parent.variable == this) return Promise.reject("Cannot reduce LHS of assignment");
 
             if (!animated || !this.stage) {
                 return _get(JumpingChestVarExpr.prototype.__proto__ || Object.getPrototypeOf(JumpingChestVarExpr.prototype), "performReduction", this).call(this, animated);
@@ -546,7 +545,7 @@ var AssignExpr = function (_Expression2) {
     _createClass(AssignExpr, [{
         key: "canReduce",
         value: function canReduce() {
-            return this.value && this.variable && (this.value.canReduce() || this.value.isValue()) && (this.variable instanceof VarExpr || this.variable instanceof VtableVarExpr);
+            return this.value && this.variable && (this.value.canReduce() || this.value.isValue()) && (this.variable instanceof VarExpr || this.variable instanceof VtableVarExpr || this.variable instanceof TypeInTextExpr && this.variable.canReduce());
         }
     }, {
         key: "reduce",
@@ -666,23 +665,28 @@ var AssignExpr = function (_Expression2) {
                 return Promise.reject("AssignExpr: incomplete");
             }
 
-            if (!animated) {
-                this.value.performReduction(false);
-                var value = this.value.clone();
-                this.getEnvironment().update(this.variable.name, value);
-                this.stage.environmentDisplay.update();
-                this.stage.draw();
-                return null;
+            var starter = Promise.resolve();
+            if (this.variable instanceof TypeInTextExpr) {
+                starter = this.performSubReduction(this.variable, animated);
             }
 
-            this._animating = true;
+            return starter.then(function () {
+                if (!animated) {
+                    _this15.value.performReduction(false);
+                    var value = _this15.value.clone();
+                    _this15.getEnvironment().update(_this15.variable.name, value);
+                    _this15.stage.environmentDisplay.update();
+                    _this15.stage.draw();
+                    return Promise.resolve(null);
+                }
 
-            return this.performSubReduction(this.value, true).then(function (value) {
-                _this15.value = value;
-                _this15.update();
-                if (_this15.stage) _this15.stage.draw();
-                return after(500).then(function () {
-                    return _this15.animateReduction();
+                return _this15.performSubReduction(_this15.value, true).then(function (value) {
+                    _this15.value = value;
+                    _this15.update();
+                    if (_this15.stage) _this15.stage.draw();
+                    return after(500).then(function () {
+                        return _this15.animateReduction();
+                    });
                 });
             });
         }
@@ -710,9 +714,7 @@ var AssignExpr = function (_Expression2) {
                 return;
             }
 
-            if (!this._animating) {
-                this.performReduction();
-            }
+            this.performUserReduction();
         }
     }, {
         key: "toString",
