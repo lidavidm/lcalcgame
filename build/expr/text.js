@@ -72,6 +72,11 @@ var TextExpr = function (_ExpressionPlus) {
             return this.text;
         }
     }, {
+        key: 'canReduce',
+        value: function canReduce() {
+            return true;
+        }
+    }, {
         key: 'text',
         get: function get() {
             return this._text;

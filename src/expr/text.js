@@ -74,4 +74,5 @@ class TextExpr extends ExpressionPlus {
     }
     hits(pos, options) { return false; } // disable mouse events
     value() { return this.text; }
+    canReduce() { return true; }
 }

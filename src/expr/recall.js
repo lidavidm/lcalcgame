@@ -211,6 +211,21 @@ class TypeInTextExpr extends TextExpr {
         }
     }
 
+    constructorArgs() {
+        return [ this.validator, null, 1 ];
+    }
+    clone() {
+        let t = new TypeInTextExpr(this.validator);
+        if (this.typeBox) {
+            //console.log(t.typeBox);
+            t.typeBox.text = this.typeBox.text;
+        } else {
+            t.text = this.text;
+            t.typeBox = null;
+        }
+        return t;
+    }
+
     // 'validator' is a function taking the text as an argument,
     // and returning true if valid and false if rejected.
     constructor(validator, afterCommit, charLimit=1) {
@@ -265,9 +280,13 @@ class TypeInTextExpr extends TextExpr {
     }
 
     reduce() {
-        let txt = this.typeBox.text.trim();
-        if (this.validator(txt)) {
-            return __PARSER.parse(txt);
+        if (this.typeBox) {
+            debugger;
+            console.log(this.children.length);
+            let txt = this.typeBox.text.trim();
+            if (this.validator(txt)) {
+                this.typeBox.carriageReturn();
+            }
         }
         return this;
     }
@@ -288,9 +307,24 @@ class TypeInTextExpr extends TextExpr {
     focus() { this.typeBox.focus(); this.typeBox.onmouseleave(); }
     blur() { this.typeBox.blur(); }
     isValue() { return false; }
+    isPlaceholder() {
+        return !this.isCommitted();
+    }
+    animatePlaceholderStatus() {
+        if (this.typeBox)
+            Animate.blink(this.typeBox, 1000, [1,0,0], 2);
+    }
     canReduce() {
-        let txt = this.typeBox.text.trim();
-        return this.validator(txt);
+        if (this.typeBox) {
+            let txt = this.typeBox.text.trim();
+            let valid = this.validator(txt);
+            if (valid) {
+                this.reduce();
+                return true;
+            }
+            return false;
+        }
+        else return true;
     }
     value() { return undefined; }
 }

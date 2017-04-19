@@ -27,10 +27,10 @@ class CompareExpr extends Expression {
 
     update() {
         super.update();
-        if (this.rightExpr instanceof BooleanPrimitive)
-            this.rightExpr.color = '#ff90d1';
-        if (this.leftExpr instanceof BooleanPrimitive)
-            this.leftExpr.color = '#ff90d1';
+        if (this.rightExpr instanceof BooleanPrimitive || this.rightExpr instanceof CompareExpr)
+            this.rightExpr.color = '#ff99d1';
+        if (this.leftExpr instanceof BooleanPrimitive || this.leftExpr instanceof CompareExpr)
+            this.leftExpr.color = '#ff99d1';
     }
 
     reduce() {
@@ -41,7 +41,7 @@ class CompareExpr extends Expression {
     }
 
     canReduce() {
-        return this.leftExpr && this.rightExpr &&
+        return this.leftExpr && this.rightExpr && this.operatorExpr.canReduce() &&
             (this.leftExpr.canReduce() || this.leftExpr.isValue()) &&
             (this.rightExpr.canReduce() || this.rightExpr.isValue());
     }
@@ -83,6 +83,7 @@ class CompareExpr extends Expression {
         return Promise.reject("Cannot reduce!");
     }
     compare() {
+        if (!this.operatorExpr.canReduce()) return undefined;
         if (this.funcName === '==') {
             if (!this.rightExpr || !this.leftExpr) return undefined;
 
@@ -165,6 +166,11 @@ class CompareExpr extends Expression {
                   this.stroke ? this.stroke.opacity : null);
     }
 
+    detach() {
+        super.detach();
+        this.color = "HotPink";
+    }
+
     toString() {
         return (this.locked ? '/' : '') + '(' + this.funcName + ' ' + this.leftExpr.toString() + ' ' + this.rightExpr.toString() + ')';
     }
@@ -195,6 +201,12 @@ class UnaryOpExpr extends Expression {
         if (!this._animating) {
             this.performReduction();
         }
+    }
+
+    update() {
+        super.update();
+        if (this.rightExpr instanceof BooleanPrimitive || this.rightExpr instanceof CompareExpr)
+            this.rightExpr.color = '#ff99d1';
     }
 
     reduce() {

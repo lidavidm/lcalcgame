@@ -56,8 +56,8 @@ var CompareExpr = function (_Expression) {
         key: 'update',
         value: function update() {
             _get(CompareExpr.prototype.__proto__ || Object.getPrototypeOf(CompareExpr.prototype), 'update', this).call(this);
-            if (this.rightExpr instanceof BooleanPrimitive) this.rightExpr.color = '#ff90d1';
-            if (this.leftExpr instanceof BooleanPrimitive) this.leftExpr.color = '#ff90d1';
+            if (this.rightExpr instanceof BooleanPrimitive || this.rightExpr instanceof CompareExpr) this.rightExpr.color = '#ff99d1';
+            if (this.leftExpr instanceof BooleanPrimitive || this.leftExpr instanceof CompareExpr) this.leftExpr.color = '#ff99d1';
         }
     }, {
         key: 'reduce',
@@ -68,7 +68,7 @@ var CompareExpr = function (_Expression) {
     }, {
         key: 'canReduce',
         value: function canReduce() {
-            return this.leftExpr && this.rightExpr && (this.leftExpr.canReduce() || this.leftExpr.isValue()) && (this.rightExpr.canReduce() || this.rightExpr.isValue());
+            return this.leftExpr && this.rightExpr && this.operatorExpr.canReduce() && (this.leftExpr.canReduce() || this.leftExpr.isValue()) && (this.rightExpr.canReduce() || this.rightExpr.isValue());
         }
     }, {
         key: 'performReduction',
@@ -126,6 +126,7 @@ var CompareExpr = function (_Expression) {
     }, {
         key: 'compare',
         value: function compare() {
+            if (!this.operatorExpr.canReduce()) return undefined;
             if (this.funcName === '==') {
                 if (!this.rightExpr || !this.leftExpr) return undefined;
 
@@ -184,6 +185,12 @@ var CompareExpr = function (_Expression) {
             }
             ctx.fillStyle = this.color;
             hexaRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null);
+        }
+    }, {
+        key: 'detach',
+        value: function detach() {
+            _get(CompareExpr.prototype.__proto__ || Object.getPrototypeOf(CompareExpr.prototype), 'detach', this).call(this);
+            this.color = "HotPink";
         }
     }, {
         key: 'toString',
@@ -263,6 +270,12 @@ var UnaryOpExpr = function (_Expression2) {
             if (!this._animating) {
                 this.performReduction();
             }
+        }
+    }, {
+        key: 'update',
+        value: function update() {
+            _get(UnaryOpExpr.prototype.__proto__ || Object.getPrototypeOf(UnaryOpExpr.prototype), 'update', this).call(this);
+            if (this.rightExpr instanceof BooleanPrimitive || this.rightExpr instanceof CompareExpr) this.rightExpr.color = '#ff99d1';
         }
     }, {
         key: 'reduce',

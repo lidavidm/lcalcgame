@@ -308,6 +308,7 @@ class Expression extends mag.RoundedRect {
                 });
                 return Promise.reject("Expression: expression cannot reduce");
             }
+            console.log('r', this.canReduce);
 
             this.animateReducingStatus();
 
@@ -403,8 +404,10 @@ class Expression extends mag.RoundedRect {
         return Promise.resolve(this);
     }
     reduceCompletely() { // Try to reduce this expression and its subexpressions as completely as possible.
-        var e = this;
-        var prev_holes = e.holes;
+        let e = this;
+        e.update();
+        let prev_holes = e.holes;
+        let prev_children = e.children;
         if (e.children.length === 0) return e.reduce();
         else {
             e.holes = e.holes.map((hole) => {
@@ -413,12 +416,13 @@ class Expression extends mag.RoundedRect {
                 else
                     return hole;
             });
-            e.children = [];
-            e.holes.forEach((hole) => e.addChild(hole));
+            e.update();
+            //e.children = [];
+            //e.holes.forEach((hole) => e.addChild(hole));
             var red = e.reduce();
-            e.children = [];
+            e.children = prev_children;
             e.holes = prev_holes;
-            e.holes.forEach((hole) => e.addChild(hole));
+            //e.holes.forEach((hole) => e.addChild(hole));
             return red;
         }
     }

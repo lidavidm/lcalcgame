@@ -252,7 +252,29 @@ var BlinkingCursor = function (_mag$Rect2) {
 var TypeInTextExpr = function (_TextExpr) {
     _inherits(TypeInTextExpr, _TextExpr);
 
-    _createClass(TypeInTextExpr, null, [{
+    _createClass(TypeInTextExpr, [{
+        key: 'constructorArgs',
+        value: function constructorArgs() {
+            return [this.validator, null, 1];
+        }
+    }, {
+        key: 'clone',
+        value: function clone() {
+            var t = new TypeInTextExpr(this.validator);
+            if (this.typeBox) {
+                //console.log(t.typeBox);
+                t.typeBox.text = this.typeBox.text;
+            } else {
+                t.text = this.text;
+                t.typeBox = null;
+            }
+            return t;
+        }
+
+        // 'validator' is a function taking the text as an argument,
+        // and returning true if valid and false if rejected.
+
+    }], [{
         key: 'fromExprCode',
 
 
@@ -302,10 +324,6 @@ var TypeInTextExpr = function (_TextExpr) {
                 return null;
             }
         }
-
-        // 'validator' is a function taking the text as an argument,
-        // and returning true if valid and false if rejected.
-
     }]);
 
     function TypeInTextExpr(validator, afterCommit) {
@@ -360,9 +378,13 @@ var TypeInTextExpr = function (_TextExpr) {
     _createClass(TypeInTextExpr, [{
         key: 'reduce',
         value: function reduce() {
-            var txt = this.typeBox.text.trim();
-            if (this.validator(txt)) {
-                return __PARSER.parse(txt);
+            if (this.typeBox) {
+                debugger;
+                console.log(this.children.length);
+                var txt = this.typeBox.text.trim();
+                if (this.validator(txt)) {
+                    this.typeBox.carriageReturn();
+                }
             }
             return this;
         }
@@ -409,10 +431,27 @@ var TypeInTextExpr = function (_TextExpr) {
             return false;
         }
     }, {
+        key: 'isPlaceholder',
+        value: function isPlaceholder() {
+            return !this.isCommitted();
+        }
+    }, {
+        key: 'animatePlaceholderStatus',
+        value: function animatePlaceholderStatus() {
+            if (this.typeBox) Animate.blink(this.typeBox, 1000, [1, 0, 0], 2);
+        }
+    }, {
         key: 'canReduce',
         value: function canReduce() {
-            var txt = this.typeBox.text.trim();
-            return this.validator(txt);
+            if (this.typeBox) {
+                var txt = this.typeBox.text.trim();
+                var valid = this.validator(txt);
+                if (valid) {
+                    this.reduce();
+                    return true;
+                }
+                return false;
+            } else return true;
         }
     }, {
         key: 'value',
