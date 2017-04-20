@@ -47,27 +47,25 @@ class CompareExpr extends Expression {
     }
 
     performReduction(animated=true) {
-        if (this.leftExpr && this.rightExpr && !this.leftExpr.isValue()) {
-            let before = this.leftExpr;
-            return this.performSubReduction(this.leftExpr, true).then(() => {
-                if (this.leftExpr != before) {
-                    return this.performReduction();
-                }
-                return Promise.reject("Left expression did not reduce!");
-            });
+        if (this.leftExpr && this.rightExpr && !this._reducing && !(this.leftExpr.isValue() && this.rightExpr.isValue())) {
+            let animations = [];
+            let genSubreduceAnimation = (expr) => {
+                let before = expr;
+                let prom = this.performSubReduction(expr, true).then(() => {
+                    if (expr != before)
+                        return Promise.resolve();
+                    else
+                        return Promise.reject("@ CompareExpr.performReduction: Subexpression did not reduce!");
+                });
+            };
+            if (!this.leftExpr.isValue())
+                animations.push(genSubreduceAnimation(this.leftExpr));
+            if (!this.rightExpr.isValue())
+                animations.push(genSubreduceAnimation(this.rightExpr));
+            return Promise.all(animations);
         }
-
-        if (this.leftExpr && this.rightExpr && !this.rightExpr.isValue()) {
-            let before = this.rightExpr;
-            return this.performSubReduction(this.rightExpr, true).then(() => {
-                if (this.rightExpr != before) {
-                    return this.performReduction();
-                }
-                return Promise.reject("Right expression did not reduce!");
-            });
-        }
-
         if (this.reduce() != this) {
+            console.log('reducing');
             if (animated) {
                 return new Promise((resolve, _reject) => {
                     var shatter = new ShatterExpressionEffect(this);
@@ -105,7 +103,7 @@ class CompareExpr extends Expression {
                 return lval === rval;
         } else if (this.funcName === '!=') {
             return this.leftExpr.value() !== this.rightExpr.value();
-        } else if (this.funcName === 'and' || this.funcName === 'or') {
+        } else if (this.funcName === 'and' || this.funcName === 'or' || this.funcName === 'and not' || this.funcName === 'or not') {
             if (!this.rightExpr || !this.leftExpr) return undefined;
 
             var lval = this.leftExpr.value();
@@ -119,8 +117,12 @@ class CompareExpr extends Expression {
 
             if (this.funcName === 'and')
                 return (lval === true) && (rval === true);
+            else if (this.funcName === 'and not')
+                return (lval === true) && !(rval === true);
             else if (this.funcName === 'or')
                 return (lval === true) || (rval === true);
+            else if (this.funcName === 'or not')
+                return (lval === true) || !(rval === true);
             else {
                 console.warn('Logical operator "' + this.funcName + '" not implemented.');
                 return undefined;

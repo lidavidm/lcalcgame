@@ -77,39 +77,20 @@ var CompareExpr = function (_Expression) {
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
-            if (this.leftExpr && this.rightExpr && !this.leftExpr.isValue() && !this._reducing) {
-                var _ret = function () {
-                    var before = _this2.leftExpr;
-                    return {
-                        v: _this2.performSubReduction(_this2.leftExpr, true).then(function () {
-                            if (_this2.leftExpr != before) {
-                                return _this2.performReduction();
-                            }
-                            return Promise.reject("Left expression did not reduce!");
-                        })
-                    };
-                }();
-
-                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+            if (this.leftExpr && this.rightExpr && !this._reducing && !(this.leftExpr.isValue() && this.rightExpr.isValue())) {
+                var animations = [];
+                var genSubreduceAnimation = function genSubreduceAnimation(expr) {
+                    var before = expr;
+                    var prom = _this2.performSubReduction(expr, true).then(function () {
+                        if (expr != before) return Promise.resolve();else return Promise.reject("@ CompareExpr.performReduction: Subexpression did not reduce!");
+                    });
+                };
+                if (!this.leftExpr.isValue()) animations.push(genSubreduceAnimation(this.leftExpr));
+                if (!this.rightExpr.isValue()) animations.push(genSubreduceAnimation(this.rightExpr));
+                return Promise.all(animations);
             }
-
-            if (this.leftExpr && this.rightExpr && !this.rightExpr.isValue() && !this._reducing) {
-                var _ret2 = function () {
-                    var before = _this2.rightExpr;
-                    return {
-                        v: _this2.performSubReduction(_this2.rightExpr, true).then(function () {
-                            if (_this2.rightExpr != before) {
-                                return _this2.performReduction();
-                            }
-                            return Promise.reject("Right expression did not reduce!");
-                        })
-                    };
-                }();
-
-                if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
-            }
-
             if (this.reduce() != this) {
+                console.log('reducing');
                 if (animated) {
                     return new Promise(function (resolve, _reject) {
                         var shatter = new ShatterExpressionEffect(_this2);
@@ -144,7 +125,7 @@ var CompareExpr = function (_Expression) {
                 });else return lval === rval;
             } else if (this.funcName === '!=') {
                 return this.leftExpr.value() !== this.rightExpr.value();
-            } else if (this.funcName === 'and' || this.funcName === 'or') {
+            } else if (this.funcName === 'and' || this.funcName === 'or' || this.funcName === 'and not' || this.funcName === 'or not') {
                 if (!this.rightExpr || !this.leftExpr) return undefined;
 
                 var lval = this.leftExpr.value();
@@ -155,7 +136,7 @@ var CompareExpr = function (_Expression) {
                 //console.log('leftexpr', this.leftExpr.constructor.name, this.leftExpr instanceof LambdaVarExpr, lval);
                 //console.log('rightexpr', this.rightExpr.constructor.name, rval);
 
-                if (this.funcName === 'and') return lval === true && rval === true;else if (this.funcName === 'or') return lval === true || rval === true;else {
+                if (this.funcName === 'and') return lval === true && rval === true;else if (this.funcName === 'and not') return lval === true && !(rval === true);else if (this.funcName === 'or') return lval === true || rval === true;else if (this.funcName === 'or not') return lval === true || !(rval === true);else {
                     console.warn('Logical operator "' + this.funcName + '" not implemented.');
                     return undefined;
                 }
@@ -305,7 +286,7 @@ var UnaryOpExpr = function (_Expression2) {
 
 
             if (this.rightExpr && !this.rightExpr.isValue() && !this._animating) {
-                var _ret3 = function () {
+                var _ret = function () {
                     _this5._animating = true;
                     var before = _this5.rightExpr;
                     return {
@@ -318,7 +299,7 @@ var UnaryOpExpr = function (_Expression2) {
                     };
                 }();
 
-                if ((typeof _ret3 === 'undefined' ? 'undefined' : _typeof(_ret3)) === "object") return _ret3.v;
+                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
             }
 
             if (this.reduce() != this) {

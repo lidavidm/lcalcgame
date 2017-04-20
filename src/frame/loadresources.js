@@ -152,7 +152,6 @@ function LOAD_REDUCT_RESOURCES(Resource) {
 
     // Add levels here:
     const chapterDigraph = {
-        'logicalops' : ['intro'],
         'intro': ['booleans'],
         'booleans': ['conditionals'],
         'conditionals': ['bindings', 'bags'],
@@ -163,7 +162,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         'define': ['intro_obj'],
         'intro_obj': ['intro_obj2'],
         'intro_obj2': ['intro_typing'],
-        'intro_typing': ['assign'],
+        'intro_typing': ['logicalops'],
+        'logicalops' : ['assign'],
         'assign': ['sequence'],
         'sequence': ['loops'],
         'loops': ['mystery'],
@@ -233,7 +233,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         }
 
         let fadedBorders = ExprManager.fadeBordersAt(level_idx);
-        if (fadedBorders.length > 0) {
+        if (fadedBorders.length > 0 && (!('showFade' in level_desc) || level_desc.showFade === true)) {
 
             ExprManager.fadesAtBorder = false;
             console.log('Making unfaded level...');

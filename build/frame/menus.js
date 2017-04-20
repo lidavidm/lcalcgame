@@ -1,7 +1,5 @@
 'use strict';
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -239,11 +237,16 @@ var MainMenu = function (_mag$Stage) {
 
                 // Find a random position that doesn't intersect other previously created stars.
                 var p = genRandomPt();
+
+                // Limit how many times we try (mobile optimization)
+                var tries = 0;
+
                 for (var i = 0; i < stars.length; i++) {
                     var s = stars[i];
                     var prect = { x: p.x, y: p.y, w: star.size.w, h: star.size.h };
                     var srect = { x: s._pos.x, y: s._pos.y, w: s.size.w, h: s.size.h };
-                    if (intersects(STARBOY_RECT, prect) || intersects(prect, srect)) {
+                    tries++;
+                    if ((intersects(STARBOY_RECT, prect) || intersects(prect, srect)) && tries < 100) {
                         p = genRandomPt();
                         i = 0;
                     }
@@ -344,6 +347,8 @@ var MainMenu = function (_mag$Stage) {
                 if (starboy.cancelFloat) twn.cancel();
             });
             twn.run();
+
+            this.starboy = starboy;
         }
     }, {
         key: 'showTitle',
@@ -368,6 +373,15 @@ var MainMenu = function (_mag$Stage) {
             var b = new MenuButton(GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, GLOBAL_DEFAULT_SCREENSIZE.height / 2.0 + 80 + 120, 140, 60, 'Settings', onClickSettings, 'Purple', 'lightgray', 'Indigo', 'Purple');
             b.anchor = { x: 0.5, y: 0.5 };
             this.add(b);
+        }
+    }, {
+        key: 'onorientationchange',
+        value: function onorientationchange() {
+            this.starboy.pos = { x: GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y: GLOBAL_DEFAULT_SCREENSIZE.height / 2.1 };
+            this.title.pos = { x: GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y: GLOBAL_DEFAULT_SCREENSIZE.height / 1.2 };
+            this.bg.size = {
+                w: GLOBAL_DEFAULT_SCREENSIZE.width, h: GLOBAL_DEFAULT_SCREENSIZE.height
+            };
         }
     }]);
 
@@ -1648,7 +1662,6 @@ var ChapterSelectMenu = function (_mag$Stage2) {
             this.ctx.save();
             this.ctx.scale(this._scale, this._scale);
             this.clear();
-            this.ctx.translate(this.offset.x, this.offset.y);
             var len = this.nodes.length;
             for (var i = 0; i < len; i++) {
                 this.nodes[i].draw(this.ctx);
@@ -2190,9 +2203,12 @@ function layoutGroup(group, boundingArea, seededRandom) {
             var lastCell = extraCells.pop();
             var cellAboveIndex = xCells * yCells - 2;
             var cellAbove = gridCells[cellAboveIndex];
-            gridCells[cellAboveIndex] = lastCell;
-            lastCell.x = 0.5 * lastCell.x + 0.5 * cellAbove.x;
-            lastCell.y = 0.7 * lastCell.y + 0.3 * cellAbove.y;
+            // Sometimes, the cell above us is part of extraCells and no longer usable
+            if (cellAbove) {
+                gridCells[cellAboveIndex] = lastCell;
+                lastCell.x = 0.5 * lastCell.x + 0.5 * cellAbove.x;
+                lastCell.y = 0.7 * lastCell.y + 0.3 * cellAbove.y;
+            }
         }
     }
 
@@ -2237,20 +2253,19 @@ function topologicalSort(adjacencyList) {
     var _iteratorError9 = undefined;
 
     try {
-        for (var _iterator9 = Object.entries(adjacencyList)[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-            var _step9$value = _slicedToArray(_step9.value, 2);
+        for (var _iterator9 = Object.keys(adjacencyList)[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+            var _src = _step9.value;
 
-            var _src = _step9$value[0];
-            var dsts = _step9$value[1];
+            var dsts = adjacencyList[_src];
             var _iteratorNormalCompletion13 = true;
             var _didIteratorError13 = false;
             var _iteratorError13 = undefined;
 
             try {
                 for (var _iterator13 = dsts[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
-                    var _dst = _step13.value;
+                    var _dst2 = _step13.value;
 
-                    dependencies[_dst][_src] = true;
+                    dependencies[_dst2][_src] = true;
                 }
             } catch (err) {
                 _didIteratorError13 = true;
@@ -2289,12 +2304,10 @@ function topologicalSort(adjacencyList) {
         var _iteratorError10 = undefined;
 
         try {
-            for (var _iterator10 = Object.entries(dependencies)[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
-                var _step10$value = _slicedToArray(_step10.value, 2);
+            for (var _iterator10 = Object.keys(dependencies)[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+                var dst = _step10.value;
 
-                var dst = _step10$value[0];
-                var deps = _step10$value[1];
-
+                var deps = dependencies[dst];
                 if (Object.keys(deps).length === 0) {
                     found.push(dst);
                 }
@@ -2322,19 +2335,17 @@ function topologicalSort(adjacencyList) {
 
         try {
             for (var _iterator11 = found[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
-                var dst = _step11.value;
+                var _dst = _step11.value;
                 var _iteratorNormalCompletion12 = true;
                 var _didIteratorError12 = false;
                 var _iteratorError12 = undefined;
 
                 try {
-                    for (var _iterator12 = Object.entries(dependencies)[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
-                        var _step12$value = _slicedToArray(_step12.value, 2);
+                    for (var _iterator12 = Object.keys(dependencies)[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+                        var key = _step12.value;
 
-                        var _ = _step12$value[0];
-                        var deps = _step12$value[1];
-
-                        delete deps[dst];
+                        var _deps = dependencies[key];
+                        delete _deps[_dst];
                     }
                 } catch (err) {
                     _didIteratorError12 = true;
@@ -2351,7 +2362,7 @@ function topologicalSort(adjacencyList) {
                     }
                 }
 
-                delete dependencies[dst];
+                delete dependencies[_dst];
             }
 
             // Sort the list to give us a deterministic order
@@ -2403,7 +2414,6 @@ var Mask = function (_mag$Rect3) {
         value: function drawInternal(ctx, pos, boundingSize) {
             // Do everything in absolute coordinates to avoid any
             // weirdness with stage scale changing
-            ctx.resetTransform();
             ctx.scale(1.0, 1.0);
             var w = ctx.canvas.clientWidth;
             var h = ctx.canvas.clientHeight;

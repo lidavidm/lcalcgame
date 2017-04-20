@@ -566,6 +566,9 @@ var mag = function (_) {
             key: 'onkeyup',
             value: function onkeyup(event) {}
         }, {
+            key: 'onorientationchange',
+            value: function onorientationchange(event) {}
+        }, {
             key: 'getHitNodes',
             value: function getHitNodes(pos) {
                 var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -762,7 +765,7 @@ var mag = function (_) {
             var onkeydown = function onkeydown(e) {
                 var event = getCBKeyEvent(e);
                 stage.onkeydown(event);
-                if (e.keyCode == 32) {
+                if (e.keyCode == 32 || e.keyCode == 13) {
                     stage.onkeypress(event);
                     e.preventDefault();
                 }
