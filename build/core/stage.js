@@ -436,12 +436,23 @@ var mag = function (_) {
                 var is_toolbox = function is_toolbox(e) {
                     return e && (e.toolbox || e.parent && is_toolbox(e.parent));
                 };
-                var hit_nodes = this.getHitNodes(pos, { 'exclude': [node] });
+                var hit_nodes = this.getHitNodesIntersecting(node, { 'exclude': [node] });
                 var hit = null;
                 if (hit_nodes.length > 0) {
-                    for (var i = hit_nodes.length - 1; i > -1; i--) {
-                        if (hit_nodes[i] != node && !is_toolbox(hit_nodes[i])) hit = hit_nodes[i];
-                    }
+                    (function () {
+
+                        // Sort hit nodes by closeness to center of dragged node:
+                        var center = node.centerPos();
+                        hit_nodes.sort(function (a, b) {
+                            return distBetweenPos(center, a.centerPos()) > distBetweenPos(center, b.centerPos());
+                        });
+
+                        console.log(hit_nodes);
+
+                        for (var i = hit_nodes.length - 1; i > -1; i--) {
+                            if (hit_nodes[i] != node && !is_toolbox(hit_nodes[i])) hit = hit_nodes[i];
+                        }
+                    })();
                 }
                 return hit;
             }
@@ -486,7 +497,6 @@ var mag = function (_) {
                         if (underNode) underNode.ondropenter(this.heldNode, pos);
                         this.underNode = underNode;
                     } else if (this.underNode != underNode) {
-                        // this.underNode != underNode
                         if (underNode) underNode.ondropenter(this.heldNode, pos);
                         this.underNode.ondropexit(this.heldNode, pos);
                         this.underNode = underNode;
@@ -582,6 +592,53 @@ var mag = function (_) {
                 return hits;
             }
         }, {
+            key: 'getHitNodesIntersecting',
+            value: function getHitNodesIntersecting(node) {
+                var _this6 = this;
+
+                var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+                var startingNodes = arguments[2];
+
+                if (typeof startingNodes === 'undefined') startingNodes = this.nodes;
+                var hits = [];
+                var nodeSize = node.absoluteSize;
+                var nodeBounds = rectFromPosAndSize(node.upperLeftPos(node.absolutePos, nodeSize), nodeSize);
+                var hitnode = null;
+                startingNodes.forEach(function (n) {
+                    if (n == node) return;
+
+                    // Check whether absolute boundaries intersect:
+                    var hitNodeSize = n.absoluteSize;
+                    var hitNodeBounds = rectFromPosAndSize(n.upperLeftPos(n.absolutePos, hitNodeSize), hitNodeSize);
+                    if (intersects(nodeBounds, hitNodeBounds)) {
+
+                        // Give priority to intersections with child nodes (recursively)
+                        var holes = n.holes ? n.holes.filter(function (e) {
+                            return e instanceof Expression;
+                        }) : [];
+                        if (holes.length > 0) {
+                            var subintersections = _this6.getHitNodesIntersecting(node, options, holes);
+                            if (subintersections.length > 0) {
+                                hits = hits.concat(subintersections);
+                                return;
+                            }
+                        }
+
+                        // Get the intersection rectangle and its center point:
+                        var intersection = rectFromIntersection(nodeBounds, hitNodeBounds);
+                        var center = { x: intersection.x + intersection.w / 2.0, y: intersection.y + intersection.h / 2.0 };
+
+                        // Use the hit test as if the cursor was at the center of the intersection:
+                        // (this allows us to use existing hit test code, which relies on points, not rectangles)
+                        hitnode = n.hits(center, options);
+                        if (hitnode) {
+                            hits.push(hitnode);
+                        }
+                    }
+                });
+                return hits;
+            }
+        }, {
             key: 'toString',
             value: function toString() {
                 return "[Stage toString method is undefined]";
@@ -621,7 +678,7 @@ var mag = function (_) {
             value: function getNodesWithClass(Class) {
                 var excludedNodes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
-                var _this6 = this;
+                var _this7 = this;
 
                 var recursive = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
                 var nodes = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
@@ -635,7 +692,7 @@ var mag = function (_) {
                     });
                     if (excluded) return;else if (n instanceof Class) rt.push(n);
                     if (recursive && n.children.length > 0) {
-                        var childs = _this6.getNodesWithClass(Class, excludedNodes, true, n.children);
+                        var childs = _this7.getNodesWithClass(Class, excludedNodes, true, n.children);
                         childs.forEach(function (c) {
                             return rt.push(c);
                         });

@@ -144,7 +144,17 @@ function rectFromPosAndSize(pos, size) {
     return { x: pos.x, y: pos.y, w: size.w, h: size.h };
 }
 function intersects(r1, r2) {
-    return !(r2.x > r1.x + r2.w || r2.x + r2.w < r1.x || r2.y > r1.y + r1.h || r2.y + r2.h < r1.y);
+    return !(r2.x > r1.x + r1.w || r2.x + r2.w < r1.x || r2.y > r1.y + r1.h || r2.y + r2.h < r1.y);
+}
+function rectFromIntersection(r1, r2) {
+    var swap = r1.x < r2.x;
+    var a = swap ? r1 : r2;
+    var b = swap ? r2 : r1;
+    return {
+        x: b.x, y: Math.max(a.y, b.y),
+        w: Math.min(b.w, a.x + a.w - b.w),
+        h: Math.min(b.h, a.y + a.h - b.y)
+    };
 }
 function setStrokeStyle(ctx, stroke) {
     if (!stroke) ctx.strokeStyle = null;else {

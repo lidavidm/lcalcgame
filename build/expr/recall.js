@@ -379,8 +379,6 @@ var TypeInTextExpr = function (_TextExpr) {
         key: 'reduce',
         value: function reduce() {
             if (this.typeBox) {
-                debugger;
-                console.log(this.children.length);
                 var txt = this.typeBox.text.trim();
                 if (this.validator(txt)) {
                     this.typeBox.carriageReturn();

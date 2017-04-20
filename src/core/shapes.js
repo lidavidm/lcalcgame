@@ -52,6 +52,10 @@
          set scale(sc) { this._scale = sc; }
          set color(clr) { this._color = clr; }
          upperLeftPos(pos, boundingSize) {
+             if (!pos && !boundingSize) {
+                 pos = this.absolutePos;
+                 boundingSize = this.absoluteSize;
+             }
              return { x:pos.x - this.anchor.x*boundingSize.w, y:pos.y - this.anchor.y*boundingSize.h };
          }
          centerPos() {
