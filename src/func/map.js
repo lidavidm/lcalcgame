@@ -115,8 +115,10 @@ class MapFunc extends FuncExpr {
             var superReduce = () => {
                 this.bag = bagCopy;
                 this.update();
-                this.bag = super.performReduction();
-                stage.draw();
+                return super.performReduction().then((bag) => {
+                    this.bag = bag;
+                    stage.draw();
+                });
             };
 
             // Run 'map' animation.
@@ -124,9 +126,10 @@ class MapFunc extends FuncExpr {
 
                 // debug
                 if (!this.animatedReduction) {
-                    superReduce();
-                    this.bag.spill(false); // don't log this spill
-                    stage.remove(this.bag);
+                    superReduce().then(() => {
+                        this.bag.spill(false); // don't log this spill
+                        stage.remove(this.bag);
+                    });
                     return;
                 }
                 else this.bag.lock();
