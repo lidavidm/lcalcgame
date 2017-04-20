@@ -41,7 +41,7 @@
             }
         },
         {
-            "goal": "'star'",
+            "goal": "'rice'",
             "board": ["x = _t_single; y = x", "y"],
             "toolbox": "",
             "globals": {
@@ -49,18 +49,18 @@
         },
         {
             "goal": "true",
-            "board": ["_t_variable = _t_single; _t_variable = 'triangle'; answer = x == y", "answer"],
+            "board": ["_t_variable = _t_single; _t_variable = 'rice'; answer = x == y", "answer"],
             "toolbox": "",
             "globals": {
             }
         },
         {
-            "goal": "'rect'",
+            "goal": "'rice'",
             "board": ["_t_single"],
             "toolbox": [],
             "globals": {
-                "x": "(arrayobj /(bag /triangle /star))",
-                "y": "(arrayobj /(bag /star /rect))"
+                "x": "(arrayobj /(bag /rice /bread))",
+                "y": "(arrayobj /(bag /bread /rice))"
             },
             "fade": {
                 "reference": 4
