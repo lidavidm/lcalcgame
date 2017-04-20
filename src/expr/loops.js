@@ -49,7 +49,9 @@ class RepeatLoopExpr extends Expression {
         if (this.timesExpr instanceof NumberExpr) {
             let missing = [];
             for (let i = 0; i < this.timesExpr.number; i++) {
-                missing.push(this.bodyExpr.clone());
+                let e = new Expression();
+                e._size = { w: this.bodyExpr.size.w, h: e.size.h };
+                missing.push(e);
             }
             this.template = new (ExprManager.getClass('sequence'))(...missing);
             this.template.lockSubexpressions();
@@ -252,6 +254,7 @@ class RepeatLoopExpr extends Expression {
                             },
                         }, 300).after(() => {
                             let oldOffset = this.bodyExpr.shadowOffset;
+                            let body = this.bodyExpr.clone();
 
                             Animate.tween(this, {
                                 _leverAngle: 0,
@@ -264,7 +267,8 @@ class RepeatLoopExpr extends Expression {
                                 },
                             }, 400).after(() => {
                                 for (let i = 0; i < numExprs; i++) {
-                                    this.template.subexpressions[index + i].opacity = 1.0;
+                                    this.template.subexpressions[index + i] = body.clone();
+                                    this.template.update();
                                 }
                                 index += numExprs;
 
