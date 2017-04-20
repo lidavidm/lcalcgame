@@ -283,7 +283,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         }
 
         var fadedBorders = ExprManager.fadeBordersAt(level_idx);
-        if (fadedBorders.length > 0) {
+        if (fadedBorders.length > 0 && (!('showFade' in level_desc) || level_desc.showFade === true)) {
             var _ret = function () {
 
                 ExprManager.fadesAtBorder = false;

@@ -592,7 +592,7 @@ var mag = (function(_) {
             var onkeydown = (e) => {
                 let event = getCBKeyEvent(e);
                 stage.onkeydown(event);
-                if(e.keyCode == 32) {
+                if(e.keyCode == 32 || e.keyCode == 13) {
                     stage.onkeypress(event);
                     e.preventDefault();
                 }
