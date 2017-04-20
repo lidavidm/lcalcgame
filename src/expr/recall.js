@@ -325,5 +325,14 @@ class TypeInTextExpr extends TextExpr {
         }
         else return true;
     }
+    isComplete() {
+        if (this.typeBox) {
+            let txt = this.typeBox.text.trim();
+            return this.validator(txt);
+        }
+        else {
+            return true;
+        }
+    }
     value() { return undefined; }
 }
