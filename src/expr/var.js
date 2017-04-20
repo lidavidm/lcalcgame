@@ -554,11 +554,23 @@ class AssignExpr extends Expression {
                 return Promise.resolve(null);
             }
 
-            return this.performSubReduction(this.value, true).then((value) => {
+            let promise;
+            // Don't need as much delay if we're using
+            // performSubReduction, since it pauses for us
+            let delay = 200;
+            if (this.value.isValue()) {
+                promise = Promise.resolve(this.value);
+                delay = 500;
+            }
+            else {
+                promise = this.performSubReduction(this.value, true);
+            }
+
+            return promise.then((value) => {
                 this.value = value;
                 this.update();
                 if (this.stage) this.stage.draw();
-                return after(500).then(() => this.animateReduction());
+                return after(delay).then(() => this.animateReduction());
             });
         });
     }
