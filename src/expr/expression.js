@@ -332,7 +332,7 @@ class Expression extends mag.RoundedRect {
     performSubReduction(expr, animated=true) {
         return new Promise((resolve, reject) => {
             if (expr.isValue() || !expr.canReduce()) {
-                resolve(expr);
+                after(300).then(() => resolve(expr));
                 return;
             }
             let result = expr.performReduction(animated);
@@ -341,7 +341,7 @@ class Expression extends mag.RoundedRect {
                     if (this.stage) this.stage.draw();
                     if (result instanceof Expression) result.lock();
 
-                    after(400).then(() => {
+                    after(1000).then(() => {
                         if (this.stage) this.stage.draw();
                         return resolve(result);
                     });
@@ -349,13 +349,8 @@ class Expression extends mag.RoundedRect {
             }
             else {
                 if (this.stage) this.stage.draw();
-                let delay = 400;
-                if (!result) {
-                    result = expr;
-                    delay = 0;
-                }
                 if (result instanceof Expression && !(result instanceof MissingExpression)) result.lock();
-                after(400).then(() => {
+                after(1000).then(() => {
                     if (this.stage) this.stage.draw();
                     return resolve(result);
                 });
