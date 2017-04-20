@@ -165,12 +165,17 @@ class MainMenu extends mag.Stage {
 
             // Find a random position that doesn't intersect other previously created stars.
             let p = genRandomPt();
+
+            // Limit how many times we try (mobile optimization)
+            let tries = 0;
+
             for (let i = 0; i < stars.length; i++) {
                 let s = stars[i];
                 let prect = {x:p.x, y:p.y, w:star.size.w, h:star.size.h};
                 let srect = {x:s._pos.x, y:s._pos.y, w:s.size.w, h:s.size.h};
-                if (intersects(STARBOY_RECT, prect) ||
-                    intersects(prect, srect)) {
+                tries++;
+                if ((intersects(STARBOY_RECT, prect) ||
+                     intersects(prect, srect)) && tries < 100) {
                     p = genRandomPt();
                     i = 0;
                 }
@@ -261,6 +266,8 @@ class MainMenu extends mag.Stage {
             if (starboy.cancelFloat) twn.cancel();
         });
         twn.run();
+
+        this.starboy = starboy;
     }
 
     showTitle() {
@@ -290,6 +297,14 @@ class MainMenu extends mag.Stage {
                                'Purple', 'lightgray', 'Indigo', 'Purple');
         b.anchor = { x:0.5, y:0.5 };
         this.add(b);
+    }
+
+    onorientationchange() {
+        this.starboy.pos = { x:GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y:GLOBAL_DEFAULT_SCREENSIZE.height / 2.1 };
+        this.title.pos = { x:GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y:GLOBAL_DEFAULT_SCREENSIZE.height / 1.2 };
+        this.bg.size = {
+            w: GLOBAL_DEFAULT_SCREENSIZE.width, h: GLOBAL_DEFAULT_SCREENSIZE.height
+        };
     }
 }
 
@@ -1344,7 +1359,6 @@ class ChapterSelectMenu extends mag.Stage {
         this.ctx.save();
         this.ctx.scale(this._scale, this._scale);
         this.clear();
-        this.ctx.translate(this.offset.x, this.offset.y);
         const len = this.nodes.length;
         for (let i = 0; i < len; i++) {
             this.nodes[i].draw(this.ctx);
@@ -1713,9 +1727,12 @@ function layoutGroup(group, boundingArea, seededRandom) {
             let lastCell = extraCells.pop();
             let cellAboveIndex = xCells * yCells - 2;
             let cellAbove = gridCells[cellAboveIndex];
-            gridCells[cellAboveIndex] = lastCell;
-            lastCell.x = 0.5 * lastCell.x + 0.5 * cellAbove.x;
-            lastCell.y = 0.7 * lastCell.y + 0.3 * cellAbove.y;
+            // Sometimes, the cell above us is part of extraCells and no longer usable
+            if (cellAbove) {
+                gridCells[cellAboveIndex] = lastCell;
+                lastCell.x = 0.5 * lastCell.x + 0.5 * cellAbove.x;
+                lastCell.y = 0.7 * lastCell.y + 0.3 * cellAbove.y;
+            }
         }
     }
 
@@ -1734,7 +1751,8 @@ function topologicalSort(adjacencyList) {
         dependencies[src] = {};
     }
 
-    for (let [src, dsts] of Object.entries(adjacencyList)) {
+    for (let src of Object.keys(adjacencyList)) {
+        let dsts = adjacencyList[src];
         for (let dst of dsts) {
             dependencies[dst][src] = true;
         }
@@ -1742,7 +1760,8 @@ function topologicalSort(adjacencyList) {
 
     while (true) {
         let found = [];
-        for (let [dst, deps] of Object.entries(dependencies)) {
+        for (let dst of Object.keys(dependencies)) {
+            let deps = dependencies[dst];
             if (Object.keys(deps).length === 0) {
                 found.push(dst);
             }
@@ -1751,7 +1770,8 @@ function topologicalSort(adjacencyList) {
         if (found.length === 0) break;
 
         for (let dst of found) {
-            for (let [_, deps] of Object.entries(dependencies)) {
+            for (let key of Object.keys(dependencies)) {
+                let deps = dependencies[key];
                 delete deps[dst];
             }
             delete dependencies[dst];
@@ -1780,7 +1800,6 @@ class Mask extends mag.Rect {
     drawInternal(ctx, pos, boundingSize) {
         // Do everything in absolute coordinates to avoid any
         // weirdness with stage scale changing
-        ctx.resetTransform();
         ctx.scale(1.0, 1.0);
         let w = ctx.canvas.clientWidth;
         let h = ctx.canvas.clientHeight;
