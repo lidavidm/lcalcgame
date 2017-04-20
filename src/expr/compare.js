@@ -62,12 +62,10 @@ class CompareExpr extends Expression {
                 animations.push(genSubreduceAnimation(this.leftExpr));
             if (!this.rightExpr.isValue())
                 animations.push(genSubreduceAnimation(this.rightExpr));
-            return Promise.all(animations).then(() => {
-                return this.performReduction();
-            });
+            return Promise.all(animations);
         }
-
         if (this.reduce() != this) {
+            console.log('reducing');
             if (animated) {
                 return new Promise((resolve, _reject) => {
                     var shatter = new ShatterExpressionEffect(this);

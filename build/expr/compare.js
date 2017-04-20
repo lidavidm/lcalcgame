@@ -87,12 +87,10 @@ var CompareExpr = function (_Expression) {
                 };
                 if (!this.leftExpr.isValue()) animations.push(genSubreduceAnimation(this.leftExpr));
                 if (!this.rightExpr.isValue()) animations.push(genSubreduceAnimation(this.rightExpr));
-                return Promise.all(animations).then(function () {
-                    return _this2.performReduction();
-                });
+                return Promise.all(animations);
             }
-
             if (this.reduce() != this) {
+                console.log('reducing');
                 if (animated) {
                     return new Promise(function (resolve, _reject) {
                         var shatter = new ShatterExpressionEffect(_this2);
