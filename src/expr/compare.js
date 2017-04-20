@@ -47,7 +47,7 @@ class CompareExpr extends Expression {
     }
 
     performReduction(animated=true) {
-        if (this.leftExpr && this.rightExpr && !this.leftExpr.isValue() && !this._reducing) {
+        if (this.leftExpr && this.rightExpr && !this.leftExpr.isValue()) {
             let before = this.leftExpr;
             return this.performSubReduction(this.leftExpr, true).then(() => {
                 if (this.leftExpr != before) {
@@ -57,7 +57,7 @@ class CompareExpr extends Expression {
             });
         }
 
-        if (this.leftExpr && this.rightExpr && !this.rightExpr.isValue() && !this._reducing) {
+        if (this.leftExpr && this.rightExpr && !this.rightExpr.isValue()) {
             let before = this.rightExpr;
             return this.performSubReduction(this.rightExpr, true).then(() => {
                 if (this.rightExpr != before) {
