@@ -47,23 +47,23 @@ class CompareExpr extends Expression {
     }
 
     performReduction(animated=true) {
-        if (this.leftExpr && this.rightExpr && !this.leftExpr.isValue() && !this._reducing) {
-            let before = this.leftExpr;
-            return this.performSubReduction(this.leftExpr, true).then(() => {
-                if (this.leftExpr != before) {
-                    return this.performReduction();
-                }
-                return Promise.reject("Left expression did not reduce!");
-            });
-        }
-
-        if (this.leftExpr && this.rightExpr && !this.rightExpr.isValue() && !this._reducing) {
-            let before = this.rightExpr;
-            return this.performSubReduction(this.rightExpr, true).then(() => {
-                if (this.rightExpr != before) {
-                    return this.performReduction();
-                }
-                return Promise.reject("Right expression did not reduce!");
+        if (this.leftExpr && this.rightExpr && !this._reducing && !(this.leftExpr.isValue() && this.rightExpr.isValue())) {
+            let animations = [];
+            let genSubreduceAnimation = (expr) => {
+                let before = expr;
+                let prom = this.performSubReduction(expr, true).then(() => {
+                    if (expr != before)
+                        return Promise.resolve();
+                    else
+                        return Promise.reject("@ CompareExpr.performReduction: Subexpression did not reduce!");
+                });
+            };
+            if (!this.leftExpr.isValue())
+                animations.push(genSubreduceAnimation(this.leftExpr));
+            if (!this.rightExpr.isValue())
+                animations.push(genSubreduceAnimation(this.rightExpr));
+            return Promise.all(animations).then(() => {
+                return this.performReduction();
             });
         }
 

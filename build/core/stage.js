@@ -566,6 +566,9 @@ var mag = function (_) {
             key: 'onkeyup',
             value: function onkeyup(event) {}
         }, {
+            key: 'onorientationchange',
+            value: function onorientationchange(event) {}
+        }, {
             key: 'getHitNodes',
             value: function getHitNodes(pos) {
                 var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
