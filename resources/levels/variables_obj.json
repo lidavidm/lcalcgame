@@ -42,21 +42,21 @@
         },
         {
             "goal": "'star'",
-            "board": ["x = _t_any; y = x", "y"],
+            "board": ["x = _t_single; y = x", "y"],
             "toolbox": "",
             "globals": {
             }
         },
         {
             "goal": "true",
-            "board": ["_t_variable = _t_any; _t_variable = 'triangle'; answer = x == y", "answer"],
+            "board": ["_t_variable = _t_single; _t_variable = 'triangle'; answer = x == y", "answer"],
             "toolbox": "",
             "globals": {
             }
         },
         {
             "goal": "'rect'",
-            "board": ["_t_any"],
+            "board": ["_t_single"],
             "toolbox": [],
             "globals": {
                 "x": "(arrayobj /(bag /triangle /star))",

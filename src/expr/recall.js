@@ -186,7 +186,6 @@ class TypeInTextExpr extends TextExpr {
     static fromExprCode(code, afterCommit) {
         code = code.replace('_t_', ''); // remove prepend
         let validators = {
-            'any': () => true,
             'string':(txt) => (__PARSER.parse(txt) instanceof StringValueExpr),
             'nonneg':(txt) => {
                 let i = Number.parseInt(txt, 10);
