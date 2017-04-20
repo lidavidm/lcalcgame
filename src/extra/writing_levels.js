@@ -49,7 +49,7 @@ function constructGanttChart(table, chapters) {
     let concepts = {
         'Lambda':{
             'color': rgb(200, 200, 200),
-            'matches': [ 'λ', 'lambda' ]
+            'matches': [ 'λ', 'lambda', '(x) =>' ]
         },
         'Boolean':{
             'color': rgb(255, 105, 180),
@@ -57,7 +57,11 @@ function constructGanttChart(table, chapters) {
         },
         'Equality':{
             'color': rgb(255, 182, 193),
-            'matches': [ '==' ]
+            'matches': [ '==', '!=' ]
+        },
+        'Operators':{
+            'color': rgb(255, 182, 213),
+            'matches': [ '&&', '||', '!', ' > ', ' < ' ]
         },
         'Conditional':{
             'color': rgb(0, 206, 209),
@@ -73,7 +77,7 @@ function constructGanttChart(table, chapters) {
         },
         'Array Objects':{
             'color': rgb(40, 200, 40),
-            'matches': [ 'arrayobj' ]
+            'matches': [ 'arrayobj', '[]', '__' ]
         },
         'Object define':{
             'color': rgb(154,205,50),
@@ -171,7 +175,7 @@ function constructGanttChart(table, chapters) {
         let url = 'index.html?level=' + lvl_idx;
         if (levelContainsConcept(level, concept)) {
             let color = concept.color;
-            if (level.fade) {
+            if (level.fade && !('showFade' in level && level.showFade === false)) {
                 for (let e in level.fade) {
                     if (conceptContainsExpr(concept, e)) {
                         color = rgb(60, 60, 90);

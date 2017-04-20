@@ -125,7 +125,7 @@ var CompareExpr = function (_Expression) {
                 });else return lval === rval;
             } else if (this.funcName === '!=') {
                 return this.leftExpr.value() !== this.rightExpr.value();
-            } else if (this.funcName === 'and' || this.funcName === 'or') {
+            } else if (this.funcName === 'and' || this.funcName === 'or' || this.funcName === 'and not' || this.funcName === 'or not') {
                 if (!this.rightExpr || !this.leftExpr) return undefined;
 
                 var lval = this.leftExpr.value();
@@ -136,7 +136,7 @@ var CompareExpr = function (_Expression) {
                 //console.log('leftexpr', this.leftExpr.constructor.name, this.leftExpr instanceof LambdaVarExpr, lval);
                 //console.log('rightexpr', this.rightExpr.constructor.name, rval);
 
-                if (this.funcName === 'and') return lval === true && rval === true;else if (this.funcName === 'or') return lval === true || rval === true;else {
+                if (this.funcName === 'and') return lval === true && rval === true;else if (this.funcName === 'and not') return lval === true && !(rval === true);else if (this.funcName === 'or') return lval === true || rval === true;else if (this.funcName === 'or not') return lval === true || !(rval === true);else {
                     console.warn('Logical operator "' + this.funcName + '" not implemented.');
                     return undefined;
                 }
