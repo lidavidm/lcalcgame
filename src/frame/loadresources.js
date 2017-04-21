@@ -114,6 +114,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     loadAudio('fatbtn-click', 'fatbtn_click.wav');
     loadAudio('fatbtn-beep', 'fatbtn_space.wav');
     loadAudio('fatbtn-beep2', 'fatbtn_space2.wav');
+    loadAudio('printer', '119556__vrodge__office-printer-printing.wav');
+    loadAudio('stamp', '33310__queensize__stamp.wav');
     loadAudio('goback', 'ui_back.wav');
     loadAudio('zoomin', 'zoom_planet.wav');
     loadAudio('define', 'define.wav');

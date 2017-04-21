@@ -252,15 +252,17 @@ class RepeatLoopExpr extends Expression {
                             y -= expr.size.h * expr.scale.y;
                         }
 
+                        Resource.play('printer');
                         Animate.tween(this.template, {
                             pos: {
                                 x: x,
                                 y: y,
                             },
-                        }, 300).after(() => {
+                        }, 400).after(() => {
                             let oldOffset = this.bodyExpr.shadowOffset;
                             let body = this.bodyExpr.clone();
 
+                            Resource.play('stamp');
                             Animate.tween(this, {
                                 _leverAngle: 0,
                             }, 400);
