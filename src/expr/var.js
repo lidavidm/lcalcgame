@@ -251,7 +251,8 @@ class ChestVarExpr extends VarExpr {
             return this.animateReduction(value, true);
         }
         else if (animated) {
-            this.animateReduction(new TextExpr("?"), false).then((wat) => {
+            let wat = new TextExpr("?");
+            this.animateReduction(wat, false).then((wat) => {
                 this._opened = false;
                 window.setTimeout(() => {
                     Animate.poof(wat);
@@ -637,12 +638,31 @@ class JumpingAssignExpr extends AssignExpr {
                 }
                 else {
                     if (Object.keys(this.stage.environmentDisplay.bindings).length === 0) {
-                        targetPos = this.stage.environmentDisplay.absolutePos;
+                        targetPos = clonePos(this.stage.environmentDisplay.absolutePos);
+                        targetPos.y += this.stage.environmentDisplay.padding.inner;
                     }
                     else {
-                        let contents = this.stage.environmentDisplay.contents;
-                        let last = contents[contents.length - 1];
-                        targetPos = addPos(last.absolutePos, { x: 0, y: last.absoluteSize.h + this.stage.environmentDisplay.padding });
+                        let contents = this.stage.environmentDisplay.bindings;
+                        let maxY = 0;
+                        let last;
+                        for (let binding of Object.keys(contents)) {
+                            binding = contents[binding];
+                            let ap = binding.absolutePos;
+                            if (ap.y > maxY) {
+                                maxY = ap.y;
+                                last = binding;
+                            }
+                        }
+                        if (last) {
+                            targetPos = addPos(last.absolutePos, {
+                                x: 0,
+                                y: last.absoluteSize.h + this.stage.environmentDisplay.padding.inner
+                            });
+                        }
+                        else {
+                            targetPos = clonePos(this.stage.environmentDisplay.absolutePos);
+                            targetPos.y += this.stage.environmentDisplay.padding.inner;
+                        }
                     }
 
                     value = new (ExprManager.getClass('reference_display'))(this.variable.name, this.value.clone());
@@ -655,6 +675,7 @@ class JumpingAssignExpr extends AssignExpr {
                     pos: targetPos,
                     scale: { x: 0.7, y: 0.7 },
                 };
+                value.update();
 
                 let lerp = arcLerp(value.absolutePos.y, targetPos.y, -150);
                 Resource.play('fly-to');
