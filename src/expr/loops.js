@@ -39,6 +39,32 @@ class RepeatLoopExpr extends Expression {
             this.bodyExpr && this.bodyExpr.isComplete();
     }
 
+    // Properly implement reduce()/canReduce() so they don't modify
+    // the original expr and cause trouble
+    reduce() {
+        if (this.canReduce() && this.timesExpr instanceof NumberExpr) {
+            return this.reduceCompletely();
+        }
+        return this;
+    }
+
+    reduceCompletely() {
+        if (this.canReduce()) {
+            let times = this.timesExpr.reduceCompletely().value();
+            if (!Number.isInteger(times)) return this;
+            let missing = [];
+            for (let i = 0; i < times; i++) {
+                let e = this.bodyExpr.clone();
+                missing.push(e);
+            }
+            let template = new (ExprManager.getClass('sequence'))(...missing);
+            template.lockSubexpressions();
+
+            return template;
+        }
+        return this;
+    }
+
     update() {
         super.update();
 
