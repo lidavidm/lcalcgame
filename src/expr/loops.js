@@ -203,8 +203,13 @@ class RepeatLoopExpr extends Expression {
                 let x = this.template.pos.x;
                 let y = this.template.pos.y;
 
+                // Reduce instantly if we're a child of something else
                 if (this.parent) {
                     index = this.template.subexpressions.length + 1;
+                    for (let i = 0; i < this.template.subexpressions.length; i++) {
+                        this.template.subexpressions[i] = this.bodyExpr.clone();
+                    }
+                    this.template.update();
                 }
 
                 let nextStep = () => {
