@@ -82,6 +82,21 @@ class VarExpr extends Expression {
         return value;
     }
 
+    isPlaceholder() {
+        if (this.canReduce()) return false;
+        if (this.parent) {
+            if (this.rootParent instanceof Sequence) return false;
+            if (this.parent instanceof AssignExpr) {
+                return this.parent.variable != this;
+            }
+        }
+        return true;
+    }
+
+    animatePlaceholderStatus() {
+        if (!this.canReduce()) this.performReduction();
+    }
+
     onmouseclick() {
         this.performReduction();
     }
