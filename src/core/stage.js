@@ -383,8 +383,6 @@ var mag = (function(_) {
                     return distBetweenPos(center, a.centerPos()) > distBetweenPos(center, b.centerPos())
                 });
 
-                console.log(hit_nodes);
-
                 for(let i = hit_nodes.length-1; i > -1; i--) {
                     if (hit_nodes[i] != node && !is_toolbox(hit_nodes[i]))
                         hit = hit_nodes[i];

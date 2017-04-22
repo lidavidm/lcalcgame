@@ -291,17 +291,24 @@ var LambdaHoleExpr = function (_MissingExpression) {
                         _this6.parent.environmentDisplay.openDrawer({ force: true, speed: 50 });
                     }
 
+                    var preview_nodes = [];
+                    var is_replication_expr = true;
                     subvarexprs.forEach(function (e) {
+                        if (e.parent != _this6.parent) is_replication_expr = false;
                         if (e.name === _this6.name) {
                             var preview_node = node.clone();
                             preview_node.opacity = 1.0;
                             preview_node.bindSubexpressions();
                             e.open(preview_node);
+                            preview_nodes.push(preview_node);
                         }
                     });
                     _this6.opened_subexprs = subvarexprs;
+                    _this6.preview_nodes = preview_nodes;
+                    _this6.is_replication_expr = is_replication_expr && _this6.preview_nodes.length > 0;
                     _this6.close_opened_subexprs = function () {
                         if (!_this6.opened_subexprs) return;
+                        _this6.preview_nodes = null;
                         _this6.opened_subexprs.forEach(function (e) {
                             e.close();
                         });
@@ -347,21 +354,59 @@ var LambdaHoleExpr = function (_MissingExpression) {
             if (node.dragging) {
                 // Make sure node is being dragged by the user.
 
-                // Special case: Funnel dropped over hole.
-                // if (node instanceof FunnelMapFunc) {
-                //     node.func = this.parent;
-                //     this.parent.parent = null;
-                //     this.parent.stage.remove(this.parent);
-                //     this.onmouseleave();
-                //     this.parent.onmouseenter();
-                //     node.update();
-                //     return;
-                // }
-
                 var afterDrop = function afterDrop() {
+
+                    var stage = node.stage;
+
+                    var preview_nodes = _this7.preview_nodes;
+                    var is_replication_expr = _this7.is_replication_expr;
+                    if (_this7.close_opened_subexprs) {
+                        if (is_replication_expr && preview_nodes.length > 0) {
+                            (function () {
+                                var final_nodes = [];
+                                preview_nodes.forEach(function (n) {
+                                    var c = n.clone();
+                                    c.anchor = n.anchor;
+                                    c.pos = n.absolutePos;
+                                    c.scale = n.absoluteScale;
+                                    var pos = addPos(c.pos, { x: 0, y: -40 });
+                                    final_nodes.push(c);
+                                });
+                                var overlap_layout = false;
+                                for (var i = 0; i < final_nodes.length - 1; i++) {
+                                    var a = final_nodes[i];
+                                    var b = final_nodes[i + 1];
+                                    if (Math.abs(b.pos.x - a.pos.x) < a.size.w) {
+                                        // If these two nodes will overlap...
+                                        console.log('overlap', a.pos, b.pos, a.size);
+                                        overlap_layout = true;
+                                        break;
+                                    }
+                                }
+                                var len = final_nodes.length;
+                                var total_width = final_nodes.reduce(function (prev, n) {
+                                    return prev + n.size.w;
+                                }, 0);
+                                var mid_xpos = final_nodes.reduce(function (prev, n) {
+                                    return prev + n.pos.x;
+                                }, 0) / len;
+                                final_nodes.forEach(function (c, i) {
+                                    var final_pos = void 0;
+                                    if (overlap_layout) final_pos = { x: mid_xpos + (len - i - 1) / len * total_width - total_width / 4.0, y: c.pos.y - 40 };else final_pos = { x: c.pos.x, y: c.pos.y - 40 };
+                                    stage.add(c);
+                                    Animate.tween(c, { scale: { x: 1, y: 1 }, pos: final_pos }, 300, function (e) {
+                                        return Math.pow(e, 0.5);
+                                    }).after(function () {
+                                        c.onmouseleave();
+                                    });
+                                });
+                            })();
+                        }
+                        _this7.close_opened_subexprs();
+                    }
+
                     // Cleanup
                     node.opacity = 1.0;
-                    if (_this7.close_opened_subexprs) _this7.close_opened_subexprs();
 
                     // User dropped an expression into the lambda hole.
                     Resource.play('pop');
@@ -370,7 +415,6 @@ var LambdaHoleExpr = function (_MissingExpression) {
                     var dropped_expr = node.clone();
 
                     // Save the current state of the board.
-                    var stage = node.stage;
                     stage.saveState();
 
                     Logger.log('state-save', stage.toString());
@@ -386,12 +430,23 @@ var LambdaHoleExpr = function (_MissingExpression) {
                         var dropped_exp_str = node.toString();
 
                         // Animate this application
-                        var result = _this7.applyExpr(node, true);
-                        if (result === null) {
-                            // The application failed.
-                            stage.add(node);
-                            stage.update();
-                            return;
+                        if (!is_replication_expr) {
+                            var result = _this7.applyExpr(node, true);
+                            if (result === null) {
+                                // The application failed.
+                                stage.add(node);
+                                stage.update();
+                                return;
+                            }
+                        } else {
+                            parent.opacity = 1;
+                            parent.ignoreEvents = true;
+                            Animate.tween(parent, { opacity: 0 }, 400, function (elapsed) {
+                                return Math.pow(elapsed, 0.5);
+                            }).after(function () {
+                                stage.remove(parent);
+                                stage.update();
+                            });
                         }
 
                         // Log the reduction.
@@ -408,7 +463,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
                             (parent.parent || parent.stage).remove(parent);
                         } else stage.dumpState();
 
-                        return result;
+                        return null;
                     } else {
                         console.warn('ERROR: Cannot perform lambda-substitution: Hole has no parent.');
 

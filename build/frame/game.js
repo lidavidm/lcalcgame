@@ -36,8 +36,6 @@ var Level = function () {
         key: 'build',
         value: function build(canvas) {
 
-            console.log('Building ', this);
-
             var stage = new ReductStage(canvas);
 
             // Seed the random number generator so that while randomly generated,

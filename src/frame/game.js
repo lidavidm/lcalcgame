@@ -19,8 +19,6 @@ class Level {
     // * written in code, for instance -- and generate the entire game on-the-fly.
     build(canvas) {
 
-        console.log('Building ', this);
-
         var stage = new ReductStage(canvas);
 
         // Seed the random number generator so that while randomly generated,
