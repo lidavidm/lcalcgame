@@ -401,7 +401,7 @@ class AssignExpr extends Expression {
             this.addArg(variable);
         }
         else {
-            let missing = new MissingChestExpression(new VarExpr("_"));
+            let missing = new (ExprManager.getClass('_v'))(new VarExpr("_"));
             missing.acceptedClasses = [VarExpr];
             this.addArg(missing);
         }

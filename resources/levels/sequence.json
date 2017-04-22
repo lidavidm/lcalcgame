@@ -24,7 +24,7 @@
             "description": "Fill in the blank",
             "board": "(sequence /(assign $z _) _ /(assign $y $x))",
             "goal": "(star)",
-            "toolbox": "(star) (assign _ _) ($x) ($y) ($z)"
+            "toolbox": "(star) (assign _v _) ($x) ($y) ($z)"
         },
         {
             "description": "Swap the variables",

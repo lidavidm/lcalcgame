@@ -215,15 +215,33 @@ class MissingKeyExpression extends MissingBooleanExpression {
 class MissingChestExpression extends MissingTypedExpression {
     constructor(expr_to_miss) {
         super(expr_to_miss);
-        this.label = new TextExpr("xy");
-        this.label.color = "#AAA";
-        this.addArg(this.label);
+        this.initialize();
         this.acceptedClasses = [ VarExpr, VtableVarExpr ];
     }
+
+    initialize() {
+        this.image = new mag.ImageRect(0, 0, 48, 48, 'chest-silhouette');
+        this.addArg(this.image);
+    }
+
+    hitsChild() {
+        return null;
+    }
+
     getClass() { return MissingChestExpression; }
 
     accepts(expr) {
         return (expr instanceof VarExpr) || (expr instanceof VtableVarExpr && !expr.subReduceMethod);
+    }
+}
+
+class MissingVariableExpression extends MissingChestExpression {
+    getClass() { return MissingVariableExpression; }
+
+    initialize() {
+        this.label = new TextExpr("xy");
+        this.label.color = "#AAA";
+        this.addArg(this.label);
     }
 }
 

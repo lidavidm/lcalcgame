@@ -14,6 +14,7 @@ var ExprManager = (function() {
         '_b':       [MissingKeyExpression, MissingBooleanExpression],
         '_t':       [TypeInTextExpr],
         '_n':       [MissingNumberExpression],
+        '_v':       [MissingChestExpression, MissingVariableExpression],
         'true':     [KeyTrueExpr, TrueExpr],
         'false':    [KeyFalseExpr, FalseExpr],
         'number':   [NumberExpr, FadedNumberExpr],
