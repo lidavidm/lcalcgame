@@ -1,6 +1,45 @@
-"use strict";
+'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+function LOAD_REDUCT_GAMEAUDIO(Resource) {
+    var loadAudio = Resource.loadAudio;
+    loadAudio('pop', 'pop.wav');
+    loadAudio('poof', '208111__planman__poof-of-smoke.wav');
+    loadAudio('fly-to', '60012__qubodup__swing-25.wav');
+    loadAudio('fall-to', '202753__sheepfilms__slide-whistle-1.wav');
+    loadAudio('come-out', '202753__sheepfilms__slide-whistle-2.wav');
+    loadAudio('bag-spill', 'spill.wav');
+    loadAudio('bag-addItem', 'putaway.wav');
+    loadAudio('heatup', 'heatup.wav');
+    loadAudio('shatter', 'shatter1.wav');
+    loadAudio('mirror-shatter', 'shatter2.wav');
+    loadAudio('splosion', 'firework1.wav');
+    loadAudio('shootwee', 'firework-shooting.wav');
+    loadAudio('swoop', 'swoop.wav');
+    loadAudio('key-jiggle', 'key-jiggle.wav');
+    loadAudio('key-unlock', 'key-unlock-fast.wav');
+    loadAudio('victory', '325805__wagna__collect.wav');
+    loadAudio('matching-goal', 'matching-the-goal2.wav');
+    loadAudio('mutate', 'deflate.wav');
+    loadAudio('game-complete', 'game-complete.wav');
+    loadAudio('chest-open', '202092__spookymodem__chest-opening.wav');
+    loadAudio('fatbtn-click', 'fatbtn_click.wav');
+    loadAudio('fatbtn-beep', 'fatbtn_space.wav');
+    loadAudio('fatbtn-beep2', 'fatbtn_space2.wav');
+    loadAudio('goback', 'ui_back.wav');
+    loadAudio('zoomin', 'zoom_planet.wav');
+    loadAudio('define', 'define.wav');
+    loadAudio('place', 'place_from_toolbox.wav');
+    loadAudio('define-convert', 'convert.wav');
+    loadAudio('drawer-open', 'drawer_close.wav');
+    loadAudio('drawer-close', 'drawer_open.wav');
+    loadAudio('carriage-return', 'carriage-return.wav');
+    loadAudio('key-press-1', 'key-press-1.wav');
+    loadAudio('key-press-2', 'key-press-2.wav');
+    loadAudio('key-press-3', 'key-press-3.wav');
+    loadAudio('key-press-4', 'key-press-4.wav');
+}
 
 function LOAD_REDUCT_RESOURCES(Resource) {
     var __RESOURCE_PATH = Resource.path;
@@ -143,43 +182,6 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     Resource.pushChapter = pushChapter;
     Resource.loadChapterFromFile = loadChapterFromFile;
     Resource.loadChaptersFromFiles = loadChaptersFromFiles;
-
-    // Add resources here:
-    loadAudio('pop', 'pop.wav');
-    loadAudio('poof', '208111__planman__poof-of-smoke.wav');
-    loadAudio('fly-to', '60012__qubodup__swing-25.wav');
-    loadAudio('fall-to', '202753__sheepfilms__slide-whistle-1.wav');
-    loadAudio('come-out', '202753__sheepfilms__slide-whistle-2.wav');
-    loadAudio('bag-spill', 'spill.wav');
-    loadAudio('bag-addItem', 'putaway.wav');
-    loadAudio('heatup', 'heatup.wav');
-    loadAudio('shatter', 'shatter1.wav');
-    loadAudio('mirror-shatter', 'shatter2.wav');
-    loadAudio('splosion', 'firework1.wav');
-    loadAudio('shootwee', 'firework-shooting.wav');
-    loadAudio('swoop', 'swoop.wav');
-    loadAudio('key-jiggle', 'key-jiggle.wav');
-    loadAudio('key-unlock', 'key-unlock-fast.wav');
-    loadAudio('victory', '325805__wagna__collect.wav');
-    loadAudio('matching-goal', 'matching-the-goal2.wav');
-    loadAudio('mutate', 'deflate.wav');
-    loadAudio('game-complete', 'game-complete.wav');
-    loadAudio('chest-open', '202092__spookymodem__chest-opening.wav');
-    loadAudio('fatbtn-click', 'fatbtn_click.wav');
-    loadAudio('fatbtn-beep', 'fatbtn_space.wav');
-    loadAudio('fatbtn-beep2', 'fatbtn_space2.wav');
-    loadAudio('goback', 'ui_back.wav');
-    loadAudio('zoomin', 'zoom_planet.wav');
-    loadAudio('define', 'define.wav');
-    loadAudio('place', 'place_from_toolbox.wav');
-    loadAudio('define-convert', 'convert.wav');
-    loadAudio('drawer-open', 'drawer_close.wav');
-    loadAudio('drawer-close', 'drawer_open.wav');
-    loadAudio('carriage-return', 'carriage-return.wav');
-    loadAudio('key-press-1', 'key-press-1.wav');
-    loadAudio('key-press-2', 'key-press-2.wav');
-    loadAudio('key-press-3', 'key-press-3.wav');
-    loadAudio('key-press-4', 'key-press-4.wav');
 
     // This is used as a tiled texture, thus it can't be part of the spritesheet
     loadImage('shinewrap', 'shinewrap.png');
@@ -335,13 +337,13 @@ function LOAD_REDUCT_RESOURCES(Resource) {
 
                             if (unfaded_root.fadingOut) {
                                 //    console.log('sdasdads');
-                                return "continue";
+                                return 'continue';
                             }
 
                             if (ExprManager.isExcludedFromFadingAnimation(unfaded_root)) {
                                 faded.remove(unfaded_root);
                                 root.opacity = 1;
-                                return "continue";
+                                return 'continue';
                             }
 
                             unfaded_root.fadingOut = true;
@@ -381,7 +383,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                         for (var r = 0; r < faded_roots.length; r++) {
                             var _ret2 = _loop(r);
 
-                            if (_ret2 === "continue") continue;
+                            if (_ret2 === 'continue') continue;
                         }
                     }
                 } catch (err) {
@@ -404,7 +406,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                 };
             }();
 
-            if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
+            if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
         } else {
             return Level.make(level_desc).build(canvas);
         }

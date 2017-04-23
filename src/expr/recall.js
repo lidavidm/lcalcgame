@@ -280,8 +280,6 @@ class TypeInTextExpr extends TextExpr {
 
     reduce() {
         if (this.typeBox) {
-            debugger;
-            console.log(this.children.length);
             let txt = this.typeBox.text.trim();
             if (this.validator(txt)) {
                 this.typeBox.carriageReturn();

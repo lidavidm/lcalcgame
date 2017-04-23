@@ -373,9 +373,16 @@ var mag = (function(_) {
             // Exclude nodes that are in the toolbox - we don't want
             // to allow any interaction except dragging them out.
             let is_toolbox = (e) => e && (e.toolbox || (e.parent && is_toolbox(e.parent)));
-            var hit_nodes = this.getHitNodes(pos, {'exclude':[node]});
+            var hit_nodes = this.getHitNodesIntersecting(node, {'exclude':[node]});
             var hit = null;
             if (hit_nodes.length > 0) {
+
+                // Sort hit nodes by closeness to center of dragged node:
+                const center = node.centerPos();
+                hit_nodes.sort((a, b) => {
+                    return distBetweenPos(center, a.centerPos()) > distBetweenPos(center, b.centerPos())
+                });
+
                 for(let i = hit_nodes.length-1; i > -1; i--) {
                     if (hit_nodes[i] != node && !is_toolbox(hit_nodes[i]))
                         hit = hit_nodes[i];
@@ -419,7 +426,7 @@ var mag = (function(_) {
                 else if (!this.underNode) {
                     if (underNode) underNode.ondropenter(this.heldNode, pos);
                     this.underNode = underNode;
-                } else if (this.underNode != underNode) { // this.underNode != underNode
+                } else if (this.underNode != underNode) {
                     if (underNode) underNode.ondropenter(this.heldNode, pos);
                     this.underNode.ondropexit(this.heldNode, pos);
                     this.underNode = underNode;
@@ -490,6 +497,44 @@ var mag = (function(_) {
             this.nodes.forEach((n) => {
                 hitnode = n.hits(pos, options);
                 if (hitnode) hits.push(hitnode);
+            });
+            return hits;
+        }
+        getHitNodesIntersecting(node, options={}, startingNodes) {
+            if (typeof startingNodes === 'undefined') startingNodes = this.nodes;
+            var hits = [];
+            let nodeSize = node.absoluteSize;
+            let nodeBounds = rectFromPosAndSize(node.upperLeftPos(node.absolutePos, nodeSize), nodeSize);
+            var hitnode = null;
+            startingNodes.forEach((n) => {
+                if (n == node) return;
+
+                // Check whether absolute boundaries intersect:
+                let hitNodeSize = n.absoluteSize;
+                let hitNodeBounds = rectFromPosAndSize(n.upperLeftPos(n.absolutePos, hitNodeSize), hitNodeSize)
+                if (intersects(nodeBounds, hitNodeBounds)) {
+
+                    // Give priority to intersections with child nodes (recursively)
+                    let holes = n.holes ? n.holes.filter((e) => (e instanceof Expression)) : [];
+                    if (holes.length > 0) {
+                        let subintersections = this.getHitNodesIntersecting(node, options, holes);
+                        if (subintersections.length > 0) {
+                            hits = hits.concat(subintersections);
+                            return;
+                        }
+                    }
+
+                    // Get the intersection rectangle and its center point:
+                    const intersection = rectFromIntersection(nodeBounds, hitNodeBounds);
+                    const center = { x:intersection.x + intersection.w / 2.0, y:intersection.y + intersection.h / 2.0 };
+
+                    // Use the hit test as if the cursor was at the center of the intersection:
+                    // (this allows us to use existing hit test code, which relies on points, not rectangles)
+                    hitnode = n.hits(center, options);
+                    if (hitnode) {
+                        hits.push(hitnode);
+                    }
+                }
             });
             return hits;
         }

@@ -222,17 +222,25 @@ class LambdaHoleExpr extends MissingExpression {
                 this.parent.environmentDisplay.openDrawer({ force: true, speed: 50 });
             }
 
+            let preview_nodes = [];
+            let is_replication_expr = true;
             subvarexprs.forEach((e) => {
+                if (e.parent != this.parent)
+                    is_replication_expr = false;
                 if (e.name === this.name) {
                     let preview_node = node.clone();
                     preview_node.opacity = 1.0;
                     preview_node.bindSubexpressions();
                     e.open(preview_node);
+                    preview_nodes.push(preview_node);
                 }
             });
             this.opened_subexprs = subvarexprs;
+            this.preview_nodes = preview_nodes;
+            this.is_replication_expr = is_replication_expr && this.preview_nodes.length > 0;
             this.close_opened_subexprs = () => {
                 if (!this.opened_subexprs) return;
+                this.preview_nodes = null;
                 this.opened_subexprs.forEach((e) => {
                     e.close();
                 });
@@ -270,21 +278,53 @@ class LambdaHoleExpr extends MissingExpression {
 
         if (node.dragging) { // Make sure node is being dragged by the user.
 
-            // Special case: Funnel dropped over hole.
-            // if (node instanceof FunnelMapFunc) {
-            //     node.func = this.parent;
-            //     this.parent.parent = null;
-            //     this.parent.stage.remove(this.parent);
-            //     this.onmouseleave();
-            //     this.parent.onmouseenter();
-            //     node.update();
-            //     return;
-            // }
-
             var afterDrop = () => {
+
+                var stage = node.stage;
+
+                let preview_nodes = this.preview_nodes;
+                let is_replication_expr = this.is_replication_expr;
+                if (this.close_opened_subexprs) {
+                    if (is_replication_expr && preview_nodes.length > 0) {
+                        let final_nodes = [];
+                        preview_nodes.forEach((n) => {
+                            let c = n.clone();
+                            c.anchor = n.anchor;
+                            c.pos = n.absolutePos;
+                            c.scale = n.absoluteScale;
+                            let pos = addPos(c.pos, {x:0, y:-40})
+                            final_nodes.push( c );
+                        });
+                        let overlap_layout = false;
+                        for (let i = 0; i < final_nodes.length - 1; i++) {
+                            let a = final_nodes[i];
+                            let b = final_nodes[i+1];
+                            if (Math.abs(b.pos.x - a.pos.x) < a.size.w) { // If these two nodes will overlap...
+                                console.log('overlap', a.pos, b.pos, a.size);
+                                overlap_layout = true;
+                                break;
+                            }
+                        }
+                        const len = final_nodes.length;
+                        const total_width = final_nodes.reduce((prev, n) => prev + n.size.w, 0);
+                        const mid_xpos = final_nodes.reduce((prev, n) => prev + n.pos.x, 0) / len;
+                        final_nodes.forEach((c, i) => {
+                            let final_pos;
+                            if (overlap_layout)
+                                final_pos = { x:mid_xpos + (len - i - 1) / len * total_width - total_width / 4.0, y:c.pos.y - 40 };
+                            else
+                                final_pos = { x:c.pos.x, y:c.pos.y - 40 };
+                            stage.add(c);
+                            Animate.tween(c, {scale:{x:1, y:1}, pos:final_pos}, 300, (e) => Math.pow(e, 0.5)).after(() => {
+                                c.onmouseleave();
+                            });
+                        });
+                    }
+                    this.close_opened_subexprs();
+                }
+
                 // Cleanup
                 node.opacity = 1.0;
-                if (this.close_opened_subexprs) this.close_opened_subexprs();
 
                 // User dropped an expression into the lambda hole.
                 Resource.play('pop');
@@ -293,7 +333,6 @@ class LambdaHoleExpr extends MissingExpression {
                 var dropped_expr = node.clone();
 
                 // Save the current state of the board.
-                var stage = node.stage;
                 stage.saveState();
 
                 Logger.log('state-save', stage.toString());
@@ -309,12 +348,21 @@ class LambdaHoleExpr extends MissingExpression {
                     let dropped_exp_str = node.toString();
 
                     // Animate this application
-                    let result = this.applyExpr(node, true);
-                    if (result === null) {
-                        // The application failed.
-                        stage.add(node);
-                        stage.update();
-                        return;
+                    if (!is_replication_expr) {
+                        let result = this.applyExpr(node, true);
+                        if (result === null) {
+                            // The application failed.
+                            stage.add(node);
+                            stage.update();
+                            return;
+                        }
+                    } else {
+                        parent.opacity = 1;
+                        parent.ignoreEvents = true;
+                        Animate.tween(parent, { opacity:0 }, 400, (elapsed) => Math.pow(elapsed, 0.5)).after(() => {
+                            stage.remove(parent);
+                            stage.update();
+                        });
                     }
 
                     // Log the reduction.
@@ -333,7 +381,7 @@ class LambdaHoleExpr extends MissingExpression {
                     } else
                         stage.dumpState();
 
-                    return result;
+                    return null;
 
                 } else {
                     console.warn('ERROR: Cannot perform lambda-substitution: Hole has no parent.');

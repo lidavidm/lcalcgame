@@ -39,6 +39,10 @@ var mag = function (_) {
         _createClass(Rect, [{
             key: 'upperLeftPos',
             value: function upperLeftPos(pos, boundingSize) {
+                if (!pos && !boundingSize) {
+                    pos = this.absolutePos;
+                    boundingSize = this.absoluteSize;
+                }
                 return { x: pos.x - this.anchor.x * boundingSize.w, y: pos.y - this.anchor.y * boundingSize.h };
             }
         }, {

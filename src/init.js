@@ -61,6 +61,14 @@ function init() {
         // * This callback must be set only after all load() method calls... *
         Resource.afterLoadSequence('init', () => {
 
+            console.log('Loaded game initial resources.');
+
+            Resource.setCurrentLoadSequence('gameaudio');
+            LOAD_REDUCT_GAMEAUDIO(Resource);
+            Resource.afterLoadSequence('gameaudio', function () {
+                console.log('Loaded game audio resources.');
+            });
+
             // Start a new log session (creating userID as necessary),
             // and then begin the game.
             Logger.startSession().then(function (userinfo) {
