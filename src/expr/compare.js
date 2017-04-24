@@ -62,7 +62,12 @@ class CompareExpr extends Expression {
                 animations.push(genSubreduceAnimation(this.leftExpr));
             if (!this.rightExpr.isValue())
                 animations.push(genSubreduceAnimation(this.rightExpr));
-            return Promise.all(animations);
+            return Promise.all(animations).then(() => {
+                if (this.reduce() != this) {
+                    return this.performReduction(animated);
+                }
+                return Promise.reject("@ CompareExpr.performReduction: Subexpressions did not reduce!");
+            });
         }
         if (this.reduce() != this) {
             console.log('reducing');
