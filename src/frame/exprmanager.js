@@ -137,14 +137,7 @@ var ExprManager = (function() {
 
         //let is_primitive = primitives.indexOf(ename) > -1;
 
-        if ((ename === 'var' || ename === 'hole') && 'lambda' in fade_levels) {
-            let max = pub.getNumOfFadeLevels(ename) - 1;
-            let fl = pub.getFadeLevel('lambda');
-            if (fl > max) return max;
-            else          return fl;
-        }
-
-        else if (ename in fade_levels) {
+        if (ename in fade_levels) {
 
             let lvl_map = fade_levels[ename];
             let cur_level = 0;

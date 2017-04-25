@@ -68,6 +68,16 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         var lang = json.language || "reduct-scheme";
         json.levels.forEach((lvl) => {
             lvl.language = lang;
+            if (lvl.fade) {
+                // Shorthand: specify "lambda" to fade both var and
+                // hole. If one has fewer fade levels than the other,
+                // saturate the fade level.
+                if (lvl.fade["lambda"]) {
+                    lvl.fade["var"] = Math.min(lvl.fade["lambda"], ExprManager.getNumOfFadeLevels("var"));
+                    lvl.fade["hole"] = Math.min(lvl.fade["lambda"], ExprManager.getNumOfFadeLevels("hole"));
+                    delete lvl.fade["lambda"];
+                }
+            }
             levels.push(lvl);
         });
     };
