@@ -51,7 +51,7 @@ class CompareExpr extends Expression {
             let animations = [];
             let genSubreduceAnimation = (expr) => {
                 let before = expr;
-                let prom = this.performSubReduction(expr, true).then((result) => {
+                return this.performSubReduction(expr, true).then((result) => {
                     if (result != before)
                         return Promise.resolve();
                     else
