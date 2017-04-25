@@ -422,7 +422,7 @@ class Level {
             let varname = arg.replace('$', '').replace('_', '');
             // Lock unless there is an underscore in the name
             locked = !(arg.indexOf('_') > -1);
-            return lock(new (ExprManager.getClass('reference'))(varname), locked);
+            return lock(new (ExprManager.getClass('var'))(varname), locked);
         } else {
             console.error('Unknown argument: ', arg);
             return lock(new FadedValueExpr(arg), locked);

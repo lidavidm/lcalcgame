@@ -8,6 +8,7 @@
             "toolbox": "(star) (rect) (triangle)",
             "goal": "(false)",
             "fade": {
+                "var": 4,
                 "primitives": 1
             }
         },
@@ -54,7 +55,7 @@
             },
             "fade": {
                 "assign": 1,
-                "reference": 1
+                "var": 5
             }
         },
         {
@@ -81,7 +82,7 @@
             },
             "fade": {
                 "assign": 2,
-                "reference": 2,
+                "var": 6,
                 "reference_display": 1
             }
         },
@@ -232,7 +233,7 @@
                 "y": "(star)"
             },
             "fade": {
-                "reference": 3,
+                "var": 7,
                 "assign": 2,
                 "reference_display": 2,
                 "environment_display": 1,
