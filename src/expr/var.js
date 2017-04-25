@@ -284,9 +284,16 @@ class ChestVarExpr extends VarExpr {
         let stage = this.stage;
 
         value = value.clone();
-        stage.add(value);
-        value.scale = { x: 0.1, y: 0.1 };
         value.anchor = { x: 0.5, y: 0.5 };
+        stage.add(value);
+        value.update();
+
+        let target = {
+            x: this.absolutePos.x - this.anchor.x * this.size.w + 0.5 * this.size.w,
+            y: this.absolutePos.y - value.size.h,
+        };
+
+        value.scale = { x: 0.1, y: 0.1 };
         value.update();
         value.pos = {
             x: this.absolutePos.x - this.anchor.x * this.size.w + 0.5 * this.size.w,
@@ -302,10 +309,7 @@ class ChestVarExpr extends VarExpr {
             Resource.play('come-out');
             Animate.tween(value, {
                 scale: { x: 1.0, y: 1.0 },
-                pos: {
-                    x: this.absolutePos.x + 0.5 * this.size.w - 0.5 * value.size.w,
-                    y: this.absolutePos.y - value.size.h,
-                },
+                pos: target,
             }, 500).after(() => {
                 window.setTimeout(() => {
                     if (destroy) {
