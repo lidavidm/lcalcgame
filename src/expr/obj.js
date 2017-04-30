@@ -465,6 +465,7 @@ class ObjectExtensionExpr extends ExpressionPlus {
             methodtxt._xOffset = -15;
             methodtxt._sizeOffset = {w:-10, h:0};
         } else this.holes[0].unlock();
+        this.subReduceText = methodText;
         this.subReduceMethod = subReduceMethod;
         this.addArg(methodtxt);
 
@@ -495,6 +496,8 @@ class ObjectExtensionExpr extends ExpressionPlus {
         this.removeChild(this.drawer);
         this.drawer = null;
     }
+
+    isValue() { return !this.subReduceMethod; }
 
     _setHoleScales() {
         this.holes.forEach((expr) => {

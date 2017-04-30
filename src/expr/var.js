@@ -803,9 +803,17 @@ class VtableVarExpr extends ObjectExtensionExpr {
             }
         }
         else {
-            let result = this.reduce();
-            (this.parent || this.stage).swap(this, result);
-            return result;
+            let parent = this.parent || this.stage;
+            let surrogate = this.createSurrogate();
+            parent.swap(this, surrogate);
+            surrogate.ignoreEvents = true;
+            surrogate._reducing = true;
+            surrogate.animateReducingStatus();
+            return after(800).then(() => {
+                let result = surrogate.reduce();
+                parent.swap(surrogate, result);
+                return result;
+            });
         }
     }
 
@@ -824,13 +832,7 @@ class VtableVarExpr extends ObjectExtensionExpr {
         }
     }
 
-    reduce() {
-        if ((!this.hasVtable || !this.subReduceMethod) && !this.variable.canReduce()) {
-            return this;
-        }
-        if (!this.hasVtable) return this.value;
-        if (!this.subReduceMethod) return this.value;
-
+    createSurrogate() {
         // Use a surrogate to do the actual reduction, so that (1) we
         // can use the actual object's reduce() method (this is
         // important for ArrayObjectExpr which does some
@@ -844,8 +846,18 @@ class VtableVarExpr extends ObjectExtensionExpr {
         }
 
         surrogate.parent = this;  // In case the surrogate needs our environment
-        surrogate.setExtension("", this.subReduceMethod, this.methodArgs);
+        surrogate.setExtension(this.subReduceText, this.subReduceMethod, this.methodArgs);
+        return surrogate;
+    }
 
+    reduce() {
+        if ((!this.hasVtable || !this.subReduceMethod) && !this.variable.canReduce()) {
+            return this;
+        }
+        if (!this.hasVtable) return this.value;
+        if (!this.subReduceMethod) return this.value;
+
+        let surrogate = this.createSurrogate();
         return surrogate.reduce();
     }
 }
