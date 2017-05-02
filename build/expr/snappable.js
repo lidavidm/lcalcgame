@@ -211,10 +211,10 @@ var Snappable = function (_Expression) {
             var radius = this.radius * this.absoluteScale.x;
 
             var draw = function draw(offset) {
-                var x = pos.x;
-                var y = pos.y;
-                var width = boundingSize.w;
-                var height = boundingSize.h;
+                var x = pos.x,
+                    y = pos.y;
+                var width = boundingSize.w,
+                    height = boundingSize.h;
 
 
                 y += offset;

@@ -53,18 +53,14 @@ var BagExpr = function (_CollectionExpr) {
     _createClass(BagExpr, [{
         key: 'arrangeNicely',
         value: function arrangeNicely() {
-            var _this3 = this;
-
             var dotpos = DiceNumber.drawPositionsFor(this.items.length);
             if (dotpos.length > 0) {
-                (function () {
-                    // Arrange items according to dot positions.
-                    var sz = _this3.graphicNode.size;
-                    var topsz = _this3.graphicNode.topSize(sz.w / 2.0);
-                    _this3.graphicNode.children.slice(1).forEach(function (e, idx) {
-                        e.pos = { x: dotpos[idx].x * sz.w * 0.4 + topsz.w / 3.4, y: dotpos[idx].y * sz.h * 0.4 + topsz.h * 1.9 };
-                    });
-                })();
+                // Arrange items according to dot positions.
+                var sz = this.graphicNode.size;
+                var topsz = this.graphicNode.topSize(sz.w / 2.0);
+                this.graphicNode.children.slice(1).forEach(function (e, idx) {
+                    e.pos = { x: dotpos[idx].x * sz.w * 0.4 + topsz.w / 3.4, y: dotpos[idx].y * sz.h * 0.4 + topsz.h * 1.9 };
+                });
             }
         }
     }, {
@@ -124,12 +120,12 @@ var BagExpr = function (_CollectionExpr) {
     }, {
         key: 'popItem',
         value: function popItem() {
-            var _this4 = this;
+            var _this3 = this;
 
             var item = this._items.pop();
             this.graphicNode.removeAllItems();
             this._items.forEach(function (item) {
-                _this4.graphicNode.addItem(item);
+                _this3.graphicNode.addItem(item);
             });
             return item;
         }
@@ -140,7 +136,7 @@ var BagExpr = function (_CollectionExpr) {
     }, {
         key: 'map',
         value: function map(lambdaExpr) {
-            var _this5 = this;
+            var _this4 = this;
 
             if (!(lambdaExpr instanceof LambdaExpr) || !lambdaExpr.takesArgument) {
                 console.error('@ BagExpr.applyFunc: Func expr does not take argument.');
@@ -156,7 +152,7 @@ var BagExpr = function (_CollectionExpr) {
                 var c = item.clone();
                 var pos = item.pos;
                 var func = lambdaExpr.clone();
-                _this5.stage.add(func);
+                _this4.stage.add(func);
                 func.update();
                 var new_funcs = func.applyExpr(c);
                 if (!Array.isArray(new_funcs)) new_funcs = [new_funcs];
@@ -169,7 +165,7 @@ var BagExpr = function (_CollectionExpr) {
                     for (var _iterator = new_funcs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                         var new_func = _step.value;
 
-                        _this5.stage.remove(new_func);
+                        _this4.stage.remove(new_func);
                         new_func.pos = pos;
                         new_func.unlockSubexpressions();
                         new_func.lockSubexpressions(function (expr) {
@@ -206,7 +202,7 @@ var BagExpr = function (_CollectionExpr) {
     }, {
         key: 'spill',
         value: function spill() {
-            var _this6 = this;
+            var _this5 = this;
 
             var logspill = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
@@ -238,7 +234,7 @@ var BagExpr = function (_CollectionExpr) {
             items.forEach(function (item, index) {
                 item = item.clone();
                 var theta = index / items.length * Math.PI * 2;
-                var rad = _this6.size.w * 1.5;
+                var rad = _this5.size.w * 1.5;
                 var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
 
                 targetPos = clipToRect(targetPos, item.absoluteSize, { x: 25, y: 0 }, { w: GLOBAL_DEFAULT_SCREENSIZE.width - 25,
@@ -250,7 +246,7 @@ var BagExpr = function (_CollectionExpr) {
                 });
                 //item.pos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) });
                 item.parent = null;
-                _this6.graphicNode.removeItem(item);
+                _this5.graphicNode.removeItem(item);
                 item.scale = { x: 1, y: 1 };
                 stage.add(item);
             });
@@ -392,14 +388,14 @@ var BagExpr = function (_CollectionExpr) {
             return this._items.slice();
         },
         set: function set(items) {
-            var _this7 = this;
+            var _this6 = this;
 
             this._items.forEach(function (item) {
-                return _this7.graphicNode.removeItem(item);
+                return _this6.graphicNode.removeItem(item);
             });
             this._items = [];
             items.forEach(function (item) {
-                _this7.addItem(item);
+                _this6.addItem(item);
             });
         }
     }, {
@@ -423,25 +419,25 @@ var BracketArrayExpr = function (_BagExpr) {
 
         _classCallCheck(this, BracketArrayExpr);
 
-        var _this8 = _possibleConstructorReturn(this, (BracketArrayExpr.__proto__ || Object.getPrototypeOf(BracketArrayExpr)).call(this, x, y, w, h, holding));
+        var _this7 = _possibleConstructorReturn(this, (BracketArrayExpr.__proto__ || Object.getPrototypeOf(BracketArrayExpr)).call(this, x, y, w, h, holding));
 
-        _this8.holes = [];
-        _this8.children = [];
+        _this7.holes = [];
+        _this7.children = [];
 
         // This becomes graphicNode.
-        _this8.addArg(new Expression());
+        _this7.addArg(new Expression());
 
-        _this8._items = holding;
+        _this7._items = holding;
 
-        _this8.l_brak = new TextExpr('[');
-        _this8.r_brak = new TextExpr(']');
-        _this8.graphicNode.addArg(_this8.l_brak);
-        _this8.graphicNode.addArg(_this8.r_brak);
+        _this7.l_brak = new TextExpr('[');
+        _this7.r_brak = new TextExpr(']');
+        _this7.graphicNode.addArg(_this7.l_brak);
+        _this7.graphicNode.addArg(_this7.r_brak);
 
-        _this8.graphicNode.padding = { left: 10, inner: 0, right: 20 };
+        _this7.graphicNode.padding = { left: 10, inner: 0, right: 20 };
 
         //this.color = "tan";
-        return _this8;
+        return _this7;
     }
 
     _createClass(BracketArrayExpr, [{
@@ -509,7 +505,7 @@ var BracketArrayExpr = function (_BagExpr) {
     }, {
         key: 'spill',
         value: function spill() {
-            var _this9 = this;
+            var _this8 = this;
 
             var logspill = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
@@ -546,7 +542,7 @@ var BracketArrayExpr = function (_BagExpr) {
 
                 item = item.clone();
                 var theta = index / items.length * Math.PI * 2;
-                var rad = _this9.size.h * 2.0;
+                var rad = _this8.size.h * 2.0;
                 var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
 
                 targetPos = clipToRect(targetPos, item.absoluteSize, { x: 25, y: 0 }, { w: GLOBAL_DEFAULT_SCREENSIZE.width - 25,
@@ -558,7 +554,7 @@ var BracketArrayExpr = function (_BagExpr) {
                 });
                 //item.pos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) });
                 item.parent = null;
-                _this9.graphicNode.removeChild(item);
+                _this8.graphicNode.removeChild(item);
                 item.scale = { x: 1, y: 1 };
                 stage.add(item);
             });
@@ -628,15 +624,15 @@ var BracketArrayExpr = function (_BagExpr) {
             return this._items.slice();
         },
         set: function set(items) {
-            var _this10 = this;
+            var _this9 = this;
 
             this._items.forEach(function (item) {
-                return _this10.graphicNode.removeArg(item);
+                return _this9.graphicNode.removeArg(item);
             });
             this.graphicNode.holes = [this.l_brak, this.r_brak];
             this._items = [];
             items.forEach(function (item) {
-                _this10.addItem(item);
+                _this9.addItem(item);
             });
         }
     }, {
@@ -663,10 +659,10 @@ var PutExpr = function (_Expression) {
         txt_put.color = 'black';
         txt_in.color = 'black';
 
-        var _this11 = _possibleConstructorReturn(this, (PutExpr.__proto__ || Object.getPrototypeOf(PutExpr)).call(this, [txt_put, item, txt_in, collection]));
+        var _this10 = _possibleConstructorReturn(this, (PutExpr.__proto__ || Object.getPrototypeOf(PutExpr)).call(this, [txt_put, item, txt_in, collection]));
 
-        _this11.color = 'violet';
-        return _this11;
+        _this10.color = 'violet';
+        return _this10;
     }
 
     _createClass(PutExpr, [{
@@ -721,10 +717,10 @@ var PopExpr = function (_Expression2) {
         var txt_pop = new TextExpr('pop');
         txt_pop.color = 'black';
 
-        var _this12 = _possibleConstructorReturn(this, (PopExpr.__proto__ || Object.getPrototypeOf(PopExpr)).call(this, [txt_pop, collection]));
+        var _this11 = _possibleConstructorReturn(this, (PopExpr.__proto__ || Object.getPrototypeOf(PopExpr)).call(this, [txt_pop, collection]));
 
-        _this12.color = 'violet';
-        return _this12;
+        _this11.color = 'violet';
+        return _this11;
     }
 
     _createClass(PopExpr, [{

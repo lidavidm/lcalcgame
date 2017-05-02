@@ -2,8 +2,6 @@
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -163,24 +161,22 @@ var LabeledVarExpr = function (_VarExpr) {
             return new Promise(function (resolve, reject) {
                 var value = _this3.reduce();
                 if (_this3.reduce() != _this3) {
-                    (function () {
-                        var dummy = display.getExpr().clone();
-                        var stage = _this3.stage;
-                        stage.add(dummy);
-                        dummy.pos = display.getExpr().absolutePos;
-                        dummy.scale = display.getExpr().absoluteScale;
+                    var dummy = display.getExpr().clone();
+                    var stage = _this3.stage;
+                    stage.add(dummy);
+                    dummy.pos = display.getExpr().absolutePos;
+                    dummy.scale = display.getExpr().absoluteScale;
 
-                        Animate.tween(dummy, {
-                            pos: _this3.absolutePos,
-                            scale: { x: 1, y: 1 }
-                        }, 300).after(function () {
-                            var clone = display.getExpr().clone();
-                            (_this3.parent || _this3.stage).swap(_this3, clone);
-                            if (_this3.locked) clone.lock();
-                            stage.remove(dummy);
-                            resolve();
-                        });
-                    })();
+                    Animate.tween(dummy, {
+                        pos: _this3.absolutePos,
+                        scale: { x: 1, y: 1 }
+                    }, 300).after(function () {
+                        var clone = display.getExpr().clone();
+                        (_this3.parent || _this3.stage).swap(_this3, clone);
+                        if (_this3.locked) clone.lock();
+                        stage.remove(dummy);
+                        resolve();
+                    });
                 } else {
                     reject();
                 }
@@ -200,28 +196,22 @@ var LabeledVarExpr = function (_VarExpr) {
                 _parent.swap(this, value);
                 return Promise.resolve(value);
             } else {
-                var _ret2 = function () {
-                    var wat = new TextExpr("?");
-                    _this4.stage.add(wat);
-                    wat.pos = _this4.label.absolutePos;
-                    Animate.tween(wat, {
-                        pos: {
-                            x: wat.pos.x,
-                            y: wat.pos.y - 50
-                        }
-                    }, 250);
-                    window.setTimeout(function () {
-                        Animate.poof(wat);
-                        _this4.stage.remove(wat);
-                        _this4.stage.draw();
-                        _this4.stage.update();
-                    }, 500);
-                    return {
-                        v: Promise.reject("Cannot reduce undefined variable")
-                    };
-                }();
-
-                if ((typeof _ret2 === "undefined" ? "undefined" : _typeof(_ret2)) === "object") return _ret2.v;
+                var wat = new TextExpr("?");
+                this.stage.add(wat);
+                wat.pos = this.label.absolutePos;
+                Animate.tween(wat, {
+                    pos: {
+                        x: wat.pos.x,
+                        y: wat.pos.y - 50
+                    }
+                }, 250);
+                window.setTimeout(function () {
+                    Animate.poof(wat);
+                    _this4.stage.remove(wat);
+                    _this4.stage.draw();
+                    _this4.stage.update();
+                }, 500);
+                return Promise.reject("Cannot reduce undefined variable");
             }
         }
     }]);
@@ -236,7 +226,6 @@ var ChestVarExpr = function (_VarExpr2) {
         _classCallCheck(this, ChestVarExpr);
 
         // See MissingTypedExpression#constructor
-
         var _this5 = _possibleConstructorReturn(this, (ChestVarExpr.__proto__ || Object.getPrototypeOf(ChestVarExpr)).call(this, name));
 
         _this5.equivalentClasses = [ChestVarExpr];
@@ -481,7 +470,6 @@ var LabeledChestVarExpr = function (_ChestVarExpr2) {
         _classCallCheck(this, LabeledChestVarExpr);
 
         // See MissingTypedExpression#constructor
-
         var _this10 = _possibleConstructorReturn(this, (LabeledChestVarExpr.__proto__ || Object.getPrototypeOf(LabeledChestVarExpr)).call(this, name));
 
         _this10.equivalentClasses = [LabeledChestVarExpr];
@@ -546,7 +534,10 @@ var AssignExpr = function (_Expression2) {
     _createClass(AssignExpr, [{
         key: "canReduce",
         value: function canReduce() {
-            return this.value && this.variable && (this.value.canReduce() || this.value.isValue()) && (this.variable instanceof VarExpr || this.variable instanceof VtableVarExpr || this.variable instanceof TypeInTextExpr && this.variable.canReduce());
+            /*return this.value && this.variable && (this.value.canReduce() || this.value.isValue()) &&
+                (this.variable instanceof VarExpr || this.variable instanceof VtableVarExpr
+                 || (this.variable instanceof TypeInTextExpr && this.variable.canReduce()));*/
+            return true;
         }
     }, {
         key: "reduce",
@@ -656,6 +647,56 @@ var AssignExpr = function (_Expression2) {
                     // Try and play any animation anyways to hint at why
                     // the value can't reduce.
                     var result = this.value.performReduction();
+
+                    if (this.value instanceof ArrayObjectExpr) {
+                        this.value = this.value.baseArray;
+                    }
+                    if (this.value instanceof StringObjectExpr) {
+                        this.value = this.value.baseStringValue;
+                    }
+
+                    console.log("This.Variable and This.Variable.name and This.Value and RESULT");
+                    console.log(this.variable);
+                    console.log(this.variable.name);
+                    console.log(this.value);
+                    console.log(result);
+
+                    if (this.variable instanceof ArrayObjectExpr) {
+                        var rhs = this.variable.baseArray.reduce();
+                        console.log("RHS!!!!!!");
+                        console.log(rhs);
+                        this.variable.name = this.variable.baseArray.name;
+                        if (this.variable.defaultMethodCall === "[..]") {
+                            console.log("method call is [..]");
+                            console.log("this.variable.name:");
+                            console.log(this.variable.name);
+                            console.log("This Value!!!!");
+                            console.log(this.value);
+                            this.variable.holes[2] = this.variable.holes[2].reduce();
+                            console.log("index: " + this.variable.holes[2].number);
+                            rhs._items[this.variable.holes[2].number] = this.value.clone();
+                            this.value = rhs.clone();
+                            console.log("after: rhs is:");
+                            console.log(rhs);
+                        }
+                    }
+
+                    if (this.variable instanceof StringObjectExpr) {
+                        var _rhs = this.variable.baseStringValue.reduce();
+                        this.variable.name = this.variable.baseStringValue.name;
+                        console.log("variable name: " + this.variable.name);
+                        if (this.variable.defaultMethodCall === "[..]") {
+                            var originalString = _rhs.toString();
+                            console.log("ori string: " + originalString);
+                            var slicePosition = this.variable.holes[2].number;
+                            console.log("slicePos: " + slicePosition);
+                            console.log(this.value.toString());
+                            var newString = originalString.slice(0, slicePosition) + this.value.toString() + originalString.slice(slicePosition + 1);
+                            console.log("new String: " + newString);
+                            this.value = new StringValueExpr(newString);
+                        }
+                    }
+
                     if (result instanceof Promise) {
                         return result.then(function () {
                             return Promise.reject("AssignExpr: RHS cannot reduce");
@@ -664,6 +705,58 @@ var AssignExpr = function (_Expression2) {
                     return Promise.reject("AssignExpr: RHS cannot reduce");
                 }
                 return Promise.reject("AssignExpr: incomplete");
+            }
+
+            console.log("this.canReduce() == true!!");
+
+            this.value = this.value.reduce();
+
+            if (this.value instanceof ArrayObjectExpr) {
+                this.value = this.value.baseArray;
+            }
+            if (this.value instanceof StringObjectExpr) {
+                this.value = this.value.baseStringValue;
+            }
+
+            console.log("This.Variable and This.Variable.name and This.Value");
+            console.log(this.variable);
+            console.log(this.variable.name);
+            console.log(this.value);
+
+            if (this.variable instanceof ArrayObjectExpr) {
+                var _rhs2 = this.variable.baseArray.reduce();
+                console.log("RHS!!!!!!");
+                console.log(_rhs2);
+                this.variable.name = this.variable.baseArray.name;
+                if (this.variable.defaultMethodCall === "[..]") {
+                    console.log("method call is [..]");
+                    console.log("this.variable.name:");
+                    console.log(this.variable.name);
+                    console.log("This Value!!!!");
+                    console.log(this.value);
+                    this.variable.holes[2] = this.variable.holes[2].reduce();
+                    console.log("index: " + this.variable.holes[2].number);
+                    _rhs2._items[this.variable.holes[2].number] = this.value.clone();
+                    this.value = _rhs2.clone();
+                    console.log("after: rhs is:");
+                    console.log(_rhs2);
+                }
+            }
+
+            if (this.variable instanceof StringObjectExpr) {
+                var _rhs3 = this.variable.baseStringValue.reduce();
+                this.variable.name = this.variable.baseStringValue.name;
+                console.log("variable name: " + this.variable.name);
+                if (this.variable.defaultMethodCall === "[..]") {
+                    var _originalString = _rhs3.toString();
+                    console.log("ori string: " + _originalString);
+                    var _slicePosition = this.variable.holes[2].number;
+                    console.log("slicePos: " + _slicePosition);
+                    console.log(this.value.toString());
+                    var _newString = _originalString.slice(0, _slicePosition) + this.value.toString() + _originalString.slice(_slicePosition + 1);
+                    console.log("new String: " + _newString);
+                    this.value = new StringValueExpr(_newString);
+                }
             }
 
             var starter = Promise.resolve();

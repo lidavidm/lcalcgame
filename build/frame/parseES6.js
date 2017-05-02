@@ -1,7 +1,5 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -167,9 +165,9 @@ var ES6Parser = function () {
                         return new (ExprManager.getClass('arrayobj'))(_this2.parseNode(node.callee.object), 'map', _this2.parseNode(node.arguments[0]));
                         //return new (ExprManager.getClass('map'))(this.parseNode(node.arguments[0]), this.parseNode(node.callee.object));
                     } else {
-                            console.error('Call expressions outside of the special $() unlock syntax are currently undefined.');
-                            return null;
-                        }
+                        console.error('Call expressions outside of the special $() unlock syntax are currently undefined.');
+                        return null;
+                    }
                 },
 
                 /* Anonymous functions of the form (x) => x */
@@ -210,18 +208,12 @@ var ES6Parser = function () {
                 */
                 'BinaryExpression': function BinaryExpression(node) {
                     if (node.operator === '>>>') {
-                        var _ret = function () {
-                            // Special typing-operators expression:
-                            var comp = new (ExprManager.getClass('=='))(_this2.parseNode(node.left), _this2.parseNode(node.right), '>>>');
-                            comp.holes[1] = TypeInTextExpr.fromExprCode('_t_equiv', function (finalText) {
-                                comp.funcName = finalText;
-                            }); // give it a nonexistent funcName
-                            return {
-                                v: comp
-                            };
-                        }();
-
-                        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+                        // Special typing-operators expression:
+                        var comp = new (ExprManager.getClass('=='))(_this2.parseNode(node.left), _this2.parseNode(node.right), '>>>');
+                        comp.holes[1] = TypeInTextExpr.fromExprCode('_t_equiv', function (finalText) {
+                            comp.funcName = finalText;
+                        }); // give it a nonexistent funcName
+                        return comp;
                     } else if (ExprManager.hasClass(node.operator)) {
                         var BinaryExprClass = ExprManager.getClass(node.operator);
                         if (node.operator in CompareExpr.operatorMap()) return new BinaryExprClass(_this2.parseNode(node.left), _this2.parseNode(node.right), node.operator);else return new BinaryExprClass(_this2.parseNode(node.left), _this2.parseNode(node.right));

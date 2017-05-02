@@ -1,7 +1,5 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
@@ -748,11 +746,11 @@ var Expression = function (_mag$RoundedRect) {
             if (!notches || notches.length === 0) {
                 return null; // By default, expressions do not have notches.
             } else if (!otherExpr || !otherNotch) {
-                    console.error('@ Expression.findNearestCompatibleNotch: Passed expression or notch is null.');
-                    return null;
-                } else if (!otherExpr.notches || otherExpr.notches.length === 0) {
-                    return null;
-                }
+                console.error('@ Expression.findNearestCompatibleNotch: Passed expression or notch is null.');
+                return null;
+            } else if (!otherExpr.notches || otherExpr.notches.length === 0) {
+                return null;
+            }
 
             // Loop through this expression's notches and
             // check for ones compatible to the passed notch.
@@ -801,17 +799,15 @@ var Expression = function (_mag$RoundedRect) {
                     console.warn('@ Expression.findCompatibleNotches: Duplicate expression passed.', e);
                     return;
                 } else {
-                    (function () {
-                        var nearest = [];
-                        e.notches.forEach(function (eNotch) {
-                            var n = _this9.findNearestCompatibleNotch(e, eNotch);
-                            if (n) nearest.push(n);
-                        });
-                        if (nearest.length > 0) {
-                            candidates.push(Array.minimum(nearest, 'dist'));
-                            dups.push(e);
-                        }
-                    })();
+                    var nearest = [];
+                    e.notches.forEach(function (eNotch) {
+                        var n = _this9.findNearestCompatibleNotch(e, eNotch);
+                        if (n) nearest.push(n);
+                    });
+                    if (nearest.length > 0) {
+                        candidates.push(Array.minimum(nearest, 'dist'));
+                        dups.push(e);
+                    }
                 }
             });
 
@@ -1039,24 +1035,18 @@ var ExpressionPlus = function (_Expression) {
             var parent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
             if (this.drawer) {
-                var _ret2 = function () {
-                    var extras = [];
-                    _this14.children.forEach(function (c) {
-                        if (_this14.holes.indexOf(c) === -1) extras.push(c);
-                    });
-                    extras.forEach(function (c) {
-                        return _this14.removeChild(c);
-                    });
-                    var cln = _get(ExpressionPlus.prototype.__proto__ || Object.getPrototypeOf(ExpressionPlus.prototype), 'clone', _this14).call(_this14, parent);
-                    extras.forEach(function (c) {
-                        return _this14.addChild(c);
-                    });
-                    return {
-                        v: cln
-                    };
-                }();
-
-                if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
+                var extras = [];
+                this.children.forEach(function (c) {
+                    if (_this14.holes.indexOf(c) === -1) extras.push(c);
+                });
+                extras.forEach(function (c) {
+                    return _this14.removeChild(c);
+                });
+                var cln = _get(ExpressionPlus.prototype.__proto__ || Object.getPrototypeOf(ExpressionPlus.prototype), 'clone', this).call(this, parent);
+                extras.forEach(function (c) {
+                    return _this14.addChild(c);
+                });
+                return cln;
             } else return _get(ExpressionPlus.prototype.__proto__ || Object.getPrototypeOf(ExpressionPlus.prototype), 'clone', this).call(this, parent);
         }
     }]);

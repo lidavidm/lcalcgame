@@ -1,7 +1,5 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -11,7 +9,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * Given a set of "expressions", a player must manipulate those expressions to
  * reach a "goal" state, with optional support from a "toolbox" of primitive expressions.
  * (*This may change in time.*) */
-
 var Level = function () {
     function Level(expressions, goal) {
         var toolbox = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
@@ -57,7 +54,7 @@ var Level = function () {
                 y: canvas_screen.h * (1 - 1 / 1.4) / 2.0,
                 x: canvas_screen.w * (1 - 1 / 1.4) / 2.0
             };
-            var board_packing = this.findBestPacking(this.exprs, screen);
+            var board_packing = this.findFastPacking(this.exprs, screen);
             stage.addAll(board_packing); // add expressions to the stage
 
             // TODO: Offload this onto second stage?
@@ -247,9 +244,6 @@ var Level = function () {
 
     }, {
         key: 'findFastPacking',
-
-
-        // Unreachable....
 
 
         // David's rather terrible packing algorithm. Used if there are a
@@ -624,12 +618,12 @@ var Level = function () {
     }], [{
         key: 'make',
         value: function make(desc) {
-            var expr_descs = desc.board;
-            var goal_descs = desc.goal;
-            var toolbox_descs = desc.toolbox;
-            var globals_descs = desc.globals;
-            var resources = desc.resources;
-            var language = desc.language;
+            var expr_descs = desc.board,
+                goal_descs = desc.goal,
+                toolbox_descs = desc.toolbox,
+                globals_descs = desc.globals,
+                resources = desc.resources,
+                language = desc.language;
 
 
             var lvl = new Level(Level.parse(expr_descs, language), new Goal(new ExpressionPattern(Level.parse(goal_descs, language)), resources.aliens), toolbox_descs ? Level.parse(toolbox_descs, language) : null, Environment.parse(globals_descs));
@@ -657,8 +651,6 @@ var Level = function () {
     }, {
         key: 'parse',
         value: function parse(desc) {
-            var _this3 = this;
-
             var language = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "reduct-scheme";
 
             if (desc.length === 0) return [];
@@ -669,30 +661,21 @@ var Level = function () {
                     return ES6Parser.parse(d);
                 });else return [ES6Parser.parse(desc)];
             } else if (language === "reduct-scheme" || !language) {
-                var descs;
 
-                var _ret = function () {
+                // Split string by top-level parentheses.
+                var descs = this.splitParen(desc);
+                //console.log('descs', descs);
 
-                    // Split string by top-level parentheses.
-                    descs = _this3.splitParen(desc);
-                    //console.log('descs', descs);
-
-                    // Parse expressions recursively.
-
-                    var es = descs.map(function (expr_desc) {
-                        return Level.parseExpr(expr_desc);
-                    });
-                    var LambdaClass = ExprManager.getClass('lambda_abstraction');
-                    es = es.map(function (e) {
-                        return e instanceof LambdaHoleExpr ? new LambdaClass([e]) : e;
-                    });
-                    //console.log('exprs', es);
-                    return {
-                        v: es
-                    };
-                }();
-
-                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+                // Parse expressions recursively.
+                var es = descs.map(function (expr_desc) {
+                    return Level.parseExpr(expr_desc);
+                });
+                var LambdaClass = ExprManager.getClass('lambda_abstraction');
+                es = es.map(function (e) {
+                    return e instanceof LambdaHoleExpr ? new LambdaClass([e]) : e;
+                });
+                //console.log('exprs', es);
+                return es;
             }
         }
     }, {
@@ -791,42 +774,36 @@ var Level = function () {
                         op_class.pos = { x: 0, y: 80 };
                         return op_class;
                     } else if (op_class instanceof BagExpr) {
-                        var _ret2 = function () {
-                            var bag = op_class;
-                            var sz = bag.graphicNode.size;
-                            var topsz = bag.graphicNode.topSize ? bag.graphicNode.topSize(sz.w / 2.0) : { w: 0, h: 0 };
+                        var bag = op_class;
+                        var sz = bag.graphicNode.size;
+                        var topsz = bag.graphicNode.topSize ? bag.graphicNode.topSize(sz.w / 2.0) : { w: 0, h: 0 };
 
-                            for (var _i3 = 1; _i3 < exprs.length; _i3++) {
-                                bag.addItem(exprs[_i3]);
-                            } // Set start positions of bag items. If from 1 to 6, arrange like dice dots.
-                            if (!(op_class instanceof BracketArrayExpr)) {
-                                var dotpos = DiceNumber.drawPositionsFor(exprs.length - 1);
-                                if (dotpos.length > 0) {
-                                    // Arrange items according to dot positions.
-                                    bag.arrangeNicely();
-                                } else {
-                                    // Arrange items randomly in bag.
-                                    exprs.slice(1).forEach(function (e) {
-                                        e.pos = { x: (Math.random() + 0.4) * sz.w / 2.0, y: (Math.random() + 0.7) * sz.h / 2.0 };
-                                    });
-                                }
+                        for (var _i3 = 1; _i3 < exprs.length; _i3++) {
+                            bag.addItem(exprs[_i3]);
+                        } // Set start positions of bag items. If from 1 to 6, arrange like dice dots.
+                        if (!(op_class instanceof BracketArrayExpr)) {
+                            var dotpos = DiceNumber.drawPositionsFor(exprs.length - 1);
+                            if (dotpos.length > 0) {
+                                // Arrange items according to dot positions.
+                                bag.arrangeNicely();
+                            } else {
+                                // Arrange items randomly in bag.
+                                exprs.slice(1).forEach(function (e) {
+                                    e.pos = { x: (Math.random() + 0.4) * sz.w / 2.0, y: (Math.random() + 0.7) * sz.h / 2.0 };
+                                });
                             }
+                        }
 
-                            return {
-                                v: lock(bag, toplevel_lock)
-                            };
-                        }();
-
-                        if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
+                        return lock(bag, toplevel_lock);
                     } else if (args[0] in CompareExpr.operatorMap()) {
                         // op name is supported comparison operation like ==, !=, etc
                         //console.log('constructing comparator ' + args[0] + ' with exprs ', exprs.slice(1));
                         var es = exprs.slice(1);es.push(args[0]);
                         return lock(constructClassInstance(op_class, es), toplevel_lock); // pass the operator name to the comparator
                     } else {
-                            //console.log(exprs);
-                            return lock(constructClassInstance(op_class, exprs.slice(1)), toplevel_lock); // (this is really generic, man)
-                        }
+                        //console.log(exprs);
+                        return lock(constructClassInstance(op_class, exprs.slice(1)), toplevel_lock); // (this is really generic, man)
+                    }
                 }
             }
 
@@ -872,6 +849,10 @@ var Level = function () {
                 'arrayobj': ExprManager.getClass('arrayobj'),
                 'infinite': ExprManager.getClass('infinite'),
                 'notch': new (ExprManager.getClass('notch'))(1),
+                '-': ExprManager.getClass('-'),
+                '*': ExprManager.getClass('*'),
+                '--': ExprManager.getClass('--'),
+                'stringobj': ExprManager.getClass('stringobj'),
                 'dot': function () {
                     var circ = new CircleExpr(0, 0, 18);
                     circ.color = 'gold';
@@ -911,10 +892,15 @@ var Level = function () {
                 // Lock unless there is an underscore in the name
                 locked = !(arg.indexOf('_') > -1);
                 return lock(new (ExprManager.getClass('reference'))(_varname2), locked);
+            } else if (true) {
+                var string = new StringValueExpr(arg);
+                return string;
             } else {
                 console.error('Unknown argument: ', arg);
                 return lock(new FadedValueExpr(arg), locked);
             }
+
+            // Unreachable....
         }
     }]);
 
@@ -1164,6 +1150,13 @@ var ExpressionPattern = function () {
             var compare = function compare(e, f) {
 
                 var isarr = false;
+
+                if (e instanceof StringObjectExpr || f instanceof StringObjectExpr) {
+                    e = e.toString();
+                    f = f.toString();
+                    return e === f;
+                }
+
                 if (e instanceof ArrayObjectExpr && e.holes.length === 1) {
                     e = e.holes[0]; // compare only the underlying array.
                 }
@@ -1210,23 +1203,23 @@ var ExpressionPattern = function () {
                     //console.log(' > Constructors don\'t match.');
                     return false; // expressions don't match
                 } else if (e instanceof Expression && f instanceof Expression && (e.isValue() != f.isValue() || !valuesMatch)) {
+                    return false;
+                } else {
+                    // Check whether the expressions at this level have the same # of children. If so, do one-to-one comparison.
+                    var e_children = e.children;
+                    var f_children = f.children;
+                    if (e_children.length !== f_children.length) {
+                        //console.log(' > Length of child array doesn\'t match.');
                         return false;
                     } else {
-                        // Check whether the expressions at this level have the same # of children. If so, do one-to-one comparison.
-                        var e_children = e.children;
-                        var f_children = f.children;
-                        if (e_children.length !== f_children.length) {
-                            //console.log(' > Length of child array doesn\'t match.');
-                            return false;
-                        } else {
-                            for (var _i4 = 0; _i4 < e_children.length; _i4++) {
-                                if (!compare(e_children[_i4], f_children[_i4])) {
-                                    //console.log(' > Children don\'t match.');
-                                    return false;
-                                }
+                        for (var _i4 = 0; _i4 < e_children.length; _i4++) {
+                            if (!compare(e_children[_i4], f_children[_i4])) {
+                                //console.log(' > Children don\'t match.');
+                                return false;
                             }
                         }
                     }
+                }
 
                 //console.log(' > Expressions are equal.');
                 return true;

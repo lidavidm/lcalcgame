@@ -1,7 +1,5 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -13,7 +11,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 // A boolean compare function like ==, !=, >, >=, <=, <.
-
 var CompareExpr = function (_Expression) {
     _inherits(CompareExpr, _Expression);
 
@@ -286,20 +283,14 @@ var UnaryOpExpr = function (_Expression2) {
 
 
             if (this.rightExpr && !this.rightExpr.isValue() && !this._animating) {
-                var _ret = function () {
-                    _this5._animating = true;
-                    var before = _this5.rightExpr;
-                    return {
-                        v: _this5.performSubReduction(_this5.rightExpr, true).then(function () {
-                            _this5._animating = false;
-                            if (_this5.rightExpr != before) {
-                                return _this5.performReduction();
-                            }
-                        })
-                    };
-                }();
-
-                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+                this._animating = true;
+                var before = this.rightExpr;
+                return this.performSubReduction(this.rightExpr, true).then(function () {
+                    _this5._animating = false;
+                    if (_this5.rightExpr != before) {
+                        return _this5.performReduction();
+                    }
+                });
             }
 
             if (this.reduce() != this) {

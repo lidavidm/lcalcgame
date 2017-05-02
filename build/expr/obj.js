@@ -1,8 +1,10 @@
 'use strict';
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _set = function set(object, property, value, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent !== null) { set(parent, property, value, receiver); } } else if ("value" in desc && desc.writable) { desc.value = value; } else { var setter = desc.set; if (setter !== undefined) { setter.call(receiver, value); } } return value; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
@@ -18,7 +20,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * An inner 'play area' to mess around and make programs in.
  * It's a pen because you can't drag expressions _out_!
  */
-
 var PlayPenExpr = function (_ExpressionPlus) {
     _inherits(PlayPenExpr, _ExpressionPlus);
 
@@ -236,7 +237,7 @@ var PlayPenExpr = function (_ExpressionPlus) {
             return { w: this.pen.size.w + this.padding.left * 2, h: this.pen.size.h + this.padding.top + this.padding.bottom };
         },
         set: function set(sz) {
-            _set(PlayPenExpr.prototype.__proto__ || Object.getPrototypeOf(PlayPenExpr.prototype), 'size', sz, this);
+            //super.size = sz;
             this.pen.size = sz;
         }
     }]);
@@ -489,7 +490,13 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
             // 'this' needs to be late-bound, or else cloning an
             // ObjectExtensionExpr means methods will be called on the
             // wrong object
-            self.setExtension(cell.children[0].text.replace('.', '').split('(')[0], cell.children[0]._reduceMethod);
+
+            //self.setExtension(cell.children[0].text.replace('.', '').split('(')[0], cell.children[0]._reduceMethod);
+
+            var methodText = void 0;
+            var origText = cell.children[0].text;
+            if (origText === '[..]') methodText = origText;else methodText = origText.replace('.', '').split('(')[0];
+            _this7.setExtension(methodText, cell.children[0]._reduceMethod);
         };
 
         // Make pullout-drawer:
@@ -523,7 +530,6 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
         }
     }, {
         key: 'isCompletelySpecified',
-        // everything not text must be an argument...
         value: function isCompletelySpecified() {
             if (this.holes[0] instanceof MissingExpression) return false;
             var args = this.methodArgs;
@@ -579,9 +585,18 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
             var argExprs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
             if (this.holes[1]) this.holes.splice(1, 1);
+
+            var isProperty = true;
+
             if (!subReduceMethod) {
                 subReduceMethod = this.objMethods[methodText];
             }
+
+            if ((typeof subReduceMethod === 'undefined' ? 'undefined' : _typeof(subReduceMethod)) === 'object') {
+                isProperty = subReduceMethod["isProperty"];
+                subReduceMethod = subReduceMethod["reduce"];
+            }
+
             if (!argExprs) {
                 var numArgs = subReduceMethod.length - 1;
                 argExprs = [];
@@ -594,7 +609,13 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
             } else if (!Array.isArray(argExprs)) argExprs = [argExprs];
 
             // Left text
-            var methodtxt = new TextExpr('.' + methodText + '(');
+            //let methodtxt = new TextExpr('.' + methodText + '(');
+            var pretext = void 0;
+            var isIndicesNotation = methodText === '[..]';
+            if (isIndicesNotation) pretext = '[';else pretext = '.' + methodText + (isProperty ? '' : '(');
+
+            var methodtxt = new TextExpr(pretext);
+
             methodtxt.fontSize = 25;
             methodtxt._yMultiplier = 2.85;
             if (!(this.holes[0] instanceof MissingExpression)) {
@@ -616,11 +637,13 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
                     this.addArg(comma);
                     this.addArg(argExprs[i]);
                 }
-                var closingParen = new TextExpr(')'); // comma to separate arguments
+                //let closingParen = new TextExpr(')'); // comma to separate arguments
+                var closingParen = new TextExpr(isIndicesNotation ? ']' : ')'); // comma to separate arguments
+
                 closingParen.fontSize = methodtxt.fontSize;
                 closingParen._yMultiplier = methodtxt._yMultiplier;
                 this.addArg(closingParen);
-            } else methodtxt.text += ')'; // just add closing paren.
+            } else if (!isProperty) methodtxt.text += ')'; // just add closing paren.
 
             this.update();
 
@@ -654,7 +677,7 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
             if (this.holes.length <= 1) return [];else {
                 return this.holes.slice(1).filter(function (x) {
                     return !(x instanceof TextExpr);
-                });
+                }); // everything not text must be an argument...
             }
         }
     }]);
@@ -695,7 +718,32 @@ var ArrayObjectExpr = function (_ObjectExtensionExpr) {
                     });
                     return mapped;
                 } else return arrayExpr;
-            } }));
+            },
+            'length': {
+                'isProperty': true,
+                'reduce': function reduce(arrayExpr) {
+                    this.isProperty = true;
+                    return new NumberExpr(arrayExpr.items.length);
+                }
+            },
+            '[..]': function _(arrayExpr, numberExpr) {
+                if (!numberExpr || numberExpr instanceof MissingExpression || numberExpr instanceof LambdaVarExpr) {
+                    return arrayExpr;
+                } else if (numberExpr.number >= arrayExpr.items.length) {
+                    return arrayExpr; //TODO: return undefined
+                } else {
+                    return arrayExpr.items[numberExpr.number].clone();
+                }
+            },
+            'indexOf': function indexOf(arrayExpr, findExpr) {
+                if (findExpr instanceof ArrayObjectExpr) findExpr = findExpr.holes[0];
+
+                if (!findExpr || findExpr instanceof MissingExpression || findExpr instanceof LambdaVarExpr) return arrayExpr;else {
+                    var index = arrayExpr.items.indexOf(findExpr);
+                    alert(index);
+                }
+            }
+        }));
 
         if (baseArray instanceof CollectionExpr) baseArray.disableSpill();
         _this9.color = 'YellowGreen';
@@ -703,11 +751,12 @@ var ArrayObjectExpr = function (_ObjectExtensionExpr) {
         if (!defaultMethodCall) {} else if (defaultMethodCall in _this9.objMethods) {
             _this9.setExtension(defaultMethodCall, null, defaultMethodArgs); // TODO: method args
         } else {
-                console.error('@ ArrayObjectExpr: Method call ' + defaultMethodCall + ' not a possible member of the object.');
-            }
+            console.error('@ ArrayObjectExpr: Method call ' + defaultMethodCall + ' not a possible member of the object.');
+        }
 
         _this9.defaultMethodCall = defaultMethodCall;
         _this9.defaultMethodArgs = defaultMethodArgs;
+        _this9.baseArray = baseArray;
         return _this9;
     }
 
@@ -832,25 +881,23 @@ var DropdownSelect = function (_mag$Rect3) {
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
             if (this.cells.length <= 1) {} else if (animated) {
-                (function () {
-                    var FADE_TIME = 100;
-                    var waittime = 0;
-                    _this13.cells.slice(1).forEach(function (c, i) {
-                        c.opacity = 0;
-                        Animate.wait(waittime).after(function () {
-                            Animate.tween(c, { opacity: 1.0 }, FADE_TIME, function (e) {
-                                _this13.stage.draw();
-                                return e;
-                            }).after(function () {
-                                c.opacity = 1.0;
-                                _this13.resize();
-                                _this13.stage.draw();
-                            });
+                var FADE_TIME = 100;
+                var waittime = 0;
+                this.cells.slice(1).forEach(function (c, i) {
+                    c.opacity = 0;
+                    Animate.wait(waittime).after(function () {
+                        Animate.tween(c, { opacity: 1.0 }, FADE_TIME, function (e) {
+                            _this13.stage.draw();
+                            return e;
+                        }).after(function () {
+                            c.opacity = 1.0;
+                            _this13.resize();
+                            _this13.stage.draw();
                         });
-                        waittime += FADE_TIME;
-                        _this13.children[i + 1] = c;
                     });
-                })();
+                    waittime += FADE_TIME;
+                    _this13.children[i + 1] = c;
+                });
             } else {
                 this.children = this.cells.slice();
                 this.relayoutCells();
@@ -961,15 +1008,20 @@ var PulloutDrawer = function (_mag$Rect4) {
         var txts = [];
         for (var key in propertyTree) {
             if (propertyTree.hasOwnProperty(key)) {
-                var str = '.' + key;
-                if (typeof propertyTree[key] === 'function' && propertyTree[key].length > 1) {
-                    str += '(..)';
+                var str = void 0;
+                var f = propertyTree[key];
+                if ((typeof f === 'undefined' ? 'undefined' : _typeof(f)) === 'object' && f.isProperty) {
+                    str = '.' + key;
+                } else if (key === '[..]') {
+                    str = key;
+                } else if (typeof f === 'function' && f.length > 1) {
+                    str = '.' + key + '(..)';
                 } else {
-                    str += '()';
+                    str = '.' + key + '()';
                 }
                 var t = new TextExpr(str);
                 t.ignoreEvents = true;
-                t._reduceMethod = propertyTree[key];
+                t._reduceMethod = f;
                 txts.push(t);
             }
         }

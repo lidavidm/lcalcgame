@@ -17,7 +17,6 @@ var mag = function (_) {
     // This construct allows us to embed stages within each other,
     // without messing with the internal logic that may be relied on
     // for the stage's children (such as identifying the part node as a Stage)
-
     var StageNode = function (_mag$Rect) {
         _inherits(StageNode, _mag$Rect);
 
@@ -265,8 +264,6 @@ var mag = function (_) {
         }, {
             key: 'swap',
             value: function swap(node, anotherNodeOrNodes) {
-                var _this4 = this;
-
                 var i = this.nodes.indexOf(node);
                 if (i > -1) {
 
@@ -317,13 +314,11 @@ var mag = function (_) {
                         });
                     }
                     if (pos.x > this.boundingSize.w) {
-                        (function () {
-                            var offset = pos.x - _this4.boundingSize.w;
-                            anotherNode.forEach(function (n) {
-                                var p = n.pos;
-                                n.pos = { x: p.x - offset, y: p.y };
-                            });
-                        })();
+                        var offset = pos.x - this.boundingSize.w;
+                        anotherNode.forEach(function (n) {
+                            var p = n.pos;
+                            n.pos = { x: p.x - offset, y: p.y };
+                        });
                     }
                 }
             }
@@ -395,7 +390,7 @@ var mag = function (_) {
         }, {
             key: 'draw',
             value: function draw() {
-                var _this5 = this;
+                var _this4 = this;
 
                 // To avoid redundant draws, when someone calls draw, we
                 // instead try to schedule an actual redraw. Another
@@ -406,8 +401,8 @@ var mag = function (_) {
                 if (!this.requested) {
                     this.requested = true;
                     window.requestAnimationFrame(function () {
-                        _this5.drawImpl();
-                        _this5.requested = false;
+                        _this4.drawImpl();
+                        _this4.requested = false;
                     });
                 }
             }
@@ -439,18 +434,16 @@ var mag = function (_) {
                 var hit_nodes = this.getHitNodesIntersecting(node, { 'exclude': [node] });
                 var hit = null;
                 if (hit_nodes.length > 0) {
-                    (function () {
 
-                        // Sort hit nodes by closeness to center of dragged node:
-                        var center = node.centerPos();
-                        hit_nodes.sort(function (a, b) {
-                            return distBetweenPos(center, a.centerPos()) > distBetweenPos(center, b.centerPos());
-                        });
+                    // Sort hit nodes by closeness to center of dragged node:
+                    var center = node.centerPos();
+                    hit_nodes.sort(function (a, b) {
+                        return distBetweenPos(center, a.centerPos()) > distBetweenPos(center, b.centerPos());
+                    });
 
-                        for (var i = hit_nodes.length - 1; i > -1; i--) {
-                            if (hit_nodes[i] != node && !is_toolbox(hit_nodes[i])) hit = hit_nodes[i];
-                        }
-                    })();
+                    for (var i = hit_nodes.length - 1; i > -1; i--) {
+                        if (hit_nodes[i] != node && !is_toolbox(hit_nodes[i])) hit = hit_nodes[i];
+                    }
                 }
                 return hit;
             }
@@ -592,7 +585,7 @@ var mag = function (_) {
         }, {
             key: 'getHitNodesIntersecting',
             value: function getHitNodesIntersecting(node) {
-                var _this6 = this;
+                var _this5 = this;
 
                 var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
                 var startingNodes = arguments[2];
@@ -615,7 +608,7 @@ var mag = function (_) {
                             return e instanceof Expression;
                         }) : [];
                         if (holes.length > 0) {
-                            var subintersections = _this6.getHitNodesIntersecting(node, options, holes);
+                            var subintersections = _this5.getHitNodesIntersecting(node, options, holes);
                             if (subintersections.length > 0) {
                                 hits = hits.concat(subintersections);
                                 return;
@@ -676,7 +669,7 @@ var mag = function (_) {
             value: function getNodesWithClass(Class) {
                 var excludedNodes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
-                var _this7 = this;
+                var _this6 = this;
 
                 var recursive = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
                 var nodes = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
@@ -690,7 +683,7 @@ var mag = function (_) {
                     });
                     if (excluded) return;else if (n instanceof Class) rt.push(n);
                     if (recursive && n.children.length > 0) {
-                        var childs = _this7.getNodesWithClass(Class, excludedNodes, true, n.children);
+                        var childs = _this6.getNodesWithClass(Class, excludedNodes, true, n.children);
                         childs.forEach(function (c) {
                             return rt.push(c);
                         });

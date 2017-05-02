@@ -153,77 +153,75 @@ var Sequence = function (_Expression) {
                         (_this2.parent || _this2.stage).swap(_this2, null);
                         resolve(null);
                     } else {
-                        (function () {
-                            var expr = _this2.holes[0];
-                            var result = expr.performReduction();
-                            var delay = function delay(newExpr) {
-                                if (newExpr instanceof Expression && newExpr != expr) {
-                                    _this2.holes[0] = newExpr;
-                                } else if (newExpr instanceof Expression && newExpr.isValue()) {
-                                    _this2.holes.shift();
-                                } else if (newExpr == expr) {
-                                    cleanup();
-                                    reject();
-                                    return;
-                                } else {
-                                    _this2.holes.shift();
+                        var expr = _this2.holes[0];
+                        var result = expr.performReduction();
+                        var delay = function delay(newExpr) {
+                            if (newExpr instanceof Expression && newExpr != expr) {
+                                _this2.holes[0] = newExpr;
+                            } else if (newExpr instanceof Expression && newExpr.isValue()) {
+                                _this2.holes.shift();
+                            } else if (newExpr == expr) {
+                                cleanup();
+                                reject();
+                                return;
+                            } else {
+                                _this2.holes.shift();
+                            }
+
+                            // To handle expressions like loops that
+                            // expand into sequences, flatten any
+                            // subsequences we encounter.
+                            var newHoles = [];
+                            var _iteratorNormalCompletion4 = true;
+                            var _didIteratorError4 = false;
+                            var _iteratorError4 = undefined;
+
+                            try {
+                                for (var _iterator4 = _this2.holes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                                    var _expr2 = _step4.value;
+
+                                    if (_expr2 instanceof Sequence) {
+                                        newHoles = newHoles.concat(_expr2.holes);
+                                    } else {
+                                        newHoles.push(_expr2);
+                                    }
                                 }
-
-                                // To handle expressions like loops that
-                                // expand into sequences, flatten any
-                                // subsequences we encounter.
-                                var newHoles = [];
-                                var _iteratorNormalCompletion4 = true;
-                                var _didIteratorError4 = false;
-                                var _iteratorError4 = undefined;
-
+                            } catch (err) {
+                                _didIteratorError4 = true;
+                                _iteratorError4 = err;
+                            } finally {
                                 try {
-                                    for (var _iterator4 = _this2.holes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                                        var _expr2 = _step4.value;
-
-                                        if (_expr2 instanceof Sequence) {
-                                            newHoles = newHoles.concat(_expr2.holes);
-                                        } else {
-                                            newHoles.push(_expr2);
-                                        }
+                                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                                        _iterator4.return();
                                     }
-                                } catch (err) {
-                                    _didIteratorError4 = true;
-                                    _iteratorError4 = err;
                                 } finally {
-                                    try {
-                                        if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                                            _iterator4.return();
-                                        }
-                                    } finally {
-                                        if (_didIteratorError4) {
-                                            throw _iteratorError4;
-                                        }
+                                    if (_didIteratorError4) {
+                                        throw _iteratorError4;
                                     }
                                 }
+                            }
 
-                                _this2.holes = newHoles;
+                            _this2.holes = newHoles;
 
-                                _this2.update();
-                                if (newExpr instanceof Expression) newExpr.lock();
-                                if (newHoles.length > 0) {
-                                    after(800).then(function () {
-                                        return nextStep();
-                                    });
-                                } else {
-                                    nextStep();
-                                }
-                            };
-                            if (result instanceof Promise) {
-                                result.then(delay, function () {
-                                    // Uh-oh, an error happened
-                                    cleanup();
-                                    reject();
+                            _this2.update();
+                            if (newExpr instanceof Expression) newExpr.lock();
+                            if (newHoles.length > 0) {
+                                after(800).then(function () {
+                                    return nextStep();
                                 });
                             } else {
-                                delay(result || expr);
+                                nextStep();
                             }
-                        })();
+                        };
+                        if (result instanceof Promise) {
+                            result.then(delay, function () {
+                                // Uh-oh, an error happened
+                                cleanup();
+                                reject();
+                            });
+                        } else {
+                            delay(result || expr);
+                        }
                     }
                 };
                 nextStep();

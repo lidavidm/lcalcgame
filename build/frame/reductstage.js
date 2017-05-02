@@ -268,65 +268,63 @@ var ReductStage = function (_mag$Stage) {
 
                     // DEBUG TEST FLYTO ANIMATION.
                     if (!this.ranCompletionAnim) {
-                        (function () {
 
-                            Logger.log('victory', { 'final_state': _this4.toString(), 'num_of_moves': undefined });
+                        Logger.log('victory', { 'final_state': this.toString(), 'num_of_moves': undefined });
 
-                            var you_win = function you_win() {
+                        var you_win = function you_win() {
 
-                                //if (level_idx < 1) {
-                                var cmp = new mag.ImageRect(GLOBAL_DEFAULT_SCREENSIZE.w / 2, GLOBAL_DEFAULT_SCREENSIZE.h / 2, 740 / 2, 146 / 2, 'victory');
-                                cmp.anchor = { x: 0.5, y: 0.5 };
-                                _this4.add(cmp);
-                                _this4.draw();
+                            //if (level_idx < 1) {
+                            var cmp = new mag.ImageRect(GLOBAL_DEFAULT_SCREENSIZE.w / 2, GLOBAL_DEFAULT_SCREENSIZE.h / 2, 740 / 2, 146 / 2, 'victory');
+                            cmp.anchor = { x: 0.5, y: 0.5 };
+                            _this4.add(cmp);
+                            _this4.draw();
 
-                                Resource.play('victory');
-                                Animate.wait(1080).after(function () {
-                                    next();
-                                });
-                                //} else { // Skip victory jingle on every level after first.
-                                //    next();
-                                //}
-                            };
-
-                            var pairs = level_complete;
-                            var num_exploded = 0;
-                            var playedSplosionAudio = false;
-
-                            pairs.forEach(function (pair, idx) {
-                                var node = pair[0];
-                                var goalNode = pair[1];
-                                node.ignoreEvents = true;
-
-                                Resource.play('matching-goal');
-
-                                var blinkCount = level_idx === 0 ? 2 : 1;
-                                Animate.blink([node, goalNode], 2500 / 2.0 * blinkCount, [0, 1, 1], blinkCount).after(function () {
-                                    //Resource.play('shootwee');
-
-                                    _this4.playerWon = true;
-
-                                    //Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x:200, y:300 }, () => {
-                                    SplosionEffect.run(node);
-                                    SplosionEffect.run(goalNode);
-
-                                    if (!playedSplosionAudio) {
-                                        // Play sFx.
-                                        Resource.play('splosion');
-                                        playedSplosionAudio = true;
-                                    }
-
-                                    goalNode.parent.removeChild(goalNode);
-                                    num_exploded++;
-                                    if (num_exploded === pairs.length) {
-                                        Animate.wait(500).after(you_win);
-                                    }
-                                    //});
-                                });
+                            Resource.play('victory');
+                            Animate.wait(1080).after(function () {
+                                next();
                             });
+                            //} else { // Skip victory jingle on every level after first.
+                            //    next();
+                            //}
+                        };
 
-                            _this4.ranCompletionAnim = true;
-                        })();
+                        var pairs = level_complete;
+                        var num_exploded = 0;
+                        var playedSplosionAudio = false;
+
+                        pairs.forEach(function (pair, idx) {
+                            var node = pair[0];
+                            var goalNode = pair[1];
+                            node.ignoreEvents = true;
+
+                            Resource.play('matching-goal');
+
+                            var blinkCount = level_idx === 0 ? 2 : 1;
+                            Animate.blink([node, goalNode], 2500 / 2.0 * blinkCount, [0, 1, 1], blinkCount).after(function () {
+                                //Resource.play('shootwee');
+
+                                _this4.playerWon = true;
+
+                                //Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x:200, y:300 }, () => {
+                                SplosionEffect.run(node);
+                                SplosionEffect.run(goalNode);
+
+                                if (!playedSplosionAudio) {
+                                    // Play sFx.
+                                    Resource.play('splosion');
+                                    playedSplosionAudio = true;
+                                }
+
+                                goalNode.parent.removeChild(goalNode);
+                                num_exploded++;
+                                if (num_exploded === pairs.length) {
+                                    Animate.wait(500).after(you_win);
+                                }
+                                //});
+                            });
+                        });
+
+                        this.ranCompletionAnim = true;
                     }
                 }
             }

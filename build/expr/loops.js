@@ -235,53 +235,51 @@ var RepeatLoopExpr = function (_Expression) {
                                 after(400).then(nextStep);
                             });
                         } else {
-                            (function () {
-                                var current = _this3.template.subexpressions[index];
-                                // If we're stamping a sequence, treat each
-                                // group of expressions as a single stamp
-                                var numExprs = 1;
-                                if (_this3.bodyExpr instanceof Sequence) {
-                                    numExprs = _this3.bodyExpr.subexpressions.length;
-                                }
+                            var current = _this3.template.subexpressions[index];
+                            // If we're stamping a sequence, treat each
+                            // group of expressions as a single stamp
+                            var numExprs = 1;
+                            if (_this3.bodyExpr instanceof Sequence) {
+                                numExprs = _this3.bodyExpr.subexpressions.length;
+                            }
 
-                                for (var i = 0; i < numExprs; i++) {
-                                    var expr = _this3.template.subexpressions[index + i];
-                                    y -= expr.size.h * expr.scale.y;
-                                }
+                            for (var i = 0; i < numExprs; i++) {
+                                var expr = _this3.template.subexpressions[index + i];
+                                y -= expr.size.h * expr.scale.y;
+                            }
 
-                                Animate.tween(_this3.template, {
+                            Animate.tween(_this3.template, {
+                                pos: {
+                                    x: x,
+                                    y: y
+                                }
+                            }, 300).after(function () {
+                                var oldOffset = _this3.bodyExpr.shadowOffset;
+
+                                Animate.tween(_this3, {
+                                    _leverAngle: 0
+                                }, 400);
+                                Animate.tween(_this3.bodyExpr, {
+                                    shadowOffset: -4,
                                     pos: {
-                                        x: x,
-                                        y: y
+                                        x: _this3.bodyExpr.pos.x,
+                                        y: _this3.bodyExpr.pos.y + 2
                                     }
-                                }, 300).after(function () {
-                                    var oldOffset = _this3.bodyExpr.shadowOffset;
+                                }, 400).after(function () {
+                                    for (var _i = 0; _i < numExprs; _i++) {
+                                        _this3.template.subexpressions[index + _i].opacity = 1.0;
+                                    }
+                                    index += numExprs;
 
-                                    Animate.tween(_this3, {
-                                        _leverAngle: 0
-                                    }, 400);
-                                    Animate.tween(_this3.bodyExpr, {
-                                        shadowOffset: -4,
-                                        pos: {
-                                            x: _this3.bodyExpr.pos.x,
-                                            y: _this3.bodyExpr.pos.y + 2
-                                        }
-                                    }, 400).after(function () {
-                                        for (var _i = 0; _i < numExprs; _i++) {
-                                            _this3.template.subexpressions[index + _i].opacity = 1.0;
-                                        }
-                                        index += numExprs;
-
-                                        _this3.bodyExpr.shadowOffset = oldOffset;
-                                        _this3.bodyExpr.pos = {
-                                            x: _this3.bodyExpr.pos.x,
-                                            y: _this3.bodyExpr.pos.y - 2
-                                        };
-                                        _this3.stage.draw();
-                                        after(400).then(nextStep);
-                                    });
+                                    _this3.bodyExpr.shadowOffset = oldOffset;
+                                    _this3.bodyExpr.pos = {
+                                        x: _this3.bodyExpr.pos.x,
+                                        y: _this3.bodyExpr.pos.y - 2
+                                    };
+                                    _this3.stage.draw();
+                                    after(400).then(nextStep);
                                 });
-                            })();
+                            });
                         }
                     };
 
@@ -466,10 +464,9 @@ function drawPointsAround(ctx, centerX, centerY, points, rotation) {
 
     try {
         for (var _iterator = points[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var _step$value = _slicedToArray(_step.value, 2);
-
-            var x = _step$value[0];
-            var y = _step$value[1];
+            var _step$value = _slicedToArray(_step.value, 2),
+                x = _step$value[0],
+                y = _step$value[1];
 
             var tx = centerX + x * Math.cos(rotation) - y * Math.sin(rotation);
             var ty = centerY + x * Math.sin(rotation) + y * Math.cos(rotation);

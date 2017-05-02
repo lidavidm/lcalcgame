@@ -1,7 +1,5 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
@@ -15,7 +13,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 /**
  * Special function expressions inside the game, like map, fold, etc.
  */
-
 var MapFunc = function (_FuncExpr) {
     _inherits(MapFunc, _FuncExpr);
 
@@ -119,168 +116,138 @@ var MapFunc = function (_FuncExpr) {
 
             var reduced_expr = this.reduce();
             if (!this.isAnimating && reduced_expr && reduced_expr != this) {
-                var superReduce;
-                var bagAfterMap;
-                var popCount;
 
-                var _this;
+                var stage = this.stage;
+                var func = this.func;
+                var bagCopy = this.bag.clone();
+                var superReduce = function superReduce() {
+                    _this3.bag = bagCopy;
+                    _this3.update();
+                    _this3.bag = _get(MapFunc.prototype.__proto__ || Object.getPrototypeOf(MapFunc.prototype), 'performReduction', _this3).call(_this3);
+                    stage.draw();
+                };
 
-                var bagToFuncArrowPath;
-                var bag;
-                var mapSize;
-                var mapCenterPos;
+                // Run 'map' animation.
+                if (this.bag instanceof BagExpr) {
 
-                var _runNextAnim;
+                    // debug
+                    if (!this.animatedReduction) {
+                        superReduce();
+                        this.bag.spill(false); // don't log this spill
+                        stage.remove(this.bag);
+                        return;
+                    } else this.bag.lock();
 
-                var _ret = function () {
+                    var bagAfterMap = this.reduce();
+                    var popCount = bagAfterMap.items.length / this.bag.items.length; // in case ßthere was replication...ß
 
-                    var stage = _this3.stage;
-                    var func = _this3.func;
-                    var bagCopy = _this3.bag.clone();
+                    var _this = this;
+                    var bagToFuncArrowPath;
+                    var bag = this.bag;
+                    var mapSize = this.absoluteSize;
+                    var mapCenterPos = this.centerPos();
+                    var runNextAnim = function runNextAnim(n) {
 
-                    superReduce = function superReduce() {
-                        _this3.bag = bagCopy;
-                        _this3.update();
-                        _this3.bag = _get(MapFunc.prototype.__proto__ || Object.getPrototypeOf(MapFunc.prototype), 'performReduction', _this3).call(_this3);
-                        stage.draw();
+                        if (bag.items.length === 0) {
+
+                            // Reached end of bag. Terminate animation.
+                            _this3.isAnimating = false;
+                            stage.remove(_this3);
+                            stage.update();
+                            stage.draw();
+                        } else {
+
+                            // Pop an item off the bag.
+                            var item = bag.popItem();
+                            var itemsAfterMap = [];
+                            for (var i = 0; i < popCount; i++) {
+                                itemsAfterMap.push(bagAfterMap.popItem());
+                            } // TODO: Replicators...
+
+                            func.holes[0].open();
+
+                            // Add it to the stage, making it smaller
+                            // so that it can 'follow' the path of the arrow from bag into function.
+                            stage.add(item);
+                            stage.update();
+                            bagToFuncArrowPath = _this.bagToFuncArrowPath;
+
+                            item.scale = { x: 0.5, y: 0.5 };
+                            item.parent = null;
+
+                            var preview_item = item.clone();
+                            preview_item.parent = null;
+
+                            _this3.isAnimating = true;
+
+                            var dropItem = function dropItem() {
+
+                                // Preview
+                                func.holes[0].ondropenter(preview_item);
+
+                                // Remove item (preview) from the stage when it reaches end of arrow path (enters 'function' hole).
+                                stage.remove(item);
+                                stage.update();
+
+                                mapCenterPos = _this.centerPos();
+
+                                var preview_duration = func.isConstantFunction ? 100 : 1000;
+
+                                Animate.wait(preview_duration).after(function () {
+
+                                    func.holes[0].ondropexit();
+
+                                    // Spill individial items onto stage as they are created.
+                                    for (var _i = 0; _i < itemsAfterMap.length; _i++) {
+
+                                        var itemAfterMap = itemsAfterMap[_i];
+                                        var pos = func.body.absolutePos;
+
+                                        itemAfterMap.pos = pos;
+                                        itemAfterMap.scale = { x: 1.0, y: 1.0 };
+                                        itemAfterMap.parent = null;
+                                        stage.add(itemAfterMap);
+
+                                        var theta = Math.random() * Math.PI * 2;
+                                        //let radX = mapSize.w / 2.0;
+                                        //let radY = mapSize.h / 2.0 * 2.0;
+                                        var radX = bag.size.h * 1.5;
+                                        var radY = radX;
+                                        var sz = itemAfterMap.absoluteSize;
+                                        var center = addPos(pos, { x: -sz.w, y: 0 });
+
+                                        var targetPos = addPos(center, { x: radX * Math.cos(theta),
+                                            y: radY * Math.sin(theta) });
+                                        //                                 y:radY + radY * Math.abs(Math.sin(theta)) / 2.0 } );
+
+                                        targetPos = clipToRect(targetPos, itemAfterMap.absoluteSize, { x: 25, y: 0 }, { w: GLOBAL_DEFAULT_SCREENSIZE.width - 25,
+                                            h: GLOBAL_DEFAULT_SCREENSIZE.height - stage.toolbox.size.h });
+
+                                        Animate.tween(itemAfterMap, { 'pos': targetPos }, 500, function (elapsed) {
+                                            return Math.pow(elapsed, 0.5);
+                                        });
+                                    }
+                                    stage.draw();
+
+                                    runNextAnim(n + 1);
+                                });
+                            };
+
+                            if (bagToFuncArrowPath) Animate.followPath(item, bagToFuncArrowPath, 800).after(dropItem);else dropItem();
+                        }
                     };
 
-                    // Run 'map' animation.
+                    runNextAnim(0);
+                } else if (this.bag instanceof Expression) {
 
-
-                    if (_this3.bag instanceof BagExpr) {
-
-                        // debug
-                        if (!_this3.animatedReduction) {
-                            superReduce();
-                            _this3.bag.spill(false); // don't log this spill
-                            stage.remove(_this3.bag);
-                            return {
-                                v: void 0
-                            };
-                        } else _this3.bag.lock();
-
-                        bagAfterMap = _this3.reduce();
-                        popCount = bagAfterMap.items.length / _this3.bag.items.length; // in case ßthere was replication...ß
-
-                        _this = _this3;
-                        bag = _this3.bag;
-                        mapSize = _this3.absoluteSize;
-                        mapCenterPos = _this3.centerPos();
-
-                        _runNextAnim = function runNextAnim(n) {
-
-                            if (bag.items.length === 0) {
-
-                                // Reached end of bag. Terminate animation.
-                                _this3.isAnimating = false;
-                                stage.remove(_this3);
-                                stage.update();
-                                stage.draw();
-                            } else {
-                                var itemsAfterMap;
-                                var dropItem;
-
-                                (function () {
-
-                                    // Pop an item off the bag.
-                                    var item = bag.popItem();
-                                    itemsAfterMap = [];
-
-                                    for (var i = 0; i < popCount; i++) {
-                                        itemsAfterMap.push(bagAfterMap.popItem());
-                                    } // TODO: Replicators...
-
-                                    func.holes[0].open();
-
-                                    // Add it to the stage, making it smaller
-                                    // so that it can 'follow' the path of the arrow from bag into function.
-                                    stage.add(item);
-                                    stage.update();
-                                    bagToFuncArrowPath = _this.bagToFuncArrowPath;
-
-                                    item.scale = { x: 0.5, y: 0.5 };
-                                    item.parent = null;
-
-                                    var preview_item = item.clone();
-                                    preview_item.parent = null;
-
-                                    _this3.isAnimating = true;
-
-                                    dropItem = function dropItem() {
-
-                                        // Preview
-                                        func.holes[0].ondropenter(preview_item);
-
-                                        // Remove item (preview) from the stage when it reaches end of arrow path (enters 'function' hole).
-                                        stage.remove(item);
-                                        stage.update();
-
-                                        mapCenterPos = _this.centerPos();
-
-                                        var preview_duration = func.isConstantFunction ? 100 : 1000;
-
-                                        Animate.wait(preview_duration).after(function () {
-
-                                            func.holes[0].ondropexit();
-
-                                            // Spill individial items onto stage as they are created.
-                                            for (var _i = 0; _i < itemsAfterMap.length; _i++) {
-
-                                                var itemAfterMap = itemsAfterMap[_i];
-                                                var pos = func.body.absolutePos;
-
-                                                itemAfterMap.pos = pos;
-                                                itemAfterMap.scale = { x: 1.0, y: 1.0 };
-                                                itemAfterMap.parent = null;
-                                                stage.add(itemAfterMap);
-
-                                                var theta = Math.random() * Math.PI * 2;
-                                                //let radX = mapSize.w / 2.0;
-                                                //let radY = mapSize.h / 2.0 * 2.0;
-                                                var radX = bag.size.h * 1.5;
-                                                var radY = radX;
-                                                var sz = itemAfterMap.absoluteSize;
-                                                var center = addPos(pos, { x: -sz.w, y: 0 });
-
-                                                var targetPos = addPos(center, { x: radX * Math.cos(theta),
-                                                    y: radY * Math.sin(theta) });
-                                                //                                 y:radY + radY * Math.abs(Math.sin(theta)) / 2.0 } );
-
-                                                targetPos = clipToRect(targetPos, itemAfterMap.absoluteSize, { x: 25, y: 0 }, { w: GLOBAL_DEFAULT_SCREENSIZE.width - 25,
-                                                    h: GLOBAL_DEFAULT_SCREENSIZE.height - stage.toolbox.size.h });
-
-                                                Animate.tween(itemAfterMap, { 'pos': targetPos }, 500, function (elapsed) {
-                                                    return Math.pow(elapsed, 0.5);
-                                                });
-                                            }
-                                            stage.draw();
-
-                                            _runNextAnim(n + 1);
-                                        });
-                                    };
-
-                                    if (bagToFuncArrowPath) Animate.followPath(item, bagToFuncArrowPath, 800).after(dropItem);else dropItem();
-                                })();
-                            }
-                        };
-
-                        _runNextAnim(0);
-                    } else if (_this3.bag instanceof Expression) {
-
-                        var expr = _this3.bag.clone();
-                        _this3.stage.add(expr);
-                        expr.parent = null;
-                        Animate.followPath(expr, _this3.bagToFuncArrowPath);
-                    } else {
-                        console.error('@ MapFunc.performReduction: this.bag is not a valid expression.');
-                        return {
-                            v: _this3
-                        };
-                    }
-                }();
-
-                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+                    var expr = this.bag.clone();
+                    this.stage.add(expr);
+                    expr.parent = null;
+                    Animate.followPath(expr, this.bagToFuncArrowPath);
+                } else {
+                    console.error('@ MapFunc.performReduction: this.bag is not a valid expression.');
+                    return this;
+                }
             }
         }
 
@@ -460,7 +427,6 @@ var FadedMapFunc = function (_FadedSimpleMapFunc) {
         _classCallCheck(this, FadedMapFunc);
 
         // Remove animations + arrow
-
         var _this6 = _possibleConstructorReturn(this, (FadedMapFunc.__proto__ || Object.getPrototypeOf(FadedMapFunc)).call(this, oneParamFunc, bag));
 
         _this6.heightScalar = 1.0;

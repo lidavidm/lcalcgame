@@ -101,7 +101,7 @@ class PlayPenExpr extends ExpressionPlus {
         return { w:this.pen.size.w + this.padding.left*2, h:this.pen.size.h + this.padding.top + this.padding.bottom };
     }
     set size(sz) {
-        super.size = sz;
+        //super.size = sz;
         this.pen.size = sz;
     }
     update() {
@@ -364,7 +364,14 @@ class ObjectExtensionExpr extends ExpressionPlus {
             // 'this' needs to be late-bound, or else cloning an
             // ObjectExtensionExpr means methods will be called on the
             // wrong object
-            self.setExtension(cell.children[0].text.replace('.', '').split('(')[0], cell.children[0]._reduceMethod);
+
+            //self.setExtension(cell.children[0].text.replace('.', '').split('(')[0], cell.children[0]._reduceMethod);
+
+            let methodText;
+            let origText = cell.children[0].text;
+            if (origText === '[..]') methodText = origText;
+            else methodText = origText.replace('.', '').split('(')[0];
+            this.setExtension(methodText, cell.children[0]._reduceMethod);
         };
 
         // Make pullout-drawer:
@@ -442,12 +449,21 @@ class ObjectExtensionExpr extends ExpressionPlus {
     }
     setExtension(methodText, subReduceMethod=null, argExprs=null) {
         if (this.holes[1]) this.holes.splice(1, 1);
+
+        let isProperty = true;
+
         if (!subReduceMethod) {
             subReduceMethod = this.objMethods[methodText];
         }
+
+        if (typeof subReduceMethod === 'object') {
+            isProperty = subReduceMethod["isProperty"];
+            subReduceMethod = subReduceMethod["reduce"];
+        }
+
         if (!argExprs) {
             let numArgs = subReduceMethod.length - 1;
-            argExprs = []
+            argExprs = [];
             while (numArgs > 0) {
                 let me = new MissingExpression();
                 me._size = { w:44, h:44 };
@@ -458,7 +474,14 @@ class ObjectExtensionExpr extends ExpressionPlus {
             argExprs = [ argExprs ];
 
         // Left text
-        let methodtxt = new TextExpr('.' + methodText + '(');
+        //let methodtxt = new TextExpr('.' + methodText + '(');
+        let pretext;
+        let isIndicesNotation = methodText === '[..]';
+        if (isIndicesNotation) pretext = '[';
+        else pretext = '.' + methodText + (isProperty ? '' : '(');
+
+        let methodtxt = new TextExpr(pretext);
+
         methodtxt.fontSize = 25;
         methodtxt._yMultiplier = 2.85;
         if (!(this.holes[0] instanceof MissingExpression)) {
@@ -480,12 +503,14 @@ class ObjectExtensionExpr extends ExpressionPlus {
                 this.addArg(comma);
                 this.addArg(argExprs[i]);
             }
-            let closingParen = new TextExpr(')'); // comma to separate arguments
+            //let closingParen = new TextExpr(')'); // comma to separate arguments
+            let closingParen = new TextExpr(isIndicesNotation ? ']' : ')'); // comma to separate arguments
+
             closingParen.fontSize = methodtxt.fontSize;
             closingParen._yMultiplier = methodtxt._yMultiplier;
             this.addArg(closingParen);
 
-        } else methodtxt.text += ')'; // just add closing paren.
+        } else if (!isProperty) methodtxt.text += ')'; // just add closing paren.
 
         this.update();
 
@@ -517,7 +542,7 @@ class ArrayObjectExpr extends ObjectExtensionExpr {
                     if (arrayExpr.items.length === 0) return arrayExpr; // TODO: This should return undefined.
                     let item = arrayExpr.items[arrayExpr.items.length-1].clone();
                     return item;
-              },
+                },
                 'push':(arrayExpr, pushedExpr) => {
 
                     if (pushedExpr instanceof ArrayObjectExpr)
@@ -532,7 +557,7 @@ class ArrayObjectExpr extends ObjectExtensionExpr {
                         new_coll.addItem(pushedExpr.clone()); // add item to bag
                         return new_coll; // return new bag with item appended
                     }
-              },
+                },
                 'map':(arrayExpr, lambdaExpr) => {
                     let mapped = arrayExpr.map(lambdaExpr);
                     if (mapped) {
@@ -540,7 +565,41 @@ class ArrayObjectExpr extends ObjectExtensionExpr {
                         return mapped;
                     }
                     else return arrayExpr;
-        }});
+                },
+                  'length': {
+                            'isProperty': true,
+                            'reduce': function (arrayExpr) {
+                              this.isProperty = true;
+                              return new NumberExpr(arrayExpr.items.length);
+                          }
+                  },
+                  '[..]': (arrayExpr, numberExpr) => {
+                      if (!numberExpr ||
+                          numberExpr instanceof MissingExpression ||
+                          numberExpr instanceof LambdaVarExpr) {
+                          return arrayExpr;
+                      }
+                      else if (numberExpr.number >= arrayExpr.items.length) {
+                          return arrayExpr; //TODO: return undefined
+                      }
+                      else {
+                          return arrayExpr.items[numberExpr.number].clone();
+                      }
+                  },
+                  'indexOf':(arrayExpr, findExpr) => {
+                      if (findExpr instanceof ArrayObjectExpr)
+                          findExpr = findExpr.holes[0];
+
+                      if (!findExpr ||
+                          findExpr instanceof MissingExpression ||
+                          findExpr instanceof LambdaVarExpr)
+                          return arrayExpr;
+                      else {
+                          let index = arrayExpr.items.indexOf(findExpr);
+                          alert(index);
+                      }
+                  }
+              });
 
         if (baseArray instanceof CollectionExpr) baseArray.disableSpill();
         this.color = 'YellowGreen';
@@ -554,6 +613,7 @@ class ArrayObjectExpr extends ObjectExtensionExpr {
 
         this.defaultMethodCall = defaultMethodCall;
         this.defaultMethodArgs = defaultMethodArgs;
+        this.baseArray = baseArray;
     }
     get constructorArgs() { return [this.holes[0].clone(), this.defaultMethodCall, this.defaultMethodArgs]; }
     reduce() {
@@ -731,15 +791,21 @@ class PulloutDrawer extends mag.Rect {
         let txts = [];
         for (var key in propertyTree) {
             if (propertyTree.hasOwnProperty(key)) {
-                let str = '.' + key;
-                if (typeof propertyTree[key] === 'function' && propertyTree[key].length > 1) {
-                    str += '(..)';
+                let str;
+                let f = propertyTree[key];
+                if (typeof f === 'object' && f.isProperty) {
+                    str = '.' + key;
+                }
+                else if (key === '[..]') {
+                    str = key;
+                } else if (typeof f === 'function' && f.length > 1) {
+                    str = '.' + key + '(..)';
                 } else {
-                    str += '()';
+                    str = '.' + key + '()';
                 }
                 let t = new TextExpr(str);
                 t.ignoreEvents = true;
-                t._reduceMethod = propertyTree[key];
+                t._reduceMethod = f;
                 txts.push( t );
             }
         }

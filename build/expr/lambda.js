@@ -15,7 +15,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * The LambdaHoleExpr performs substitution on LambdaVar subexpressions in its parent expression context.
  * -----------------------------------------------
  * */
-
 var LambdaHoleExpr = function (_MissingExpression) {
     _inherits(LambdaHoleExpr, _MissingExpression);
 
@@ -33,16 +32,6 @@ var LambdaHoleExpr = function (_MissingExpression) {
 
     _createClass(LambdaHoleExpr, [{
         key: 'colorForVarName',
-        //'IndianRed';
-
-        // return {
-        //
-        //     'x':'orange',
-        //     'y':'IndianRed',
-        //     'z':'green',
-        //     'w':'blue'
-        //
-        // }[v];
         value: function colorForVarName() {
             return LambdaHoleExpr.colorForVarName(this.name);
         }
@@ -281,44 +270,42 @@ var LambdaHoleExpr = function (_MissingExpression) {
             node.opacity = 0.4;
 
             if (this.parent) {
-                (function () {
-                    // Ignore variables that are shadowed when previewing
-                    var subvarexprs = findNoncapturingVarExpr(_this6.parent, _this6.name);
+                // Ignore variables that are shadowed when previewing
+                var subvarexprs = findNoncapturingVarExpr(this.parent, this.name);
 
-                    var wasClosed = false;
-                    if (_this6.parent.environmentDisplay) {
-                        wasClosed = _this6.parent.environmentDisplay._state === 'closed' || _this6.parent.environmentDisplay._state === 'closing';
-                        _this6.parent.environmentDisplay.openDrawer({ force: true, speed: 50 });
+                var wasClosed = false;
+                if (this.parent.environmentDisplay) {
+                    wasClosed = this.parent.environmentDisplay._state === 'closed' || this.parent.environmentDisplay._state === 'closing';
+                    this.parent.environmentDisplay.openDrawer({ force: true, speed: 50 });
+                }
+
+                var preview_nodes = [];
+                var is_replication_expr = true;
+                subvarexprs.forEach(function (e) {
+                    if (e.parent != _this6.parent) is_replication_expr = false;
+                    if (e.name === _this6.name) {
+                        var preview_node = node.clone();
+                        preview_node.opacity = 1.0;
+                        preview_node.bindSubexpressions();
+                        e.open(preview_node);
+                        preview_nodes.push(preview_node);
                     }
-
-                    var preview_nodes = [];
-                    var is_replication_expr = true;
-                    subvarexprs.forEach(function (e) {
-                        if (e.parent != _this6.parent) is_replication_expr = false;
-                        if (e.name === _this6.name) {
-                            var preview_node = node.clone();
-                            preview_node.opacity = 1.0;
-                            preview_node.bindSubexpressions();
-                            e.open(preview_node);
-                            preview_nodes.push(preview_node);
-                        }
+                });
+                this.opened_subexprs = subvarexprs;
+                this.preview_nodes = preview_nodes;
+                this.is_replication_expr = is_replication_expr && this.preview_nodes.length > 0;
+                this.close_opened_subexprs = function () {
+                    if (!_this6.opened_subexprs) return;
+                    _this6.preview_nodes = null;
+                    _this6.opened_subexprs.forEach(function (e) {
+                        e.close();
                     });
-                    _this6.opened_subexprs = subvarexprs;
-                    _this6.preview_nodes = preview_nodes;
-                    _this6.is_replication_expr = is_replication_expr && _this6.preview_nodes.length > 0;
-                    _this6.close_opened_subexprs = function () {
-                        if (!_this6.opened_subexprs) return;
-                        _this6.preview_nodes = null;
-                        _this6.opened_subexprs.forEach(function (e) {
-                            e.close();
-                        });
-                        _this6.opened_subexprs = null;
+                    _this6.opened_subexprs = null;
 
-                        if (_this6.parent.environmentDisplay && wasClosed) {
-                            _this6.parent.environmentDisplay.closeDrawer({ force: true, speed: 50 });
-                        }
-                    };
-                })();
+                    if (_this6.parent.environmentDisplay && wasClosed) {
+                        _this6.parent.environmentDisplay.closeDrawer({ force: true, speed: 50 });
+                    }
+                };
             }
         }
     }, {
@@ -362,45 +349,43 @@ var LambdaHoleExpr = function (_MissingExpression) {
                     var is_replication_expr = _this7.is_replication_expr;
                     if (_this7.close_opened_subexprs) {
                         if (is_replication_expr && preview_nodes.length > 0) {
-                            (function () {
-                                var final_nodes = [];
-                                preview_nodes.forEach(function (n) {
-                                    var c = n.clone();
-                                    c.anchor = n.anchor;
-                                    c.pos = n.absolutePos;
-                                    c.scale = n.absoluteScale;
-                                    var pos = addPos(c.pos, { x: 0, y: -40 });
-                                    final_nodes.push(c);
-                                });
-                                var overlap_layout = false;
-                                for (var i = 0; i < final_nodes.length - 1; i++) {
-                                    var a = final_nodes[i];
-                                    var b = final_nodes[i + 1];
-                                    if (Math.abs(b.pos.x - a.pos.x) < a.size.w) {
-                                        // If these two nodes will overlap...
-                                        console.log('overlap', a.pos, b.pos, a.size);
-                                        overlap_layout = true;
-                                        break;
-                                    }
+                            var final_nodes = [];
+                            preview_nodes.forEach(function (n) {
+                                var c = n.clone();
+                                c.anchor = n.anchor;
+                                c.pos = n.absolutePos;
+                                c.scale = n.absoluteScale;
+                                var pos = addPos(c.pos, { x: 0, y: -40 });
+                                final_nodes.push(c);
+                            });
+                            var overlap_layout = false;
+                            for (var i = 0; i < final_nodes.length - 1; i++) {
+                                var a = final_nodes[i];
+                                var b = final_nodes[i + 1];
+                                if (Math.abs(b.pos.x - a.pos.x) < a.size.w) {
+                                    // If these two nodes will overlap...
+                                    console.log('overlap', a.pos, b.pos, a.size);
+                                    overlap_layout = true;
+                                    break;
                                 }
-                                var len = final_nodes.length;
-                                var total_width = final_nodes.reduce(function (prev, n) {
-                                    return prev + n.size.w;
-                                }, 0);
-                                var mid_xpos = final_nodes.reduce(function (prev, n) {
-                                    return prev + n.pos.x;
-                                }, 0) / len;
-                                final_nodes.forEach(function (c, i) {
-                                    var final_pos = void 0;
-                                    if (overlap_layout) final_pos = { x: mid_xpos + (len - i - 1) / len * total_width - total_width / 4.0, y: c.pos.y - 40 };else final_pos = { x: c.pos.x, y: c.pos.y - 40 };
-                                    stage.add(c);
-                                    Animate.tween(c, { scale: { x: 1, y: 1 }, pos: final_pos }, 300, function (e) {
-                                        return Math.pow(e, 0.5);
-                                    }).after(function () {
-                                        c.onmouseleave();
-                                    });
+                            }
+                            var len = final_nodes.length;
+                            var total_width = final_nodes.reduce(function (prev, n) {
+                                return prev + n.size.w;
+                            }, 0);
+                            var mid_xpos = final_nodes.reduce(function (prev, n) {
+                                return prev + n.pos.x;
+                            }, 0) / len;
+                            final_nodes.forEach(function (c, i) {
+                                var final_pos = void 0;
+                                if (overlap_layout) final_pos = { x: mid_xpos + (len - i - 1) / len * total_width - total_width / 4.0, y: c.pos.y - 40 };else final_pos = { x: c.pos.x, y: c.pos.y - 40 };
+                                stage.add(c);
+                                Animate.tween(c, { scale: { x: 1, y: 1 }, pos: final_pos }, 300, function (e) {
+                                    return Math.pow(e, 0.5);
+                                }).after(function () {
+                                    c.onmouseleave();
                                 });
-                            })();
+                            });
                         }
                         _this7.close_opened_subexprs();
                     }
@@ -498,7 +483,16 @@ var LambdaHoleExpr = function (_MissingExpression) {
         key: 'colorForVarName',
         value: function colorForVarName(v) {
 
-            if (v === 'x') return 'lightgray';else return 'white';
+            if (v === 'x') return 'lightgray';else return 'white'; //'IndianRed';
+
+            // return {
+            //
+            //     'x':'orange',
+            //     'y':'IndianRed',
+            //     'z':'green',
+            //     'w':'blue'
+            //
+            // }[v];
         }
     }]);
 
@@ -582,29 +576,25 @@ var LambdaVarExpr = function (_ImageExpr) {
             var preview_expr = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
             if (this.stateGraph.currentState !== 'open') {
-                (function () {
-                    _this10.stateGraph.enter('opening');
+                this.stateGraph.enter('opening');
 
-                    var _this = _this10;
-                    var stage = _this10.stage;
+                var _this = this;
+                var stage = this.stage;
 
-                    if (preview_expr) {
-                        (function () {
-                            var stateGraph = _this10.stateGraph;
-                            Animate.wait(140).after(function () {
-                                if (stateGraph.currentState === 'opening' || stateGraph.currentState === 'open') {
-                                    var scale = _this10.graphicNode.size.w / preview_expr.size.w * 0.8;
-                                    preview_expr.pos = { x: _this10.children[0].size.w / 2.0, y: -10 };
-                                    preview_expr.scale = { x: scale, y: scale };
-                                    preview_expr.anchor = { x: 0.5, y: 0 };
-                                    preview_expr.stroke = null;
-                                    _this.graphicNode.addChild(preview_expr);
-                                    stage.draw();
-                                }
-                            });
-                        })();
-                    }
-                })();
+                if (preview_expr) {
+                    var stateGraph = this.stateGraph;
+                    Animate.wait(140).after(function () {
+                        if (stateGraph.currentState === 'opening' || stateGraph.currentState === 'open') {
+                            var scale = _this10.graphicNode.size.w / preview_expr.size.w * 0.8;
+                            preview_expr.pos = { x: _this10.children[0].size.w / 2.0, y: -10 };
+                            preview_expr.scale = { x: scale, y: scale };
+                            preview_expr.anchor = { x: 0.5, y: 0 };
+                            preview_expr.stroke = null;
+                            _this.graphicNode.addChild(preview_expr);
+                            stage.draw();
+                        }
+                    });
+                }
             }
         }
     }, {
@@ -829,9 +819,9 @@ var LambdaExpr = function (_Expression) {
                     // if expression was removed...
                     this.holes[0].close(); // close the hole, undoubtedly
                 } else if (node instanceof MissingExpression) {
-                        // if expression was placed...
-                        this.updateHole();
-                    }
+                    // if expression was placed...
+                    this.updateHole();
+                }
             }
         }
     }, {
@@ -1056,10 +1046,6 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
         }
     }, {
         key: 'hits',
-
-        // We can't check isOpen because that confuses
-        // LambdaExpr#hitsChild (which means that we can't do things
-        // like drag expressions into holes!)
         value: function hits(pos) {
             var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
 
@@ -1242,6 +1228,9 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
             // account for that when deciding whether the lambda is
             // reducible
             return this.holes.length > 0 && this.holes[0] instanceof LambdaHoleExpr && !this._originalArg;
+            // We can't check isOpen because that confuses
+            // LambdaExpr#hitsChild (which means that we can't do things
+            // like drag expressions into holes!)
         }
     }]);
 

@@ -431,9 +431,10 @@ class AssignExpr extends Expression {
     }
 
     canReduce() {
-        return this.value && this.variable && (this.value.canReduce() || this.value.isValue()) &&
+        /*return this.value && this.variable && (this.value.canReduce() || this.value.isValue()) &&
             (this.variable instanceof VarExpr || this.variable instanceof VtableVarExpr
-             || (this.variable instanceof TypeInTextExpr && this.variable.canReduce()));
+             || (this.variable instanceof TypeInTextExpr && this.variable.canReduce()));*/
+        return true;
     }
 
     reduce() {
@@ -529,6 +530,59 @@ class AssignExpr extends Expression {
                 // Try and play any animation anyways to hint at why
                 // the value can't reduce.
                 let result = this.value.performReduction();
+
+
+                if (this.value instanceof ArrayObjectExpr) {
+                    this.value = this.value.baseArray;
+                }
+                if (this.value instanceof StringObjectExpr) {
+                    this.value = this.value.baseStringValue;
+                }
+
+                console.log("This.Variable and This.Variable.name and This.Value and RESULT");
+                console.log(this.variable);
+                console.log(this.variable.name);
+                console.log(this.value);
+                console.log(result);
+
+                if (this.variable instanceof ArrayObjectExpr) {
+                    let rhs = this.variable.baseArray.reduce();
+                    console.log("RHS!!!!!!");
+                    console.log(rhs);
+                    this.variable.name = this.variable.baseArray.name;
+                    if (this.variable.defaultMethodCall === "[..]") {
+                        console.log("method call is [..]");
+                        console.log("this.variable.name:");
+                        console.log(this.variable.name);
+                        console.log("This Value!!!!");
+                        console.log(this.value);
+                        this.variable.holes[2] = this.variable.holes[2].reduce();
+                        console.log("index: " + this.variable.holes[2].number);
+                        rhs._items[this.variable.holes[2].number] = this.value.clone();
+                        this.value = rhs.clone();
+                        console.log("after: rhs is:");
+                        console.log(rhs);
+                    }
+                }
+
+                if (this.variable instanceof StringObjectExpr) {
+                    let rhs = this.variable.baseStringValue.reduce();
+                    this.variable.name = this.variable.baseStringValue.name;
+                    console.log("variable name: " + this.variable.name);
+                    if (this.variable.defaultMethodCall === "[..]") {
+                        let originalString = rhs.toString();
+                        console.log("ori string: " + originalString);
+                        let slicePosition = this.variable.holes[2].number;
+                        console.log("slicePos: " + slicePosition);
+                        console.log(this.value.toString());
+                        let newString = originalString.slice(0, slicePosition) + this.value.toString()
+                            + originalString.slice(slicePosition + 1);
+                        console.log("new String: " + newString);
+                        this.value = new StringValueExpr(newString);
+                    }
+                }
+
+
                 if (result instanceof Promise) {
                     return result.then(() => {
                         return Promise.reject("AssignExpr: RHS cannot reduce");
@@ -538,6 +592,62 @@ class AssignExpr extends Expression {
             }
             return Promise.reject("AssignExpr: incomplete");
         }
+
+
+        console.log("this.canReduce() == true!!");
+
+        this.value = this.value.reduce();
+
+        if (this.value instanceof ArrayObjectExpr) {
+            this.value = this.value.baseArray;
+        }
+        if (this.value instanceof StringObjectExpr) {
+            this.value = this.value.baseStringValue;
+        }
+
+        console.log("This.Variable and This.Variable.name and This.Value");
+        console.log(this.variable);
+        console.log(this.variable.name);
+        console.log(this.value);
+
+        if (this.variable instanceof ArrayObjectExpr) {
+            let rhs = this.variable.baseArray.reduce();
+            console.log("RHS!!!!!!");
+            console.log(rhs);
+            this.variable.name = this.variable.baseArray.name;
+            if (this.variable.defaultMethodCall === "[..]") {
+                console.log("method call is [..]");
+                console.log("this.variable.name:");
+                console.log(this.variable.name);
+                console.log("This Value!!!!");
+                console.log(this.value);
+                this.variable.holes[2] = this.variable.holes[2].reduce();
+                console.log("index: " + this.variable.holes[2].number);
+                rhs._items[this.variable.holes[2].number] = this.value.clone();
+                this.value = rhs.clone();
+                console.log("after: rhs is:");
+                console.log(rhs);
+            }
+        }
+
+        if (this.variable instanceof StringObjectExpr) {
+            let rhs = this.variable.baseStringValue.reduce();
+            this.variable.name = this.variable.baseStringValue.name;
+            console.log("variable name: " + this.variable.name);
+            if (this.variable.defaultMethodCall === "[..]") {
+                let originalString = rhs.toString();
+                console.log("ori string: " + originalString);
+                let slicePosition = this.variable.holes[2].number;
+                console.log("slicePos: " + slicePosition);
+                console.log(this.value.toString());
+                let newString = originalString.slice(0, slicePosition) + this.value.toString()
+                    + originalString.slice(slicePosition + 1);
+                console.log("new String: " + newString);
+                this.value = new StringValueExpr(newString);
+            }
+        }
+
+
 
         let starter = Promise.resolve();
         if (this.variable instanceof TypeInTextExpr) {
