@@ -1,6 +1,6 @@
 {
     "chapterName":"More Array Objects",
-    "description":"Array.length and Array [...] indices",
+    "description":"Array Methods",
     "levels": [
         {
             "goal": "(star)",
