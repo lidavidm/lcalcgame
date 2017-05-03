@@ -365,6 +365,7 @@ class Expression extends mag.RoundedRect {
 
     // * Swaps this expression for its reduction (if one exists) in the expression hierarchy.
     performReduction() {
+        console.log("called performReduction");
         var reduced_expr = this.reduce();
         if (reduced_expr !== undefined && reduced_expr != this) { // Only swap if reduction returns something > null.
 
@@ -404,6 +405,7 @@ class Expression extends mag.RoundedRect {
         return Promise.resolve(this);
     }
     reduceCompletely() { // Try to reduce this expression and its subexpressions as completely as possible.
+        console.log("called reduce completely");
         let e = this;
         e.update();
         let prev_holes = e.holes;
