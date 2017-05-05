@@ -59,10 +59,13 @@ class StringObjectExpr extends ObjectExtensionExpr {
                 }
             },
         });
-        this.string = baseString.value();
-        this.primitiveName = baseString.value();
         //text.color = "OrangeRed";
         this.color = "YellowGreen";
+
+        console.log("baseString:");
+        console.log(baseString);
+        //this.string = baseString;
+        //this.primitiveName = baseString;
 
         if (!defaultMethodCall) {}
         else if (defaultMethodCall in this.objMethods) {
@@ -84,7 +87,10 @@ class StringObjectExpr extends ObjectExtensionExpr {
     */
 
     toString() {
-        return this.primitiveName;
+        if (this.baseStringValue.canReduce())
+            return this.baseStringValue.reduceCompletely().toString();
+        else
+            return this.baseStringValue.toString();
     }
 
     get constructorArgs() {
