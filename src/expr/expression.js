@@ -331,11 +331,16 @@ class Expression extends mag.RoundedRect {
     // Try and reduce the given child expression before continuing with our reduction
     performSubReduction(expr, animated=true) {
         return new Promise((resolve, reject) => {
+            console.log("inside promise");
             if (expr.isValue() || !expr.canReduce()) {
+                console.log("1");
                 resolve(expr);
+                console.log("2");
                 return;
             }
+            console.log("reached here");
             let result = expr.performReduction(animated);
+            console.log("result");
             if (result instanceof Promise) {
                 result.then((result) => {
                     if (this.stage) this.stage.draw();
