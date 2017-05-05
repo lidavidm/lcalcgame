@@ -182,6 +182,7 @@ class RepeatLoopExpr extends Expression {
     }
 
     performReduction() {
+        console.log("called perform reduction in RepeatLoopExpr");
         this._cachedSize = this.size;
 
         return this.performSubReduction(this.timesExpr).then((num) => {
@@ -321,6 +322,11 @@ class FadedRepeatLoopExpr extends Expression {
         this.holes[3] = expr;
     }
 
+    canReduce() {
+        //TODO
+        return true;
+    }
+
     get size() {
         let padding = this.padding;
         let sizes = this.getHoleSizes();
@@ -380,9 +386,13 @@ class FadedRepeatLoopExpr extends Expression {
     }
 
     performReduction() {
+        console.log("called performReduction() in FadedRepeatLoopExpr");
         if (this.canReduce()) {
+            console.log("canReduce() == true");
             return this.performSubReduction(this.timesExpr).then(() => {
                 let missing = [];
+                console.log("this.timesExpr:");
+                console.log(this.timesExpr);
                 for (let i = 0; i < this.timesExpr.number; i++) {
                     missing.push(this.bodyExpr.clone());
                 }
@@ -397,6 +407,7 @@ class FadedRepeatLoopExpr extends Expression {
             });
         }
         else {
+            console.log("canReduce() == false");
             return Promise.reject();
         }
     }
