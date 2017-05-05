@@ -422,6 +422,10 @@ class ObjectExtensionExpr extends ExpressionPlus {
     onmouseclick() {
         this.performReduction();
     }
+    canReduce() {
+        //TODO
+        return true;
+    }
     reduce() {
         console.log('reduce');
         if (this.holes[0] instanceof MissingExpression) return this;
@@ -440,10 +444,19 @@ class ObjectExtensionExpr extends ExpressionPlus {
                     return this;
                 }
             }
+            let args0 = this.holes[0];
+            if (args0.canReduce()) {
+                args0 = args0.reduceCompletely();
+            }
+
+            //console.log("args0 && this.holes[0] after reducing");
+            //console.log(args0);
+            //console.log(this.holes[0]);
+
             if (args.length > 0) // Add arguments to method call.
-                r = this.subReduceMethod(this.holes[0], ...args);
-            else r = this.subReduceMethod(this.holes[0]); // Method doesn't take arguments.
-            if (r == this.holes[0]) return this;
+                r = this.subReduceMethod(args0, ...args);
+            else r = this.subReduceMethod(args0); // Method doesn't take arguments.
+            if (r == args0) return this;
             else return r;
         } else return this;
     }
