@@ -11,69 +11,64 @@
             }
         },
         {
-            "goal": "(b)",
-            "board": "(0) (1) (2) (3)",
-            "toolbox": "(arrayobj $s `[..]) ($index) ($s)",
+            "goal": "(star)",
+            "board": "(0)",
+            "toolbox": "(arrayobj $s `[..]) ($index)",
             "globals": {
                 "s": "(bag star)",
-                "index": "(0)",
-                "index2": "(0)"
+                "index": "(0)"
             }
         },
 
         {
-            "goal": "(level3)",
-            "board": "($index) (arrayobj $array) (0) (rect)",
-            "toolbox": "(assign /(arrayobj $array `[..]) /_) ($s)（$array）",
+            "goal": "(bag rect rect)",
+            "board": "(0) (rect)",
+            "toolbox": "(assign /(arrayobj $array `[..]) /_) ($array)",
             "globals": {
-                "s": "(stringobj (somes))",
-                "array": "((bag star rect))",
-                "x": "null"
+                "array": "((bag star rect))"
             }
         },
+
         {
-            "goal": "(4)",
+            "goal": "(aade)",
             "board": "(0)",
-            "toolbox": "(assign /(stringobj $s `[..]) /(a) )",
+            "toolbox": "(assign /(stringobj $s `[..]) /(a) ) ($s)",
             "globals": {
-                "s": "(bade)",
-                "index": "(0)",
-                "x": "null"
+                "s": "(bade)"
             }
         },
         {
-            "goal": "(level5)",
-            "board": "$index",
-            "toolbox": "(assign /$x /(stringobj $s `[..]) )",
+            "goal": "(g)",
+            "board": "($index) (assign /$index /_)",
+            "toolbox": "(assign /$x /(stringobj $s `[..]) ) (0) (1) (2) (3) (4) ($x)",
             "globals": {
                 "s": "(bagar)",
-                "index": "(0)",
                 "x": "null"
             }
         },
         {
-            "goal": "(6)",
-            "board": "$index",
-            "toolbox": "(assign /$x /(arrayobj $s `[..]))",
+            "goal": "(star)",
+            "board": "($index) (assign /($index) /_)",
+            "toolbox": "(assign /$x /(arrayobj $s `[..])) ($x) (0) (1)",
             "globals": {
                 "s": "(bag star rect)",
-                "index": "(0)",
                 "x": "null"
             }
         },
+
         {
-            "goal": "(7)",
-            "board": "(0) (1) ($x)",
-            "toolbox": "(assign /(arrayobj $s `[..]) /_) (assign /$x /(star))",
+            "goal": "(bag star star)",
+            "board": "(assign /(arrayobj $s `[..]) /_) (assign /$x /(star)) ($x)",
+            "toolbox": "(0) (1)",
             "globals": {
-                "s": "(bag star rect)",
-                "index": "(0)",
+                "s": "(bag rect star)",
                 "x": "null"
             }
         },
+
         {
-            "goal": "(8)",
-            "board": "($index) ($index1)",
+            "goal": "(bag star star)",
+            "board": "($index) ($index1) ($s) ($s)",
             "toolbox": "(assign /(arrayobj $s `[..]) /(arrayobj $s `[..]))",
             "globals": {
                 "s": "(bag star rect)",
@@ -110,9 +105,9 @@
             }
         },
         {
-            "goal": "(abcdef)",
+            "goal": "(reverse_an_array)",
             "board": "(repeat /($i) /(sequence _ /(assign /$x /(arrayobj $s `[..])) /(assign /(arrayobj $s `[..]) /(arrayobj $s `[..])) /(assign /(arrayobj $s `[..]) $x) _ ))  (assign /$index /(+ /$index /1))",
-            "toolbox": "(assign /$i _) (assign /$index2 _) (-- /(arrayobj $s `length) /2) ($index) ($index) ($index2) ($index2) (- /(arrayobj $s `length) /(+ /$index /1))) (arrayobj $s)",
+            "toolbox": "($s) ($s) (assign /$i _) (assign /$index2 _) (-- /(arrayobj $s `length) /2) ($index) ($index) ($index2) ($index2) (- /(arrayobj $s `length) /(+ /$index /1))) (arrayobj $s)",
             "globals": {
                 "s": "(bag (a) (b))",
                 "index": "(0)",
