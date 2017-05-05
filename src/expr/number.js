@@ -85,7 +85,11 @@ class OperatorExpr extends Expression {
     }
 
     onmouseclick() {
-        this.performUserReduction();
+        //this.performUserReduction();
+        console.log("clicked Operator Expression!!");
+        if (!this._animating) {
+            this.performReduction();
+        }
     }
 
     toString() {
@@ -149,9 +153,11 @@ class DivisionExpr extends OperatorExpr {
 
     reduce() {
         if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {
+            console.log("reducing division expression");
             return new (ExprManager.getClass('number'))(this.leftExpr.value() / this.rightExpr.value());
         }
         else {
+            console.log("reduce failed!!");
             return this;
         }
     }
