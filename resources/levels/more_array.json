@@ -83,7 +83,7 @@
             }
         },
         {
-            "goal": "(abcdef)",
+            "goal": "(swap_two_elements)",
             "board": "(sequence /(assign /$x /(arrayobj $s `[..])) /(assign /(arrayobj $s `[..]) /(arrayobj $s `[..])) /(assign /(arrayobj $s `[..]) $x) )",
             "toolbox": "(0) (1) (0) (1) ($s)",
             "globals": {
@@ -91,6 +91,22 @@
                 "index": "(0)",
                 "index2": "null",
                 "x": "null"
+            }
+        },
+        {
+            "goal": "(test_array.length_method)",
+            "board": "(arrayobj $s `length)",
+            "toolbox": "",
+            "globals": {
+                "s": "(bag (a) (b))"
+            }
+        },
+        {
+            "goal": "(test_division)",
+            "board": "(-- /4 /2)",
+            "toolbox": "",
+            "globals": {
+                "s": "(bag (a) (b))"
             }
         },
         {
