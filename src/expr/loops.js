@@ -39,6 +39,32 @@ class RepeatLoopExpr extends Expression {
             this.bodyExpr && this.bodyExpr.isComplete();
     }
 
+    // Properly implement reduce()/canReduce() so they don't modify
+    // the original expr and cause trouble
+    reduce() {
+        if (this.canReduce() && this.timesExpr instanceof NumberExpr) {
+            return this.reduceCompletely();
+        }
+        return this;
+    }
+
+    reduceCompletely() {
+        if (this.canReduce()) {
+            let times = this.timesExpr.reduceCompletely().value();
+            if (!Number.isInteger(times)) return this;
+            let missing = [];
+            for (let i = 0; i < times; i++) {
+                let e = this.bodyExpr.clone();
+                missing.push(e);
+            }
+            let template = new (ExprManager.getClass('sequence'))(...missing);
+            template.lockSubexpressions();
+
+            return template;
+        }
+        return this;
+    }
+
     update() {
         super.update();
 
@@ -49,7 +75,9 @@ class RepeatLoopExpr extends Expression {
         if (this.timesExpr instanceof NumberExpr) {
             let missing = [];
             for (let i = 0; i < this.timesExpr.number; i++) {
-                missing.push(this.bodyExpr.clone());
+                let e = new Expression();
+                e._size = { w: this.bodyExpr.size.w, h: e.size.h };
+                missing.push(e);
             }
             this.template = new (ExprManager.getClass('sequence'))(...missing);
             this.template.lockSubexpressions();
@@ -201,8 +229,13 @@ class RepeatLoopExpr extends Expression {
                 let x = this.template.pos.x;
                 let y = this.template.pos.y;
 
+                // Reduce instantly if we're a child of something else
                 if (this.parent) {
                     index = this.template.subexpressions.length + 1;
+                    for (let i = 0; i < this.template.subexpressions.length; i++) {
+                        this.template.subexpressions[i] = this.bodyExpr.clone();
+                    }
+                    this.template.update();
                 }
 
                 let nextStep = () => {
@@ -245,14 +278,17 @@ class RepeatLoopExpr extends Expression {
                             y -= expr.size.h * expr.scale.y;
                         }
 
+                        Resource.play('printer');
                         Animate.tween(this.template, {
                             pos: {
                                 x: x,
                                 y: y,
                             },
-                        }, 300).after(() => {
+                        }, 400).after(() => {
                             let oldOffset = this.bodyExpr.shadowOffset;
+                            let body = this.bodyExpr.clone();
 
+                            Resource.play('stamp');
                             Animate.tween(this, {
                                 _leverAngle: 0,
                             }, 400);
@@ -264,7 +300,8 @@ class RepeatLoopExpr extends Expression {
                                 },
                             }, 400).after(() => {
                                 for (let i = 0; i < numExprs; i++) {
-                                    this.template.subexpressions[index + i].opacity = 1.0;
+                                    this.template.subexpressions[index + i] = body.clone();
+                                    this.template.update();
                                 }
                                 index += numExprs;
 

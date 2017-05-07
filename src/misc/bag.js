@@ -1,5 +1,3 @@
-
-
 class Bag extends mag.Circle {
     constructor(x, y, rad, includeInner=true) {
         super(x, y, rad);

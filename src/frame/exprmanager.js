@@ -14,6 +14,7 @@ var ExprManager = (function() {
         '_b':       [MissingKeyExpression, MissingBooleanExpression],
         '_t':       [TypeInTextExpr],
         '_n':       [MissingNumberExpression],
+        '_v':       [MissingChestExpression, MissingVariableExpression],
         'true':     [KeyTrueExpr, TrueExpr],
         'false':    [KeyFalseExpr, FalseExpr],
         'number':   [NumberExpr, FadedNumberExpr],
@@ -34,8 +35,7 @@ var ExprManager = (function() {
         'put':      [PutExpr],
         'pop':      [PopExpr],
         'define':   [DefineExpr],
-        'var':      [LambdaVarExpr, HalfFadedLambdaVarExpr, FadedLambdaVarExpr, FadedLambdaVarExpr],
-        'reference':[JumpingChestVarExpr, ChestVarExpr, LabeledChestVarExpr, LabeledVarExpr, VtableVarExpr],
+        'var':      [LambdaVarExpr, HalfFadedLambdaVarExpr, FadedLambdaVarExpr, FadedLambdaVarExpr, JumpingChestVarExpr, ChestVarExpr, LabeledChestVarExpr, LabeledVarExpr, VtableVarExpr],
         'reference_display':[DisplayChest, LabeledDisplayChest, SpreadsheetDisplay],
         'environment_display':[EnvironmentDisplay, SpreadsheetEnvironmentDisplay],
         'hole':     [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedLambdaHoleExpr, FadedES6LambdaHoleExpr, DelayedFadedES6LambdaHoleExpr],
@@ -136,14 +136,7 @@ var ExprManager = (function() {
 
         //let is_primitive = primitives.indexOf(ename) > -1;
 
-        if ((ename === 'var' || ename === 'hole') && 'lambda' in fade_levels) {
-            let max = pub.getNumOfFadeLevels(ename) - 1;
-            let fl = pub.getFadeLevel('lambda');
-            if (fl > max) return max;
-            else          return fl;
-        }
-
-        else if (ename in fade_levels) {
+        if (ename in fade_levels) {
 
             let lvl_map = fade_levels[ename];
             let cur_level = 0;

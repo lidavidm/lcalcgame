@@ -275,6 +275,37 @@ class BagExpr extends CollectionExpr {
     }
 }
 
+class BracketBag extends Expression {
+    constructor() {
+        super();
+
+        this.l_brak = new TextExpr('[');
+        this.r_brak = new TextExpr(']');
+        this.addArg(this.l_brak);
+        this.addArg(this.r_brak);
+
+        this.padding = { left:10, inner:0, right:20 };
+    }
+
+    reset() {
+        this.holes = [this.l_brak, this.r_brak];
+    }
+
+    swap(arg, otherArg) {
+        if (this.parent) {
+            let items = this.parent.items.slice();
+            for (let i = 0; i < items.length; i++) {
+                if (items[i] == arg) {
+                    items[i] = otherArg;
+                }
+            }
+            this.parent.items = items;
+        }
+
+        super.swap(arg, otherArg);
+    }
+}
+
 /** "Faded" variant of a BagExpr. */
 class BracketArrayExpr extends BagExpr {
     constructor(x, y, w, h, holding=[]) {
@@ -284,23 +315,15 @@ class BracketArrayExpr extends BagExpr {
         this.children = [];
 
         // This becomes graphicNode.
-        this.addArg(new Expression());
+        this.addArg(new BracketBag());
 
         this._items = holding;
-
-        this.l_brak = new TextExpr('[');
-        this.r_brak = new TextExpr(']');
-        this.graphicNode.addArg(this.l_brak);
-        this.graphicNode.addArg(this.r_brak);
-
-        this.graphicNode.padding = { left:10, inner:0, right:20 };
 
         //this.color = "tan";
     }
     get items() { return this._items.slice(); }
     set items(items) {
         this._items.forEach((item) => this.graphicNode.removeArg(item));
-        this.graphicNode.holes = [this.l_brak, this.r_brak];
         this._items = [];
         items.forEach((item) => {
             this.addItem(item);
@@ -310,7 +333,7 @@ class BracketArrayExpr extends BagExpr {
     get delegateToInner() { return true; }
     clone(parent=null) {
         let c = new BracketArrayExpr(this.pos.x, this.pos.y, this.size.w, this.size.h);
-        c.graphicNode.holes = [c.l_brak, c.r_brak];
+        c.graphicNode.reset();
         this.items.forEach((i) => {
             if (!(i instanceof TextExpr))
                 c.addItem(i.clone());
@@ -409,7 +432,7 @@ class BracketArrayExpr extends BagExpr {
 
         // Set the items in the bag back to nothing.
         this.items = [];
-        this.graphicNode.holes = [this.l_brak, this.r_brak]; // just to be sure!
+        this.graphicNode.reset(); // just to be sure!
         this.graphicNode.update();
 
         // Log changes

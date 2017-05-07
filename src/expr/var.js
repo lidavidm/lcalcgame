@@ -82,6 +82,21 @@ class VarExpr extends Expression {
         return value;
     }
 
+    isPlaceholder() {
+        if (this.canReduce()) return false;
+        if (this.parent) {
+            if (this.rootParent instanceof Sequence) return false;
+            if (this.parent instanceof AssignExpr) {
+                return this.parent.variable != this;
+            }
+        }
+        return true;
+    }
+
+    animatePlaceholderStatus() {
+        if (!this.canReduce()) this.performReduction();
+    }
+
     onmouseclick() {
         this.performReduction();
     }
@@ -251,7 +266,8 @@ class ChestVarExpr extends VarExpr {
             return this.animateReduction(value, true);
         }
         else if (animated) {
-            this.animateReduction(new TextExpr("?"), false).then((wat) => {
+            let wat = new TextExpr("?");
+            this.animateReduction(wat, false).then((wat) => {
                 this._opened = false;
                 window.setTimeout(() => {
                     Animate.poof(wat);
@@ -268,9 +284,16 @@ class ChestVarExpr extends VarExpr {
         let stage = this.stage;
 
         value = value.clone();
-        stage.add(value);
-        value.scale = { x: 0.1, y: 0.1 };
         value.anchor = { x: 0.5, y: 0.5 };
+        stage.add(value);
+        value.update();
+
+        let target = {
+            x: this.absolutePos.x - this.anchor.x * this.size.w + 0.5 * this.size.w,
+            y: this.absolutePos.y - value.size.h,
+        };
+
+        value.scale = { x: 0.1, y: 0.1 };
         value.update();
         value.pos = {
             x: this.absolutePos.x - this.anchor.x * this.size.w + 0.5 * this.size.w,
@@ -286,10 +309,7 @@ class ChestVarExpr extends VarExpr {
             Resource.play('come-out');
             Animate.tween(value, {
                 scale: { x: 1.0, y: 1.0 },
-                pos: {
-                    x: this.absolutePos.x + 0.5 * this.size.w - 0.5 * value.size.w,
-                    y: this.absolutePos.y - value.size.h,
-                },
+                pos: target,
             }, 500).after(() => {
                 window.setTimeout(() => {
                     if (destroy) {
@@ -400,7 +420,7 @@ class AssignExpr extends Expression {
             this.addArg(variable);
         }
         else {
-            let missing = new MissingChestExpression(new VarExpr("_"));
+            let missing = new (ExprManager.getClass('_v'))(new VarExpr("_"));
             missing.acceptedClasses = [VarExpr];
             this.addArg(missing);
         }
@@ -554,11 +574,23 @@ class AssignExpr extends Expression {
                 return Promise.resolve(null);
             }
 
-            return this.performSubReduction(this.value, true).then((value) => {
+            let promise;
+            // Don't need as much delay if we're using
+            // performSubReduction, since it pauses for us
+            let delay = 200;
+            if (this.value.isValue()) {
+                promise = Promise.resolve(this.value);
+                delay = 500;
+            }
+            else {
+                promise = this.performSubReduction(this.value, true);
+            }
+
+            return promise.then((value) => {
                 this.value = value;
                 this.update();
                 if (this.stage) this.stage.draw();
-                return after(500).then(() => this.animateReduction());
+                return after(delay).then(() => this.animateReduction());
             });
         });
     }
@@ -625,12 +657,31 @@ class JumpingAssignExpr extends AssignExpr {
                 }
                 else {
                     if (Object.keys(this.stage.environmentDisplay.bindings).length === 0) {
-                        targetPos = this.stage.environmentDisplay.absolutePos;
+                        targetPos = clonePos(this.stage.environmentDisplay.absolutePos);
+                        targetPos.y += this.stage.environmentDisplay.padding.inner;
                     }
                     else {
-                        let contents = this.stage.environmentDisplay.contents;
-                        let last = contents[contents.length - 1];
-                        targetPos = addPos(last.absolutePos, { x: 0, y: last.absoluteSize.h + this.stage.environmentDisplay.padding });
+                        let contents = this.stage.environmentDisplay.bindings;
+                        let maxY = 0;
+                        let last;
+                        for (let binding of Object.keys(contents)) {
+                            binding = contents[binding];
+                            let ap = binding.absolutePos;
+                            if (ap.y > maxY) {
+                                maxY = ap.y;
+                                last = binding;
+                            }
+                        }
+                        if (last) {
+                            targetPos = addPos(last.absolutePos, {
+                                x: 0,
+                                y: last.absoluteSize.h + this.stage.environmentDisplay.padding.inner
+                            });
+                        }
+                        else {
+                            targetPos = clonePos(this.stage.environmentDisplay.absolutePos);
+                            targetPos.y += this.stage.environmentDisplay.padding.inner;
+                        }
                     }
 
                     value = new (ExprManager.getClass('reference_display'))(this.variable.name, this.value.clone());
@@ -643,6 +694,7 @@ class JumpingAssignExpr extends AssignExpr {
                     pos: targetPos,
                     scale: { x: 0.7, y: 0.7 },
                 };
+                value.update();
 
                 let lerp = arcLerp(value.absolutePos.y, targetPos.y, -150);
                 Resource.play('fly-to');
@@ -751,9 +803,17 @@ class VtableVarExpr extends ObjectExtensionExpr {
             }
         }
         else {
-            let result = this.reduce();
-            (this.parent || this.stage).swap(this, result);
-            return result;
+            let parent = this.parent || this.stage;
+            let surrogate = this.createSurrogate();
+            parent.swap(this, surrogate);
+            surrogate.ignoreEvents = true;
+            surrogate._reducing = true;
+            surrogate.animateReducingStatus();
+            return after(800).then(() => {
+                let result = surrogate.reduce();
+                parent.swap(surrogate, result);
+                return result;
+            });
         }
     }
 
@@ -772,13 +832,7 @@ class VtableVarExpr extends ObjectExtensionExpr {
         }
     }
 
-    reduce() {
-        if ((!this.hasVtable || !this.subReduceMethod) && !this.variable.canReduce()) {
-            return this;
-        }
-        if (!this.hasVtable) return this.value;
-        if (!this.subReduceMethod) return this.value;
-
+    createSurrogate() {
         // Use a surrogate to do the actual reduction, so that (1) we
         // can use the actual object's reduce() method (this is
         // important for ArrayObjectExpr which does some
@@ -792,8 +846,18 @@ class VtableVarExpr extends ObjectExtensionExpr {
         }
 
         surrogate.parent = this;  // In case the surrogate needs our environment
-        surrogate.setExtension("", this.subReduceMethod, this.methodArgs);
+        surrogate.setExtension(this.subReduceText, this.subReduceMethod, this.methodArgs);
+        return surrogate;
+    }
 
+    reduce() {
+        if ((!this.hasVtable || !this.subReduceMethod) && !this.variable.canReduce()) {
+            return this;
+        }
+        if (!this.hasVtable) return this.value;
+        if (!this.subReduceMethod) return this.value;
+
+        let surrogate = this.createSurrogate();
         return surrogate.reduce();
     }
 }

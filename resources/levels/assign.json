@@ -8,6 +8,7 @@
             "toolbox": "(star) (rect) (triangle)",
             "goal": "(false)",
             "fade": {
+                "var": 4,
                 "primitives": 1
             }
         },
@@ -51,13 +52,17 @@
             "toolbox": "(triangle) (star)",
             "globals": {
                 "x": "(rect)"
+            },
+            "fade": {
+                "assign": 1,
+                "var": 5
             }
         },
         {
             "description": "Assign to an undefined variable.",
-            "board": "(assign $y _) ($_y)",
+            "board": "($_y)",
             "goal": "(star)",
-            "toolbox": "(rect) (star)"
+            "toolbox": "(assign $y _) (rect) (star)"
         },
         {
             "description": "Multiple assignment.",
@@ -66,10 +71,6 @@
             "toolbox": "(triangle) (star)",
             "globals": {
                 "x": "(rect)"
-            },
-            "fade": {
-                "assign": 1,
-                "reference": 1
             }
         },
         {
@@ -81,7 +82,7 @@
             },
             "fade": {
                 "assign": 2,
-                "reference": 2,
+                "var": 6,
                 "reference_display": 1
             }
         },
@@ -96,12 +97,12 @@
         },
         {
             "description": "Choose where to assign.",
-            "board": "(assign _ /star)",
+            "board": "(assign _v /star)",
             "goal": "(star) (triangle)",
             "toolbox": "($_x) ($_x) ($_y) ($_y)",
             "globals": {
-                "x": "(rect)",
-                "y": "(triangle)"
+                "x": "(triangle)",
+                "y": "(rect)"
             }
         },
         {
@@ -136,7 +137,7 @@
             "description": "Make things equal first",
             "board": "(== $x $y)",
             "goal": "(true)",
-            "toolbox": "(assign _ _) ($x) ($y)",
+            "toolbox": "(assign _v _) ($x) ($y)",
             "globals": {
                 "x": "(rect)",
                 "y": "(triangle)"
@@ -209,7 +210,7 @@
             "description": "Comparing bags",
             "board": "(== $x $y)",
             "goal": "(true)",
-            "toolbox": "(assign _ _) ($x) ($y)",
+            "toolbox": "(assign _v _) ($x) ($y)",
             "globals": {
                 "x": "(bag star)"
             }
@@ -232,17 +233,18 @@
                 "y": "(star)"
             },
             "fade": {
-                "reference": 3,
+                "var": 7,
                 "assign": 2,
                 "reference_display": 2,
-                "environment_display": 1
+                "environment_display": 1,
+                "_v": 1
             }
         },
         {
             "description": "Fade out variables II",
             "board": "(if $x $y)",
             "goal": "(rect)",
-            "toolbox": "(assign _ _) ($x) ($y) (rect) (star)",
+            "toolbox": "(assign _v _) ($x) ($y) (rect) (star)",
             "globals": {
                 "x": "(true)"
             }
