@@ -441,7 +441,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
                         } else {
                             parent.opacity = 1;
                             parent.ignoreEvents = true;
-                            Animate.tween(parent, { opacity: 0 }, 400, function (elapsed) {
+                            Animate.tween(parent, { opacity: 0 }, 200, function (elapsed) {
                                 return Math.pow(elapsed, 0.5);
                             }).after(function () {
                                 stage.remove(parent);

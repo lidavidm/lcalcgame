@@ -359,7 +359,7 @@ class LambdaHoleExpr extends MissingExpression {
                     } else {
                         parent.opacity = 1;
                         parent.ignoreEvents = true;
-                        Animate.tween(parent, { opacity:0 }, 400, (elapsed) => Math.pow(elapsed, 0.5)).after(() => {
+                        Animate.tween(parent, { opacity:0 }, 200, (elapsed) => Math.pow(elapsed, 0.5)).after(() => {
                             stage.remove(parent);
                             stage.update();
                         });
