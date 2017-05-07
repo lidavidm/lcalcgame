@@ -63,7 +63,7 @@
         },
         {
             "description": "Increment things with repeat",
-            "board": "$x (repeat /2 /(assign $x /(+ $x /1)))",
+            "board": "($x) (repeat /2 /(assign $x /(+ $x /1)))",
             "goal": "(3)",
             "toolbox": "",
             "globals": {
@@ -100,7 +100,7 @@
         },
         {
             "description": "You can repeat a variable number of times",
-            "board": "(sequence /(repeat $x /(assign $x /(+ $x /1))) /(assign $y /(== $x _))) $y",
+            "board": "(sequence /(repeat $x /(assign $x /(+ $x /1))) /(assign $y /(== $x _))) ($y)",
             "toolbox": "(4) (5) (6)",
             "goal": "(true)",
             "globals": {

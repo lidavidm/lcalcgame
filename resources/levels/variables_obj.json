@@ -4,27 +4,6 @@
     "language": "JavaScript",
     "levels": [
         {
-            "goal": "'rect'",
-            "board": [],
-            "toolbox": ["x", "y"],
-            "globals": {
-                "x": "(arrayobj /(bag /triangle /star))",
-                "y": "(arrayobj /(bag /star /rect))"
-            }
-        },
-        {
-            "goal": "'rect'",
-            "board": [],
-            "toolbox": ["x", "y"],
-            "globals": {
-                "x": "(arrayobj /(bag /triangle /star))",
-                "y": "(arrayobj /(bag /star /rect))"
-            },
-            "fade": {
-                "reference": 4
-            }
-        },
-        {
             "goal": "'triangle'",
             "board": ["_ = x", "z"],
             "toolbox": ["y", "z"],
@@ -41,29 +20,83 @@
             }
         },
         {
-            "goal": "'star'",
-            "board": ["x = _t_any; y = x", "y"],
+            "goal": "'rice'",
+            "board": ["x = _t_single; y = x", "y"],
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "goal": "false",
+            "board": ["_t_variable = 'bread'; b = 'rice'; k = a == b", "k"],
             "toolbox": "",
             "globals": {
             }
         },
         {
             "goal": "true",
-            "board": ["_t_variable = _t_any; _t_variable = 'triangle'; answer = x == y", "answer"],
+            "board": ["_t_variable = _t_single; _t_variable = 'rice'; k = x == y", "k"],
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "goal": "'leftovers'",
+            "board": ["_t_variable = 'chow'; y = 'rice'; k = x == y", "k ? 'rice' : null", "'leftovers'"],
+            "toolbox": "",
+            "globals": {
+                "k": "(true)"
+            }
+        },
+        {
+            "goal": "'cat'",
+            "board": ["_t_variable = 'kitty'; _t_variable = _t_single; k = (_t_single == _t_single)", "k ? 'cat' : 'dog'"],
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "goal": "'prize'",
+            "board": ["a = _t_single; b = a ? 'prize' : null", "b"],
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "goal": "'prize'",
+            "board": ["_t_single; b = a ? 'prize' : null", "b"],
             "toolbox": "",
             "globals": {
             }
         },
         {
             "goal": "'rect'",
-            "board": ["_t_any"],
-            "toolbox": [],
+            "board": [],
+            "toolbox": ["x", "y"],
             "globals": {
                 "x": "(arrayobj /(bag /triangle /star))",
                 "y": "(arrayobj /(bag /star /rect))"
             },
             "fade": {
-                "reference": 4
+                "reference": 8
+            }
+        },
+        {
+            "goal": "'rect'",
+            "board": [],
+            "toolbox": ["x", "y"],
+            "globals": {
+                "x": "(arrayobj /(bag /triangle /star))",
+                "y": "(arrayobj /(bag /star /rect))"
+            }
+        },
+        {
+            "goal": "'rice'",
+            "board": ["_t_single"],
+            "toolbox": [],
+            "globals": {
+                "x": "(arrayobj /(bag /rice /bread))",
+                "y": "(arrayobj /(bag /bread /rice))"
             }
         }
     ],
