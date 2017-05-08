@@ -617,9 +617,7 @@ var mag = function (_) {
                         var holes = n.holes ? n.holes.filter(function (e) {
                             return e instanceof Expression;
                         }) : [];
-                        if (n instanceof LambdaExpr) holes = holes.filter(function (e) {
-                            return e instanceof LambdaHoleExpr || e instanceof MissingExpression;
-                        });
+                        //if (n instanceof LambdaExpr) holes = holes.filter((e) => (e instanceof LambdaHoleExpr || e instanceof MissingExpression));
                         if (!(n instanceof BracketArrayExpr || n instanceof FadedES6LambdaHoleExpr)) {
                             if (holes.length > 0) {
                                 var subintersections = _this6.getHitNodesIntersecting(node, options, holes);

@@ -519,7 +519,7 @@ var mag = (function(_) {
                     // Give priority to intersections with child nodes (recursively)
                     //console.log('intersects', node, n);
                     let holes = n.holes ? n.holes.filter((e) => (e instanceof Expression)) : [];
-                    if (n instanceof LambdaExpr) holes = holes.filter((e) => (e instanceof LambdaHoleExpr || e instanceof MissingExpression));
+                    //if (n instanceof LambdaExpr) holes = holes.filter((e) => (e instanceof LambdaHoleExpr || e instanceof MissingExpression));
                     if (!(n instanceof BracketArrayExpr || n instanceof FadedES6LambdaHoleExpr)) {
                         if (holes.length > 0) {
                             let subintersections = this.getHitNodesIntersecting(node, options, holes);
