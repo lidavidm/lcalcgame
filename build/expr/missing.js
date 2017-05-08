@@ -378,14 +378,23 @@ var MissingChestExpression = function (_MissingTypedExpressi3) {
 
         var _this7 = _possibleConstructorReturn(this, (MissingChestExpression.__proto__ || Object.getPrototypeOf(MissingChestExpression)).call(this, expr_to_miss));
 
-        _this7.label = new TextExpr("xy");
-        _this7.label.color = "#AAA";
-        _this7.addArg(_this7.label);
+        _this7.initialize();
         _this7.acceptedClasses = [VarExpr, VtableVarExpr];
         return _this7;
     }
 
     _createClass(MissingChestExpression, [{
+        key: 'initialize',
+        value: function initialize() {
+            this.image = new mag.ImageRect(0, 0, 48, 48, 'chest-silhouette');
+            this.addArg(this.image);
+        }
+    }, {
+        key: 'hitsChild',
+        value: function hitsChild() {
+            return null;
+        }
+    }, {
         key: 'getClass',
         value: function getClass() {
             return MissingChestExpression;
@@ -399,6 +408,32 @@ var MissingChestExpression = function (_MissingTypedExpressi3) {
 
     return MissingChestExpression;
 }(MissingTypedExpression);
+
+var MissingVariableExpression = function (_MissingChestExpressi) {
+    _inherits(MissingVariableExpression, _MissingChestExpressi);
+
+    function MissingVariableExpression() {
+        _classCallCheck(this, MissingVariableExpression);
+
+        return _possibleConstructorReturn(this, (MissingVariableExpression.__proto__ || Object.getPrototypeOf(MissingVariableExpression)).apply(this, arguments));
+    }
+
+    _createClass(MissingVariableExpression, [{
+        key: 'getClass',
+        value: function getClass() {
+            return MissingVariableExpression;
+        }
+    }, {
+        key: 'initialize',
+        value: function initialize() {
+            this.label = new TextExpr("xy");
+            this.label.color = "#AAA";
+            this.addArg(this.label);
+        }
+    }]);
+
+    return MissingVariableExpression;
+}(MissingChestExpression);
 
 var MissingSequenceExpression = function (_MissingExpression2) {
     _inherits(MissingSequenceExpression, _MissingExpression2);
@@ -459,12 +494,12 @@ var MissingNumberExpression = function (_MissingTypedExpressi4) {
     function MissingNumberExpression(expr_to_miss) {
         _classCallCheck(this, MissingNumberExpression);
 
-        var _this10 = _possibleConstructorReturn(this, (MissingNumberExpression.__proto__ || Object.getPrototypeOf(MissingNumberExpression)).call(this, expr_to_miss));
+        var _this11 = _possibleConstructorReturn(this, (MissingNumberExpression.__proto__ || Object.getPrototypeOf(MissingNumberExpression)).call(this, expr_to_miss));
 
-        _this10.graphicNode = new mag.ImageRect(0, 0, 24, 32, 'die');
+        _this11.graphicNode = new mag.ImageRect(0, 0, 24, 32, 'die');
 
-        _this10.acceptedClasses = [VarExpr, NumberExpr];
-        return _this10;
+        _this11.acceptedClasses = [VarExpr, NumberExpr];
+        return _this11;
     }
 
     _createClass(MissingNumberExpression, [{

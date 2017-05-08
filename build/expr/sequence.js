@@ -235,20 +235,6 @@ var Sequence = function (_Expression) {
             this.performUserReduction();
         }
     }, {
-        key: "drawReductionIndicator",
-        value: function drawReductionIndicator(ctx, pos, boundingSize) {
-            if (this._reducing) {
-                var radius = this.radius * this.absoluteScale.x;
-                var rightMargin = 15 * this.scale.x;
-
-                var rad = rightMargin / 3;
-                var indicatorX = pos.x + boundingSize.w - rightMargin / 2 - rad;
-                var verticalDistance = boundingSize.h - 2 * this.radius;
-                var verticalOffset = 0.5 * (1.0 + Math.sin(this._reducingTime / 250)) * verticalDistance;
-                drawCircle(ctx, indicatorX, pos.y + radius + verticalOffset, rad, "lightblue", null);
-            }
-        }
-    }, {
         key: "toString",
         value: function toString() {
             return (this.locked ? '/' : '') + "(sequence " + this.subexpressions.map(function (x) {

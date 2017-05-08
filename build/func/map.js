@@ -141,8 +141,10 @@ var MapFunc = function (_FuncExpr) {
                     superReduce = function superReduce() {
                         _this3.bag = bagCopy;
                         _this3.update();
-                        _this3.bag = _get(MapFunc.prototype.__proto__ || Object.getPrototypeOf(MapFunc.prototype), 'performReduction', _this3).call(_this3);
-                        stage.draw();
+                        return _get(MapFunc.prototype.__proto__ || Object.getPrototypeOf(MapFunc.prototype), 'performReduction', _this3).call(_this3).then(function (bag) {
+                            _this3.bag = bag;
+                            stage.draw();
+                        });
                     };
 
                     // Run 'map' animation.
@@ -152,9 +154,10 @@ var MapFunc = function (_FuncExpr) {
 
                         // debug
                         if (!_this3.animatedReduction) {
-                            superReduce();
-                            _this3.bag.spill(false); // don't log this spill
-                            stage.remove(_this3.bag);
+                            superReduce().then(function () {
+                                _this3.bag.spill(false); // don't log this spill
+                                stage.remove(_this3.bag);
+                            });
                             return {
                                 v: void 0
                             };

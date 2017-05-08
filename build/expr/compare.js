@@ -81,13 +81,20 @@ var CompareExpr = function (_Expression) {
                 var animations = [];
                 var genSubreduceAnimation = function genSubreduceAnimation(expr) {
                     var before = expr;
-                    var prom = _this2.performSubReduction(expr, true).then(function () {
-                        if (expr != before) return Promise.resolve();else return Promise.reject("@ CompareExpr.performReduction: Subexpression did not reduce!");
+                    return _this2.performSubReduction(expr, true).then(function (result) {
+                        if (result != before) return Promise.resolve();else return Promise.reject("@ CompareExpr.performReduction: Subexpression did not reduce!");
                     });
                 };
                 if (!this.leftExpr.isValue()) animations.push(genSubreduceAnimation(this.leftExpr));
                 if (!this.rightExpr.isValue()) animations.push(genSubreduceAnimation(this.rightExpr));
-                return Promise.all(animations);
+                return Promise.all(animations).then(function () {
+                    if (_this2.reduce() != _this2) {
+                        return after(500).then(function () {
+                            return _this2.performReduction(animated);
+                        });
+                    }
+                    return Promise.reject("@ CompareExpr.performReduction: Subexpressions did not reduce!");
+                });
             }
             if (this.reduce() != this) {
                 console.log('reducing');

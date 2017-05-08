@@ -438,6 +438,7 @@ var mag = function (_) {
                 };
                 var hit_nodes = this.getHitNodesIntersecting(node, { 'exclude': [node] });
                 var hit = null;
+                console.log('under-nodes:', hit_nodes);
                 if (hit_nodes.length > 0) {
                     (function () {
 
@@ -452,6 +453,7 @@ var mag = function (_) {
                         }
                     })();
                 }
+                console.log('nodeUnder:', hit);
                 return hit;
             }
         }, {
@@ -611,16 +613,24 @@ var mag = function (_) {
                     if (intersects(nodeBounds, hitNodeBounds)) {
 
                         // Give priority to intersections with child nodes (recursively)
+                        //console.log('intersects', node, n);
                         var holes = n.holes ? n.holes.filter(function (e) {
                             return e instanceof Expression;
                         }) : [];
-                        if (holes.length > 0) {
-                            var subintersections = _this6.getHitNodesIntersecting(node, options, holes);
-                            if (subintersections.length > 0) {
-                                hits = hits.concat(subintersections);
-                                return;
+                        if (n instanceof LambdaExpr) holes = holes.filter(function (e) {
+                            return e instanceof LambdaHoleExpr || e instanceof MissingExpression;
+                        });
+                        if (!(n instanceof BracketArrayExpr || n instanceof FadedES6LambdaHoleExpr)) {
+                            if (holes.length > 0) {
+                                var subintersections = _this6.getHitNodesIntersecting(node, options, holes);
+                                if (subintersections.length > 0) {
+                                    hits = hits.concat(subintersections);
+                                    return;
+                                }
                             }
                         }
+
+                        if (n instanceof LambdaHoleExpr && node instanceof LambdaExpr) console.log('lambda intersects', node, n);
 
                         // Get the intersection rectangle and its center point:
                         var intersection = rectFromIntersection(nodeBounds, hitNodeBounds);
@@ -631,6 +641,9 @@ var mag = function (_) {
                         hitnode = n.hits(center, options);
                         if (hitnode) {
                             hits.push(hitnode);
+                        } else if (n instanceof LambdaHoleExpr) {
+                            hitnode = n.hits(n.absolutePos, options);
+                            if (hitnode) hits.push(hitnode);
                         }
                     }
                 });

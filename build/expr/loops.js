@@ -43,6 +43,36 @@ var RepeatLoopExpr = function (_Expression) {
         value: function canReduce() {
             return this.timesExpr && (this.timesExpr.canReduce() || this.timesExpr.isValue()) && this.bodyExpr && this.bodyExpr.isComplete();
         }
+
+        // Properly implement reduce()/canReduce() so they don't modify
+        // the original expr and cause trouble
+
+    }, {
+        key: 'reduce',
+        value: function reduce() {
+            if (this.canReduce() && this.timesExpr instanceof NumberExpr) {
+                return this.reduceCompletely();
+            }
+            return this;
+        }
+    }, {
+        key: 'reduceCompletely',
+        value: function reduceCompletely() {
+            if (this.canReduce()) {
+                var times = this.timesExpr.reduceCompletely().value();
+                if (!Number.isInteger(times)) return this;
+                var missing = [];
+                for (var i = 0; i < times; i++) {
+                    var e = this.bodyExpr.clone();
+                    missing.push(e);
+                }
+                var template = new (Function.prototype.bind.apply(ExprManager.getClass('sequence'), [null].concat(missing)))();
+                template.lockSubexpressions();
+
+                return template;
+            }
+            return this;
+        }
     }, {
         key: 'update',
         value: function update() {
@@ -55,7 +85,9 @@ var RepeatLoopExpr = function (_Expression) {
             if (this.timesExpr instanceof NumberExpr) {
                 var missing = [];
                 for (var i = 0; i < this.timesExpr.number; i++) {
-                    missing.push(this.bodyExpr.clone());
+                    var e = new Expression();
+                    e._size = { w: this.bodyExpr.size.w, h: e.size.h };
+                    missing.push(e);
                 }
                 this.template = new (Function.prototype.bind.apply(ExprManager.getClass('sequence'), [null].concat(missing)))();
                 this.template.lockSubexpressions();
@@ -205,8 +237,13 @@ var RepeatLoopExpr = function (_Expression) {
                     var x = _this3.template.pos.x;
                     var y = _this3.template.pos.y;
 
+                    // Reduce instantly if we're a child of something else
                     if (_this3.parent) {
                         index = _this3.template.subexpressions.length + 1;
+                        for (var i = 0; i < _this3.template.subexpressions.length; i++) {
+                            _this3.template.subexpressions[i] = _this3.bodyExpr.clone();
+                        }
+                        _this3.template.update();
                     }
 
                     var nextStep = function nextStep() {
@@ -244,19 +281,22 @@ var RepeatLoopExpr = function (_Expression) {
                                     numExprs = _this3.bodyExpr.subexpressions.length;
                                 }
 
-                                for (var i = 0; i < numExprs; i++) {
-                                    var expr = _this3.template.subexpressions[index + i];
+                                for (var _i = 0; _i < numExprs; _i++) {
+                                    var expr = _this3.template.subexpressions[index + _i];
                                     y -= expr.size.h * expr.scale.y;
                                 }
 
+                                Resource.play('printer');
                                 Animate.tween(_this3.template, {
                                     pos: {
                                         x: x,
                                         y: y
                                     }
-                                }, 300).after(function () {
+                                }, 400).after(function () {
                                     var oldOffset = _this3.bodyExpr.shadowOffset;
+                                    var body = _this3.bodyExpr.clone();
 
+                                    Resource.play('stamp');
                                     Animate.tween(_this3, {
                                         _leverAngle: 0
                                     }, 400);
@@ -267,8 +307,9 @@ var RepeatLoopExpr = function (_Expression) {
                                             y: _this3.bodyExpr.pos.y + 2
                                         }
                                     }, 400).after(function () {
-                                        for (var _i = 0; _i < numExprs; _i++) {
-                                            _this3.template.subexpressions[index + _i].opacity = 1.0;
+                                        for (var _i2 = 0; _i2 < numExprs; _i2++) {
+                                            _this3.template.subexpressions[index + _i2] = body.clone();
+                                            _this3.template.update();
                                         }
                                         index += numExprs;
 

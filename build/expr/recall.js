@@ -292,9 +292,6 @@ var TypeInTextExpr = function (_TextExpr) {
         value: function fromExprCode(code, afterCommit) {
             code = code.replace('_t_', ''); // remove prepend
             var validators = {
-                'any': function any() {
-                    return true;
-                },
                 'string': function string(txt) {
                     return __PARSER.parse(txt) instanceof StringValueExpr;
                 },
@@ -450,6 +447,16 @@ var TypeInTextExpr = function (_TextExpr) {
                 }
                 return false;
             } else return true;
+        }
+    }, {
+        key: 'isComplete',
+        value: function isComplete() {
+            if (this.typeBox) {
+                var txt = this.typeBox.text.trim();
+                return this.validator(txt);
+            } else {
+                return true;
+            }
         }
     }, {
         key: 'value',

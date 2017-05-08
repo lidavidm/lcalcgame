@@ -39,6 +39,8 @@ function LOAD_REDUCT_GAMEAUDIO(Resource) {
     loadAudio('key-press-2', 'key-press-2.wav');
     loadAudio('key-press-3', 'key-press-3.wav');
     loadAudio('key-press-4', 'key-press-4.wav');
+    loadAudio('printer', '119556__vrodge__office-printer-printing.wav');
+    loadAudio('stamp', '33310__queensize__stamp.wav');
 }
 
 function LOAD_REDUCT_RESOURCES(Resource) {
@@ -70,6 +72,16 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         var lang = json.language || "reduct-scheme";
         json.levels.forEach(function (lvl) {
             lvl.language = lang;
+            if (lvl.fade) {
+                // Shorthand: specify "lambda" to fade both var and
+                // hole. If one has fewer fade levels than the other,
+                // saturate the fade level.
+                if (lvl.fade["lambda"]) {
+                    lvl.fade["var"] = Math.min(lvl.fade["lambda"], ExprManager.getNumOfFadeLevels("var"));
+                    lvl.fade["hole"] = Math.min(lvl.fade["lambda"], ExprManager.getNumOfFadeLevels("hole"));
+                    delete lvl.fade["lambda"];
+                }
+            }
             levels.push(lvl);
         });
     };
@@ -308,6 +320,12 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                 unfaded.invalidate();
                 faded.validate();
 
+                // Don't add roots that have already been processed. When
+                // fading things that are nested, we can get confused
+                // (causing us to hit the error condition below) because
+                // we will try and fade a root twice.
+                var already_faded = [];
+
                 var _iteratorNormalCompletion3 = true;
                 var _didIteratorError3 = false;
                 var _iteratorError3 = undefined;
@@ -317,8 +335,12 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                         var border = _step3.value;
 
 
-                        var unfaded_roots = unfaded.getRootNodesThatIncludeClass(border.unfadedClass);
-                        var faded_roots = faded.getRootNodesThatIncludeClass(border.fadedClass);
+                        var unfaded_roots = unfaded.getRootNodesThatIncludeClass(border.unfadedClass).filter(function (x) {
+                            return already_faded.indexOf(x) === -1;
+                        });
+                        var faded_roots = faded.getRootNodesThatIncludeClass(border.fadedClass).filter(function (x) {
+                            return already_faded.indexOf(x) === -1;
+                        });
 
                         if (unfaded_roots.length !== faded_roots.length) {
                             console.error('Cannot fade border ', border, ': Different # of root expressions.', unfaded_roots, faded_roots, unfaded.nodes, faded.nodes);
@@ -328,6 +350,9 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                         var _loop = function _loop(r) {
                             var unfaded_root = unfaded_roots[r];
                             var root = faded_roots[r];
+
+                            already_faded.push(unfaded_root);
+                            already_faded.push(root);
 
                             // DEBUG: This only works for level 50!
                             if (unfaded.uiGoalNodes.indexOf(unfaded_root) > -1) {

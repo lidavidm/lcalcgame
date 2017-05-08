@@ -601,6 +601,7 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
                 methodtxt._xOffset = -15;
                 methodtxt._sizeOffset = { w: -10, h: 0 };
             } else this.holes[0].unlock();
+            this.subReduceText = methodText;
             this.subReduceMethod = subReduceMethod;
             this.addArg(methodtxt);
 
@@ -629,6 +630,11 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
 
             this.removeChild(this.drawer);
             this.drawer = null;
+        }
+    }, {
+        key: 'isValue',
+        value: function isValue() {
+            return !this.subReduceMethod;
         }
     }, {
         key: '_setHoleScales',

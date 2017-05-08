@@ -396,7 +396,9 @@ var Expression = function (_mag$RoundedRect) {
 
             return new Promise(function (resolve, reject) {
                 if (expr.isValue() || !expr.canReduce()) {
-                    resolve(expr);
+                    after(300).then(function () {
+                        return resolve(expr);
+                    });
                     return;
                 }
                 var result = expr.performReduction(animated);
@@ -405,20 +407,15 @@ var Expression = function (_mag$RoundedRect) {
                         if (_this6.stage) _this6.stage.draw();
                         if (result instanceof Expression) result.lock();
 
-                        after(400).then(function () {
+                        after(1000).then(function () {
                             if (_this6.stage) _this6.stage.draw();
                             return resolve(result);
                         });
                     });
                 } else {
                     if (_this6.stage) _this6.stage.draw();
-                    var delay = 400;
-                    if (!result) {
-                        result = expr;
-                        delay = 0;
-                    }
                     if (result instanceof Expression && !(result instanceof MissingExpression)) result.lock();
-                    after(400).then(function () {
+                    after(1000).then(function () {
                         if (_this6.stage) _this6.stage.draw();
                         return resolve(result);
                     });

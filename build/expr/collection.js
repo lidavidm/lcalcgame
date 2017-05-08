@@ -412,6 +412,48 @@ var BagExpr = function (_CollectionExpr) {
     return BagExpr;
 }(CollectionExpr);
 
+var BracketBag = function (_Expression) {
+    _inherits(BracketBag, _Expression);
+
+    function BracketBag() {
+        _classCallCheck(this, BracketBag);
+
+        var _this8 = _possibleConstructorReturn(this, (BracketBag.__proto__ || Object.getPrototypeOf(BracketBag)).call(this));
+
+        _this8.l_brak = new TextExpr('[');
+        _this8.r_brak = new TextExpr(']');
+        _this8.addArg(_this8.l_brak);
+        _this8.addArg(_this8.r_brak);
+
+        _this8.padding = { left: 10, inner: 0, right: 20 };
+        return _this8;
+    }
+
+    _createClass(BracketBag, [{
+        key: 'reset',
+        value: function reset() {
+            this.holes = [this.l_brak, this.r_brak];
+        }
+    }, {
+        key: 'swap',
+        value: function swap(arg, otherArg) {
+            if (this.parent) {
+                var items = this.parent.items.slice();
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i] == arg) {
+                        items[i] = otherArg;
+                    }
+                }
+                this.parent.items = items;
+            }
+
+            _get(BracketBag.prototype.__proto__ || Object.getPrototypeOf(BracketBag.prototype), 'swap', this).call(this, arg, otherArg);
+        }
+    }]);
+
+    return BracketBag;
+}(Expression);
+
 /** "Faded" variant of a BagExpr. */
 
 
@@ -423,25 +465,18 @@ var BracketArrayExpr = function (_BagExpr) {
 
         _classCallCheck(this, BracketArrayExpr);
 
-        var _this8 = _possibleConstructorReturn(this, (BracketArrayExpr.__proto__ || Object.getPrototypeOf(BracketArrayExpr)).call(this, x, y, w, h, holding));
+        var _this9 = _possibleConstructorReturn(this, (BracketArrayExpr.__proto__ || Object.getPrototypeOf(BracketArrayExpr)).call(this, x, y, w, h, holding));
 
-        _this8.holes = [];
-        _this8.children = [];
+        _this9.holes = [];
+        _this9.children = [];
 
         // This becomes graphicNode.
-        _this8.addArg(new Expression());
+        _this9.addArg(new BracketBag());
 
-        _this8._items = holding;
-
-        _this8.l_brak = new TextExpr('[');
-        _this8.r_brak = new TextExpr(']');
-        _this8.graphicNode.addArg(_this8.l_brak);
-        _this8.graphicNode.addArg(_this8.r_brak);
-
-        _this8.graphicNode.padding = { left: 10, inner: 0, right: 20 };
+        _this9._items = holding;
 
         //this.color = "tan";
-        return _this8;
+        return _this9;
     }
 
     _createClass(BracketArrayExpr, [{
@@ -453,7 +488,7 @@ var BracketArrayExpr = function (_BagExpr) {
             var parent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
             var c = new BracketArrayExpr(this.pos.x, this.pos.y, this.size.w, this.size.h);
-            c.graphicNode.holes = [c.l_brak, c.r_brak];
+            c.graphicNode.reset();
             this.items.forEach(function (i) {
                 if (!(i instanceof TextExpr)) c.addItem(i.clone());
             });
@@ -509,7 +544,7 @@ var BracketArrayExpr = function (_BagExpr) {
     }, {
         key: 'spill',
         value: function spill() {
-            var _this9 = this;
+            var _this10 = this;
 
             var logspill = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
@@ -546,7 +581,7 @@ var BracketArrayExpr = function (_BagExpr) {
 
                 item = item.clone();
                 var theta = index / items.length * Math.PI * 2;
-                var rad = _this9.size.h * 2.0;
+                var rad = _this10.size.h * 2.0;
                 var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
 
                 targetPos = clipToRect(targetPos, item.absoluteSize, { x: 25, y: 0 }, { w: GLOBAL_DEFAULT_SCREENSIZE.width - 25,
@@ -558,14 +593,14 @@ var BracketArrayExpr = function (_BagExpr) {
                 });
                 //item.pos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) });
                 item.parent = null;
-                _this9.graphicNode.removeChild(item);
+                _this10.graphicNode.removeChild(item);
                 item.scale = { x: 1, y: 1 };
                 stage.add(item);
             });
 
             // Set the items in the bag back to nothing.
             this.items = [];
-            this.graphicNode.holes = [this.l_brak, this.r_brak]; // just to be sure!
+            this.graphicNode.reset(); // just to be sure!
             this.graphicNode.update();
 
             // Log changes
@@ -628,15 +663,14 @@ var BracketArrayExpr = function (_BagExpr) {
             return this._items.slice();
         },
         set: function set(items) {
-            var _this10 = this;
+            var _this11 = this;
 
             this._items.forEach(function (item) {
-                return _this10.graphicNode.removeArg(item);
+                return _this11.graphicNode.removeArg(item);
             });
-            this.graphicNode.holes = [this.l_brak, this.r_brak];
             this._items = [];
             items.forEach(function (item) {
-                _this10.addItem(item);
+                _this11.addItem(item);
             });
         }
     }, {
@@ -652,8 +686,8 @@ var BracketArrayExpr = function (_BagExpr) {
 /** Collections */
 
 
-var PutExpr = function (_Expression) {
-    _inherits(PutExpr, _Expression);
+var PutExpr = function (_Expression2) {
+    _inherits(PutExpr, _Expression2);
 
     function PutExpr(item, collection) {
         _classCallCheck(this, PutExpr);
@@ -663,10 +697,10 @@ var PutExpr = function (_Expression) {
         txt_put.color = 'black';
         txt_in.color = 'black';
 
-        var _this11 = _possibleConstructorReturn(this, (PutExpr.__proto__ || Object.getPrototypeOf(PutExpr)).call(this, [txt_put, item, txt_in, collection]));
+        var _this12 = _possibleConstructorReturn(this, (PutExpr.__proto__ || Object.getPrototypeOf(PutExpr)).call(this, [txt_put, item, txt_in, collection]));
 
-        _this11.color = 'violet';
-        return _this11;
+        _this12.color = 'violet';
+        return _this12;
     }
 
     _createClass(PutExpr, [{
@@ -712,8 +746,8 @@ var PutExpr = function (_Expression) {
     return PutExpr;
 }(Expression);
 
-var PopExpr = function (_Expression2) {
-    _inherits(PopExpr, _Expression2);
+var PopExpr = function (_Expression3) {
+    _inherits(PopExpr, _Expression3);
 
     function PopExpr(collection) {
         _classCallCheck(this, PopExpr);
@@ -721,10 +755,10 @@ var PopExpr = function (_Expression2) {
         var txt_pop = new TextExpr('pop');
         txt_pop.color = 'black';
 
-        var _this12 = _possibleConstructorReturn(this, (PopExpr.__proto__ || Object.getPrototypeOf(PopExpr)).call(this, [txt_pop, collection]));
+        var _this13 = _possibleConstructorReturn(this, (PopExpr.__proto__ || Object.getPrototypeOf(PopExpr)).call(this, [txt_pop, collection]));
 
-        _this12.color = 'violet';
-        return _this12;
+        _this13.color = 'violet';
+        return _this13;
     }
 
     _createClass(PopExpr, [{

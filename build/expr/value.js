@@ -346,6 +346,11 @@ var MirrorExpr = function (_ImageExpr3) {
     }
 
     _createClass(MirrorExpr, [{
+        key: 'canReduce',
+        value: function canReduce() {
+            return true;
+        }
+    }, {
         key: 'drawInternalAfterChildren',
         value: function drawInternalAfterChildren(ctx, pos, boundingSize) {
             if (!this.innerExpr) return;

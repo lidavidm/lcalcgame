@@ -1451,7 +1451,10 @@ var HalfFadedLambdaHoleExpr = function (_LambdaHoleExpr3) {
 
         var _this21 = _possibleConstructorReturn(this, (HalfFadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr)).call(this, varname));
 
-        _this21.addArg(new TextExpr("λ" + varname));
+        var txt = new TextExpr(varname);
+        txt._xOffset = 6;
+        txt.fontSize = 32;
+        _this21.addArg(txt);
         _this21.label.color = "#FFF";
         return _this21;
     }
@@ -1480,10 +1483,14 @@ var HalfFadedLambdaHoleExpr = function (_LambdaHoleExpr3) {
     }, {
         key: 'size',
         get: function get() {
-            var size = _get(HalfFadedLambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr.prototype), 'size', this);
-            size.w = Math.max(size.w, size.h);
-            size.h = Math.max(size.w, size.h);
-            return size;
+            return {
+                w: 50,
+                h: 50
+            };
+            // let size = super.size;
+            // size.w = Math.max(size.w, size.h);
+            // size.h = Math.max(size.w, size.h);
+            // return size;
         }
     }]);
 

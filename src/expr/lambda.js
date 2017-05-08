@@ -1096,7 +1096,10 @@ class FadedLambdaHoleExpr extends LambdaHoleExpr {
 class HalfFadedLambdaHoleExpr extends LambdaHoleExpr {
     constructor(varname) {
         super(varname);
-        this.addArg(new TextExpr("λ" + varname));
+        let txt = new TextExpr(varname);
+        txt._xOffset = 6;
+        txt.fontSize = 32;
+        this.addArg(txt);
         this.label.color = "#FFF";
     }
 
@@ -1119,10 +1122,14 @@ class HalfFadedLambdaHoleExpr extends LambdaHoleExpr {
     }
 
     get size() {
-        let size = super.size;
-        size.w = Math.max(size.w, size.h);
-        size.h = Math.max(size.w, size.h);
-        return size;
+        return {
+            w:50,
+            h:50
+        };
+        // let size = super.size;
+        // size.w = Math.max(size.w, size.h);
+        // size.h = Math.max(size.w, size.h);
+        // return size;
     }
 }
 

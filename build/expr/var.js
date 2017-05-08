@@ -121,6 +121,23 @@ var VarExpr = function (_Expression) {
             return value;
         }
     }, {
+        key: "isPlaceholder",
+        value: function isPlaceholder() {
+            if (this.canReduce()) return false;
+            if (this.parent) {
+                if (this.rootParent instanceof Sequence) return false;
+                if (this.parent instanceof AssignExpr) {
+                    return this.parent.variable != this;
+                }
+            }
+            return true;
+        }
+    }, {
+        key: "animatePlaceholderStatus",
+        value: function animatePlaceholderStatus() {
+            if (!this.canReduce()) this.performReduction();
+        }
+    }, {
         key: "onmouseclick",
         value: function onmouseclick() {
             this.performReduction();
@@ -322,7 +339,8 @@ var ChestVarExpr = function (_VarExpr2) {
                 this._animating = true;
                 return this.animateReduction(value, true);
             } else if (animated) {
-                this.animateReduction(new TextExpr("?"), false).then(function (wat) {
+                var wat = new TextExpr("?");
+                this.animateReduction(wat, false).then(function (wat) {
                     _this6._opened = false;
                     window.setTimeout(function () {
                         Animate.poof(wat);
@@ -342,9 +360,16 @@ var ChestVarExpr = function (_VarExpr2) {
             var stage = this.stage;
 
             value = value.clone();
-            stage.add(value);
-            value.scale = { x: 0.1, y: 0.1 };
             value.anchor = { x: 0.5, y: 0.5 };
+            stage.add(value);
+            value.update();
+
+            var target = {
+                x: this.absolutePos.x - this.anchor.x * this.size.w + 0.5 * this.size.w,
+                y: this.absolutePos.y - value.size.h
+            };
+
+            value.scale = { x: 0.1, y: 0.1 };
             value.update();
             value.pos = {
                 x: this.absolutePos.x - this.anchor.x * this.size.w + 0.5 * this.size.w,
@@ -360,10 +385,7 @@ var ChestVarExpr = function (_VarExpr2) {
                 Resource.play('come-out');
                 Animate.tween(value, {
                     scale: { x: 1.0, y: 1.0 },
-                    pos: {
-                        x: _this7.absolutePos.x + 0.5 * _this7.size.w - 0.5 * value.size.w,
-                        y: _this7.absolutePos.y - value.size.h
-                    }
+                    pos: target
                 }, 500).after(function () {
                     window.setTimeout(function () {
                         if (destroy) {
@@ -525,7 +547,7 @@ var AssignExpr = function (_Expression2) {
         if (variable && !(variable instanceof MissingExpression)) {
             _this11.addArg(variable);
         } else {
-            var missing = new MissingChestExpression(new VarExpr("_"));
+            var missing = new (ExprManager.getClass('_v'))(new VarExpr("_"));
             missing.acceptedClasses = [VarExpr];
             _this11.addArg(missing);
         }
@@ -681,11 +703,22 @@ var AssignExpr = function (_Expression2) {
                     return Promise.resolve(null);
                 }
 
-                return _this15.performSubReduction(_this15.value, true).then(function (value) {
+                var promise = void 0;
+                // Don't need as much delay if we're using
+                // performSubReduction, since it pauses for us
+                var delay = 200;
+                if (_this15.value.isValue()) {
+                    promise = Promise.resolve(_this15.value);
+                    delay = 500;
+                } else {
+                    promise = _this15.performSubReduction(_this15.value, true);
+                }
+
+                return promise.then(function (value) {
                     _this15.value = value;
                     _this15.update();
                     if (_this15.stage) _this15.stage.draw();
-                    return after(500).then(function () {
+                    return after(delay).then(function () {
                         return _this15.animateReduction();
                     });
                 });
@@ -778,11 +811,51 @@ var JumpingAssignExpr = function (_AssignExpr) {
                         _this17.stage.environmentDisplay.prepareAssign(_this17.variable.name);
                     } else {
                         if (Object.keys(_this17.stage.environmentDisplay.bindings).length === 0) {
-                            targetPos = _this17.stage.environmentDisplay.absolutePos;
+                            targetPos = clonePos(_this17.stage.environmentDisplay.absolutePos);
+                            targetPos.y += _this17.stage.environmentDisplay.padding.inner;
                         } else {
-                            var contents = _this17.stage.environmentDisplay.contents;
-                            var last = contents[contents.length - 1];
-                            targetPos = addPos(last.absolutePos, { x: 0, y: last.absoluteSize.h + _this17.stage.environmentDisplay.padding });
+                            var contents = _this17.stage.environmentDisplay.bindings;
+                            var maxY = 0;
+                            var last = void 0;
+                            var _iteratorNormalCompletion = true;
+                            var _didIteratorError = false;
+                            var _iteratorError = undefined;
+
+                            try {
+                                for (var _iterator = Object.keys(contents)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                                    var binding = _step.value;
+
+                                    binding = contents[binding];
+                                    var ap = binding.absolutePos;
+                                    if (ap.y > maxY) {
+                                        maxY = ap.y;
+                                        last = binding;
+                                    }
+                                }
+                            } catch (err) {
+                                _didIteratorError = true;
+                                _iteratorError = err;
+                            } finally {
+                                try {
+                                    if (!_iteratorNormalCompletion && _iterator.return) {
+                                        _iterator.return();
+                                    }
+                                } finally {
+                                    if (_didIteratorError) {
+                                        throw _iteratorError;
+                                    }
+                                }
+                            }
+
+                            if (last) {
+                                targetPos = addPos(last.absolutePos, {
+                                    x: 0,
+                                    y: last.absoluteSize.h + _this17.stage.environmentDisplay.padding.inner
+                                });
+                            } else {
+                                targetPos = clonePos(_this17.stage.environmentDisplay.absolutePos);
+                                targetPos.y += _this17.stage.environmentDisplay.padding.inner;
+                            }
                         }
 
                         value = new (ExprManager.getClass('reference_display'))(_this17.variable.name, _this17.value.clone());
@@ -795,6 +868,7 @@ var JumpingAssignExpr = function (_AssignExpr) {
                         pos: targetPos,
                         scale: { x: 0.7, y: 0.7 }
                     };
+                    value.update();
 
                     var lerp = arcLerp(value.absolutePos.y, targetPos.y, -150);
                     Resource.play('fly-to');
@@ -890,6 +964,8 @@ var VtableVarExpr = function (_ObjectExtensionExpr) {
     }, {
         key: "performReduction",
         value: function performReduction() {
+            var _this20 = this;
+
             if (!this.hasVtable || !this.subReduceMethod) {
                 if (!this.variable.canReduce()) {
                     // Play the ? animation
@@ -901,9 +977,23 @@ var VtableVarExpr = function (_ObjectExtensionExpr) {
                     return Promise.resolve(value);
                 }
             } else {
-                var result = this.reduce();
-                (this.parent || this.stage).swap(this, result);
-                return result;
+                var _ret3 = function () {
+                    var parent = _this20.parent || _this20.stage;
+                    var surrogate = _this20.createSurrogate();
+                    parent.swap(_this20, surrogate);
+                    surrogate.ignoreEvents = true;
+                    surrogate._reducing = true;
+                    surrogate.animateReducingStatus();
+                    return {
+                        v: after(800).then(function () {
+                            var result = surrogate.reduce();
+                            parent.swap(surrogate, result);
+                            return result;
+                        })
+                    };
+                }();
+
+                if ((typeof _ret3 === "undefined" ? "undefined" : _typeof(_ret3)) === "object") return _ret3.v;
             }
         }
     }, {
@@ -921,14 +1011,8 @@ var VtableVarExpr = function (_ObjectExtensionExpr) {
             }
         }
     }, {
-        key: "reduce",
-        value: function reduce() {
-            if ((!this.hasVtable || !this.subReduceMethod) && !this.variable.canReduce()) {
-                return this;
-            }
-            if (!this.hasVtable) return this.value;
-            if (!this.subReduceMethod) return this.value;
-
+        key: "createSurrogate",
+        value: function createSurrogate() {
             // Use a surrogate to do the actual reduction, so that (1) we
             // can use the actual object's reduce() method (this is
             // important for ArrayObjectExpr which does some
@@ -942,8 +1026,19 @@ var VtableVarExpr = function (_ObjectExtensionExpr) {
             }
 
             surrogate.parent = this; // In case the surrogate needs our environment
-            surrogate.setExtension("", this.subReduceMethod, this.methodArgs);
+            surrogate.setExtension(this.subReduceText, this.subReduceMethod, this.methodArgs);
+            return surrogate;
+        }
+    }, {
+        key: "reduce",
+        value: function reduce() {
+            if ((!this.hasVtable || !this.subReduceMethod) && !this.variable.canReduce()) {
+                return this;
+            }
+            if (!this.hasVtable) return this.value;
+            if (!this.subReduceMethod) return this.value;
 
+            var surrogate = this.createSurrogate();
             return surrogate.reduce();
         }
     }, {
@@ -985,12 +1080,12 @@ var DynamicPulloutDrawer = function (_PulloutDrawer) {
     function DynamicPulloutDrawer(x, y, w, h, parent, onCellSelect) {
         _classCallCheck(this, DynamicPulloutDrawer);
 
-        var _this20 = _possibleConstructorReturn(this, (DynamicPulloutDrawer.__proto__ || Object.getPrototypeOf(DynamicPulloutDrawer)).call(this, x, y, w, h, parent ? parent.objMethods : {}, onCellSelect));
+        var _this21 = _possibleConstructorReturn(this, (DynamicPulloutDrawer.__proto__ || Object.getPrototypeOf(DynamicPulloutDrawer)).call(this, x, y, w, h, parent ? parent.objMethods : {}, onCellSelect));
         // Guard against null parent for cloning
 
 
-        _this20.parent = parent;
-        return _this20;
+        _this21.parent = parent;
+        return _this21;
     }
 
     _createClass(DynamicPulloutDrawer, [{

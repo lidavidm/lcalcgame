@@ -139,6 +139,7 @@ class MirrorExpr extends ImageExpr {
         sz.h = 54;
         return sz;
     }
+    canReduce() { return true; }
     set exprInMirror(e) {
         this.innerExpr = e;
 

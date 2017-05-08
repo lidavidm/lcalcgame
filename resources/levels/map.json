@@ -75,12 +75,6 @@
             "toolbox": "(star) (rect) (triangle)"
         },
         {
-            "description": "Faded primitives.",
-            "board": "(== _ /star)",
-            "goal": "(true)",
-            "toolbox": "(star) (rect) (triangle)"
-        },
-        {
             "description": "Reversed harder binded booleans inside arrow functions.",
             "board": "(map /(λx _b) /(bag triangle star))",
             "goal": "(false)(false)",

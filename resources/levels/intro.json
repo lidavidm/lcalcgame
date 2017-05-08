@@ -18,10 +18,7 @@
             "description":"Introduces concept: Constant functions.",
             "board":"(λx /star) (rect) (star)",
             "goal":"(star) (star)",
-            "toolbox":"",
-            "fade":{
-                "lambda":1
-            }
+            "toolbox":""
         },
         {
             "description":"Introduces concept: Toolbox. (*used to be deletion)",
@@ -65,7 +62,7 @@
             "goal":"(star) (diamond)",
             "toolbox":"(star) (λx #x)",
             "fade":{
-                "lambda":2
+                "lambda":1
             }
         }
     ],

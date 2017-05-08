@@ -14,7 +14,7 @@
             "goal": "false",
             "toolbox": "",
             "fade": {
-                "lambda":3
+                "lambda":2
             }
         },
         {
