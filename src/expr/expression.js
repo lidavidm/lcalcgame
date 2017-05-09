@@ -331,16 +331,11 @@ class Expression extends mag.RoundedRect {
     // Try and reduce the given child expression before continuing with our reduction
     performSubReduction(expr, animated=true) {
         return new Promise((resolve, reject) => {
-            console.log("inside promise");
             if (expr.isValue() || !expr.canReduce()) {
-                console.log("1");
                 resolve(expr);
-                console.log("2");
                 return;
             }
-            console.log("reached here");
             let result = expr.performReduction(animated);
-            console.log("result");
             if (result instanceof Promise) {
                 result.then((result) => {
                     if (this.stage) this.stage.draw();
@@ -370,7 +365,7 @@ class Expression extends mag.RoundedRect {
 
     // * Swaps this expression for its reduction (if one exists) in the expression hierarchy.
     performReduction() {
-        console.log("called performReduction");
+        //console.log("called performReduction");
         var reduced_expr = this.reduce();
         if (reduced_expr !== undefined && reduced_expr != this) { // Only swap if reduction returns something > null.
 
@@ -410,7 +405,7 @@ class Expression extends mag.RoundedRect {
         return Promise.resolve(this);
     }
     reduceCompletely() { // Try to reduce this expression and its subexpressions as completely as possible.
-        console.log("called reduce completely");
+        //console.log("called reduce completely");
         let e = this;
         e.update();
         let prev_holes = e.holes;
