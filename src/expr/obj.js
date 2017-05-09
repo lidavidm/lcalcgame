@@ -463,7 +463,7 @@ class ObjectExtensionExpr extends ExpressionPlus {
     setExtension(methodText, subReduceMethod=null, argExprs=null) {
         if (this.holes[1]) this.holes.splice(1, 1);
 
-        let isProperty = true;
+        let isProperty = false;
 
         if (!subReduceMethod) {
             subReduceMethod = this.objMethods[methodText];
@@ -500,6 +500,10 @@ class ObjectExtensionExpr extends ExpressionPlus {
         if (!(this.holes[0] instanceof MissingExpression)) {
             methodtxt._xOffset = -15;
             methodtxt._sizeOffset = {w:-10, h:0};
+            if (this.holes[0] instanceof VtableVarExpr) {
+                methodtxt._xOffset = -5;
+                methodtxt._sizeOffset = {w: -5, h:0};
+            }
         } else this.holes[0].unlock();
         this.subReduceMethod = subReduceMethod;
         this.addArg(methodtxt);
