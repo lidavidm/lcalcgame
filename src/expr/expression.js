@@ -44,13 +44,22 @@ class Expression extends mag.RoundedRect {
         return false;
     }
     clone(parent=null) {
+        //console.log("parent");
+        //console.log(parent);
         var c = super.clone(parent);
+        //console.log("c!!!!!");
+        //console.log(c);
         var children = c.children;
+        var holes = c.holes;
         c.children = [];
         c.holes = [];
         c.stroke = null;
         c.toolbox = null;
         children.forEach((child) => c.addArg(child));
+        c.holes = [];
+        holes.forEach((hole) => c.addHole(hole));
+        //console.log("c.holes");
+        //console.log(c.holes);
         return c;
     }
 
@@ -63,6 +72,10 @@ class Expression extends mag.RoundedRect {
                 hole.bindSubexpressions();
             }
         });
+    }
+
+    addHole(hole) {
+        this.holes.push(hole);
     }
 
     addArg(arg) {
