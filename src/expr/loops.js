@@ -394,8 +394,12 @@ class FadedRepeatLoopExpr extends Expression {
                 let missing = [];
                 console.log("this.timesExpr:");
                 console.log(this.timesExpr);
+                console.log("this.bodyExpr");
+                console.log(this.bodyExpr);
                 for (let i = 0; i < this.timesExpr.number; i++) {
-                    missing.push(this.bodyExpr.clone());
+                    console.log("calling this.bodyExpr.clone()");
+                    let thisBodyExprClone = this.bodyExpr.clone();
+                    missing.push(thisBodyExprClone);
                 }
 
 
