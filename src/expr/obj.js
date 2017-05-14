@@ -427,12 +427,12 @@ class ObjectExtensionExpr extends ExpressionPlus {
         return true;
     }
     reduce() {
-        console.log('reduce');
+        console.log('reduce() in ObjectExtensionExpr');
         if (this.holes[0] instanceof MissingExpression) return this;
         if (this.subReduceMethod) {
             let r;
             let args = this.methodArgs;
-            console.log(args);
+            //console.log(args);
             // Reduce the args before calling (call-by-value)
             for (let i = 0; i < args.length; i++) {
                 let arg = args[i];
