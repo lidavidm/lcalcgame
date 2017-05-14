@@ -416,6 +416,7 @@ class AssignExpr extends Expression {
         }
 
         this._animating = false;
+        this.animatedValue = value;
     }
 
     get variable() {
@@ -479,7 +480,7 @@ class AssignExpr extends Expression {
 
         // Keep a copy of the original value before we start
         // messing with it, to update the environment afterwards
-        this._actualValue = this.value.clone();
+        //this._actualValue = this.value.clone();
     }
 
     finishReduction() {
@@ -535,37 +536,6 @@ class AssignExpr extends Expression {
                 // the value can't reduce.
                 let result = this.value.reduceCompletely();
 
-
-                if (this.value instanceof ArrayObjectExpr) {
-                    this.value = this.value.baseArray;
-                }
-                if (this.value instanceof StringObjectExpr) {
-                    this.value = this.value.baseStringValue;
-                }
-
-                if (this.variable instanceof ArrayObjectExpr) {
-                    let rhs = this.variable.baseArray.reduce();
-                    this.variable.name = this.variable.baseArray.name;
-                    if (this.variable.defaultMethodCall === "[..]") {
-                        this.variable.holes[2] = this.variable.holes[2].reduce();
-                        rhs._items[this.variable.holes[2].number] = this.value.clone();
-                        this.value = rhs.clone();
-                    }
-                }
-
-                if (this.variable instanceof StringObjectExpr) {
-                    let rhs = this.variable.baseStringValue.reduce();
-                    this.variable.name = this.variable.baseStringValue.name;
-                    if (this.variable.defaultMethodCall === "[..]") {
-                        let originalString = rhs.toString();
-                        let slicePosition = this.variable.holes[2].number;
-                        let newString = originalString.slice(0, slicePosition) + this.value.toString()
-                            + originalString.slice(slicePosition + 1);
-                        this.value = new StringValueExpr(newString);
-                    }
-                }
-
-
                 if (result instanceof Promise) {
                     return result.then(() => {
                         return Promise.reject("AssignExpr: RHS cannot reduce");
@@ -589,6 +559,7 @@ class AssignExpr extends Expression {
         if (this.value instanceof StringObjectExpr) {
             this.value = this.value.baseStringValue;
         }
+        this.animatedValue = this.value.clone();
 
         //this.variable.name = this.variable.holes[0].name;
         //console.log("This.Variable and This.Variable.name and This.Value");
@@ -613,22 +584,23 @@ class AssignExpr extends Expression {
                 this.value = rhs.clone();
                 console.log("after: rhs is:");
                 console.log(rhs);
-            }*/
-            //this.variable.name = this.variable.baseArray.name;
-            let leftHandSide = this.variable.holes[0].reduceCompletely();
-            //console.log("left Hand Side:");
+            }
+            this.variable.name = this.variable.baseArray.name;*/
+            let leftHandSide = this.variable.baseArray.reduceCompletely();
+            console.log("left Hand Side:");
             console.log(leftHandSide);
             if (this.variable.defaultMethodCall === "[..]") {
                 //console.log("this.variable");
                 //console.log(this.variable);
-                let index = this.variable.holes[3].reduceCompletely().number;
+                let index = this.variable.holes[2].reduceCompletely().number;
                 //console.log("index: INDEX:");
                 //console.log(index);
                 //console.log("left hand side, should be bracket array expression and this.value");
                 //console.log(leftHandSide.items);
                 //console.log(this.value);
-                leftHandSide._items[index] = this.value;
-                this.value = leftHandSide;
+                leftHandSide._items[index] = this.value.clone();
+                this.animatedValue = this.value.clone();
+                this.value = leftHandSide.clone();
                 //console.log("left hand side, should be bracket array expression!!");
                 //console.log(this.value);
                 this.variable.name = this.variable.baseArray.name;
@@ -670,7 +642,8 @@ class AssignExpr extends Expression {
             }
 
             return this.performSubReduction(this.value, true).then((value) => {
-                this.value = value;
+                this._actualValue = this.value.clone();
+                this.value = this.animatedValue.clone();
                 this.update();
                 if (this.stage) this.stage.draw();
                 return after(500).then(() => this.animateReduction());
