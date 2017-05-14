@@ -587,23 +587,23 @@ class AssignExpr extends Expression {
             }
             this.variable.name = this.variable.baseArray.name;*/
             let leftHandSide = this.variable.baseArray.reduceCompletely();
+            this.variable.name = this.variable.baseArray.name;
             console.log("left Hand Side:");
             console.log(leftHandSide);
             if (this.variable.defaultMethodCall === "[..]") {
-                //console.log("this.variable");
-                //console.log(this.variable);
+                console.log("this.variable");
+                console.log(this.variable);
                 let index = this.variable.holes[2].reduceCompletely().number;
                 //console.log("index: INDEX:");
                 //console.log(index);
                 //console.log("left hand side, should be bracket array expression and this.value");
-                //console.log(leftHandSide.items);
-                //console.log(this.value);
+                console.log(leftHandSide.items);
+                console.log(this.value);
                 leftHandSide._items[index] = this.value.clone();
                 this.animatedValue = this.value.clone();
                 this.value = leftHandSide.clone();
                 //console.log("left hand side, should be bracket array expression!!");
                 //console.log(this.value);
-                this.variable.name = this.variable.baseArray.name;
             }
         }
 
