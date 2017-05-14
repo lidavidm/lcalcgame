@@ -393,8 +393,10 @@ class ObjectExtensionExpr extends ExpressionPlus {
             let cln = super.clone(parent);
             this.addChild(this.drawer);
             return cln;
-        } else
-            return super.clone(parent);
+        } else {
+            let cln = super.clone(parent);
+            return cln;
+        }
     }
     get constructorArgs() { return [this.holes[0].clone(), $.extend(true, {}, this.objMethods)]; }
     get methodArgs() {
