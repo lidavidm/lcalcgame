@@ -51,6 +51,7 @@ class RepeatLoopExpr extends Expression {
             for (let i = 0; i < this.timesExpr.number; i++) {
                 missing.push(this.bodyExpr.clone());
             }
+
             this.template = new (ExprManager.getClass('sequence'))(...missing);
             this.template.lockSubexpressions();
             this.template.scale = { x: 0.8, y: 0.8 };
@@ -397,11 +398,20 @@ class FadedRepeatLoopExpr extends Expression {
                     missing.push(this.bodyExpr.clone());
                 }
 
+
+                console.log("...missing");
+                console.log(...missing);
+                console.log("missing");
+                console.log(missing);
+
                 let template = new (ExprManager.getClass('sequence'))(...missing);
                 template.lockSubexpressions();
 
                 (this.parent || this.stage).swap(this, template);
                 template.update();
+
+                console.log("template");
+                console.log(template);
 
                 return template;
             });
