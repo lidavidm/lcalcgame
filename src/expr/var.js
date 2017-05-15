@@ -435,6 +435,13 @@ class AssignExpr extends Expression {
         this.holes[2] = expr;
     }
 
+    clone (parent = null) {
+        let cln = super.clone(parent);
+        cln.holes = [];
+        this.holes.forEach((hole) => cln.holes.push(hole.clone()));
+        return cln;
+    }
+
     canReduce() {
         /*return this.value && this.variable && (this.value.canReduce() || this.value.isValue()) &&
             (this.variable instanceof VarExpr || this.variable instanceof VtableVarExpr
@@ -551,7 +558,7 @@ class AssignExpr extends Expression {
 
         //The value is the right hand side
         //Reduce the right hand side first!!
-        this.value = this.value.reduceCompletely();
+        this.value = this.value.reduceCompletely().clone();
 
         if (this.value instanceof ArrayObjectExpr) {
             this.value = this.value.baseArray;
@@ -608,18 +615,20 @@ class AssignExpr extends Expression {
         }
 
         if (this.variable instanceof StringObjectExpr) {
-            let rhs = this.variable.baseStringValue.reduce();
+            let rhs = this.variable.baseStringValue.reduceCompletely();
             this.variable.name = this.variable.baseStringValue.name;
-            //console.log("variable name: " + this.variable.name);
+            console.log("variable name: " + this.variable.name);
             if (this.variable.defaultMethodCall === "[..]") {
-                let originalString = rhs.toString();
-                //console.log("ori string: " + originalString);
-                let slicePosition = this.variable.holes[2].number;
-                //console.log("slicePos: " + slicePosition);
-                //console.log(this.value.toString());
-                let newString = originalString.slice(0, slicePosition) + this.value.toString()
+                console.log("default method call is [..]");
+                console.log(rhs);
+                let originalString = rhs.value();
+                console.log("ori string: " + originalString);
+                let slicePosition = this.variable.holes[2].reduceCompletely().number;
+                console.log("slicePos: " + slicePosition);
+                console.log("this.value.toString()" + this.value.toString());
+                let newString = originalString.slice(0, slicePosition) + this.value.value()
                     + originalString.slice(slicePosition + 1);
-                //console.log("new String: " + newString);
+                console.log("new String: " + newString);
                 this.value = new StringValueExpr(newString);
             }
         }
