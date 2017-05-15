@@ -395,6 +395,8 @@ class ObjectExtensionExpr extends ExpressionPlus {
             return cln;
         } else {
             let cln = super.clone(parent);
+            cln.holes = [];
+            this.holes.forEach((hole) => cln.holes.push(hole));
             return cln;
         }
     }
