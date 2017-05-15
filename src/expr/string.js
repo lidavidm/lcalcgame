@@ -62,8 +62,8 @@ class StringObjectExpr extends ObjectExtensionExpr {
         //text.color = "OrangeRed";
         this.color = "YellowGreen";
 
-        console.log("baseString:");
-        console.log(baseString);
+        //console.log("baseString:");
+        //console.log(baseString);
         //this.string = baseString;
         //this.primitiveName = baseString;
 
