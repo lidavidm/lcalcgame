@@ -528,10 +528,23 @@ var AssignExpr = function (_Expression2) {
         }
 
         _this11._animating = false;
+        _this11.animatedValue = value;
         return _this11;
     }
 
     _createClass(AssignExpr, [{
+        key: "clone",
+        value: function clone() {
+            var parent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+            var cln = _get(AssignExpr.prototype.__proto__ || Object.getPrototypeOf(AssignExpr.prototype), "clone", this).call(this, parent);
+            cln.holes = [];
+            this.holes.forEach(function (hole) {
+                return cln.holes.push(hole.clone());
+            });
+            return cln;
+        }
+    }, {
         key: "canReduce",
         value: function canReduce() {
             /*return this.value && this.variable && (this.value.canReduce() || this.value.isValue()) &&
@@ -582,7 +595,7 @@ var AssignExpr = function (_Expression2) {
 
             // Keep a copy of the original value before we start
             // messing with it, to update the environment afterwards
-            this._actualValue = this.value.clone();
+            //this._actualValue = this.value.clone();
         }
     }, {
         key: "finishReduction",
@@ -646,56 +659,7 @@ var AssignExpr = function (_Expression2) {
                 if (this.value && this.variable && !this.value.canReduce()) {
                     // Try and play any animation anyways to hint at why
                     // the value can't reduce.
-                    var result = this.value.performReduction();
-
-                    if (this.value instanceof ArrayObjectExpr) {
-                        this.value = this.value.baseArray;
-                    }
-                    if (this.value instanceof StringObjectExpr) {
-                        this.value = this.value.baseStringValue;
-                    }
-
-                    console.log("This.Variable and This.Variable.name and This.Value and RESULT");
-                    console.log(this.variable);
-                    console.log(this.variable.name);
-                    console.log(this.value);
-                    console.log(result);
-
-                    if (this.variable instanceof ArrayObjectExpr) {
-                        var rhs = this.variable.baseArray.reduce();
-                        console.log("RHS!!!!!!");
-                        console.log(rhs);
-                        this.variable.name = this.variable.baseArray.name;
-                        if (this.variable.defaultMethodCall === "[..]") {
-                            console.log("method call is [..]");
-                            console.log("this.variable.name:");
-                            console.log(this.variable.name);
-                            console.log("This Value!!!!");
-                            console.log(this.value);
-                            this.variable.holes[2] = this.variable.holes[2].reduce();
-                            console.log("index: " + this.variable.holes[2].number);
-                            rhs._items[this.variable.holes[2].number] = this.value.clone();
-                            this.value = rhs.clone();
-                            console.log("after: rhs is:");
-                            console.log(rhs);
-                        }
-                    }
-
-                    if (this.variable instanceof StringObjectExpr) {
-                        var _rhs = this.variable.baseStringValue.reduce();
-                        this.variable.name = this.variable.baseStringValue.name;
-                        console.log("variable name: " + this.variable.name);
-                        if (this.variable.defaultMethodCall === "[..]") {
-                            var originalString = _rhs.toString();
-                            console.log("ori string: " + originalString);
-                            var slicePosition = this.variable.holes[2].number;
-                            console.log("slicePos: " + slicePosition);
-                            console.log(this.value.toString());
-                            var newString = originalString.slice(0, slicePosition) + this.value.toString() + originalString.slice(slicePosition + 1);
-                            console.log("new String: " + newString);
-                            this.value = new StringValueExpr(newString);
-                        }
-                    }
+                    var result = this.value.reduceCompletely();
 
                     if (result instanceof Promise) {
                         return result.then(function () {
@@ -709,7 +673,9 @@ var AssignExpr = function (_Expression2) {
 
             console.log("this.canReduce() == true!!");
 
-            this.value = this.value.reduce();
+            //The value is the right hand side
+            //Reduce the right hand side first!!
+            this.value = this.value.reduceCompletely().clone();
 
             if (this.value instanceof ArrayObjectExpr) {
                 this.value = this.value.baseArray;
@@ -717,16 +683,18 @@ var AssignExpr = function (_Expression2) {
             if (this.value instanceof StringObjectExpr) {
                 this.value = this.value.baseStringValue;
             }
+            this.animatedValue = this.value.clone();
 
-            console.log("This.Variable and This.Variable.name and This.Value");
-            console.log(this.variable);
-            console.log(this.variable.name);
-            console.log(this.value);
+            //this.variable.name = this.variable.holes[0].name;
+            //console.log("This.Variable and This.Variable.name and This.Value");
+            //console.log(this.variable);
+            //console.log(this.variable.name);
+            //console.log(this.value);
 
             if (this.variable instanceof ArrayObjectExpr) {
-                var _rhs2 = this.variable.baseArray.reduce();
+                /*let rhs = this.variable.baseArray.reduceCompletely();
                 console.log("RHS!!!!!!");
-                console.log(_rhs2);
+                console.log(rhs);
                 this.variable.name = this.variable.baseArray.name;
                 if (this.variable.defaultMethodCall === "[..]") {
                     console.log("method call is [..]");
@@ -736,26 +704,48 @@ var AssignExpr = function (_Expression2) {
                     console.log(this.value);
                     this.variable.holes[2] = this.variable.holes[2].reduce();
                     console.log("index: " + this.variable.holes[2].number);
-                    _rhs2._items[this.variable.holes[2].number] = this.value.clone();
-                    this.value = _rhs2.clone();
+                    rhs._items[this.variable.holes[2].number] = this.value.clone();
+                    this.value = rhs.clone();
                     console.log("after: rhs is:");
-                    console.log(_rhs2);
+                    console.log(rhs);
+                }
+                this.variable.name = this.variable.baseArray.name;*/
+                var leftHandSide = this.variable.baseArray.reduceCompletely();
+                this.variable.name = this.variable.baseArray.name;
+                console.log("left Hand Side:");
+                console.log(leftHandSide);
+                if (this.variable.defaultMethodCall === "[..]") {
+                    console.log("this.variable");
+                    console.log(this.variable);
+                    var index = this.variable.holes[2].reduceCompletely().number;
+                    //console.log("index: INDEX:");
+                    //console.log(index);
+                    //console.log("left hand side, should be bracket array expression and this.value");
+                    console.log(leftHandSide.items);
+                    console.log(this.value);
+                    leftHandSide._items[index] = this.value.clone();
+                    this.animatedValue = this.value.clone();
+                    this.value = leftHandSide.clone();
+                    //console.log("left hand side, should be bracket array expression!!");
+                    //console.log(this.value);
                 }
             }
 
             if (this.variable instanceof StringObjectExpr) {
-                var _rhs3 = this.variable.baseStringValue.reduce();
+                var rhs = this.variable.baseStringValue.reduceCompletely();
                 this.variable.name = this.variable.baseStringValue.name;
                 console.log("variable name: " + this.variable.name);
                 if (this.variable.defaultMethodCall === "[..]") {
-                    var _originalString = _rhs3.toString();
-                    console.log("ori string: " + _originalString);
-                    var _slicePosition = this.variable.holes[2].number;
-                    console.log("slicePos: " + _slicePosition);
-                    console.log(this.value.toString());
-                    var _newString = _originalString.slice(0, _slicePosition) + this.value.toString() + _originalString.slice(_slicePosition + 1);
-                    console.log("new String: " + _newString);
-                    this.value = new StringValueExpr(_newString);
+                    console.log("default method call is [..]");
+                    console.log(rhs);
+                    var originalString = rhs.value();
+                    console.log("ori string: " + originalString);
+                    var slicePosition = this.variable.holes[2].reduceCompletely().number;
+                    console.log("slicePos: " + slicePosition);
+                    console.log("this.value.toString()" + this.value.toString());
+                    var newString = originalString.slice(0, slicePosition) + this.value.value() + originalString.slice(slicePosition + 1);
+                    console.log("new String: " + newString);
+                    this.value = new StringValueExpr(newString);
                 }
             }
 
@@ -775,7 +765,8 @@ var AssignExpr = function (_Expression2) {
                 }
 
                 return _this15.performSubReduction(_this15.value, true).then(function (value) {
-                    _this15.value = value;
+                    _this15._actualValue = _this15.value.clone();
+                    _this15.value = _this15.animatedValue.clone();
                     _this15.update();
                     if (_this15.stage) _this15.stage.draw();
                     return after(500).then(function () {
@@ -821,6 +812,9 @@ var AssignExpr = function (_Expression2) {
         key: "variable",
         get: function get() {
             return this.holes[0] instanceof MissingExpression ? null : this.holes[0];
+        },
+        set: function set(expr) {
+            this.holes[0] = expr;
         }
     }, {
         key: "value",

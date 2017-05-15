@@ -57,6 +57,7 @@ var RepeatLoopExpr = function (_Expression) {
                 for (var i = 0; i < this.timesExpr.number; i++) {
                     missing.push(this.bodyExpr.clone());
                 }
+
                 this.template = new (Function.prototype.bind.apply(ExprManager.getClass('sequence'), [null].concat(missing)))();
                 this.template.lockSubexpressions();
                 this.template.scale = { x: 0.8, y: 0.8 };
@@ -186,6 +187,7 @@ var RepeatLoopExpr = function (_Expression) {
         value: function performReduction() {
             var _this3 = this;
 
+            console.log("called perform reduction in RepeatLoopExpr");
             this._cachedSize = this.size;
 
             return this.performSubReduction(this.timesExpr).then(function (num) {
@@ -378,16 +380,36 @@ var FadedRepeatLoopExpr = function (_Expression2) {
             this.children = this.holes;
         }
     }, {
+        key: 'canReduce',
+        value: function canReduce() {
+            return this.timesExpr && (this.timesExpr.canReduce() || this.timesExpr.isValue()) && this.bodyExpr && this.bodyExpr.isComplete();
+        }
+    }, {
         key: 'performReduction',
         value: function performReduction() {
             var _this6 = this;
 
+            console.log("called performReduction() in FadedRepeatLoopExpr");
             if (this.canReduce()) {
+                console.log("canReduce() == true");
                 return this.performSubReduction(this.timesExpr).then(function () {
+                    var _console;
+
                     var missing = [];
+                    console.log("this.timesExpr:");
+                    console.log(_this6.timesExpr);
+                    console.log("this.bodyExpr");
+                    console.log(_this6.bodyExpr);
                     for (var i = 0; i < _this6.timesExpr.number; i++) {
+                        console.log("calling this.bodyExpr.clone()");
+                        //let thisBodyExprClone = this.bodyExpr.clone();
                         missing.push(_this6.bodyExpr.clone());
                     }
+
+                    console.log("...missing");
+                    (_console = console).log.apply(_console, missing);
+                    console.log("missing");
+                    console.log(missing);
 
                     var template = new (Function.prototype.bind.apply(ExprManager.getClass('sequence'), [null].concat(missing)))();
                     template.lockSubexpressions();
@@ -395,9 +417,13 @@ var FadedRepeatLoopExpr = function (_Expression2) {
                     (_this6.parent || _this6.stage).swap(_this6, template);
                     template.update();
 
+                    console.log("template");
+                    console.log(template);
+
                     return template;
                 });
             } else {
+                console.log("canReduce() == false");
                 return Promise.reject();
             }
         }

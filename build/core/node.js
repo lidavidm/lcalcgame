@@ -159,6 +159,7 @@ var mag = function (_) {
 
                 var parent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
+                //console.log("called clone in node.js");
                 var ins = constructClassInstance(this.constructor, this.constructorArgs);
                 //console.warn('Cloning', this.constructor);
                 var _iteratorNormalCompletion = true;

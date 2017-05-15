@@ -2,742 +2,24 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0b48bb8f-d392-4f1c-86b6-75b24b6ebf86" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/acceptDeleteIcon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/acceptDeleteIcon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/addNodeIcon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/addNodeIcon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/backIcon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/backIcon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/connectIcon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/connectIcon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/cross.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/cross.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/cross2.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/cross2.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/deleteIcon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/deleteIcon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/downArrow.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/downArrow.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/editIcon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/editIcon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/leftArrow.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/leftArrow.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/minus.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/minus.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/plus.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/plus.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/rightArrow.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/rightArrow.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/upArrow.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/upArrow.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/zoomExtends.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/network/zoomExtends.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/timeline/delete.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/img/timeline/delete.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/fonts/glyphicons-halflings-regular.eot" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/fonts/glyphicons-halflings-regular.eot" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/fonts/glyphicons-halflings-regular.ttf" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/fonts/glyphicons-halflings-regular.ttf" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/fonts/glyphicons-halflings-regular.woff" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/fonts/glyphicons-halflings-regular.woff" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/fonts/glyphicons-halflings-regular.woff2" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/fonts/glyphicons-halflings-regular.woff2" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/crossword.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/crossword.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/crosswordStrong.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/crosswordStrong.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/external-link-icons/external-link-icon-white.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/external-link-icons/external-link-icon-white.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/external-link-icons/external-link-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/external-link-icons/external-link-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/graph/graph.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/graph/graph.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/graph/graph120x60.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/graph/graph120x60.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/graph3d.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/graph3d.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/graph3d120x60.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/graph3d120x60.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/timeline/timeline.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/timeline/timeline.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/timeline/timeline120x60.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/timeline/timeline120x60.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/vis_overview.odg" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/vis_overview.odg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/vis_overview.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/vis_overview.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/screenshots/fsm.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/screenshots/fsm.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/screenshots/hello.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/screenshots/hello.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/screenshots/softmaint.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/screenshots/softmaint.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/screenshots/traffic_lights.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/screenshots/traffic_lights.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/1.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/10.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/10.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/11.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/11.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/12.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/12.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/13.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/13.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/14.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/14.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/2.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/2.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/3.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/3.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/4.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/4.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/5.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/5.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/6.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/6.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/7.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/7.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/8.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/8.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/9.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/indonesia/9.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Hardware-Fax-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Hardware-Fax-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Hardware-Laptop-1-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Hardware-Laptop-1-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Hardware-Mobile-Phone-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Hardware-Mobile-Phone-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Hardware-My-Computer-3-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Hardware-My-Computer-3-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Hardware-My-PDA-02-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Hardware-My-PDA-02-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Hardware-My-PDA-04-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Hardware-My-PDA-04-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Hardware-My-PDA-05-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Hardware-My-PDA-05-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Hardware-My-Phone-Picture-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Hardware-My-Phone-Picture-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Hardware-Printer-Blue-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Hardware-Printer-Blue-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Misc-Scanner-default-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Misc-Scanner-default-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Network-Drive-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Network-Drive-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Network-Internet-Connection-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Network-Internet-Connection-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Network-Pipe-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/Network-Pipe-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/System-Firewall-2-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/System-Firewall-2-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/System-Globe-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/System-Globe-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Document-icon24.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Document-icon24.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Document-icon32.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Document-icon32.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Document-icon48.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Document-icon48.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Email-icon24.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Email-icon24.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Email-icon32.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Email-icon32.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Email-icon48.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Email-icon48.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Folder-icon24.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Folder-icon24.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Folder-icon32.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Folder-icon32.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Folder-icon48.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Folder-icon48.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Folder-icon64.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Folder-icon64.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Smiley-Angry-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Smiley-Angry-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Smiley-Grin-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/Smiley-Grin-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/User-Administrator-Blue-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/User-Administrator-Blue-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/User-Administrator-Green-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/User-Administrator-Green-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/User-Coat-Blue-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/User-Coat-Blue-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/User-Coat-Green-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/User-Coat-Green-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/User-Coat-Red-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/User-Coat-Red-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/User-Executive-Green-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/User-Executive-Green-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/User-Preppy-Blue-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/User-Preppy-Blue-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/User-Preppy-Red-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/User-Preppy-Red-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/resources/img/Hardware-Mobile-Phone-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/resources/img/Hardware-Mobile-Phone-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/resources/img/product-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/resources/img/product-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/resources/img/truck-icon.png" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/resources/img/truck-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/prev_versions/v0.1/v0.1.zip" afterPath="$PROJECT_DIR$/prev_versions/v0.1/v0.1.zip" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/prev_versions/v0.14/playtest_notes.pages" afterPath="$PROJECT_DIR$/prev_versions/v0.14/playtest_notes.pages" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/prev_versions/v0.17/v0.17.zip" afterPath="$PROJECT_DIR$/prev_versions/v0.17/v0.17.zip" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/prev_versions/v0.2.zip" afterPath="$PROJECT_DIR$/prev_versions/v0.2.zip" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/202092__spookymodem__chest-opening.wav" afterPath="$PROJECT_DIR$/resources/audio/202092__spookymodem__chest-opening.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/202753__sheepfilms__slide-whistle-1.wav" afterPath="$PROJECT_DIR$/resources/audio/202753__sheepfilms__slide-whistle-1.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/202753__sheepfilms__slide-whistle-2.wav" afterPath="$PROJECT_DIR$/resources/audio/202753__sheepfilms__slide-whistle-2.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/208111__planman__poof-of-smoke.wav" afterPath="$PROJECT_DIR$/resources/audio/208111__planman__poof-of-smoke.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/325805__wagna__collect.wav" afterPath="$PROJECT_DIR$/resources/audio/325805__wagna__collect.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/336725__kubatko__inception-horn-victory.wav" afterPath="$PROJECT_DIR$/resources/audio/336725__kubatko__inception-horn-victory.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/3417__patchen__you-win.wav" afterPath="$PROJECT_DIR$/resources/audio/3417__patchen__you-win.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/341984__unadamlar__winning.wav" afterPath="$PROJECT_DIR$/resources/audio/341984__unadamlar__winning.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/361922__lacimarsik__tuning-fork-a4-440hz.wav" afterPath="$PROJECT_DIR$/resources/audio/361922__lacimarsik__tuning-fork-a4-440hz.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/60012__qubodup__swing-25.wav" afterPath="$PROJECT_DIR$/resources/audio/60012__qubodup__swing-25.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/carriage-return.wav" afterPath="$PROJECT_DIR$/resources/audio/carriage-return.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/convert.wav" afterPath="$PROJECT_DIR$/resources/audio/convert.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/define.wav" afterPath="$PROJECT_DIR$/resources/audio/define.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/deflate.wav" afterPath="$PROJECT_DIR$/resources/audio/deflate.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/drawer_close.wav" afterPath="$PROJECT_DIR$/resources/audio/drawer_close.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/drawer_open.wav" afterPath="$PROJECT_DIR$/resources/audio/drawer_open.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/fatbtn_click.wav" afterPath="$PROJECT_DIR$/resources/audio/fatbtn_click.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/fatbtn_space.wav" afterPath="$PROJECT_DIR$/resources/audio/fatbtn_space.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/fatbtn_space2.wav" afterPath="$PROJECT_DIR$/resources/audio/fatbtn_space2.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/firework-shooting.wav" afterPath="$PROJECT_DIR$/resources/audio/firework-shooting.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/firework1.wav" afterPath="$PROJECT_DIR$/resources/audio/firework1.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/firework2.wav" afterPath="$PROJECT_DIR$/resources/audio/firework2.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/game-complete.wav" afterPath="$PROJECT_DIR$/resources/audio/game-complete.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/heatup.wav" afterPath="$PROJECT_DIR$/resources/audio/heatup.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/heatup2.wav" afterPath="$PROJECT_DIR$/resources/audio/heatup2.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/key-jiggle.wav" afterPath="$PROJECT_DIR$/resources/audio/key-jiggle.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/key-press-1.wav" afterPath="$PROJECT_DIR$/resources/audio/key-press-1.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/key-press-2.wav" afterPath="$PROJECT_DIR$/resources/audio/key-press-2.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/key-press-3.wav" afterPath="$PROJECT_DIR$/resources/audio/key-press-3.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/key-press-4.wav" afterPath="$PROJECT_DIR$/resources/audio/key-press-4.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/key-unlock-fast.wav" afterPath="$PROJECT_DIR$/resources/audio/key-unlock-fast.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/key-unlock.wav" afterPath="$PROJECT_DIR$/resources/audio/key-unlock.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/matching-the-goal.wav" afterPath="$PROJECT_DIR$/resources/audio/matching-the-goal.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/matching-the-goal2.wav" afterPath="$PROJECT_DIR$/resources/audio/matching-the-goal2.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/mouth-revving.wav" afterPath="$PROJECT_DIR$/resources/audio/mouth-revving.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/place_from_toolbox.wav" afterPath="$PROJECT_DIR$/resources/audio/place_from_toolbox.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/poof.wav" afterPath="$PROJECT_DIR$/resources/audio/poof.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/pop.wav" afterPath="$PROJECT_DIR$/resources/audio/pop.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/popin.wav" afterPath="$PROJECT_DIR$/resources/audio/popin.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/putaway.wav" afterPath="$PROJECT_DIR$/resources/audio/putaway.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/sci-fi-engine-startup.wav" afterPath="$PROJECT_DIR$/resources/audio/sci-fi-engine-startup.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/shatter1.wav" afterPath="$PROJECT_DIR$/resources/audio/shatter1.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/shatter2.wav" afterPath="$PROJECT_DIR$/resources/audio/shatter2.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/spill.wav" afterPath="$PROJECT_DIR$/resources/audio/spill.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/swoop.wav" afterPath="$PROJECT_DIR$/resources/audio/swoop.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/ui_back.wav" afterPath="$PROJECT_DIR$/resources/audio/ui_back.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/wubwub.mp3" afterPath="$PROJECT_DIR$/resources/audio/wubwub.mp3" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/audio/zoom_planet.wav" afterPath="$PROJECT_DIR$/resources/audio/zoom_planet.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/aliens/alien-bag-1.png" afterPath="$PROJECT_DIR$/resources/graphics/aliens/alien-bag-1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/aliens/alien-bag-2.png" afterPath="$PROJECT_DIR$/resources/graphics/aliens/alien-bag-2.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/aliens/alien-bag-3.png" afterPath="$PROJECT_DIR$/resources/graphics/aliens/alien-bag-3.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/aliens/alien-boolean-1.png" afterPath="$PROJECT_DIR$/resources/graphics/aliens/alien-boolean-1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/aliens/alien-boolean-2.png" afterPath="$PROJECT_DIR$/resources/graphics/aliens/alien-boolean-2.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/aliens/alien-boolean-3.png" afterPath="$PROJECT_DIR$/resources/graphics/aliens/alien-boolean-3.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/aliens/alien-boolean-4.png" afterPath="$PROJECT_DIR$/resources/graphics/aliens/alien-boolean-4.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/aliens/alien-boolean-5.png" afterPath="$PROJECT_DIR$/resources/graphics/aliens/alien-boolean-5.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/aliens/alien-conditional-1.png" afterPath="$PROJECT_DIR$/resources/graphics/aliens/alien-conditional-1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/aliens/alien-conditional-2.png" afterPath="$PROJECT_DIR$/resources/graphics/aliens/alien-conditional-2.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/aliens/alien-conditional-3.png" afterPath="$PROJECT_DIR$/resources/graphics/aliens/alien-conditional-3.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/aliens/alien-conditional-4.png" afterPath="$PROJECT_DIR$/resources/graphics/aliens/alien-conditional-4.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/aliens/alien-function-1.png" afterPath="$PROJECT_DIR$/resources/graphics/aliens/alien-function-1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/aliens/alien-function-2.png" afterPath="$PROJECT_DIR$/resources/graphics/aliens/alien-function-2.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/aliens/alien-function-3.png" afterPath="$PROJECT_DIR$/resources/graphics/aliens/alien-function-3.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/apply-arrow.png" afterPath="$PROJECT_DIR$/resources/graphics/apply-arrow.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/bag-background.png" afterPath="$PROJECT_DIR$/resources/graphics/bag-background.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/broken-key-icon.png" afterPath="$PROJECT_DIR$/resources/graphics/broken-key-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/btn-back-default.png" afterPath="$PROJECT_DIR$/resources/graphics/btn-back-default.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/btn-back-down.png" afterPath="$PROJECT_DIR$/resources/graphics/btn-back-down.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/btn-back-hover.png" afterPath="$PROJECT_DIR$/resources/graphics/btn-back-hover.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/btn-hamburger-default.png" afterPath="$PROJECT_DIR$/resources/graphics/btn-hamburger-default.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/btn-hamburger-down.png" afterPath="$PROJECT_DIR$/resources/graphics/btn-hamburger-down.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/btn-hamburger-hover.png" afterPath="$PROJECT_DIR$/resources/graphics/btn-hamburger-hover.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/btn-menu-default.png" afterPath="$PROJECT_DIR$/resources/graphics/btn-menu-default.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/btn-menu-down.png" afterPath="$PROJECT_DIR$/resources/graphics/btn-menu-down.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/btn-menu-hover.png" afterPath="$PROJECT_DIR$/resources/graphics/btn-menu-hover.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/btn-mute-default.png" afterPath="$PROJECT_DIR$/resources/graphics/btn-mute-default.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/btn-mute-down.png" afterPath="$PROJECT_DIR$/resources/graphics/btn-mute-down.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/btn-mute-hover.png" afterPath="$PROJECT_DIR$/resources/graphics/btn-mute-hover.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/btn-next-default.png" afterPath="$PROJECT_DIR$/resources/graphics/btn-next-default.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/btn-next-down.png" afterPath="$PROJECT_DIR$/resources/graphics/btn-next-down.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/btn-next-hover.png" afterPath="$PROJECT_DIR$/resources/graphics/btn-next-hover.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/btn-reset-default.png" afterPath="$PROJECT_DIR$/resources/graphics/btn-reset-default.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/btn-reset-down.png" afterPath="$PROJECT_DIR$/resources/graphics/btn-reset-down.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/btn-reset-hover.png" afterPath="$PROJECT_DIR$/resources/graphics/btn-reset-hover.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/chest-metal-base.png" afterPath="$PROJECT_DIR$/resources/graphics/chest-metal-base.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/chest-metal-lid-closed.png" afterPath="$PROJECT_DIR$/resources/graphics/chest-metal-lid-closed.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/chest-metal-lid-open.png" afterPath="$PROJECT_DIR$/resources/graphics/chest-metal-lid-open.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/chest-wood-base.png" afterPath="$PROJECT_DIR$/resources/graphics/chest-wood-base.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/chest-wood-lid-closed.png" afterPath="$PROJECT_DIR$/resources/graphics/chest-wood-lid-closed.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/chest-wood-lid-open.png" afterPath="$PROJECT_DIR$/resources/graphics/chest-wood-lid-open.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/die.png" afterPath="$PROJECT_DIR$/resources/graphics/die.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/drag-patch.png" afterPath="$PROJECT_DIR$/resources/graphics/drag-patch.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/funnel-selected.png" afterPath="$PROJECT_DIR$/resources/graphics/funnel-selected.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/funnel.png" afterPath="$PROJECT_DIR$/resources/graphics/funnel.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/infinity-symbol.png" afterPath="$PROJECT_DIR$/resources/graphics/infinity-symbol.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/key-icon.png" afterPath="$PROJECT_DIR$/resources/graphics/key-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/lambda-pipe-open.png" afterPath="$PROJECT_DIR$/resources/graphics/lambda-pipe-open.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/lambda-pipe-opening0.png" afterPath="$PROJECT_DIR$/resources/graphics/lambda-pipe-opening0.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/lambda-pipe-opening1.png" afterPath="$PROJECT_DIR$/resources/graphics/lambda-pipe-opening1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/lambda-pipe-white-open.png" afterPath="$PROJECT_DIR$/resources/graphics/lambda-pipe-white-open.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/lambda-pipe-white.png" afterPath="$PROJECT_DIR$/resources/graphics/lambda-pipe-white.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/lambda-pipe-x-open.png" afterPath="$PROJECT_DIR$/resources/graphics/lambda-pipe-x-open.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/lambda-pipe-x-opening0.png" afterPath="$PROJECT_DIR$/resources/graphics/lambda-pipe-x-opening0.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/lambda-pipe-x-opening1.png" afterPath="$PROJECT_DIR$/resources/graphics/lambda-pipe-x-opening1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/lambda-pipe-x-opening2.png" afterPath="$PROJECT_DIR$/resources/graphics/lambda-pipe-x-opening2.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/lambda-pipe-x-opening3.png" afterPath="$PROJECT_DIR$/resources/graphics/lambda-pipe-x-opening3.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/lambda-pipe-x.png" afterPath="$PROJECT_DIR$/resources/graphics/lambda-pipe-x.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/lambda-pipe-xside-closed.png" afterPath="$PROJECT_DIR$/resources/graphics/lambda-pipe-xside-closed.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/lambda-pipe-y.png" afterPath="$PROJECT_DIR$/resources/graphics/lambda-pipe-y.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/lambda-pipe.png" afterPath="$PROJECT_DIR$/resources/graphics/lambda-pipe.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/lock-icon-unlocked.png" afterPath="$PROJECT_DIR$/resources/graphics/lock-icon-unlocked.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/lock-icon.png" afterPath="$PROJECT_DIR$/resources/graphics/lock-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/lock-keyhole.png" afterPath="$PROJECT_DIR$/resources/graphics/lock-keyhole.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/lock-top-locked.png" afterPath="$PROJECT_DIR$/resources/graphics/lock-top-locked.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/lock-top-unlocked.png" afterPath="$PROJECT_DIR$/resources/graphics/lock-top-unlocked.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/mirror-icon-broken.png" afterPath="$PROJECT_DIR$/resources/graphics/mirror-icon-broken.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/mirror-icon-fade-false-lefthalf.png" afterPath="$PROJECT_DIR$/resources/graphics/mirror-icon-fade-false-lefthalf.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/mirror-icon-fade-false-righthalf.png" afterPath="$PROJECT_DIR$/resources/graphics/mirror-icon-fade-false-righthalf.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/mirror-icon-fade-false.png" afterPath="$PROJECT_DIR$/resources/graphics/mirror-icon-fade-false.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/mirror-icon-fade-true.png" afterPath="$PROJECT_DIR$/resources/graphics/mirror-icon-fade-true.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/mirror-icon.png" afterPath="$PROJECT_DIR$/resources/graphics/mirror-icon.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/missing-bracket-selected.png" afterPath="$PROJECT_DIR$/resources/graphics/missing-bracket-selected.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/missing-bracket.png" afterPath="$PROJECT_DIR$/resources/graphics/missing-bracket.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/null-circle-highlight.png" afterPath="$PROJECT_DIR$/resources/graphics/null-circle-highlight.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/null-circle.png" afterPath="$PROJECT_DIR$/resources/graphics/null-circle.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/null1-highlighted.png" afterPath="$PROJECT_DIR$/resources/graphics/null1-highlighted.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/poof0.png" afterPath="$PROJECT_DIR$/resources/graphics/poof0.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/poof1.png" afterPath="$PROJECT_DIR$/resources/graphics/poof1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/poof2.png" afterPath="$PROJECT_DIR$/resources/graphics/poof2.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/poof3.png" afterPath="$PROJECT_DIR$/resources/graphics/poof3.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/poof4.png" afterPath="$PROJECT_DIR$/resources/graphics/poof4.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/pullout-drawer-handle.png" afterPath="$PROJECT_DIR$/resources/graphics/pullout-drawer-handle.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/shinewrap-rightend.png" afterPath="$PROJECT_DIR$/resources/graphics/shinewrap-rightend.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/shinewrap.png" afterPath="$PROJECT_DIR$/resources/graphics/shinewrap.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/caption-long-left.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/caption-long-left.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/caption-long-mid.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/caption-long-mid.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/caption-long-right.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/caption-long-right.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/level-spot-glow.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/level-spot-glow.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/mainmenu-starboy-glow.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/mainmenu-starboy-glow.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/mainmenu-starboy.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/mainmenu-starboy.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planet-bagbag-locked.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planet-bagbag-locked.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planet-bagbag.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planet-bagbag.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planet-binder-locked.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planet-binder-locked.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planet-binder.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planet-binder.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planet-boolili-locked.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planet-boolili-locked.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planet-boolili.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planet-boolili.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planet-conditionabo-locked.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planet-conditionabo-locked.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planet-conditionabo.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planet-conditionabo.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planet-functiana-locked.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planet-functiana-locked.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planet-functiana.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planet-functiana.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planet-glow.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planet-glow.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planet-mapa-locked.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planet-mapa-locked.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planet-mapa.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planet-mapa.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planet-variablana-locked.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planet-variablana-locked.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planet-variablana.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planet-variablana.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_bagbag-locked.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_bagbag-locked.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_bagbag.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_bagbag.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_binder.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_binder.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_boolili-locked.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_boolili-locked.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_boolili.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_boolili.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_conditionabo-locked.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_conditionabo-locked.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_conditionabo.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_conditionabo.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_functiana-locked.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_functiana-locked.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_functiana-selected.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_functiana-selected.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_functiana.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_functiana.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_mapa.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_mapa.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_variablana.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/planets-hires/planet_variablana.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/ship-crashed.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/ship-crashed.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/ship-large-starboy.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/ship-large-starboy.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/ship-large.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/ship-large.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/ship-small.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/ship-small.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star1.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star10.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star10.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star11.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star11.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star12.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star12.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star13.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star13.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star14.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star14.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star2.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star2.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star3.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star3.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star4.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star4.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star5.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star5.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star6.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star6.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star7.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star7.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star8.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star8.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star9.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/stars/mainmenu-star9.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/unused/alien1-functiana.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/unused/alien1-functiana.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/unused/bg-playtable.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/unused/bg-playtable.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/unused/caption-double.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/unused/caption-double.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/unused/caption-single.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/unused/caption-single.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/unused/planet-functiana-selected.png" afterPath="$PROJECT_DIR$/resources/graphics/starboy/unused/planet-functiana-selected.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/toolbox-bg.png" afterPath="$PROJECT_DIR$/resources/graphics/toolbox-bg.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unmute-button-down.png" afterPath="$PROJECT_DIR$/resources/graphics/unmute-button-down.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unmute-button-hover.png" afterPath="$PROJECT_DIR$/resources/graphics/unmute-button-hover.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unmute-button.png" afterPath="$PROJECT_DIR$/resources/graphics/unmute-button.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/chapter-complete.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/chapter-complete.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/game-complete.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/game-complete.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-closed.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-closed.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-opening1.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-opening1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-opening2.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-opening2.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-red-closed.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-red-closed.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-red.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-red.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-white-closed.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-white-closed.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-white.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-white.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-x-closed-es6.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-x-closed-es6.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-x-closed-python.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-x-closed-python.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-x-closed.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-x-closed.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-x-es6.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-x-es6.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-x-python.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-x-python.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-x.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-x.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-xside-closed.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-xside-closed.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-xside.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-xside.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-y-closed.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-y-closed.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-y.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole-y.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-hole.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-pipe-red-closed.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-pipe-red-closed.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/lambda-pipe-red-open.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/lambda-pipe-red-open.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/mirror-fade-false-gold.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/mirror-fade-false-gold.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/unused/mirror-fade-true-gold.png" afterPath="$PROJECT_DIR$/resources/graphics/unused/mirror-fade-true-gold.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/victory.png" afterPath="$PROJECT_DIR$/resources/graphics/victory.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/analysis/.jshintrc" afterPath="$PROJECT_DIR$/analysis/.jshintrc" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/analysis/rules.js" afterPath="$PROJECT_DIR$/analysis/rules.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/concept.js" afterPath="$PROJECT_DIR$/build/concept.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/core/animate.js" afterPath="$PROJECT_DIR$/build/core/animate.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/core/environment.js" afterPath="$PROJECT_DIR$/build/core/environment.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/core/image.js" afterPath="$PROJECT_DIR$/build/core/image.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/core/node.js" afterPath="$PROJECT_DIR$/build/core/node.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/core/resource.js" afterPath="$PROJECT_DIR$/build/core/resource.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/core/shapes.js" afterPath="$PROJECT_DIR$/build/core/shapes.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/core/stage.js" afterPath="$PROJECT_DIR$/build/core/stage.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/apply.js" afterPath="$PROJECT_DIR$/build/expr/apply.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/bool.js" afterPath="$PROJECT_DIR$/build/expr/bool.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/choice.js" afterPath="$PROJECT_DIR$/build/expr/choice.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/clamp.js" afterPath="$PROJECT_DIR$/build/expr/clamp.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/collection.js" afterPath="$PROJECT_DIR$/build/expr/collection.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/compare.js" afterPath="$PROJECT_DIR$/build/expr/compare.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/conditional.js" afterPath="$PROJECT_DIR$/build/expr/conditional.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/define.js" afterPath="$PROJECT_DIR$/build/expr/define.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/entangled.js" afterPath="$PROJECT_DIR$/build/expr/entangled.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/error.js" afterPath="$PROJECT_DIR$/build/expr/error.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/expression.js" afterPath="$PROJECT_DIR$/build/expr/expression.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/lambda-david.js" afterPath="$PROJECT_DIR$/build/expr/lambda-david.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/lambda.js" afterPath="$PROJECT_DIR$/build/expr/lambda.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/loops.js" afterPath="$PROJECT_DIR$/build/expr/loops.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/meta.js" afterPath="$PROJECT_DIR$/build/expr/meta.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/missing.js" afterPath="$PROJECT_DIR$/build/expr/missing.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/notch.js" afterPath="$PROJECT_DIR$/build/expr/notch.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/null.js" afterPath="$PROJECT_DIR$/build/expr/null.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/number.js" afterPath="$PROJECT_DIR$/build/expr/number.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/obj.js" afterPath="$PROJECT_DIR$/build/expr/obj.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/recall.js" afterPath="$PROJECT_DIR$/build/expr/recall.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/sequence.js" afterPath="$PROJECT_DIR$/build/expr/sequence.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/snappable.js" afterPath="$PROJECT_DIR$/build/expr/snappable.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/text.js" afterPath="$PROJECT_DIR$/build/expr/text.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/value.js" afterPath="$PROJECT_DIR$/build/expr/value.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/string.js" afterPath="$PROJECT_DIR$/build/expr/string.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/var.js" afterPath="$PROJECT_DIR$/build/expr/var.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/expr/vardisplay.js" afterPath="$PROJECT_DIR$/build/expr/vardisplay.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/extra/writing_levels.js" afterPath="$PROJECT_DIR$/build/extra/writing_levels.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/frame/environmentdisplay.js" afterPath="$PROJECT_DIR$/build/frame/environmentdisplay.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/frame/exprmanager.js" afterPath="$PROJECT_DIR$/build/frame/exprmanager.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/frame/game.js" afterPath="$PROJECT_DIR$/build/frame/game.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/frame/game.js.orig" afterPath="$PROJECT_DIR$/build/frame/game.js.orig" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/frame/loadresources.js" afterPath="$PROJECT_DIR$/build/frame/loadresources.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/frame/menus.js" afterPath="$PROJECT_DIR$/build/frame/menus.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/frame/parseES6.js" afterPath="$PROJECT_DIR$/build/frame/parseES6.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/frame/reductstage.js" afterPath="$PROJECT_DIR$/build/frame/reductstage.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/frame/toolbox.js" afterPath="$PROJECT_DIR$/build/frame/toolbox.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/func/count.js" afterPath="$PROJECT_DIR$/build/func/count.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/func/func.js" afterPath="$PROJECT_DIR$/build/func/func.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/func/map.js" afterPath="$PROJECT_DIR$/build/func/map.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/fx/effect.js" afterPath="$PROJECT_DIR$/build/fx/effect.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/init.js" afterPath="$PROJECT_DIR$/build/init.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/log/logger.js" afterPath="$PROJECT_DIR$/build/log/logger.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/log_analyzer.js" afterPath="$PROJECT_DIR$/build/log_analyzer.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/misc/arrowpath.js" afterPath="$PROJECT_DIR$/build/misc/arrowpath.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/misc/bag.js" afterPath="$PROJECT_DIR$/build/misc/bag.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/misc/rainbowtrail.js" afterPath="$PROJECT_DIR$/build/misc/rainbowtrail.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/test.js" afterPath="$PROJECT_DIR$/build/test.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/unit/test.js" afterPath="$PROJECT_DIR$/build/unit/test.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/util.js" afterPath="$PROJECT_DIR$/build/util.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/datalogger.sh" afterPath="$PROJECT_DIR$/datalogger.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gantt.html" afterPath="$PROJECT_DIR$/gantt.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index-expr.html" afterPath="$PROJECT_DIR$/index-expr.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index-mobile.html" afterPath="$PROJECT_DIR$/index-mobile.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index.html" afterPath="$PROJECT_DIR$/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/dijkstras.js" afterPath="$PROJECT_DIR$/lib/dijkstras.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/esprima.js" afterPath="$PROJECT_DIR$/lib/esprima.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/jquery-ui.min.css" afterPath="$PROJECT_DIR$/lib/jquery-ui.min.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/jquery-ui.min.js" afterPath="$PROJECT_DIR$/lib/jquery-ui.min.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/jquery-ui.structure.min.css" afterPath="$PROJECT_DIR$/lib/jquery-ui.structure.min.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/lowLag.js" afterPath="$PROJECT_DIR$/lib/lowLag.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/mobile-detect.min.js" afterPath="$PROJECT_DIR$/lib/mobile-detect.min.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/pace.css" afterPath="$PROJECT_DIR$/lib/pace.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/pace.min.js" afterPath="$PROJECT_DIR$/lib/pace.min.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/progressBar.js" afterPath="$PROJECT_DIR$/lib/progressBar.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/writeALevelPopup.js" afterPath="$PROJECT_DIR$/lib/writeALevelPopup.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/writing_levels.js" afterPath="$PROJECT_DIR$/lib/writing_levels.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/index.html" afterPath="$PROJECT_DIR$/log_analyzer/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/CONTRIBUTING.md" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/CONTRIBUTING.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/HISTORY.md" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/HISTORY.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/LICENSE-APACHE-2.0" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/LICENSE-APACHE-2.0" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/LICENSE-MIT" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/LICENSE-MIT" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/NOTICE" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/NOTICE" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/README.md" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/README.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/vis-graph3d.min.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/vis-graph3d.min.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/vis-network.min.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/vis-network.min.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/vis-timeline-graph2d.min.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/vis-timeline-graph2d.min.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/vis.css" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/vis.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/vis.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/vis.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/vis.map" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/vis.map" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/vis.min.css" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/vis.min.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/vis.min.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/dist/vis.min.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/css/bootstrap-theme.css" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/css/bootstrap-theme.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/css/bootstrap-theme.css.map" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/css/bootstrap-theme.css.map" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/css/bootstrap-theme.min.css" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/css/bootstrap-theme.min.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/css/bootstrap.css" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/css/bootstrap.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/css/bootstrap.css.map" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/css/bootstrap.css.map" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/css/bootstrap.min.css" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/css/bootstrap.min.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/css/carousel.css" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/css/carousel.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/css/prettify.css" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/css/prettify.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/css/style.css" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/css/style.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/data/dataset.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/data/dataset.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/data/dataview.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/data/dataview.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/data/index.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/data/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/fonts/glyphicons-halflings-regular.svg" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/fonts/glyphicons-halflings-regular.svg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/graph2d/index.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/graph2d/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/graph3d/index.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/graph3d/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/arrow.svg" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/arrow.svg" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/external-link-icons/license.txt" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/img/external-link-icons/license.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/index.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/bootstrap.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/bootstrap.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/bootstrap.min.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/bootstrap.min.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/docs.min.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/docs.min.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/googleAnalytics.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/googleAnalytics.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/ie-emulation-modes-warning.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/ie-emulation-modes-warning.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/ie10-viewport-bug-workaround.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/ie10-viewport-bug-workaround.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/jquery.highlight.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/jquery.highlight.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/jquery.min.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/jquery.min.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/jquery.url.min.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/jquery.url.min.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/main.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/main.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-apollo.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-apollo.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-css.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-css.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-hs.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-hs.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-lisp.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-lisp.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-lua.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-lua.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-ml.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-ml.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-proto.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-proto.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-scala.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-scala.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-sql.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-sql.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-vb.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-vb.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-vhdl.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-vhdl.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-wiki.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-wiki.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-yaml.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/lang-yaml.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/prettify.css" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/prettify.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/prettify.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/prettify/prettify.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/smooth-scroll.min.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/smooth-scroll.min.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/tipuesearch.config.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/tipuesearch.config.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/tipuesearch.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/tipuesearch.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/tipuesearch.min.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/tipuesearch.min.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/toggleTable.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/js/toggleTable.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/network/configure.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/network/configure.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/network/edges.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/network/edges.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/network/groups.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/network/groups.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/network/index.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/network/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/network/interaction.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/network/interaction.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/network/layout.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/network/layout.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/network/manipulation.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/network/manipulation.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/network/nodes.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/network/nodes.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/network/physics.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/network/physics.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/timeline/index.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/docs/timeline/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/googleAnalytics.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/googleAnalytics.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/01_basic.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/01_basic.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/02_bars.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/02_bars.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/03_groups.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/03_groups.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/04_rightAxis.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/04_rightAxis.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/05_bothAxis.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/05_bothAxis.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/06_interpolation.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/06_interpolation.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/07_scrollingAndSorting.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/07_scrollingAndSorting.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/08_performance.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/08_performance.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/09_external_legend.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/09_external_legend.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/10_barsSideBySide.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/10_barsSideBySide.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/11_barsSideBySideGroups.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/11_barsSideBySideGroups.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/12_customRange.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/12_customRange.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/13_localization.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/13_localization.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/14_toggleGroups.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/14_toggleGroups.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/15_streaming_data.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/15_streaming_data.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/16_bothAxisTitles.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/16_bothAxisTitles.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/17_dynamicStyling.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/17_dynamicStyling.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/18_scatterplot.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/18_scatterplot.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/19_labels.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/19_labels.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/20_shading.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/20_shading.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/default.css" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph2d/default.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/01_basics.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/01_basics.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/02_camera.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/02_camera.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/03_filter_data.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/03_filter_data.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/04_animation.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/04_animation.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/05_line.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/05_line.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/06_moving_dots.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/06_moving_dots.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/07_dot_cloud_colors.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/07_dot_cloud_colors.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/08_dot_cloud_size.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/08_dot_cloud_size.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/09_mobile.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/09_mobile.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/10_styling.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/10_styling.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/11_tooltips.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/11_tooltips.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/12_custom_labels.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/12_custom_labels.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/default.css" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/default.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/csv2array.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/csv2array.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/csv2datatable.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/csv2datatable.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/datasource.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/datasource.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/datasource.php" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/datasource.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/index.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/playground.css" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/playground.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/playground.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/playground.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-apollo.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-apollo.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-css.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-css.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-hs.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-hs.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-lisp.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-lisp.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-lua.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-lua.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-ml.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-ml.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-proto.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-proto.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-scala.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-scala.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-sql.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-sql.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-vb.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-vb.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-vhdl.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-vhdl.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-wiki.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-wiki.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-yaml.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/lang-yaml.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/prettify.css" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/prettify.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/prettify.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/graph3d/playground/prettify/prettify.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/basicUsage.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/basicUsage.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/datasets.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/datasets.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/data/cellular_automata.gv.txt" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/data/cellular_automata.gv.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/data/computer_network.gv.txt" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/data/computer_network.gv.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/data/simple.gv.txt" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/data/simple.gv.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/dotLanguage.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/dotLanguage.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/dotPlayground.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/dotPlayground.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/fsm.gv.txt" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/fsm.gv.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/hello.gv.txt" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/hello.gv.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/process.gv.txt" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/process.gv.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/siblings.gv.txt" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/siblings.gv.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/softmaint.gv.txt" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/softmaint.gv.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/traffic_lights.gv.txt" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/traffic_lights.gv.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/transparency.gv.txt" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/transparency.gv.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/twopi2.gv.txt" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/twopi2.gv.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/unix.gv.txt" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/unix.gv.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/world.gv.txt" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dotLanguage/graphvizGallery/world.gv.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dynamicData.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/dynamicData.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/importingFromGephi.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/importingFromGephi.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/scalingCustom.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/scalingCustom.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/scalingNodesEdges.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/scalingNodesEdges.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/scalingNodesEdgesLabels.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/data/scalingNodesEdgesLabels.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/datasources/WorldCup2014.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/datasources/WorldCup2014.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/datasources/WorldCup2014.json" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/datasources/WorldCup2014.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/datasources/largeHierarchicalDataset.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/datasources/largeHierarchicalDataset.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/edgeStyles/arrows.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/edgeStyles/arrows.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/edgeStyles/colors.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/edgeStyles/colors.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/edgeStyles/dashes.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/edgeStyles/dashes.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/edgeStyles/smooth.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/edgeStyles/smooth.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/edgeStyles/smoothWorldCup.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/edgeStyles/smoothWorldCup.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/events/interactionEvents.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/events/interactionEvents.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/events/physicsEvents.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/events/physicsEvents.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/events/renderEvents.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/events/renderEvents.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/exampleApplications/disassemblerExample.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/exampleApplications/disassemblerExample.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/exampleApplications/lesMiserables.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/exampleApplications/lesMiserables.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/exampleApplications/loadingBar.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/exampleApplications/loadingBar.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/exampleApplications/neighbourhoodHighlight.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/exampleApplications/neighbourhoodHighlight.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/exampleApplications/nodeLegend.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/exampleApplications/nodeLegend.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/exampleApplications/worldCupPerformance.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/exampleApplications/worldCupPerformance.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/exampleUtil.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/exampleUtil.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/license.txt" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/refresh-cl/license.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/license.txt" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/img/soft-scraps-icons/license.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/labels/labelAlignment.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/labels/labelAlignment.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/labels/labelBackground.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/labels/labelBackground.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/labels/labelColorAndSize.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/labels/labelColorAndSize.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/labels/labelStroke.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/labels/labelStroke.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/labels/multilineText.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/labels/multilineText.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/layout/hierarchicalLayout.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/layout/hierarchicalLayout.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/layout/hierarchicalLayoutMethods.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/layout/hierarchicalLayoutMethods.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/layout/hierarchicalLayoutUserdefined.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/layout/hierarchicalLayoutUserdefined.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/layout/hierarchicalLayoutWithoutPhysics.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/layout/hierarchicalLayoutWithoutPhysics.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/layout/randomSeed.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/layout/randomSeed.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/HTMLInNodes.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/HTMLInNodes.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/circularImages.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/circularImages.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/colors.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/colors.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/customGroups.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/customGroups.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/groups.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/groups.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/icons.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/icons.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/images.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/images.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/imagesWithBorders.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/imagesWithBorders.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/shadows.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/shadows.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/shapes.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/shapes.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/shapesWithDashedBorders.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/nodeStyles/shapesWithDashedBorders.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/other/animationShowcase.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/other/animationShowcase.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/other/clustering.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/other/clustering.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/other/clusteringByZoom.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/other/clusteringByZoom.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/other/configuration.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/other/configuration.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/other/manipulation.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/other/manipulation.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/other/navigation.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/other/navigation.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/other/performance.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/other/performance.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/physics/physicsConfiguration.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/network/physics/physicsConfiguration.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/basicUsage.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/basicUsage.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/dataHandling/dataSerialization.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/dataHandling/dataSerialization.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/dataHandling/loadExternalData.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/dataHandling/loadExternalData.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/editing/customSnappingOfItems.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/editing/customSnappingOfItems.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/editing/editingItems.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/editing/editingItems.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/editing/editingItemsCallbacks.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/editing/editingItemsCallbacks.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/editing/individualEditableItems.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/editing/individualEditableItems.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/editing/updateDataOnEvent.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/editing/updateDataOnEvent.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/groups/groups.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/groups/groups.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/groups/groupsEditable.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/groups/groupsEditable.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/groups/groupsOrdering.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/groups/groupsOrdering.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/groups/subgroups.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/groups/subgroups.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/interaction/animateWindow.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/interaction/animateWindow.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/interaction/clickToUse.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/interaction/clickToUse.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/interaction/eventListeners.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/interaction/eventListeners.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/interaction/limitMoveAndZoom.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/interaction/limitMoveAndZoom.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/interaction/setSelection.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/interaction/setSelection.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/items/backgroundAreas.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/items/backgroundAreas.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/items/backgroundAreasWithGroups.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/items/backgroundAreasWithGroups.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/items/htmlContents.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/items/htmlContents.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/items/itemOrdering.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/items/itemOrdering.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/items/rangeOverflowItem.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/items/rangeOverflowItem.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/customTimeBars.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/customTimeBars.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/dataAttributes.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/dataAttributes.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/dataAttributesAll.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/dataAttributesAll.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/groupsPerformance.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/groupsPerformance.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/hidingPeriods.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/hidingPeriods.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/localization.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/localization.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/performance.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/performance.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/requirejs/requirejs_example.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/requirejs/requirejs_example.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/requirejs/scripts/main.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/requirejs/scripts/main.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/requirejs/scripts/require.js" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/requirejs/scripts/require.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/rtl.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/rtl.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/timezone.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/other/timezone.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/resources/data/basic.json" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/resources/data/basic.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/resources/data/wk2014.json" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/resources/data/wk2014.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/resources/img/license.txt" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/resources/img/license.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/resources/img/license_aesthetica-2.txt" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/resources/img/license_aesthetica-2.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/resources/img/license_refresh-cl.txt" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/resources/img/license_refresh-cl.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/styling/axisOrientation.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/styling/axisOrientation.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/styling/customCss.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/styling/customCss.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/styling/gridStyling.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/styling/gridStyling.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/styling/itemTemplates.html" afterPath="$PROJECT_DIR$/log_analyzer/lib/vis/examples/timeline/styling/itemTemplates.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/nodejs-log-listener/log-listener.js" afterPath="$PROJECT_DIR$/log_analyzer/nodejs-log-listener/log-listener.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/nodejs-log-listener/package.json" afterPath="$PROJECT_DIR$/log_analyzer/nodejs-log-listener/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyzer/nodejs-log-listener/userlogs/test.json" afterPath="$PROJECT_DIR$/log_analyzer/nodejs-log-listener/userlogs/test.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/package.json" afterPath="$PROJECT_DIR$/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/prev_versions/v0.1/log_1465587213981.json" afterPath="$PROJECT_DIR$/prev_versions/v0.1/log_1465587213981.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/prev_versions/v0.1/log_1465653006736.json" afterPath="$PROJECT_DIR$/prev_versions/v0.1/log_1465653006736.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/prev_versions/v0.1/log_1465655740596.json" afterPath="$PROJECT_DIR$/prev_versions/v0.1/log_1465655740596.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/prev_versions/v0.1/log_1465655864685.json" afterPath="$PROJECT_DIR$/prev_versions/v0.1/log_1465655864685.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/assets.json" afterPath="$PROJECT_DIR$/resources/graphics/assets.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/graphics/starboy/menu-assets.json" afterPath="$PROJECT_DIR$/resources/graphics/starboy/menu-assets.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/assign.json" afterPath="$PROJECT_DIR$/resources/levels/assign.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/bags.json" afterPath="$PROJECT_DIR$/resources/levels/bags.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/bindings.json" afterPath="$PROJECT_DIR$/resources/levels/bindings.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/booleans.json" afterPath="$PROJECT_DIR$/resources/levels/booleans.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/combination.json" afterPath="$PROJECT_DIR$/resources/levels/combination.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/conditionals.json" afterPath="$PROJECT_DIR$/resources/levels/conditionals.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/define.json" afterPath="$PROJECT_DIR$/resources/levels/define.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/define2.json" afterPath="$PROJECT_DIR$/resources/levels/define2.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/example-intro.json" afterPath="$PROJECT_DIR$/resources/levels/example-intro.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/example.json" afterPath="$PROJECT_DIR$/resources/levels/example.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/experimental.json" afterPath="$PROJECT_DIR$/resources/levels/experimental.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/intro.json" afterPath="$PROJECT_DIR$/resources/levels/intro.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/intro_obj.json" afterPath="$PROJECT_DIR$/resources/levels/intro_obj.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/intro_obj2.json" afterPath="$PROJECT_DIR$/resources/levels/intro_obj2.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/intro_typing.json" afterPath="$PROJECT_DIR$/resources/levels/intro_typing.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/lambdapuzzles.json" afterPath="$PROJECT_DIR$/resources/levels/lambdapuzzles.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/logicalops.json" afterPath="$PROJECT_DIR$/resources/levels/logicalops.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/loops.json" afterPath="$PROJECT_DIR$/resources/levels/loops.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/map.json" afterPath="$PROJECT_DIR$/resources/levels/map.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/mystery.json" afterPath="$PROJECT_DIR$/resources/levels/mystery.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/posttest_v1.json" afterPath="$PROJECT_DIR$/resources/levels/posttest_v1.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/sequence.json" afterPath="$PROJECT_DIR$/resources/levels/sequence.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/variables_obj.json" afterPath="$PROJECT_DIR$/resources/levels/variables_obj.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels_before_cut/bags.json" afterPath="$PROJECT_DIR$/resources/levels_before_cut/bags.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels_before_cut/bindings.json" afterPath="$PROJECT_DIR$/resources/levels_before_cut/bindings.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels_before_cut/booleans.json" afterPath="$PROJECT_DIR$/resources/levels_before_cut/booleans.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels_before_cut/conditionals.json" afterPath="$PROJECT_DIR$/resources/levels_before_cut/conditionals.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels_before_cut/example.json" afterPath="$PROJECT_DIR$/resources/levels_before_cut/example.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels_before_cut/experimental.json" afterPath="$PROJECT_DIR$/resources/levels_before_cut/experimental.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels_before_cut/intro.json" afterPath="$PROJECT_DIR$/resources/levels_before_cut/intro.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels_before_cut/map.json" afterPath="$PROJECT_DIR$/resources/levels_before_cut/map.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels_before_cut/posttest_v1.json" afterPath="$PROJECT_DIR$/resources/levels_before_cut/posttest_v1.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server.sh" afterPath="$PROJECT_DIR$/server.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/.babelrc" afterPath="$PROJECT_DIR$/src/.babelrc" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/.jshintrc" afterPath="$PROJECT_DIR$/src/.jshintrc" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/concept.js" afterPath="$PROJECT_DIR$/src/concept.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/animate.js" afterPath="$PROJECT_DIR$/src/core/animate.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/environment.js" afterPath="$PROJECT_DIR$/src/core/environment.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/image.js" afterPath="$PROJECT_DIR$/src/core/image.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/node.js" afterPath="$PROJECT_DIR$/src/core/node.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/resource.js" afterPath="$PROJECT_DIR$/src/core/resource.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/shapes.js" afterPath="$PROJECT_DIR$/src/core/shapes.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/stage.js" afterPath="$PROJECT_DIR$/src/core/stage.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/apply.js" afterPath="$PROJECT_DIR$/src/expr/apply.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/bool.js" afterPath="$PROJECT_DIR$/src/expr/bool.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/choice.js" afterPath="$PROJECT_DIR$/src/expr/choice.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/clamp.js" afterPath="$PROJECT_DIR$/src/expr/clamp.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/collection.js" afterPath="$PROJECT_DIR$/src/expr/collection.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/compare.js" afterPath="$PROJECT_DIR$/src/expr/compare.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/conditional.js" afterPath="$PROJECT_DIR$/src/expr/conditional.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/define.js" afterPath="$PROJECT_DIR$/src/expr/define.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/entangled.js" afterPath="$PROJECT_DIR$/src/expr/entangled.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/error.js" afterPath="$PROJECT_DIR$/src/expr/error.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/expression.js" afterPath="$PROJECT_DIR$/src/expr/expression.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/lambda.js" afterPath="$PROJECT_DIR$/src/expr/lambda.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/levels/more_array.json" afterPath="$PROJECT_DIR$/resources/levels/more_array.json" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/loops.js" afterPath="$PROJECT_DIR$/src/expr/loops.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/meta.js" afterPath="$PROJECT_DIR$/src/expr/meta.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/missing.js" afterPath="$PROJECT_DIR$/src/expr/missing.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/notch.js" afterPath="$PROJECT_DIR$/src/expr/notch.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/null.js" afterPath="$PROJECT_DIR$/src/expr/null.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/number.js" afterPath="$PROJECT_DIR$/src/expr/number.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/obj.js" afterPath="$PROJECT_DIR$/src/expr/obj.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/recall.js" afterPath="$PROJECT_DIR$/src/expr/recall.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/sequence.js" afterPath="$PROJECT_DIR$/src/expr/sequence.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/snappable.js" afterPath="$PROJECT_DIR$/src/expr/snappable.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/text.js" afterPath="$PROJECT_DIR$/src/expr/text.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/value.js" afterPath="$PROJECT_DIR$/src/expr/value.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/string.js" afterPath="$PROJECT_DIR$/src/expr/string.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/var.js" afterPath="$PROJECT_DIR$/src/expr/var.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/expr/vardisplay.js" afterPath="$PROJECT_DIR$/src/expr/vardisplay.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/extra/writing_levels.js" afterPath="$PROJECT_DIR$/src/extra/writing_levels.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/frame/environmentdisplay.js" afterPath="$PROJECT_DIR$/src/frame/environmentdisplay.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/frame/exprmanager.js" afterPath="$PROJECT_DIR$/src/frame/exprmanager.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/frame/game.js" afterPath="$PROJECT_DIR$/src/frame/game.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/frame/loadresources.js" afterPath="$PROJECT_DIR$/src/frame/loadresources.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/frame/menus.js" afterPath="$PROJECT_DIR$/src/frame/menus.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/frame/parseES6.js" afterPath="$PROJECT_DIR$/src/frame/parseES6.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/frame/reductstage.js" afterPath="$PROJECT_DIR$/src/frame/reductstage.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/frame/toolbox.js" afterPath="$PROJECT_DIR$/src/frame/toolbox.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/func/count.js" afterPath="$PROJECT_DIR$/src/func/count.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/func/func.js" afterPath="$PROJECT_DIR$/src/func/func.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/func/map.js" afterPath="$PROJECT_DIR$/src/func/map.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/fx/effect.js" afterPath="$PROJECT_DIR$/src/fx/effect.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/init.js" afterPath="$PROJECT_DIR$/src/init.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/log/logger.js" afterPath="$PROJECT_DIR$/src/log/logger.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/log_analyzer.js" afterPath="$PROJECT_DIR$/src/log_analyzer.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/misc/arrowpath.js" afterPath="$PROJECT_DIR$/src/misc/arrowpath.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/misc/bag.js" afterPath="$PROJECT_DIR$/src/misc/bag.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/misc/rainbowtrail.js" afterPath="$PROJECT_DIR$/src/misc/rainbowtrail.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test.js" afterPath="$PROJECT_DIR$/src/test.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/unit/test.js" afterPath="$PROJECT_DIR$/src/unit/test.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/util.js" afterPath="$PROJECT_DIR$/src/util.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/watch.sh" afterPath="$PROJECT_DIR$/watch.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/writing_levels.html" afterPath="$PROJECT_DIR$/writing_levels.html" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -753,8 +35,104 @@
     <option name="PATCH_PATH" value="" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="sequence.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/expr/sequence.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="703">
+              <caret line="231" column="67" lean-forward="false" selection-start-line="231" selection-start-column="67" selection-end-line="231" selection-end-column="67" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="meta.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/expr/meta.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding>
+                <element signature="n#!!doc" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="loops.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/expr/loops.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1159">
+              <caret line="435" column="9" lean-forward="false" selection-start-line="435" selection-start-column="9" selection-end-line="435" selection-end-column="9" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="var.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/expr/var.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="702">
+              <caret line="440" column="64" lean-forward="false" selection-start-line="440" selection-start-column="64" selection-end-line="440" selection-end-column="64" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>subreducemethod</find>
+      <find>performsubreduction</find>
+      <find>isvalue()</find>
+      <find>canreduce()</find>
+      <find>equalsassi</find>
+      <find>performreduction</find>
+      <find>item</find>
+      <find>unlock()</find>
+      <find>isproperty</find>
+      <find>global</find>
+      <find>draw()</find>
+      <find>this.bodyexpr</find>
+      <find>holes</find>
+      <find>this.bodyExpr</find>
+      <find>actualvalue</find>
+      <find>console.log</find>
+      <find>animatejump</find>
+      <find>clo</find>
+      <find>hol</find>
+      <find>animatedvalue</find>
+      <find>clone(</find>
+      <find>child</find>
+      <find>repeat</find>
+      <find>canRed</find>
+      <find>labeledvar</find>
+      <find>clone</find>
+      <find>assignexpr</find>
+    </findStrings>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/src/expr/missing.js" />
+        <option value="$PROJECT_DIR$/src/expr/number.js" />
+        <option value="$PROJECT_DIR$/resources/levels/variable_obj.json" />
+        <option value="$PROJECT_DIR$/src/frame/loadresources.js" />
+        <option value="$PROJECT_DIR$/src/frame/environmentdisplay.js" />
+        <option value="$PROJECT_DIR$/src/core/node.js" />
+        <option value="$PROJECT_DIR$/src/expr/string.js" />
+        <option value="$PROJECT_DIR$/src/expr/expression.js" />
+        <option value="$PROJECT_DIR$/src/expr/loops.js" />
+        <option value="$PROJECT_DIR$/src/expr/obj.js" />
+        <option value="$PROJECT_DIR$/resources/levels/more_array.json" />
+        <option value="$PROJECT_DIR$/src/expr/sequence.js" />
+        <option value="$PROJECT_DIR$/src/expr/var.js" />
+      </list>
+    </option>
   </component>
   <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
   <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
@@ -784,15 +162,174 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="Scratches" />
-      <pane id="ProjectPane" />
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lcalcgame-ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lcalcgame-ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lcalcgame-ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lcalcgame-ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lcalcgame-ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lcalcgame-ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="frame" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lcalcgame-ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lcalcgame-ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="expr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lcalcgame-ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lcalcgame-ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="resources" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lcalcgame-ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lcalcgame-ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="resources" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="levels" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="HbShouldOpenHtmlAsHb" value="" />
     <property name="FullScreen" value="true" />
+    <property name="nodejs_interpreter_path" value="/usr/local/bin/node" />
+    <property name="js.eslint.eslintPackage" value="" />
+    <property name="js-jscs-nodeInterpreter" value="/usr/local/bin/node" />
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="DartCommandLineRunConfigurationType" factoryName="Dart Command Line Application">
+      <method />
+    </configuration>
+    <configuration default="true" type="DartTestRunConfigurationType" factoryName="Dart Test">
+      <method />
+    </configuration>
+    <configuration default="true" type="JavaScriptTestRunnerKarma" factoryName="Karma">
+      <config-file value="" />
+      <node-interpreter value="project" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavaScriptTestRunnerProtractor" factoryName="Protractor">
+      <config-file value="" />
+      <node-interpreter value="project" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
+      <method />
+    </configuration>
+    <configuration default="true" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="project" working-dir="">
+      <method />
+    </configuration>
+    <configuration default="true" type="cucumber.js" factoryName="Cucumber.js">
+      <option name="cucumberJsArguments" value="" />
+      <option name="executablePath" />
+      <option name="filePath" />
+      <method />
+    </configuration>
+    <configuration default="true" type="js.build_tools.gulp" factoryName="Gulp.js">
+      <node-interpreter>project</node-interpreter>
+      <node-options />
+      <gulpfile />
+      <tasks />
+      <arguments />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="js.build_tools.npm" factoryName="npm">
+      <command value="run" />
+      <scripts />
+      <node-interpreter value="project" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="mocha-javascript-test-runner" factoryName="Mocha">
+      <node-interpreter>project</node-interpreter>
+      <node-options />
+      <working-directory />
+      <pass-parent-env>true</pass-parent-env>
+      <envs />
+      <ui />
+      <extra-mocha-options />
+      <test-kind>DIRECTORY</test-kind>
+      <test-directory />
+      <recursive>false</recursive>
+      <method />
+    </configuration>
   </component>
   <component name="ShelveChangesManager" show_recycled="false">
     <option name="remove_strategy" value="false" />
@@ -804,33 +341,40 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1493756451288</updated>
-      <workItem from="1493756452976" duration="16000" />
+      <workItem from="1493756452976" duration="5602000" />
+      <workItem from="1493924704379" duration="19475000" />
+      <workItem from="1494353074371" duration="6858000" />
+      <workItem from="1494445886283" duration="2126000" />
+      <workItem from="1494608022389" duration="3942000" />
+      <workItem from="1494727128948" duration="412000" />
+      <workItem from="1494741400828" duration="11305000" />
+      <workItem from="1494816979482" duration="7022000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="16000" />
+    <option name="totallyTimeSpent" value="56742000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.225" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25791326" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -842,5 +386,351 @@
   <component name="XDebuggerManager">
     <breakpoint-manager />
     <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/expr/obj.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="8246">
+          <caret line="434" column="14" lean-forward="false" selection-start-line="434" selection-start-column="14" selection-end-line="434" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/levels/more_array.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1064">
+          <caret line="56" column="9" lean-forward="true" selection-start-line="56" selection-start-column="9" selection-end-line="56" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/expr/loops.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/levels/more_array.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="893">
+          <caret line="47" column="10" lean-forward="false" selection-start-line="47" selection-start-column="10" selection-end-line="47" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/expr/var.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/expr/obj.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="8417">
+          <caret line="443" column="65" lean-forward="false" selection-start-line="443" selection-start-column="65" selection-end-line="443" selection-end-column="65" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/levels/more_array.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="589">
+          <caret line="31" column="13" lean-forward="false" selection-start-line="31" selection-start-column="13" selection-end-line="31" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/expr/string.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/expr/number.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="532">
+          <caret line="28" column="9" lean-forward="true" selection-start-line="28" selection-start-column="9" selection-end-line="28" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/levels/intro_obj.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/expr/recall.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/func/func.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="309">
+          <caret line="379" column="34" lean-forward="false" selection-start-line="379" selection-start-column="34" selection-end-line="379" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/expr/missing.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="437">
+          <caret line="70" column="15" lean-forward="false" selection-start-line="70" selection-start-column="15" selection-end-line="70" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/expr/string.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="181">
+          <caret line="96" column="24" lean-forward="false" selection-start-line="96" selection-start-column="24" selection-end-line="96" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../lcalcgame-ui-legacy/src/expr/number.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1311">
+          <caret line="79" column="0" lean-forward="false" selection-start-line="79" selection-start-column="0" selection-end-line="81" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../lcalcgame-ui-legacy/src/expr/expression.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="665">
+          <caret line="293" column="5" lean-forward="true" selection-start-line="293" selection-start-column="5" selection-end-line="293" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/expr/number.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="665">
+          <caret line="88" column="53" lean-forward="false" selection-start-line="88" selection-start-column="53" selection-end-line="88" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/levels/variables_obj.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/levels/variable_obj_methods.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="855">
+          <caret line="45" column="20" lean-forward="false" selection-start-line="45" selection-start-column="20" selection-end-line="45" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/frame/loadresources.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="499">
+          <caret line="174" column="26" lean-forward="false" selection-start-line="174" selection-start-column="26" selection-end-line="174" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../lcalcgame-ui-legacy/src/expr/obj.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="874">
+          <caret line="308" column="46" lean-forward="true" selection-start-line="308" selection-start-column="46" selection-end-line="308" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/frame/game.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-4275">
+          <caret line="37" column="55" lean-forward="true" selection-start-line="37" selection-start-column="55" selection-end-line="37" selection-end-column="55" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/frame/reductstage.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="76">
+          <caret line="4" column="33" lean-forward="false" selection-start-line="4" selection-start-column="33" selection-end-line="4" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/core/stage.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4579">
+          <caret line="340" column="14" lean-forward="false" selection-start-line="340" selection-start-column="8" selection-end-line="340" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/frame/environmentdisplay.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="76">
+          <caret line="4" column="37" lean-forward="false" selection-start-line="4" selection-start-column="37" selection-end-line="4" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/levels/sequence.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/expr/collection.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-8393">
+          <caret line="42" column="4" lean-forward="false" selection-start-line="42" selection-start-column="4" selection-end-line="42" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/expr/var.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="197">
+          <caret line="841" column="32" lean-forward="false" selection-start-line="841" selection-start-column="32" selection-end-line="841" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../Operating System/project3/blockdb_go/example/test_run.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-888">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/frame/exprmanager.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="475">
+          <caret line="47" column="76" lean-forward="false" selection-start-line="47" selection-start-column="76" selection-end-line="47" selection-end-column="76" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/expr/lambda.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5044">
+          <caret line="607" column="4" lean-forward="false" selection-start-line="607" selection-start-column="4" selection-end-line="607" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/lib/JavaScriptLanguage.jar!/com/intellij/lang/javascript/index/predefined/EcmaScript.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="275">
+          <caret line="132" column="0" lean-forward="false" selection-start-line="132" selection-start-column="0" selection-end-line="132" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/log_analyzer/lib/vis/dist/vis.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="252">
+          <caret line="3630" column="25" lean-forward="false" selection-start-line="3630" selection-start-column="19" selection-end-line="3630" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/core/shapes.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="114">
+          <caret line="6" column="28" lean-forward="false" selection-start-line="6" selection-start-column="28" selection-end-line="6" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/expr/snappable.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/core/node.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="95" column="14" lean-forward="false" selection-start-line="95" selection-start-column="14" selection-end-line="95" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/expr/value.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="616">
+          <caret line="222" column="47" lean-forward="false" selection-start-line="222" selection-start-column="47" selection-end-line="222" selection-end-column="47" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/levels/loops.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/expr/string.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="627">
+          <caret line="78" column="19" lean-forward="false" selection-start-line="78" selection-start-column="19" selection-end-line="78" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/expr/expression.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="532">
+          <caret line="59" column="46" lean-forward="false" selection-start-line="59" selection-start-column="46" selection-end-line="59" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/levels/more_array.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="418">
+          <caret line="167" column="59" lean-forward="false" selection-start-line="167" selection-start-column="59" selection-end-line="167" selection-end-column="59" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/expr/obj.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="613">
+          <caret line="398" column="63" lean-forward="false" selection-start-line="398" selection-start-column="63" selection-end-line="398" selection-end-column="63" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/expr/sequence.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="703">
+          <caret line="231" column="67" lean-forward="false" selection-start-line="231" selection-start-column="67" selection-end-line="231" selection-end-column="67" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/expr/meta.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/expr/loops.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1159">
+          <caret line="435" column="9" lean-forward="false" selection-start-line="435" selection-start-column="9" selection-end-line="435" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/expr/var.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="702">
+          <caret line="440" column="64" lean-forward="false" selection-start-line="440" selection-start-column="64" selection-end-line="440" selection-end-column="64" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
   </component>
 </project>

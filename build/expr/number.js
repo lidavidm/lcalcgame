@@ -116,7 +116,11 @@ var OperatorExpr = function (_Expression2) {
     }, {
         key: 'onmouseclick',
         value: function onmouseclick() {
-            this.performUserReduction();
+            //this.performUserReduction();
+            console.log("clicked Operator Expression!!");
+            if (!this._animating) {
+                this.performReduction();
+            }
         }
     }, {
         key: 'toString',
@@ -229,8 +233,10 @@ var DivisionExpr = function (_OperatorExpr4) {
         key: 'reduce',
         value: function reduce() {
             if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {
+                console.log("reducing division expression");
                 return new (ExprManager.getClass('number'))(this.leftExpr.value() / this.rightExpr.value());
             } else {
+                console.log("reduce failed!!");
                 return this;
             }
         }

@@ -69,8 +69,13 @@ var Expression = function (_mag$RoundedRect) {
         value: function clone() {
             var parent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
+            //console.log("parent");
+            //console.log(parent);
             var c = _get(Expression.prototype.__proto__ || Object.getPrototypeOf(Expression.prototype), 'clone', this).call(this, parent);
+            //console.log("c!!!!!");
+            //console.log(c);
             var children = c.children;
+            var holes = c.holes;
             c.children = [];
             c.holes = [];
             c.stroke = null;
@@ -78,6 +83,12 @@ var Expression = function (_mag$RoundedRect) {
             children.forEach(function (child) {
                 return c.addArg(child);
             });
+            c.holes = [];
+            holes.forEach(function (hole) {
+                return c.addHole(hole);
+            });
+            //console.log("c.holes");
+            //console.log(c.holes);
             return c;
         }
 
@@ -92,6 +103,11 @@ var Expression = function (_mag$RoundedRect) {
                     hole.bindSubexpressions();
                 }
             });
+        }
+    }, {
+        key: 'addHole',
+        value: function addHole(hole) {
+            this.holes.push(hole);
         }
     }, {
         key: 'addArg',
@@ -429,6 +445,7 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'performReduction',
         value: function performReduction() {
+            //console.log("called performReduction");
             var reduced_expr = this.reduce();
             if (reduced_expr !== undefined && reduced_expr != this) {
                 // Only swap if reduction returns something > null.
@@ -469,6 +486,7 @@ var Expression = function (_mag$RoundedRect) {
         key: 'reduceCompletely',
         value: function reduceCompletely() {
             // Try to reduce this expression and its subexpressions as completely as possible.
+            //console.log("called reduce completely");
             var e = this;
             e.update();
             var prev_holes = e.holes;

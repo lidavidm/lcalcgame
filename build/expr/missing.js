@@ -99,10 +99,10 @@ var MissingExpression = function (_Expression) {
                 }*/
 
                 // Blink blue if reduction is possible with this config.
-                var try_reduce = node.parent.reduceCompletely();
-                if (try_reduce != node.parent && try_reduce !== undefined || node.parent.isComplete()) {
-                    Animate.blink(node.parent, 1000, [1, 1, 0], 1);
-                }
+                //var try_reduce = node.parent.reduceCompletely();
+                /*if ((try_reduce != node.parent && try_reduce !== undefined) || node.parent.isComplete()) {
+                    Animate.blink(node.parent, 1000, [1,1,0], 1);
+                }*/
             }
         }
     }, {

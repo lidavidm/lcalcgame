@@ -526,7 +526,14 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
                 var cln = _get(ObjectExtensionExpr.prototype.__proto__ || Object.getPrototypeOf(ObjectExtensionExpr.prototype), 'clone', this).call(this, parent);
                 this.addChild(this.drawer);
                 return cln;
-            } else return _get(ObjectExtensionExpr.prototype.__proto__ || Object.getPrototypeOf(ObjectExtensionExpr.prototype), 'clone', this).call(this, parent);
+            } else {
+                var _cln = _get(ObjectExtensionExpr.prototype.__proto__ || Object.getPrototypeOf(ObjectExtensionExpr.prototype), 'clone', this).call(this, parent);
+                _cln.holes = [];
+                this.holes.forEach(function (hole) {
+                    return _cln.holes.push(hole);
+                });
+                return _cln;
+            }
         }
     }, {
         key: 'isCompletelySpecified',
@@ -555,14 +562,20 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
             this.performReduction();
         }
     }, {
+        key: 'canReduce',
+        value: function canReduce() {
+            //TODO
+            return true;
+        }
+    }, {
         key: 'reduce',
         value: function reduce() {
-            console.log('reduce');
+            console.log('reduce() in ObjectExtensionExpr');
             if (this.holes[0] instanceof MissingExpression) return this;
             if (this.subReduceMethod) {
                 var r = void 0;
                 var args = this.methodArgs;
-                console.log(args);
+                //console.log(args);
                 // Reduce the args before calling (call-by-value)
                 for (var i = 0; i < args.length; i++) {
                     var arg = args[i];
@@ -573,9 +586,18 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
                         return this;
                     }
                 }
+                var args0 = this.holes[0];
+                if (args0.canReduce()) {
+                    args0 = args0.reduceCompletely();
+                }
+
+                //console.log("args0 && this.holes[0] after reducing");
+                //console.log(args0);
+                //console.log(this.holes[0]);
+
                 if (args.length > 0) // Add arguments to method call.
-                    r = this.subReduceMethod.apply(this, [this.holes[0]].concat(_toConsumableArray(args)));else r = this.subReduceMethod(this.holes[0]); // Method doesn't take arguments.
-                if (r == this.holes[0]) return this;else return r;
+                    r = this.subReduceMethod.apply(this, [args0].concat(_toConsumableArray(args)));else r = this.subReduceMethod(args0); // Method doesn't take arguments.
+                if (r == args0) return this;else return r;
             } else return this;
         }
     }, {
@@ -586,7 +608,7 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
 
             if (this.holes[1]) this.holes.splice(1, 1);
 
-            var isProperty = true;
+            var isProperty = false;
 
             if (!subReduceMethod) {
                 subReduceMethod = this.objMethods[methodText];
@@ -621,6 +643,10 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
             if (!(this.holes[0] instanceof MissingExpression)) {
                 methodtxt._xOffset = -15;
                 methodtxt._sizeOffset = { w: -10, h: 0 };
+                if (this.holes[0] instanceof VtableVarExpr) {
+                    methodtxt._xOffset = -5;
+                    methodtxt._sizeOffset = { w: -5, h: 0 };
+                }
             } else this.holes[0].unlock();
             this.subReduceMethod = subReduceMethod;
             this.addArg(methodtxt);

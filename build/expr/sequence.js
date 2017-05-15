@@ -381,6 +381,23 @@ var SemicolonSequence = function (_Sequence2) {
                 ctx.fillText(";", pos.x + boundingSize.w - rightMargin, expr1y);
             }
         }
+    }, {
+        key: "clone",
+        value: function clone() {
+            var parent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+            console.log("called clone() in semicolon sequence");
+            var cln = _get(SemicolonSequence.prototype.__proto__ || Object.getPrototypeOf(SemicolonSequence.prototype), "clone", this).call(this, parent);
+            cln.holes = [];
+            cln.children = [];
+            console.log("this.holes");
+            console.log(this.holes);
+            //let thisHoles = this.holes.clone();
+            this.holes.forEach(function (hole) {
+                return cln.holes.push(hole.clone());
+            });
+            return cln;
+        }
     }]);
 
     return SemicolonSequence;

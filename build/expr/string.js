@@ -24,6 +24,7 @@ var StringObjectExpr = function (_ObjectExtensionExpr) {
 
         _classCallCheck(this, StringObjectExpr);
 
+        //text.color = "OrangeRed";
         var _this = _possibleConstructorReturn(this, (StringObjectExpr.__proto__ || Object.getPrototypeOf(StringObjectExpr)).call(this, baseString, {
             'length': {
                 'isProperty': true,
@@ -65,10 +66,12 @@ var StringObjectExpr = function (_ObjectExtensionExpr) {
             }
         }));
 
-        _this.string = baseString.value();
-        _this.primitiveName = baseString.value();
-        //text.color = "OrangeRed";
         _this.color = "YellowGreen";
+
+        //console.log("baseString:");
+        //console.log(baseString);
+        //this.string = baseString;
+        //this.primitiveName = baseString;
 
         if (!defaultMethodCall) {} else if (defaultMethodCall in _this.objMethods) {
             _this.setExtension(defaultMethodCall); // TODO: method args
@@ -92,7 +95,7 @@ var StringObjectExpr = function (_ObjectExtensionExpr) {
     _createClass(StringObjectExpr, [{
         key: 'toString',
         value: function toString() {
-            return this.primitiveName;
+            if (this.baseStringValue.canReduce()) return this.baseStringValue.reduceCompletely().toString();else return this.baseStringValue.toString();
         }
     }, {
         key: 'reduce',
