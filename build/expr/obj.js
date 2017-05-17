@@ -749,7 +749,7 @@ var ArrayObjectExpr = function (_ObjectExtensionExpr) {
                 'isProperty': true,
                 'reduce': function reduce(arrayExpr) {
                     this.isProperty = true;
-                    return new NumberExpr(arrayExpr.items.length);
+                    return new (ExprManager.getClass('number'))(arrayExpr.items.length);
                 }
             },
             '[..]': function _(arrayExpr, numberExpr) {

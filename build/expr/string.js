@@ -30,7 +30,7 @@ var StringObjectExpr = function (_ObjectExtensionExpr) {
                 'isProperty': true,
                 'reduce': function reduce(stringExpr) {
                     this.isProperty = true;
-                    return new NumberExpr(stringExpr.value().length);
+                    return new (ExprManager.getClass('number'))(stringExpr.value().length);
                 }
             },
             'slice': function slice(stringExpr, numberExpr1, numberExpr2) {
