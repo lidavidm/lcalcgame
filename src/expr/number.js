@@ -154,7 +154,8 @@ class DivisionExpr extends OperatorExpr {
     reduce() {
         if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {
             console.log("reducing division expression");
-            return new (ExprManager.getClass('number'))(this.leftExpr.value() / this.rightExpr.value());
+            let result = parseInt(this.leftExpr.value()/this.rightExpr.value());
+            return new (ExprManager.getClass('number'))(result);
         }
         else {
             console.log("reduce failed!!");
