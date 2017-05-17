@@ -224,9 +224,10 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         'sequence': ['loops'],
         'loops': ['mystery'],
         'mystery': ['variables_obj'],
-        'variables_obj': ['more_array'],
-        'more_array': ['intro_string'],
-        'intro_string': ['variable_obj_methods'],
+        'variables_obj': ['intro_string'],
+        'intro_string': ['more_array'],
+        'more_array': ['intro_string_obj'],
+        'intro_string_obj': ['variable_obj_methods'],
         'variable_obj_methods': []
     };
 
