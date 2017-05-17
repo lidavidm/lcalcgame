@@ -56,8 +56,8 @@ class Expression extends mag.RoundedRect {
         c.stroke = null;
         c.toolbox = null;
         children.forEach((child) => c.addArg(child));
-        c.holes = [];
-        holes.forEach((hole) => c.addHole(hole));
+        //c.holes = [];
+        //holes.forEach((hole) => c.addHole(hole));
         //console.log("c.holes");
         //console.log(c.holes);
         return c;
