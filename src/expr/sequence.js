@@ -222,12 +222,12 @@ class SemicolonSequence extends Sequence {
     }
 
     clone (parent = null) {
-        console.log("called clone() in semicolon sequence");
+        //console.log("called clone() in semicolon sequence");
         let cln = super.clone(parent);
         cln.holes = [];
         cln.children = [];
-        console.log("this.holes");
-        console.log(this.holes);
+        //console.log("this.holes");
+        //console.log(this.holes);
         //let thisHoles = this.holes.clone();
         this.holes.forEach((hole) => cln.holes.push(hole.clone()));
         return cln;
