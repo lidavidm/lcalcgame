@@ -83,10 +83,8 @@ var Expression = function (_mag$RoundedRect) {
             children.forEach(function (child) {
                 return c.addArg(child);
             });
-            c.holes = [];
-            holes.forEach(function (hole) {
-                return c.addHole(hole);
-            });
+            //c.holes = [];
+            //holes.forEach((hole) => c.addHole(hole));
             //console.log("c.holes");
             //console.log(c.holes);
             return c;
