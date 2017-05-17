@@ -1,6 +1,7 @@
 {
   "chapterName":"Variable Objects Methods",
   "description":"Using methods on variables",
+  "furtherInfo": "reverse a string",
   "levels": [
     {
       "goal": "(star)",

@@ -1,15 +1,15 @@
 {
     "chapterName":"Intro to Strings",
-    "description":"Intro to Strings",
+    "description":"Brief intro to strings",
     "levels": [
         {
-            "goal": "(5)",
-            "board": "(stringobj (apple) `length)",
-            "toolbox": ""
+            "goal": "(0)",
+            "board": "(stringobj (apple) `[..])",
+            "toolbox": "(0)"
         },
         {
-            "goal": "(5)",
-            "board": "(stringobj (apple))",
+            "goal": "(4)",
+            "board": "(stringobj (pear))",
             "toolbox": ""
         },
         {
