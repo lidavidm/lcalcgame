@@ -504,9 +504,15 @@ class ObjectExtensionExpr extends ExpressionPlus {
         if (!(this.holes[0] instanceof MissingExpression)) {
             methodtxt._xOffset = -15;
             methodtxt._sizeOffset = {w:-10, h:0};
+            //console.log("WHAT IS THIS?");
+            //console.log(this);
             if (this.holes[0] instanceof VtableVarExpr) {
                 methodtxt._xOffset = -5;
-                methodtxt._sizeOffset = {w: -5, h:0};
+                methodtxt._sizeOffset = {w : -4, h : 0};
+            }
+            else if (this instanceof StringObjectExpr) {
+                methodtxt._xOffset = -5;
+                methodtxt._sizeOffset = {w : -4, h : 0};
             }
         } else this.holes[0].unlock();
         this.subReduceMethod = subReduceMethod;
