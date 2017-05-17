@@ -26,24 +26,6 @@
             "goal": "3",
             "board": "(stringobj (apple) `slice)",
             "toolbox": "(0) (1) (2) (4)"
-        },
-        {
-            "goal": "(b)",
-            "board": "(0) (1) (2) (3)",
-            "toolbox": "(stringobj $s `[..]) ($index)",
-            "globals": {
-                "s": "(abcdef)",
-                "index": "(0)"
-            }
-        },
-        {
-            "goal": "(abcdef)",
-            "board": "(repeat /($i) /(sequence _ /(assign /$x /(stringobj $s `[..])) /(assign /(stringobj $s `[..]) /(stringobj $s `[..])) /(assign /(stringobj $s `[..]) $x) _ ))  (assign /$index /(+ /$index /1))",
-            "toolbox": "(assign /$i _) (assign /$index2 _) (-- /(stringobj $s `length) /2) ($index) ($index) ($index2) ($index2) (- /(stringobj $s `length) /(+ /$index /1))) (stringobj $s)",
-            "globals": {
-                "s": "(abcdef)",
-                "index": "(0)"
-            }
         }
     ],
     "resources":{
