@@ -14,6 +14,15 @@
     {
       "goal": "(star)",
       "board": "(arrayobj $s `[..])",
+      "toolbox": "(0)",
+      "globals": {
+        "s": "(bag star rect)"
+      }
+    },
+
+    {
+      "goal": "(star)",
+      "board": "(arrayobj $s `[..])",
       "toolbox": "($index)",
       "globals": {
         "s": "(bag star rect)",
@@ -22,19 +31,20 @@
     },
 
     {
-      "goal": "(aade)",
-      "board": "(0) (assign /(stringobj $s `[..]) /(a) )",
+      "goal": "(modify)",
+      "board": "(5) (assign /(stringobj $s `[..]) /(y) )",
       "toolbox": "($s)",
       "globals": {
-        "s": "(bade)"
+        "s": "(modifi)"
       }
     },
+
     {
-      "goal": "(g)",
-      "board": "($index) (assign /$index /_) (assign /$x /(stringobj $s `[..]) )",
+      "goal": "(C)",
+      "board": "($index) (sequence /(assign /$index /_) /(assign /$x /(stringobj $s `[..])) )",
       "toolbox": "(0) (1) (2) (3) (4) ($x)",
       "globals": {
-        "s": "(bagar)",
+        "s": "(getChar)",
         "x": "null"
       }
     },
@@ -50,10 +60,10 @@
 
     {
       "goal": "(bag star star)",
-      "board": "(assign /(arrayobj $s `[..]) /_) (assign /$x /(star)) ($x)",
+      "board": "(sequence /(assign /$x /(star)) /(assign /(arrayobj $s `[..]) /_) ) ($x)",
       "toolbox": "(0) (1)",
       "globals": {
-        "s": "(bag rect star)",
+        "s": "(bag star rect)",
         "x": "null"
       }
     },
@@ -72,7 +82,7 @@
 
     {
       "goal": "(star)",
-      "board": "($index) (assign /($index) /_) (assign /$x /(arrayobj $s `[..]))",
+      "board": "($index) (sequence /(assign /($index) /_) /(assign /$x /(arrayobj $s `[..])) )",
       "toolbox": "($x) (0) (1)",
       "globals": {
         "s": "(bag star rect)",
@@ -81,12 +91,11 @@
     },
 
     {
-      "goal": "2",
+      "goal": "4",
       "description": "(test_division)",
-      "board": "(-- /4 /2)",
+      "board": "(-- /8 /2)",
       "toolbox": "",
       "globals": {
-        "s": "(bag (a) (b) (c) (d))"
       }
     },
 
@@ -114,8 +123,8 @@
 
     {
       "goal": "(abc)",
-      "board": "(sequence /(assign /$x /(stringobj $s `[..])) /(assign /(stringobj $s `[..]) /(stringobj $s `[..])) /(assign /(stringobj $s `[..]) $x) )",
-      "toolbox": "(0) (1) (2) ($s) (assign /$index /_) (assign /$index2 /_) ($index) ($index) ($index2) ($index2)",
+      "board": "(sequence /(assign /$index /_) /(assign /$index2 /_) /(assign /$x /(stringobj $s `[..])) /(assign /(stringobj $s `[..]) /(stringobj $s `[..])) /(assign /(stringobj $s `[..]) $x) )",
+      "toolbox": "(0) (1) (2) ($s) ($index) ($index) ($index2) ($index2)",
       "globals": {
         "s": "(cba)",
         "index": "null",
@@ -125,13 +134,26 @@
     },
 
     {
-      "goal": "(abc)",
+      "goal": "(copys2a)",
+      "description": "copy a string",
+      "board": "(repeat /($i) /(sequence /(assign /(stringobj $a `[..]) /(stringobj $s `[..])) (assign /$index /(+ /$index /1)) ))",
+      "toolbox": "($a) (assign /$i _) (stringobj $s `length) ($index) ($index)",
+      "globals": {
+        "s": "(copys2a)",
+        "a": "(......)",
+        "index": "(0)",
+        "x": "null"
+      }
+    },
+
+    {
+      "goal": "(take)",
       "description": "take first half of string",
       "board": "(repeat /($i) /(sequence /(assign /(stringobj $a `[..]) /(stringobj $s `[..])) (assign /$index /(+ /$index /1)) ))",
       "toolbox": "($a) (assign /$i _) (-- /(stringobj $s `length) /2) ($index) ($index)",
       "globals": {
-        "s": "(abcedf)",
-        "a": "(...)",
+        "s": "(takehalf)",
+        "a": "(....)",
         "index": "(0)",
         "x": "null"
       }
