@@ -591,7 +591,7 @@ class ArrayObjectExpr extends ObjectExtensionExpr {
                             'isProperty': true,
                             'reduce': function (arrayExpr) {
                               this.isProperty = true;
-                              return new NumberExpr(arrayExpr.items.length);
+                              return new (ExprManager.getClass('number'))(arrayExpr.items.length);
                           }
                   },
                   '[..]': (arrayExpr, numberExpr) => {

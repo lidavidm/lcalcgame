@@ -11,7 +11,7 @@ class StringObjectExpr extends ObjectExtensionExpr {
                 'isProperty': true,
                 'reduce': function (stringExpr) {
                     this.isProperty = true;
-                    return new NumberExpr(stringExpr.value().length);
+                    return new (ExprManager.getClass('number'))(stringExpr.value().length);
                 }
             },
             'slice': (stringExpr, numberExpr1, numberExpr2) => {
