@@ -852,6 +852,7 @@ var Level = function () {
                 '-': ExprManager.getClass('-'),
                 '*': ExprManager.getClass('*'),
                 '--': ExprManager.getClass('--'),
+                '++': ExprManager.getClass('++'),
                 'stringobj': ExprManager.getClass('stringobj'),
                 'dot': function () {
                     var circ = new CircleExpr(0, 0, 18);

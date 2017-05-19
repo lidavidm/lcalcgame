@@ -25,6 +25,7 @@ var ExprManager = function () {
         '-': [SubtractionExpr],
         '*': [MultiplicationExpr],
         '--': [DivisionExpr],
+        '++': [StringAddExpr],
         '!=': [MirrorCompareExpr, FadedCompareExpr],
         'and': [CompareExpr],
         'or': [CompareExpr],

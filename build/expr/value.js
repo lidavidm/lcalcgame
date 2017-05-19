@@ -607,3 +607,87 @@ var StringCircleExpr = function (_StringValueExpr4) {
 
     return StringCircleExpr;
 }(StringValueExpr);
+
+var StringAddExpr = function (_Expression4) {
+    _inherits(StringAddExpr, _Expression4);
+
+    function StringAddExpr(left, right) {
+        _classCallCheck(this, StringAddExpr);
+
+        var op = new TextExpr("+");
+        /*if (left instanceof MissingExpression && !(left instanceof MissingNumberExpression))
+            left = new MissingNumberExpression();
+        if (right instanceof MissingExpression && !(right instanceof MissingNumberExpression))
+            right = new MissingNumberExpression();*/
+        return _possibleConstructorReturn(this, (StringAddExpr.__proto__ || Object.getPrototypeOf(StringAddExpr)).call(this, [left, op, right]));
+    }
+
+    _createClass(StringAddExpr, [{
+        key: 'canReduce',
+        value: function canReduce() {
+            return this.leftExpr && (this.leftExpr.isValue() || this.leftExpr.canReduce()) && this.rightExpr && (this.rightExpr.isValue() || this.rightExpr.canReduce());
+        }
+    }, {
+        key: 'performReduction',
+        value: function performReduction() {
+            var _this23 = this;
+
+            return this.performSubReduction(this.leftExpr).then(function (left) {
+                if (!(left instanceof StringValueExpr)) {
+                    return Promise.reject();
+                }
+                return _this23.performSubReduction(_this23.rightExpr).then(function (right) {
+                    if (!(right instanceof StringValueExpr)) {
+                        return Promise.reject();
+                    }
+
+                    var stage = _this23.stage;
+
+                    var val = _get(StringAddExpr.prototype.__proto__ || Object.getPrototypeOf(StringAddExpr.prototype), 'performReduction', _this23).call(_this23);
+                    stage.update();
+                    return val;
+                });
+            });
+        }
+    }, {
+        key: 'onmouseclick',
+        value: function onmouseclick() {
+            //this.performUserReduction();
+            console.log("clicked Operator Expression!!");
+            if (!this._animating) {
+                this.performReduction();
+            }
+        }
+    }, {
+        key: 'toString',
+        value: function toString() {
+            return (this.locked ? '/(' : '(') + this.op.toString() + ' ' + this.leftExpr.toString() + ' ' + this.rightExpr.toString() + ')';
+        }
+    }, {
+        key: 'reduce',
+        value: function reduce() {
+            if (this.leftExpr instanceof StringValueExpr && this.rightExpr instanceof StringValueExpr) {
+                return new StringValueExpr(this.leftExpr.value() + this.rightExpr.value());
+            } else {
+                return this;
+            }
+        }
+    }, {
+        key: 'leftExpr',
+        get: function get() {
+            return this.holes[0];
+        }
+    }, {
+        key: 'rightExpr',
+        get: function get() {
+            return this.holes[2];
+        }
+    }, {
+        key: 'op',
+        get: function get() {
+            return this.holes[1];
+        }
+    }]);
+
+    return StringAddExpr;
+}(Expression);

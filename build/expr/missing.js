@@ -463,7 +463,7 @@ var MissingNumberExpression = function (_MissingTypedExpressi4) {
 
         _this10.graphicNode = new mag.ImageRect(0, 0, 24, 32, 'die');
 
-        _this10.acceptedClasses = [VarExpr, NumberExpr];
+        _this10.acceptedClasses = [VarExpr, NumberExpr, ObjectExtensionExpr];
         return _this10;
     }
 
