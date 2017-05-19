@@ -92,11 +92,12 @@
     },
 
     {
-      "goal": "4",
+      "goal": "3",
       "description": "(test_division)",
-      "board": "(-- /8 /2)",
+      "board": "(-- /_ /2) (stringobj $s `length)",
       "toolbox": "",
       "globals": {
+        "s" : "abcdef"
       }
     },
 
@@ -135,13 +136,13 @@
     },
 
     {
-      "goal": "(copys2a)",
+      "goal": "(copyb2a)",
       "description": "copy a string",
-      "board": "(repeat /($i) /(sequence /(assign /(stringobj $a `[..]) /(stringobj $s `[..])) (assign /$index /(+ /$index /1)) ))",
-      "toolbox": "($a) (assign /$i _) (stringobj $s `length) ($index) ($index)",
+      "board": "(repeat /($i) /(sequence /(assign /(stringobj $a `[..]) /(stringobj $b `[..])) (assign /$index /(+ /$index /1)) ))",
+      "toolbox": "($a) (assign /$i _) (stringobj $b `length) ($index) ($index)",
       "globals": {
-        "s": "(copys2a)",
-        "a": "(......)",
+        "b": "(copyb2a)",
+        "a": "(.......)",
         "index": "(0)",
         "x": "null"
       }
