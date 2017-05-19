@@ -503,7 +503,7 @@ class ObjectExtensionExpr extends ExpressionPlus {
         methodtxt._yMultiplier = 2.85;
         if (!(this.holes[0] instanceof MissingExpression)) {
             methodtxt._xOffset = -15;
-            methodtxt._sizeOffset = {w:-10, h:0};
+            methodtxt._sizeOffset = {w:-15, h:0};
             //console.log("WHAT IS THIS?");
             //console.log(this);
             if (this.holes[0] instanceof VtableVarExpr) {
