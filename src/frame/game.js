@@ -385,6 +385,7 @@ class Level {
             '-':ExprManager.getClass('-'),
             '*':ExprManager.getClass('*'),
             '--':ExprManager.getClass('--'),
+            '++': ExprManager.getClass('++'),
             'stringobj':ExprManager.getClass('stringobj'),
             'dot':(() => {
                 let circ = new CircleExpr(0,0,18);
