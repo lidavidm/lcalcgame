@@ -80,25 +80,29 @@ class IfStatement extends Expression {
                 let stage = this.stage;
                 let afterEffects = () => {
                     this.ignoreEvents = false;
-                    let rtn = super.performReduction();
                     stage.update();
                     stage.draw();
-                    if (rtn === null) {
-                        rtn = new FadedNullExpr();
-                    }
-                    resolve(rtn);
-                    return rtn;
+
+                    return super.performReduction().then((rtn) => {
+                        if (rtn === null) {
+                            rtn = new FadedNullExpr();
+                        }
+                        resolve(rtn);
+                        stage.update();
+                        return rtn;
+                    });
                 };
 
                 if (reduction === null) {
                     this.playJimmyAnimation(afterEffects);
                 }
-                else if (reduction instanceof FadedNullExpr) {
-                    let red = afterEffects();
-                    red.ignoreEvents = true; // don't let them move a null.
-                    Resource.play('pop');
-                    Animate.blink(red, 1000, [1,1,1], 0.4).after(() => {
-                        red.poof();
+                else if (reduction instanceof NullExpr) {
+                    let red = afterEffects().then((red) => {
+                        red.ignoreEvents = true; // don't let them move a null.
+                        Resource.play('pop');
+                        Animate.blink(red, 1000, [1,1,1], 0.4).after(() => {
+                            Animate.poof(red);
+                        });
                     });
                     //this.playJimmyAnimation(afterEffects);
                 }
@@ -134,7 +138,7 @@ class ArrowIfStatement extends IfStatement {
         arrow.color = 'black';
         this.holes = [ cond, arrow, branch ];
     }
-    get emptyExpr() { return null; }
+    get emptyExpr() { return this.parent ? new FadedNullExpr() : null; }
     get cond() { return this.holes[0]; }
     get branch() { return this.holes[2]; }
 }
@@ -188,7 +192,7 @@ class LockIfStatement extends IfStatement {
         shinewrap.opacity = 0.8;
         this._shinewrap = shinewrap;
     }
-    get emptyExpr() { return null; }
+    get emptyExpr() { return this.parent ? new FadedNullExpr() : null; }
     get cond() { return this.holes[0]; }
     get branch() { return this.holes[1]; }
 
@@ -279,7 +283,7 @@ class InlineLockIfStatement extends IfStatement {
         this.holes = [ cond, lock, branch ];
     }
 
-    get emptyExpr() { return null; }
+    get emptyExpr() { return this.parent ? new FadedNullExpr() : null; }
     get cond() { return this.holes[0]; }
     get branch() { return this.holes[2]; }
 
