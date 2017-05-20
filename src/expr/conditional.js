@@ -247,6 +247,8 @@ class LockIfStatement extends IfStatement {
         let bgsz = { w:condsz.w+14, h:condsz.h+16 };
         let bgpos = addPos(pos, {x:-(bgsz.w-condsz.w)/2.0+this.cond.pos.x, y:-(bgsz.h-condsz.h)/2.0+3});
         let topsz = this._top.size;
+        topsz.w *= this.scale.x;
+        topsz.h *= this.scale.y;
         let wrapsz = { w:boundingSize.w - condsz.w, h:boundingSize.h };
         let wrappos = { x:bgpos.x+bgsz.w, y:pos.y };
 
