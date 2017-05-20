@@ -429,12 +429,41 @@ class FadedRepeatLoopExpr extends Expression {
         this.children = this.holes;
     }
 
+    reduceCompletely() {
+         if (this.canReduce()) {
+            let times = this.timesExpr.reduceCompletely().value();
+            if (!Number.isInteger(times)) return this;
+            let missing = [];
+
+            let numExprs = this.bodyExpr instanceof Sequence ? this.bodyExpr.subexpressions.length : 1;
+            for (let i = 0; i < times; i++) {
+                if (numExprs === 1) {
+                    let e = this.bodyExpr.clone();
+                    missing.push(e);
+                }
+                else {
+                    missing = missing.concat(this.bodyExpr.subexpressions.map((e) => e.clone()));
+                }
+            }
+            let template = new (ExprManager.getClass('sequence'))(...missing);
+            template.lockSubexpressions();
+
+            return template;
+        }
+        return this;
+    }
+
     performReduction() {
         if (this.canReduce()) {
             return this.performSubReduction(this.timesExpr).then(() => {
                 let missing = [];
                 for (let i = 0; i < this.timesExpr.number; i++) {
-                    missing.push(this.bodyExpr.clone());
+                    if (this.bodyExpr instanceof Sequence) {
+                        missing = missing.concat(this.bodyExpr.subexpressions.map((e) => e.clone()));
+                    }
+                    else {
+                        missing.push(this.bodyExpr.clone());
+                    }
                 }
 
                 let template = new (ExprManager.getClass('sequence'))(...missing);
@@ -452,7 +481,7 @@ class FadedRepeatLoopExpr extends Expression {
     }
 
     onmouseclick() {
-        this.performReduction();
+        this.performUserReduction();
     }
 
     toString() {
