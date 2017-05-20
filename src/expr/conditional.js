@@ -170,7 +170,13 @@ class LockIfStatement extends IfStatement {
     constructor(cond, branch) {
         super(cond, branch);
         this.holes = [ cond, branch ];
+        this._makeGraphics();
+    }
 
+    _makeGraphics() {
+        // This needs to be called on clones so that duplicated locks
+        // don't all appear to unlock together (since clone() by
+        // default makes them share these objects)
         var bluebg = new mag.RoundedRect(0, 0, 25, 25);
         bluebg.color = "#2484f5";
         this._bg = bluebg;
@@ -185,6 +191,12 @@ class LockIfStatement extends IfStatement {
     get emptyExpr() { return null; }
     get cond() { return this.holes[0]; }
     get branch() { return this.holes[1]; }
+
+    clone(parent=null) {
+        let c = super.clone(parent);
+        c._makeGraphics();
+        return c;
+    }
 
     playJimmyAnimation(onComplete) {
         Resource.play('key-jiggle');
