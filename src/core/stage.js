@@ -268,6 +268,8 @@ var mag = (function(_) {
                     });
                 }
             }
+
+            this.update();
         }
         bringToFront(node) {
             var i = this.nodes.indexOf(node);
