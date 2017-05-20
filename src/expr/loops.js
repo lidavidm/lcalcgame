@@ -350,6 +350,11 @@ class FadedRepeatLoopExpr extends Expression {
         super([new TextExpr("repeat ("), times, new TextExpr(") {"), body, new TextExpr("}")]);
     }
 
+    canReduce() {
+        return this.timesExpr && (this.timesExpr.canReduce() || this.timesExpr.isValue()) &&
+            this.bodyExpr && this.bodyExpr.isComplete();
+    }
+
     get timesExpr() {
         return this.holes[1];
     }
