@@ -742,7 +742,7 @@ class VtableVarExpr extends ObjectExtensionExpr {
         return this.holes[0];
     }
 
-    get value() {
+    value() {
         if (this.variable && this.variable.canReduce()) {
             return this.getEnvironment().lookup(this.variable.name);
         }
@@ -750,7 +750,7 @@ class VtableVarExpr extends ObjectExtensionExpr {
     }
 
     get objMethods() {
-        let value = this.value;
+        let value = this.value();
         if (value) {
             return value.objMethods;
         }
@@ -767,7 +767,7 @@ class VtableVarExpr extends ObjectExtensionExpr {
     }
 
     updateVtable() {
-        let value = this.value;
+        let value = this.value();
         if (value) {
             if (value.color) {
                 this.color = value.color;
@@ -854,8 +854,8 @@ class VtableVarExpr extends ObjectExtensionExpr {
         if ((!this.hasVtable || !this.subReduceMethod) && !this.variable.canReduce()) {
             return this;
         }
-        if (!this.hasVtable) return this.value;
-        if (!this.subReduceMethod) return this.value;
+        if (!this.hasVtable) return this.value();
+        if (!this.subReduceMethod) return this.value();
 
         let surrogate = this.createSurrogate();
         return surrogate.reduce();
