@@ -82,12 +82,28 @@ function init() {
                     }
                 }
 
+                lockFocus();
+
                 return loadChapterSelect();
             }).then(initMainMenu);
 
         });
 
     });
+}
+
+/// Keep keyboard/input focus on the game by preventing any other
+/// element on the page from receiving focus.
+function lockFocus() {
+    let nodes = document.querySelectorAll('div.centered,#devinfo,div.centered *, #devinfo *');
+
+    // http://stackoverflow.com/a/9110355/262727
+    for (let i = 0; i < nodes.length; i++) {
+        nodes[i].setAttribute("tabIndex", "-1");
+        nodes[i].onfocus = function() {
+            this.blur();
+        };
+    }
 }
 
 function loadCustomLevel(lvl_desc, goal_desc, toolbox_desc) {
