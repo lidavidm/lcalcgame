@@ -127,6 +127,18 @@ class Sequence extends Expression {
     toString() {
         return `${this.locked ? '/' : ''}(sequence ${this.subexpressions.map((x) => x.toString()).join(" ")})`;
     }
+
+    reduceCompletely() {
+        if (this.canReduce()) {
+            // Return non-undefined non-this value so that when the
+            // user drops everything in, MissingExpression#ondropped
+            // will make this expr blink
+            return null;
+        }
+        else {
+            return this;
+        }
+    }
 }
 
 class NotchedSequence extends Sequence {
