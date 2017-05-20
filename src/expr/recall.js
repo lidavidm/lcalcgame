@@ -278,14 +278,30 @@ class TypeInTextExpr extends TextExpr {
         }
     }
 
-    reduce() {
+    parsedValue() {
         if (this.typeBox) {
             let txt = this.typeBox.text.trim();
             if (this.validator(txt)) {
-                this.typeBox.carriageReturn();
+                let result = __PARSER.parse(txt);
+                if (result) return result;
             }
         }
+        return null;
+    }
+
+    reduce() {
+        let value = this.parsedValue();
+        if (value) {
+            this.typeBox.carriageReturn();
+            return value;
+        }
         return this;
+    }
+
+    performReduction() {
+        let value = this.parsedValue();
+        if (value) return Promise.resolve(value);
+        return Promise.reject();
     }
 
     commit(renderedText) {

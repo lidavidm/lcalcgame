@@ -52,6 +52,7 @@ class ES6Parser {
         let statements = AST.body;
         if (statements.length === 1) {
             let expr = this.parseNode(statements[0]);
+            if (!expr) return null;
             expr.lockSubexpressions(this.lockFilter);
             expr.unlock();
             return expr;
