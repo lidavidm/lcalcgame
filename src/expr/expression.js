@@ -345,6 +345,8 @@ class Expression extends mag.RoundedRect {
                         if (this.stage) this.stage.draw();
                         return resolve(result);
                     });
+                }, (e) => {
+                    reject(e);
                 });
             }
             else {

@@ -591,6 +591,8 @@ class AssignExpr extends Expression {
                 this.update();
                 if (this.stage) this.stage.draw();
                 return after(delay).then(() => this.animateReduction());
+            }, () => {
+                return Promise.reject();
             });
         });
     }
