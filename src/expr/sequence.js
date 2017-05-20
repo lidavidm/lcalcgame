@@ -164,8 +164,10 @@ class NotchedSequence extends Sequence {
                   }, true, false,
                   null);
 
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 1;
+        setStrokeStyle(ctx, {
+            color: '#000',
+            lineWidth: 1,
+        });
         for (let i = 0; i < this.holes.length - 1; i++) {
             let expr1 = this.holes[i];
             let expr2 = this.holes[i + 1];
