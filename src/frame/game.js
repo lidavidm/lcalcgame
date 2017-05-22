@@ -12,6 +12,10 @@ class Level {
         this.globals = globals;
     }
 
+    static getStage() {
+        return stage;
+    }
+
     // Builds a single Stage from the level description,
     // and returns it.
     // * The layout should be generated automatically, and consistently.
