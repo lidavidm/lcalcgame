@@ -7,6 +7,7 @@ class ReductStage extends mag.Stage {
         super(canvas);
         this.stateStack = [];
         this.environment = new Environment();
+        this.functions = {};
         this.md = new MobileDetect(window.navigator.userAgent);
         this.onorientationchange();
     }
