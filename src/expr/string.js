@@ -86,11 +86,11 @@ class StringObjectExpr extends ObjectExtensionExpr {
     isValue() { return true; }
     */
 
-    toString() {
+    value() {
         if (this.baseStringValue.canReduce())
-            return this.baseStringValue.reduceCompletely().toString();
+            return this.baseStringValue.reduceCompletely().value();
         else
-            return this.baseStringValue.toString();
+            return this.baseStringValue.value();
     }
 
     get constructorArgs() {

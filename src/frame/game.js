@@ -769,8 +769,8 @@ class ExpressionPattern {
             let isarr = false;
 
             if (e instanceof StringObjectExpr || f instanceof StringObjectExpr) {
-                e = e.toString();
-                f = f.toString();
+                e = e.value();
+                f = f.value();
                 return e === f;
             }
 

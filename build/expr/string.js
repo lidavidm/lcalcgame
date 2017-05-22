@@ -93,9 +93,9 @@ var StringObjectExpr = function (_ObjectExtensionExpr) {
     */
 
     _createClass(StringObjectExpr, [{
-        key: 'toString',
-        value: function toString() {
-            if (this.baseStringValue.canReduce()) return this.baseStringValue.reduceCompletely().toString();else return this.baseStringValue.toString();
+        key: 'value',
+        value: function value() {
+            if (this.baseStringValue.canReduce()) return this.baseStringValue.reduceCompletely().value();else return this.baseStringValue.value();
         }
     }, {
         key: 'reduce',
