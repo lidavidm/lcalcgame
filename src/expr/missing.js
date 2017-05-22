@@ -261,7 +261,7 @@ class MissingNumberExpression extends MissingTypedExpression {
         super(expr_to_miss);
         this.graphicNode = new mag.ImageRect(0, 0, 24, 32, 'die');
 
-        this.acceptedClasses = [ VarExpr, NumberExpr, ObjectExtensionExpr ];
+        this.acceptedClasses = [ VarExpr, NumberExpr, ObjectExtensionExpr , NamedExpr];
     }
     getClass() { return MissingNumberExpression; }
 
