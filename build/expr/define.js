@@ -96,6 +96,7 @@ var NamedExpr = function (_Expression) {
     _createClass(NamedExpr, [{
         key: 'onmouseclick',
         value: function onmouseclick() {
+            console.log(this);
             this.performReduction();
         }
     }, {
@@ -311,6 +312,9 @@ var DefineExpr = function (_ClampExpr) {
     _createClass(DefineExpr, [{
         key: 'onSnap',
         value: function onSnap(otherNotch, otherExpr, thisNotch) {
+            this.stage.functions[this.funcname] = this;
+            console.log(this.stage);
+
             _get(DefineExpr.prototype.__proto__ || Object.getPrototypeOf(DefineExpr.prototype), 'onSnap', this).call(this, otherNotch, otherExpr, thisNotch);
             if (this.children[0].holes.length === 1) {
                 var drag_patch = new DragPatch(0, 0, 42, 52);
@@ -328,14 +332,20 @@ var DefineExpr = function (_ClampExpr) {
     }, {
         key: 'generateNamedExpr',
         value: function generateNamedExpr() {
+            //console.log(this.stage);
+
             var funcname = this.funcname;
             var args = [];
             var numargs = 0;
+
             if (this.expr instanceof LambdaExpr) numargs = this.expr.numOfNestedLambdas();
+            console.log(numargs);
             for (var i = 0; i < numargs; i++) {
                 args.push(new MissingExpression());
             } // Return named function (expression).
-            return new NamedExpr(funcname, this, args);
+            //return new NamedExpr(funcname, this, args);
+
+            return new NamedFuncExpr(funcname, args);
         }
         // get notchPos() {
         //     return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - this.notch.relpos) };
@@ -377,6 +387,7 @@ var DefineExpr = function (_ClampExpr) {
     }, {
         key: 'onmouseclick',
         value: function onmouseclick() {
+            console.log(this);
             return; // disable for now;
 
             if (this.funcname) {

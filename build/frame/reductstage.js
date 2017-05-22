@@ -27,6 +27,7 @@ var ReductStage = function (_mag$Stage) {
 
         _this.stateStack = [];
         _this.environment = new Environment();
+        _this.functions = {};
         _this.md = new MobileDetect(window.navigator.userAgent);
         _this.onorientationchange();
         return _this;

@@ -22,15 +22,15 @@ var Level = function () {
         this.globals = globals;
     }
 
-    // Builds a single Stage from the level description,
-    // and returns it.
-    // * The layout should be generated automatically, and consistently.
-    // * That way a higher function can 'parse' a text file description of levels --
-    // * written in code, for instance -- and generate the entire game on-the-fly.
-
-
     _createClass(Level, [{
         key: 'build',
+
+
+        // Builds a single Stage from the level description,
+        // and returns it.
+        // * The layout should be generated automatically, and consistently.
+        // * That way a higher function can 'parse' a text file description of levels --
+        // * written in code, for instance -- and generate the entire game on-the-fly.
         value: function build(canvas) {
 
             var stage = new ReductStage(canvas);
@@ -616,6 +616,11 @@ var Level = function () {
             return rtn;
         }
     }], [{
+        key: 'getStage',
+        value: function getStage() {
+            return stage;
+        }
+    }, {
         key: 'make',
         value: function make(desc) {
             var expr_descs = desc.board,
