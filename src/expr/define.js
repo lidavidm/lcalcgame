@@ -59,6 +59,7 @@ class NamedExpr extends Expression {
     }
 
     onmouseclick() {
+        console.log(this);
         this.performReduction();
     }
     reduce() {
@@ -195,6 +196,9 @@ class DefineExpr extends ClampExpr {
         this.notches = [ new WedgeNotch('left', 10, 10, 0.8, true) ];
     }
     onSnap(otherNotch, otherExpr, thisNotch) {
+        this.stage.functions[this.funcname] = this;
+        console.log(this.stage);
+
         super.onSnap(otherNotch, otherExpr, thisNotch);
         if (this.children[0].holes.length === 1) {
             let drag_patch = new DragPatch(0, 0, 42, 52);
@@ -211,16 +215,22 @@ class DefineExpr extends ClampExpr {
     get expr() { return this.children[1]; }
     get constructorArgs() { return [ this.expr.clone() ]; }
     generateNamedExpr() {
+        //console.log(this.stage);
+
         let funcname = this.funcname;
         let args = [];
         let numargs = 0;
+
         if (this.expr instanceof LambdaExpr)
             numargs = this.expr.numOfNestedLambdas();
+        console.log(numargs);
         for (let i = 0; i < numargs; i++)
             args.push( new MissingExpression() );
 
         // Return named function (expression).
-        return new NamedExpr(funcname, this, args);
+        //return new NamedExpr(funcname, this, args);
+
+        return new NamedFuncExpr(funcname, args);
     }
     // get notchPos() {
     //     return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - this.notch.relpos) };
@@ -259,6 +269,7 @@ class DefineExpr extends ClampExpr {
     //     }
     // }
     onmouseclick() {
+        console.log(this);
         return; // disable for now;
 
         if (this.funcname) {
