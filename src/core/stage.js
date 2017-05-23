@@ -375,7 +375,7 @@ var mag = (function(_) {
             let is_toolbox = (e) => e && (e.toolbox || (e.parent && is_toolbox(e.parent)));
             var hit_nodes = this.getHitNodesIntersecting(node, {'exclude':[node]});
             var hit = null;
-            console.log('under-nodes:', hit_nodes);
+            //console.log('under-nodes:', hit_nodes);
             if (hit_nodes.length > 0) {
 
                 // Sort hit nodes by closeness to center of dragged node:
@@ -389,7 +389,7 @@ var mag = (function(_) {
                         hit = hit_nodes[i];
                 }
             }
-            console.log('nodeUnder:', hit);
+            //console.log('nodeUnder:', hit);
             return hit;
         }
         onmousedown(pos) { // Mouse clicked down.

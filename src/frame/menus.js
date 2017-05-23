@@ -144,7 +144,7 @@ class MainMenu extends mag.Stage {
 
         this.showStars();
         this.showStarboy(onClickPlay);
-        this.showTitle();
+        //this.showTitle();
         //this.showPlayButton(onClickPlay);
         //this.showSettingsButton(onClickSettings);
     }

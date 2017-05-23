@@ -438,7 +438,7 @@ var mag = function (_) {
                 };
                 var hit_nodes = this.getHitNodesIntersecting(node, { 'exclude': [node] });
                 var hit = null;
-                console.log('under-nodes:', hit_nodes);
+                //console.log('under-nodes:', hit_nodes);
                 if (hit_nodes.length > 0) {
                     (function () {
 
@@ -453,7 +453,7 @@ var mag = function (_) {
                         }
                     })();
                 }
-                console.log('nodeUnder:', hit);
+                //console.log('nodeUnder:', hit);
                 return hit;
             }
         }, {

@@ -773,7 +773,7 @@ var LogAnalyzer = (function() {
             return visgraph;
         };
 
-        return flowSaturate( { nodes: raw_graph.nodes.map((state) => {
+        return { nodes: raw_graph.nodes.map((state) => {
                                 var s = state.toString();
                                 var node = { id:s, label:s, shape:'box' };
                                 if (state.initial) {
@@ -812,22 +812,22 @@ var LogAnalyzer = (function() {
                  edges:raw_graph.edges.map((edge) => {
                                 var e = { from:edge.from.toString(), to:edge.to.toString() };
                                 if (edge.undo > 0) e.color = 'red';
-                                if (edge.reduce) { // Edge becomes more visible proportional to player count.
-                                    e.label = edge.reduce + '';
-                                    e.width = edge.reduce / 200.0;
-                                    if (e.width < 0.5) {
-                                        e.color = colorFrom255(200);
-                                        if (e.width < 0.1)
-                                           e.physics = false;
-                                    } else {
-                                        e.label = edge.reduce + ' : ' + edge.reduction;
-                                        e.reduction = edge.reduction;
-                                    }
-                                }
-                                //if (edge.reduction) e.label = edge.reduce + ' : ' + edge.reduction;
-                                //else if (edge.reduce) e.label = edge.reduce + '';
+                                // if (edge.reduce) { // Edge becomes more visible proportional to player count.
+                                //     e.label = edge.reduce + '';
+                                //     e.width = edge.reduce / 200.0;
+                                //     if (e.width < 0.5) {
+                                //         e.color = colorFrom255(200);
+                                //         if (e.width < 0.1)
+                                //            e.physics = false;
+                                //     } else {
+                                //         e.label = edge.reduce + ' : ' + edge.reduction;
+                                //         e.reduction = edge.reduction;
+                                //     }
+                                // }
+                                if (edge.reduction) e.label = edge.reduce + ' : ' + edge.reduction;
+                                else if (edge.reduce) e.label = edge.reduce + '';
                                 return e;
-        })});//.filter((e) => e.to !== 'reset')};
+        })};//.filter((e) => e.to !== 'reset')};
     };
 
     var refreshTaskVis = () => {

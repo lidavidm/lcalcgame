@@ -9,7 +9,11 @@
         {
             "goal": "true",
             "board": "(== _ /triangle)",
-            "toolbox": "(arrayobj (bag /rect /star) `pop) (arrayobj (bag /star /triangle) `pop) (arrayobj (bag /triangle /rect) `pop)"
+            "toolbox": "(arrayobj (bag /rect /star) `pop) (arrayobj (bag /star /triangle) `pop) (arrayobj (bag /triangle /rect) `pop)",
+            "fade": {
+                "true":1,
+                "false":1
+            }
         },
         {
             "goal": "(bag /star /star /rect)",

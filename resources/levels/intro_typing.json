@@ -37,11 +37,6 @@
             "goal": ["true","true"],
             "board": ["(x) => _t_single", "(x) => (x == 'cat')", "'cat'", "'dog'"],
             "toolbox": ""
-        },
-        {
-            "goal": ["'star'"],
-            "board": ["(x) => xx", "_t_single", "'star'"],
-            "toolbox": ""
         }
     ],
     "resources":{
