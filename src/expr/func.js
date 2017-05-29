@@ -1,7 +1,7 @@
 // Acts as a named wrapper for a def'd expression.
+// Should not store the procedure, but only store the name of the function
 class NamedFuncExpr extends Expression {
     constructor(name, args) {
-        //console.log(this.parent.stage);
         let txt_name = new TextExpr(name);
         txt_name.color = 'black';
         let exprs = [ txt_name ];
@@ -10,20 +10,30 @@ class NamedFuncExpr extends Expression {
         super(exprs);
         this.color = 'OrangeRed';
         this.name = name;
+        
         this._args = args.map((a) => a.clone());
 
         this.stage = Level.getStage();
-
         let refDefineExpr = this.stage.functions[name];
-        console.log(refDefineExpr);
-
         this._wrapped_ref = refDefineExpr;
         this.scale = refDefineExpr.scale;
+        console.log("reached end of NamedFuncExpr constructor");
     }
-    get expr() { return this._wrapped_ref.expr.clone(); }
+    /*get expr() {
+        console.log("called get expr() in NAMEDFUNCEXPR");
+        console.log(Level.getStage().functions[this.name].expr);
+        return Level.getStage().functions[this.name].expr.clone();
+    }*/
+
+    get funcExpr() {
+        //return Level.getStage().functions[this.name].expr.clone();
+        return this._wrapped_ref.expr.clone();
+        return new NamedFuncExpr(this.name, this._args);
+    }
+
     get args() { return this.holes.slice(1).map((a) => a.clone()); }
     get constructorArgs() {
-        return [ this.name, this.expr.clone(), this.args ];
+        return [ this.name, this.funcExpr, this.args ];
     }
 
     onmouseclick() {
@@ -31,7 +41,7 @@ class NamedFuncExpr extends Expression {
         this.performReduction();
     }
     reduce() {
-        let expr = this.expr;
+        let expr = this.funcExpr;
         if (!expr || expr instanceof MissingExpression)
             return this;
         else {
@@ -51,7 +61,7 @@ class NamedFuncExpr extends Expression {
             if (args.length === 0 || validateAll(args, isValidArgument)) { // true if all args valid
 
                 // All the arguments check out. Now we need to apply them.
-                let expr = this.expr;
+                let expr = this.funcExpr;
                 console.log(expr);
 
                 if (args.length > 0)
