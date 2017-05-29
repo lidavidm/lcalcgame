@@ -85,6 +85,8 @@ var NamedExpr = function (_Expression) {
 
         _this2.color = 'OrangeRed';
         _this2.name = name;
+        console.log("args");
+        console.log(args);
         _this2._args = args.map(function (a) {
             return a.clone();
         });
@@ -313,7 +315,7 @@ var DefineExpr = function (_ClampExpr) {
         key: 'onSnap',
         value: function onSnap(otherNotch, otherExpr, thisNotch) {
             this.stage.functions[this.funcname] = this;
-            console.log(this.stage);
+            //console.log(this.stage);
 
             _get(DefineExpr.prototype.__proto__ || Object.getPrototypeOf(DefineExpr.prototype), 'onSnap', this).call(this, otherNotch, otherExpr, thisNotch);
             if (this.children[0].holes.length === 1) {
@@ -457,6 +459,9 @@ var DefineExpr = function (_ClampExpr) {
     }, {
         key: 'expr',
         get: function get() {
+            console.log("called get expr() in DEFINEEXPR");
+            console.trace();
+            console.log(this.children[1]);
             return this.children[1];
         }
     }, {

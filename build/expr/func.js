@@ -9,13 +9,13 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 // Acts as a named wrapper for a def'd expression.
+// Should not store the procedure, but only store the name of the function
 var NamedFuncExpr = function (_Expression) {
     _inherits(NamedFuncExpr, _Expression);
 
     function NamedFuncExpr(name, args) {
         _classCallCheck(this, NamedFuncExpr);
 
-        //console.log(this.parent.stage);
         var txt_name = new TextExpr(name);
         txt_name.color = 'black';
         var exprs = [txt_name];
@@ -26,19 +26,23 @@ var NamedFuncExpr = function (_Expression) {
 
         _this.color = 'OrangeRed';
         _this.name = name;
+
         _this._args = args.map(function (a) {
             return a.clone();
         });
 
         _this.stage = Level.getStage();
-
         var refDefineExpr = _this.stage.functions[name];
-        console.log(refDefineExpr);
-
         _this._wrapped_ref = refDefineExpr;
         _this.scale = refDefineExpr.scale;
+        console.log("reached end of NamedFuncExpr constructor");
         return _this;
     }
+    /*get expr() {
+        console.log("called get expr() in NAMEDFUNCEXPR");
+        console.log(Level.getStage().functions[this.name].expr);
+        return Level.getStage().functions[this.name].expr.clone();
+    }*/
 
     _createClass(NamedFuncExpr, [{
         key: 'onmouseclick',
@@ -49,7 +53,7 @@ var NamedFuncExpr = function (_Expression) {
     }, {
         key: 'reduce',
         value: function reduce() {
-            var expr = this.expr;
+            var expr = this.funcExpr;
             if (!expr || expr instanceof MissingExpression) return this;else {
 
                 var incomplete_exprs = mag.Stage.getNodesWithClass(MissingExpression, [], true, [expr]).filter(function (e) {
@@ -78,7 +82,7 @@ var NamedFuncExpr = function (_Expression) {
                     // true if all args valid
 
                     // All the arguments check out. Now we need to apply them.
-                    var _expr = this.expr;
+                    var _expr = this.funcExpr;
                     console.log(_expr);
 
                     if (args.length > 0) _expr = args.reduce(function (lambdaExpr, arg) {
@@ -113,9 +117,11 @@ var NamedFuncExpr = function (_Expression) {
             return s;
         }
     }, {
-        key: 'expr',
+        key: 'funcExpr',
         get: function get() {
+            //return Level.getStage().functions[this.name].expr.clone();
             return this._wrapped_ref.expr.clone();
+            return new NamedFuncExpr(this.name, this._args);
         }
     }, {
         key: 'args',
@@ -127,7 +133,7 @@ var NamedFuncExpr = function (_Expression) {
     }, {
         key: 'constructorArgs',
         get: function get() {
-            return [this.name, this.expr.clone(), this.args];
+            return [this.name, this.funcExpr, this.args];
         }
     }]);
 
