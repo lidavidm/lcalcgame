@@ -16,12 +16,31 @@
     },
 
     {
+      "board": "(define /(λx /(ifelse /(== #x 0) /0 /_)) `???) (notch)",
+      "goal": "0",
+      "toolbox": "(2) (1) (0)"
+    },
+    {
       "board": "(define /(λx /(λx /#x)) `???) (notch)",
       "goal": "6",
       "toolbox": "(2) (1)"
     },
     {
       "board": "(define /(λy /(λx /#y)) `???) (notch)",
+      "goal": "6",
+      "toolbox": "(2) (1)"
+    },
+    {
+      "board": "(define /(λx /(+ #x #x)) `double) (notch)",
+      "goal": "4",
+      "toolbox": "(1)"
+    },
+    {
+      "board": "(define /star `star) (notch)",
+      "goal": "(star) (star) (star)"
+    },
+    {
+      "board": "(define /(λx /_) `???) (define /star `star) (notch) (notch)",
       "goal": "6",
       "toolbox": "(2) (1)"
     }
