@@ -48,6 +48,8 @@ class NamedExpr extends Expression {
         super(exprs);
         this.color = 'OrangeRed';
         this.name = name;
+        console.log("args");
+        console.log(args);
         this._args = args.map((a) => a.clone());
         this._wrapped_ref = refDefineExpr;
         this.scale = refDefineExpr.scale;
@@ -197,7 +199,7 @@ class DefineExpr extends ClampExpr {
     }
     onSnap(otherNotch, otherExpr, thisNotch) {
         this.stage.functions[this.funcname] = this;
-        console.log(this.stage);
+        //console.log(this.stage);
 
         super.onSnap(otherNotch, otherExpr, thisNotch);
         if (this.children[0].holes.length === 1) {
@@ -212,7 +214,12 @@ class DefineExpr extends ClampExpr {
         }
     }
     get name() { return this.funcname; }
-    get expr() { return this.children[1]; }
+    get expr() {
+        console.log("called get expr() in DEFINEEXPR");
+        console.trace();
+        console.log(this.children[1]);
+        return this.children[1];
+    }
     get constructorArgs() { return [ this.expr.clone() ]; }
     generateNamedExpr() {
         //console.log(this.stage);
