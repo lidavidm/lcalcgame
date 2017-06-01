@@ -1,48 +1,42 @@
 {
-  "chapterName":"Early Testing",
-  "description":"Caution!",
+  "chapterName":"Recursion",
+  "description":"Introduction to recursion",
   "levels": [
     {
-      "description": "Lambda variables shadow outer ones",
-      "board": "(λx /(λx /#x)) ($x)",
-      "goal": "(star) (triangle)",
-      "toolbox": "(diamond) (triangle)"
+      "description": "a function",
+      "board": "(define /star `Star) (notch)",
+      "goal": "(star)",
+      "toolbox": ""
     },
     {
-      "description": "Outer variables are still visible",
-      "board": "(λy /(λx /#y))",
-      "goal": "(triangle)",
-      "toolbox": "(diamond) (star) (triangle)"
+      "board": "(define /(λx /2) `foo) (namedfunc /(foo) /1) (notch)",
+      "goal": "2",
+      "toolbox": ""
     },
-
     {
-      "board": "(define /(λx /(ifelse /(== #x 0) /0 /_)) `???) (notch)",
+      "board": "(define /(λx /(namedfunc (star))) `foo) (define /star `star) (namedfunc (foo) /1)(notch) (notch)",
+      "goal": "star",
+      "toolbox": ""
+    },
+    {
+      "board": "(define /(λx /(ifelse /(== #x 0) /0 /(namedfunc (???) /0))) `???) (notch)",
       "goal": "0",
-      "toolbox": "(2) (1) (0)"
+      "toolbox": "(5)"
     },
     {
-      "board": "(define /(λx /(λx /#x)) `???) (notch)",
+      "board": "(define /(λx /(ifelse /(== #x 0) /0 /(namedfunc (???) /(- /#x /1)))) `???) (notch)",
+      "goal": "0",
+      "toolbox": "(2)"
+    },
+    {
+      "board": "(define /(λx /(ifelse /(== #x 0) /1 /(* /#x /(namedfunc (factorial) /(- /#x /1)))  )) `factorial) (notch)",
       "goal": "6",
-      "toolbox": "(2) (1)"
+      "toolbox": "(3)"
     },
     {
-      "board": "(define /(λy /(λx /#y)) `???) (notch)",
-      "goal": "6",
-      "toolbox": "(2) (1)"
-    },
-    {
-      "board": "(define /(λx /(+ #x #x)) `double) (notch)",
-      "goal": "4",
-      "toolbox": "(1)"
-    },
-    {
-      "board": "(define /star `star) (notch)",
-      "goal": "(star) (star) (star)"
-    },
-    {
-      "board": "(define /(λx /_) `???) (define /star `star) (notch) (notch)",
-      "goal": "6",
-      "toolbox": "(2) (1)"
+      "board": "(define /(λx /(ifelse /(== #x 0) /1 /(* /2 /(namedfunc (pow2) /_))  )) `pow2) (notch)",
+      "goal": "8",
+      "toolbox": "(3) (- /#x /1)"
     }
   ],
   "resources":{
