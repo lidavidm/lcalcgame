@@ -234,7 +234,7 @@ var DragPatch = function (_ImageExpr) {
 
             SET_CURSOR_STYLE(CONST.CURSOR.GRABBING);
 
-            var stage = this.stage;
+            //let stage = this.stage;
             var replacement = this.parent.parent.generateNamedExpr(); // DefineExpr -> NamedExpr, or PlayPenExpr -> ObjectExtensionExpr
             var ghosted_name = this.parent.clone();
             ghosted_name.scale = this.parent.absoluteScale;
@@ -308,15 +308,16 @@ var DefineExpr = function (_ClampExpr) {
         if (name) _this5.funcname = name;
 
         _this5.notches = [new WedgeNotch('left', 10, 10, 0.8, true)];
+
+        //this.stage.functions[this.funcname] = this;
         return _this5;
     }
 
     _createClass(DefineExpr, [{
         key: 'onSnap',
         value: function onSnap(otherNotch, otherExpr, thisNotch) {
+            DefineExpr.functions[this.funcname] = this;
             this.stage.functions[this.funcname] = this;
-            //console.log(this.stage);
-
             _get(DefineExpr.prototype.__proto__ || Object.getPrototypeOf(DefineExpr.prototype), 'onSnap', this).call(this, otherNotch, otherExpr, thisNotch);
             if (this.children[0].holes.length === 1) {
                 var drag_patch = new DragPatch(0, 0, 42, 52);
@@ -334,7 +335,6 @@ var DefineExpr = function (_ClampExpr) {
     }, {
         key: 'generateNamedExpr',
         value: function generateNamedExpr() {
-            //console.log(this.stage);
 
             var funcname = this.funcname;
             var args = [];
@@ -347,7 +347,7 @@ var DefineExpr = function (_ClampExpr) {
             } // Return named function (expression).
             //return new NamedExpr(funcname, this, args);
 
-            return new NamedFuncExpr(funcname, args);
+            return new (Function.prototype.bind.apply(NamedFuncExpr, [null].concat([funcname], args)))();
         }
         // get notchPos() {
         //     return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - this.notch.relpos) };
@@ -459,8 +459,8 @@ var DefineExpr = function (_ClampExpr) {
     }, {
         key: 'expr',
         get: function get() {
-            console.log("called get expr() in DEFINEEXPR");
-            console.trace();
+            console.log("Called get expr() in DEFINEEXPR ...!!!!");
+            //console.trace();
             console.log(this.children[1]);
             return this.children[1];
         }
@@ -473,3 +473,5 @@ var DefineExpr = function (_ClampExpr) {
 
     return DefineExpr;
 }(ClampExpr);
+
+DefineExpr.functions = {};

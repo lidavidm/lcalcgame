@@ -62,7 +62,7 @@ var Logger = function () {
     pub.playerId = null;
 
     // Static logging. (as backup)
-    var isOfflineSession = false;
+    var isOfflineSession = true;
     var static_log = [];
     var logStatic = function logStatic(funcname, data, uploaded) {
         if (!uploaded) data['error_message'] = 'This log failed to upload to the server.';

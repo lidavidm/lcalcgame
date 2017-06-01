@@ -859,6 +859,7 @@ var Level = function () {
                 '--': ExprManager.getClass('--'),
                 '++': ExprManager.getClass('++'),
                 'stringobj': ExprManager.getClass('stringobj'),
+                'namedfunc': ExprManager.getClass('namedfunc'),
                 'dot': function () {
                     var circ = new CircleExpr(0, 0, 18);
                     circ.color = 'gold';
