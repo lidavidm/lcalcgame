@@ -391,6 +391,7 @@ class Level {
             '--':ExprManager.getClass('--'),
             '++': ExprManager.getClass('++'),
             'stringobj':ExprManager.getClass('stringobj'),
+            'namedfunc':ExprManager.getClass('namedfunc'),
             'dot':(() => {
                 let circ = new CircleExpr(0,0,18);
                 circ.color = 'gold';

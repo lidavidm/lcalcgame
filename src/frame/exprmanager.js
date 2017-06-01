@@ -54,7 +54,8 @@ var ExprManager = (function() {
         'arrayobj': [ArrayObjectExpr],
         'stringobj':[StringObjectExpr],
         'infinite': [InfiniteExpression],
-        'notch':    [NotchHangerExpr]
+        'notch':    [NotchHangerExpr],
+        'namedfunc':[NamedFuncExpr]
     };
     var fade_levels = {};
     var DEFAULT_FADE_LEVEL = 0;
