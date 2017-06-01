@@ -144,7 +144,7 @@ class DragPatch extends ImageExpr {
 
         SET_CURSOR_STYLE(CONST.CURSOR.GRABBING);
 
-        let stage = this.stage;
+        //let stage = this.stage;
         let replacement = this.parent.parent.generateNamedExpr(); // DefineExpr -> NamedExpr, or PlayPenExpr -> ObjectExtensionExpr
         let ghosted_name = this.parent.clone();
         ghosted_name.scale = this.parent.absoluteScale;
@@ -196,11 +196,12 @@ class DefineExpr extends ClampExpr {
         if (name) this.funcname = name;
 
         this.notches = [ new WedgeNotch('left', 10, 10, 0.8, true) ];
+
+        //this.stage.functions[this.funcname] = this;
     }
     onSnap(otherNotch, otherExpr, thisNotch) {
+        DefineExpr.functions[this.funcname] = this;
         this.stage.functions[this.funcname] = this;
-        //console.log(this.stage);
-
         super.onSnap(otherNotch, otherExpr, thisNotch);
         if (this.children[0].holes.length === 1) {
             let drag_patch = new DragPatch(0, 0, 42, 52);
@@ -215,14 +216,13 @@ class DefineExpr extends ClampExpr {
     }
     get name() { return this.funcname; }
     get expr() {
-        console.log("called get expr() in DEFINEEXPR");
-        console.trace();
+        console.log("Called get expr() in DEFINEEXPR ...!!!!");
+        //console.trace();
         console.log(this.children[1]);
         return this.children[1];
     }
     get constructorArgs() { return [ this.expr.clone() ]; }
     generateNamedExpr() {
-        //console.log(this.stage);
 
         let funcname = this.funcname;
         let args = [];
@@ -237,7 +237,7 @@ class DefineExpr extends ClampExpr {
         // Return named function (expression).
         //return new NamedExpr(funcname, this, args);
 
-        return new NamedFuncExpr(funcname, args);
+        return new NamedFuncExpr(funcname, ...args);
     }
     // get notchPos() {
     //     return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - this.notch.relpos) };
@@ -336,3 +336,5 @@ class DefineExpr extends ClampExpr {
     }
     toString() { return '(define ' + this.expr.toString() + ' `' + this.funcname + ')'; }
 }
+
+DefineExpr.functions = {};
