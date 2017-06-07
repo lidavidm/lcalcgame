@@ -228,7 +228,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         'intro_string': ['more_array'],
         'more_array': ['intro_string_obj'],
         'intro_string_obj': ['variable_obj_methods'],
-        'variable_obj_methods': ['testing'],
+        'variable_obj_methods': ['reverse_string'],
+        'reverse_string': ['testing'],
         'testing': []
     };
 
