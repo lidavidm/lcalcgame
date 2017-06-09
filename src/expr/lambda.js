@@ -127,6 +127,14 @@ class LambdaHoleExpr extends MissingExpression {
             if (expr.name === this.name) {
                 let c = node.clone();
                 //c.bindSubexpressions();
+
+                console.log("node");
+                console.log(node);
+                console.log("c.parent");
+                console.log(c.parent);
+                console.log("expr.parent");
+                console.log(expr.parent);
+
                 c.stage = null;
                 expr.parent.swap(expr, c); // Swap the expression for a clone of the dropped node.
                 c.parent.bindSubexpressions();
