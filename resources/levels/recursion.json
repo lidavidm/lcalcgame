@@ -18,8 +18,15 @@
       "goal": "star",
       "toolbox": ""
     },
+
     {
-      "board": "(define /(λx /(ifelse /(== #x 0) /0 /(namedfunc (???) /0))) `???) (notch)",
+      "board": "(define /(λx /(ifelse /(== #x 0) /true /false)) `isZero) (notch)",
+      "goal": "true",
+      "toolbox": "(5) (0)"
+    },
+
+    {
+      "board": "(define /(λx /(ifelse /(== #x 0) /0 /(namedfunc (zero) /0))) `zero) (notch)",
       "goal": "0",
       "toolbox": "(5)"
     },
@@ -28,15 +35,74 @@
       "goal": "0",
       "toolbox": "(2)"
     },
+
     {
-      "board": "(define /(λx /(ifelse /(== #x 0) /1 /(* /#x /(namedfunc (factorial) /(- /#x /1)))  )) `factorial) (notch)",
-      "goal": "6",
-      "toolbox": "(3)"
+      "board": "(repeat /($i) /(sequence /(assign /$ans /_) ))",
+      "goal": "64",
+      "toolbox": "(* /2 /$ans) ($ans) (assign /$i /_) (1) (2) (3) (4) (5) (6)",
+      "globals": {
+        "ans": "1",
+        "num": "1"
+      }
     },
     {
-      "board": "(define /(λx /(ifelse /(== #x 0) /1 /(* /2 /(namedfunc (pow2) /_))  )) `pow2) (notch)",
+      "board": "(define /(λx /(ifelse /(== #x 0) /1 /(* /2 /(namedfunc (pow2) /(- /#x /1)))  )) `pow2) (notch)",
       "goal": "8",
+      "toolbox": "(3)"
+    },
+
+    {
+      "board": "(define /(λx /(ifelse /(== #x 0) /1 /(* /#x /(namedfunc (factorial) /_))  )) `factorial) (notch)",
+      "goal": "6",
       "toolbox": "(3) (- /#x /1)"
+    },
+    {
+      "board": "(repeat /($i) /(sequence /(assign /$ans /(* /$ans /$num)) /(assign /$num /_)))",
+      "goal": "24",
+      "toolbox": "(4)  (+ /$num /1) (assign /$i /_) ($ans)",
+      "globals": {
+        "ans": "1",
+        "num": "1"
+      }
+    },
+
+    {
+      "board": "(repeat /($i) /(sequence /(assign /$ans /(+ /$ans /$num)) /(assign /$num /_)))",
+      "goal": "10",
+      "toolbox": "(1) (2) (3) (4)  (+ /$num /1) (assign /$i /_) ($ans)",
+      "globals": {
+        "ans": "0",
+        "num": "1"
+      }
+    },
+    {
+      "board": "(define /(λx /(ifelse /(== #x _) /0 /(+ /#x /(namedfunc (sum) /_))  )) `sum) (notch)",
+      "goal": "(10)",
+      "toolbox": "(0) (1) (2) (3) (4) (- /#x /1)"
+    },
+
+    {
+      "board": "(define /(λx /#x ) `reverse) (notch)",
+      "goal": "(e)",
+      "toolbox": "(0) (#x) (ef)"
+    },
+
+    {
+      "board": "(define /(λx /(stringobj #x `[..]) ) `reverse) (notch)",
+      "goal": "(e)",
+      "toolbox": "(0) (ef)"
+    },
+
+    {
+      "board": "(define /(λx /(ifelse /(== /(stringobj $x `length) /1) /0 /1) ) `reverse) (notch)",
+      "goal": "(rever5e)",
+      "toolbox": "(0) (stringobj #x `slice) (1) (- /(stringobj #x `length) /1) (e5rever)"
+    },
+
+    {
+      "board": "(define /(λx /(ifelse /(== /(stringobj $x `length) /1) /$x /(++ /(namedfunc (reverse) /_)  /(stringobj #x `[..])) )) `reverse) (notch)",
+      "goal": "(rever5e)",
+      "toolbox": "(0) ($x) (stringobj $x `slice) (1) (- /(stringobj $x `length) /1) (e5rever)"
     }
   ],
   "resources":{

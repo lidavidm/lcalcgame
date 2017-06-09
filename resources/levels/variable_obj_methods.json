@@ -32,7 +32,7 @@
 
     {
       "goal": "(modify)",
-      "board": "(5) (assign /(stringobj $s `[..]) /(y) )",
+      "board": "(5) (assign /(stringobj $s `[..]) /_) (y)",
       "toolbox": "($s)",
       "globals": {
         "s": "(modifi)"
