@@ -106,7 +106,7 @@ class NamedFuncExpr extends Expression {
         //console.log("...args.....!!!");
         //console.log(...args);
 
-        console.trace();
+        //console.trace();
 
         let txt_name = new TextExpr(name);
         txt_name.color = 'black';
@@ -146,7 +146,7 @@ class NamedFuncExpr extends Expression {
     }
 
     onmouseclick() {
-        console.log(this);
+        //console.log(this);
         this.performReduction();
     }
     reduce() {
@@ -168,7 +168,7 @@ class NamedFuncExpr extends Expression {
 
             let incomplete_exprs = mag.Stage.getNodesWithClass(MissingExpression, [], true, [expr]).filter((e) => (!(e instanceof LambdaHoleExpr)));
             if (incomplete_exprs.length > 0) {
-                console.log(incomplete_exprs);
+                //console.log(incomplete_exprs);
                 incomplete_exprs.forEach((e) => Animate.blink(e, 1000, [1,0,0], 2));
                 return this;
             }
@@ -182,7 +182,7 @@ class NamedFuncExpr extends Expression {
 
                 // All the arguments check out. Now we need to apply them.
                 let expr = this.funcExpr;
-                console.log(expr);
+                //console.log(expr);
 
                 if (args.length > 0)
                     expr = args.reduce((lambdaExpr, arg) => lambdaExpr.applyExpr(arg), expr); // Chains application to inner lambda expressions.

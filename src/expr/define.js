@@ -216,9 +216,9 @@ class DefineExpr extends ClampExpr {
     }
     get name() { return this.funcname; }
     get expr() {
-        console.log("Called get expr() in DEFINEEXPR ...!!!!");
+        //console.log("Called get expr() in DEFINEEXPR ...!!!!");
         //console.trace();
-        console.log(this.children[1]);
+        //console.log(this.children[1]);
         return this.children[1];
     }
     get constructorArgs() { return [ this.expr.clone() ]; }
@@ -230,7 +230,7 @@ class DefineExpr extends ClampExpr {
 
         if (this.expr instanceof LambdaExpr)
             numargs = this.expr.numOfNestedLambdas();
-        console.log(numargs);
+        //console.log(numargs);
         for (let i = 0; i < numargs; i++)
             args.push( new MissingExpression() );
 
