@@ -650,6 +650,11 @@ class ArrayObjectExpr extends ObjectExtensionExpr {
         }
         return r;
     }
+
+    canReduce() {
+        //TODO
+        return true;
+    }
 }
 
 class DropdownCell extends mag.Rect {

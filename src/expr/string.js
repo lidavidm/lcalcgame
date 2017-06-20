@@ -104,4 +104,9 @@ class StringObjectExpr extends ObjectExtensionExpr {
         }
         return r;
     }
+
+    canReduce() {
+        //TODO
+        return true;
+    }
 }

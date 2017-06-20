@@ -443,10 +443,12 @@ class AssignExpr extends Expression {
     }
 
     canReduce() {
-        /*return this.value && this.variable && (this.value.canReduce() || this.value.isValue()) &&
+        return this.value && this.variable && (this.value.canReduce() || this.value.isValue()) &&
             (this.variable instanceof VarExpr || this.variable instanceof VtableVarExpr
-             || (this.variable instanceof TypeInTextExpr && this.variable.canReduce()));*/
-        return true;
+             || (this.variable instanceof TypeInTextExpr && this.variable.canReduce())
+             || (this.variable instanceof ArrayObjectExpr && this.variable.canReduce())
+             || (this.variable instanceof StringObjectExpr) && this.variable.canReduce());
+        //return true;
     }
 
     reduce() {
@@ -600,6 +602,10 @@ class AssignExpr extends Expression {
             if (this.variable.defaultMethodCall === "[..]") {
                 console.log("this.variable");
                 console.log(this.variable);
+                let indexNum = this.variable.holes[2].reduceCompletely();
+                if (!(indexNum instanceof NumberExpr)) {
+                    return Promise.reject("invalid index!");
+                }
                 let index = this.variable.holes[2].reduceCompletely().number;
                 //console.log("index: INDEX:");
                 //console.log(index);
@@ -624,6 +630,12 @@ class AssignExpr extends Expression {
                 let originalString = rhs.value();
                 console.log("ori string: " + originalString);
                 let slicePosition = this.variable.holes[2].reduceCompletely().number;
+
+                let indexNum = this.variable.holes[2].reduceCompletely();
+                if (!(indexNum instanceof NumberExpr)) {
+                    return Promise.reject("invalid index!");
+                }
+
                 console.log("slicePos: " + slicePosition);
                 console.log("this.value.toString()" + this.value.toString());
                 let newString = originalString.slice(0, slicePosition) + this.value.value()
