@@ -55,39 +55,43 @@ function init() {
     }
 
     // Wait until page is loaded, then...
+    var __DONE_ONCE = false;
     Pace.on('done', () => {
 
         // Wait until all resources are loaded...
         // * This callback must be set only after all load() method calls... *
-        Resource.afterLoadSequence('init', () => {
+        if (!__DONE_ONCE) {
+            __DONE_ONCE = true;
+            Resource.afterLoadSequence('init', () => {
 
-            console.log('Loaded game initial resources.');
+                console.log('Loaded game initial resources.');
 
-            Resource.setCurrentLoadSequence('gameaudio');
-            LOAD_REDUCT_GAMEAUDIO(Resource);
-            Resource.afterLoadSequence('gameaudio', function () {
-                console.log('Loaded game audio resources.');
-            });
+                Resource.setCurrentLoadSequence('gameaudio');
+                LOAD_REDUCT_GAMEAUDIO(Resource);
+                Resource.afterLoadSequence('gameaudio', function () {
+                    console.log('Loaded game audio resources.');
+                });
 
-            // Start a new log session (creating userID as necessary),
-            // and then begin the game.
-            Logger.startSession().then(function (userinfo) {
+                // Start a new log session (creating userID as necessary),
+                // and then begin the game.
+                Logger.startSession().then(function (userinfo) {
 
-                if (userinfo.cond) {
-                    __COND = userinfo.cond;
+                    if (userinfo.cond) {
+                        __COND = userinfo.cond;
 
-                    if (userinfo.cond === 'B') {
-                        ExprManager.setDefaultFadeLevel(100);
-                        $('#fade_status').text('OFF');
+                        if (userinfo.cond === 'B') {
+                            ExprManager.setDefaultFadeLevel(100);
+                            $('#fade_status').text('OFF');
+                        }
                     }
-                }
-
+                  
                 lockFocus();
 
                 return loadChapterSelect();
             }).then(initMainMenu);
 
-        });
+            });
+        }
 
     });
 }
@@ -284,7 +288,7 @@ function initMainMenu() {
         prepareCanvas();
         $(canvas).css('background-color','#EEE');
 
-        //stage = new MainMenu(canvas, initChapterSelectMenu);
+        stage = new MainMenu(canvas, initChapterSelectMenu);
 
         // stage = new MainMenu(canvas, () => {
         //
@@ -297,7 +301,7 @@ function initMainMenu() {
             // Clicked 'settings' button. Transition to settings screen.
         //});
 
-        initBoard();
+        //initBoard();
 
         //__DEBUG_TESTBED(stage);
 

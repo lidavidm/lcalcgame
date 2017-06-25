@@ -210,7 +210,7 @@ var MainMenu = function (_mag$Stage) {
 
         _this5.showStars();
         _this5.showStarboy(onClickPlay);
-        _this5.showTitle();
+        //this.showTitle();
         //this.showPlayButton(onClickPlay);
         //this.showSettingsButton(onClickSettings);
         return _this5;

@@ -101,7 +101,7 @@ class ReductStage extends mag.Stage {
                 btn_menu.pos = btn_reset.pos;
                 btn_reset.pos = btn_next.pos;
             }
-            this.add(btn_menu);
+            //this.add(btn_menu);
             this.add(btn_reset);
         }
 
@@ -118,7 +118,7 @@ class ReductStage extends mag.Stage {
         }
         this.environmentDisplay = env;
 
-        this.uiNodes = [ btn_back, btn_menu, btn_reset, btn_next, btn_hamburger, toolbox, env ];
+        this.uiNodes = [ btn_back, btn_reset, btn_next, btn_hamburger, toolbox, env ];
 
         this.layoutUI();
     }
@@ -131,16 +131,16 @@ class ReductStage extends mag.Stage {
         let canvas_screen = this.boundingSize;
 
         let btn_back = this.uiNodes[0];
-        let btn_menu = this.uiNodes[1];
-        let btn_reset = this.uiNodes[2];
-        let btn_next = this.uiNodes[3];
-        let btn_hamburger = this.uiNodes[4];
+        //let btn_menu = this.uiNodes[1];
+        let btn_reset = this.uiNodes[1];
+        let btn_next = this.uiNodes[2];
+        let btn_hamburger = this.uiNodes[3];
 
         const NUM_BUTTONS = (__IS_MOBILE ? 3 : 2) + (__SHOW_DEV_INFO ? 2 : 0);
 
         for (let i = 0; i < NUM_BUTTONS; i++) {
             this.uiNodes[i].pos = {
-                x: canvas_screen.w - 64*(NUM_BUTTONS - i) - UI_PADDING,
+                x: canvas_screen.w - 64*(NUM_BUTTONS - i - 1) - UI_PADDING,
                 y: this.uiNodes[i].pos.y,
             };
         }

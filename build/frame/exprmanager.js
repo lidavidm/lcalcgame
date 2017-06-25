@@ -42,7 +42,7 @@ var ExprManager = function () {
         'environment_display': [EnvironmentDisplay, SpreadsheetEnvironmentDisplay],
         'hole': [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr], // DelayedFadedES6LambdaHoleExpr],
         'lambda': [LambdaHoleExpr, HalfFadedLambdaHoleExpr, FadedES6LambdaHoleExpr], // DelayedFadedES6LambdaHoleExpr],
-        'lambda_abstraction': [LambdaExpr, EnvironmentLambdaExpr],
+        'lambda_abstraction': [LambdaExpr], //EnvironmentLambdaExpr],
         'assign': [JumpingAssignExpr, AssignExpr, EqualsAssignExpr],
         'sequence': [NotchedSequence, SemicolonNotchedSequence, SemicolonSequence],
         'repeat': [RepeatLoopExpr, FadedRepeatLoopExpr],
