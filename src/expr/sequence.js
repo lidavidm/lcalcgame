@@ -127,6 +127,18 @@ class Sequence extends Expression {
     toString() {
         return `${this.locked ? '/' : ''}(sequence ${this.subexpressions.map((x) => x.toString()).join(" ")})`;
     }
+
+    reduceCompletely() {
+        if (this.canReduce()) {
+            // Return non-undefined non-this value so that when the
+            // user drops everything in, MissingExpression#ondropped
+            // will make this expr blink
+            return null;
+        }
+        else {
+            return this;
+        }
+    }
 }
 
 class NotchedSequence extends Sequence {
@@ -152,8 +164,10 @@ class NotchedSequence extends Sequence {
                   }, true, false,
                   null);
 
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 1;
+        setStrokeStyle(ctx, {
+            color: '#000',
+            lineWidth: 1,
+        });
         for (let i = 0; i < this.holes.length - 1; i++) {
             let expr1 = this.holes[i];
             let expr2 = this.holes[i + 1];

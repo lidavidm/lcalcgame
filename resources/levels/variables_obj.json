@@ -70,6 +70,27 @@
             }
         },
         {
+            "goal": "'prize'",
+            "board": ["key = true; c = key && _t_single ; _t_single; b = a ? 'prize' : null", "b"],
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "goal": "'prize'",
+            "board": ["_t_single; c = val || false ; _t_single; b = key ? 'prize' : null", "b"],
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "goal": "3",
+            "board": ["_t_single; wallet = wallet + 1; wallet = wallet + _t_single", "wallet"],
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
             "goal": "'rect'",
             "board": [],
             "toolbox": ["x", "y"],
@@ -78,7 +99,7 @@
                 "y": "(arrayobj /(bag /star /rect))"
             },
             "fade": {
-                "reference": 8
+                "var": 8
             }
         },
         {

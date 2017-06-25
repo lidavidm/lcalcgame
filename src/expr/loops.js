@@ -53,9 +53,16 @@ class RepeatLoopExpr extends Expression {
             let times = this.timesExpr.reduceCompletely().value();
             if (!Number.isInteger(times)) return this;
             let missing = [];
+
+            let numExprs = this.bodyExpr instanceof Sequence ? this.bodyExpr.subexpressions.length : 1;
             for (let i = 0; i < times; i++) {
-                let e = this.bodyExpr.clone();
-                missing.push(e);
+                if (numExprs === 1) {
+                    let e = this.bodyExpr.clone();
+                    missing.push(e);
+                }
+                else {
+                    missing = missing.concat(this.bodyExpr.subexpressions.map((e) => e.clone()));
+                }
             }
             let template = new (ExprManager.getClass('sequence'))(...missing);
             template.lockSubexpressions();
@@ -74,7 +81,8 @@ class RepeatLoopExpr extends Expression {
 
         if (this.timesExpr instanceof NumberExpr) {
             let missing = [];
-            for (let i = 0; i < this.timesExpr.number; i++) {
+            let numExprs = this.bodyExpr instanceof Sequence ? this.bodyExpr.subexpressions.length : 1;
+            for (let i = 0; i < this.timesExpr.number * numExprs; i++) {
                 let e = new Expression();
                 e._size = { w: this.bodyExpr.size.w, h: e.size.h };
                 missing.push(e);
@@ -232,19 +240,14 @@ class RepeatLoopExpr extends Expression {
                 // Reduce instantly if we're a child of something else
                 if (this.parent) {
                     index = this.template.subexpressions.length + 1;
-                    for (let i = 0; i < this.template.subexpressions.length; i++) {
-                        this.template.subexpressions[i] = this.bodyExpr.clone();
-                    }
-                    this.template.update();
                 }
 
                 let nextStep = () => {
                     this._leverAngle = -Math.PI / 2;
 
                     if (index > this.template.subexpressions.length) {
-                        this.template.holes.forEach((expr) => {
-                            expr.opacity = 1;
-                        });
+                        this.template = this.reduceCompletely();
+                        this.template.update();
                         resolve(this.template);
                         Animate.poof(this);
                         this.template.parent = null;
@@ -299,10 +302,15 @@ class RepeatLoopExpr extends Expression {
                                     y: this.bodyExpr.pos.y + 2,
                                 },
                             }, 400).after(() => {
-                                for (let i = 0; i < numExprs; i++) {
-                                    this.template.subexpressions[index + i] = body.clone();
-                                    this.template.update();
+                                if (numExprs === 1) {
+                                    this.template.subexpressions[index] = body.clone();
                                 }
+                                else {
+                                    for (let i = 0; i < numExprs; i++) {
+                                        this.template.subexpressions[index + i] = body.subexpressions[i].clone();
+                                    }
+                                }
+                                this.template.update();
                                 index += numExprs;
 
                                 this.bodyExpr.shadowOffset = oldOffset;
@@ -340,6 +348,11 @@ class RepeatLoopExpr extends Expression {
 class FadedRepeatLoopExpr extends Expression {
     constructor(times, body) {
         super([new TextExpr("repeat ("), times, new TextExpr(") {"), body, new TextExpr("}")]);
+    }
+
+    canReduce() {
+        return this.timesExpr && (this.timesExpr.canReduce() || this.timesExpr.isValue()) &&
+            this.bodyExpr && this.bodyExpr.isComplete();
     }
 
     get timesExpr() {
@@ -416,12 +429,41 @@ class FadedRepeatLoopExpr extends Expression {
         this.children = this.holes;
     }
 
+    reduceCompletely() {
+         if (this.canReduce()) {
+            let times = this.timesExpr.reduceCompletely().value();
+            if (!Number.isInteger(times)) return this;
+            let missing = [];
+
+            let numExprs = this.bodyExpr instanceof Sequence ? this.bodyExpr.subexpressions.length : 1;
+            for (let i = 0; i < times; i++) {
+                if (numExprs === 1) {
+                    let e = this.bodyExpr.clone();
+                    missing.push(e);
+                }
+                else {
+                    missing = missing.concat(this.bodyExpr.subexpressions.map((e) => e.clone()));
+                }
+            }
+            let template = new (ExprManager.getClass('sequence'))(...missing);
+            template.lockSubexpressions();
+
+            return template;
+        }
+        return this;
+    }
+
     performReduction() {
         if (this.canReduce()) {
             return this.performSubReduction(this.timesExpr).then(() => {
                 let missing = [];
                 for (let i = 0; i < this.timesExpr.number; i++) {
-                    missing.push(this.bodyExpr.clone());
+                    if (this.bodyExpr instanceof Sequence) {
+                        missing = missing.concat(this.bodyExpr.subexpressions.map((e) => e.clone()));
+                    }
+                    else {
+                        missing.push(this.bodyExpr.clone());
+                    }
                 }
 
                 let template = new (ExprManager.getClass('sequence'))(...missing);
@@ -439,7 +481,7 @@ class FadedRepeatLoopExpr extends Expression {
     }
 
     onmouseclick() {
-        this.performReduction();
+        this.performUserReduction();
     }
 
     toString() {

@@ -80,25 +80,29 @@ class IfStatement extends Expression {
                 let stage = this.stage;
                 let afterEffects = () => {
                     this.ignoreEvents = false;
-                    let rtn = super.performReduction();
                     stage.update();
                     stage.draw();
-                    if (rtn === null) {
-                        rtn = new FadedNullExpr();
-                    }
-                    resolve(rtn);
-                    return rtn;
+
+                    return super.performReduction().then((rtn) => {
+                        if (rtn === null) {
+                            rtn = new FadedNullExpr();
+                        }
+                        resolve(rtn);
+                        stage.update();
+                        return rtn;
+                    });
                 };
 
                 if (reduction === null) {
                     this.playJimmyAnimation(afterEffects);
                 }
-                else if (reduction instanceof FadedNullExpr) {
-                    let red = afterEffects();
-                    red.ignoreEvents = true; // don't let them move a null.
-                    Resource.play('pop');
-                    Animate.blink(red, 1000, [1,1,1], 0.4).after(() => {
-                        red.poof();
+                else if (reduction instanceof NullExpr) {
+                    let red = afterEffects().then((red) => {
+                        red.ignoreEvents = true; // don't let them move a null.
+                        Resource.play('pop');
+                        Animate.blink(red, 1000, [1,1,1], 0.4).after(() => {
+                            Animate.poof(red);
+                        });
                     });
                     //this.playJimmyAnimation(afterEffects);
                 }
@@ -134,7 +138,7 @@ class ArrowIfStatement extends IfStatement {
         arrow.color = 'black';
         this.holes = [ cond, arrow, branch ];
     }
-    get emptyExpr() { return null; }
+    get emptyExpr() { return this.parent ? new FadedNullExpr() : null; }
     get cond() { return this.holes[0]; }
     get branch() { return this.holes[2]; }
 }
@@ -170,7 +174,13 @@ class LockIfStatement extends IfStatement {
     constructor(cond, branch) {
         super(cond, branch);
         this.holes = [ cond, branch ];
+        this._makeGraphics();
+    }
 
+    _makeGraphics() {
+        // This needs to be called on clones so that duplicated locks
+        // don't all appear to unlock together (since clone() by
+        // default makes them share these objects)
         var bluebg = new mag.RoundedRect(0, 0, 25, 25);
         bluebg.color = "#2484f5";
         this._bg = bluebg;
@@ -182,9 +192,15 @@ class LockIfStatement extends IfStatement {
         shinewrap.opacity = 0.8;
         this._shinewrap = shinewrap;
     }
-    get emptyExpr() { return null; }
+    get emptyExpr() { return this.parent ? new FadedNullExpr() : null; }
     get cond() { return this.holes[0]; }
     get branch() { return this.holes[1]; }
+
+    clone(parent=null) {
+        let c = super.clone(parent);
+        c._makeGraphics();
+        return c;
+    }
 
     playJimmyAnimation(onComplete) {
         Resource.play('key-jiggle');
@@ -231,6 +247,8 @@ class LockIfStatement extends IfStatement {
         let bgsz = { w:condsz.w+14, h:condsz.h+16 };
         let bgpos = addPos(pos, {x:-(bgsz.w-condsz.w)/2.0+this.cond.pos.x, y:-(bgsz.h-condsz.h)/2.0+3});
         let topsz = this._top.size;
+        topsz.w *= this.scale.x;
+        topsz.h *= this.scale.y;
         let wrapsz = { w:boundingSize.w - condsz.w, h:boundingSize.h };
         let wrappos = { x:bgpos.x+bgsz.w, y:pos.y };
 
@@ -267,7 +285,7 @@ class InlineLockIfStatement extends IfStatement {
         this.holes = [ cond, lock, branch ];
     }
 
-    get emptyExpr() { return null; }
+    get emptyExpr() { return this.parent ? new FadedNullExpr() : null; }
     get cond() { return this.holes[0]; }
     get branch() { return this.holes[2]; }
 
