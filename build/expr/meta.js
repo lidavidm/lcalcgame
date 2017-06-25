@@ -12,7 +12,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 // An infinite resource.
 // Wraps around an existing expression.
-
 var InfiniteExpression = function (_GraphicValueExpr) {
     _inherits(InfiniteExpression, _GraphicValueExpr);
 
@@ -21,9 +20,7 @@ var InfiniteExpression = function (_GraphicValueExpr) {
 
         expr.update();
 
-
         // Inifinity symbol.
-
         var _this2 = _possibleConstructorReturn(this, (InfiniteExpression.__proto__ || Object.getPrototypeOf(InfiniteExpression)).call(this, expr.clone()));
 
         var c = new mag.Circle(0, 0, 14);

@@ -21,6 +21,10 @@ var ExprManager = (function() {
         'cmp':      [MirrorCompareExpr, FadedCompareExpr],
         '==':       [MirrorCompareExpr, FadedCompareExpr],
         '+':        [AddExpr],
+        '-':        [SubtractionExpr],
+        '*':        [MultiplicationExpr],
+        '--':       [DivisionExpr],
+        '++':       [StringAddExpr],
         '!=':       [MirrorCompareExpr, FadedCompareExpr],
         'and':      [CompareExpr],
         'or':       [CompareExpr],
@@ -48,8 +52,10 @@ var ExprManager = (function() {
         'snappable':[Snappable, FadedSnappable],//, NotchSnappable],
         'level':    [ReductStageExpr],
         'arrayobj': [ArrayObjectExpr],
+        'stringobj':[StringObjectExpr],
         'infinite': [InfiniteExpression],
-        'notch':    [NotchHangerExpr]
+        'notch':    [NotchHangerExpr],
+        'namedfunc':[NamedFuncExpr]
     };
     var fade_levels = {};
     var DEFAULT_FADE_LEVEL = 0;

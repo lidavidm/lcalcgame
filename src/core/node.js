@@ -93,6 +93,7 @@ var mag = (function(_) {
         // Generic clone function.
         get constructorArgs() { return null; }
         clone(parent=null) {
+            //console.log("called clone in node.js");
             var ins = constructClassInstance(this.constructor, this.constructorArgs);
             //console.warn('Cloning', this.constructor);
             for (const key of Object.keys(this)) {

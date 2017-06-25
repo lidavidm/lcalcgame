@@ -1040,8 +1040,8 @@ var LogAnalyzer = function () {
             }
 
             // For each task, merge all loaded graphs into a single state graph.
-            for (var _i5 = 0; _i5 < 71; _i5++) {
-                var _task = _i5.toString();
+            for (var i = 0; i < 71; i++) {
+                var _task = i.toString();
                 if (_task in graphsPerTask) {
                     graphsPerTask[_task] = mergeStateGraphs(graphsPerTask[_task]);
                 }
@@ -1151,71 +1151,63 @@ var LogAnalyzer = function () {
             };
 
             if (conceptName in hierarchy) {
-                (function () {
-                    // This alters hierarchy[conceptName][i] in-position, returning novelty.
-                    var hierarchyParams = paramArrayForLength(hierarchy[conceptName], conceptParams.length, conceptName);
-                    if (Array.isArray(hierarchyParams)) {
-                        // Recurse if array.
-                        var innerComparisons = conceptParams.map(function (param, i) {
-                            return applyConceptToKnowledgeHierarchy(param, hierarchyParams[i], global_hierarchy, localized);
-                        });
-                        novelty = innerComparisons.reduce(function (p, c) {
-                            return mergeNovelty(p, c);
-                        }, novelty); // merge inner novelty scores
-                    }
-                })();
-            } else if (hierarchy != global_hierarchy) {
-                    (function () {
-
-                        //Concept is 'new' at a local level.
-                        if (!localized) {
-                            novelty.local += 1;
-                            //console.log(' >> new local concept: ', conceptName, 'in hier', hierarchy);
-                        }
-
-                        hierarchy[conceptName] = {};
-                        var a = paramArrayForLength(hierarchy[conceptName], conceptParams.length, conceptName);
-                        if (Array.isArray(a)) {
-                            var innerComparisons = a.map(function (obj, i) {
-                                return applyConceptToKnowledgeHierarchy(conceptParams[i], a[i], global_hierarchy, true);
-                            });
-                            novelty = innerComparisons.reduce(function (p, c) {
-                                return mergeNovelty(p, c);
-                            }, novelty); // merge inner novelty scores
-                        } else {
-                                //console.log('>>>', conceptName, hierarchy[conceptName], a);
-                            }
-                    })();
+                // This alters hierarchy[conceptName][i] in-position, returning novelty.
+                var hierarchyParams = paramArrayForLength(hierarchy[conceptName], conceptParams.length, conceptName);
+                if (Array.isArray(hierarchyParams)) {
+                    // Recurse if array.
+                    var innerComparisons = conceptParams.map(function (param, i) {
+                        return applyConceptToKnowledgeHierarchy(param, hierarchyParams[i], global_hierarchy, localized);
+                    });
+                    novelty = innerComparisons.reduce(function (p, c) {
+                        return mergeNovelty(p, c);
+                    }, novelty); // merge inner novelty scores
                 }
+            } else if (hierarchy != global_hierarchy) {
+
+                //Concept is 'new' at a local level.
+                if (!localized) {
+                    novelty.local += 1;
+                    //console.log(' >> new local concept: ', conceptName, 'in hier', hierarchy);
+                }
+
+                hierarchy[conceptName] = {};
+                var a = paramArrayForLength(hierarchy[conceptName], conceptParams.length, conceptName);
+                if (Array.isArray(a)) {
+                    var _innerComparisons = a.map(function (obj, i) {
+                        return applyConceptToKnowledgeHierarchy(conceptParams[i], a[i], global_hierarchy, true);
+                    });
+                    novelty = _innerComparisons.reduce(function (p, c) {
+                        return mergeNovelty(p, c);
+                    }, novelty); // merge inner novelty scores
+                } else {
+                        //console.log('>>>', conceptName, hierarchy[conceptName], a);
+                    }
+            }
 
             if (!(conceptName in global_hierarchy)) {
-                (function () {
-                    // New global concept.
-                    novelty.global += 1;
-                    global_hierarchy[conceptName] = {};
-                    var a = paramArrayForLength(global_hierarchy[conceptName], conceptParams.length, conceptName);
-                    if (Array.isArray(a)) {
-                        var innerComparisons = a.map(function (obj, i) {
-                            return applyConceptToKnowledgeHierarchy(conceptParams[i], a[i], global_hierarchy, localized);
-                        });
-                        novelty = innerComparisons.reduce(function (p, c) {
-                            return mergeNovelty(p, c);
-                        }, novelty); // merge inner novelty scores
-                    }
-                })();
-            } else if (hierarchy != global_hierarchy) {
-                    (function () {
-                        var a = paramArrayForLength(global_hierarchy[conceptName], conceptParams.length, conceptName);
-                        if (Array.isArray(a)) {
-                            var innerComparisons = a.map(function (obj, i) {
-                                return applyConceptToKnowledgeHierarchy(conceptParams[i], a[i], global_hierarchy, true);
-                            });
-                            novelty = innerComparisons.reduce(function (p, c) {
-                                return mergeNovelty(p, c);
-                            }, novelty); // merge inner novelty scores
-                        }
-                    })();
+                // New global concept.
+                novelty.global += 1;
+                global_hierarchy[conceptName] = {};
+                var _a = paramArrayForLength(global_hierarchy[conceptName], conceptParams.length, conceptName);
+                if (Array.isArray(_a)) {
+                    var _innerComparisons2 = _a.map(function (obj, i) {
+                        return applyConceptToKnowledgeHierarchy(conceptParams[i], _a[i], global_hierarchy, localized);
+                    });
+                    novelty = _innerComparisons2.reduce(function (p, c) {
+                        return mergeNovelty(p, c);
+                    }, novelty); // merge inner novelty scores
                 }
+            } else if (hierarchy != global_hierarchy) {
+                var _a2 = paramArrayForLength(global_hierarchy[conceptName], conceptParams.length, conceptName);
+                if (Array.isArray(_a2)) {
+                    var _innerComparisons3 = _a2.map(function (obj, i) {
+                        return applyConceptToKnowledgeHierarchy(conceptParams[i], _a2[i], global_hierarchy, true);
+                    });
+                    novelty = _innerComparisons3.reduce(function (p, c) {
+                        return mergeNovelty(p, c);
+                    }, novelty); // merge inner novelty scores
+                }
+            }
 
             return novelty;
         };

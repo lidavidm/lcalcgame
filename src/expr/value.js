@@ -237,3 +237,71 @@ class StringTriangleExpr extends StringValueExpr {
 class StringCircleExpr extends StringValueExpr {
     constructor() { super('dot', 'circle'); }
 }
+
+class StringAddExpr extends Expression {
+    constructor(left, right) {
+        let op = new TextExpr("+");
+        /*if (left instanceof MissingExpression && !(left instanceof MissingNumberExpression))
+            left = new MissingNumberExpression();
+        if (right instanceof MissingExpression && !(right instanceof MissingNumberExpression))
+            right = new MissingNumberExpression();*/
+        super([left, op, right]);
+    }
+
+    canReduce() {
+        return this.leftExpr && (this.leftExpr.isValue() || this.leftExpr.canReduce()) &&
+            this.rightExpr && (this.rightExpr.isValue() || this.rightExpr.canReduce());
+    }
+
+    get leftExpr() {
+        return this.holes[0];
+    }
+
+    get rightExpr() {
+        return this.holes[2];
+    }
+
+    get op() {
+        return this.holes[1];
+    }
+
+    performReduction() {
+        return this.performSubReduction(this.leftExpr).then((left) => {
+            if (!(left instanceof StringValueExpr)) {
+                return Promise.reject();
+            }
+            return this.performSubReduction(this.rightExpr).then((right) => {
+                if (!(right instanceof StringValueExpr)) {
+                    return Promise.reject();
+                }
+
+                let stage = this.stage;
+
+                let val = super.performReduction();
+                stage.update();
+                return val;
+            });
+        });
+    }
+
+    onmouseclick() {
+        //this.performUserReduction();
+        console.log("clicked Operator Expression!!");
+        if (!this._animating) {
+            this.performReduction();
+        }
+    }
+
+    toString() {
+        return (this.locked ? '/(' : '(') + this.op.toString() + ' ' + this.leftExpr.toString() + ' ' + this.rightExpr.toString() + ')';
+    }
+
+    reduce() {
+        if (this.leftExpr instanceof StringValueExpr && this.rightExpr instanceof StringValueExpr) {
+            return new (StringValueExpr)(this.leftExpr.value() + this.rightExpr.value());
+        }
+        else {
+            return this;
+        }
+    }
+}

@@ -329,9 +329,7 @@ var MirrorShatterEffect = function (_ImageExpr) {
         var pos = mirrorToShatter.upperLeftPos(mirrorToShatter.absolutePos, size);
         pos = addPos(pos, { x: size.w / 2.0 - 4, y: size.h / 2.0 - 11 });
 
-
         //this.size = size;
-
         var _this4 = _possibleConstructorReturn(this, (MirrorShatterEffect.__proto__ || Object.getPrototypeOf(MirrorShatterEffect)).call(this, pos.x, pos.y, size.w, size.h, shouldBreak ? 'mirror-icon-fade-false' : 'mirror-icon-fade-true'));
 
         _this4.pos = pos;

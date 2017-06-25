@@ -44,13 +44,22 @@ class Expression extends mag.RoundedRect {
         return false;
     }
     clone(parent=null) {
+        //console.log("parent");
+        //console.log(parent);
         var c = super.clone(parent);
+        //console.log("c!!!!!");
+        //console.log(c);
         var children = c.children;
+        var holes = c.holes;
         c.children = [];
         c.holes = [];
         c.stroke = null;
         c.toolbox = null;
         children.forEach((child) => c.addArg(child));
+        //c.holes = [];
+        //holes.forEach((hole) => c.addHole(hole));
+        //console.log("c.holes");
+        //console.log(c.holes);
         return c;
     }
 
@@ -63,6 +72,10 @@ class Expression extends mag.RoundedRect {
                 hole.bindSubexpressions();
             }
         });
+    }
+
+    addHole(hole) {
+        this.holes.push(hole);
     }
 
     addArg(arg) {
@@ -81,6 +94,16 @@ class Expression extends mag.RoundedRect {
     swap(arg, anotherArg) {
         if (!arg || anotherArg === undefined) return;
         var i = this.holes.indexOf(arg);
+
+        console.log("swap: arg");
+        console.log(arg);
+        console.log("this.holes");
+        console.log(this.holes);
+
+        if (arg instanceof LambdaVarExpr) {
+            i = 0;
+        }
+
         if (i > -1) {
 
             if (anotherArg === null) {
@@ -362,6 +385,7 @@ class Expression extends mag.RoundedRect {
 
     // * Swaps this expression for its reduction (if one exists) in the expression hierarchy.
     performReduction() {
+        //console.log("called performReduction");
         var reduced_expr = this.reduce();
         if (reduced_expr !== undefined && reduced_expr != this) { // Only swap if reduction returns something > null.
 
@@ -401,6 +425,7 @@ class Expression extends mag.RoundedRect {
         return Promise.resolve(this);
     }
     reduceCompletely() { // Try to reduce this expression and its subexpressions as completely as possible.
+        //console.log("called reduce completely");
         let e = this;
         e.update();
         let prev_holes = e.holes;
