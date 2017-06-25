@@ -1,6 +1,6 @@
 "use strict";
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 /** Logging singleton.
  * Logs to internal JSON, local server (if run from localhost),
@@ -62,7 +62,7 @@ var Logger = function () {
     pub.playerId = null;
 
     // Static logging. (as backup)
-    var isOfflineSession = false;
+    var isOfflineSession = true;
     var static_log = [];
     var logStatic = function logStatic(funcname, data, uploaded) {
         if (!uploaded) data['error_message'] = 'This log failed to upload to the server.';
@@ -275,8 +275,8 @@ var Logger = function () {
             };
             return pub.endTask(currentTaskID).then(startNextTask, startNextTask); // start next task on both rejection and resolution
         } else {
-                return pub.startTask(taskID, data);
-            }
+            return pub.startTask(taskID, data);
+        }
     };
 
     pub.log = function (actionID, data) {

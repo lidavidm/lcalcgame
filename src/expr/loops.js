@@ -87,6 +87,7 @@ class RepeatLoopExpr extends Expression {
                 e._size = { w: this.bodyExpr.size.w, h: e.size.h };
                 missing.push(e);
             }
+
             this.template = new (ExprManager.getClass('sequence'))(...missing);
             this.template.lockSubexpressions();
             this.template.scale = { x: 0.8, y: 0.8 };
@@ -218,6 +219,7 @@ class RepeatLoopExpr extends Expression {
     }
 
     performReduction() {
+        console.log("called perform reduction in RepeatLoopExpr");
         this._cachedSize = this.size;
 
         return this.performSubReduction(this.timesExpr).then((num) => {
@@ -453,10 +455,21 @@ class FadedRepeatLoopExpr extends Expression {
         return this;
     }
 
+    canReduce() {
+        return this.timesExpr && (this.timesExpr.canReduce() || this.timesExpr.isValue()) &&
+            this.bodyExpr && this.bodyExpr.isComplete();
+    }
+
     performReduction() {
+        console.log("called performReduction() in FadedRepeatLoopExpr");
         if (this.canReduce()) {
+            console.log("canReduce() == true");
             return this.performSubReduction(this.timesExpr).then(() => {
                 let missing = [];
+                console.log("this.timesExpr:");
+                console.log(this.timesExpr);
+                console.log("this.bodyExpr");
+                console.log(this.bodyExpr);
                 for (let i = 0; i < this.timesExpr.number; i++) {
                     if (this.bodyExpr instanceof Sequence) {
                         missing = missing.concat(this.bodyExpr.subexpressions.map((e) => e.clone()));
@@ -466,16 +479,26 @@ class FadedRepeatLoopExpr extends Expression {
                     }
                 }
 
+
+                console.log("...missing");
+                console.log(...missing);
+                console.log("missing");
+                console.log(missing);
+
                 let template = new (ExprManager.getClass('sequence'))(...missing);
                 template.lockSubexpressions();
 
                 (this.parent || this.stage).swap(this, template);
                 template.update();
 
+                console.log("template");
+                console.log(template);
+
                 return template;
             });
         }
         else {
+            console.log("canReduce() == false");
             return Promise.reject();
         }
     }

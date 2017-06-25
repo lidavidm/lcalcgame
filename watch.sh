@@ -1,1 +1,1 @@
-babel src --watch --out-dir build
+./node_modules/.bin/babel src --watch --out-dir build

@@ -48,6 +48,8 @@ class NamedExpr extends Expression {
         super(exprs);
         this.color = 'OrangeRed';
         this.name = name;
+        console.log("args");
+        console.log(args);
         this._args = args.map((a) => a.clone());
         this._wrapped_ref = refDefineExpr;
         this.scale = refDefineExpr.scale;
@@ -59,6 +61,7 @@ class NamedExpr extends Expression {
     }
 
     onmouseclick() {
+        console.log(this);
         this.performReduction();
     }
     reduce() {
@@ -141,7 +144,7 @@ class DragPatch extends ImageExpr {
 
         SET_CURSOR_STYLE(CONST.CURSOR.GRABBING);
 
-        let stage = this.stage;
+        //let stage = this.stage;
         let replacement = this.parent.parent.generateNamedExpr(); // DefineExpr -> NamedExpr, or PlayPenExpr -> ObjectExtensionExpr
         let ghosted_name = this.parent.clone();
         ghosted_name.scale = this.parent.absoluteScale;
@@ -193,8 +196,12 @@ class DefineExpr extends ClampExpr {
         if (name) this.funcname = name;
 
         this.notches = [ new WedgeNotch('left', 10, 10, 0.8, true) ];
+
+        //this.stage.functions[this.funcname] = this;
     }
     onSnap(otherNotch, otherExpr, thisNotch) {
+        DefineExpr.functions[this.funcname] = this;
+        this.stage.functions[this.funcname] = this;
         super.onSnap(otherNotch, otherExpr, thisNotch);
         if (this.children[0].holes.length === 1) {
             let drag_patch = new DragPatch(0, 0, 42, 52);
@@ -208,19 +215,29 @@ class DefineExpr extends ClampExpr {
         }
     }
     get name() { return this.funcname; }
-    get expr() { return this.children[1]; }
+    get expr() {
+        //console.log("Called get expr() in DEFINEEXPR ...!!!!");
+        //console.trace();
+        //console.log(this.children[1]);
+        return this.children[1];
+    }
     get constructorArgs() { return [ this.expr.clone() ]; }
     generateNamedExpr() {
+
         let funcname = this.funcname;
         let args = [];
         let numargs = 0;
+
         if (this.expr instanceof LambdaExpr)
             numargs = this.expr.numOfNestedLambdas();
+        //console.log(numargs);
         for (let i = 0; i < numargs; i++)
             args.push( new MissingExpression() );
 
         // Return named function (expression).
-        return new NamedExpr(funcname, this, args);
+        //return new NamedExpr(funcname, this, args);
+
+        return new NamedFuncExpr(funcname, ...args);
     }
     // get notchPos() {
     //     return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - this.notch.relpos) };
@@ -259,6 +276,7 @@ class DefineExpr extends ClampExpr {
     //     }
     // }
     onmouseclick() {
+        console.log(this);
         return; // disable for now;
 
         if (this.funcname) {
@@ -318,3 +336,5 @@ class DefineExpr extends ClampExpr {
     }
     toString() { return '(define ' + this.expr.toString() + ' `' + this.funcname + ')'; }
 }
+
+DefineExpr.functions = {};

@@ -493,8 +493,8 @@ function next() {
         initEndGame();
     } else {
         Resource.getChapterGraph().then(function (graph) {
-            var chapters = graph.chapters;
-            var transitions = graph.transitions;
+            var chapters = graph.chapters,
+                transitions = graph.transitions;
 
             completedLevels[level_idx] = true;
             saveProgress();

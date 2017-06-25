@@ -19,7 +19,7 @@ var EnvironmentDisplay = function (_Expression) {
         var _this = _possibleConstructorReturn(this, (EnvironmentDisplay.__proto__ || Object.getPrototypeOf(EnvironmentDisplay)).call(this, []));
 
         _this._pos = { x: x, y: y };
-        _this._size = { w: w, h: h };
+        _this._size = { w: w + 100, h: h };
         _this.padding = { left: 0, inner: 20, between: 15, right: 0 };
 
         _this._layout = { direction: "vertical", align: "horizontal" };

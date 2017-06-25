@@ -12,6 +12,10 @@ class Level {
         this.globals = globals;
     }
 
+    static getStage() {
+        return stage;
+    }
+
     // Builds a single Stage from the level description,
     // and returns it.
     // * The layout should be generated automatically, and consistently.
@@ -43,7 +47,7 @@ class Level {
             y:canvas_screen.h*(1-1/1.4) / 2.0,
             x:(canvas_screen.w*(1-1/1.4) / 2.0)
         };
-        var board_packing = this.findBestPacking(this.exprs, screen);
+        var board_packing = this.findFastPacking(this.exprs, screen);
         stage.addAll(board_packing); // add expressions to the stage
 
         // TODO: Offload this onto second stage?
@@ -383,6 +387,12 @@ class Level {
             'arrayobj':ExprManager.getClass('arrayobj'),
             'infinite':ExprManager.getClass('infinite'),
             'notch':new (ExprManager.getClass('notch'))(1),
+            '-':ExprManager.getClass('-'),
+            '*':ExprManager.getClass('*'),
+            '--':ExprManager.getClass('--'),
+            '++': ExprManager.getClass('++'),
+            'stringobj':ExprManager.getClass('stringobj'),
+            'namedfunc':ExprManager.getClass('namedfunc'),
             'dot':(() => {
                 let circ = new CircleExpr(0,0,18);
                 circ.color = 'gold';
@@ -422,8 +432,12 @@ class Level {
             let varname = arg.replace('$', '').replace('_', '');
             // Lock unless there is an underscore in the name
             locked = !(arg.indexOf('_') > -1);
-            return lock(new (ExprManager.getClass('var'))(varname), locked);
-        } else {
+            return lock(new (ExprManager.getClass('reference'))(varname), locked);
+        } else if (true) {
+            let string = new StringValueExpr(arg);
+            return string;
+        }
+        else {
             console.error('Unknown argument: ', arg);
             return lock(new FadedValueExpr(arg), locked);
         }
@@ -759,6 +773,13 @@ class ExpressionPattern {
         var compare = (e, f) => {
 
             let isarr = false;
+
+            if (e instanceof StringObjectExpr || f instanceof StringObjectExpr) {
+                e = e.value();
+                f = f.value();
+                return e === f;
+            }
+
             if (e instanceof ArrayObjectExpr && e.holes.length === 1) {
                 e = e.holes[0]; // compare only the underlying array.
             }

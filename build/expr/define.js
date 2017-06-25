@@ -11,7 +11,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 // Notch attachment node.
-
 var NewInstanceExpr = function (_FadedValueExpr) {
     _inherits(NewInstanceExpr, _FadedValueExpr);
 
@@ -86,6 +85,8 @@ var NamedExpr = function (_Expression) {
 
         _this2.color = 'OrangeRed';
         _this2.name = name;
+        console.log("args");
+        console.log(args);
         _this2._args = args.map(function (a) {
             return a.clone();
         });
@@ -97,6 +98,7 @@ var NamedExpr = function (_Expression) {
     _createClass(NamedExpr, [{
         key: 'onmouseclick',
         value: function onmouseclick() {
+            console.log(this);
             this.performReduction();
         }
     }, {
@@ -232,7 +234,7 @@ var DragPatch = function (_ImageExpr) {
 
             SET_CURSOR_STYLE(CONST.CURSOR.GRABBING);
 
-            var stage = this.stage;
+            //let stage = this.stage;
             var replacement = this.parent.parent.generateNamedExpr(); // DefineExpr -> NamedExpr, or PlayPenExpr -> ObjectExtensionExpr
             var ghosted_name = this.parent.clone();
             ghosted_name.scale = this.parent.absoluteScale;
@@ -306,12 +308,16 @@ var DefineExpr = function (_ClampExpr) {
         if (name) _this5.funcname = name;
 
         _this5.notches = [new WedgeNotch('left', 10, 10, 0.8, true)];
+
+        //this.stage.functions[this.funcname] = this;
         return _this5;
     }
 
     _createClass(DefineExpr, [{
         key: 'onSnap',
         value: function onSnap(otherNotch, otherExpr, thisNotch) {
+            DefineExpr.functions[this.funcname] = this;
+            this.stage.functions[this.funcname] = this;
             _get(DefineExpr.prototype.__proto__ || Object.getPrototypeOf(DefineExpr.prototype), 'onSnap', this).call(this, otherNotch, otherExpr, thisNotch);
             if (this.children[0].holes.length === 1) {
                 var drag_patch = new DragPatch(0, 0, 42, 52);
@@ -329,14 +335,19 @@ var DefineExpr = function (_ClampExpr) {
     }, {
         key: 'generateNamedExpr',
         value: function generateNamedExpr() {
+
             var funcname = this.funcname;
             var args = [];
             var numargs = 0;
+
             if (this.expr instanceof LambdaExpr) numargs = this.expr.numOfNestedLambdas();
+            //console.log(numargs);
             for (var i = 0; i < numargs; i++) {
                 args.push(new MissingExpression());
             } // Return named function (expression).
-            return new NamedExpr(funcname, this, args);
+            //return new NamedExpr(funcname, this, args);
+
+            return new (Function.prototype.bind.apply(NamedFuncExpr, [null].concat([funcname], args)))();
         }
         // get notchPos() {
         //     return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - this.notch.relpos) };
@@ -378,6 +389,7 @@ var DefineExpr = function (_ClampExpr) {
     }, {
         key: 'onmouseclick',
         value: function onmouseclick() {
+            console.log(this);
             return; // disable for now;
 
             if (this.funcname) {
@@ -447,6 +459,9 @@ var DefineExpr = function (_ClampExpr) {
     }, {
         key: 'expr',
         get: function get() {
+            //console.log("Called get expr() in DEFINEEXPR ...!!!!");
+            //console.trace();
+            //console.log(this.children[1]);
             return this.children[1];
         }
     }, {
@@ -458,3 +473,5 @@ var DefineExpr = function (_ClampExpr) {
 
     return DefineExpr;
 }(ClampExpr);
+
+DefineExpr.functions = {};

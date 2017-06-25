@@ -1,6 +1,6 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -68,9 +68,9 @@ var mag = function (_) {
 
                 var _loop = function _loop(i) {
 
-                    var f = _arguments.length <= i + 0 ? undefined : _arguments[i + 0];
-                    var d = _arguments.length <= i + 1 + 0 ? undefined : _arguments[i + 1 + 0];
-                    var o = _arguments.length <= i + 2 + 0 ? undefined : _arguments[i + 2 + 0];
+                    var f = _arguments.length <= i ? undefined : _arguments[i];
+                    var d = _arguments.length <= i + 1 ? undefined : _arguments[i + 1];
+                    var o = _arguments.length <= i + 2 ? undefined : _arguments[i + 2];
 
                     var t = new Tween(f, d);
                     if (o) t.after(o);
@@ -270,25 +270,23 @@ var mag = function (_) {
 
 
                 if (expr.stage) {
-                    (function () {
 
-                        var stg = expr.stage;
-                        var sz = expr.size;
-                        var len = sz.h;
-                        var pos = expr.centerPos();
-                        var scale = 1.4;
-                        var img = new mag.ImageRect(pos.x - len * 1.4 / 2.0, pos.y - len * 1.4 / 2.0, len * 1.4, len * 1.4, 'poof0');
-                        stg.add(img);
+                    var stg = expr.stage;
+                    var sz = expr.size;
+                    var len = sz.h;
+                    var pos = expr.centerPos();
+                    var scale = 1.4;
+                    var img = new mag.ImageRect(pos.x - len * 1.4 / 2.0, pos.y - len * 1.4 / 2.0, len * 1.4, len * 1.4, 'poof0');
+                    stg.add(img);
 
-                        var anim = Resource.getAnimation('poof');
-                        Animate.play(anim, img, function () {
-                            stg.remove(img); // remove self from stage on animation end.
-                            stg.update();
-                            stg.draw();
-                        });
+                    var anim = Resource.getAnimation('poof');
+                    Animate.play(anim, img, function () {
+                        stg.remove(img); // remove self from stage on animation end.
+                        stg.update();
+                        stg.draw();
+                    });
 
-                        if (sfx) Resource.play(sfx, 0.4);
-                    })();
+                    if (sfx) Resource.play(sfx, 0.4);
                 }
             }
         }]);

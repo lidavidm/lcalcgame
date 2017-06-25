@@ -2,7 +2,7 @@ class EnvironmentDisplay extends Expression {
     constructor(x, y, w, h) {
         super([]);
         this._pos = { x: x, y: y };
-        this._size = { w: w, h: h };
+        this._size = { w: w+100, h: h };
         this.padding = { left: 0, inner: 20, between: 15, right: 0 };
 
         this._layout = { direction: "vertical", align: "horizontal" };
