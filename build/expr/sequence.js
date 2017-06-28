@@ -424,7 +424,7 @@ var MultiClampSequence = function (_Sequence3) {
 
         _this7._layout.direction = "horizontal";
         _this7.shadowOffset = 6;
-        _this7._numOfClamps = exprsPerClamp.length + 1;
+        _this7._numOfClamps = exprsPerClamp.length / 2 + 1;
         var ground = 0;
         var breakIndices = [0];
         for (var i = 0; i < exprsPerClamp.length; i++) {
@@ -469,7 +469,7 @@ var MultiClampSequence = function (_Sequence3) {
     }, {
         key: "getMidSize",
         value: function getMidSize() {
-            return this.getSizeForSection(1);
+            return this.getSizeForSection(2);
         }
     }, {
         key: "getBotSize",
@@ -508,14 +508,18 @@ var MultiClampSequence = function (_Sequence3) {
                 y = padding;
             }
 
+            var currentBreakIdx = 1;
             this.holes.forEach(function (expr, i) {
                 // Update hole expression positions.
 
-                if (i === _this8.breakIndices[1]) {
+                if (i === _this8.breakIndices[currentBreakIdx]) {
                     x = _this8.getMidSize().w / 2.0 - expr.size.w / 2.0 * expr.scale.x;
-                    y += expr.anchor.y * expr.size.h * expr.scale.y + FILLER_INNER_HEIGHT + padding / 2;
-                    y += (1 - expr.anchor.y) * expr.size.h * expr.scale.y;
+                    if (currentBreakIdx % 2 === 1) y += FILLER_INNER_HEIGHT + padding;else {
+                        y += expr.anchor.y * expr.size.h * expr.scale.y + padding / 2;
+                        y += (1 - expr.anchor.y) * expr.size.h * expr.scale.y / 2;
+                    }
                     if (_this8.padding.between) y += _this8.padding.between;
+                    currentBreakIdx++;
                 }
 
                 expr.anchor = { x: 0, y: 0.5 };
@@ -584,3 +588,23 @@ var MultiClampSequence = function (_Sequence3) {
 
     return MultiClampSequence;
 }(Sequence);
+
+// A Statement (as in, multi-line code) of the form
+// if (...) {
+//     ...
+// } else {
+//     ...
+// }
+
+
+var IfElseBlockStatement = function (_MultiClampSequence) {
+    _inherits(IfElseBlockStatement, _MultiClampSequence);
+
+    function IfElseBlockStatement(cond, branch, elseBranch) {
+        _classCallCheck(this, IfElseBlockStatement);
+
+        return _possibleConstructorReturn(this, (IfElseBlockStatement.__proto__ || Object.getPrototypeOf(IfElseBlockStatement)).call(this, [[new TextExpr('if'), cond], [branch], [new TextExpr('else')], [elseBranch]]));
+    }
+
+    return IfElseBlockStatement;
+}(MultiClampSequence);

@@ -244,7 +244,7 @@ class MultiClampSequence extends Sequence {
         super([]);
         this._layout.direction = "horizontal";
         this.shadowOffset = 6;
-        this._numOfClamps = exprsPerClamp.length+1;
+        this._numOfClamps = exprsPerClamp.length/2+1;
         let ground = 0;
         let breakIndices = [ 0 ];
         for(let i = 0; i < exprsPerClamp.length; i++) {
@@ -276,7 +276,7 @@ class MultiClampSequence extends Sequence {
         return this.getSizeForSection(0);
     }
     getMidSize() {
-        return this.getSizeForSection(1);
+        return this.getSizeForSection(2);
     }
     getBotSize() {
         return { w:100, h:30 };
@@ -327,13 +327,18 @@ class MultiClampSequence extends Sequence {
             y = padding;
         }
 
+        let currentBreakIdx = 1;
         this.holes.forEach((expr, i) => { // Update hole expression positions.
 
-            if (i === this.breakIndices[1]) {
+            if (i === this.breakIndices[currentBreakIdx]) {
                 x = this.getMidSize().w / 2.0 - expr.size.w / 2.0 * expr.scale.x;
-                y += expr.anchor.y * expr.size.h * expr.scale.y + FILLER_INNER_HEIGHT + padding / 2;
-                y += (1 - expr.anchor.y) * expr.size.h * expr.scale.y;
+                if (currentBreakIdx % 2 === 1) y += FILLER_INNER_HEIGHT + padding;
+                else {
+                    y += expr.anchor.y * expr.size.h * expr.scale.y + padding / 2;
+                    y += (1 - expr.anchor.y) * expr.size.h * expr.scale.y / 2;
+                }
                 if (this.padding.between) y += this.padding.between;
+                currentBreakIdx++;
             }
 
             expr.anchor = { x:0, y:0.5 };
@@ -377,5 +382,16 @@ class MultiClampSequence extends Sequence {
                       this.stroke ? this.stroke.opacity : null,
                       this.notches ? this.notches : null);
     }
+}
 
+// A Statement (as in, multi-line code) of the form
+// if (...) {
+//     ...
+// } else {
+//     ...
+// }
+class IfElseBlockStatement extends MultiClampSequence {
+    constructor(cond, branch, elseBranch) {
+        super([ [new TextExpr('if'), cond], [branch], [new TextExpr('else')], [elseBranch] ]);
+    }
 }

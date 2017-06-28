@@ -194,7 +194,7 @@ function __DEBUG_TESTBED(stage) {
     //console.log(ErrorExpr);
     //ErrorEffect.run(stage, { x:300, y:250 });
 
-    let multiclamp = new MultiClampSequence([ [ new TextExpr('if'), new TextExpr('(x == 3)')], [ new TextExpr('else') ] ]);
+    let multiclamp = new IfElseBlockStatement(new TextExpr('(x == 3)'), new MissingExpression(), new MissingExpression());
     multiclamp.pos = { x:300, y:300 };
     stage.add(multiclamp);
 
