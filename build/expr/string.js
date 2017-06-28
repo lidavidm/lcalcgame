@@ -18,6 +18,7 @@ var StringObjectExpr = function (_ObjectExtensionExpr) {
     _inherits(StringObjectExpr, _ObjectExtensionExpr);
 
     //baseString should be of type StringValueExpr
+
     function StringObjectExpr(baseString) {
         var defaultMethodCall = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var defaultMethodArgs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
@@ -25,6 +26,7 @@ var StringObjectExpr = function (_ObjectExtensionExpr) {
         _classCallCheck(this, StringObjectExpr);
 
         //text.color = "OrangeRed";
+
         var _this = _possibleConstructorReturn(this, (StringObjectExpr.__proto__ || Object.getPrototypeOf(StringObjectExpr)).call(this, baseString, {
             'length': {
                 'isProperty': true,
@@ -59,10 +61,10 @@ var StringObjectExpr = function (_ObjectExtensionExpr) {
                 } else if (numberExpr.number >= stringExpr.value().length) {
                     return stringExpr; //TODO: return undefined
                 } else {
-                    var newString = stringExpr.value()[numberExpr.number];
-                    var newStringObj = new StringObjectExpr(new StringValueExpr(newString));
-                    return newStringObj;
-                }
+                        var newString = stringExpr.value()[numberExpr.number];
+                        var newStringObj = new StringObjectExpr(new StringValueExpr(newString));
+                        return newStringObj;
+                    }
             }
         }));
 
@@ -76,8 +78,8 @@ var StringObjectExpr = function (_ObjectExtensionExpr) {
         if (!defaultMethodCall) {} else if (defaultMethodCall in _this.objMethods) {
             _this.setExtension(defaultMethodCall); // TODO: method args
         } else {
-            console.error('@ StringObjectExpr: Method call ' + defaultMethodCall + ' not a possible member of the object.');
-        }
+                console.error('@ StringObjectExpr: Method call ' + defaultMethodCall + ' not a possible member of the object.');
+            }
 
         _this.defaultMethodCall = defaultMethodCall;
         _this.defaultMethodArgs = defaultMethodArgs;

@@ -582,6 +582,82 @@ function clampRect(ctx, x, y, topWidth, topHeight, midWidth, midHeight, botWidth
   if (stroke) strokeWithOpacity(ctx, strokeOpacity);
 }
 
+function multiClampRect(ctx, x, y, topWidth, topHeight, innerWidth, innerHeight, midWidth, midHeight, botWidth, botHeight, numOfMidSections, radius, fill, stroke, strokeOpacity, notches) {
+  if (typeof stroke == 'undefined') stroke = true;
+  if (typeof radius === 'undefined') radius = 5;
+  if (typeof radius === 'number') radius = {tl: radius, tr: radius, br: radius, bl: radius};
+  else {
+    var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
+    for (var side in defaultRadius) {
+      radius[side] = radius[side] || defaultRadius[side];
+    }
+  }
+  ctx.beginPath();
+
+  // Top edge
+  ctx.moveTo(x + radius.tl, y);
+  ctx.lineTo(x + topWidth - radius.tr, y);
+  ctx.quadraticCurveTo(x + topWidth, y, x + topWidth, y + radius.tr);
+
+  ctx.stroke();
+
+  // Top-right rounded edge
+  ctx.lineTo(x + topWidth, y + topHeight - radius.br);
+  ctx.quadraticCurveTo(x + topWidth, y + topHeight, x + topWidth - radius.br, y + topHeight);
+
+  // Top-bottom sharp edge, meeting at a point with inner-right edge:
+  ctx.lineTo(x + innerWidth, y + topHeight);
+
+  let _y = y + topHeight;
+  if (numOfMidSections && numOfMidSections >= 1) {
+      while(numOfMidSections-- > 0) {
+
+          _y += innerHeight;
+
+          // First inner-right sharp edge
+          ctx.lineTo(x + innerWidth, _y);
+
+          // Mid-top sharp edge
+          ctx.lineTo(x + midWidth, _y);
+
+          // Mid-right rounded edge
+          _y += midHeight;
+          ctx.lineTo(x + midWidth, _y - radius.br);
+          ctx.quadraticCurveTo(x + midWidth, _y, x + midWidth - radius.br, _y);
+
+          // Mid-bot rounded edge
+          ctx.lineTo(x + innerWidth, _y);
+          //ctx.quadraticCurveTo(x + innerWidth, _y, x + innerWidth, _y - radius.bl);
+      }
+  }
+
+  _y += innerHeight;
+  ctx.lineTo(x + innerWidth, _y);
+
+  // Bot-top sharp edge
+  ctx.lineTo(x + botWidth, _y);
+
+  // Bot-right rounded edge
+  _y += botHeight;
+  ctx.lineTo(x + botWidth, _y - radius.br);
+  ctx.quadraticCurveTo(x + botWidth, _y, x + botWidth - radius.br, _y);
+
+  // Bot-bot rounded edge
+  ctx.lineTo(x + radius.bl, _y);
+  ctx.quadraticCurveTo(x, _y, x, _y - radius.bl);
+
+  // Bot-left rounded edge
+  if (notches && notches.length === 1) { // Only 'left' side notches are supported for now.
+      notches[0].drawVert(ctx, x, _y - radius.bl, (topHeight + innerHeight + botHeight - radius.bl) - radius.tl, -1);
+  }
+  ctx.lineTo(x, y + radius.tl);
+  ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+
+  ctx.closePath();
+  if (fill) ctx.fill();
+  if (stroke) strokeWithOpacity(ctx, strokeOpacity);
+}
+
 /** Thanks to markE @ SO: http://stackoverflow.com/a/25840319 */
  function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius, strokeStyle=null, fillStyle='white') {
      var rot = Math.PI / 2 * 3;

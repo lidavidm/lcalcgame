@@ -66,9 +66,9 @@ var ChoiceExpr = function (_Expression) {
                 });
                 var size = this.size;
 
-                var _cellSize = this.cellSize,
-                    boxW = _cellSize.w,
-                    boxH = _cellSize.h;
+                var _cellSize = this.cellSize;
+                var boxW = _cellSize.w;
+                var boxH = _cellSize.h;
 
 
                 var col = 0;
@@ -382,9 +382,9 @@ var ChoiceExpr = function (_Expression) {
             var padding = this.padding;
             if (this.getHoleSizes().length === 0) return { w: this._size.w, h: this._size.h };
 
-            var _cellSize2 = this.cellSize,
-                boxW = _cellSize2.w,
-                boxH = _cellSize2.h;
+            var _cellSize2 = this.cellSize;
+            var boxW = _cellSize2.w;
+            var boxH = _cellSize2.h;
 
             var width = this.padding.left + this.rowSize * boxW + this.padding.right;
             var height = this.padding.inner * 2 + Math.ceil(this.choices.length / this.rowSize) * boxH;

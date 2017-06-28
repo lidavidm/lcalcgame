@@ -99,10 +99,10 @@ var MissingExpression = function (_Expression) {
                 }*/
 
                 // Blink blue if reduction is possible with this config.
-                var try_reduce = node.parent.reduceCompletely();
-                if (try_reduce != node.parent && try_reduce !== undefined || node.parent.isComplete()) {
-                    Animate.blink(node.parent, 1000, [1, 1, 0], 1);
-                }
+                //var try_reduce = node.parent.reduceCompletely();
+                /*if ((try_reduce != node.parent && try_reduce !== undefined) || node.parent.isComplete()) {
+                    Animate.blink(node.parent, 1000, [1,1,0], 1);
+                }*/
             }
         }
     }, {
@@ -498,7 +498,7 @@ var MissingNumberExpression = function (_MissingTypedExpressi4) {
 
         _this11.graphicNode = new mag.ImageRect(0, 0, 24, 32, 'die');
 
-        _this11.acceptedClasses = [VarExpr, NumberExpr];
+        _this11.acceptedClasses = [VarExpr, NumberExpr, ObjectExtensionExpr, NamedExpr];
         return _this11;
     }
 

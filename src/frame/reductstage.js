@@ -5,6 +5,7 @@ const UI_PADDING = __IS_MOBILE ? 2.5 : 10;
 class ReductStage extends mag.Stage {
     constructor(canvas=null) {
         super(canvas);
+        this.color = '#eee';
         this.stateStack = [];
         this.environment = new Environment();
         this.functions = {};

@@ -62,18 +62,46 @@ var EntangledExpr = function (_ExpressionPlus) {
             var _this = this;
 
             if (this.isShuttered) {
-                // Close shutter and swap out inner expression for next in sequence.
-                var animateShutter = function animateShutter(idx) {
-                    _this.overlay.closeShutter(250).after(function () {
-                        _this.removeChild(_this.holes[0]);
-                        _this.removeChild(_this.overlay);
-                        _this.holes = [_this.hiddenExprs[idx]];
-                        _this.update();
-                        _this.addChild(_this.overlay);
-                        _this.overlay.openShutter(250).after(function () {
+                (function () {
+                    // Close shutter and swap out inner expression for next in sequence.
+                    var animateShutter = function animateShutter(idx) {
+                        _this.overlay.closeShutter(250).after(function () {
+                            _this.removeChild(_this.holes[0]);
+                            _this.removeChild(_this.overlay);
+                            _this.holes = [_this.hiddenExprs[idx]];
+                            _this.update();
+                            _this.addChild(_this.overlay);
+                            _this.overlay.openShutter(250).after(function () {
+                                Animate.wait(2000).after(function () {
+                                    _this.afterWait = function () {
+                                        return animateShutter((idx + 1) % _this.hiddenExprs.length);
+                                    };
+                                    if (_this.pair) {
+
+                                        if (_this.pair.waiting) {
+                                            _this.waiting = false;
+                                            _this.pair.waiting = false;
+                                            _this.pair.afterWait();
+                                            _this.afterWait();
+                                        } else _this.waiting = true;
+                                    } else _this.afterWait();
+                                });
+                            });
+                        });
+                    };
+                    animateShutter(1);
+                })();
+            } else {
+                (function () {
+                    // Move selector frame from expression to expression, left to right.
+                    var animateFrameOverHole = function animateFrameOverHole(idx) {
+                        var frames = _this.getHoleSizes();
+                        Animate.tween(_this.overlay, { size: frames[idx], pos: _this.holes[idx].pos }, 500, function (e) {
+                            return Math.pow(e, 2);
+                        }).after(function () {
                             Animate.wait(2000).after(function () {
                                 _this.afterWait = function () {
-                                    return animateShutter((idx + 1) % _this.hiddenExprs.length);
+                                    return animateFrameOverHole((idx + 1) % _this.holes.length);
                                 };
                                 if (_this.pair) {
 
@@ -86,33 +114,9 @@ var EntangledExpr = function (_ExpressionPlus) {
                                 } else _this.afterWait();
                             });
                         });
-                    });
-                };
-                animateShutter(1);
-            } else {
-                // Move selector frame from expression to expression, left to right.
-                var animateFrameOverHole = function animateFrameOverHole(idx) {
-                    var frames = _this.getHoleSizes();
-                    Animate.tween(_this.overlay, { size: frames[idx], pos: _this.holes[idx].pos }, 500, function (e) {
-                        return Math.pow(e, 2);
-                    }).after(function () {
-                        Animate.wait(2000).after(function () {
-                            _this.afterWait = function () {
-                                return animateFrameOverHole((idx + 1) % _this.holes.length);
-                            };
-                            if (_this.pair) {
-
-                                if (_this.pair.waiting) {
-                                    _this.waiting = false;
-                                    _this.pair.waiting = false;
-                                    _this.pair.afterWait();
-                                    _this.afterWait();
-                                } else _this.waiting = true;
-                            } else _this.afterWait();
-                        });
-                    });
-                };
-                animateFrameOverHole(1);
+                    };
+                    animateFrameOverHole(1);
+                })();
             }
         }
     }], [{

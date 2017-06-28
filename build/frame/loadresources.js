@@ -232,18 +232,15 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         'logicalops': ['assign-chi'],
         'assign-chi': ['sequence'],
         'sequence': ['loops'],
-        'loops': ['define'],
-        'define': ['mystery'],
-        'mystery': []
-        //'intro_obj': ['intro_obj2'],
-        //'intro_obj2': ['intro_typing'],
-        //'intro_typing': ['logicalops'],
-        //'logicalops' : ['assign'],
-        //'assign': ['sequence'],
-        //'sequence': ['loops'],
-        //'loops': ['mystery'],
-        //'mystery': ['variables_obj'],
-        //'variables_obj': [],
+        'loops': ['mystery'],
+        'mystery': ['variables_obj'],
+        'variables_obj': ['intro_string'],
+        'intro_string': ['more_array'],
+        'more_array': ['intro_string_obj'],
+        'intro_string_obj': ['variable_obj_methods'],
+        'variable_obj_methods': ['reverse_string'],
+        'reverse_string': ['recursion'],
+        'recursion': []
     };
 
     var chapter_load_prom = loadChaptersFromDigraph(chapterDigraph);

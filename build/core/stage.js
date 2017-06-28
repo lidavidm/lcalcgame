@@ -326,6 +326,8 @@ var mag = function (_) {
                         })();
                     }
                 }
+
+                this.update();
             }
         }, {
             key: 'bringToFront',

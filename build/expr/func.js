@@ -104,6 +104,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 }*/
 
 // Acts as a named wrapper for a def'd expression.
+
 var NamedFuncExpr = function (_Expression) {
     _inherits(NamedFuncExpr, _Expression);
 

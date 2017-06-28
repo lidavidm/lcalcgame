@@ -84,11 +84,11 @@ function init() {
                             $('#fade_status').text('OFF');
                         }
                     }
-                  
-                lockFocus();
 
-                return loadChapterSelect();
-            }).then(initMainMenu);
+                    lockFocus();
+                    return loadChapterSelect();
+
+                }).then(initBoard);
 
             });
         }
@@ -191,8 +191,12 @@ function initChapterSelectMenu(flyToChapIdx) {
 
 function __DEBUG_TESTBED(stage) {
 
-    console.log(ErrorExpr);
-    ErrorEffect.run(stage, { x:300, y:250 });
+    //console.log(ErrorExpr);
+    //ErrorEffect.run(stage, { x:300, y:250 });
+
+    let multiclamp = new MultiClampSequence([ [ new TextExpr('if'), new TextExpr('(x == 3)')], [ new TextExpr('else') ] ]);
+    multiclamp.pos = { x:300, y:300 };
+    stage.add(multiclamp);
 
     // let dropdown = new DropdownSelect( 200, 100, 120, 40, [ "A", "B", "C" ], null, "YellowGreen", "Green", "PaleGreen", false );
     // stage.add(dropdown);
@@ -229,6 +233,8 @@ function __DEBUG_TESTBED(stage) {
 
     // let pen = new PlayPenRect(300, 300, 200, 200);
     // stage.add(pen);
+
+
 
     // let obj = new ArrayObjectExpr(new BracketArrayExpr(0, 0, 44, 44));
     // obj.pos = { x:200, y:200 };
@@ -303,8 +309,6 @@ function initMainMenu() {
 
         //initBoard();
 
-        //__DEBUG_TESTBED(stage);
-
         redraw(stage);
 
         //Animate.tween(substage, { scale:{x:0.5, y:0.5} }, 1000);
@@ -353,6 +357,8 @@ let prepareCanvas = (function() {
 
     return function() {
         canvas = document.getElementById('canvas');
+        $(canvas).css('background-color', '#EEE');
+
         if (canvas.getContext) {
             clearStage();
             resizeCanvas();
@@ -431,6 +437,8 @@ function initBoard() {
                 });
             }
         }
+
+        __DEBUG_TESTBED(stage);
 
         stage.update();
         stage.draw();

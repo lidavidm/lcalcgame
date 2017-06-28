@@ -86,11 +86,26 @@ function init() {
                         }
                     }
 
+                    lockFocus();
                     return loadChapterSelect();
-                }).then(initMainMenu);
+                }).then(initBoard);
             });
         }
     });
+}
+
+/// Keep keyboard/input focus on the game by preventing any other
+/// element on the page from receiving focus.
+function lockFocus() {
+    var nodes = document.querySelectorAll('div.centered,#devinfo,div.centered *, #devinfo *');
+
+    // http://stackoverflow.com/a/9110355/262727
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].setAttribute("tabIndex", "-1");
+        nodes[i].onfocus = function () {
+            this.blur();
+        };
+    }
 }
 
 function loadCustomLevel(lvl_desc, goal_desc, toolbox_desc) {
@@ -173,8 +188,12 @@ function initChapterSelectMenu(flyToChapIdx) {
 
 function __DEBUG_TESTBED(stage) {
 
-    console.log(ErrorExpr);
-    ErrorEffect.run(stage, { x: 300, y: 250 });
+    //console.log(ErrorExpr);
+    //ErrorEffect.run(stage, { x:300, y:250 });
+
+    var multiclamp = new MultiClampSequence([[new TextExpr('if'), new TextExpr('(x == 3)')], [new TextExpr('else')]]);
+    multiclamp.pos = { x: 300, y: 300 };
+    stage.add(multiclamp);
 
     // let dropdown = new DropdownSelect( 200, 100, 120, 40, [ "A", "B", "C" ], null, "YellowGreen", "Green", "PaleGreen", false );
     // stage.add(dropdown);
@@ -285,8 +304,6 @@ function initMainMenu() {
 
         //initBoard();
 
-        //__DEBUG_TESTBED(stage);
-
         redraw(stage);
 
         //Animate.tween(substage, { scale:{x:0.5, y:0.5} }, 1000);
@@ -335,6 +352,8 @@ var prepareCanvas = function () {
 
     return function () {
         canvas = document.getElementById('canvas');
+        $(canvas).css('background-color', '#EEE');
+
         if (canvas.getContext) {
             clearStage();
             resizeCanvas();
@@ -412,6 +431,8 @@ function initBoard() {
                 });
             }
         }
+
+        __DEBUG_TESTBED(stage);
 
         stage.update();
         stage.draw();
@@ -493,8 +514,8 @@ function next() {
         initEndGame();
     } else {
         Resource.getChapterGraph().then(function (graph) {
-            var chapters = graph.chapters,
-                transitions = graph.transitions;
+            var chapters = graph.chapters;
+            var transitions = graph.transitions;
 
             completedLevels[level_idx] = true;
             saveProgress();

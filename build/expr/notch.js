@@ -10,6 +10,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 // Specifies a 'notch' in a drawn rectangle.
 // left, right, top, or bottom, and relpos is the relative position on that side from 0 to 1, clockwise.
+
 var Notch = function () {
     function Notch() {
         var side = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'left';

@@ -11,6 +11,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 // An if statement.
+
 var IfStatement = function (_Expression) {
     _inherits(IfStatement, _Expression);
 
@@ -21,12 +22,14 @@ var IfStatement = function (_Expression) {
         var else_text = new TextExpr(': null');
         question_mark.color = else_text.color = 'black';
 
+
         // OLD -- if ... then ...
         /*var if_text = new TextExpr('if');
         var then_text = new TextExpr('then');
         if_text.color = 'black';
         then_text.color = 'black';
         super([if_text, cond, then_text, branch]);*/
+
         var _this = _possibleConstructorReturn(this, (IfStatement.__proto__ || Object.getPrototypeOf(IfStatement)).call(this, [cond, question_mark, branch, else_text]));
 
         _this.color = 'LightBlue';
@@ -98,42 +101,48 @@ var IfStatement = function (_Expression) {
             return new Promise(function (resolve, reject) {
                 var reduction = _this2.reduce();
                 if (reduction != _this2) {
+                    (function () {
 
-                    var stage = _this2.stage;
-                    var afterEffects = function afterEffects() {
-                        _this2.ignoreEvents = false;
-                        var rtn = _get(IfStatement.prototype.__proto__ || Object.getPrototypeOf(IfStatement.prototype), 'performReduction', _this2).call(_this2);
-                        stage.update();
-                        stage.draw();
-                        if (rtn === null) {
-                            rtn = new FadedNullExpr();
-                        }
-                        resolve(rtn);
-                        return rtn;
-                    };
+                        var stage = _this2.stage;
+                        var afterEffects = function afterEffects() {
+                            _this2.ignoreEvents = false;
+                            stage.update();
+                            stage.draw();
 
-                    if (reduction === null) {
-                        _this2.playJimmyAnimation(afterEffects);
-                    } else if (reduction instanceof FadedNullExpr) {
-                        var red = afterEffects();
-                        red.ignoreEvents = true; // don't let them move a null.
-                        Resource.play('pop');
-                        Animate.blink(red, 1000, [1, 1, 1], 0.4).after(function () {
-                            red.poof();
-                        });
-                        //this.playJimmyAnimation(afterEffects);
-                    } else {
-                        _this2.playUnlockAnimation(afterEffects);
-                    }
+                            return _get(IfStatement.prototype.__proto__ || Object.getPrototypeOf(IfStatement.prototype), 'performReduction', _this2).call(_this2).then(function (rtn) {
+                                if (rtn === null) {
+                                    rtn = new FadedNullExpr();
+                                }
+                                resolve(rtn);
+                                stage.update();
+                                return rtn;
+                            });
+                        };
 
-                    _this2.ignoreEvents = true;
-                    //var shatter = new ShatterExpressionEffect(this);
-                    //shatter.run(stage, (() => {
-                    //    super.performReduction();
-                    //}).bind(this));
+                        if (reduction === null) {
+                            _this2.playJimmyAnimation(afterEffects);
+                        } else if (reduction instanceof NullExpr) {
+                            var red = afterEffects().then(function (red) {
+                                red.ignoreEvents = true; // don't let them move a null.
+                                Resource.play('pop');
+                                Animate.blink(red, 1000, [1, 1, 1], 0.4).after(function () {
+                                    Animate.poof(red);
+                                });
+                            });
+                            //this.playJimmyAnimation(afterEffects);
+                        } else {
+                                _this2.playUnlockAnimation(afterEffects);
+                            }
+
+                        _this2.ignoreEvents = true;
+                        //var shatter = new ShatterExpressionEffect(this);
+                        //shatter.run(stage, (() => {
+                        //    super.performReduction();
+                        //}).bind(this));
+                    })();
                 } else {
-                    reject();
-                }
+                        reject();
+                    }
             });
         }
     }, {
@@ -191,7 +200,7 @@ var ArrowIfStatement = function (_IfStatement) {
     _createClass(ArrowIfStatement, [{
         key: 'emptyExpr',
         get: function get() {
-            return null;
+            return this.parent ? new FadedNullExpr() : null;
         }
     }, {
         key: 'cond',
@@ -266,21 +275,37 @@ var LockIfStatement = function (_IfStatement3) {
         var _this5 = _possibleConstructorReturn(this, (LockIfStatement.__proto__ || Object.getPrototypeOf(LockIfStatement)).call(this, cond, branch));
 
         _this5.holes = [cond, branch];
-
-        var bluebg = new mag.RoundedRect(0, 0, 25, 25);
-        bluebg.color = "#2484f5";
-        _this5._bg = bluebg;
-
-        var top = new mag.ImageRect(0, 0, 112 / 2.0, 74 / 2.0, 'lock-top-locked');
-        _this5._top = top;
-
-        var shinewrap = new mag.PatternRect(0, 0, 24, 100, 'shinewrap');
-        shinewrap.opacity = 0.8;
-        _this5._shinewrap = shinewrap;
+        _this5._makeGraphics();
         return _this5;
     }
 
     _createClass(LockIfStatement, [{
+        key: '_makeGraphics',
+        value: function _makeGraphics() {
+            // This needs to be called on clones so that duplicated locks
+            // don't all appear to unlock together (since clone() by
+            // default makes them share these objects)
+            var bluebg = new mag.RoundedRect(0, 0, 25, 25);
+            bluebg.color = "#2484f5";
+            this._bg = bluebg;
+
+            var top = new mag.ImageRect(0, 0, 112 / 2.0, 74 / 2.0, 'lock-top-locked');
+            this._top = top;
+
+            var shinewrap = new mag.PatternRect(0, 0, 24, 100, 'shinewrap');
+            shinewrap.opacity = 0.8;
+            this._shinewrap = shinewrap;
+        }
+    }, {
+        key: 'clone',
+        value: function clone() {
+            var parent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+            var c = _get(LockIfStatement.prototype.__proto__ || Object.getPrototypeOf(LockIfStatement.prototype), 'clone', this).call(this, parent);
+            c._makeGraphics();
+            return c;
+        }
+    }, {
         key: 'playJimmyAnimation',
         value: function playJimmyAnimation(onComplete) {
             var _this6 = this;
@@ -334,6 +359,8 @@ var LockIfStatement = function (_IfStatement3) {
             var bgsz = { w: condsz.w + 14, h: condsz.h + 16 };
             var bgpos = addPos(pos, { x: -(bgsz.w - condsz.w) / 2.0 + this.cond.pos.x, y: -(bgsz.h - condsz.h) / 2.0 + 3 });
             var topsz = this._top.size;
+            topsz.w *= this.scale.x;
+            topsz.h *= this.scale.y;
             var wrapsz = { w: boundingSize.w - condsz.w, h: boundingSize.h };
             var wrappos = { x: bgpos.x + bgsz.w, y: pos.y };
 
@@ -363,7 +390,7 @@ var LockIfStatement = function (_IfStatement3) {
     }, {
         key: 'emptyExpr',
         get: function get() {
-            return null;
+            return this.parent ? new FadedNullExpr() : null;
         }
     }, {
         key: 'cond',
@@ -420,7 +447,7 @@ var InlineLockIfStatement = function (_IfStatement4) {
     }, {
         key: 'emptyExpr',
         get: function get() {
-            return null;
+            return this.parent ? new FadedNullExpr() : null;
         }
     }, {
         key: 'cond',

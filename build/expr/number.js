@@ -11,6 +11,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 // Integers
+
 var NumberExpr = function (_Expression) {
     _inherits(NumberExpr, _Expression);
 
@@ -358,16 +359,19 @@ var DiceNumber = function (_mag$Rect) {
     }, {
         key: 'drawInternal',
         value: function drawInternal(ctx, pos, boundingSize) {
+            var _this10 = this;
 
             if (this.circlePos && this.circlePos.length > 0) {
+                (function () {
 
-                var rad = this.radius * boundingSize.w / this.size.w;
-                var fill = this.color;
-                var stroke = this.stroke;
-                this.circlePos.forEach(function (relpos) {
-                    var drawpos = { x: pos.x + boundingSize.w * relpos.x - rad, y: pos.y + boundingSize.h * relpos.y - rad };
-                    drawCircle(ctx, drawpos.x, drawpos.y, rad, fill, stroke);
-                });
+                    var rad = _this10.radius * boundingSize.w / _this10.size.w;
+                    var fill = _this10.color;
+                    var stroke = _this10.stroke;
+                    _this10.circlePos.forEach(function (relpos) {
+                        var drawpos = { x: pos.x + boundingSize.w * relpos.x - rad, y: pos.y + boundingSize.h * relpos.y - rad };
+                        drawCircle(ctx, drawpos.x, drawpos.y, rad, fill, stroke);
+                    });
+                })();
             }
         }
     }, {

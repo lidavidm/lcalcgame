@@ -4,6 +4,8 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -16,9 +18,9 @@ var Sequence = function (_Expression) {
     function Sequence() {
         _classCallCheck(this, Sequence);
 
-        var _this = _possibleConstructorReturn(this, (Sequence.__proto__ || Object.getPrototypeOf(Sequence)).call(this, []));
+        var _this2 = _possibleConstructorReturn(this, (Sequence.__proto__ || Object.getPrototypeOf(Sequence)).call(this, []));
 
-        _this.padding.between = 5;
+        _this2.padding.between = 5;
 
         for (var _len = arguments.length, exprs = Array(_len), _key = 0; _key < _len; _key++) {
             exprs[_key] = arguments[_key];
@@ -26,18 +28,18 @@ var Sequence = function (_Expression) {
 
         exprs.forEach(function (expr) {
             if (expr instanceof MissingExpression) {
-                _this.holes.push(new MissingSequenceExpression());
+                _this2.holes.push(new MissingSequenceExpression());
             } else if (expr instanceof Sequence) {
                 expr.holes.forEach(function (x) {
-                    return _this.holes.push(x);
+                    return _this2.holes.push(x);
                 });
             } else {
-                _this.holes.push(expr);
+                _this2.holes.push(expr);
             }
         });
-        _this._layout = { direction: "vertical", align: "none" };
-        _this._animating = false;
-        return _this;
+        _this2._layout = { direction: "vertical", align: "none" };
+        _this2._animating = false;
+        return _this2;
     }
 
     _createClass(Sequence, [{
@@ -133,95 +135,97 @@ var Sequence = function (_Expression) {
     }, {
         key: "performReduction",
         value: function performReduction() {
-            var _this2 = this;
+            var _this3 = this;
 
             var cleanup = function cleanup() {
-                _this2._animating = false;
-                while (_this2.holes.length > 0 && _this2.holes[0] instanceof MissingExpression) {
-                    _this2.holes.shift();
+                _this3._animating = false;
+                while (_this3.holes.length > 0 && _this3.holes[0] instanceof MissingExpression) {
+                    _this3.holes.shift();
                 }
-                _this2.update();
+                _this3.update();
 
-                Animate.blink(_this2, 1000, [1.0, 0.0, 0.0]);
+                Animate.blink(_this3, 1000, [1.0, 0.0, 0.0]);
             };
 
             this.lockSubexpressions();
             return new Promise(function (resolve, reject) {
                 var nextStep = function nextStep() {
-                    if (_this2.holes.length === 0) {
-                        Animate.poof(_this2);
-                        (_this2.parent || _this2.stage).swap(_this2, null);
+                    if (_this3.holes.length === 0) {
+                        Animate.poof(_this3);
+                        (_this3.parent || _this3.stage).swap(_this3, null);
                         resolve(null);
                     } else {
-                        var expr = _this2.holes[0];
-                        var result = expr.performReduction();
-                        var delay = function delay(newExpr) {
-                            if (newExpr instanceof Expression && newExpr != expr) {
-                                _this2.holes[0] = newExpr;
-                            } else if (newExpr instanceof Expression && newExpr.isValue()) {
-                                _this2.holes.shift();
-                            } else if (newExpr == expr) {
-                                cleanup();
-                                reject();
-                                return;
-                            } else {
-                                _this2.holes.shift();
-                            }
-
-                            // To handle expressions like loops that
-                            // expand into sequences, flatten any
-                            // subsequences we encounter.
-                            var newHoles = [];
-                            var _iteratorNormalCompletion4 = true;
-                            var _didIteratorError4 = false;
-                            var _iteratorError4 = undefined;
-
-                            try {
-                                for (var _iterator4 = _this2.holes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                                    var _expr2 = _step4.value;
-
-                                    if (_expr2 instanceof Sequence) {
-                                        newHoles = newHoles.concat(_expr2.holes);
-                                    } else {
-                                        newHoles.push(_expr2);
-                                    }
+                        (function () {
+                            var expr = _this3.holes[0];
+                            var result = expr.performReduction();
+                            var delay = function delay(newExpr) {
+                                if (newExpr instanceof Expression && newExpr != expr) {
+                                    _this3.holes[0] = newExpr;
+                                } else if (newExpr instanceof Expression && newExpr.isValue()) {
+                                    _this3.holes.shift();
+                                } else if (newExpr == expr) {
+                                    cleanup();
+                                    reject();
+                                    return;
+                                } else {
+                                    _this3.holes.shift();
                                 }
-                            } catch (err) {
-                                _didIteratorError4 = true;
-                                _iteratorError4 = err;
-                            } finally {
+
+                                // To handle expressions like loops that
+                                // expand into sequences, flatten any
+                                // subsequences we encounter.
+                                var newHoles = [];
+                                var _iteratorNormalCompletion4 = true;
+                                var _didIteratorError4 = false;
+                                var _iteratorError4 = undefined;
+
                                 try {
-                                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                                        _iterator4.return();
+                                    for (var _iterator4 = _this3.holes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                                        var _expr2 = _step4.value;
+
+                                        if (_expr2 instanceof Sequence) {
+                                            newHoles = newHoles.concat(_expr2.holes);
+                                        } else {
+                                            newHoles.push(_expr2);
+                                        }
                                     }
+                                } catch (err) {
+                                    _didIteratorError4 = true;
+                                    _iteratorError4 = err;
                                 } finally {
-                                    if (_didIteratorError4) {
-                                        throw _iteratorError4;
+                                    try {
+                                        if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                                            _iterator4.return();
+                                        }
+                                    } finally {
+                                        if (_didIteratorError4) {
+                                            throw _iteratorError4;
+                                        }
                                     }
                                 }
-                            }
 
-                            _this2.holes = newHoles;
+                                _this3.holes = newHoles;
 
-                            _this2.update();
-                            if (newExpr instanceof Expression) newExpr.lock();
-                            if (newHoles.length > 0) {
-                                after(800).then(function () {
-                                    return nextStep();
+                                _this3.update();
+                                if (newExpr instanceof Expression) newExpr.lock();
+                                if (newHoles.length > 0) {
+                                    after(800).then(function () {
+                                        return nextStep();
+                                    });
+                                } else {
+                                    nextStep();
+                                }
+                            };
+                            if (result instanceof Promise) {
+                                result.then(delay, function () {
+                                    // Uh-oh, an error happened
+                                    cleanup();
+                                    reject();
                                 });
                             } else {
-                                nextStep();
+                                delay(result || expr);
                             }
-                        };
-                        if (result instanceof Promise) {
-                            result.then(delay, function () {
-                                // Uh-oh, an error happened
-                                cleanup();
-                                reject();
-                            });
-                        } else {
-                            delay(result || expr);
-                        }
+                        })();
                     }
                 };
                 nextStep();
@@ -238,6 +242,18 @@ var Sequence = function (_Expression) {
             return (this.locked ? '/' : '') + "(sequence " + this.subexpressions.map(function (x) {
                 return x.toString();
             }).join(" ") + ")";
+        }
+    }, {
+        key: "reduceCompletely",
+        value: function reduceCompletely() {
+            if (this.canReduce()) {
+                // Return non-undefined non-this value so that when the
+                // user drops everything in, MissingExpression#ondropped
+                // will make this expr blink
+                return null;
+            } else {
+                return this;
+            }
         }
     }, {
         key: "subexpressions",
@@ -261,11 +277,11 @@ var NotchedSequence = function (_Sequence) {
             exprs[_key2] = arguments[_key2];
         }
 
-        var _this3 = _possibleConstructorReturn(this, (_ref = NotchedSequence.__proto__ || Object.getPrototypeOf(NotchedSequence)).call.apply(_ref, [this].concat(exprs)));
+        var _this4 = _possibleConstructorReturn(this, (_ref = NotchedSequence.__proto__ || Object.getPrototypeOf(NotchedSequence)).call.apply(_ref, [this].concat(exprs)));
 
-        _this3.padding.right = 17.5;
-        _this3._reductionIndicatorStart = 0;
-        return _this3;
+        _this4.padding.right = 17.5;
+        _this4._reductionIndicatorStart = 0;
+        return _this4;
     }
 
     _createClass(NotchedSequence, [{
@@ -282,8 +298,10 @@ var NotchedSequence = function (_Sequence) {
                 br: radius
             }, true, false, null);
 
-            ctx.strokeStyle = '#000';
-            ctx.lineWidth = 1;
+            setStrokeStyle(ctx, {
+                color: '#000',
+                lineWidth: 1
+            });
             for (var i = 0; i < this.holes.length - 1; i++) {
                 var expr1 = this.holes[i];
                 var expr2 = this.holes[i + 1];
@@ -313,10 +331,10 @@ var SemicolonNotchedSequence = function (_NotchedSequence) {
             exprs[_key3] = arguments[_key3];
         }
 
-        var _this4 = _possibleConstructorReturn(this, (_ref2 = SemicolonNotchedSequence.__proto__ || Object.getPrototypeOf(SemicolonNotchedSequence)).call.apply(_ref2, [this].concat(exprs)));
+        var _this5 = _possibleConstructorReturn(this, (_ref2 = SemicolonNotchedSequence.__proto__ || Object.getPrototypeOf(SemicolonNotchedSequence)).call.apply(_ref2, [this].concat(exprs)));
 
-        _this4.padding.right = 15;
-        return _this4;
+        _this5.padding.right = 15;
+        return _this5;
     }
 
     _createClass(SemicolonNotchedSequence, [{
@@ -387,4 +405,182 @@ var SemicolonSequence = function (_Sequence2) {
     }]);
 
     return SemicolonSequence;
+}(Sequence);
+
+/* A wrapper for blocks that are sequences but wrapped in a multi-line
+   code {} block, like if {} else {} statements, for {} loops, while {} loops,
+   etc. */
+
+
+var MultiClampSequence = function (_Sequence3) {
+    _inherits(MultiClampSequence, _Sequence3);
+
+    function MultiClampSequence(exprsPerClamp) {
+        var includeBottomClamp = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+        _classCallCheck(this, MultiClampSequence);
+
+        var _this7 = _possibleConstructorReturn(this, (MultiClampSequence.__proto__ || Object.getPrototypeOf(MultiClampSequence)).call(this, []));
+
+        _this7._layout.direction = "horizontal";
+        _this7.shadowOffset = 6;
+        _this7._numOfClamps = exprsPerClamp.length + 1;
+        var ground = 0;
+        var breakIndices = [0];
+        for (var i = 0; i < exprsPerClamp.length; i++) {
+            var es = exprsPerClamp[i];
+            ground += es.length;
+            breakIndices.push(ground);
+        }
+        _this7.holes = exprsPerClamp.reduce(function (a, b) {
+            return a.concat(b);
+        });
+        _this7.breakIndices = breakIndices;
+
+        _this7._exprsPerClamp = exprsPerClamp;
+
+        console.log(_this7);
+        return _this7;
+    }
+
+    _createClass(MultiClampSequence, [{
+        key: "aggregateSize",
+        value: function aggregateSize(sizes) {
+            var padding = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+            if (!padding) padding = { right: 0, left: 0, inner: 0 };
+            return { w: sizes.reduce(function (p, c) {
+                    return p + c.w + padding.inner;
+                }, padding.left) + padding.right,
+                h: Math.max.apply(Math, _toConsumableArray(sizes.map(function (sz) {
+                    return sz.h;
+                }))) + padding.inner };
+        }
+    }, {
+        key: "getSizeForSection",
+        value: function getSizeForSection(secID) {
+            return this.aggregateSize(this.getHoleSizes().slice(this.breakIndices[secID], this.breakIndices[secID + 1]), this.padding);
+        }
+    }, {
+        key: "getTopSize",
+        value: function getTopSize() {
+            return this.getSizeForSection(0);
+        }
+    }, {
+        key: "getMidSize",
+        value: function getMidSize() {
+            return this.getSizeForSection(1);
+        }
+    }, {
+        key: "getBotSize",
+        value: function getBotSize() {
+            return { w: 100, h: 30 };
+        }
+
+        // Sizes to match its children.
+
+    }, {
+        key: "update",
+        value: function update() {
+            var _this8 = this;
+
+            var _this = this;
+            this.children = [];
+            var FILLER_INNER_HEIGHT = 40;
+
+            this.holes.forEach(function (expr) {
+                return _this.addChild(expr);
+            });
+            // In the centering calculation below, we need this expr's
+            // size to be stable. So we first set the scale on our
+            // children, then compute our size once to lay out the
+            // children.
+            this.holes.forEach(function (expr) {
+                expr.anchor = { x: 0, y: 0.5 };
+                expr.scale = { x: 0.85, y: 0.85 };
+                expr.update();
+            });
+            var size = this.size;
+            var padding = this.padding.inner;
+            var x = this.padding.left;
+            var y = this.getTopSize().h / 2.0 + (this.exprOffsetY ? this.exprOffsetY : 0);
+            if (this._layout.direction == "vertical") {
+                y = padding;
+            }
+
+            this.holes.forEach(function (expr, i) {
+                // Update hole expression positions.
+
+                if (i === _this8.breakIndices[1]) {
+                    x = _this8.getMidSize().w / 2.0 - expr.size.w / 2.0 * expr.scale.x;
+                    y += expr.anchor.y * expr.size.h * expr.scale.y + FILLER_INNER_HEIGHT + padding / 2;
+                    y += (1 - expr.anchor.y) * expr.size.h * expr.scale.y;
+                    if (_this8.padding.between) y += _this8.padding.between;
+                }
+
+                expr.anchor = { x: 0, y: 0.5 };
+                expr.pos = { x: x, y: y };
+                expr.scale = { x: 0.85, y: 0.85 };
+                expr.update();
+
+                if (_this8._layout.direction == "vertical") {
+                    y += expr.anchor.y * expr.size.h * expr.scale.y;
+                    var offset = x;
+
+                    // Centering
+                    if (_this8._layout.align == "horizontal") {
+                        var innerWidth = size.w;
+                        var scale = expr.scale.x;
+                        offset = (innerWidth - scale * expr.size.w) / 2;
+                    }
+
+                    expr.pos = { x: offset, y: y };
+
+                    y += (1 - expr.anchor.y) * expr.size.h * expr.scale.y;
+                    if (_this8.padding.between) y += _this8.padding.between;
+                } else {
+                    x += expr.size.w * expr.scale.x + padding;
+                }
+            });
+
+            this.children = this.holes; // for rendering
+        }
+    }, {
+        key: "drawBaseShape",
+        value: function drawBaseShape(ctx, pos, boundingSize) {
+            multiClampRect(ctx, pos.x, pos.y, boundingSize.w * this.topRatio.x, boundingSize.h * this.topRatio.y, boundingSize.w * this.innerRatio.x, boundingSize.h * this.innerRatio.y, boundingSize.w * this.midRatio.x, boundingSize.h * this.midRatio.y, boundingSize.w * this.botRatio.x, boundingSize.h * this.botRatio.y, this._numOfClamps - 2, // number of inner sections
+            this.radius * this.absoluteScale.x, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null, this.notches ? this.notches : null);
+        }
+    }, {
+        key: "constructorArgs",
+        get: function get() {
+            return [this._exprsPerClamp];
+        }
+    }, {
+        key: "size",
+        get: function get() {
+            var padding = this.padding;
+            var width = 0;
+            var height = DEFAULT_EXPR_HEIGHT;
+
+            var FILLER_INNER_HEIGHT = 40;
+            var topSize = this.getTopSize();
+            var midSize = this.getMidSize();
+            var botSize = this.getBotSize();
+
+            var sz = { w: Math.max(topSize.w, midSize.w, botSize.w),
+                h: [topSize.h, FILLER_INNER_HEIGHT * (this._numOfClamps - 1), midSize.h * (this._numOfClamps - 2), botSize.h].reduce(function (a, b) {
+                    return a + b;
+                }, 0) };
+
+            this.topRatio = { x: topSize.w / sz.w, y: (topSize.h + padding.inner) / sz.h };
+            this.innerRatio = { x: padding.left * 2 / sz.w, y: FILLER_INNER_HEIGHT / sz.h };
+            this.midRatio = { x: midSize.w / sz.w, y: (midSize.h - padding.inner) / sz.h };
+            this.botRatio = { x: (botSize.w - padding.left * 2) / sz.w, y: botSize.h / sz.h };
+
+            return sz;
+        }
+    }]);
+
+    return MultiClampSequence;
 }(Sequence);

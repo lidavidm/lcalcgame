@@ -1453,6 +1453,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
     //     chapterIdx: chapter_idx,
     //     startIdx: idx_of_starting_level,
     // }
+
     function ChapterSelectMenu(canvas, onLevelSelect, flyToChapIdx) {
         _classCallCheck(this, ChapterSelectMenu);
 
@@ -2396,6 +2397,7 @@ var Mask = function (_mag$Rect3) {
         _classCallCheck(this, Mask);
 
         // cx, cy are in % of context width/height
+
         var _this33 = _possibleConstructorReturn(this, (Mask.__proto__ || Object.getPrototypeOf(Mask)).call(this, 0, 0, 0, 0));
 
         _this33.cx = cx;

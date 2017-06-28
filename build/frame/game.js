@@ -25,15 +25,15 @@ var Level = function () {
         this.globals = globals;
     }
 
-    // Builds a single Stage from the level description,
-    // and returns it.
-    // * The layout should be generated automatically, and consistently.
-    // * That way a higher function can 'parse' a text file description of levels --
-    // * written in code, for instance -- and generate the entire game on-the-fly.
-
-
     _createClass(Level, [{
         key: 'build',
+
+
+        // Builds a single Stage from the level description,
+        // and returns it.
+        // * The layout should be generated automatically, and consistently.
+        // * That way a higher function can 'parse' a text file description of levels --
+        // * written in code, for instance -- and generate the entire game on-the-fly.
         value: function build(canvas) {
 
             var stage = new ReductStage(canvas);
@@ -57,7 +57,7 @@ var Level = function () {
                 y: canvas_screen.h * (1 - 1 / 1.4) / 2.0,
                 x: canvas_screen.w * (1 - 1 / 1.4) / 2.0
             };
-            var board_packing = this.findBestPacking(this.exprs, screen);
+            var board_packing = this.findFastPacking(this.exprs, screen);
             stage.addAll(board_packing); // add expressions to the stage
 
             // TODO: Offload this onto second stage?
@@ -622,6 +622,11 @@ var Level = function () {
             return rtn;
         }
     }], [{
+        key: 'getStage',
+        value: function getStage() {
+            return stage;
+        }
+    }, {
         key: 'make',
         value: function make(desc) {
             var expr_descs = desc.board;
@@ -873,6 +878,12 @@ var Level = function () {
                 'arrayobj': ExprManager.getClass('arrayobj'),
                 'infinite': ExprManager.getClass('infinite'),
                 'notch': new (ExprManager.getClass('notch'))(1),
+                '-': ExprManager.getClass('-'),
+                '*': ExprManager.getClass('*'),
+                '--': ExprManager.getClass('--'),
+                '++': ExprManager.getClass('++'),
+                'stringobj': ExprManager.getClass('stringobj'),
+                'namedfunc': ExprManager.getClass('namedfunc'),
                 'dot': function () {
                     var circ = new CircleExpr(0, 0, 18);
                     circ.color = 'gold';
@@ -911,7 +922,10 @@ var Level = function () {
                 var _varname2 = arg.replace('$', '').replace('_', '');
                 // Lock unless there is an underscore in the name
                 locked = !(arg.indexOf('_') > -1);
-                return lock(new (ExprManager.getClass('var'))(_varname2), locked);
+                return lock(new (ExprManager.getClass('reference'))(_varname2), locked);
+            } else if (true) {
+                var string = new StringValueExpr(arg);
+                return string;
             } else {
                 console.error('Unknown argument: ', arg);
                 return lock(new FadedValueExpr(arg), locked);
@@ -1165,6 +1179,13 @@ var ExpressionPattern = function () {
             var compare = function compare(e, f) {
 
                 var isarr = false;
+
+                if (e instanceof StringObjectExpr || f instanceof StringObjectExpr) {
+                    e = e.value();
+                    f = f.value();
+                    return e === f;
+                }
+
                 if (e instanceof ArrayObjectExpr && e.holes.length === 1) {
                     e = e.holes[0]; // compare only the underlying array.
                 }

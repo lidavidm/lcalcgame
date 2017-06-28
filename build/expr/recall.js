@@ -373,15 +373,33 @@ var TypeInTextExpr = function (_TextExpr) {
     }
 
     _createClass(TypeInTextExpr, [{
-        key: 'reduce',
-        value: function reduce() {
+        key: 'parsedValue',
+        value: function parsedValue() {
             if (this.typeBox) {
                 var txt = this.typeBox.text.trim();
                 if (this.validator(txt)) {
-                    this.typeBox.carriageReturn();
+                    var result = __PARSER.parse(txt);
+                    if (result) return result;
                 }
             }
+            return null;
+        }
+    }, {
+        key: 'reduce',
+        value: function reduce() {
+            var value = this.parsedValue();
+            if (value) {
+                this.typeBox.carriageReturn();
+                return value;
+            }
             return this;
+        }
+    }, {
+        key: 'performReduction',
+        value: function performReduction() {
+            var value = this.parsedValue();
+            if (value) return Promise.resolve(value);
+            return Promise.reject();
         }
     }, {
         key: 'commit',

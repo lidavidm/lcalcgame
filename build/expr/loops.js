@@ -6,6 +6,8 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -62,11 +64,19 @@ var RepeatLoopExpr = function (_Expression) {
                 var times = this.timesExpr.reduceCompletely().value();
                 if (!Number.isInteger(times)) return this;
                 var missing = [];
+
+                var numExprs = this.bodyExpr instanceof Sequence ? this.bodyExpr.subexpressions.length : 1;
                 for (var i = 0; i < times; i++) {
-                    var e = this.bodyExpr.clone();
-                    missing.push(e);
+                    if (numExprs === 1) {
+                        var e = this.bodyExpr.clone();
+                        missing.push(e);
+                    } else {
+                        missing = missing.concat(this.bodyExpr.subexpressions.map(function (e) {
+                            return e.clone();
+                        }));
+                    }
                 }
-                var template = new (Function.prototype.bind.apply(ExprManager.getClass('sequence'), [null].concat(missing)))();
+                var template = new (Function.prototype.bind.apply(ExprManager.getClass('sequence'), [null].concat(_toConsumableArray(missing))))();
                 template.lockSubexpressions();
 
                 return template;
@@ -84,11 +94,13 @@ var RepeatLoopExpr = function (_Expression) {
 
             if (this.timesExpr instanceof NumberExpr) {
                 var missing = [];
-                for (var i = 0; i < this.timesExpr.number; i++) {
+                var numExprs = this.bodyExpr instanceof Sequence ? this.bodyExpr.subexpressions.length : 1;
+                for (var i = 0; i < this.timesExpr.number * numExprs; i++) {
                     var e = new Expression();
                     e._size = { w: this.bodyExpr.size.w, h: e.size.h };
                     missing.push(e);
                 }
+
                 this.template = new (Function.prototype.bind.apply(ExprManager.getClass('sequence'), [null].concat(missing)))();
                 this.template.lockSubexpressions();
                 this.template.scale = { x: 0.8, y: 0.8 };
@@ -218,6 +230,7 @@ var RepeatLoopExpr = function (_Expression) {
         value: function performReduction() {
             var _this3 = this;
 
+            console.log("called perform reduction in RepeatLoopExpr");
             this._cachedSize = this.size;
 
             return this.performSubReduction(this.timesExpr).then(function (num) {
@@ -240,19 +253,14 @@ var RepeatLoopExpr = function (_Expression) {
                     // Reduce instantly if we're a child of something else
                     if (_this3.parent) {
                         index = _this3.template.subexpressions.length + 1;
-                        for (var i = 0; i < _this3.template.subexpressions.length; i++) {
-                            _this3.template.subexpressions[i] = _this3.bodyExpr.clone();
-                        }
-                        _this3.template.update();
                     }
 
                     var nextStep = function nextStep() {
                         _this3._leverAngle = -Math.PI / 2;
 
                         if (index > _this3.template.subexpressions.length) {
-                            _this3.template.holes.forEach(function (expr) {
-                                expr.opacity = 1;
-                            });
+                            _this3.template = _this3.reduceCompletely();
+                            _this3.template.update();
                             resolve(_this3.template);
                             Animate.poof(_this3);
                             _this3.template.parent = null;
@@ -281,8 +289,8 @@ var RepeatLoopExpr = function (_Expression) {
                                     numExprs = _this3.bodyExpr.subexpressions.length;
                                 }
 
-                                for (var _i = 0; _i < numExprs; _i++) {
-                                    var expr = _this3.template.subexpressions[index + _i];
+                                for (var i = 0; i < numExprs; i++) {
+                                    var expr = _this3.template.subexpressions[index + i];
                                     y -= expr.size.h * expr.scale.y;
                                 }
 
@@ -307,10 +315,14 @@ var RepeatLoopExpr = function (_Expression) {
                                             y: _this3.bodyExpr.pos.y + 2
                                         }
                                     }, 400).after(function () {
-                                        for (var _i2 = 0; _i2 < numExprs; _i2++) {
-                                            _this3.template.subexpressions[index + _i2] = body.clone();
-                                            _this3.template.update();
+                                        if (numExprs === 1) {
+                                            _this3.template.subexpressions[index] = body.clone();
+                                        } else {
+                                            for (var _i = 0; _i < numExprs; _i++) {
+                                                _this3.template.subexpressions[index + _i] = body.subexpressions[_i].clone();
+                                            }
                                         }
+                                        _this3.template.update();
                                         index += numExprs;
 
                                         _this3.bodyExpr.shadowOffset = oldOffset;
@@ -378,6 +390,11 @@ var FadedRepeatLoopExpr = function (_Expression2) {
     }
 
     _createClass(FadedRepeatLoopExpr, [{
+        key: 'canReduce',
+        value: function canReduce() {
+            return this.timesExpr && (this.timesExpr.canReduce() || this.timesExpr.isValue()) && this.bodyExpr && this.bodyExpr.isComplete();
+        }
+    }, {
         key: 'update',
         value: function update() {
             var _this5 = this;
@@ -421,33 +438,87 @@ var FadedRepeatLoopExpr = function (_Expression2) {
             this.children = this.holes;
         }
     }, {
+        key: 'reduceCompletely',
+        value: function reduceCompletely() {
+            if (this.canReduce()) {
+                var times = this.timesExpr.reduceCompletely().value();
+                if (!Number.isInteger(times)) return this;
+                var missing = [];
+
+                var numExprs = this.bodyExpr instanceof Sequence ? this.bodyExpr.subexpressions.length : 1;
+                for (var i = 0; i < times; i++) {
+                    if (numExprs === 1) {
+                        var e = this.bodyExpr.clone();
+                        missing.push(e);
+                    } else {
+                        missing = missing.concat(this.bodyExpr.subexpressions.map(function (e) {
+                            return e.clone();
+                        }));
+                    }
+                }
+                var template = new (Function.prototype.bind.apply(ExprManager.getClass('sequence'), [null].concat(_toConsumableArray(missing))))();
+                template.lockSubexpressions();
+
+                return template;
+            }
+            return this;
+        }
+    }, {
+        key: 'canReduce',
+        value: function canReduce() {
+            return this.timesExpr && (this.timesExpr.canReduce() || this.timesExpr.isValue()) && this.bodyExpr && this.bodyExpr.isComplete();
+        }
+    }, {
         key: 'performReduction',
         value: function performReduction() {
             var _this6 = this;
 
+            console.log("called performReduction() in FadedRepeatLoopExpr");
             if (this.canReduce()) {
+                console.log("canReduce() == true");
                 return this.performSubReduction(this.timesExpr).then(function () {
+                    var _console;
+
                     var missing = [];
+                    console.log("this.timesExpr:");
+                    console.log(_this6.timesExpr);
+                    console.log("this.bodyExpr");
+                    console.log(_this6.bodyExpr);
                     for (var i = 0; i < _this6.timesExpr.number; i++) {
-                        missing.push(_this6.bodyExpr.clone());
+                        if (_this6.bodyExpr instanceof Sequence) {
+                            missing = missing.concat(_this6.bodyExpr.subexpressions.map(function (e) {
+                                return e.clone();
+                            }));
+                        } else {
+                            missing.push(_this6.bodyExpr.clone());
+                        }
                     }
 
-                    var template = new (Function.prototype.bind.apply(ExprManager.getClass('sequence'), [null].concat(missing)))();
+                    console.log("...missing");
+                    (_console = console).log.apply(_console, _toConsumableArray(missing));
+                    console.log("missing");
+                    console.log(missing);
+
+                    var template = new (Function.prototype.bind.apply(ExprManager.getClass('sequence'), [null].concat(_toConsumableArray(missing))))();
                     template.lockSubexpressions();
 
                     (_this6.parent || _this6.stage).swap(_this6, template);
                     template.update();
 
+                    console.log("template");
+                    console.log(template);
+
                     return template;
                 });
             } else {
+                console.log("canReduce() == false");
                 return Promise.reject();
             }
         }
     }, {
         key: 'onmouseclick',
         value: function onmouseclick() {
-            this.performReduction();
+            this.performUserReduction();
         }
     }, {
         key: 'toString',
