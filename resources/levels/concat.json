@@ -15,18 +15,18 @@
         },
         {
             "goal" : "'cattywampus'",
-            "board": ["_ + 'y'", "_ + 't'", "_ + 'w'", "_ + _", "_ + 'us'"],
+            "board": ["_ + 'y'", "_ + 't'", "_ + _", "'w' + _", "_ + _", "_ + 'us'"],
             "toolbox": ["'t'", "'am'", "'cat'", "'p'"]
         },
         {
             "goal" : "'adam'",
             "board": ["_ + _", "(x) => xx"],
-            "toolbox": ["'m'", "'a'", "'d'"]
+            "toolbox": ["'m'", "'a'", "'d'", "_ + _"]
         },
         {
             "goal" : ["'bee'", "'kee'", "'per'"],
             "board": ["_ + _", "(x) => xx", "(x) => xx", "'b' + _", "'k' + _", "_ + 'r'"],
-            "toolbox": ["'e'", "'p'"]
+            "toolbox": ["'e'", "'e'", "'p'"]
         },
         {
             "goal" : "'zxy'",
@@ -40,12 +40,9 @@
         },
         {
             "goal" : "'abracadabra'",
-            "board": "x = 'a';\
-                      y = x + _t_string;\
-                      z = y + x;
-                      y = z + _t_string + z;",
+            "board": "x = 'a'; y = x + _t_string; z = y + x; y = z + _t_string + z;",
             "toolbox": ["y"]
-        },
+        }
     ],
     "resources":{
         "planet":"planet-boolili",

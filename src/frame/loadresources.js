@@ -85,6 +85,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         return new Promise(function(resolve, reject) {
             $.getJSON(__LEVELS_PATH + json_filename + '.json', function(json) {
 
+                console.log(json_filename);
+
                 // Copy the planet's aliens to the individual level
                 // definitions, so that buildLevel has access to
                 // them. Provide a default alien when not specified.
@@ -98,6 +100,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
 
                 pushChapter(json, json_filename);
                 resolve();
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                console.error('getJSON request failed! ' + textStatus + ' @ ' + json_filename, errorThrown);
             });
         });
     };

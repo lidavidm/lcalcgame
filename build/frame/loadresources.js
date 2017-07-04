@@ -89,6 +89,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         return new Promise(function (resolve, reject) {
             $.getJSON(__LEVELS_PATH + json_filename + '.json', function (json) {
 
+                console.log(json_filename);
+
                 // Copy the planet's aliens to the individual level
                 // definitions, so that buildLevel has access to
                 // them. Provide a default alien when not specified.
@@ -122,6 +124,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
 
                 pushChapter(json, json_filename);
                 resolve();
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                console.error('getJSON request failed! ' + textStatus + ' @ ' + json_filename, errorThrown);
             });
         });
     };
@@ -230,11 +234,13 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         'intro_obj': ['intro_typing'],
         'intro_typing': ['logicalops'],
         'logicalops': ['assign-chi'],
-        'assign-chi': ['sequence'],
+        'assign-chi': ['logicalops_vars'],
+        'logicalops_vars': ['sequence'],
         'sequence': ['loops'],
         'loops': ['mystery'],
         'mystery': ['variables_obj'],
-        'variables_obj': ['intro_string'],
+        'variables_obj': ['concat'],
+        'concat': ['intro_string'],
         'intro_string': ['more_array'],
         'more_array': ['intro_string_obj'],
         'intro_string_obj': ['variable_obj_methods'],

@@ -22,7 +22,7 @@ var ExprManager = function () {
         'number': [NumberExpr, FadedNumberExpr],
         'cmp': [MirrorCompareExpr, FadedCompareExpr],
         '==': [MirrorCompareExpr, FadedCompareExpr],
-        '+': [AddExpr],
+        '+': [StringAddExpr], //[AddExpr],
         '-': [SubtractionExpr],
         '*': [MultiplicationExpr],
         '--': [DivisionExpr],

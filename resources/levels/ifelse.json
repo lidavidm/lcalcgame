@@ -9,7 +9,7 @@
             },
             "board": ["if (a == rect)\
                         x = star;\
-                      else\
+                       else\
                         x = rect;"],
             "toolbox": ["a = star", "a = rect"],
             "fade":{

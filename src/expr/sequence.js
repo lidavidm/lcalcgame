@@ -394,4 +394,51 @@ class IfElseBlockStatement extends MultiClampSequence {
     constructor(cond, branch, elseBranch) {
         super([ [new TextExpr('if'), cond], [branch], [new TextExpr('else')], [elseBranch] ]);
     }
+    get cond()       { return this.holes[1]; }
+    get branch()     { return this.holes[2]; }
+    get elseBranch() { return this.holes[4]; }
+    reduce() {
+        if (this.canReduce()) {
+            let c = this.cond.reduceCompletely();
+            if ()
+        }
+    }
+    performReduction(animated=true) {
+        let cleanup = () => {
+            this._animating = false;
+            this.update();
+        };
+        let swap = (node, branch) => {
+            var parent = node.parent ? node.parent : node.stage;
+            if (branch) branch.ignoreEvents = node.ignoreEvents; // the new expression should inherit whatever this expression was capable of as input
+            parent.swap(node, branch);
+        };
+        let condSwap = () => {
+            if (this.cond.value() === true) {
+                swap(this, this.branch);
+            } else if (this.cond.value() === false) {
+                swap(this, this.elseBranch);
+            } else {
+                console.error('Error @ IfElseBlockStatement.performReduction: Condition value is ', this.cond.value());
+                cleanup();
+                return Promise.reject();
+            }
+            return Promise.resolve();
+        };
+
+        this.lockSubexpressions();
+
+        let r = this.reduceCompletely();
+        if (r != this) {
+            this._animating = true;
+            if (this.cond.canReduce()) { // If condition is reducable, animate its reduction first.
+                return this.cond.performReduction(animated).then(() => {
+                    return condSwap();
+                });
+            }
+            else return condSwap();
+        }
+
+        return Promise.reject("Cannot reduce!");
+    }
 }

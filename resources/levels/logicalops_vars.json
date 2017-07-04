@@ -27,30 +27,19 @@
         {
             "goal": "true",
             "board": ["z && (x || y)",
-                      "n = _;\
-                       x = n > 3;\
-                       y = 8 > n;\
-                       z = n > 10;"],
+                      "n = _; x = n > 3; y = 8 > n; z = n > 10;"],
             "toolbox": ""
         },
         {
             "goal": "true",
             "board": ["!(x || y) && z",
-                      "a = _b || _b;\
-                       b = _b && !_b;\
-                       x = a && b;\
-                       y = false || b;\
-                       z = a && _b"],
+                      "a = _b || _b; b = _b && !_b; x = a && b; y = false || b; z = a && _b"],
             "toolbox": ["false", "true", "false", "true", "false", "true"]
         },
         {
             "goal": "true",
             "board": ["!z && !y && x",
-                      "a = true;\
-                       b = false;\
-                       x = a >>> b;\
-                       y = !b >>> a;\
-                       z = x >>> y"],
+                      "a = true; b = false; x = a >>> b; y = !b >>> a; z = x >>> y"],
             "toolbox": ""
         },
         {
