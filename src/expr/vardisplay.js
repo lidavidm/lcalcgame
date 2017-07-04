@@ -171,7 +171,6 @@ class SpreadsheetDisplay extends Expression {
         this.addArg(this.value);
         this.setExpr(expr);
         this.origValue = null;
-
         this._fixedSize = { w: 0, h: 0 };
         this.valuePos = 0;
     }

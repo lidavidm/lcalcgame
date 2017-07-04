@@ -191,9 +191,11 @@ function __DEBUG_TESTBED(stage) {
     //console.log(ErrorExpr);
     //ErrorEffect.run(stage, { x:300, y:250 });
 
-    var multiclamp = new IfElseBlockStatement(new TextExpr('(x == 3)'), new MissingExpression(), new MissingExpression());
-    multiclamp.pos = { x: 300, y: 300 };
-    stage.add(multiclamp);
+    if (level_idx === 0) {
+        var multiclamp = new IfElseBlockStatement(new TextExpr('(x == 3)'), new MissingExpression(), new MissingExpression());
+        multiclamp.pos = { x: 300, y: 300 };
+        stage.add(multiclamp);
+    }
 
     // let dropdown = new DropdownSelect( 200, 100, 120, 40, [ "A", "B", "C" ], null, "YellowGreen", "Green", "PaleGreen", false );
     // stage.add(dropdown);

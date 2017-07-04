@@ -55,7 +55,8 @@ var ExprManager = (function() {
         'stringobj':[StringObjectExpr],
         'infinite': [InfiniteExpression],
         'notch':    [NotchHangerExpr],
-        'namedfunc':[NamedFuncExpr]
+        'namedfunc':[NamedFuncExpr],
+        'vargoal':  [VariableGoalDisplay]
     };
     var fade_levels = {};
     var DEFAULT_FADE_LEVEL = 0;

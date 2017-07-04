@@ -116,13 +116,18 @@ class Level {
         }.bind(stage);
         stage.isCompleted = function() {
             let exprs = this.expressionNodes();
-            let matching = goal.test(exprs.map((n) => n.clone()));
+            let matching = goal.test(exprs.map((n) => n.clone()), this.environmentDisplay);
             if (matching) { // Pair nodes so that goal nodes reference the actual nodes on-screen (they aren't clones).
                 // goal.test returns an array of indexes, referring to the indexes of the expressions passed into the test,
                 // ordered by the order of the goal nodes displayed on screen. So the info needed to pair an expression to a goal node.
                 // With this we can reconstruct the actual pairing for the nodes on-screen (not clones).
-                let pairs = matching.map((j, i) => [ exprs[j], this.goalNodes[i] ] );
-                return pairs;
+                if (exprs.length === 0 && matching.length === 1) { // Memory state match; glow the environment value instead...
+                    let pairs = [[this.environmentDisplay.getBinding(matching[0]).getExpr(), this.goalNodes[0].getValue()]];
+                    return pairs;
+                } else {
+                    let pairs = matching.map((j, i) => [ exprs[j], this.goalNodes[i] ] );
+                    return pairs;
+                }
             }
             return false;
         }.bind(stage);
@@ -338,7 +343,7 @@ class Level {
                     var es = exprs.slice(1); es.push(args[0]);
                     return lock(constructClassInstance(op_class, es), toplevel_lock); // pass the operator name to the comparator
                 } else {
-                    //console.log(exprs);
+                    // console.log(exprs);
                     return lock(constructClassInstance(op_class, exprs.slice(1)), toplevel_lock); // (this is really generic, man)
                 }
             }
@@ -393,6 +398,7 @@ class Level {
             '++': ExprManager.getClass('++'),
             'stringobj':ExprManager.getClass('stringobj'),
             'namedfunc':ExprManager.getClass('namedfunc'),
+            'vargoal':ExprManager.getClass('vargoal'),
             'dot':(() => {
                 let circ = new CircleExpr(0,0,18);
                 circ.color = 'gold';
@@ -432,7 +438,7 @@ class Level {
             let varname = arg.replace('$', '').replace('_', '');
             // Lock unless there is an underscore in the name
             locked = !(arg.indexOf('_') > -1);
-            return lock(new (ExprManager.getClass('reference'))(varname), locked);
+            return lock(new (ExprManager.getClass('var'))(varname), locked);
         } else if (true) {
             let string = new StringValueExpr(arg);
             return string;
@@ -738,11 +744,10 @@ class Goal {
         return [node, exprs_node];
     }
 
-    // MAYBE? TODO: Use reduction stack.
-    test(exprs, reduction_stack=null) {
+    test(exprs, env, reduction_stack=null) {
 
         for(let pattern of this.patterns) {
-            let paired_matching = pattern.test(exprs);
+            let paired_matching = pattern.test(exprs, env);
             if (paired_matching) return paired_matching;
         }
 
@@ -761,14 +766,11 @@ class ExpressionPattern {
         if (!Array.isArray(exprs)) exprs = [exprs];
         this.exprs = exprs;
     }
-    test(exprs) {
+    test(exprs, envdisplay) {
         var lvl_exprs = exprs;
         var es = this.exprs.map((e) => e); // shallow clone
         var es_idxs = this.exprs.map((e, i) => i);
         var paired_matching = [];
-
-        // If sets of expressions have different length, they can't be equal.
-        if (lvl_exprs.length !== es.length) return false;
 
         var compare = (e, f) => {
 
@@ -853,6 +855,21 @@ class ExpressionPattern {
             //console.log(' > Expressions are equal.');
             return true;
         };
+
+        // Special case: Variable goals.
+        if (es.length === 1 && es[0] instanceof VariableGoalDisplay) {
+            let v = envdisplay.getEnvironment().lookup(es[0].name);
+            console.log(v, envdisplay);
+            if (v) {
+                if (compare(v, es[0].getValue())) {
+                    return [ es[0].name ]; // paired match... return the name for the binding instead.
+                }
+            }
+            return false;
+        }
+
+        // If sets of expressions have different length, they can't be equal.
+        if (lvl_exprs.length !== es.length) return false;
 
         for (let lvl_e of lvl_exprs) {
             var valid = -1;

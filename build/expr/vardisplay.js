@@ -242,7 +242,6 @@ var SpreadsheetDisplay = function (_Expression3) {
         _this6.addArg(_this6.value);
         _this6.setExpr(expr);
         _this6.origValue = null;
-
         _this6._fixedSize = { w: 0, h: 0 };
         _this6.valuePos = 0;
         return _this6;

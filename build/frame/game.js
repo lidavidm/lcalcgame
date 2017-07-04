@@ -190,16 +190,22 @@ var Level = function () {
                 var exprs = this.expressionNodes();
                 var matching = goal.test(exprs.map(function (n) {
                     return n.clone();
-                }));
+                }), this.environmentDisplay);
                 if (matching) {
                     // Pair nodes so that goal nodes reference the actual nodes on-screen (they aren't clones).
                     // goal.test returns an array of indexes, referring to the indexes of the expressions passed into the test,
                     // ordered by the order of the goal nodes displayed on screen. So the info needed to pair an expression to a goal node.
                     // With this we can reconstruct the actual pairing for the nodes on-screen (not clones).
-                    var pairs = matching.map(function (j, i) {
-                        return [exprs[j], _this2.goalNodes[i]];
-                    });
-                    return pairs;
+                    if (exprs.length === 0 && matching.length === 1) {
+                        // Memory state match; glow the environment value instead...
+                        var pairs = [[this.environmentDisplay.getBinding(matching[0]).getExpr(), this.goalNodes[0].getValue()]];
+                        return pairs;
+                    } else {
+                        var _pairs = matching.map(function (j, i) {
+                            return [exprs[j], _this2.goalNodes[i]];
+                        });
+                        return _pairs;
+                    }
                 }
                 return false;
             }.bind(stage);
@@ -829,7 +835,7 @@ var Level = function () {
                         var es = exprs.slice(1);es.push(args[0]);
                         return lock(constructClassInstance(op_class, es), toplevel_lock); // pass the operator name to the comparator
                     } else {
-                            //console.log(exprs);
+                            // console.log(exprs);
                             return lock(constructClassInstance(op_class, exprs.slice(1)), toplevel_lock); // (this is really generic, man)
                         }
                 }
@@ -884,6 +890,7 @@ var Level = function () {
                 '++': ExprManager.getClass('++'),
                 'stringobj': ExprManager.getClass('stringobj'),
                 'namedfunc': ExprManager.getClass('namedfunc'),
+                'vargoal': ExprManager.getClass('vargoal'),
                 'dot': function () {
                     var circ = new CircleExpr(0, 0, 18);
                     circ.color = 'gold';
@@ -922,7 +929,7 @@ var Level = function () {
                 var _varname2 = arg.replace('$', '').replace('_', '');
                 // Lock unless there is an underscore in the name
                 locked = !(arg.indexOf('_') > -1);
-                return lock(new (ExprManager.getClass('reference'))(_varname2), locked);
+                return lock(new (ExprManager.getClass('var'))(_varname2), locked);
             } else if (true) {
                 var string = new StringValueExpr(arg);
                 return string;
@@ -961,11 +968,8 @@ var Goal = function () {
 
     _createClass(Goal, [{
         key: 'test',
-
-
-        // MAYBE? TODO: Use reduction stack.
-        value: function test(exprs) {
-            var reduction_stack = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+        value: function test(exprs, env) {
+            var reduction_stack = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
             var _iteratorNormalCompletion13 = true;
             var _didIteratorError13 = false;
             var _iteratorError13 = undefined;
@@ -975,7 +979,7 @@ var Goal = function () {
                 for (var _iterator13 = this.patterns[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
                     var pattern = _step13.value;
 
-                    var paired_matching = pattern.test(exprs);
+                    var paired_matching = pattern.test(exprs, env);
                     if (paired_matching) return paired_matching;
                 }
             } catch (err) {
@@ -1163,7 +1167,7 @@ var ExpressionPattern = function () {
 
     _createClass(ExpressionPattern, [{
         key: 'test',
-        value: function test(exprs) {
+        value: function test(exprs, envdisplay) {
             var lvl_exprs = exprs;
             var es = this.exprs.map(function (e) {
                 return e;
@@ -1172,9 +1176,6 @@ var ExpressionPattern = function () {
                 return i;
             });
             var paired_matching = [];
-
-            // If sets of expressions have different length, they can't be equal.
-            if (lvl_exprs.length !== es.length) return false;
 
             var compare = function compare(e, f) {
 
@@ -1253,6 +1254,21 @@ var ExpressionPattern = function () {
                 //console.log(' > Expressions are equal.');
                 return true;
             };
+
+            // Special case: Variable goals.
+            if (es.length === 1 && es[0] instanceof VariableGoalDisplay) {
+                var v = envdisplay.getEnvironment().lookup(es[0].name);
+                console.log(v, envdisplay);
+                if (v) {
+                    if (compare(v, es[0].getValue())) {
+                        return [es[0].name]; // paired match... return the name for the binding instead.
+                    }
+                }
+                return false;
+            }
+
+            // If sets of expressions have different length, they can't be equal.
+            if (lvl_exprs.length !== es.length) return false;
 
             var _iteratorNormalCompletion16 = true;
             var _didIteratorError16 = false;

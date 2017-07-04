@@ -1,22 +1,51 @@
 {
     "chapterName":"Intro to Strings",
     "description":"Brief intro to strings",
+    "language":"JavaScript",
     "levels": [
         {
-            "goal" : "(pineapple)",
-            "board": "(pine) (apple) (++ /_ /_)",
+            "goal" : "'pineapple'",
+            "board": ["'pine'", "'apple'", "_ + _"],
             "toolbox": ""
         },
         {
-            "goal": "(a)",
-            "board": "(stringobj (apple) `[..])",
-            "toolbox": "(0)"
+            "goal" : "'crabapple'",
+            "board": ["_ + _", "_ + _"],
+            "toolbox": ["'bap'", "'app'", "'cra'", "'ple'"]
         },
         {
-            "goal": "(l)",
-            "board": "(stringobj (apple) `[..])",
-            "toolbox": "(0) (1) (2) (3) (4)"
-        }
+            "goal" : "'cattywampus'",
+            "board": ["_ + 'y'", "_ + 't'", "_ + 'w'", "_ + _", "_ + 'us'"],
+            "toolbox": ["'t'", "'am'", "'cat'", "'p'"]
+        },
+        {
+            "goal" : "'adam'",
+            "board": ["_ + _", "(x) => xx"],
+            "toolbox": ["'m'", "'a'", "'d'"]
+        },
+        {
+            "goal" : ["'bee'", "'kee'", "'per'"],
+            "board": ["_ + _", "(x) => xx", "(x) => xx", "'b' + _", "'k' + _", "_ + 'r'"],
+            "toolbox": ["'e'", "'p'"]
+        },
+        {
+            "goal" : "'zxy'",
+            "board": ["x + y + z", "x = _", "y = _", "z = _"],
+            "toolbox": ["'x'", "'y'", "'z'"]
+        },
+        {
+            "goal" : "'hotshot'",
+            "board": ["x = _t_string", "y = _t_string", "z = x"],
+            "toolbox": ["x + y + z", "y + z + x", "z + x + y"]
+        },
+        {
+            "goal" : "'abracadabra'",
+            "board": "x = 'a';\
+                      y = x + _t_string;\
+                      z = y + x;
+                      y = z + _t_string + z;",
+            "toolbox": ["y"]
+        },
     ],
     "resources":{
         "planet":"planet-boolili",

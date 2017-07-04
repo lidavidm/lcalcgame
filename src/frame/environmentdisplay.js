@@ -134,23 +134,47 @@ class SpreadsheetEnvironmentDisplay extends EnvironmentDisplay {
         ctx.beginPath();
         ctx.lineWidth = 0.5;
 
-        let y = this.absolutePos.y;
+        let pos = this.upperLeftPos();
+        let y = pos.y;
         this.holes.forEach((display) => {
             y = display.absolutePos.y + display.absoluteSize.h / 2;
             ctx.moveTo(display.absolutePos.x, y);
             ctx.lineTo(display.absolutePos.x + this.absoluteSize.w, y);
         });
 
-        let maxY = this.absolutePos.y + this.absoluteSize.h - 42.5;
+        let maxY = pos.y + this.absoluteSize.h - 42.5;
         while (y < maxY) {
             y += 42.5;
-            ctx.moveTo(this.absolutePos.x, Math.floor(y));
-            ctx.lineTo(this.absolutePos.x + this.absoluteSize.w, Math.floor(y));
+            ctx.moveTo(pos.x, Math.floor(y));
+            ctx.lineTo(pos.x + this.absoluteSize.w, Math.floor(y));
         }
 
-        ctx.moveTo(this.absolutePos.x + this.maxLabelSize, this.absolutePos.y);
-        ctx.lineTo(this.absolutePos.x + this.maxLabelSize, this.absolutePos.y + this.absoluteSize.h);
+        ctx.moveTo(pos.x + this.maxLabelSize, pos.y);
+        ctx.lineTo(pos.x + this.maxLabelSize, pos.y + this.absoluteSize.h);
         ctx.stroke();
         ctx.restore();
+    }
+}
+
+class VariableGoalDisplay extends SpreadsheetEnvironmentDisplay {
+    constructor(name, expr) {
+        super(100,20,30,50);
+        if (typeof name !== "string") console.warn('@ VariableGoalDisplay.constructor: Name is not a String.');
+        let s = new SpreadsheetDisplay(name, expr.clone());
+        s.valuePos = 30; //
+        this.addArg(s);
+        this.name = name;
+        this.value = expr.clone();
+        this.update();
+    }
+    updateBindings() {}
+    getValue() {
+        return this.holes[0].getExpr();
+    }
+    get constructorArgs() {
+        return [ this.name, this.value.clone() ];
+    }
+    clone() {
+        return constructClassInstance(VariableGoalDisplay, this.constructorArgs);
     }
 }

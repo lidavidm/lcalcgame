@@ -237,22 +237,23 @@ var SpreadsheetEnvironmentDisplay = function (_EnvironmentDisplay) {
             ctx.beginPath();
             ctx.lineWidth = 0.5;
 
-            var y = this.absolutePos.y;
+            var pos = this.upperLeftPos();
+            var y = pos.y;
             this.holes.forEach(function (display) {
                 y = display.absolutePos.y + display.absoluteSize.h / 2;
                 ctx.moveTo(display.absolutePos.x, y);
                 ctx.lineTo(display.absolutePos.x + _this5.absoluteSize.w, y);
             });
 
-            var maxY = this.absolutePos.y + this.absoluteSize.h - 42.5;
+            var maxY = pos.y + this.absoluteSize.h - 42.5;
             while (y < maxY) {
                 y += 42.5;
-                ctx.moveTo(this.absolutePos.x, Math.floor(y));
-                ctx.lineTo(this.absolutePos.x + this.absoluteSize.w, Math.floor(y));
+                ctx.moveTo(pos.x, Math.floor(y));
+                ctx.lineTo(pos.x + this.absoluteSize.w, Math.floor(y));
             }
 
-            ctx.moveTo(this.absolutePos.x + this.maxLabelSize, this.absolutePos.y);
-            ctx.lineTo(this.absolutePos.x + this.maxLabelSize, this.absolutePos.y + this.absoluteSize.h);
+            ctx.moveTo(pos.x + this.maxLabelSize, pos.y);
+            ctx.lineTo(pos.x + this.maxLabelSize, pos.y + this.absoluteSize.h);
             ctx.stroke();
             ctx.restore();
         }
@@ -265,3 +266,44 @@ var SpreadsheetEnvironmentDisplay = function (_EnvironmentDisplay) {
 
     return SpreadsheetEnvironmentDisplay;
 }(EnvironmentDisplay);
+
+var VariableGoalDisplay = function (_SpreadsheetEnvironme) {
+    _inherits(VariableGoalDisplay, _SpreadsheetEnvironme);
+
+    function VariableGoalDisplay(name, expr) {
+        _classCallCheck(this, VariableGoalDisplay);
+
+        var _this6 = _possibleConstructorReturn(this, (VariableGoalDisplay.__proto__ || Object.getPrototypeOf(VariableGoalDisplay)).call(this, 100, 20, 30, 50));
+
+        if (typeof name !== "string") console.warn('@ VariableGoalDisplay.constructor: Name is not a String.');
+        var s = new SpreadsheetDisplay(name, expr.clone());
+        s.valuePos = 30; //
+        _this6.addArg(s);
+        _this6.name = name;
+        _this6.value = expr.clone();
+        _this6.update();
+        return _this6;
+    }
+
+    _createClass(VariableGoalDisplay, [{
+        key: "updateBindings",
+        value: function updateBindings() {}
+    }, {
+        key: "getValue",
+        value: function getValue() {
+            return this.holes[0].getExpr();
+        }
+    }, {
+        key: "clone",
+        value: function clone() {
+            return constructClassInstance(VariableGoalDisplay, this.constructorArgs);
+        }
+    }, {
+        key: "constructorArgs",
+        get: function get() {
+            return [this.name, this.value.clone()];
+        }
+    }]);
+
+    return VariableGoalDisplay;
+}(SpreadsheetEnvironmentDisplay);

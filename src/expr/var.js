@@ -521,6 +521,7 @@ class AssignExpr extends Expression {
             lambda.update();
             lambda.environmentDisplay.highlight(this.variable.name);
         });
+        this.stage.update();
         this.stage.draw();
     }
 

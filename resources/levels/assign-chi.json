@@ -41,6 +41,14 @@
             }
         },
         {
+            "description": "Variable goals.",
+            "board": "(assign $x /star)",
+            "goal": "(vargoal `x star)",
+            "globals": {
+                "x": "(rect)"
+            }
+        },
+        {
             "description": "Choose what to assign.",
             "board": "(assign $x _) ($_x)",
             "goal": "(star)",

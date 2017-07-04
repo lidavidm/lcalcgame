@@ -25,6 +25,7 @@
  *							else
  *								<f>
  *
+ *
  *   and then 'everything' is rendered accordingly.
  *
  * 	 Right now, swapping syntax is an incredible pain: all 'final' text classes
@@ -36,5 +37,26 @@
  * 	 Now, there still *can* be fancy, language-specific classes.
  * 	 But these should exist as special cases rather than the norm. And tbh,
  * 	 scrolling through lines and lines of code to decipher the semantics
- * 	 from the syntax / visuals is a paaaain. :) 
+ * 	 from the syntax / visuals is a paaaain. :)
  */
+
+class AbstractValue {
+    reduce() { return this.value(); }
+    value() { return undefined; }
+}
+
+class AbstractTrueValueModel {
+    value() { return true; }
+}
+class AbstractFalseValueModel {
+    value() { return true; }
+}
+
+class AbstractIfStatementModel {
+    reduce(b, t, f) {
+        b.reduce()
+    }
+}
+class JSIfStatement extends AbstractIfStatementModel {
+    // Erik: Data is handled in subclass...
+}

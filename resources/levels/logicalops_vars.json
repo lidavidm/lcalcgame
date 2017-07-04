@@ -1,21 +1,67 @@
 {
-    "chapterName":"Intro to Strings",
-    "description":"Brief intro to strings",
+    "chapterName":"Logical Operators & Variables",
+    "description":"'and', 'or', 'not' with variables and sequences",
+    "language":"JavaScript",
     "levels": [
         {
-            "goal" : "(pineapple)",
-            "board": "(pine) (apple) (++ /_ /_)",
+            "goal": "true",
+            "board": ["x && y", "x = y", "y = _b"],
+            "toolbox": ["true", "false"],
+            "fade":{
+                "==":1,
+                "!=":1,
+                "true":1,
+                "false":1,
+                "lambda":2,
+                "number":1,
+                "map":1,
+                "__":1
+            },
+            "showFade":false
+        },
+        {
+            "goal": "true",
+            "board": ["x = _", "y = x", "z = x", "x = !x", "x && !z && y"],
+            "toolbox": ["true","false"]
+        },
+        {
+            "goal": "true",
+            "board": ["z && (x || y)",
+                      "n = _;\
+                       x = n > 3;\
+                       y = 8 > n;\
+                       z = n > 10;"],
             "toolbox": ""
         },
         {
-            "goal": "(a)",
-            "board": "(stringobj (apple) `[..])",
-            "toolbox": "(0)"
+            "goal": "true",
+            "board": ["!(x || y) && z",
+                      "a = _b || _b;\
+                       b = _b && !_b;\
+                       x = a && b;\
+                       y = false || b;\
+                       z = a && _b"],
+            "toolbox": ["false", "true", "false", "true", "false", "true"]
         },
         {
-            "goal": "(l)",
-            "board": "(stringobj (apple) `[..])",
-            "toolbox": "(0) (1) (2) (3) (4)"
+            "goal": "true",
+            "board": ["!z && !y && x",
+                      "a = true;\
+                       b = false;\
+                       x = a >>> b;\
+                       y = !b >>> a;\
+                       z = x >>> y"],
+            "toolbox": ""
+        },
+        {
+            "goal": "true",
+            "board": ["!_b == _b", "_ && _", "!_", "!_", "_ || _"],
+            "toolbox": ["p", "q", "p", "q"],
+            "globals":{
+                "p":"true",
+                "q":"false"
+            },
+            "description":"De Morgan's Level"
         }
     ],
     "resources":{

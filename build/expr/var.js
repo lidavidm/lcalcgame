@@ -642,6 +642,7 @@ var AssignExpr = function (_Expression2) {
                 lambda.update();
                 lambda.environmentDisplay.highlight(_this13.variable.name);
             });
+            this.stage.update();
             this.stage.draw();
         }
     }, {
