@@ -243,7 +243,7 @@ class DiceNumber extends mag.Rect {
         };
         if (num in map) return map[num];
         else {
-            console.error('Dice pos array does not exist for number ' + num + '.');
+            //console.error('Dice pos array does not exist for number ' + num + '.');
             return [];
         }
     }

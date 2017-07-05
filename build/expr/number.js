@@ -331,7 +331,7 @@ var DiceNumber = function (_mag$Rect) {
                 6: [{ x: L, y: T }, { x: R, y: T }, { x: R, y: M }, { x: R, y: B }, { x: L, y: B }, { x: L, y: M }]
             };
             if (num in map) return map[num];else {
-                console.error('Dice pos array does not exist for number ' + num + '.');
+                //console.error('Dice pos array does not exist for number ' + num + '.');
                 return [];
             }
         }

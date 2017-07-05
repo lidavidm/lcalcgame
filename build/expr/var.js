@@ -102,6 +102,11 @@ var VarExpr = function (_Expression) {
             return undefined;
         }
     }, {
+        key: "isValue",
+        value: function isValue() {
+            return false;
+        }
+    }, {
         key: "canReduce",
         value: function canReduce() {
             return this.getEnvironment() && (this.parent || this.stage) && this.getEnvironment().lookup(this.name);
@@ -1051,9 +1056,14 @@ var VtableVarExpr = function (_ObjectExtensionExpr) {
         key: "value",
         value: function value() {
             if (this.variable && this.variable.canReduce()) {
-                return this.getEnvironment().lookup(this.variable.name);
+                return this.getEnvironment().lookup(this.name);
             }
             return null;
+        }
+    }, {
+        key: "isValue",
+        value: function isValue() {
+            return false;
         }
     }, {
         key: "update",

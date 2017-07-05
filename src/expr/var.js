@@ -65,6 +65,10 @@ class VarExpr extends Expression {
         return undefined;
     }
 
+    isValue() {
+        return false;
+    }
+
     canReduce() {
         return this.getEnvironment() && (this.parent || this.stage) && this.getEnvironment().lookup(this.name);
     }
@@ -860,9 +864,12 @@ class VtableVarExpr extends ObjectExtensionExpr {
 
     value() {
         if (this.variable && this.variable.canReduce()) {
-            return this.getEnvironment().lookup(this.variable.name);
+            return this.getEnvironment().lookup(this.name);
         }
         return null;
+    }
+    isValue() {
+        return false;
     }
 
     get objMethods() {

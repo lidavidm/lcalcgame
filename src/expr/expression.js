@@ -331,7 +331,7 @@ class Expression extends mag.RoundedRect {
                 });
                 return Promise.reject("Expression: expression cannot reduce");
             }
-            console.log('r', this.canReduce);
+            console.log('Can reduce?: ', this.canReduce());
 
             this.animateReducingStatus();
 

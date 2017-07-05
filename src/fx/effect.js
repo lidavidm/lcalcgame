@@ -27,6 +27,28 @@ class ShapeExpandEffect {
     }
 }
 
+class WatEffect {
+    static run(node, moveDur=250, waitDur=500) {
+        let stage = node.stage;
+        let wat = new TextExpr("?");
+        stage.add(wat);
+        wat.pos = node.absolutePos;
+        Animate.tween(wat, {
+            pos: {
+                x: wat.pos.x,
+                y: wat.pos.y - 50,
+            },
+        }, moveDur).after(() => {
+            Animate.wait(waitDur).after(() => {
+                Animate.poof(wat);
+                stage.remove(wat);
+                stage.draw();
+                stage.update();
+            });
+        });
+    }
+}
+
 // Node disappears and is replaced by a firework-like particle explosion.
 class SplosionEffect {
     static run(node) {

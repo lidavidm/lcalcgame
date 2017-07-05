@@ -51,6 +51,40 @@ var ShapeExpandEffect = function () {
     return ShapeExpandEffect;
 }();
 
+var WatEffect = function () {
+    function WatEffect() {
+        _classCallCheck(this, WatEffect);
+    }
+
+    _createClass(WatEffect, null, [{
+        key: 'run',
+        value: function run(node) {
+            var moveDur = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 250;
+            var waitDur = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 500;
+
+            var stage = node.stage;
+            var wat = new TextExpr("?");
+            stage.add(wat);
+            wat.pos = node.absolutePos;
+            Animate.tween(wat, {
+                pos: {
+                    x: wat.pos.x,
+                    y: wat.pos.y - 50
+                }
+            }, moveDur).after(function () {
+                Animate.wait(waitDur).after(function () {
+                    Animate.poof(wat);
+                    stage.remove(wat);
+                    stage.draw();
+                    stage.update();
+                });
+            });
+        }
+    }]);
+
+    return WatEffect;
+}();
+
 // Node disappears and is replaced by a firework-like particle explosion.
 
 
