@@ -47,30 +47,35 @@ class StarExpr extends GraphicValueExpr {
         super(new mag.Star(x, y, rad, pts));
     }
     toString() { return (this.locked ? '/' : '') + 'star'; }
+    toJavaScript() { return '__star'; }
 }
 class CircleExpr extends GraphicValueExpr {
     constructor(x, y, rad) {
         super(new mag.Circle(x, y, rad));
     }
     toString() { return (this.locked ? '/' : '') + 'circle'; }
+    toJavaScript() { return '__circle'; }
 }
 class PipeExpr extends GraphicValueExpr {
     constructor(x, y, w, h) {
         super(new mag.Pipe(x, y, w, h-12));
     }
     toString() { return (this.locked ? '/' : '') + 'pipe'; }
+    toJavaScript() { return '__pipe'; }
 }
 class TriangleExpr extends GraphicValueExpr {
     constructor(x, y, w, h) {
         super(new mag.Triangle(x, y, w, h));
     }
     toString() { return (this.locked ? '/' : '') + 'triangle'; }
+    toJavaScript() { return '__triangle'; }
 }
 class RectExpr extends GraphicValueExpr {
     constructor(x, y, w, h) {
         super(new mag.Rect(x, y, w, h));
     }
     toString() { return (this.locked ? '/' : '') + 'rect'; }
+    toJavaScript() { return '__rect'; }
 }
 class ImageExpr extends GraphicValueExpr {
     constructor(x, y, w, h, resource_key) {
@@ -83,6 +88,7 @@ class ImageExpr extends GraphicValueExpr {
         this.graphicNode.image = img;
     }
     toString() { return this._image; }
+    toJavaScript() { return '__IMAGE_EXPR()'; }
 }
 class FunnelExpr extends ImageExpr {
     constructor(x, y, w, h) {
@@ -122,6 +128,9 @@ class NullExpr extends ImageExpr {
         this.performReduction();
     }
     toString() {
+        return 'null';
+    }
+    toJavaScript() {
         return 'null';
     }
     value() { return null; }
@@ -190,6 +199,9 @@ class FadedValueExpr extends Expression {
     toString() {
         return this.primitiveName;
     }
+    toJavaScript() {
+        return `__${this.primitiveName}`;
+    }
     value() { return (this.locked ? '/' : '') + this.toString(); }
 }
 class FadedStarExpr extends FadedValueExpr {
@@ -222,6 +234,9 @@ class StringValueExpr extends Expression {
     isValue() { return true; }
     toString() {
         return (this.locked ? '/' : '') + this.primitiveName;
+    }
+    toJavaScript() {
+        return `__${this.primitiveName}`;
     }
     value() { return this.name; }
 }
@@ -294,6 +309,9 @@ class StringAddExpr extends Expression {
 
     toString() {
         return (this.locked ? '/(' : '(') + this.op.toString() + ' ' + this.leftExpr.toString() + ' ' + this.rightExpr.toString() + ')';
+    }
+    toJavaScript() {
+        return `${this.leftExpr.toJavaScript()} + ${this.rightExpr.toJavaScript()}`;
     }
 
     reduce() {

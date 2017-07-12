@@ -284,4 +284,8 @@ class ChoiceExpr extends Expression {
         let children = this.choices.map((x) => x.toString()).join(" ");
         return `(choice ${children})`;
     }
+    toJavaScript() {
+        let children = this.choices.map((x) => x.toJavaScript()).join(",");
+        return `__choice(${children})`;
+    }
 }

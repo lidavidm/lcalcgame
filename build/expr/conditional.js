@@ -22,14 +22,6 @@ var IfStatement = function (_Expression) {
         var else_text = new TextExpr(': null');
         question_mark.color = else_text.color = 'black';
 
-
-        // OLD -- if ... then ...
-        /*var if_text = new TextExpr('if');
-        var then_text = new TextExpr('then');
-        if_text.color = 'black';
-        then_text.color = 'black';
-        super([if_text, cond, then_text, branch]);*/
-
         var _this = _possibleConstructorReturn(this, (IfStatement.__proto__ || Object.getPrototypeOf(IfStatement)).call(this, [cond, question_mark, branch, else_text]));
 
         _this.color = 'LightBlue';
@@ -156,6 +148,11 @@ var IfStatement = function (_Expression) {
             return (this.locked ? '/' : '') + '(if ' + this.cond.toString() + ' ' + this.branch.toString() + ')';
         }
     }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return '((' + this.cond.toJavaScript() + ') ? (' + this.branch.toJavaScript() + ') : null)';
+        }
+    }, {
         key: 'cond',
         get: function get() {
             return this.holes[0];
@@ -247,6 +244,11 @@ var IfElseStatement = function (_IfStatement2) {
         key: 'toString',
         value: function toString() {
             return (this.locked ? '/' : '') + '(if ' + this.cond.toString() + ' ' + this.branch.toString() + ' ' + this.elseBranch.toString() + ')';
+        }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return '(' + this.cond.toJavaScript() + ') ? (' + this.branch.toJavaScript() + ') : (' + this.elseBranch.toJavaScript() + ')';
         }
     }, {
         key: 'elseBranch',

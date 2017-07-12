@@ -42,6 +42,11 @@ var NumberExpr = function (_Expression) {
             return (this.locked ? '/' : '') + this.number.toString();
         }
     }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return this.number.toString();
+        }
+    }, {
         key: 'onmouseclick',
         value: function onmouseclick(pos) {
             // We can't really reduce, let's see if our parent wants to
@@ -127,6 +132,11 @@ var OperatorExpr = function (_Expression2) {
         key: 'toString',
         value: function toString() {
             return (this.locked ? '/(' : '(') + this.op.toString() + ' ' + this.leftExpr.toString() + ' ' + this.rightExpr.toString() + ')';
+        }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return '(' + this.leftExpr.toJavaScript() + ' ' + this.op.text + ' ' + this.rightExpr.toJavaScript() + ')';
         }
     }, {
         key: 'leftExpr',
@@ -246,66 +256,6 @@ var DivisionExpr = function (_OperatorExpr4) {
 
     return DivisionExpr;
 }(OperatorExpr);
-
-/*class AddExpr extends Expression {
-    constructor(left, right) {
-        let op = new TextExpr("+");
-        if (left instanceof MissingExpression && !(left instanceof MissingNumberExpression))
-            left = new MissingNumberExpression();
-        if (right instanceof MissingExpression && !(right instanceof MissingNumberExpression))
-            right = new MissingNumberExpression();
-        super([left, op, right]);
-    }
-
-    canReduce() {
-        return this.leftExpr && (this.leftExpr.isValue() || this.leftExpr.canReduce()) &&
-            this.rightExpr && (this.rightExpr.isValue() || this.rightExpr.canReduce());
-    }
-
-    get leftExpr() {
-        return this.holes[0];
-    }
-
-    get rightExpr() {
-        return this.holes[2];
-    }
-
-    reduce() {
-        if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {
-            return new (ExprManager.getClass('number'))(this.leftExpr.value() + this.rightExpr.value());
-        }
-        else {
-            return this;
-        }
-    }
-
-    performReduction() {
-        return this.performSubReduction(this.leftExpr).then((left) => {
-            if (!(left instanceof NumberExpr)) {
-                return Promise.reject();
-            }
-            return this.performSubReduction(this.rightExpr).then((right) => {
-                if (!(right instanceof NumberExpr)) {
-                    return Promise.reject();
-                }
-
-                let stage = this.stage;
-
-                let val = super.performReduction();
-                stage.update();
-                return val;
-            });
-        });
-    }
-
-    onmouseclick() {
-        this.performUserReduction();
-    }
-
-    toString() {
-        return (this.locked ? '/' : '') + '(+ ' + this.leftExpr.toString() + ' ' + this.rightExpr.toString() + ')';
-    }
-}*/
 
 // Draws the circles for a dice number inside its boundary.
 

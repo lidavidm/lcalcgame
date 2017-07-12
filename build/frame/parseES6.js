@@ -271,18 +271,25 @@ var ES6Parser = function () {
                     return _this2.parseNode(node.value);
                 },
                 'FunctionExpression': function FunctionExpression(node) {
-                    return new DefineExpr(_this2.parseNode(node.body), node.id ? node.id : '???');
+                    return new (ExprManager.getClass('define'))(_this2.parseNode(node.body), node.id ? node.id : '???', node.params.map(function (id) {
+                        return id.name;
+                    }));
                 },
                 'FunctionDeclaration': function FunctionDeclaration(node) {
-                    return new DefineExpr(_this2.parseNode(node.body), node.id ? node.id.name : '???');
+                    return new (ExprManager.getClass('define'))(_this2.parseNode(node.body), node.id ? node.id.name : '???', node.params.map(function (id) {
+                        return id.name;
+                    }));
                 },
                 'BlockStatement': function BlockStatement(node) {
                     if (node.body.length === 1 && node.body[0].type === 'ReturnStatement') {
-                        return _this2.parseNode(node.body[0].argument);
+                        if (ExprManager.getFadeLevel('define') === 0) return _this2.parseNode(node.body[0].argument);else return new (ExprManager.getClass('return'))(_this2.parseNode(node.body[0].argument));
                     } else {
                         console.error('Block expressions longer than a single return are not yet supported.');
                         return null;
                     }
+                },
+                'IfStatement': function IfStatement(node) {
+                    return new (ExprManager.getClass('ifelseblock'))(_this2.parseNode(node.test), _this2.parseNode(node.consequent), _this2.parseNode(node.alternate));
                 }
             };
 

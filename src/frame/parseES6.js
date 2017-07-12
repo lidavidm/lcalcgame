@@ -243,18 +243,24 @@ class ES6Parser {
                 return this.parseNode(node.value);
             },
             'FunctionExpression': (node) => {
-                return new DefineExpr(this.parseNode(node.body), node.id ? node.id : '???');
+                return new (ExprManager.getClass('define'))(this.parseNode(node.body), node.id ? node.id : '???', node.params.map((id) => id.name));
             },
             'FunctionDeclaration': (node) => {
-                return new DefineExpr(this.parseNode(node.body), node.id ? node.id.name : '???');
+                return new (ExprManager.getClass('define'))(this.parseNode(node.body), node.id ? node.id.name : '???', node.params.map((id) => id.name));
             },
             'BlockStatement': (node) => {
                 if (node.body.length === 1 && node.body[0].type === 'ReturnStatement') {
-                    return this.parseNode(node.body[0].argument);
+                    if (ExprManager.getFadeLevel('define') === 0)
+                        return this.parseNode(node.body[0].argument);
+                    else
+                        return new (ExprManager.getClass('return'))(this.parseNode(node.body[0].argument));
                 } else {
                     console.error('Block expressions longer than a single return are not yet supported.');
                     return null;
                 }
+            },
+            'IfStatement': (node) => {
+                return new (ExprManager.getClass('ifelseblock'))(this.parseNode(node.test), this.parseNode(node.consequent), this.parseNode(node.alternate));
             }
         }
 

@@ -204,6 +204,12 @@ class Level {
     }
     static parse(desc, language="reduct-scheme") {
         if (desc.length === 0) return [];
+        else if (!Array.isArray(desc) && desc === Object(desc)) { // If desc is an object, then it's a globals specifier...
+            // TODO: Expand to multiple globals.
+            console.log('Parsing variable goal...', desc);
+            let keys = Object.keys(desc);
+            return new (ExprManager.getClass('vargoal'))(keys[0], Level.parse(desc[keys[0]], language)[0]);
+        }
 
         if (language === "JavaScript") {
             // Use ES6 parser

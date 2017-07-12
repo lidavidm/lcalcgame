@@ -100,6 +100,16 @@ var StringObjectExpr = function (_ObjectExtensionExpr) {
             if (this.baseStringValue.canReduce()) return this.baseStringValue.reduceCompletely().value();else return this.baseStringValue.value();
         }
     }, {
+        key: 'toString',
+        value: function toString() {
+            return '`' + this.value();
+        }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return '"' + this.value() + '"';
+        }
+    }, {
         key: 'reduce',
         value: function reduce() {
             var r = _get(StringObjectExpr.prototype.__proto__ || Object.getPrototypeOf(StringObjectExpr.prototype), 'reduce', this).call(this);

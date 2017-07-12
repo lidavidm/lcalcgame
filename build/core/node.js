@@ -52,6 +52,15 @@ var mag = function (_) {
                 }
             }
         }, {
+            key: 'removeLastChild',
+            value: function removeLastChild() {
+                var len = this.children.length;
+                if (len > 0) {
+                    this.children[len - 1].stage = null;
+                    this.children.splice(len - 1, 1);
+                }
+            }
+        }, {
             key: 'addAll',
             value: function addAll(children) {
                 var _this = this;

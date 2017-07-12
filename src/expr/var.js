@@ -108,6 +108,9 @@ class VarExpr extends Expression {
     toString() {
         return '$' + (this.ignoreEvents ? '' : '_') + this.name;
     }
+    toJavaScript() {
+        return this.name;
+    }
 }
 
 class LabeledVarExpr extends VarExpr {
@@ -745,6 +748,11 @@ class AssignExpr extends Expression {
         let value = this.value ? this.value.toString() : '_';
         return `${this.locked ? '/' : ''}(assign ${variable} ${value})`;
     }
+    toJavaScript() {
+        let variable = this.variable ? this.variable.toString() : '_';
+        let value = this.value ? this.value.toString() : '_';
+        return `${variable} = ${value};`;
+    }
 }
 
 class JumpingAssignExpr extends AssignExpr {
@@ -982,6 +990,13 @@ class VtableVarExpr extends ObjectExtensionExpr {
 
         let surrogate = this.createSurrogate();
         return surrogate.reduce();
+    }
+
+    toString() {
+        return this.variable.toString();
+    }
+    toJavaScript() {
+        return this.variable.toJavaScript();
     }
 }
 

@@ -152,6 +152,11 @@ var VarExpr = function (_Expression) {
         value: function toString() {
             return '$' + (this.ignoreEvents ? '' : '_') + this.name;
         }
+    }, {
+        key: "toJavaScript",
+        value: function toJavaScript() {
+            return this.name;
+        }
     }]);
 
     return VarExpr;
@@ -874,6 +879,13 @@ var AssignExpr = function (_Expression2) {
             return (this.locked ? '/' : '') + "(assign " + variable + " " + value + ")";
         }
     }, {
+        key: "toJavaScript",
+        value: function toJavaScript() {
+            var variable = this.variable ? this.variable.toString() : '_';
+            var value = this.value ? this.value.toString() : '_';
+            return variable + " = " + value + ";";
+        }
+    }, {
         key: "variable",
         get: function get() {
             return this.holes[0] instanceof MissingExpression ? null : this.holes[0];
@@ -1172,6 +1184,16 @@ var VtableVarExpr = function (_ObjectExtensionExpr) {
 
             var surrogate = this.createSurrogate();
             return surrogate.reduce();
+        }
+    }, {
+        key: "toString",
+        value: function toString() {
+            return this.variable.toString();
+        }
+    }, {
+        key: "toJavaScript",
+        value: function toJavaScript() {
+            return this.variable.toJavaScript();
         }
     }, {
         key: "name",

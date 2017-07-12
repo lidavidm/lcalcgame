@@ -1,9 +1,6 @@
- 
- 
- 
-
 class EmptyExpr extends Expression {
     value() { return null; }
+    toJavaScript() { return 'null'; }
 }
 
 class NullExpr extends ImageExpr {
@@ -27,6 +24,9 @@ class NullExpr extends ImageExpr {
         this.performReduction();
     }
     toString() {
+        return 'null';
+    }
+    toJavaScript() {
         return 'null';
     }
     value() { return null; }

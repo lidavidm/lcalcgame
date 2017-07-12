@@ -49,6 +49,13 @@ var mag = (function(_) {
                 this.children.splice(i, 1);
             }
         }
+        removeLastChild() {
+            let len = this.children.length;
+            if (len > 0) {
+                this.children[len-1].stage = null;
+                this.children.splice(len-1, 1);
+            }
+        }
         addAll(children) {
             children.forEach((child) => this.addChild(child));
         }

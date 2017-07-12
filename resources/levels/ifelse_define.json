@@ -4,30 +4,77 @@
     "language":"JavaScript",
     "levels": [
         {
-            "goal": {
-                "x":"star"
-            },
-            "board": "if (a == rect) x = star; else x = rect;",
-            "toolbox": ["a = star", "a = rect"],
+            "goal": ["6", "2"],
+            "board": ["function double(x) { return x * 2; }", "_notch"],
+            "toolbox": ["1", "2", "3"],
+            "description": "Intro to block functions and reminder of doubling.",
             "fade":{
-                "==":1,
-                "!=":1,
-                "true":1,
-                "false":1,
-                "lambda":2,
-                "number":1,
-                "map":1,
-                "__":1
-            },
-            "showFade":false
+                "define":1
+            }
+        },
+        {
+            "goal": ["6", "9", "12"],
+            "board": ["function triple(x) { return _t_single; }", "_notch"],
+            "toolbox": ["2", "3", "4"],
+            "description": "Typing with block functions.",
+            "hint": "* is multiply."
+        },
+        {
+            "goal": ["27", "27", "27"],
+            "board": ["function multiply(x) { _t_single; }", "_notch"],
+            "toolbox": ["1", "3", "9"],
+            "description": "Typing entire return line.",
+            "hint": "* is multiply."
         },
         {
             "goal": {
-                "p":"'elephant'"
+                "x":"22"
             },
-            "board": ["if (p != 'gigantic') p = 'mouse'; else p = 'elephant';",
-                      "p = _t_string"],
+            "board": ["if (x != 12) x = 5; else x = 7;",
+                      "x = x * 2", "x = x * 3",
+                      "x = _t_int; x = x * 2;"],
             "toolbox": ""
+        },
+        {
+            "goal": {
+                "x":"'growing'"
+            },
+            "board": ["_t_single"],
+            "toolbox": "",
+            "description":"Intro to writing a whole assignment statement."
+        },
+        {
+            "goal": {
+                "x":"'bat'"
+            },
+            "board": ["if (_b) _t_single; else x = 'man';"],
+            "toolbox": ["false", "true"]
+        },
+        {
+            "goal": ["'Thing 1'", "'Thing 2'", "Thing 3"],
+            "board": ["function thingify(x) { return _t_single; }", "_notch"],
+            "toolbox": ["1", "2", "3"],
+            "description": "Dr. Who?",
+            "hint": "You can put strings together with +."
+        },
+        {
+            "goal": ["'normal'", "'weird'"],
+            "board": ["function isRealLife(x) { if (x == 'real') return 'normal'; else return 'weird'; }", "_notch"],
+            "toolbox": ["'real'", "'unreal'"],
+            "description": "First time we see a block if statement inside a function."
+        },
+        {
+            "goal": ["star", "rect", "rect", "rect"],
+            "board": ["function convert(x) { if (_t_single) return star; else return rect; }", "_notch"],
+            "toolbox": ["1", "2", "3", "4"],
+            "description": "First time typing in conditional of a block if statement inside a function."
+        },
+        {
+            "goal": ["'okay'", "'okay'", "'no chance'"],
+            "board": ["function accept(x) { _t_multiline; }", "_notch"],
+            "toolbox": ["5", "10", "20"],
+            "description": "Intro to multi-line typing!!!!! :O",
+            "hint": "Press ENTER key to go to the next line. Use TAB key to indent."
         }
     ],
     "resources":{

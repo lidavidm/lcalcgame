@@ -1,6 +1,3 @@
-
-
-
 // Integers
 class NumberExpr extends Expression {
     constructor(num) {
@@ -20,6 +17,9 @@ class NumberExpr extends Expression {
     }
     toString() {
         return (this.locked ? '/' : '') + this.number.toString();
+    }
+    toJavaScript() {
+        return this.number.toString();
     }
 
     onmouseclick(pos) {
@@ -95,6 +95,9 @@ class OperatorExpr extends Expression {
     toString() {
         return (this.locked ? '/(' : '(') + this.op.toString() + ' ' + this.leftExpr.toString() + ' ' + this.rightExpr.toString() + ')';
     }
+    toJavaScript() {
+        return `(${this.leftExpr.toJavaScript()} ${this.op.text} ${this.rightExpr.toJavaScript()})`;
+    }
 }
 
 class AddExpr extends OperatorExpr {
@@ -163,66 +166,6 @@ class DivisionExpr extends OperatorExpr {
         }
     }
 }
-
-/*class AddExpr extends Expression {
-    constructor(left, right) {
-        let op = new TextExpr("+");
-        if (left instanceof MissingExpression && !(left instanceof MissingNumberExpression))
-            left = new MissingNumberExpression();
-        if (right instanceof MissingExpression && !(right instanceof MissingNumberExpression))
-            right = new MissingNumberExpression();
-        super([left, op, right]);
-    }
-
-    canReduce() {
-        return this.leftExpr && (this.leftExpr.isValue() || this.leftExpr.canReduce()) &&
-            this.rightExpr && (this.rightExpr.isValue() || this.rightExpr.canReduce());
-    }
-
-    get leftExpr() {
-        return this.holes[0];
-    }
-
-    get rightExpr() {
-        return this.holes[2];
-    }
-
-    reduce() {
-        if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {
-            return new (ExprManager.getClass('number'))(this.leftExpr.value() + this.rightExpr.value());
-        }
-        else {
-            return this;
-        }
-    }
-
-    performReduction() {
-        return this.performSubReduction(this.leftExpr).then((left) => {
-            if (!(left instanceof NumberExpr)) {
-                return Promise.reject();
-            }
-            return this.performSubReduction(this.rightExpr).then((right) => {
-                if (!(right instanceof NumberExpr)) {
-                    return Promise.reject();
-                }
-
-                let stage = this.stage;
-
-                let val = super.performReduction();
-                stage.update();
-                return val;
-            });
-        });
-    }
-
-    onmouseclick() {
-        this.performUserReduction();
-    }
-
-    toString() {
-        return (this.locked ? '/' : '') + '(+ ' + this.leftExpr.toString() + ' ' + this.rightExpr.toString() + ')';
-    }
-}*/
 
 // Draws the circles for a dice number inside its boundary.
 class DiceNumber extends mag.Rect {

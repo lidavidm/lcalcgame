@@ -203,7 +203,9 @@ class TypeInTextExpr extends TextExpr {
             },
         };
         if (code in validators) {
-            return new TypeInTextExpr(validators[code], afterCommit);
+            let t = new TypeInTextExpr(validators[code], afterCommit);
+            t._exprCode = '_t_' + code;
+            return t;
         } else {
             console.error('@ TypeInTextExpr.fromExprCode: Code ' + code + ' doesn\'t match any known validator.');
             return null;
@@ -223,6 +225,12 @@ class TypeInTextExpr extends TextExpr {
             t.typeBox = null;
         }
         return t;
+    }
+    toString() {
+        return this._exprCode ? this._exprCode : '_t';
+    }
+    toJavaScript() {
+        return this.toString();
     }
 
     // 'validator' is a function taking the text as an argument,

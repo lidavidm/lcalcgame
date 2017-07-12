@@ -1,12 +1,7 @@
 {
-    "chapterName":"Intro to Strings",
-    "description":"Brief intro to strings",
+    "chapterName":"Intro to String Indices",
+    "description":"Brief intro to string indices",
     "levels": [
-        {
-            "goal" : "(pineapple)",
-            "board": "(pine) (apple) (++ /_ /_)",
-            "toolbox": ""
-        },
         {
             "goal": "(a)",
             "board": "(stringobj (apple) `[..])",

@@ -244,6 +244,13 @@ var Sequence = function (_Expression) {
             }).join(" ") + ")";
         }
     }, {
+        key: "toJavaScript",
+        value: function toJavaScript() {
+            return this.subexpressions.map(function (x) {
+                return x.toJavaScript();
+            }).join(";\n");
+        }
+    }, {
         key: "reduceCompletely",
         value: function reduceCompletely() {
             if (this.canReduce()) {
@@ -603,8 +610,96 @@ var IfElseBlockStatement = function (_MultiClampSequence) {
     function IfElseBlockStatement(cond, branch, elseBranch) {
         _classCallCheck(this, IfElseBlockStatement);
 
-        return _possibleConstructorReturn(this, (IfElseBlockStatement.__proto__ || Object.getPrototypeOf(IfElseBlockStatement)).call(this, [[new TextExpr('if'), cond], [branch], [new TextExpr('else')], [elseBranch]]));
+        var _this9 = _possibleConstructorReturn(this, (IfElseBlockStatement.__proto__ || Object.getPrototypeOf(IfElseBlockStatement)).call(this, [[new TextExpr('if'), cond], [branch], [new TextExpr('else')], [elseBranch]]));
+
+        _this9.branch.anchor = { x: 0, y: 0 };
+        _this9.elseBranch.anchor = { x: 0, y: 0 };
+        return _this9;
     }
+
+    _createClass(IfElseBlockStatement, [{
+        key: "toJavaScript",
+        value: function toJavaScript() {
+            return "if (" + this.cond.toJavaScript() + ") {\n" + this.branch.toJavaScript() + "\n} else {\n" + this.elseBranch.toJavaScript() + "\n}";
+        }
+        // reduce() {
+        //     if (this.canReduce()) {
+        //         let c = this.cond.reduceCompletely();
+        //         if ()
+        //     }
+        // }
+
+    }, {
+        key: "performReduction",
+        value: function performReduction() {
+            var _this10 = this;
+
+            var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+            var cleanup = function cleanup() {
+                _this10._animating = false;
+                _this10.update();
+            };
+            var swap = function swap(node, branch) {
+                var parent = node.parent ? node.parent : node.stage;
+                if (branch) branch.ignoreEvents = node.ignoreEvents; // the new expression should inherit whatever this expression was capable of as input
+                parent.swap(node, branch);
+            };
+            var condSwap = function condSwap() {
+                if (_this10.cond.value() === true) {
+                    swap(_this10, _this10.branch);
+                } else if (_this10.cond.value() === false) {
+                    swap(_this10, _this10.elseBranch);
+                } else {
+                    console.error('Error @ IfElseBlockStatement.performReduction: Condition value is ', _this10.cond.value());
+                    cleanup();
+                    return Promise.reject();
+                }
+                return Promise.resolve();
+            };
+
+            this.lockSubexpressions();
+
+            var r = this.reduceCompletely();
+            if (r != this) {
+                this._animating = true;
+                if (this.cond.canReduce()) {
+                    // If condition is reducable, animate its reduction first.
+                    return this.cond.performReduction(animated).then(function () {
+                        return new Promise(function (resolve, reject) {
+                            Animate.wait(2000).after(function () {
+                                resolve();
+                            });
+                        });
+                    }).then(function () {
+                        return condSwap();
+                    });
+                } else if (this.cond.isValue()) return condSwap();
+            }
+
+            return Promise.reject("Cannot reduce!");
+        }
+    }, {
+        key: "cond",
+        get: function get() {
+            return this.holes[1];
+        }
+    }, {
+        key: "branch",
+        get: function get() {
+            return this.holes[2];
+        }
+    }, {
+        key: "elseBranch",
+        get: function get() {
+            return this.holes[4];
+        }
+    }, {
+        key: "constructorArgs",
+        get: function get() {
+            return [this.cond.clone(), this.branch.clone(), this.elseBranch.clone()];
+        }
+    }]);
 
     return IfElseBlockStatement;
 }(MultiClampSequence);

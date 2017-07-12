@@ -270,6 +270,16 @@ var TypeInTextExpr = function (_TextExpr) {
             }
             return t;
         }
+    }, {
+        key: 'toString',
+        value: function toString() {
+            return this._exprCode ? this._exprCode : '_t';
+        }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return this.toString();
+        }
 
         // 'validator' is a function taking the text as an argument,
         // and returning true if valid and false if rejected.
@@ -315,7 +325,9 @@ var TypeInTextExpr = function (_TextExpr) {
                 }
             };
             if (code in validators) {
-                return new TypeInTextExpr(validators[code], afterCommit);
+                var t = new TypeInTextExpr(validators[code], afterCommit);
+                t._exprCode = '_t_' + code;
+                return t;
             } else {
                 console.error('@ TypeInTextExpr.fromExprCode: Code ' + code + ' doesn\'t match any known validator.');
                 return null;

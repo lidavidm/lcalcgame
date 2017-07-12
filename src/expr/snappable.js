@@ -292,6 +292,9 @@ class Snappable extends Expression {
         }
         return `(snappable ${this.contents.toString()}${next})`;
     }
+    toJavaScript() {
+        return this.contents.toJavaScript();
+    }
 }
 
 class FadedSnappable extends Snappable {

@@ -305,6 +305,14 @@ var BagExpr = function (_CollectionExpr) {
             }, '') + ')';
         }
     }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            var itemsJS = this.items.map(function (x) {
+                return x.toJavaScript();
+            }).join(', ');
+            return '[' + itemsJS + ']';
+        }
+    }, {
         key: 'onmouseclick',
         value: function onmouseclick(pos) {
             this.spill();

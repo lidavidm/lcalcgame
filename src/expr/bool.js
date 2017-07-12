@@ -1,7 +1,3 @@
-
-
-
-
 class BooleanPrimitive extends Expression {
     constructor(name) {
         super();
@@ -40,6 +36,7 @@ class TrueExpr extends BooleanPrimitive {
     }
     value() { return true; }
     toString() { return (this.locked ? '/' : '') + 'true'; }
+    toJavaScript() { return 'true'; }
 }
 class FalseExpr extends BooleanPrimitive {
     constructor() {
@@ -47,6 +44,7 @@ class FalseExpr extends BooleanPrimitive {
     }
     value() { return false; }
     toString() { return (this.locked ? '/' : '') + 'false'; }
+    toJavaScript() { return 'false'; }
 }
 
 /** Faded bool variants. */

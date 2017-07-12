@@ -6,6 +6,7 @@ var ExprManager = function () {
     var _FADE_MAP = {
         'if': [LockIfStatement, InlineLockIfStatement, IfStatement],
         'ifelse': [IfElseStatement],
+        'ifelseblock': [IfElseBlockStatement],
         'triangle': [TriangleExpr], //, FadedTriangleExpr, StringTriangleExpr],
         'rect': [RectExpr], //, FadedRectExpr, StringRectExpr],
         'star': [StarExpr], //, FadedStarExpr, StringStarExpr],
@@ -40,7 +41,7 @@ var ExprManager = function () {
         'reduce': [ReduceFunc],
         'put': [PutExpr],
         'pop': [PopExpr],
-        'define': [DefineExpr],
+        'define': [DefineExpr, FadedDefineExpr],
         'var': [LambdaVarExpr, HalfFadedLambdaVarExpr, FadedLambdaVarExpr, FadedLambdaVarExpr, JumpingChestVarExpr, ChestVarExpr, LabeledChestVarExpr, LabeledVarExpr, VtableVarExpr],
         'reference_display': [DisplayChest, LabeledDisplayChest, SpreadsheetDisplay],
         'environment_display': [EnvironmentDisplay, SpreadsheetEnvironmentDisplay],
@@ -58,7 +59,8 @@ var ExprManager = function () {
         'infinite': [InfiniteExpression],
         'notch': [NotchHangerExpr],
         'namedfunc': [NamedFuncExpr],
-        'vargoal': [VariableGoalDisplay]
+        'vargoal': [VariableGoalDisplay],
+        'return': [ReturnStatement]
     };
     var fade_levels = {};
     var DEFAULT_FADE_LEVEL = 0;

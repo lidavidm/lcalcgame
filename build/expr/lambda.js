@@ -999,6 +999,11 @@ var LambdaExpr = function (_Expression) {
             if (this.holes.length === 1 && this.holes[0] instanceof LambdaHoleExpr) return (this.locked ? '/' : '') + '(' + _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'toString', this).call(this) + ')';else return (this.locked ? '/' : '') + _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'toString', this).call(this);
         }
     }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return '(function (' + this.hole.name + ') { return ' + this.body.toJavaScript() + '; })';
+        }
+    }, {
         key: 'isParentheses',
         get: function get() {
             return this.holes.length > 0 && !this.takesArgument;

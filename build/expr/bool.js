@@ -76,6 +76,11 @@ var TrueExpr = function (_BooleanPrimitive) {
         value: function toString() {
             return (this.locked ? '/' : '') + 'true';
         }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return 'true';
+        }
     }]);
 
     return TrueExpr;
@@ -99,6 +104,11 @@ var FalseExpr = function (_BooleanPrimitive2) {
         key: 'toString',
         value: function toString() {
             return (this.locked ? '/' : '') + 'false';
+        }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return 'false';
         }
     }]);
 

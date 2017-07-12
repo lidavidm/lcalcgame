@@ -327,6 +327,11 @@ var Snappable = function (_Expression) {
             return '(snappable ' + this.contents.toString() + next + ')';
         }
     }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return this.contents.toJavaScript();
+        }
+    }, {
         key: 'contents',
         get: function get() {
             return this.holes[0];

@@ -110,6 +110,11 @@ var MissingExpression = function (_Expression) {
         value: function toString() {
             return '_';
         }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return this.toString();
+        }
     }]);
 
     return MissingExpression;

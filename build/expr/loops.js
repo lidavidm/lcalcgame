@@ -360,6 +360,13 @@ var RepeatLoopExpr = function (_Expression) {
             return (this.locked ? '/' : '') + '(repeat ' + times + ' ' + body + ')';
         }
     }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            var times = this.timesExpr.toString();
+            var body = this.bodyExpr.toString();
+            return 'for (var i = 0; i < ' + times + '; i++) {\n\t' + body + '\n}';
+        }
+    }, {
         key: 'timesExpr',
         get: function get() {
             return this.holes[0];
@@ -526,6 +533,13 @@ var FadedRepeatLoopExpr = function (_Expression2) {
             var times = this.timesExpr.toString();
             var body = this.bodyExpr.toString();
             return (this.locked ? '/' : '') + '(repeat ' + times + ' ' + body + ')';
+        }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            var times = this.timesExpr.toString();
+            var body = this.bodyExpr.toString();
+            return 'for (var i = 0; i < ' + times + '; i++) {\n\t' + body + '\n}';
         }
     }, {
         key: 'timesExpr',

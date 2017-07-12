@@ -324,6 +324,14 @@ var ChoiceExpr = function (_Expression) {
             return "(choice " + children + ")";
         }
     }, {
+        key: "toJavaScript",
+        value: function toJavaScript() {
+            var children = this.choices.map(function (x) {
+                return x.toJavaScript();
+            }).join(",");
+            return "__choice(" + children + ")";
+        }
+    }, {
         key: "rowSize",
         get: function get() {
             var hasRectangular = false;

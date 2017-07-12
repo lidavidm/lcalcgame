@@ -77,6 +77,16 @@ var TextExpr = function (_ExpressionPlus) {
             return true;
         }
     }, {
+        key: 'toString',
+        value: function toString() {
+            return this.text;
+        }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return this.text;
+        }
+    }, {
         key: 'text',
         get: function get() {
             return this._text;

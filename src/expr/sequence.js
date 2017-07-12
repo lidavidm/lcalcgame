@@ -127,6 +127,9 @@ class Sequence extends Expression {
     toString() {
         return `${this.locked ? '/' : ''}(sequence ${this.subexpressions.map((x) => x.toString()).join(" ")})`;
     }
+    toJavaScript() {
+        return this.subexpressions.map((x) => x.toJavaScript()).join(";\n");
+    }
 
     reduceCompletely() {
         if (this.canReduce()) {
@@ -393,16 +396,24 @@ class MultiClampSequence extends Sequence {
 class IfElseBlockStatement extends MultiClampSequence {
     constructor(cond, branch, elseBranch) {
         super([ [new TextExpr('if'), cond], [branch], [new TextExpr('else')], [elseBranch] ]);
+        this.branch.anchor = {x:0, y:0};
+        this.elseBranch.anchor = {x:0, y:0};
     }
     get cond()       { return this.holes[1]; }
     get branch()     { return this.holes[2]; }
     get elseBranch() { return this.holes[4]; }
-    reduce() {
-        if (this.canReduce()) {
-            let c = this.cond.reduceCompletely();
-            if ()
-        }
+    get constructorArgs() {
+        return [ this.cond.clone(), this.branch.clone(), this.elseBranch.clone() ];
     }
+    toJavaScript() {
+        return `if (${this.cond.toJavaScript()}) {\n${this.branch.toJavaScript()}\n} else {\n${this.elseBranch.toJavaScript()}\n}`;
+    }
+    // reduce() {
+    //     if (this.canReduce()) {
+    //         let c = this.cond.reduceCompletely();
+    //         if ()
+    //     }
+    // }
     performReduction(animated=true) {
         let cleanup = () => {
             this._animating = false;
@@ -433,10 +444,17 @@ class IfElseBlockStatement extends MultiClampSequence {
             this._animating = true;
             if (this.cond.canReduce()) { // If condition is reducable, animate its reduction first.
                 return this.cond.performReduction(animated).then(() => {
+                    return new Promise(function(resolve, reject) {
+                        Animate.wait(2000).after(() => {
+                            resolve();
+                        });
+                    });
+                }).then(() => {
                     return condSwap();
                 });
             }
-            else return condSwap();
+            else if (this.cond.isValue())
+                return condSwap();
         }
 
         return Promise.reject("Cannot reduce!");

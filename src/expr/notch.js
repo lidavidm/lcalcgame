@@ -109,4 +109,5 @@ class NotchHangerExpr extends Expression {
     }
     update() { }
     toString() { return '(notch)'; }
+    toJavaScript() { return '_notch'; }
 }

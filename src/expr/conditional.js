@@ -7,12 +7,6 @@ class IfStatement extends Expression {
         question_mark.color = else_text.color = 'black';
         super([cond, question_mark, branch, else_text]);
 
-        // OLD -- if ... then ...
-        /*var if_text = new TextExpr('if');
-        var then_text = new TextExpr('then');
-        if_text.color = 'black';
-        then_text.color = 'black';
-        super([if_text, cond, then_text, branch]);*/
         this.color = 'LightBlue';
     }
 
@@ -128,6 +122,9 @@ class IfStatement extends Expression {
     toString() {
         return (this.locked ? '/' : '') + '(if ' + this.cond.toString() + ' ' + this.branch.toString() + ')';
     }
+    toJavaScript() {
+        return `((${this.cond.toJavaScript()}) ? (${this.branch.toJavaScript()}) : null)`;
+    }
 }
 
 // A simpler graphical form of if.
@@ -166,6 +163,9 @@ class IfElseStatement extends IfStatement {
 
     toString() {
         return (this.locked ? '/' : '') + '(if ' + this.cond.toString() + ' ' + this.branch.toString() + ' ' + this.elseBranch.toString() + ')';
+    }
+    toJavaScript() {
+        return `(${this.cond.toJavaScript()}) ? (${this.branch.toJavaScript()}) : (${this.elseBranch.toJavaScript()})`;
     }
 }
 

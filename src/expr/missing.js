@@ -73,6 +73,7 @@ class MissingExpression extends Expression {
     }
 
     toString() { return '_'; }
+    toJavaScript() { return this.toString(); }
 }
 
 class MissingTypedExpression extends MissingExpression {

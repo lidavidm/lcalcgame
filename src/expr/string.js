@@ -92,6 +92,12 @@ class StringObjectExpr extends ObjectExtensionExpr {
         else
             return this.baseStringValue.value();
     }
+    toString() {
+        return '`' + this.value();
+    }
+    toJavaScript() {
+        return `"${this.value()}"`;
+    }
 
     get constructorArgs() {
         return [this.holes[0].clone(), this.defaultMethodCall, this.defaultMethodArgs];

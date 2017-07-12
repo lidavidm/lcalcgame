@@ -82,6 +82,10 @@ class Expression extends mag.RoundedRect {
         this.holes.push(arg);
         this.addChild(arg);
     }
+    insertArg(idx, arg) {
+        this.holes.splice(idx, 0, arg);
+        this.update();
+    }
 
     removeArg(arg) {
         var idx = this.holes.indexOf(arg);

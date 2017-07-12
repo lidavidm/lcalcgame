@@ -166,6 +166,11 @@ var NotchHangerExpr = function (_Expression) {
             return '(notch)';
         }
     }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return '_notch';
+        }
+    }, {
         key: 'size',
         set: function set(sz) {
             this._size = { w: sz.h, h: sz.h };

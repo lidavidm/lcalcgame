@@ -714,6 +714,11 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
             });
         }
     }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return '__OBJECT_EXT_EXPR()'; // TO BE IMPLEMENTED!
+        }
+    }, {
         key: 'constructorArgs',
         get: function get() {
             return [this.holes[0].clone(), $.extend(true, {}, this.objMethods)];

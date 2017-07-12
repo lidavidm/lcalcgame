@@ -773,6 +773,9 @@ class LambdaExpr extends Expression {
         else
             return (this.locked ? '/' : '') + super.toString();
     }
+    toJavaScript() {
+        return `(function (${this.hole.name}) { return ${this.body.toJavaScript()}; })`;
+    }
 }
 
 

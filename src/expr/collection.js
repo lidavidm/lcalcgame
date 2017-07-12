@@ -201,6 +201,10 @@ class BagExpr extends CollectionExpr {
     toString() {
         return (this.locked ? '/' : '') + '(bag' + this.items.reduce(((str, curr) => str += ' ' + curr.toString().replace('/', '')), '') + ')';
     }
+    toJavaScript() {
+        let itemsJS = this.items.map((x) => x.toJavaScript()).join(', ');
+        return `[${itemsJS}]`;
+    }
 
     onmouseclick(pos) {
         this.spill();

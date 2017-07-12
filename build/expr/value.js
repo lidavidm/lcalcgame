@@ -130,6 +130,11 @@ var StarExpr = function (_GraphicValueExpr) {
         value: function toString() {
             return (this.locked ? '/' : '') + 'star';
         }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return '__star';
+        }
     }]);
 
     return StarExpr;
@@ -148,6 +153,11 @@ var CircleExpr = function (_GraphicValueExpr2) {
         key: 'toString',
         value: function toString() {
             return (this.locked ? '/' : '') + 'circle';
+        }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return '__circle';
         }
     }]);
 
@@ -168,6 +178,11 @@ var PipeExpr = function (_GraphicValueExpr3) {
         value: function toString() {
             return (this.locked ? '/' : '') + 'pipe';
         }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return '__pipe';
+        }
     }]);
 
     return PipeExpr;
@@ -187,6 +202,11 @@ var TriangleExpr = function (_GraphicValueExpr4) {
         value: function toString() {
             return (this.locked ? '/' : '') + 'triangle';
         }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return '__triangle';
+        }
     }]);
 
     return TriangleExpr;
@@ -205,6 +225,11 @@ var RectExpr = function (_GraphicValueExpr5) {
         key: 'toString',
         value: function toString() {
             return (this.locked ? '/' : '') + 'rect';
+        }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return '__rect';
         }
     }]);
 
@@ -227,6 +252,11 @@ var ImageExpr = function (_GraphicValueExpr6) {
         key: 'toString',
         value: function toString() {
             return this._image;
+        }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return '__IMAGE_EXPR()';
         }
     }, {
         key: 'image',
@@ -318,6 +348,11 @@ var NullExpr = function (_ImageExpr2) {
     }, {
         key: 'toString',
         value: function toString() {
+            return 'null';
+        }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
             return 'null';
         }
     }, {
@@ -445,6 +480,11 @@ var FadedValueExpr = function (_Expression2) {
             return this.primitiveName;
         }
     }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return '__' + this.primitiveName;
+        }
+    }, {
         key: 'value',
         value: function value() {
             return (this.locked ? '/' : '') + this.toString();
@@ -550,6 +590,11 @@ var StringValueExpr = function (_Expression3) {
         key: 'toString',
         value: function toString() {
             return (this.locked ? '/' : '') + this.primitiveName;
+        }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return '__' + this.primitiveName;
         }
     }, {
         key: 'value',
@@ -668,6 +713,11 @@ var StringAddExpr = function (_Expression4) {
         key: 'toString',
         value: function toString() {
             return (this.locked ? '/(' : '(') + this.op.toString() + ' ' + this.leftExpr.toString() + ' ' + this.rightExpr.toString() + ')';
+        }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return this.leftExpr.toJavaScript() + ' + ' + this.rightExpr.toJavaScript();
         }
     }, {
         key: 'reduce',

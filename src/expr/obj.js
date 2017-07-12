@@ -561,6 +561,10 @@ class ObjectExtensionExpr extends ExpressionPlus {
             expr.update();
         });
     }
+
+    toJavaScript() {
+        return '__OBJECT_EXT_EXPR()'; // TO BE IMPLEMENTED!
+    }
 }
 
 class ArrayObjectExpr extends ObjectExtensionExpr {

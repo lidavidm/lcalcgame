@@ -116,6 +116,12 @@ var Expression = function (_mag$RoundedRect) {
             this.addChild(arg);
         }
     }, {
+        key: 'insertArg',
+        value: function insertArg(idx, arg) {
+            this.holes.splice(idx, 0, arg);
+            this.update();
+        }
+    }, {
         key: 'removeArg',
         value: function removeArg(arg) {
             var idx = this.holes.indexOf(arg);

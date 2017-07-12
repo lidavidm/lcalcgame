@@ -24,6 +24,11 @@ var EmptyExpr = function (_Expression) {
         value: function value() {
             return null;
         }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return 'null';
+        }
     }]);
 
     return EmptyExpr;
@@ -67,6 +72,11 @@ var NullExpr = function (_ImageExpr) {
     }, {
         key: 'toString',
         value: function toString() {
+            return 'null';
+        }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
             return 'null';
         }
     }, {

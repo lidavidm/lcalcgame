@@ -106,7 +106,7 @@ class NamedExpr extends Expression {
 
     // Whoa... meta.
     toString() {
-        let s = '(' + name; // e.g. '(length'
+        let s = '(' + this.name; // e.g. '(length'
         let args = this.args;
         for ( let i = 0; i < args.length; i++ )
             s += ' ' + args[i].toString();
@@ -182,9 +182,8 @@ class DragPatch extends ImageExpr {
 
 // Analogous to 'define' in Scheme.
 class DefineExpr extends ClampExpr {
-    constructor(expr, name=null) {
-        //let txt_define = new TextExpr('define');
-        //txt_define.color = 'black';
+    constructor(expr, name=null, params=[]) {
+
         let txt_input = new Expression([ new TextExpr(name ? name : 'foo') ]); // TODO: Make this text input field (or dropdown menu).
         txt_input.color = 'Salmon';
         txt_input.radius = 2;
@@ -194,26 +193,25 @@ class DefineExpr extends ClampExpr {
         this.color = 'OrangeRed';
         this.expr.shadowOffset = -2;
         if (name) this.funcname = name;
+        this.params = params;
 
         this.notches = [ new WedgeNotch('left', 10, 10, 0.8, true) ];
 
-        //this.stage.functions[this.funcname] = this;
     }
     onSnap(otherNotch, otherExpr, thisNotch) {
         DefineExpr.functions[this.funcname] = this;
         this.stage.functions[this.funcname] = this;
         super.onSnap(otherNotch, otherExpr, thisNotch);
-        if (this.children[0].holes.length === 1) {
-            let drag_patch = new DragPatch(0, 0, 42, 52);
-            this.children[0].addChild(drag_patch);
-            this.children[0].update();
-        }
+        let drag_patch = new DragPatch(0, 0, 42, 52);
+        this.children[0].addArg(drag_patch);
+        this.children[0].update();
     }
     onDisconnect() {
         if (this.children[0].holes.length > 1) {
-            this.children[0].removeChild(this.children[0].children[1]);
+            this.children[0].removeLastChild();
         }
     }
+    get funcNameExpr() { return this.holes[0]; }
     get name() { return this.funcname; }
     get expr() {
         //console.log("Called get expr() in DEFINEEXPR ...!!!!");
@@ -230,51 +228,13 @@ class DefineExpr extends ClampExpr {
 
         if (this.expr instanceof LambdaExpr)
             numargs = this.expr.numOfNestedLambdas();
-        //console.log(numargs);
+
         for (let i = 0; i < numargs; i++)
             args.push( new MissingExpression() );
 
-        // Return named function (expression).
-        //return new NamedExpr(funcname, this, args);
-
-        return new NamedFuncExpr(funcname, ...args);
+        // Return named function (expression)
+        return new NamedFuncExpr(funcname, this.params, ...args);
     }
-    // get notchPos() {
-    //     return { x: this.pos.x, y: this.pos.y + this.radius + (this.size.h - this.radius * 2) * (1 - this.notch.relpos) };
-    // }
-    // onmousedrag(pos) {
-    //     super.onmousedrag(pos);
-    //
-    //     if (this._attachNode) {
-    //         this._attachNode.detachAttachment(this);
-    //         this._attachNode = null;
-    //     }
-    //
-    //     const ATTACHMENT_THRESHOLD = 20;
-    //     let notchPos = this.notchPos;
-    //     let attachmentNodes = this.stage.getRootNodesThatIncludeClass(NewInstanceExpr);
-    //     attachmentNodes.forEach((node) => {
-    //         if (!node.isAttached()) {
-    //             let dist = distBetweenPos(notchPos, node.notchPos);
-    //             if (dist < ATTACHMENT_THRESHOLD) {
-    //                 node.stroke = { color:'magenta', lineWidth:4 };
-    //                 this._attachProspect = node;
-    //             } else {
-    //                 node.stroke = null;
-    //                 if (this._attachProspect && this._attachProspect == node)
-    //                     this._attachProspect = null;
-    //             }
-    //         }
-    //     });
-    // }
-    // onmouseup(pos) {
-    //     super.onmouseup(pos);
-    //     if (this._attachProspect) { // Snap this function block into the NewInstanceExpr notch:
-    //         this._attachProspect.attach(this);
-    //         this._attachNode = this._attachProspect;
-    //         this._attachProspect = null;
-    //     }
-    // }
     onmouseclick() {
         console.log(this);
         return; // disable for now;
@@ -335,6 +295,44 @@ class DefineExpr extends ClampExpr {
         }
     }
     toString() { return '(define ' + this.expr.toString() + ' `' + this.funcname + ')'; }
+    toJavaScript() {
+        if (this.expr instanceof LambdaExpr) // assuming 1 hole...
+            return `function ${this.funcname}(${this.expr.hole.name}) {\n\treturn ${this.expr.body.toJavaScript()};\n}`;
+        else { // assumes we have a full function definition... (WARNING: Does not work for cases where expr return is implied, e.g. expr is StarExpr.)
+            return `function ${this.funcname}(${this.params.join(',')}) {\n\t${this.expr.toJavaScript()}\n}`;
+        }
+    }
+}
+
+class FadedDefineExpr extends DefineExpr {
+    constructor(expr, name=null, params=[]) {
+        super(expr, name, params);
+        let txt_input = this.funcNameExpr;
+        txt_input.holes[0].text += '()';
+        txt_input.insertArg(0, new TextExpr('define'));
+        //txt_input.addArg(new TextExpr('{'));
+    }
+
+    generateNamedExpr() {
+
+        let funcname = this.funcname;
+        let args = [];
+        let numargs = this.params.length;
+
+        for (let i = 0; i < numargs; i++)
+            args.push( new MissingExpression() );
+
+        // Return named function (expression)
+        return new NamedFuncExpr(funcname, this.params, ...args);
+    }
+}
+
+class ReturnStatement extends Expression {
+    constructor(es) {
+        let rtn = new TextExpr('return');
+        rtn.color = 'black';
+        super([rtn].concat(es));
+    }
 }
 
 DefineExpr.functions = {};
