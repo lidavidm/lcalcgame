@@ -176,6 +176,9 @@ class ES6Parser {
             },
 
             'AssignmentExpression': (node) => {
+                if (node.left.name === '__return') // Return statement conversion. Hacked because esprima won't parse 'return x' at top-level.
+                    return new (ExprManager.getClass('return'))(this.parseNode(node.right));
+
                 let result = new (ExprManager.getClass('assign'))(this.parseNode(node.left), this.parseNode(node.right));
                 mag.Stage.getNodesWithClass(MissingExpression, [], true, [result]).forEach((n) => {
                     n.__remain_unlocked = true;
@@ -249,13 +252,17 @@ class ES6Parser {
                 return new (ExprManager.getClass('define'))(this.parseNode(node.body), node.id ? node.id.name : '???', node.params.map((id) => id.name));
             },
             'BlockStatement': (node) => {
-                if (node.body.length === 1 && node.body[0].type === 'ReturnStatement') {
-                    if (ExprManager.getFadeLevel('define') === 0)
-                        return this.parseNode(node.body[0].argument);
-                    else
-                        return new (ExprManager.getClass('return'))(this.parseNode(node.body[0].argument));
+                if (node.body.length === 1) {
+                    if (node.body[0].type === 'ReturnStatement') {
+                        if (ExprManager.getFadeLevel('define') === 0)
+                            return this.parseNode(node.body[0].argument);
+                        else
+                            return new (ExprManager.getClass('return'))(this.parseNode(node.body[0].argument));
+                    } else {
+                        return this.parseNode(node.body[0]);
+                    }
                 } else {
-                    console.error('Block expressions longer than a single return are not yet supported.');
+                    console.error('Block expressions longer than a single statement are not yet supported.', node.body);
                     return null;
                 }
             },

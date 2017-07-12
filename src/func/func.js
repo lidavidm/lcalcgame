@@ -113,7 +113,9 @@ class MapFunc extends FuncExpr {
     toString() {
         return '(map ' + this.func.toString() + ' ' + this.bag.toString() + ')';
     }
-
+    toJavaScript() {
+        return `${this.bag.toJavaScript()}.map(${this.func.toJavaScript()})`;
+    }
 
     reduce() {
         this.update();

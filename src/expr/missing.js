@@ -183,7 +183,7 @@ class MissingBooleanExpression extends MissingTypedExpression {
 
         this.graphicNode = new mag.HexaRect(0, 0, 44, 44);
 
-        this.acceptedClasses = [ BooleanPrimitive, CompareExpr ];
+        this.acceptedClasses = [ BooleanPrimitive, CompareExpr, UnaryOpExpr ];
     }
     getClass() { return MissingBooleanExpression; }
 

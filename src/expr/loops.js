@@ -346,8 +346,8 @@ class RepeatLoopExpr extends Expression {
         return `${this.locked ? '/' : ''}(repeat ${times} ${body})`;
     }
     toJavaScript() {
-        let times = this.timesExpr.toString();
-        let body = this.bodyExpr.toString();
+        let times = this.timesExpr.toJavaScript();
+        let body = this.bodyExpr.toJavaScript();
         return `for (var i = 0; i < ${times}; i++) {\n\t${body}\n}`;
     }
 }
@@ -518,8 +518,8 @@ class FadedRepeatLoopExpr extends Expression {
         return `${this.locked ? '/' : ''}(repeat ${times} ${body})`;
     }
     toJavaScript() {
-        let times = this.timesExpr.toString();
-        let body = this.bodyExpr.toString();
+        let times = this.timesExpr.toJavaScript();
+        let body = this.bodyExpr.toJavaScript();
         return `for (var i = 0; i < ${times}; i++) {\n\t${body}\n}`;
     }
 }

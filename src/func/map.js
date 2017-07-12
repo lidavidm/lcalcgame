@@ -84,6 +84,9 @@ class MapFunc extends FuncExpr {
     toString() {
         return '(map ' + this.func.toString() + ' ' + this.bag.toString() + ')';
     }
+    toJavaScript() {
+        return `${this.bag.toJavaScript()}.map(${this.func.toJavaScript()})`;
+    }
 
 
     reduce() {
@@ -630,5 +633,8 @@ class ReduceFunc extends FuncExpr {
     toString() {
         return '(reduce ' + this.func.toString() + ' ' + this.iterable.toString() + ' ' +
                           ( this.initializer ? this.initializer.toString() : '()' ) + ')';
+    }
+    toJavaScript() {
+        return `${this.iterable.toJavaScript()}.reduce(${this.func.toJavaScript()})`;
     }
 }

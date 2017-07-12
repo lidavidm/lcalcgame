@@ -195,19 +195,20 @@ var CompareExpr = function (_Expression) {
                 '!=': 'a !== b',
                 'and': 'a && b',
                 'or': 'a || b',
-                'or not': 'a || !(b)',
-                'and not': 'a && !(b)',
+                'or not': 'a || !b',
+                'and not': 'a && !b',
                 '>': 'a > b',
                 '<': 'a < b',
                 '>=': 'a >= b',
-                '<=': 'a <= b'
+                '<=': 'a <= b',
+                '>>>': 'a >>> b' // typing operator...
             };
             if (this.funcName in js_forms) {
                 var _ret = function () {
                     var template = js_forms[_this3.funcName];
                     var inner_exprs = { 'a': _this3.leftExpr.toJavaScript(), 'b': _this3.rightExpr.toJavaScript() };
                     var final_expr = template.replace(/a|b/g, function (match) {
-                        return inner_exprs[match];
+                        return '(' + inner_exprs[match] + ')';
                     }); // replaces a with leftExpr and b with rightExpr
                     return {
                         v: final_expr
@@ -377,7 +378,7 @@ var UnaryOpExpr = function (_Expression2) {
     }, {
         key: 'toJavaScript',
         value: function toJavaScript() {
-            return '!' + this.rightExpr.toJavaScript();
+            return '!(' + this.rightExpr.toJavaScript() + ')';
         }
     }, {
         key: 'constructorArgs',

@@ -594,7 +594,7 @@ var StringValueExpr = function (_Expression3) {
     }, {
         key: 'toJavaScript',
         value: function toJavaScript() {
-            return '__' + this.primitiveName;
+            return '"' + this.primitiveName + '"';
         }
     }, {
         key: 'value',

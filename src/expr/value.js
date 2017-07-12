@@ -236,7 +236,7 @@ class StringValueExpr extends Expression {
         return (this.locked ? '/' : '') + this.primitiveName;
     }
     toJavaScript() {
-        return `__${this.primitiveName}`;
+        return `"${this.primitiveName}"`;
     }
     value() { return this.name; }
 }

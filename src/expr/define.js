@@ -299,6 +299,7 @@ class DefineExpr extends ClampExpr {
         if (this.expr instanceof LambdaExpr) // assuming 1 hole...
             return `function ${this.funcname}(${this.expr.hole.name}) {\n\treturn ${this.expr.body.toJavaScript()};\n}`;
         else { // assumes we have a full function definition... (WARNING: Does not work for cases where expr return is implied, e.g. expr is StarExpr.)
+            console.log(this.expr);
             return `function ${this.funcname}(${this.params.join(',')}) {\n\t${this.expr.toJavaScript()}\n}`;
         }
     }
@@ -323,7 +324,9 @@ class FadedDefineExpr extends DefineExpr {
             args.push( new MissingExpression() );
 
         // Return named function (expression)
-        return new NamedFuncExpr(funcname, this.params, ...args);
+        let call = new NamedFuncExpr(funcname, this.params, ...args);
+        call._javaScriptFunction = this.toJavaScript();
+        return call;
     }
 }
 
@@ -332,6 +335,10 @@ class ReturnStatement extends Expression {
         let rtn = new TextExpr('return');
         rtn.color = 'black';
         super([rtn].concat(es));
+    }
+    toJavaScript() {
+        let stm = this.holes.slice(1).map((e) => e.toJavaScript()).join(' ');
+        return `return ${stm};`;
     }
 }
 

@@ -881,8 +881,8 @@ var AssignExpr = function (_Expression2) {
     }, {
         key: "toJavaScript",
         value: function toJavaScript() {
-            var variable = this.variable ? this.variable.toString() : '_';
-            var value = this.value ? this.value.toString() : '_';
+            var variable = this.variable ? this.variable.toJavaScript() : '_';
+            var value = this.value ? this.value.toJavaScript() : '_';
             return variable + " = " + value + ";";
         }
     }, {

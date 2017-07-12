@@ -17,6 +17,12 @@ if (window.localStorage["completedLevels"]) {
 if (level_idx !== 0) level_idx = parseInt(level_idx);
 var cur_menu = null;
 
+function __TEST() {
+    console.log(stage.expressionNodes().map(function (e) {
+        return e.toJavaScript();
+    }));
+}
+
 function init() {
 
     // -- TEST CORS --

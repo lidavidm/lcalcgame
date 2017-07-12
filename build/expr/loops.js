@@ -362,8 +362,8 @@ var RepeatLoopExpr = function (_Expression) {
     }, {
         key: 'toJavaScript',
         value: function toJavaScript() {
-            var times = this.timesExpr.toString();
-            var body = this.bodyExpr.toString();
+            var times = this.timesExpr.toJavaScript();
+            var body = this.bodyExpr.toJavaScript();
             return 'for (var i = 0; i < ' + times + '; i++) {\n\t' + body + '\n}';
         }
     }, {
@@ -537,8 +537,8 @@ var FadedRepeatLoopExpr = function (_Expression2) {
     }, {
         key: 'toJavaScript',
         value: function toJavaScript() {
-            var times = this.timesExpr.toString();
-            var body = this.bodyExpr.toString();
+            var times = this.timesExpr.toJavaScript();
+            var body = this.bodyExpr.toJavaScript();
             return 'for (var i = 0; i < ' + times + '; i++) {\n\t' + body + '\n}';
         }
     }, {

@@ -316,7 +316,9 @@ var TypeInTextExpr = function (_TextExpr) {
                     return ['==', '!=', '===', '!==', 'or', 'and', 'or not', 'and not'].indexOf(txt) > -1;
                 },
                 'single': function single(txt) {
+                    txt = txt.replace('return', '__return =');
                     var res = __PARSER.parse(txt);
+                    console.log(txt, res);
                     return res && !(res instanceof Sequence);
                 },
                 'variable': function variable(txt) {
@@ -346,6 +348,7 @@ var TypeInTextExpr = function (_TextExpr) {
 
         if (!afterCommit) {
             afterCommit = function afterCommit(txt) {
+                txt = txt.replace('return', '__return =');
                 var expr = __PARSER.parse(txt);
                 if (!expr) return;
                 var parent = _this6.parent || _this6.stage;

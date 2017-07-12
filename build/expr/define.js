@@ -416,6 +416,7 @@ var DefineExpr = function (_ClampExpr) {
             if (this.expr instanceof LambdaExpr) // assuming 1 hole...
                 return 'function ' + this.funcname + '(' + this.expr.hole.name + ') {\n\treturn ' + this.expr.body.toJavaScript() + ';\n}';else {
                 // assumes we have a full function definition... (WARNING: Does not work for cases where expr return is implied, e.g. expr is StarExpr.)
+                console.log(this.expr);
                 return 'function ' + this.funcname + '(' + this.params.join(',') + ') {\n\t' + this.expr.toJavaScript() + '\n}';
             }
         }
@@ -476,7 +477,9 @@ var FadedDefineExpr = function (_DefineExpr) {
             for (var i = 0; i < numargs; i++) {
                 args.push(new MissingExpression());
             } // Return named function (expression)
-            return new (Function.prototype.bind.apply(NamedFuncExpr, [null].concat([funcname, this.params], args)))();
+            var call = new (Function.prototype.bind.apply(NamedFuncExpr, [null].concat([funcname, this.params], args)))();
+            call._javaScriptFunction = this.toJavaScript();
+            return call;
         }
     }]);
 
@@ -493,6 +496,16 @@ var ReturnStatement = function (_Expression2) {
         rtn.color = 'black';
         return _possibleConstructorReturn(this, (ReturnStatement.__proto__ || Object.getPrototypeOf(ReturnStatement)).call(this, [rtn].concat(es)));
     }
+
+    _createClass(ReturnStatement, [{
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            var stm = this.holes.slice(1).map(function (e) {
+                return e.toJavaScript();
+            }).join(' ');
+            return 'return ' + stm + ';';
+        }
+    }]);
 
     return ReturnStatement;
 }(Expression);

@@ -102,14 +102,21 @@ var NamedFuncExpr = function (_Expression) {
                         and funnel the output into the ES6Parser to return the correct Reduct block:
                      */
                     // * We have to be very careful here, in case the program hangs! *
-                    var geval = eval; // equivalent to calling eval in the global scope
-                    geval("(function " + this.name + "(" + this.paramNames.join(',') + ") {" + _expr.toJSString() + "})(" + args.map(function (a) {
-                        return a.toJSString();
-                    }).join(',') + ");");
-
-                    if (args.length > 0) _expr = args.reduce(function (lambdaExpr, arg) {
-                        return lambdaExpr.applyExpr(arg);
-                    }, _expr); // Chains application to inner lambda expressions.
+                    if (this._javaScriptFunction) {
+                        var js_code = '(' + this._javaScriptFunction + ")(" + args.map(function (a) {
+                            return a.toJavaScript();
+                        }).join(',') + ");";
+                        var geval = eval; // equivalent to calling eval in the global scope
+                        console.log(args);
+                        console.log('Eval\'ing ', js_code);
+                        var rtn = geval(js_code);
+                        console.log('Result = ', rtn);
+                        if (typeof rtn === "string") _expr = ES6Parser.parse('"' + rtn + '"');else _expr = ES6Parser.parse(rtn.toString());
+                    } else {
+                        if (args.length > 0) _expr = args.reduce(function (lambdaExpr, arg) {
+                            return lambdaExpr.applyExpr(arg);
+                        }, _expr); // Chains application to inner lambda expressions.
+                    }
 
                     Resource.play('define-convert');
 
@@ -160,7 +167,7 @@ var NamedFuncExpr = function (_Expression) {
     }, {
         key: 'args',
         get: function get() {
-            return this.holes.slice(1).map(function (a) {
+            return this.holes.slice(1, this.holes.length - 1).map(function (a) {
                 return a.clone();
             });
         }

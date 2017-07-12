@@ -198,6 +198,9 @@ var ES6Parser = function () {
                 },
 
                 'AssignmentExpression': function AssignmentExpression(node) {
+                    if (node.left.name === '__return') // Return statement conversion. Hacked because esprima won't parse 'return x' at top-level.
+                        return new (ExprManager.getClass('return'))(_this2.parseNode(node.right));
+
                     var result = new (ExprManager.getClass('assign'))(_this2.parseNode(node.left), _this2.parseNode(node.right));
                     mag.Stage.getNodesWithClass(MissingExpression, [], true, [result]).forEach(function (n) {
                         n.__remain_unlocked = true;
@@ -281,10 +284,14 @@ var ES6Parser = function () {
                     }));
                 },
                 'BlockStatement': function BlockStatement(node) {
-                    if (node.body.length === 1 && node.body[0].type === 'ReturnStatement') {
-                        if (ExprManager.getFadeLevel('define') === 0) return _this2.parseNode(node.body[0].argument);else return new (ExprManager.getClass('return'))(_this2.parseNode(node.body[0].argument));
+                    if (node.body.length === 1) {
+                        if (node.body[0].type === 'ReturnStatement') {
+                            if (ExprManager.getFadeLevel('define') === 0) return _this2.parseNode(node.body[0].argument);else return new (ExprManager.getClass('return'))(_this2.parseNode(node.body[0].argument));
+                        } else {
+                            return _this2.parseNode(node.body[0]);
+                        }
                     } else {
-                        console.error('Block expressions longer than a single return are not yet supported.');
+                        console.error('Block expressions longer than a single statement are not yet supported.', node.body);
                         return null;
                     }
                 },

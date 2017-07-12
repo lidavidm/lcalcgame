@@ -320,7 +320,7 @@ var MissingBooleanExpression = function (_MissingTypedExpressi2) {
 
         _this5.graphicNode = new mag.HexaRect(0, 0, 44, 44);
 
-        _this5.acceptedClasses = [BooleanPrimitive, CompareExpr];
+        _this5.acceptedClasses = [BooleanPrimitive, CompareExpr, UnaryOpExpr];
         return _this5;
     }
 

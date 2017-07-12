@@ -128,7 +128,13 @@ class Sequence extends Expression {
         return `${this.locked ? '/' : ''}(sequence ${this.subexpressions.map((x) => x.toString()).join(" ")})`;
     }
     toJavaScript() {
-        return this.subexpressions.map((x) => x.toJavaScript()).join(";\n");
+        let es = this.subexpressions.map((x) => x.toJavaScript());
+        for (let i = 0; i < es.length; i++) {
+            let e = es[i].trim();
+            if (e[e.length-1] !== ';')
+                es[i] += ';';
+        }
+        return es.join('\n');
     }
 
     reduceCompletely() {

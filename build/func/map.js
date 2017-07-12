@@ -93,6 +93,11 @@ var MapFunc = function (_FuncExpr) {
             return '(map ' + this.func.toString() + ' ' + this.bag.toString() + ')';
         }
     }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return this.bag.toJavaScript() + '.map(' + this.func.toJavaScript() + ')';
+        }
+    }, {
         key: 'reduce',
         value: function reduce() {
             this.update();
@@ -758,6 +763,11 @@ var ReduceFunc = function (_FuncExpr2) {
         key: 'toString',
         value: function toString() {
             return '(reduce ' + this.func.toString() + ' ' + this.iterable.toString() + ' ' + (this.initializer ? this.initializer.toString() : '()') + ')';
+        }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return this.iterable.toJavaScript() + '.reduce(' + this.func.toJavaScript() + ')';
         }
     }, {
         key: 'constructorArgs',

@@ -187,17 +187,18 @@ class CompareExpr extends Expression {
             '!=':'a !== b',
             'and':'a && b',
             'or':'a || b',
-            'or not':'a || !(b)',
-            'and not':'a && !(b)',
+            'or not':'a || !b',
+            'and not':'a && !b',
             '>':'a > b',
             '<':'a < b',
             '>=':'a >= b',
-            '<=':'a <= b'
+            '<=':'a <= b',
+            '>>>':'a >>> b' // typing operator... 
         };
         if (this.funcName in js_forms) {
             let template = js_forms[this.funcName];
             let inner_exprs = { 'a':this.leftExpr.toJavaScript(), 'b':this.rightExpr.toJavaScript() };
-            let final_expr = template.replace(/a|b/g, (match) => inner_exprs[match]); // replaces a with leftExpr and b with rightExpr
+            let final_expr = template.replace(/a|b/g, (match) => '(' + inner_exprs[match] + ')'); // replaces a with leftExpr and b with rightExpr
             return final_expr;
         } else {
             console.error('@ CompareExpr.toJavaScript: Operator name ' + this.funcName + ' not in mappings.');
@@ -309,7 +310,7 @@ class UnaryOpExpr extends Expression {
         return (this.locked ? '/' : '') + '(' + this.funcName + ' ' + this.rightExpr.toString() + ')';
     }
     toJavaScript() {
-        return `!${this.rightExpr.toJavaScript()}`;
+        return `!(${this.rightExpr.toJavaScript()})`;
     }
 }
 

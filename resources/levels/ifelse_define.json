@@ -20,7 +20,7 @@
             "hint": "* is multiply."
         },
         {
-            "goal": ["27", "27", "27"],
+            "goal": ["9", "27", "81"],
             "board": ["function multiply(x) { _t_single; }", "_notch"],
             "toolbox": ["1", "3", "9"],
             "description": "Typing entire return line.",

@@ -246,9 +246,14 @@ var Sequence = function (_Expression) {
     }, {
         key: "toJavaScript",
         value: function toJavaScript() {
-            return this.subexpressions.map(function (x) {
+            var es = this.subexpressions.map(function (x) {
                 return x.toJavaScript();
-            }).join(";\n");
+            });
+            for (var i = 0; i < es.length; i++) {
+                var e = es[i].trim();
+                if (e[e.length - 1] !== ';') es[i] += ';';
+            }
+            return es.join('\n');
         }
     }, {
         key: "reduceCompletely",

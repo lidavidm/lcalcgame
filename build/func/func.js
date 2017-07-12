@@ -166,6 +166,11 @@ var MapFunc = function (_FuncExpr) {
             return '(map ' + this.func.toString() + ' ' + this.bag.toString() + ')';
         }
     }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return this.bag.toJavaScript() + '.map(' + this.func.toJavaScript() + ')';
+        }
+    }, {
         key: 'reduce',
         value: function reduce() {
             this.update();

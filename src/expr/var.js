@@ -749,8 +749,8 @@ class AssignExpr extends Expression {
         return `${this.locked ? '/' : ''}(assign ${variable} ${value})`;
     }
     toJavaScript() {
-        let variable = this.variable ? this.variable.toString() : '_';
-        let value = this.value ? this.value.toString() : '_';
+        let variable = this.variable ? this.variable.toJavaScript() : '_';
+        let value = this.value ? this.value.toJavaScript() : '_';
         return `${variable} = ${value};`;
     }
 }

@@ -194,7 +194,9 @@ class TypeInTextExpr extends TextExpr {
             'int':(txt) => (!Number.isNaN(Number.parseInt(txt, 10))),
             'equiv':(txt) => (['==','!=','===','!==', 'or', 'and', 'or not', 'and not'].indexOf(txt) > -1),
             'single':(txt) => {
+                txt = txt.replace('return', '__return =');
                 let res = __PARSER.parse(txt);
+                console.log(txt, res);
                 return res && !(res instanceof Sequence);
             },
             'variable': (txt) => {
@@ -242,6 +244,7 @@ class TypeInTextExpr extends TextExpr {
 
         if (!afterCommit) {
             afterCommit = (txt) => {
+                txt = txt.replace('return', '__return =');
                 let expr = __PARSER.parse(txt);
                 if (!expr) return;
                 let parent = (this.parent || this.stage);

@@ -1001,7 +1001,11 @@ var LambdaExpr = function (_Expression) {
     }, {
         key: 'toJavaScript',
         value: function toJavaScript() {
-            return '(function (' + this.hole.name + ') { return ' + this.body.toJavaScript() + '; })';
+            var param_name = this.hole.name;
+            var bodyJS = this.holes.length > 2 ? this.holes.slice(1).map(function (e) {
+                return e.toJavaScript();
+            }).join('') : this.body.toJavaScript();
+            return '(function (' + param_name + ') { return ' + bodyJS + '; })';
         }
     }, {
         key: 'isParentheses',

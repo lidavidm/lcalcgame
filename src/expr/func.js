@@ -31,7 +31,7 @@ class NamedFuncExpr extends Expression {
         return Level.getStage().functions[this.name].expr.clone();
     }
 
-    get args() { return this.holes.slice(1).map((a) => a.clone()); }
+    get args() { return this.holes.slice(1, this.holes.length-1).map((a) => a.clone()); }
     get constructorArgs() {
         return [ this.name, ...this.args ];
     }
@@ -80,15 +80,23 @@ class NamedFuncExpr extends Expression {
                     and funnel the output into the ES6Parser to return the correct Reduct block:
                  */
                 // * We have to be very careful here, in case the program hangs! *
-                let geval = eval; // equivalent to calling eval in the global scope
-                geval("(function " + this.name + "(" + this.paramNames.join(',') + ") {" +
-                      expr.toJSString() +
-                      "})(" +
-                      args.map((a) => a.toJSString()).join(',') +
-                      ");");
-
-                if (args.length > 0)
-                    expr = args.reduce((lambdaExpr, arg) => lambdaExpr.applyExpr(arg), expr); // Chains application to inner lambda expressions.
+                if (this._javaScriptFunction) {
+                    let js_code = '(' + this._javaScriptFunction + ")(" +
+                          args.map((a) => a.toJavaScript()).join(',') +
+                          ");";
+                    let geval = eval; // equivalent to calling eval in the global scope
+                    console.log(args);
+                    console.log('Eval\'ing ', js_code);
+                    let rtn = geval(js_code);
+                    console.log('Result = ', rtn);
+                    if (typeof rtn === "string")
+                        expr = ES6Parser.parse('"' + rtn + '"');
+                    else
+                        expr = ES6Parser.parse(rtn.toString());
+                } else {
+                    if (args.length > 0)
+                        expr = args.reduce((lambdaExpr, arg) => lambdaExpr.applyExpr(arg), expr); // Chains application to inner lambda expressions.
+                }
 
                 Resource.play('define-convert');
 
