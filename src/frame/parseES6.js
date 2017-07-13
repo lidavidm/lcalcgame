@@ -142,9 +142,14 @@ class ES6Parser {
                 } else if (node.callee.type === 'MemberExpression' && node.callee.property.name === 'map') {
                     console.log(node.callee);
                     return new (ExprManager.getClass('arrayobj'))(this.parseNode(node.callee.object), 'map', this.parseNode(node.arguments[0]));
-                    //return new (ExprManager.getClass('map'))(this.parseNode(node.arguments[0]), this.parseNode(node.callee.object));
+                } else if (node.callee.type === 'Identifier') {
+                    // Special case 'foo(_t_params)': Call parameters (including paretheses) will be entered by player.
+                    if (node.arguments.length === 1 && node.arguments[0].type === 'Identifier' && node.arguments[0].name === '_t_params')
+                        return new NamedFuncExpr(node.callee.name, '_t_params');
+                    else // All other cases, including special case _t_varname(...) specifying that call name will be entered by player. 
+                        return new NamedFuncExpr(node.callee.name, null, ...node.arguments.map((a) => this.parseNode(a)));
                 } else {
-                    console.error('Call expressions outside of the special $() unlock syntax are currently undefined.');
+                    console.error('Call expressions involving callee name resolution are currently undefined.');
                     return null;
                 }
             },

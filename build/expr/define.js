@@ -320,14 +320,16 @@ var DefineExpr = function (_ClampExpr) {
             this.stage.functions[this.funcname] = this;
             _get(DefineExpr.prototype.__proto__ || Object.getPrototypeOf(DefineExpr.prototype), 'onSnap', this).call(this, otherNotch, otherExpr, thisNotch);
             var drag_patch = new DragPatch(0, 0, 42, 52);
-            this.children[0].addArg(drag_patch);
+            this.children[0].addChild(drag_patch);
             this.children[0].update();
         }
     }, {
         key: 'onDisconnect',
         value: function onDisconnect() {
-            if (this.children[0].holes.length > 1) {
-                this.children[0].removeLastChild();
+            var title = this.children[0];
+            if (title.children.length > 1) {
+                this.children[0].children.splice(title.children.length - 1, 1); // remove handle
+                this.update();
             }
         }
     }, {
@@ -460,7 +462,7 @@ var FadedDefineExpr = function (_DefineExpr) {
         var _this6 = _possibleConstructorReturn(this, (FadedDefineExpr.__proto__ || Object.getPrototypeOf(FadedDefineExpr)).call(this, expr, name, params));
 
         var txt_input = _this6.funcNameExpr;
-        txt_input.holes[0].text += '()';
+        txt_input.holes[0].text += '(' + params.join(', ') + ')';
         txt_input.insertArg(0, new TextExpr('define'));
         //txt_input.addArg(new TextExpr('{'));
         return _this6;

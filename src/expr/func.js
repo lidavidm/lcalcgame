@@ -2,14 +2,54 @@
 class NamedFuncExpr extends Expression {
     constructor(name, paramNames, ...args) {
 
-        let txt_name = new TextExpr(name + '(');
-        txt_name.color = 'black';
-        let exprs = [ txt_name ];
-        for ( let i = 0; i < args.length; i++ ) {
-            if (i > 0) exprs.push(new TextExpr(','));
-            exprs.push(args[i].clone());
+        let txt_name;
+        let exprs;
+
+        // Special case: Player has to enter name of call.
+        if (name === '_t_varname') {
+            let typebox = TypeInTextExpr.fromExprCode('_t_varname', (final_txt) => {
+                // After the player 'commits' to a valid call name,
+                // swap the text-enter field with plain text.
+                this.holes[0] = new TextExpr(final_txt + '(');
+                this.holes[0].color = 'black';
+                this.holes.splice(1, 1); // remove extra open parentheses
+                this.name = final_txt;
+                this.update();
+            });
+            txt_name = new TextExpr('');
+            exprs = [typebox, txt_name];
+        } else {
+            txt_name = new TextExpr(name);
+            txt_name.color = 'black';
+            exprs = [ txt_name ];
         }
-        exprs.push(new TextExpr(')'))
+
+        // Special case: Player has to enter params of call.
+        if (paramNames === '_t_params') {
+            let params_typebox = TypeInTextExpr.fromExprCode('_t_params', (final_txt) => {
+                // After the player 'commits' to valid call parameters,
+                // swap the text-enter field with plain text.
+                let dummy_call = `foo${final_txt}`;
+                this.holes[0].text += '(';
+                this.holes = [this.holes[0]]; // remove everything but the call name
+                let parsedArguments = __PARSER.parse(dummy_call).args;
+                console.log(parsedArguments);
+                for ( let i = 0; i < parsedArguments.length; i++ ) {
+                    if (i > 0) this.holes.push(new TextExpr(','));
+                    this.holes.push(parsedArguments[i]);
+                }
+                this.holes.push(new TextExpr(')'))
+                this.update();
+            });
+            exprs.push(params_typebox);
+        } else { // Construct params from provided arguments.
+            txt_name.text += '(';
+            for ( let i = 0; i < args.length; i++ ) {
+                if (i > 0) exprs.push(new TextExpr(','));
+                exprs.push(args[i].clone());
+            }
+            exprs.push(new TextExpr(')'))
+        }
 
         super(exprs);
 
@@ -24,16 +64,23 @@ class NamedFuncExpr extends Expression {
     }
 
     get expr() {
-        return new NamedFuncExpr(this.name, ...this.args);
+        return new NamedFuncExpr(this.name, this.paramNames, ...this.args);
     }
 
     get funcExpr() {
-        return Level.getStage().functions[this.name].expr.clone();
+        return Level.getStage().functions[this.name];
     }
 
-    get args() { return this.holes.slice(1, this.holes.length-1).map((a) => a.clone()); }
+    get args() {
+        let args = [];
+        for (let i = 1; i < this.holes.length-1; i++) {
+            if (i % 2 === 1)
+                args.push( this.holes[i].clone() );
+        }
+        return args;
+    }
     get constructorArgs() {
-        return [ this.name, ...this.args ];
+        return [ this.name, this.paramNames, ...this.args ];
     }
 
     onmouseclick() {
@@ -47,7 +94,7 @@ class NamedFuncExpr extends Expression {
 
         this._wrapped_ref = refDefineExpr;
         this.scale = refDefineExpr.scale;
-        let expr = this.funcExpr;
+        let expr = this.funcExpr.expr.clone();
 
         for (let it = 1; it < this.holes.length; ++it) {
             this.holes[it] = this.holes[it].reduceCompletely();
@@ -80,6 +127,7 @@ class NamedFuncExpr extends Expression {
                     and funnel the output into the ES6Parser to return the correct Reduct block:
                  */
                 // * We have to be very careful here, in case the program hangs! *
+                this._javaScriptFunction = expr.toJavaScript();
                 if (this._javaScriptFunction) {
                     let js_code = '(' + this._javaScriptFunction + ")(" +
                           args.map((a) => a.toJavaScript()).join(',') +
@@ -94,8 +142,10 @@ class NamedFuncExpr extends Expression {
                     else
                         expr = ES6Parser.parse(rtn.toString());
                 } else {
-                    if (args.length > 0)
+                    if (args.length > 0) {
+                        expr = expr.expr.clone(); // get inner expression
                         expr = args.reduce((lambdaExpr, arg) => lambdaExpr.applyExpr(arg), expr); // Chains application to inner lambda expressions.
+                    }
                 }
 
                 Resource.play('define-convert');

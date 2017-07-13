@@ -1,12 +1,12 @@
 {
-    "chapterName":"Block If/Else Statement",
-    "description":"Intro to block if statements, variable goals, and multi-line typing.",
+    "chapterName":"Block Define",
+    "description":"Typing call names and parameters. Block definitions.",
     "language":"JavaScript",
     "levels": [
         {
             "goal": ["6", "2"],
             "board": ["function double(x) { return x * 2; }", "_notch"],
-            "toolbox": ["1", "2", "3"],
+            "toolbox": ["double(1)", "_t_varname(2)", "double(_t_params)"],
             "description": "Intro to block functions and reminder of doubling.",
             "fade":{
                 "define":1

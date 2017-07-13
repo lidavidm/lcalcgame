@@ -18,19 +18,60 @@ var NamedFuncExpr = function (_Expression) {
     function NamedFuncExpr(name, paramNames) {
         _classCallCheck(this, NamedFuncExpr);
 
-        var txt_name = new TextExpr(name + '(');
-        txt_name.color = 'black';
-        var exprs = [txt_name];
+        var txt_name = void 0;
+        var exprs = void 0;
 
-        for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-            args[_key - 2] = arguments[_key];
+        // Special case: Player has to enter name of call.
+        if (name === '_t_varname') {
+            var typebox = TypeInTextExpr.fromExprCode('_t_varname', function (final_txt) {
+                // After the player 'commits' to a valid call name,
+                // swap the text-enter field with plain text.
+                _this.holes[0] = new TextExpr(final_txt + '(');
+                _this.holes[0].color = 'black';
+                _this.holes.splice(1, 1); // remove extra open parentheses
+                _this.name = final_txt;
+                _this.update();
+            });
+            txt_name = new TextExpr('');
+            exprs = [typebox, txt_name];
+        } else {
+            txt_name = new TextExpr(name);
+            txt_name.color = 'black';
+            exprs = [txt_name];
         }
 
-        for (var i = 0; i < args.length; i++) {
-            if (i > 0) exprs.push(new TextExpr(','));
-            exprs.push(args[i].clone());
+        // Special case: Player has to enter params of call.
+        if (paramNames === '_t_params') {
+            var params_typebox = TypeInTextExpr.fromExprCode('_t_params', function (final_txt) {
+                // After the player 'commits' to valid call parameters,
+                // swap the text-enter field with plain text.
+                var dummy_call = 'foo' + final_txt;
+                _this.holes[0].text += '(';
+                _this.holes = [_this.holes[0]]; // remove everything but the call name
+                var parsedArguments = __PARSER.parse(dummy_call).args;
+                console.log(parsedArguments);
+                for (var i = 0; i < parsedArguments.length; i++) {
+                    if (i > 0) _this.holes.push(new TextExpr(','));
+                    _this.holes.push(parsedArguments[i]);
+                }
+                _this.holes.push(new TextExpr(')'));
+                _this.update();
+            });
+            exprs.push(params_typebox);
+        } else {
+            // Construct params from provided arguments.
+            txt_name.text += '(';
+
+            for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+                args[_key - 2] = arguments[_key];
+            }
+
+            for (var i = 0; i < args.length; i++) {
+                if (i > 0) exprs.push(new TextExpr(','));
+                exprs.push(args[i].clone());
+            }
+            exprs.push(new TextExpr(')'));
         }
-        exprs.push(new TextExpr(')'));
 
         var _this = _possibleConstructorReturn(this, (NamedFuncExpr.__proto__ || Object.getPrototypeOf(NamedFuncExpr)).call(this, exprs));
 
@@ -60,7 +101,7 @@ var NamedFuncExpr = function (_Expression) {
 
             this._wrapped_ref = refDefineExpr;
             this.scale = refDefineExpr.scale;
-            var expr = this.funcExpr;
+            var expr = this.funcExpr.expr.clone();
 
             for (var it = 1; it < this.holes.length; ++it) {
                 this.holes[it] = this.holes[it].reduceCompletely();
@@ -102,6 +143,7 @@ var NamedFuncExpr = function (_Expression) {
                         and funnel the output into the ES6Parser to return the correct Reduct block:
                      */
                     // * We have to be very careful here, in case the program hangs! *
+                    this._javaScriptFunction = _expr.toJavaScript();
                     if (this._javaScriptFunction) {
                         var js_code = '(' + this._javaScriptFunction + ")(" + args.map(function (a) {
                             return a.toJavaScript();
@@ -113,9 +155,12 @@ var NamedFuncExpr = function (_Expression) {
                         console.log('Result = ', rtn);
                         if (typeof rtn === "string") _expr = ES6Parser.parse('"' + rtn + '"');else _expr = ES6Parser.parse(rtn.toString());
                     } else {
-                        if (args.length > 0) _expr = args.reduce(function (lambdaExpr, arg) {
-                            return lambdaExpr.applyExpr(arg);
-                        }, _expr); // Chains application to inner lambda expressions.
+                        if (args.length > 0) {
+                            _expr = _expr.expr.clone(); // get inner expression
+                            _expr = args.reduce(function (lambdaExpr, arg) {
+                                return lambdaExpr.applyExpr(arg);
+                            }, _expr); // Chains application to inner lambda expressions.
+                        }
                     }
 
                     Resource.play('define-convert');
@@ -157,24 +202,26 @@ var NamedFuncExpr = function (_Expression) {
     }, {
         key: 'expr',
         get: function get() {
-            return new (Function.prototype.bind.apply(NamedFuncExpr, [null].concat([this.name], _toConsumableArray(this.args))))();
+            return new (Function.prototype.bind.apply(NamedFuncExpr, [null].concat([this.name, this.paramNames], _toConsumableArray(this.args))))();
         }
     }, {
         key: 'funcExpr',
         get: function get() {
-            return Level.getStage().functions[this.name].expr.clone();
+            return Level.getStage().functions[this.name];
         }
     }, {
         key: 'args',
         get: function get() {
-            return this.holes.slice(1, this.holes.length - 1).map(function (a) {
-                return a.clone();
-            });
+            var args = [];
+            for (var i = 1; i < this.holes.length - 1; i++) {
+                if (i % 2 === 1) args.push(this.holes[i].clone());
+            }
+            return args;
         }
     }, {
         key: 'constructorArgs',
         get: function get() {
-            return [this.name].concat(_toConsumableArray(this.args));
+            return [this.name, this.paramNames].concat(_toConsumableArray(this.args));
         }
     }]);
 

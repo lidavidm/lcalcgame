@@ -324,6 +324,27 @@ var TypeInTextExpr = function (_TextExpr) {
                 'variable': function variable(txt) {
                     var result = __PARSER.parse(txt);
                     return result instanceof VarExpr || result instanceof VtableVarExpr;
+                },
+                'varname': function varname(txt) {
+                    if (/^[a-z_]\w*$/g.test(txt)) {
+                        // If it's a valid variable / function name...
+                        // * Note that this doesn't actually check whether function with name 'txt' is defined.
+                        // * If the player clicks on said undefined call, it should block them with a question mark effect.
+                        return true;
+                    } else {
+                        return false;
+                    }
+                },
+                'params': function params(txt) {
+                    var dummy_call = 'foo' + txt;
+                    if (__PARSER.parse(dummy_call)) {
+                        // If it's a valid parameter list including parentheses, e.g. (0, 1, a, "georgia")
+                        // * Similar to 'varname' above, doesn't type-check function to make sure call is valid.
+                        // * This just verifies that the syntax is correct.
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
             };
             if (code in validators) {

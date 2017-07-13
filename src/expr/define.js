@@ -203,12 +203,14 @@ class DefineExpr extends ClampExpr {
         this.stage.functions[this.funcname] = this;
         super.onSnap(otherNotch, otherExpr, thisNotch);
         let drag_patch = new DragPatch(0, 0, 42, 52);
-        this.children[0].addArg(drag_patch);
+        this.children[0].addChild(drag_patch);
         this.children[0].update();
     }
     onDisconnect() {
-        if (this.children[0].holes.length > 1) {
-            this.children[0].removeLastChild();
+        let title = this.children[0];
+        if (title.children.length > 1) {
+            this.children[0].children.splice(title.children.length - 1, 1); // remove handle
+            this.update();
         }
     }
     get funcNameExpr() { return this.holes[0]; }
@@ -309,7 +311,7 @@ class FadedDefineExpr extends DefineExpr {
     constructor(expr, name=null, params=[]) {
         super(expr, name, params);
         let txt_input = this.funcNameExpr;
-        txt_input.holes[0].text += '()';
+        txt_input.holes[0].text += '(' + params.join(', ') + ')';
         txt_input.insertArg(0, new TextExpr('define'));
         //txt_input.addArg(new TextExpr('{'));
     }

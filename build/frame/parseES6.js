@@ -166,11 +166,16 @@ var ES6Parser = function () {
                     } else if (node.callee.type === 'MemberExpression' && node.callee.property.name === 'map') {
                         console.log(node.callee);
                         return new (ExprManager.getClass('arrayobj'))(_this2.parseNode(node.callee.object), 'map', _this2.parseNode(node.arguments[0]));
-                        //return new (ExprManager.getClass('map'))(this.parseNode(node.arguments[0]), this.parseNode(node.callee.object));
+                    } else if (node.callee.type === 'Identifier') {
+                        // Special case 'foo(_t_params)': Call parameters (including paretheses) will be entered by player.
+                        if (node.arguments.length === 1 && node.arguments[0].type === 'Identifier' && node.arguments[0].name === '_t_params') return new NamedFuncExpr(node.callee.name, '_t_params');else // All other cases, including special case _t_varname(...) specifying that call name will be entered by player.
+                            return new (Function.prototype.bind.apply(NamedFuncExpr, [null].concat([node.callee.name, null], _toConsumableArray(node.arguments.map(function (a) {
+                                return _this2.parseNode(a);
+                            })))))();
                     } else {
-                            console.error('Call expressions outside of the special $() unlock syntax are currently undefined.');
-                            return null;
-                        }
+                        console.error('Call expressions involving callee name resolution are currently undefined.');
+                        return null;
+                    }
                 },
 
                 /* Anonymous functions of the form (x) => x */
