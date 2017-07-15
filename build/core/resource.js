@@ -84,7 +84,7 @@ var mag = function (_) {
             if (!audioEngineLoaded) {
                 if (window.lowLag) {
                     try {
-                        lowLag.init({ 'sm2url': 'lib/sm2/swf/', 'debug': 'none' });
+                        lowLag.init({ 'sm2url': 'lib/sm2/swf/', 'debug': 'console' });
                         audioEngine = 'lowLag';
                     } catch (err) {
                         console.error(err);
@@ -138,9 +138,9 @@ var mag = function (_) {
         };
 
         var muted = false;
-        if (getCookie("muted") === "true") {
-            muted = true;
-        }
+        // if (getCookie("muted") === "true") {
+        //     muted = true;
+        // }
 
         return { // TODO: Add more resource types.
             setCurrentLoadSequence: setCurrentLoadSequence,

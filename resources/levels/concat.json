@@ -6,7 +6,15 @@
         {
             "goal" : "'pineapple'",
             "board": ["'pine'", "'apple'", "_ + _"],
-            "toolbox": ""
+            "toolbox": "",
+            "fade": {
+                "var": 7,
+                "assign": 2,
+                "reference_display": 2,
+                "environment_display": 1,
+                "_v": 1
+            },
+            "showFade":false
         },
         {
             "goal" : "'crabapple'",

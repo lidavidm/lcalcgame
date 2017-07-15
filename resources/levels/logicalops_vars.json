@@ -12,10 +12,14 @@
                 "!=":1,
                 "true":1,
                 "false":1,
-                "lambda":2,
                 "number":1,
                 "map":1,
-                "__":1
+                "__":1,
+                "var": 8,
+                "assign": 2,
+                "reference_display": 2,
+                "environment_display": 1,
+                "_v": 1
             },
             "showFade":false
         },
