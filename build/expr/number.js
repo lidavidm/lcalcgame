@@ -87,8 +87,6 @@ var OperatorExpr = function (_Expression2) {
     function OperatorExpr(left, op, right) {
         _classCallCheck(this, OperatorExpr);
 
-        if (left instanceof MissingExpression && !(left instanceof MissingNumberExpression)) left = new MissingNumberExpression();
-        if (right instanceof MissingExpression && !(right instanceof MissingNumberExpression)) right = new MissingNumberExpression();
         return _possibleConstructorReturn(this, (OperatorExpr.__proto__ || Object.getPrototypeOf(OperatorExpr)).call(this, [left, op, right]));
     }
 
@@ -102,31 +100,35 @@ var OperatorExpr = function (_Expression2) {
         value: function performReduction() {
             var _this4 = this;
 
+            var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
             return this.performSubReduction(this.leftExpr).then(function (left) {
-                if (!(left instanceof NumberExpr)) {
-                    return Promise.reject();
+                return _this4.performSubReduction(_this4.rightExpr);
+            }).then(function (right) {
+                var stage = _this4.stage;
+
+                if (animated) {
+                    return new Promise(function (resolve, _reject) {
+                        var shatter = new ShatterExpressionEffect(_this4);
+                        shatter.run(stage, function () {
+                            _this4.ignoreEvents = false;
+                            resolve(_get(OperatorExpr.prototype.__proto__ || Object.getPrototypeOf(OperatorExpr.prototype), 'performReduction', _this4).call(_this4));
+                        }.bind(_this4));
+                        _this4.ignoreEvents = true;
+                    });
+                } else {
+                    return _get(OperatorExpr.prototype.__proto__ || Object.getPrototypeOf(OperatorExpr.prototype), 'performReduction', _this4).call(_this4);
                 }
-                return _this4.performSubReduction(_this4.rightExpr).then(function (right) {
-                    if (!(right instanceof NumberExpr)) {
-                        return Promise.reject();
-                    }
-
-                    var stage = _this4.stage;
-
-                    var val = _get(OperatorExpr.prototype.__proto__ || Object.getPrototypeOf(OperatorExpr.prototype), 'performReduction', _this4).call(_this4);
-                    stage.update();
-                    return val;
-                });
             });
         }
     }, {
         key: 'onmouseclick',
         value: function onmouseclick() {
-            //this.performUserReduction();
-            console.log("clicked Operator Expression!!");
-            if (!this._animating) {
-                this.performReduction();
-            }
+            this.performUserReduction();
+            //console.log("clicked Operator Expression!!");
+            //if (!this._animating) {
+            //    this.performReduction();
+            //}
         }
     }, {
         key: 'toString',
@@ -168,14 +170,18 @@ var AddExpr = function (_OperatorExpr) {
         return _possibleConstructorReturn(this, (AddExpr.__proto__ || Object.getPrototypeOf(AddExpr)).call(this, left, op, right));
     }
 
+    /* This 'add' should work for string concatenation as well. */
+
+
     _createClass(AddExpr, [{
         key: 'reduce',
         value: function reduce() {
-            if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {
+            if (!this.canReduce()) return this;else if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {
                 return new (ExprManager.getClass('number'))(this.leftExpr.value() + this.rightExpr.value());
-            } else {
-                return this;
-            }
+            } else if (this.leftExpr instanceof StringValueExpr || this.rightExpr instanceof StringValueExpr) {
+                var result = this.leftExpr.value() + this.rightExpr.value();
+                if (typeof result === 'string') return new (ExprManager.getClass('string'))(result);
+            } else return this;
         }
     }]);
 

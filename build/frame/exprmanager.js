@@ -23,7 +23,7 @@ var ExprManager = function () {
         'number': [NumberExpr, FadedNumberExpr],
         'cmp': [MirrorCompareExpr, FadedCompareExpr],
         '==': [MirrorCompareExpr, FadedCompareExpr],
-        '+': [StringAddExpr], //[AddExpr],
+        '+': [AddExpr], //[StringAddExpr],
         '-': [SubtractionExpr],
         '*': [MultiplicationExpr],
         '--': [DivisionExpr],
@@ -60,7 +60,8 @@ var ExprManager = function () {
         'notch': [NotchHangerExpr],
         'namedfunc': [NamedFuncExpr],
         'vargoal': [VariableGoalDisplay],
-        'return': [ReturnStatement]
+        'return': [ReturnStatement],
+        'string': [StringValueExpr]
     };
     var fade_levels = {};
     var DEFAULT_FADE_LEVEL = 0;

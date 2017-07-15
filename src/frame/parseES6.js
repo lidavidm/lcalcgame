@@ -104,7 +104,7 @@ class ES6Parser {
                         return this.makePrimitive(node.value);
                     }
                     else { // Otherwise this stands for a "string" value.
-                        return new StringValueExpr(node.value);
+                        return new (ExprManager.getClass('string'))(node.value);
                     }
                 } else if (Number.isNumber(node.value)) {
                     return new (ExprManager.getClass('number'))(node.value);
@@ -146,7 +146,7 @@ class ES6Parser {
                     // Special case 'foo(_t_params)': Call parameters (including paretheses) will be entered by player.
                     if (node.arguments.length === 1 && node.arguments[0].type === 'Identifier' && node.arguments[0].name === '_t_params')
                         return new NamedFuncExpr(node.callee.name, '_t_params');
-                    else // All other cases, including special case _t_varname(...) specifying that call name will be entered by player. 
+                    else // All other cases, including special case _t_varname(...) specifying that call name will be entered by player.
                         return new NamedFuncExpr(node.callee.name, null, ...node.arguments.map((a) => this.parseNode(a)));
                 } else {
                     console.error('Call expressions involving callee name resolution are currently undefined.');

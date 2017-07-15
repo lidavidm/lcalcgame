@@ -60,7 +60,23 @@ class NamedFuncExpr extends Expression {
     }
 
     canReduce() {
-        return true;
+
+        // First let's check that call is fully defined...
+        if (this.hasPlaceholderChildren()) {
+            let missing = this.getPlaceholderChildren();
+            // If not, attempt to resolve inner typeboxes...
+            for (let m of missing) {
+                if (m instanceof TypeInTextExpr && m.canReduce())
+                    m.reduce();
+                else m.animatePlaceholderStatus();
+            }
+            return false;
+        }
+        else if (this.funcExpr.hasPlaceholderChildren()) {
+            this.funcExpr.animatePlaceholderChildren();
+            return false;
+        }
+        else return true;
     }
 
     get expr() {
@@ -68,7 +84,7 @@ class NamedFuncExpr extends Expression {
     }
 
     get funcExpr() {
-        return Level.getStage().functions[this.name];
+        return this.stage.functions[this.name];
     }
 
     get args() {
@@ -88,6 +104,8 @@ class NamedFuncExpr extends Expression {
         this.performReduction();
     }
     reduce() {
+        if (!this.canReduce()) return this;
+
         let refDefineExpr = Level.getStage().functions[this.name];
         if (refDefineExpr == null)
             return this;
@@ -127,20 +145,31 @@ class NamedFuncExpr extends Expression {
                     and funnel the output into the ES6Parser to return the correct Reduct block:
                  */
                 // * We have to be very careful here, in case the program hangs! *
+                // eval("while(1) {}");
                 this._javaScriptFunction = expr.toJavaScript();
                 if (this._javaScriptFunction) {
                     let js_code = '(' + this._javaScriptFunction + ")(" +
                           args.map((a) => a.toJavaScript()).join(',') +
                           ");";
                     let geval = eval; // equivalent to calling eval in the global scope
+                    let rtn;
                     console.log(args);
                     console.log('Eval\'ing ', js_code);
-                    let rtn = geval(js_code);
-                    console.log('Result = ', rtn);
-                    if (typeof rtn === "string")
-                        expr = ES6Parser.parse('"' + rtn + '"');
-                    else
-                        expr = ES6Parser.parse(rtn.toString());
+
+                    try {
+                        rtn = geval(js_code);
+                        console.log('Result = ', rtn);
+                        if (typeof rtn === "string")
+                            expr = ES6Parser.parse('"' + rtn + '"');
+                        else
+                            expr = ES6Parser.parse(rtn.toString());
+                    } catch (e) {
+                        if (e instanceof SyntaxError) {
+                            console.warn(e.message);
+                        }
+                        console.log(e);
+                        return this; // Abort
+                    }
                 } else {
                     if (args.length > 0) {
                         expr = expr.expr.clone(); // get inner expression

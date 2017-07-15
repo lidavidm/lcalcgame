@@ -125,7 +125,7 @@ var ES6Parser = function () {
                             return _this2.makePrimitive(node.value);
                         } else {
                             // Otherwise this stands for a "string" value.
-                            return new StringValueExpr(node.value);
+                            return new (ExprManager.getClass('string'))(node.value);
                         }
                     } else if (Number.isNumber(node.value)) {
                         return new (ExprManager.getClass('number'))(node.value);

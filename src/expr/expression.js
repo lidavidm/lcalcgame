@@ -295,6 +295,18 @@ class Expression extends mag.RoundedRect {
         Animate.blink(this);
     }
 
+    hasPlaceholderChildren() {
+        return this.getPlaceholderChildren().length > 0;
+    }
+    getPlaceholderChildren() {
+        return mag.Stage.getAllNodes([this]).filter((e) => e instanceof Expression && e.isPlaceholder());
+    }
+    animatePlaceholderChildren() {
+        let missing = this.getPlaceholderChildren();
+        for (let e of missing)
+            e.animatePlaceholderStatus();
+    }
+
     // Play an animation to remind the user that this is currently reducing.
     animateReducingStatus() {
         this._reducingTime = 0;

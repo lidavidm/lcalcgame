@@ -259,6 +259,9 @@ class DefineExpr extends ClampExpr {
             }
         }
     }
+    getPlaceholderChildren() {
+        return mag.Stage.getAllNodes([this]).filter((e) => e instanceof Expression && e.isPlaceholder() && !(e instanceof VarExpr));
+    }
     reduceCompletely() { return this; }
     reduce() {
 

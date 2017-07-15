@@ -85,7 +85,41 @@ var NamedFuncExpr = function (_Expression) {
     _createClass(NamedFuncExpr, [{
         key: 'canReduce',
         value: function canReduce() {
-            return true;
+
+            // First let's check that call is fully defined...
+            if (this.hasPlaceholderChildren()) {
+                var missing = this.getPlaceholderChildren();
+                // If not, attempt to resolve inner typeboxes...
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
+
+                try {
+                    for (var _iterator = missing[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        var m = _step.value;
+
+                        if (m instanceof TypeInTextExpr && m.canReduce()) m.reduce();else m.animatePlaceholderStatus();
+                    }
+                } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion && _iterator.return) {
+                            _iterator.return();
+                        }
+                    } finally {
+                        if (_didIteratorError) {
+                            throw _iteratorError;
+                        }
+                    }
+                }
+
+                return false;
+            } else if (this.funcExpr.hasPlaceholderChildren()) {
+                this.funcExpr.animatePlaceholderChildren();
+                return false;
+            } else return true;
         }
     }, {
         key: 'onmouseclick',
@@ -96,6 +130,8 @@ var NamedFuncExpr = function (_Expression) {
     }, {
         key: 'reduce',
         value: function reduce() {
+            if (!this.canReduce()) return this;
+
             var refDefineExpr = Level.getStage().functions[this.name];
             if (refDefineExpr == null) return this;
 
@@ -143,25 +179,36 @@ var NamedFuncExpr = function (_Expression) {
                         and funnel the output into the ES6Parser to return the correct Reduct block:
                      */
                     // * We have to be very careful here, in case the program hangs! *
+                    // eval("while(1) {}");
                     this._javaScriptFunction = _expr.toJavaScript();
                     if (this._javaScriptFunction) {
                         var js_code = '(' + this._javaScriptFunction + ")(" + args.map(function (a) {
                             return a.toJavaScript();
                         }).join(',') + ");";
                         var geval = eval; // equivalent to calling eval in the global scope
+                        var rtn = void 0;
                         console.log(args);
                         console.log('Eval\'ing ', js_code);
-                        var rtn = geval(js_code);
-                        console.log('Result = ', rtn);
-                        if (typeof rtn === "string") _expr = ES6Parser.parse('"' + rtn + '"');else _expr = ES6Parser.parse(rtn.toString());
-                    } else {
-                        if (args.length > 0) {
-                            _expr = _expr.expr.clone(); // get inner expression
-                            _expr = args.reduce(function (lambdaExpr, arg) {
-                                return lambdaExpr.applyExpr(arg);
-                            }, _expr); // Chains application to inner lambda expressions.
+
+                        try {
+                            rtn = geval(js_code);
+                            console.log('Result = ', rtn);
+                            if (typeof rtn === "string") _expr = ES6Parser.parse('"' + rtn + '"');else _expr = ES6Parser.parse(rtn.toString());
+                        } catch (e) {
+                            if (e instanceof SyntaxError) {
+                                console.warn(e.message);
+                            }
+                            console.log(e);
+                            return this; // Abort
                         }
-                    }
+                    } else {
+                            if (args.length > 0) {
+                                _expr = _expr.expr.clone(); // get inner expression
+                                _expr = args.reduce(function (lambdaExpr, arg) {
+                                    return lambdaExpr.applyExpr(arg);
+                                }, _expr); // Chains application to inner lambda expressions.
+                            }
+                        }
 
                     Resource.play('define-convert');
 
@@ -207,7 +254,7 @@ var NamedFuncExpr = function (_Expression) {
     }, {
         key: 'funcExpr',
         get: function get() {
-            return Level.getStage().functions[this.name];
+            return this.stage.functions[this.name];
         }
     }, {
         key: 'args',

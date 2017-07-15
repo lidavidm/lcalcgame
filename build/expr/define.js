@@ -370,6 +370,13 @@ var DefineExpr = function (_ClampExpr) {
             }
         }
     }, {
+        key: 'getPlaceholderChildren',
+        value: function getPlaceholderChildren() {
+            return mag.Stage.getAllNodes([this]).filter(function (e) {
+                return e instanceof Expression && e.isPlaceholder() && !(e instanceof VarExpr);
+            });
+        }
+    }, {
         key: 'reduceCompletely',
         value: function reduceCompletely() {
             return this;

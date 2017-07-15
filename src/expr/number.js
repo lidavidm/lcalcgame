@@ -41,10 +41,6 @@ class FadedNumberExpr extends NumberExpr {
 
 class OperatorExpr extends Expression {
     constructor(left, op, right) {
-        if (left instanceof MissingExpression && !(left instanceof MissingNumberExpression))
-            left = new MissingNumberExpression();
-        if (right instanceof MissingExpression && !(right instanceof MissingNumberExpression))
-            right = new MissingNumberExpression();
         super([left, op, right]);
     }
 
@@ -65,31 +61,34 @@ class OperatorExpr extends Expression {
         return this.holes[1];
     }
 
-    performReduction() {
+    performReduction(animated=true) {
         return this.performSubReduction(this.leftExpr).then((left) => {
-            if (!(left instanceof NumberExpr)) {
-                return Promise.reject();
+            return this.performSubReduction(this.rightExpr);
+        }).then((right) => {
+            let stage = this.stage;
+
+            if (animated) {
+                return new Promise((resolve, _reject) => {
+                    var shatter = new ShatterExpressionEffect(this);
+                    shatter.run(stage, (() => {
+                        this.ignoreEvents = false;
+                        resolve(super.performReduction());
+                    }).bind(this));
+                    this.ignoreEvents = true;
+                });
             }
-            return this.performSubReduction(this.rightExpr).then((right) => {
-                if (!(right instanceof NumberExpr)) {
-                    return Promise.reject();
-                }
-
-                let stage = this.stage;
-
-                let val = super.performReduction();
-                stage.update();
-                return val;
-            });
+            else {
+                return super.performReduction();
+            }
         });
     }
 
     onmouseclick() {
-        //this.performUserReduction();
-        console.log("clicked Operator Expression!!");
-        if (!this._animating) {
-            this.performReduction();
-        }
+        this.performUserReduction();
+        //console.log("clicked Operator Expression!!");
+        //if (!this._animating) {
+        //    this.performReduction();
+        //}
     }
 
     toString() {
@@ -106,13 +105,18 @@ class AddExpr extends OperatorExpr {
         super(left, op, right);
     }
 
+    /* This 'add' should work for string concatenation as well. */
     reduce() {
-        if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {
+        if (!this.canReduce()) return this;
+        else if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {
             return new (ExprManager.getClass('number'))(this.leftExpr.value() + this.rightExpr.value());
         }
-        else {
-            return this;
+        else if (this.leftExpr instanceof StringValueExpr || this.rightExpr instanceof StringValueExpr) {
+            let result = this.leftExpr.value() + this.rightExpr.value();
+            if (typeof result === 'string')
+                return new (ExprManager.getClass('string'))(result);
         }
+        else return this;
     }
 }
 
