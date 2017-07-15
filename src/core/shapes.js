@@ -13,7 +13,7 @@
              this._color = "lightgray";
              this._highlightColor = 'yellow';
              this.stroke = null;
-             this.shadowOffset = 2;
+             this.shadowOffset = 4;
              this.shadowColor = 'black';
          }
          get highlightColor() { return this._highlightColor; }

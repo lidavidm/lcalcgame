@@ -612,7 +612,7 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'unlock',
         value: function unlock() {
-            this.shadowOffset = 2;
+            this.shadowOffset = 4;
             this.ignoreEvents = false;
             this.locked = false;
         }

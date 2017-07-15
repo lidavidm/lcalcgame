@@ -31,7 +31,7 @@ var mag = function (_) {
             _this._color = "lightgray";
             _this._highlightColor = 'yellow';
             _this.stroke = null;
-            _this.shadowOffset = 2;
+            _this.shadowOffset = 4;
             _this.shadowColor = 'black';
             return _this;
         }

@@ -186,8 +186,8 @@ var Logger = function () {
                 if (__OFFLINE_NAME_PROMPT) currentUserID = window.prompt('Welcome! Please enter your name.', 'unknown');else if (pub.playerId) currentUserID = pub.playerId;else currentUserID = Date.now();
                 currentSessionID = Date.now();
 
-                if (!cond) {
-                    cond = Math.random() < 0.5 ? 'A' : 'B';
+                if (!cond || cond === 'B') {
+                    cond = 'A'; //(Math.random() < 0.5 ? 'A' : 'B');
                     storeCookie('cond', cond);
                 }
 

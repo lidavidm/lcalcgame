@@ -513,7 +513,7 @@ class Expression extends mag.RoundedRect {
         this.locked = true;
     }
     unlock() {
-        this.shadowOffset = 2;
+        this.shadowOffset = 4;
         this.ignoreEvents = false;
         this.locked = false;
     }

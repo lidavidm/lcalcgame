@@ -68,33 +68,6 @@ var ExprManager = (function() {
         fade_levels = lvls;
     };
 
-    // var DEFAULT_FADE_PROGRESSION = {
-    //     'var'   : [[19, 30], 30, 42], // should be 9 (along with 'hole' below)
-    //     'reference': [79, 80, 96],
-    //     'reference_display': [80, 96],
-    //     'environment_display': [96],
-    //     //'lambda_abstraction': [98],
-    //     'lambda_abstraction': [1000000],
-    //     'assign': [79, 96],
-    //     'hole'  : [[19, 30], 30, 42],
-    //     'if'    : [26, 45],
-    //     '_b'    : [34],
-    //     '=='    : [1], //[24],
-    //     'true'  : [1], //[46],
-    //     'false' : [1], //[46],
-    //     'bag'   : [51],
-    //     '__'    : [51],
-    //     'primitives' : [66, 72],
-    //     'map'   : [61],
-    //     'repeat': [147],
-    //     'sequence': [118, 145],
-    //     'snappable': [145],
-    //     'number': [129],
-    // };
-    // primitives.forEach((p) => {
-    //     DEFAULT_FADE_PROGRESSION[p] = DEFAULT_FADE_PROGRESSION.primitives;
-    // });
-    // DEFAULT_FADE_PROGRESSION.primitives = undefined;
     const primitives = ['triangle', 'rect', 'star', 'circle', 'diamond'];
     pub.isPrimitive = (str) => {
         return primitives.indexOf(str) > -1;

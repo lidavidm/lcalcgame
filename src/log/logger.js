@@ -186,8 +186,8 @@ var Logger = (function() {
                     currentUserID = Date.now();
                 currentSessionID = Date.now();
 
-                if (!cond) {
-                    cond = (Math.random() < 0.5 ? 'A' : 'B');
+                if (!cond || cond === 'B') {
+                    cond = 'A'; //(Math.random() < 0.5 ? 'A' : 'B');
                     storeCookie('cond', cond);
                 }
 

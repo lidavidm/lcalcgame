@@ -400,7 +400,7 @@ var TypeInTextExpr = function (_TextExpr) {
             } else this.stroke = null;
         };
 
-        var box = new TypeBox(0, 0, 22, _this6.size.h, onCommit, onTextChanged);
+        var box = new TypeBox(0, 0, 52, _this6.size.h, onCommit, onTextChanged);
         box.fontSize = _this6.fontSize;
         _this6.addChild(box);
         _this6.ignoreEvents = false;

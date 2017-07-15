@@ -47,7 +47,7 @@ var Level = function () {
             var varNodesOnBoard = mag.Stage.getNodesWithClass(VarExpr, [], true, this.exprs);
             var varNodesInToolbox = mag.Stage.getNodesWithClass(VarExpr, [], true, this.toolbox);
             var showEnvironment = this.globals && (Object.keys(this.globals.bindings).length > 0 || varNodesOnBoard && varNodesOnBoard.length > 0 || varNodesInToolbox && varNodesInToolbox.length > 0);
-            var envDisplayWidth = showEnvironment ? 0.20 * canvas_screen.w : 0;
+            var envDisplayWidth = showEnvironment ? 0.10 * canvas_screen.w : 0;
 
             GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
 
@@ -930,6 +930,7 @@ var Level = function () {
                     lambdavar.ignoreEvents = false; // makes draggable
                     lambdavar.name = _varname;
                 }
+                console.log('produced', ExprManager.getFadeLevel('var'));
                 return lambdavar;
             } else if (arg.indexOf('$') > -1) {
                 var _varname2 = arg.replace('$', '').replace('_', '');

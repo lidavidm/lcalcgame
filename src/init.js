@@ -1,6 +1,6 @@
 var __SHOW_DEV_INFO = true;
 var __COND = 'unknown';
-const __SHOW_MAINMENU_NAV = false;
+const __SHOW_MAINMENU_NAV = true;
 
 var GLOBAL_DEFAULT_CTX = null;
 var GLOBAL_DEFAULT_SCREENSIZE = null;
@@ -84,15 +84,19 @@ function init() {
                         __COND = userinfo.cond;
 
                         if (userinfo.cond === 'B') {
+                            console.log('condition is B');
                             ExprManager.setDefaultFadeLevel(100);
                             $('#fade_status').text('OFF');
+                        } else {
+                            ExprManager.setDefaultFadeLevel(0);
+                            $('#fade_status').text('ON');
                         }
                     }
 
                     lockFocus();
                     return loadChapterSelect();
 
-                }).then(initBoard);
+                }).then(initChapterSelectMenu);
 
             });
         }
@@ -132,7 +136,6 @@ function clearStage() {
     if (stage) {
         stage.clear();
         stage.invalidate();
-        //delete stage;
         stage = null;
     }
 
@@ -148,13 +151,6 @@ function redraw(stage) {
         stage.draw();
     }
 }
-
-// function initChapterMenu(chapterName) {
-//     canvas = document.getElementById('canvas');
-//     stage = Resource.startChapter(chapterName, canvas);
-//     cur_chapter = chapterName;
-//     redraw(stage);
-// }
 
 function initLevel(levelSelected, levelSelectedIdx) {
     if (stage instanceof ChapterSelectMenu) {
@@ -316,15 +312,6 @@ function initMainMenu() {
         //initBoard();
 
         redraw(stage);
-
-        //Animate.tween(substage, { scale:{x:0.5, y:0.5} }, 1000);
-
-        //Animate.tween(substage, { clip:{ l:0.14, r:0.22, t:0, b:0.11 } }, 1000, (e) => Math.pow(e, 2)).after(() => {
-        //    Animate.tween(substage, { clip:{ l:0, r:1, t:0, b:1 } }, 1000, (e) => Math.pow(e, 2));
-        //});
-
-        //Animate.tween(substage, { clip:{ l:0.14, r:0.22, t:0, b:0.11 },
-        //    pos:{x:stage.boundingSize.w/2 - stage.boundingSize.w*0.14 + stage.boundingSize.w/2, y:stage.boundingSize.h*(1-0.11/2)} }, 1000);
     }
 }
 

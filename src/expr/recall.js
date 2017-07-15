@@ -294,7 +294,7 @@ class TypeInTextExpr extends TextExpr {
                 this.stroke = null;
         };
 
-        let box = new TypeBox(0, 0, 22, this.size.h, onCommit, onTextChanged);
+        let box = new TypeBox(0, 0, 52, this.size.h, onCommit, onTextChanged);
         box.fontSize = this.fontSize;
         this.addChild(box);
         this.ignoreEvents = false;

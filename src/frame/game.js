@@ -37,7 +37,7 @@ class Level {
               (Object.keys(this.globals.bindings).length > 0
                || (varNodesOnBoard && varNodesOnBoard.length > 0)
                || (varNodesInToolbox && varNodesInToolbox.length > 0));
-        const envDisplayWidth = showEnvironment ? 0.20 * canvas_screen.w : 0;
+        const envDisplayWidth = showEnvironment ? 0.10 * canvas_screen.w : 0;
 
         GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
 
@@ -439,6 +439,7 @@ class Level {
                 lambdavar.ignoreEvents = false; // makes draggable
                 lambdavar.name = varname;
             }
+            console.log('produced', (ExprManager.getFadeLevel('var')));
             return lambdavar;
         } else if (arg.indexOf('$') > -1) {
             let varname = arg.replace('$', '').replace('_', '');
