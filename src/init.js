@@ -185,6 +185,8 @@ function initChapterSelectMenu(flyToChapIdx) {
         clearStage();
         prepareCanvas();
         stage = new ChapterSelectMenu(canvas, initLevel, flyToChapIdx);
+        //let lsg = new LevelSelectGrid('Basics', () => {});
+        //stage.add(lsg);
         redraw(stage);
     }
 }

@@ -1,7 +1,5 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -32,7 +30,7 @@ var MenuButton = function (_mag$RoundedRect) {
         t.anchor = { x: 0.5, y: 0.5 };
         t.pos = { x: w / 2, y: h / 2 };
         _this2.text = t;
-        //this.addChild(t);
+        _this2.addChild(t);
 
         _this2.origShadowOffset = 14;
         _this2.shadowOffset = 14;
@@ -49,62 +47,13 @@ var MenuButton = function (_mag$RoundedRect) {
         _this2.clickFunc = onclick;
 
         _this2.pos = { x: x, y: y };
-        _this2.stroke = { color: 'black', lineWidth: 2 };
         return _this2;
     }
 
     _createClass(MenuButton, [{
-        key: 'setColors',
-        value: function setColors(color, textColor, shadowColor, onDownShadowColor) {
-            this.color = color;
-            this.onUpColor = color;
-            this.shadowColor = shadowColor;
-            this.onDownColor = shadowColor;
-            this.onDownShadowColor = onDownShadowColor;
-            this.onUpShadowColor = shadowColor;
-            this.textColor = textColor;
-            this.text.color = textColor;
-        }
-    }, {
-        key: 'showExpandingEffect',
-        value: function showExpandingEffect() {
-            var color = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'white';
-            var dur = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 160;
-
-            var _this3 = this;
-
-            var loop = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-            var loopBreakTime = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 100;
-
-            var rr = new mag.RoundedRect(this.absolutePos.x, this.absolutePos.y, this.absoluteSize.w, this.absoluteSize.h, this.radius);
-            rr.color = null;
-            rr.shadowOffset = 0;
-            rr.anchor = this.anchor;
-            rr.ignoreEvents = true;
-            rr.stroke = { color: color, lineWidth: 4, opacity: 1.0 };
-            this.stage.add(rr);
-            Animate.run(function (elapsed) {
-                //elapsed = elapsed * elapsed;
-                rr.scale = { x: 1 + elapsed, y: 1 + elapsed };
-                rr.stroke.opacity = 1 - elapsed;
-                _this3.stage.draw();
-            }, dur).after(function () {
-                _this3.stage.remove(rr);
-                _this3.stage.draw();
-                if (loop) {
-                    Animate.wait(loopBreakTime).after(function () {
-                        _this3.showExpandingEffect(color, dur, loop, loopBreakTime);
-                    });
-                }
-            });
-        }
-    }, {
         key: 'runButtonClickEffect',
         value: function runButtonClickEffect() {
-            var _this4 = this;
-
-            var shouldFireClickEvent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
+            var _this3 = this;
 
             var rr = new mag.RoundedRect(this.absolutePos.x, this.absolutePos.y, this.absoluteSize.w, this.absoluteSize.h, this.radius);
             rr.color = null;
@@ -117,21 +66,21 @@ var MenuButton = function (_mag$RoundedRect) {
             Animate.chain(function (elapsed) {
                 var c = colorTween(elapsed, [1, 215 / 255.0, 0], [1, 1, 1]);
                 var sc = colorTween(elapsed, [1, 0, 0], [0.8, 0.8, 0.8]);
-                _this4.color = c;
-                _this4.text.color = c;
-                _this4.shadowColor = sc;
-                _this4.stage.draw();
+                _this3.color = c;
+                _this3.text.color = c;
+                _this3.shadowColor = sc;
+                _this3.stage.draw();
             }, 200, null, function (elapsed) {
                 //elapsed = elapsed * elapsed;
                 rr.scale = { x: 1 + elapsed, y: 1 + elapsed };
                 rr.stroke.opacity = 1 - elapsed;
-                _this4.stage.draw();
+                _this3.stage.draw();
             }, 160, function () {
-                _this4.stage.remove(rr);
-                _this4.onmouseleave();
-                _this4.stage.draw();
-                if (_this4.clickFunc && shouldFireClickEvent) {
-                    _this4.clickFunc();
+                _this3.stage.remove(rr);
+                _this3.onmouseleave();
+                _this3.stage.draw();
+                if (_this3.clickFunc) {
+                    _this3.clickFunc();
                 }
             });
         }
@@ -179,7 +128,7 @@ var MenuButton = function (_mag$RoundedRect) {
             if (!this.hits(pos)) return;
             this._pos.y = this._origpos.y;
             this.shadowOffset = this.origShadowOffset;
-            this.runButtonClickEffect(true);
+            this.runButtonClickEffect();
             Animate.wait(50).after(function () {
                 return Resource.play('fatbtn-beep');
             });
@@ -250,27 +199,27 @@ var MainMenu = function (_mag$Stage) {
 
         _classCallCheck(this, MainMenu);
 
-        var _this6 = _possibleConstructorReturn(this, (MainMenu.__proto__ || Object.getPrototypeOf(MainMenu)).call(this, canvas));
+        var _this5 = _possibleConstructorReturn(this, (MainMenu.__proto__ || Object.getPrototypeOf(MainMenu)).call(this, canvas));
 
         var bg = new mag.Rect(0, 0, GLOBAL_DEFAULT_SCREENSIZE.width, GLOBAL_DEFAULT_SCREENSIZE.height);
         bg.color = '#594764';
         bg.pos = zeroPos();
         bg.ignoreEvents = true;
-        _this6.add(bg);
-        _this6.bg = bg;
+        _this5.add(bg);
+        _this5.bg = bg;
 
-        _this6.showStars();
-        _this6.showStarboy(onClickPlay);
+        _this5.showStars();
+        _this5.showStarboy(onClickPlay);
         //this.showTitle();
         //this.showPlayButton(onClickPlay);
         //this.showSettingsButton(onClickSettings);
-        return _this6;
+        return _this5;
     }
 
     _createClass(MainMenu, [{
         key: 'showStars',
         value: function showStars() {
-            var _this7 = this;
+            var _this6 = this;
 
             var NUM_STARS = 70;
             var STARBOY_RECT = { x: GLOBAL_DEFAULT_SCREENSIZE.width / 2.0 - 298 / 1.8 / 2, y: GLOBAL_DEFAULT_SCREENSIZE.height / 2.1 - 385 / 1.8 / 2, w: 298 / 1.8, h: 385 / 1.8 };
@@ -308,7 +257,7 @@ var MainMenu = function (_mag$Stage) {
                 star.opacity = 0.4;
                 var scale = Math.random() * 0.3 + 0.3;
                 star.scale = { x: scale, y: scale };
-                _this7.add(star);
+                _this6.add(star);
                 stars.push(star);
 
                 // Twinkling effect
@@ -353,7 +302,7 @@ var MainMenu = function (_mag$Stage) {
     }, {
         key: 'showStarboy',
         value: function showStarboy(onclick) {
-            var _this8 = this;
+            var _this7 = this;
 
             var bg = this.bg;
             var _this = this;
@@ -384,7 +333,7 @@ var MainMenu = function (_mag$Stage) {
                         onclick();
                     });
                 });
-                _this8.zoom();
+                _this7.zoom();
             });
             starboy.anchor = { x: 0.5, y: 0.5 };
             starboy.pos = { x: GLOBAL_DEFAULT_SCREENSIZE.width / 2.0, y: GLOBAL_DEFAULT_SCREENSIZE.height / 2.1 };
@@ -498,65 +447,14 @@ var LevelCell = function (_MenuButton) {
     }
 
     _createClass(LevelCell, [{
-        key: 'drawPositionsFor',
-        value: function drawPositionsFor(num) {
-            var L = 0.15;
-            var T = L;
-            var R = 1.0 - L;
-            var B = R;
-            var M = 0.5;
-            var MT = (M + T) / 2.0;
-            var MB = (M + B) / 2.0;
-            var ML = (M + L) / 2.0;
-            var MR = (M + R) / 2.0;
-            var MLL = (L + ML) / 2.0;
-            var MRR = (R + MR) / 2.0;
-            var map = {
-                0: [],
-                1: [{ x: M, y: M }],
-                2: [{ x: ML, y: MT }, { x: MR, y: MB }],
-                3: [{ x: MRR, y: MB }, { x: M, y: MT }, { x: MLL, y: MB }]
-            };
-            if (num in map) return map[num];else {
-                //console.error('Dice pos array does not exist for number ' + num + '.');
-                return [];
-            }
-        }
-    }, {
         key: 'lock',
         value: function lock() {
             this.text.text = '🔒';
-            if (!this.hasChild(this.text)) this.addChild(this.text);
             this.color = '#666';
             this.shadowColor = 'gray';
             this.pos = { x: this.pos.x, y: this.pos.y + this.shadowOffset - 8 };
             this.shadowOffset = 8;
             this.ignoreEvents = true;
-        }
-    }, {
-        key: 'markAsIncomplete',
-        value: function markAsIncomplete() {
-            this.setColors('Gold', 'white', 'Orange', 'Red');
-            this.ignoreEvents = false;
-            this.isIncomplete = true;
-            this.stroke.color = 'DarkRed';
-        }
-    }, {
-        key: 'addStars',
-        value: function addStars(num) {
-            var strokeColor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'MediumSeaGreen';
-
-            var positions = this.drawPositionsFor(num);
-            for (var i = 0; i < positions.length; i++) {
-                var rad = 12 - (positions.length - 1) * 3.0;
-                var _star = new mag.Star(this.size.w * positions[i].x, this.size.h * positions[i].y + 2, rad, 5);
-                _star.anchor = { x: 0.5, y: 0.5 };
-                _star.shadowOffset = -2;
-                _star.color = Math.random() > 0.5 ? 'gold' : 'DarkSlateGray';
-                _star.ignoreEvents = true;
-                _star.stroke = { color: strokeColor, lineWidth: 1 };
-                this.addChild(_star);
-            }
         }
     }]);
 
@@ -566,156 +464,85 @@ var LevelCell = function (_MenuButton) {
 var LevelSelectGrid = function (_mag$Rect2) {
     _inherits(LevelSelectGrid, _mag$Rect2);
 
-    function LevelSelectGrid(chapterNameOrLevels, onLevelSelect) {
+    function LevelSelectGrid(chapterName, onLevelSelect) {
         _classCallCheck(this, LevelSelectGrid);
 
-        var _this11 = _possibleConstructorReturn(this, (LevelSelectGrid.__proto__ || Object.getPrototypeOf(LevelSelectGrid)).call(this, 0, 0, 0, 0));
+        var _this10 = _possibleConstructorReturn(this, (LevelSelectGrid.__proto__ || Object.getPrototypeOf(LevelSelectGrid)).call(this, 0, 0, 0, 0));
 
-        _this11.color = null;
-        _this11.loadGrid(chapterNameOrLevels, onLevelSelect);
-        return _this11;
+        _this10.color = null;
+        _this10.showGrid(chapterName, onLevelSelect);
+        return _this10;
     }
 
     _createClass(LevelSelectGrid, [{
         key: 'hide',
         value: function hide(dur) {
-            var _this12 = this;
+            var _this11 = this;
 
-            if (dur > 0) {
-                var _ret2 = function () {
-                    var len = _this12.children.length;
-                    _this12.children.forEach(function (c, i) {
-                        c.opacity = 1;
-                        Animate.tween(c, { scale: { x: 0, y: 0 }, opacity: 0 }, (len - i - 1) * 30).after(function () {
-                            _this12.removeChild(c);
-                        });
-                    });
-                    return {
-                        v: Animate.wait((len - 1) * 30)
-                    };
-                }();
-
-                if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
-            } else {
-                this.children = [];
-                return Animate.wait(0);
-            }
+            var len = this.children.length;
+            this.children.forEach(function (c, i) {
+                c.opacity = 1;
+                Animate.tween(c, { scale: { x: 0, y: 0 }, opacity: 0 }, (len - i - 1) * 30).after(function () {
+                    _this11.removeChild(c);
+                });
+            });
+            return Animate.wait((len - 1) * 30);
         }
     }, {
         key: 'gridSizeForLevelCount',
         value: function gridSizeForLevelCount(n) {
-            if (n <= 8) return 80;else if (n <= 14) return 60;else return 44;
+            if (n <= 8) return 124;else if (n <= 14) return 100;else return 84;
         }
     }, {
-        key: 'show',
-        value: function show() {
-            this.children = [];
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
-
-            try {
-                for (var _iterator = this.cells[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var cell = _step.value;
-
-                    this.addChild(cell);
-                    cell.opacity = 1.0;
-
-                    // Animate cell into position.
-                    cell._animation();
-                }
-            } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
-                    }
-                } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
-                    }
-                }
-            }
-
-            this.update();
-        }
-    }, {
-        key: 'loadGrid',
-        value: function loadGrid(chapterNameOrLevels, onselect) {
-            var _this13 = this;
+        key: 'showGrid',
+        value: function showGrid(chapterName, onselect) {
+            var _this12 = this;
 
             // Layout measurement
-            var levels;
-            if (typeof chapterNameOrLevels === 'string') levels = Resource.levelsForChapter(chapterNameOrLevels);else levels = chapterNameOrLevels.slice();
+            var levels = Resource.levelsForChapter(chapterName);
             var NUM_CELLS = levels[0].length; // total number of cells to fit on the grid
             var CELL_SIZE = this.gridSizeForLevelCount(NUM_CELLS); // width and height of each cell square, in pixels
             var SCREEN_WIDTH = GLOBAL_DEFAULT_SCREENSIZE.width; // the width of the screen to work with
-            var SCREEN_HEIGHT = GLOBAL_DEFAULT_SCREENSIZE.height; // the height of the screen to work with
             var PADDING = 20; // padding between cells
-            var GRID_MARGIN = 200; // margin bounding grid on top, left, and right sides
+            var TOP_MARGIN = 20;
+            var GRID_MARGIN = 80; // margin bounding grid on top, left, and right sides
             var NUM_COLS = Math.trunc((SCREEN_WIDTH - GRID_MARGIN * 2) / (CELL_SIZE + PADDING)); // number of cells that fit horizontally on the screen
             var NUM_ROWS = Math.trunc(NUM_CELLS / NUM_COLS + 1); // number of rows
-            var GRID_LEFTPAD = (SCREEN_WIDTH - ((CELL_SIZE + PADDING) * NUM_COLS + GRID_MARGIN * 2)) / 2.0 + 20;
-            var TOP_MARGIN = SCREEN_HEIGHT / 2.0 - (CELL_SIZE + PADDING) * NUM_ROWS / 2.0;
+            var GRID_LEFTPAD = (SCREEN_WIDTH - ((CELL_SIZE + PADDING) * NUM_COLS + GRID_MARGIN * 2)) / 2.0;
 
             console.log(levels);
             console.log(SCREEN_WIDTH - GRID_MARGIN * 2, CELL_SIZE + PADDING, NUM_CELLS, NUM_COLS, NUM_ROWS);
 
-            var start_idx = levels[1];
             var genClickCallback = function genClickCallback(level_idx) {
                 return function () {
-                    return onselect(levels[0][level_idx], start_idx + level_idx);
+                    return onselect(levels[0][level_idx], levels[1] + level_idx);
                 };
             };
 
             var leftmost = GRID_LEFTPAD + GRID_MARGIN;
             var x = leftmost;
             var y = TOP_MARGIN;
-            this.cells = [];
 
             for (var r = 0; r < NUM_ROWS; r++) {
 
-                var last_row = r === NUM_ROWS - 1;
                 var i = r * NUM_COLS;
 
                 var _loop2 = function _loop2(c) {
 
                     // Create a level cell and add it to the grid.
-                    var cell = new LevelCell(x + CELL_SIZE / 2.0 + (last_row ? (NUM_COLS - NUM_CELLS % NUM_COLS) * (CELL_SIZE + PADDING) / 2.0 : 0), y + CELL_SIZE / 2.0, CELL_SIZE, CELL_SIZE, i.toString(), genClickCallback(i), 'LightGreen', 'Green', 'Green', 'DarkGreen');
-                    //r === 0 ? 'LightGreen' : 'Gold', 'white', r === 0 ? 'Green' : 'Teal', r === 0 ? 'DarkGreen' : 'DarkMagenta');
+                    var cell = new LevelCell(x + CELL_SIZE / 2.0, y + CELL_SIZE / 2.0, CELL_SIZE, CELL_SIZE, i.toString(), genClickCallback(i), r === 0 ? 'LightGreen' : 'Gold', 'white', r === 0 ? 'Green' : 'Teal', r === 0 ? 'DarkGreen' : 'DarkMagenta');
                     cell.onDownColor = r === 0 ? 'YellowGreen' : 'Orange';
                     cell.anchor = { x: 0.5, y: 0.5 };
-
-                    var idx = start_idx + i;
-                    if (idx !== 0 && !completedLevels[idx]) {
-                        if (completedLevels[idx - 1]) {
-                            cell.markAsIncomplete();
-                            cell.addStars(Math.trunc(Math.random() * 3 + 1), 'orange');
-                        } else {
-                            cell.lock();
-                        }
-                    } else {
-                        cell.addStars(Math.trunc(Math.random() * 3 + 1));
-                    }
-
                     //if (i > 5) cell.lock();
-                    _this13.cells.push(cell);
+                    _this12.addChild(cell);
 
-                    var dur = i * 50;
-                    cell._animation = function () {
-                        var _this14 = this;
-
-                        this.scale = { x: 0.0, y: 0 };
-                        Animate.wait(dur).after(function () {
-                            Animate.tween(_this14, { scale: { x: 1, y: 1 } }, 300, function (elapsed) {
-                                return Math.pow(elapsed, 0.5);
-                            }).after(function () {
-                                if (_this14.isIncomplete) _this14.showExpandingEffect('white', 500, true, 2000);
-                            });
+                    // Animate cell into position.
+                    cell.scale = { x: 0.0, y: 0 };
+                    Animate.wait(i * 50).after(function () {
+                        Animate.tween(cell, { scale: { x: 1, y: 1 } }, 300, function (elapsed) {
+                            return Math.pow(elapsed, 0.5);
                         });
-                    };
+                    });
 
                     // Increment x-position.
                     x += CELL_SIZE + PADDING;
@@ -726,9 +553,9 @@ var LevelSelectGrid = function (_mag$Rect2) {
                 };
 
                 for (var c = 0; c < NUM_COLS; c++) {
-                    var _ret3 = _loop2(c);
+                    var _ret2 = _loop2(c);
 
-                    if (_ret3 === 'break') break;
+                    if (_ret2 === 'break') break;
                 }
 
                 if (i >= NUM_CELLS) break;
@@ -749,25 +576,25 @@ var LevelSpot = function (_mag$Circle) {
     function LevelSpot(x, y, r, onclick) {
         _classCallCheck(this, LevelSpot);
 
-        var _this15 = _possibleConstructorReturn(this, (LevelSpot.__proto__ || Object.getPrototypeOf(LevelSpot)).call(this, x, y, r));
+        var _this13 = _possibleConstructorReturn(this, (LevelSpot.__proto__ || Object.getPrototypeOf(LevelSpot)).call(this, x, y, r));
 
-        _this15.color = 'gray';
-        _this15.enabled = false;
-        _this15.shadowOffset = 0;
-        _this15.highlightColor = 'lime';
-        _this15.disabledColor = 'gray';
-        _this15.enabledColor = 'white';
-        _this15.stroke = { color: 'black', lineWidth: 2 };
-        _this15.onclick = onclick;
-        _this15.flashing = false;
+        _this13.color = 'gray';
+        _this13.enabled = false;
+        _this13.shadowOffset = 0;
+        _this13.highlightColor = 'lime';
+        _this13.disabledColor = 'gray';
+        _this13.enabledColor = 'white';
+        _this13.stroke = { color: 'black', lineWidth: 2 };
+        _this13.onclick = onclick;
+        _this13.flashing = false;
 
         var glow = new mag.ImageRect(0, 0, r * 2.5, r * 2.5, 'level-spot-glow');
         glow.anchor = { x: 0.5, y: 0.5 };
         glow.pos = { x: r, y: r };
         glow.ignoreEvents = true;
-        _this15.glow = glow;
-        _this15.glow.parent = _this15;
-        return _this15;
+        _this13.glow = glow;
+        _this13.glow.parent = _this13;
+        return _this13;
     }
 
     _createClass(LevelSpot, [{
@@ -780,7 +607,7 @@ var LevelSpot = function (_mag$Circle) {
     }, {
         key: 'flash',
         value: function flash() {
-            var _this16 = this;
+            var _this14 = this;
 
             this.enabledColor = 'cyan';
             this.color = 'cyan';
@@ -795,23 +622,23 @@ var LevelSpot = function (_mag$Circle) {
             var sound = 0;
             var blink = function blink() {
                 if (_this.cancelBlink) {
-                    _this16.flashing = false;
+                    _this14.flashing = false;
                     return;
                 }
 
-                if (sound == 0 && !_this16.ignoreEvents && _this16.stage && !_this16.stage.invalidated) {
+                if (sound == 0 && !_this14.ignoreEvents && _this14.stage && !_this14.stage.invalidated) {
                     Resource.play('levelspot-scan');
                 }
                 sound = (sound + 1) % 4;
 
-                Animate.tween(_this16.glow, { opacity: 0.1 }, dur, function (e) {
+                Animate.tween(_this14.glow, { opacity: 0.1 }, dur, function (e) {
                     return Math.pow(e, 2);
                 }).after(function () {
                     if (_this.cancelBlink) {
-                        _this16.flashing = false;
+                        _this14.flashing = false;
                         return;
                     }
-                    Animate.tween(_this16.glow, { opacity: 0.6 }, dur, function (e) {
+                    Animate.tween(_this14.glow, { opacity: 0.6 }, dur, function (e) {
                         return Math.pow(e, 0.5);
                     }).after(blink);
                 });
@@ -888,21 +715,21 @@ var PlanetCard = function (_mag$ImageRect2) {
     function PlanetCard(x, y, r, name, planet_image, onclick) {
         _classCallCheck(this, PlanetCard);
 
-        var _this17 = _possibleConstructorReturn(this, (PlanetCard.__proto__ || Object.getPrototypeOf(PlanetCard)).call(this, x, y, r * 2, r * 2, planet_image + '-locked'));
+        var _this15 = _possibleConstructorReturn(this, (PlanetCard.__proto__ || Object.getPrototypeOf(PlanetCard)).call(this, x, y, r * 2, r * 2, planet_image + '-locked'));
 
-        _this17.radius = r;
-        _this17.name = name;
-        _this17.onclick = onclick;
+        _this15.radius = r;
+        _this15.name = name;
+        _this15.onclick = onclick;
 
         // Backing Glow on Mouseover
         var glow = new mag.ImageRect(0, 0, r * 2.5, r * 2.5, 'planet-glow');
         glow.anchor = { x: 0.5, y: 0.5 };
         glow.pos = { x: r, y: r };
         glow.ignoreEvents = true;
-        _this17.glow = glow;
+        _this15.glow = glow;
 
         // Enable backing glow for newly accessible planet
-        _this17.highlighted = false;
+        _this15.highlighted = false;
 
         // Text
         var capitalize = function capitalize(string) {
@@ -912,19 +739,29 @@ var PlanetCard = function (_mag$ImageRect2) {
         t.color = 'white';
         t.anchor = { x: 0.5, y: 0.5 };
         t.pos = { x: r, y: 2 * r + 15 };
-        _this17.text = t;
+        _this15.text = t;
         //this.addChild(t);
 
-        _this17.pts = [];
-        _this17.unitpos = function (pos) {
+        // Level path
+        var path = new ArrowPath();
+        path.stroke.color = 'white';
+        path.stroke.lineDash = [5 * _this15.radius / 120];
+        path.stroke.lineWidth = r / 120;
+        path.drawArrowHead = false;
+        path.ignoreEvents = true;
+        _this15.path = path;
+        _this15.addChild(path);
+
+        _this15.pts = [];
+        _this15.unitpos = function (pos) {
             pos = clonePos(pos);
-            pos.x -= _this17.absolutePos.x;
-            pos.y -= _this17.absolutePos.y;
-            pos.x /= _this17.absoluteSize.w / 2;
-            pos.y /= _this17.absoluteSize.h / 2;
+            pos.x -= _this15.absolutePos.x;
+            pos.y -= _this15.absolutePos.y;
+            pos.x /= _this15.absoluteSize.w / 2;
+            pos.y /= _this15.absoluteSize.h / 2;
             return pos;
         };
-        return _this17;
+        return _this15;
     }
 
     _createClass(PlanetCard, [{
@@ -980,12 +817,12 @@ var PlanetCard = function (_mag$ImageRect2) {
     }, {
         key: 'onmouseenter',
         value: function onmouseenter() {
-            var _this18 = this;
+            var _this16 = this;
 
             this.selected = true;
             this.glow.opacity = this.highlighted ? 0.5 : 0.0;
             Animate.tween(this.glow, { opacity: 1.0 }, 100).after(function () {
-                _this18.glow.opacity = 1;
+                _this16.glow.opacity = 1;
             });
         }
     }, {
@@ -1010,6 +847,37 @@ var PlanetCard = function (_mag$ImageRect2) {
             }
             _get(PlanetCard.prototype.__proto__ || Object.getPrototypeOf(PlanetCard.prototype), 'drawInternal', this).call(this, ctx, pos, boundingSize);
         }
+
+        // Uncomment for drawing curves directly on planets (DEBUG).
+
+    }, {
+        key: 'onmousedown',
+        value: function onmousedown(pos) {
+            pos = this.unitpos(pos);
+            this.pts = [pos];
+            console.warn(pos);
+        }
+    }, {
+        key: 'onmousedrag',
+        value: function onmousedrag(pos) {
+            pos = this.unitpos(pos);
+            if (this.pts.length > 0) {
+                pos.y *= -1;
+                pos.x *= -1;
+                var relpos = fromTo(pos, this.pts[0]);
+                this.pts.push(relpos);
+            }
+        }
+    }, {
+        key: 'onmouseup',
+        value: function onmouseup(pos) {
+            console.log(this.pts.reduce(function (prev, cur) {
+                return prev + '{"x":' + cur.x + ', "y":' + cur.y + '},\n';
+            }, ''));
+            if (this.pts.length > 2) this.setCurve(this.pts);
+            this.pts = [];
+            this.stage.draw();
+        }
     }, {
         key: 'activate',
         value: function activate() {
@@ -1023,6 +891,55 @@ var PlanetCard = function (_mag$ImageRect2) {
             this.active = false;
             this.hideText();
             this.removeChild(this.path);
+        }
+    }, {
+        key: 'activateSpots',
+        value: function activateSpots() {
+            var _this17 = this;
+
+            if (!this.spots) return;
+
+            this.addChild(this.path);
+
+            // Make all spots invisible.
+            this.spots.forEach(function (spot) {
+                spot.opacity = 0;
+                spot.ignoreEvents = true;
+                _this17.addChild(spot);
+            });
+
+            // Animate-in how much of the path is drawn.
+            var dur = 2000;
+            this.path.percentDrawn = 0;
+            Animate.tween(this.path, { percentDrawn: 1.0 }, dur);
+            Animate.run(function (e) {
+                _this17.spots.forEach(function (spot) {
+                    if (spot.relPosAlongPath <= _this17.path.percentDrawn) {
+                        if (spot.opacity === 0) Resource.play('levelspot-activate');
+                        spot.opacity = 1.0;
+                    }
+                });
+            }, dur).after(function () {
+                _this17.spots.forEach(function (spot) {
+                    if (spot.opacity === 0) Resource.play('levelspot-activate');
+                    spot.opacity = 1.0;
+                    spot.ignoreEvents = false;
+                });
+                _this17.path.percentDrawn = 1;
+                _this17.spots[0].enable();
+                _this17.spots[0].flash();
+                Resource.play('fatbtn-beep');
+            });
+        }
+    }, {
+        key: 'deactivateSpots',
+        value: function deactivateSpots() {
+            this.removeChild(this.path);
+
+            this.spots.forEach(function (spot) {
+                spot.opacity = 0;
+                spot.ignoreEvents = true;
+            });
         }
     }, {
         key: 'updateLevelSpots',
@@ -1050,6 +967,15 @@ var PlanetCard = function (_mag$ImageRect2) {
                         spot.enable();
                         spot.flash();
                     }
+            });
+        }
+    }, {
+        key: 'setCurve',
+        value: function setCurve(pts) {
+            var _this18 = this;
+
+            this.path.points = pts.map(function (p) {
+                return { x: p.x * _this18.radius + _this18.radius, y: p.y * _this18.radius + _this18.radius };
             });
         }
     }, {
@@ -1088,51 +1014,29 @@ var PlanetCard = function (_mag$ImageRect2) {
                     });
                 };
             };
-            var cb = function cb(lvl_idx) {
-                return genClickCallback(lvl_idx)();
-            };
 
             var md = new MobileDetect(window.navigator.userAgent);
 
-            // Level grid
-            this.grid = new LevelSelectGrid([Resource.level.slice(this.startLevelIdx, this.endLevelIdx + 1), this.startLevelIdx], cb);
-            // for (let i = 1; i <= NUM_LVLS; i++) {
-            //     let spotpos = this.path.posAlongPath((i-1) / (NUM_LVLS-1));
-            //     let r = 8 * this.radius / 120;
-            //     if (__IS_MOBILE && md.phone()) {
-            //         r = 10 * this.radius / 120;
-            //     }
-            //     let spot = new LevelSpot( spotpos.x, spotpos.y, r, genClickCallback(i-1) );
-            //     spot.anchor = { x:0.5, y:0.5 };
-            //     spot.relPosAlongPath = i / NUM_LVLS;
-            //     spot.levelId = levels[1] + i-1;
-            //     spot.stroke.lineWidth = Math.max(this.radius / 120 * 2, 1.5);
-            //     spot.ignoreEvents = true;
-            //     this.spots.push(spot);
-            //
-            //     if (this.active) this.addChild(spot);
-            // }
-        }
-    }, {
-        key: 'showGrid',
-        value: function showGrid() {
-            if (!this.grid) return;
-            this.stage.add(this.grid);
-            this.grid.show();
-            console.log('showing grid', this.grid, this.stage);
-        }
-    }, {
-        key: 'hideGrid',
-        value: function hideGrid() {
-            var _this20 = this;
+            // Level spots
+            this.spots = [];
+            for (var i = 1; i <= NUM_LVLS; i++) {
+                var spotpos = this.path.posAlongPath((i - 1) / (NUM_LVLS - 1));
+                var r = 8 * this.radius / 120;
+                if (__IS_MOBILE && md.phone()) {
+                    r = 10 * this.radius / 120;
+                }
+                var spot = new LevelSpot(spotpos.x, spotpos.y, r, genClickCallback(i - 1));
+                spot.anchor = { x: 0.5, y: 0.5 };
+                spot.relPosAlongPath = i / NUM_LVLS;
+                spot.levelId = levels[1] + i - 1;
+                spot.stroke.lineWidth = Math.max(this.radius / 120 * 2, 1.5);
+                spot.ignoreEvents = true;
+                this.spots.push(spot);
 
-            var dur = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 500;
+                if (this.active) this.addChild(spot);
+            }
 
-            if (!this.grid) return;
-            var stage = this.stage;
-            this.grid.hide(dur).after(function () {
-                stage.remove(_this20.grid);
-            });
+            this.updateLevelSpots();
         }
     }, {
         key: 'landingPoint',
@@ -1162,20 +1066,20 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
     function ChapterSelectShip() {
         _classCallCheck(this, ChapterSelectShip);
 
-        var _this21 = _possibleConstructorReturn(this, (ChapterSelectShip.__proto__ || Object.getPrototypeOf(ChapterSelectShip)).call(this, 0, 0, 82, 70, 'ship-large'));
+        var _this20 = _possibleConstructorReturn(this, (ChapterSelectShip.__proto__ || Object.getPrototypeOf(ChapterSelectShip)).call(this, 0, 0, 82, 70, 'ship-large'));
 
-        _this21.pointing = { x: 1, y: 0 };
-        _this21.velocity = { x: 0, y: 0 };
+        _this20.pointing = { x: 1, y: 0 };
+        _this20.velocity = { x: 0, y: 0 };
 
-        _this21.planet = null;
+        _this20.planet = null;
 
         var trailWidth = 140;
         var trail = new RainbowTrail(0, 0, trailWidth, 30);
         trail.pos = { x: -trailWidth + 20, y: 20 };
         //trail.anchor = { x:1, y:0 };
-        _this21.trail = trail;
-        _this21.addChild(trail);
-        return _this21;
+        _this20.trail = trail;
+        _this20.addChild(trail);
+        return _this20;
     }
 
     // Fly to another planet. (entire sequence)
@@ -1184,7 +1088,7 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
     _createClass(ChapterSelectShip, [{
         key: 'flyToPlanet',
         value: function flyToPlanet(stage, startPlanet, endPlanet) {
-            var _this22 = this;
+            var _this21 = this;
 
             // Hide the local ships and make the world ship
             // the only ship visible.
@@ -1232,12 +1136,12 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
             stage.add(starParent);
 
             for (var i = 0; i < 120; i++) {
-                var _star2 = new MenuStar();
-                _star2.pos = randomPointInRect({ x: 0, y: 0, w: stage.boundingSize.w, h: stage.boundingSize.h });
+                var _star = new MenuStar();
+                _star.pos = randomPointInRect({ x: 0, y: 0, w: stage.boundingSize.w, h: stage.boundingSize.h });
                 var _scale = Math.random() * 0.2 + 0.1;
-                _star2.scale = { x: _scale, y: _scale };
-                starParent.addChild(_star2);
-                stars.push(_star2);
+                _star.scale = { x: _scale, y: _scale };
+                starParent.addChild(_star);
+                stars.push(_star);
             }
 
             // The initial launch
@@ -1246,30 +1150,30 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
             }, 1000));
             var del = 0;
             var launchTrail = promisify(Animate.run(function (e) {
-                _this22.trail.opacity = Math.min(0.4, Math.pow(e, 0.05));
-                _this22.trail.time += (e - del) * 4000;
+                _this21.trail.opacity = Math.min(0.4, Math.pow(e, 0.05));
+                _this21.trail.time += (e - del) * 4000;
                 del = e;
             }, 1250));
 
             return launch.then(function () {
-                var p = _this22.absolutePos;
-                stage.planetParent.removeChild(_this22);
-                stage.add(_this22);
-                _this22.pos = p;
-                _this22.parent = null;
+                var p = _this21.absolutePos;
+                stage.planetParent.removeChild(_this21);
+                stage.add(_this21);
+                _this21.pos = p;
+                _this21.parent = null;
 
-                _this22.image = 'ship-large-starboy';
+                _this21.image = 'ship-large-starboy';
 
-                var rotate = promisify(Animate.tween(_this22, {
+                var rotate = promisify(Animate.tween(_this21, {
                     rotation: 0
                 }, 600));
 
                 // Zoom in on Starchild
-                var zoomShip = promisify(Animate.tween(_this22, {
+                var zoomShip = promisify(Animate.tween(_this21, {
                     scale: { x: 5, y: 5 },
                     pos: {
-                        x: stage.boundingSize.w / 2 - 2.5 * _this22.size.w,
-                        y: stage.boundingSize.h / 2 - 2.5 * _this22.size.h
+                        x: stage.boundingSize.w / 2 - 2.5 * _this21.size.w,
+                        y: stage.boundingSize.h / 2 - 2.5 * _this21.size.h
                     }
                 }, 600));
 
@@ -1290,12 +1194,12 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
                 return Promise.all([zoomShip, zoom, launchTrail, fadeOutStars, fadeInStars]);
             }).then(function () {
                 // Prepare for ignition
-                _this22.trail.time = 0;
-                return promisify(Animate.tween(_this22.trail, {
+                _this21.trail.time = 0;
+                return promisify(Animate.tween(_this21.trail, {
                     opacity: 0,
                     time: 500
                 }, 300)).then(function () {
-                    return promisify(Animate.tween(_this22.trail, {
+                    return promisify(Animate.tween(_this21.trail, {
                         opacity: 1.0,
                         time: 2500
                     }, 200));
@@ -1303,7 +1207,7 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
             }).then(function () {
                 // Enter warp space!
                 var mask = new Mask(0, 0, 0.01, "#FFFFFF");
-                _this22.stage.add(mask);
+                _this21.stage.add(mask);
 
                 var flash = after(200).then(function () {
                     return promisify(Animate.tween(mask, {
@@ -1314,18 +1218,18 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
                         opacity: 0.0
                     }, 100));
                 }).then(function () {
-                    return _this22.stage.remove(mask);
+                    return _this21.stage.remove(mask);
                 });
 
-                var jumpForward = promisify(Animate.tween(_this22, {
-                    pos: addPos(_this22.pos, { x: 300, y: 0 })
+                var jumpForward = promisify(Animate.tween(_this21, {
+                    pos: addPos(_this21.pos, { x: 300, y: 0 })
                 }, 300));
 
                 return jumpForward;
             }).then(function () {
                 // Cruising along
-                var jumpBack = promisify(Animate.tween(_this22, {
-                    pos: addPos(_this22.pos, { x: -300, y: 0 })
+                var jumpBack = promisify(Animate.tween(_this21, {
+                    pos: addPos(_this21.pos, { x: -300, y: 0 })
                 }, 1000));
 
                 var origSize = stars[0].size;
@@ -1343,7 +1247,7 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
 
                 var t0 = 0;
                 var flying = promisify(Animate.run(function (t1) {
-                    _this22.trail.time += 8000 * (t1 - t0);
+                    _this21.trail.time += 8000 * (t1 - t0);
 
                     var dx = 15000 * (t1 - t0);
                     if (t1 > deceleration) dx *= -4 * t1 + 4;
@@ -1364,12 +1268,12 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
                 return Promise.all([flying, slowing]);
             }).then(function () {
                 // Come out of warp space
-                var turnOffEngine = promisify(Animate.tween(_this22.trail, {
+                var turnOffEngine = promisify(Animate.tween(_this21.trail, {
                     opacity: 0
                 }, 400));
 
                 // Zoom back out
-                var zoomShip = promisify(Animate.tween(_this22, {
+                var zoomShip = promisify(Animate.tween(_this21, {
                     scale: { x: endScale, y: endScale },
                     pos: aboveOrbitDest
                 }, 600));
@@ -1383,7 +1287,7 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
                 }, 400));
 
                 var rotate = after(400).then(function () {
-                    return promisify(Animate.tween(_this22, {
+                    return promisify(Animate.tween(_this21, {
                         rotation: -Math.PI / 2
                     }, 600));
                 });
@@ -1394,17 +1298,17 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
 
                 return Promise.all([turnOffEngine, rotate, zoomShip, zoom, fadeOutStars, fadeInStars]);
             }).then(function () {
-                _this22.image = 'ship-large';
-                stage.remove(_this22);
-                stage.planetParent.addChild(_this22);
-                _this22.pos = relativeAboveOrbitDest;
-                var land = promisify(Animate.tween(_this22, {
+                _this21.image = 'ship-large';
+                stage.remove(_this21);
+                stage.planetParent.addChild(_this21);
+                _this21.pos = relativeAboveOrbitDest;
+                var land = promisify(Animate.tween(_this21, {
                     pos: dest
                 }, 1000));
                 return land;
             }).then(function () {
                 stage.planetParent.ignoreEvents = false;
-                endPlanet.showShip(_this22);
+                endPlanet.showShip(_this21);
                 stage.remove(starParent);
             });
         }
@@ -1421,11 +1325,11 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
     }, {
         key: 'launch',
         value: function launch() {
-            var _this23 = this;
+            var _this22 = this;
 
             this.planet = null;
             return new Promise(function (resolve, reject) {
-                _this23.moveTo(addPos(_this23.pos, { x: 0, y: -20 }), 1000).then(resolve);
+                _this22.moveTo(addPos(_this22.pos, { x: 0, y: -20 }), 1000).then(resolve);
             });
         }
 
@@ -1434,7 +1338,7 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
     }, {
         key: 'rotateTo',
         value: function rotateTo(angle) {
-            var _this24 = this;
+            var _this23 = this;
 
             var dur = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1000;
             var smoothFunc = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function (e) {
@@ -1442,7 +1346,7 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
             };
 
             return new Promise(function (resolve, reject) {
-                Animate.tween(_this24, { rotation: angle }, dur, smoothFunc).after(resolve);
+                Animate.tween(_this23, { rotation: angle }, dur, smoothFunc).after(resolve);
             });
         }
 
@@ -1451,7 +1355,7 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
     }, {
         key: 'moveTo',
         value: function moveTo(dest) {
-            var _this25 = this;
+            var _this24 = this;
 
             var dur = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1000;
             var smoothFunc = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function (e) {
@@ -1459,7 +1363,7 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
             };
 
             return new Promise(function (resolve, reject) {
-                Animate.tween(_this25, { pos: clonePos(dest) }, dur, smoothFunc).after(function () {
+                Animate.tween(_this24, { pos: clonePos(dest) }, dur, smoothFunc).after(function () {
                     resolve();
                 });
             });
@@ -1470,11 +1374,11 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
     }, {
         key: 'land',
         value: function land(dest) {
-            var _this26 = this;
+            var _this25 = this;
 
             this.trail.opacity = 0;
             return this.rotateTo(-Math.PI / 2.0, 500).then(function () {
-                return _this26.moveTo(dest, 1000);
+                return _this25.moveTo(dest, 1000);
             });
         }
     }, {
@@ -1493,7 +1397,7 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
     }, {
         key: 'flyTo',
         value: function flyTo(dest, onReachingDest) {
-            var _this27 = this;
+            var _this26 = this;
 
             var FORCE = 10;
             var travelDist = distBetweenPos(this.pos, dest);
@@ -1503,8 +1407,8 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
 
             var del = 0;
             Animate.run(function (e) {
-                _this27.trail.opacity = Math.pow(e, 0.5);
-                _this27.trail.time += (e - del) * 8000;
+                _this26.trail.opacity = Math.pow(e, 0.5);
+                _this26.trail.time += (e - del) * 8000;
                 del = e;
             }, DUR);
             this.moveTo(dest, DUR).then(onReachingDest);
@@ -1553,36 +1457,36 @@ var ChapterSelectMenu = function (_mag$Stage2) {
     function ChapterSelectMenu(canvas, onLevelSelect, flyToChapIdx) {
         _classCallCheck(this, ChapterSelectMenu);
 
-        var _this28 = _possibleConstructorReturn(this, (ChapterSelectMenu.__proto__ || Object.getPrototypeOf(ChapterSelectMenu)).call(this, canvas));
+        var _this27 = _possibleConstructorReturn(this, (ChapterSelectMenu.__proto__ || Object.getPrototypeOf(ChapterSelectMenu)).call(this, canvas));
 
-        _this28.md = new MobileDetect(window.navigator.userAgent);
-        _this28.onLevelSelect = onLevelSelect;
+        _this27.md = new MobileDetect(window.navigator.userAgent);
+        _this27.onLevelSelect = onLevelSelect;
 
-        _this28.btn_back = new mag.Button(10, 10, 50, 50, { default: 'btn-back-default', hover: 'btn-back-hover', down: 'btn-back-down' }, function () {
-            _this28.activePlanet = null;
-            _this28.remove(_this28.btn_back);
-            _this28.setPlanetsToDefaultPos(500);
+        _this27.btn_back = new mag.Button(10, 10, 50, 50, { default: 'btn-back-default', hover: 'btn-back-hover', down: 'btn-back-down' }, function () {
+            _this27.activePlanet = null;
+            _this27.remove(_this27.btn_back);
+            _this27.setPlanetsToDefaultPos(500);
             Resource.play('goback');
         });
-        _this28.btn_back.opacity = 0.7;
+        _this27.btn_back.opacity = 0.7;
 
-        _this28.planets = [];
-        _this28.stars = [];
-        _this28.activePlanet = null;
-        _this28.starParent = new mag.Rect(0, 0, 0, 0);
-        _this28.add(_this28.starParent);
+        _this27.planets = [];
+        _this27.stars = [];
+        _this27.activePlanet = null;
+        _this27.starParent = new mag.Rect(0, 0, 0, 0);
+        _this27.add(_this27.starParent);
 
-        _this28.showStarField();
+        _this27.showStarField();
 
-        _this28.onorientationchange();
+        _this27.onorientationchange();
 
-        _this28.showChapters().then(function () {
-            _this28.updateParallax();
+        _this27.showChapters().then(function () {
+            _this27.updateParallax();
 
-            _this28.offset = { x: 0, y: 0 };
-            var lastActivePlanet = _this28.lastActivePlanet;
+            _this27.offset = { x: 0, y: 0 };
+            var lastActivePlanet = _this27.lastActivePlanet;
 
-            _this28.setCameraX(lastActivePlanet.pos.x - 3 * lastActivePlanet.radius);
+            _this27.setCameraX(lastActivePlanet.pos.x - 3 * lastActivePlanet.radius);
 
             var ship = new ChapterSelectShip();
             var shipScale = lastActivePlanet.radius / 120 / 2;
@@ -1592,16 +1496,16 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                 ship.attachToPlanet(lastActivePlanet);
 
                 var minNewPlanetX = 1000000;
-                var _iteratorNormalCompletion2 = true;
-                var _didIteratorError2 = false;
-                var _iteratorError2 = undefined;
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
 
                 try {
                     var _loop3 = function _loop3() {
-                        var chap = _step2.value;
+                        var chap = _step.value;
 
                         var newChapIdx = chap.chapterIdx;
-                        var newPlanet = _this28.planets[newChapIdx];
+                        var newPlanet = _this27.planets[newChapIdx];
                         newPlanet.highlight();
                         newPlanet.activate();
                         newPlanet.deactivateSpots();
@@ -1611,13 +1515,13 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                         newPlanet.onclick = function () {
                             newPlanet.onclick = oldOnClick;
                             newPlanet.removeHighlight();
-                            _this28.remove(ship);
-                            _this28.planetParent.addChild(ship);
+                            _this27.remove(ship);
+                            _this27.planetParent.addChild(ship);
                             var startPlanet = lastActivePlanet;
-                            ship.flyToPlanet(_this28, startPlanet, newPlanet).then(function () {
+                            ship.flyToPlanet(_this27, startPlanet, newPlanet).then(function () {
                                 return new Promise(function (resolve, reject) {
                                     Animate.wait(600).after(function () {
-                                        _this28.planetParent.removeChild(ship);
+                                        _this27.planetParent.removeChild(ship);
                                         resolve();
                                     });
                                 });
@@ -1632,38 +1536,38 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                         };
                     };
 
-                    for (var _iterator2 = flyToChapIdx[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    for (var _iterator = flyToChapIdx[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                         _loop3();
                     }
                 } catch (err) {
-                    _didIteratorError2 = true;
-                    _iteratorError2 = err;
+                    _didIteratorError = true;
+                    _iteratorError = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                            _iterator2.return();
+                        if (!_iteratorNormalCompletion && _iterator.return) {
+                            _iterator.return();
                         }
                     } finally {
-                        if (_didIteratorError2) {
-                            throw _iteratorError2;
+                        if (_didIteratorError) {
+                            throw _iteratorError;
                         }
                     }
                 }
 
-                if (minNewPlanetX + _this28.planetParent.pos.x > 0.8 * _this28.boundingSize.w) {
-                    _this28.setCameraX(minNewPlanetX - 0.8 * _this28.boundingSize.w);
+                if (minNewPlanetX + _this27.planetParent.pos.x > 0.8 * _this27.boundingSize.w) {
+                    _this27.setCameraX(minNewPlanetX - 0.8 * _this27.boundingSize.w);
                 }
             } else {
                 ship.attachToPlanet(lastActivePlanet);
             }
         });
-        return _this28;
+        return _this27;
     }
 
     _createClass(ChapterSelectMenu, [{
         key: 'reset',
         value: function reset() {
-            var _this29 = this;
+            var _this28 = this;
 
             this.panningEnabled = true;
             this.starParent.children = [];
@@ -1672,10 +1576,10 @@ var ChapterSelectMenu = function (_mag$Stage2) {
             if (!lastActivePlanet) return;
             this.remove(this.btn_back);
             this.setPlanetsToDefaultPos(0).then(function () {
-                _this29.setCameraX(lastActivePlanet.pos.x - 3 * lastActivePlanet.radius);
+                _this28.setCameraX(lastActivePlanet.pos.x - 3 * lastActivePlanet.radius);
 
-                if (_this29.activePlanet) {
-                    _this29.activatePlanet(_this29.activePlanet, 0);
+                if (_this28.activePlanet) {
+                    _this28.activatePlanet(_this28.activePlanet, 0);
                 }
             });
         }
@@ -1768,11 +1672,11 @@ var ChapterSelectMenu = function (_mag$Stage2) {
     }, {
         key: 'showStarField',
         value: function showStarField() {
-            var _this30 = this;
+            var _this29 = this;
 
             var NUM_STARS = 120;
             var genRandomPt = function genRandomPt() {
-                return randomPointInRect({ x: 0, y: 0, w: 1.5 * _this30.boundingSize.w, h: _this30.boundingSize.h });
+                return randomPointInRect({ x: 0, y: 0, w: 1.5 * _this29.boundingSize.w, h: _this29.boundingSize.h });
             };
 
             var starParent = this.starParent;
@@ -1810,14 +1714,14 @@ var ChapterSelectMenu = function (_mag$Stage2) {
     }, {
         key: 'setPlanetsToDefaultPos',
         value: function setPlanetsToDefaultPos(dur) {
-            var _this31 = this;
+            var _this30 = this;
 
             var stage = this;
             this.panningEnabled = true;
 
             return Resource.getChapterGraph().then(function (chapters) {
-                var maxPlanetX = _this31.boundingSize.w;
-                var POS_MAP = layoutPlanets(chapters.transitions, _this31.boundingSize);
+                var maxPlanetX = _this30.boundingSize.w;
+                var POS_MAP = layoutPlanets(chapters.transitions, _this30.boundingSize);
                 stage.planets.forEach(function (p, i) {
                     maxPlanetX = Math.max(maxPlanetX, POS_MAP[i].x + p.radius);
                     p.ignoreEvents = false;
@@ -1828,12 +1732,11 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                     if (!stage.planetParent.hasChild(p)) stage.planetParent.addChild(p);
                     if (p.active) p.showText();
                     var rad = POS_MAP[i].r;
-                    p.hideGrid(0);
                     Animate.tween(p, { pos: { x: POS_MAP[i].x, y: POS_MAP[i].y }, scale: { x: 1, y: 1 }, opacity: 1.0 }, dur).after(function () {
                         if (p.active) p.showText();
                     });
                 });
-                _this31.maxPlanetX = maxPlanetX;
+                _this30.maxPlanetX = maxPlanetX;
             });
         }
     }, {
@@ -1847,7 +1750,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
     }, {
         key: 'activatePlanet',
         value: function activatePlanet(planet) {
-            var _this32 = this;
+            var _this31 = this;
 
             var durationMultiplier = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1.0;
 
@@ -1864,15 +1767,15 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                 if (planet.onclick) planet.expandFunc = planet.onclick;
                 planet.onclick = null;
                 planet.hideText();
-                var r = Math.min(_this32.boundingSize.w / 2.2, _this32.boundingSize.h / 2.2);
+                var r = Math.min(_this31.boundingSize.w / 2.2, _this31.boundingSize.h / 2.2);
                 var center = {
-                    x: _this32.boundingSize.w / 2.0,
-                    y: _this32.boundingSize.h / 2.0
+                    x: _this31.boundingSize.w / 2.0,
+                    y: _this31.boundingSize.h / 2.0
                 };
                 // Account for camera
                 center = addPos(center, {
-                    x: -_this32.planetParent.pos.x,
-                    y: -_this32.planetParent.pos.y
+                    x: -_this31.planetParent.pos.x,
+                    y: -_this31.planetParent.pos.y
                 });
                 stage.bringToFront(planet);
 
@@ -1880,13 +1783,14 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                 Animate.tween(planet, { scale: { x: scale, y: scale }, pos: center }, durationMultiplier * 1000, function (elapsed) {
                     return Math.pow(elapsed, 3);
                 }).after(function () {
-                    planet.showGrid();
+                    if (planet.spots) planet.spots.forEach(function (s) {
+                        s.ignoreEvents = false;
+                    });
                 });
             };
             var hide = function hide(planet) {
                 planet.opacity = 1.0;
                 planet.hideText();
-                planet.hideGrid();
                 if (planet.spots) planet.spots.forEach(function (s) {
                     s.ignoreEvents = true;
                 });
@@ -1908,7 +1812,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                 Resource.play('zoomin');
             }
             Animate.wait(durationMultiplier * 500).after(function () {
-                _this32.add(_this32.btn_back);
+                _this31.add(_this31.btn_back);
             });
 
             return new Promise(function (resolve, reject) {
@@ -1918,7 +1822,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
     }, {
         key: 'showChapters',
         value: function showChapters() {
-            var _this33 = this;
+            var _this32 = this;
 
             // Expand and disappear animations.
             var stage = this;
@@ -1926,7 +1830,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
             // Each chapter is a 'Planet' in Starboy's Universe:
             return Resource.getChapterGraph().then(function (chapters) {
                 var planets = [];
-                var POS_MAP = layoutPlanets(chapters.transitions, _this33.boundingSize);
+                var POS_MAP = layoutPlanets(chapters.transitions, _this32.boundingSize);
 
                 var planetParent = new mag.Rect(0, 0, 0, 0);
 
@@ -1935,15 +1839,18 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                     var planet = new PlanetCard(pos.x, pos.y, pos.r, chap.name, chap.resources ? chap.resources.planet : 'planet-bagbag');
 
                     planet.color = 'white';
-                    // if (i === 1) planet.path.stroke.color = 'gray';
+                    if (i === 1) planet.path.stroke.color = 'gray';
                     planet.anchor = { x: 0.5, y: 0.5 };
                     planet.shadowOffset = 0;
                     planet.onclick = function () {
-                        _this33.activatePlanet(planet);
+                        _this32.activatePlanet(planet);
                     };
 
                     if (chap.resources) {
                         var levels = Resource.levelsForChapter(chap.name);
+
+                        // Set path curve on planet.
+                        planet.setCurve(chap.resources.curve);
 
                         // Activate planet if applicable
                         if (Resource.isChapterUnlocked(i)) {
@@ -1952,36 +1859,36 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                             planet.deactivate();
                         }
 
-                        // Set levels for planet.
-                        planet.setLevels(levels, _this33.onLevelSelect);
+                        // Set levels along curve.
+                        planet.setLevels(levels, _this32.onLevelSelect);
                     }
 
                     planetParent.addChild(planet);
                     planets.push(planet);
                 });
-                _this33.add(planetParent);
-                _this33.planetParent = planetParent;
+                _this32.add(planetParent);
+                _this32.planetParent = planetParent;
 
                 var transitionMap = {};
                 chapters.chapters.forEach(function (chap, i) {
                     transitionMap[chap.key] = i;
                 });
 
-                _this33.planets = planets;
-                _this33.setPlanetsToDefaultPos();
+                _this32.planets = planets;
+                _this32.setPlanetsToDefaultPos();
             });
         }
     }, {
         key: 'lastActivePlanet',
         get: function get() {
             var lastActivePlanet = void 0;
-            var _iteratorNormalCompletion3 = true;
-            var _didIteratorError3 = false;
-            var _iteratorError3 = undefined;
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
 
             try {
-                for (var _iterator3 = this.planets[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    var _planet = _step3.value;
+                for (var _iterator2 = this.planets[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var _planet = _step2.value;
 
                     if (_planet.active && level_idx >= _planet.startLevelIdx && level_idx <= _planet.endLevelIdx) {
                         lastActivePlanet = _planet;
@@ -1989,44 +1896,44 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                     }
                 }
             } catch (err) {
-                _didIteratorError3 = true;
-                _iteratorError3 = err;
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                        _iterator3.return();
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
                     }
                 } finally {
-                    if (_didIteratorError3) {
-                        throw _iteratorError3;
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
                     }
                 }
             }
 
             if (!lastActivePlanet) {
-                var _iteratorNormalCompletion4 = true;
-                var _didIteratorError4 = false;
-                var _iteratorError4 = undefined;
+                var _iteratorNormalCompletion3 = true;
+                var _didIteratorError3 = false;
+                var _iteratorError3 = undefined;
 
                 try {
-                    for (var _iterator4 = this.planets[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                        var planet = _step4.value;
+                    for (var _iterator3 = this.planets[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                        var planet = _step3.value;
 
                         if (planet.active) {
                             lastActivePlanet = planet;
                         }
                     }
                 } catch (err) {
-                    _didIteratorError4 = true;
-                    _iteratorError4 = err;
+                    _didIteratorError3 = true;
+                    _iteratorError3 = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                            _iterator4.return();
+                        if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                            _iterator3.return();
                         }
                     } finally {
-                        if (_didIteratorError4) {
-                            throw _iteratorError4;
+                        if (_didIteratorError3) {
+                            throw _iteratorError3;
                         }
                     }
                 }
@@ -2072,13 +1979,13 @@ function layoutPlanets(adjacencyList, boundingSize) {
     // Perform a topological sort of the planets to get a layout
     var sorted = topologicalSort(adjacencyList);
     var groups = [[]];
-    var _iteratorNormalCompletion5 = true;
-    var _didIteratorError5 = false;
-    var _iteratorError5 = undefined;
+    var _iteratorNormalCompletion4 = true;
+    var _didIteratorError4 = false;
+    var _iteratorError4 = undefined;
 
     try {
-        for (var _iterator5 = sorted[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-            var group = _step5.value;
+        for (var _iterator4 = sorted[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+            var group = _step4.value;
 
             if (group.length === 1) {
                 groups[groups.length - 1] = groups[groups.length - 1].concat(group);
@@ -2088,16 +1995,16 @@ function layoutPlanets(adjacencyList, boundingSize) {
             }
         }
     } catch (err) {
-        _didIteratorError5 = true;
-        _iteratorError5 = err;
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
     } finally {
         try {
-            if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                _iterator5.return();
+            if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                _iterator4.return();
             }
         } finally {
-            if (_didIteratorError5) {
-                throw _iteratorError5;
+            if (_didIteratorError4) {
+                throw _iteratorError4;
             }
         }
     }
@@ -2109,13 +2016,13 @@ function layoutPlanets(adjacencyList, boundingSize) {
     var startX = 20;
     var startY = 20;
     var subgroups = [];
-    var _iteratorNormalCompletion6 = true;
-    var _didIteratorError6 = false;
-    var _iteratorError6 = undefined;
+    var _iteratorNormalCompletion5 = true;
+    var _didIteratorError5 = false;
+    var _iteratorError5 = undefined;
 
     try {
-        for (var _iterator6 = groups[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-            var _group = _step6.value;
+        for (var _iterator5 = groups[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+            var _group = _step5.value;
 
             if (_group.length > MAX_GROUP_SIZE) {
                 var numSubgroups = Math.ceil(_group.length / MAX_GROUP_SIZE);
@@ -2135,13 +2042,13 @@ function layoutPlanets(adjacencyList, boundingSize) {
                 subgroups = [_group];
             }
 
-            var _iteratorNormalCompletion7 = true;
-            var _didIteratorError7 = false;
-            var _iteratorError7 = undefined;
+            var _iteratorNormalCompletion6 = true;
+            var _didIteratorError6 = false;
+            var _iteratorError6 = undefined;
 
             try {
-                for (var _iterator7 = subgroups[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-                    var _subgroup = _step7.value;
+                for (var _iterator6 = subgroups[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                    var _subgroup = _step6.value;
 
                     var boundingArea = {
                         x: startX,
@@ -2154,27 +2061,27 @@ function layoutPlanets(adjacencyList, boundingSize) {
                     positions = positions.concat(sublayout);
 
                     var maxOffset = 0;
-                    var _iteratorNormalCompletion8 = true;
-                    var _didIteratorError8 = false;
-                    var _iteratorError8 = undefined;
+                    var _iteratorNormalCompletion7 = true;
+                    var _didIteratorError7 = false;
+                    var _iteratorError7 = undefined;
 
                     try {
-                        for (var _iterator8 = sublayout[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-                            var _cell = _step8.value;
+                        for (var _iterator7 = sublayout[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                            var _cell = _step7.value;
 
                             maxOffset = Math.max(maxOffset, _cell.x + _cell.r - boundingArea.x);
                         }
                     } catch (err) {
-                        _didIteratorError8 = true;
-                        _iteratorError8 = err;
+                        _didIteratorError7 = true;
+                        _iteratorError7 = err;
                     } finally {
                         try {
-                            if (!_iteratorNormalCompletion8 && _iterator8.return) {
-                                _iterator8.return();
+                            if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                                _iterator7.return();
                             }
                         } finally {
-                            if (_didIteratorError8) {
-                                throw _iteratorError8;
+                            if (_didIteratorError7) {
+                                throw _iteratorError7;
                             }
                         }
                     }
@@ -2182,31 +2089,31 @@ function layoutPlanets(adjacencyList, boundingSize) {
                     startX += maxOffset;
                 }
             } catch (err) {
-                _didIteratorError7 = true;
-                _iteratorError7 = err;
+                _didIteratorError6 = true;
+                _iteratorError6 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion7 && _iterator7.return) {
-                        _iterator7.return();
+                    if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                        _iterator6.return();
                     }
                 } finally {
-                    if (_didIteratorError7) {
-                        throw _iteratorError7;
+                    if (_didIteratorError6) {
+                        throw _iteratorError6;
                     }
                 }
             }
         }
     } catch (err) {
-        _didIteratorError6 = true;
-        _iteratorError6 = err;
+        _didIteratorError5 = true;
+        _iteratorError5 = err;
     } finally {
         try {
-            if (!_iteratorNormalCompletion6 && _iterator6.return) {
-                _iterator6.return();
+            if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                _iterator5.return();
             }
         } finally {
-            if (_didIteratorError6) {
-                throw _iteratorError6;
+            if (_didIteratorError5) {
+                throw _iteratorError5;
             }
         }
     }
@@ -2316,15 +2223,64 @@ function topologicalSort(adjacencyList) {
     var result = [];
 
     var dependencies = {};
+    var _iteratorNormalCompletion8 = true;
+    var _didIteratorError8 = false;
+    var _iteratorError8 = undefined;
+
+    try {
+        for (var _iterator8 = Object.keys(adjacencyList)[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+            var src = _step8.value;
+
+            dependencies[src] = {};
+        }
+    } catch (err) {
+        _didIteratorError8 = true;
+        _iteratorError8 = err;
+    } finally {
+        try {
+            if (!_iteratorNormalCompletion8 && _iterator8.return) {
+                _iterator8.return();
+            }
+        } finally {
+            if (_didIteratorError8) {
+                throw _iteratorError8;
+            }
+        }
+    }
+
     var _iteratorNormalCompletion9 = true;
     var _didIteratorError9 = false;
     var _iteratorError9 = undefined;
 
     try {
         for (var _iterator9 = Object.keys(adjacencyList)[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-            var src = _step9.value;
+            var _src = _step9.value;
 
-            dependencies[src] = {};
+            var dsts = adjacencyList[_src];
+            var _iteratorNormalCompletion13 = true;
+            var _didIteratorError13 = false;
+            var _iteratorError13 = undefined;
+
+            try {
+                for (var _iterator13 = dsts[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
+                    var _dst2 = _step13.value;
+
+                    dependencies[_dst2][_src] = true;
+                }
+            } catch (err) {
+                _didIteratorError13 = true;
+                _iteratorError13 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion13 && _iterator13.return) {
+                        _iterator13.return();
+                    }
+                } finally {
+                    if (_didIteratorError13) {
+                        throw _iteratorError13;
+                    }
+                }
+            }
         }
     } catch (err) {
         _didIteratorError9 = true;
@@ -2341,70 +2297,75 @@ function topologicalSort(adjacencyList) {
         }
     }
 
-    var _iteratorNormalCompletion10 = true;
-    var _didIteratorError10 = false;
-    var _iteratorError10 = undefined;
-
-    try {
-        for (var _iterator10 = Object.keys(adjacencyList)[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
-            var _src = _step10.value;
-
-            var dsts = adjacencyList[_src];
-            var _iteratorNormalCompletion14 = true;
-            var _didIteratorError14 = false;
-            var _iteratorError14 = undefined;
-
-            try {
-                for (var _iterator14 = dsts[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
-                    var _dst2 = _step14.value;
-
-                    dependencies[_dst2][_src] = true;
-                }
-            } catch (err) {
-                _didIteratorError14 = true;
-                _iteratorError14 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion14 && _iterator14.return) {
-                        _iterator14.return();
-                    }
-                } finally {
-                    if (_didIteratorError14) {
-                        throw _iteratorError14;
-                    }
-                }
-            }
-        }
-    } catch (err) {
-        _didIteratorError10 = true;
-        _iteratorError10 = err;
-    } finally {
-        try {
-            if (!_iteratorNormalCompletion10 && _iterator10.return) {
-                _iterator10.return();
-            }
-        } finally {
-            if (_didIteratorError10) {
-                throw _iteratorError10;
-            }
-        }
-    }
-
     while (true) {
         var found = [];
-        var _iteratorNormalCompletion11 = true;
-        var _didIteratorError11 = false;
-        var _iteratorError11 = undefined;
+        var _iteratorNormalCompletion10 = true;
+        var _didIteratorError10 = false;
+        var _iteratorError10 = undefined;
 
         try {
-            for (var _iterator11 = Object.keys(dependencies)[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
-                var dst = _step11.value;
+            for (var _iterator10 = Object.keys(dependencies)[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+                var dst = _step10.value;
 
                 var deps = dependencies[dst];
                 if (Object.keys(deps).length === 0) {
                     found.push(dst);
                 }
             }
+        } catch (err) {
+            _didIteratorError10 = true;
+            _iteratorError10 = err;
+        } finally {
+            try {
+                if (!_iteratorNormalCompletion10 && _iterator10.return) {
+                    _iterator10.return();
+                }
+            } finally {
+                if (_didIteratorError10) {
+                    throw _iteratorError10;
+                }
+            }
+        }
+
+        if (found.length === 0) break;
+
+        var _iteratorNormalCompletion11 = true;
+        var _didIteratorError11 = false;
+        var _iteratorError11 = undefined;
+
+        try {
+            for (var _iterator11 = found[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+                var _dst = _step11.value;
+                var _iteratorNormalCompletion12 = true;
+                var _didIteratorError12 = false;
+                var _iteratorError12 = undefined;
+
+                try {
+                    for (var _iterator12 = Object.keys(dependencies)[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+                        var key = _step12.value;
+
+                        var _deps = dependencies[key];
+                        delete _deps[_dst];
+                    }
+                } catch (err) {
+                    _didIteratorError12 = true;
+                    _iteratorError12 = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion12 && _iterator12.return) {
+                            _iterator12.return();
+                        }
+                    } finally {
+                        if (_didIteratorError12) {
+                            throw _iteratorError12;
+                        }
+                    }
+                }
+
+                delete dependencies[_dst];
+            }
+
+            // Sort the list to give us a deterministic order
         } catch (err) {
             _didIteratorError11 = true;
             _iteratorError11 = err;
@@ -2416,60 +2377,6 @@ function topologicalSort(adjacencyList) {
             } finally {
                 if (_didIteratorError11) {
                     throw _iteratorError11;
-                }
-            }
-        }
-
-        if (found.length === 0) break;
-
-        var _iteratorNormalCompletion12 = true;
-        var _didIteratorError12 = false;
-        var _iteratorError12 = undefined;
-
-        try {
-            for (var _iterator12 = found[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
-                var _dst = _step12.value;
-                var _iteratorNormalCompletion13 = true;
-                var _didIteratorError13 = false;
-                var _iteratorError13 = undefined;
-
-                try {
-                    for (var _iterator13 = Object.keys(dependencies)[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
-                        var key = _step13.value;
-
-                        var _deps = dependencies[key];
-                        delete _deps[_dst];
-                    }
-                } catch (err) {
-                    _didIteratorError13 = true;
-                    _iteratorError13 = err;
-                } finally {
-                    try {
-                        if (!_iteratorNormalCompletion13 && _iterator13.return) {
-                            _iterator13.return();
-                        }
-                    } finally {
-                        if (_didIteratorError13) {
-                            throw _iteratorError13;
-                        }
-                    }
-                }
-
-                delete dependencies[_dst];
-            }
-
-            // Sort the list to give us a deterministic order
-        } catch (err) {
-            _didIteratorError12 = true;
-            _iteratorError12 = err;
-        } finally {
-            try {
-                if (!_iteratorNormalCompletion12 && _iterator12.return) {
-                    _iterator12.return();
-                }
-            } finally {
-                if (_didIteratorError12) {
-                    throw _iteratorError12;
                 }
             }
         }
@@ -2491,15 +2398,15 @@ var Mask = function (_mag$Rect3) {
 
         // cx, cy are in % of context width/height
 
-        var _this34 = _possibleConstructorReturn(this, (Mask.__proto__ || Object.getPrototypeOf(Mask)).call(this, 0, 0, 0, 0));
+        var _this33 = _possibleConstructorReturn(this, (Mask.__proto__ || Object.getPrototypeOf(Mask)).call(this, 0, 0, 0, 0));
 
-        _this34.cx = cx;
-        _this34.cy = cy;
-        _this34.radius = r;
-        _this34.opacity = 0.0;
-        _this34.ringControl = 0;
-        _this34.color = color;
-        return _this34;
+        _this33.cx = cx;
+        _this33.cy = cy;
+        _this33.radius = r;
+        _this33.opacity = 0.0;
+        _this33.ringControl = 0;
+        _this33.color = color;
+        return _this33;
     }
 
     _createClass(Mask, [{

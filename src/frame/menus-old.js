@@ -7,7 +7,7 @@ class MenuButton extends mag.RoundedRect {
         t.anchor = { x:0.5, y:0.5 };
         t.pos = { x:w/2, y:h/2 };
         this.text = t;
-        //this.addChild(t);
+        this.addChild(t);
 
         this.origShadowOffset = 14;
         this.shadowOffset = 14;
@@ -24,17 +24,6 @@ class MenuButton extends mag.RoundedRect {
         this.clickFunc = onclick;
 
         this.pos = { x:x, y:y };
-        this.stroke = {color:'black', lineWidth:2};
-    }
-    setColors(color, textColor, shadowColor, onDownShadowColor) {
-        this.color = color;
-        this.onUpColor = color;
-        this.shadowColor = shadowColor;
-        this.onDownColor = shadowColor;
-        this.onDownShadowColor = onDownShadowColor;
-        this.onUpShadowColor = shadowColor;
-        this.textColor = textColor;
-        this.text.color = textColor;
     }
 
     get pos() { return { x:this._pos.x, y:this._pos.y }; }
@@ -43,32 +32,7 @@ class MenuButton extends mag.RoundedRect {
         this._origpos = { x:p.x, y:p.y };
     }
 
-    showExpandingEffect(color='white', dur=160, loop=false, loopBreakTime=100) {
-        var rr = new mag.RoundedRect( this.absolutePos.x, this.absolutePos.y,
-                                      this.absoluteSize.w, this.absoluteSize.h, this.radius );
-        rr.color = null;
-        rr.shadowOffset = 0;
-        rr.anchor = this.anchor;
-        rr.ignoreEvents = true;
-        rr.stroke = { color:color, lineWidth:4, opacity:1.0 };
-        this.stage.add(rr);
-        Animate.run((elapsed) => {
-            //elapsed = elapsed * elapsed;
-            rr.scale = { x:1+elapsed, y:1+elapsed };
-            rr.stroke.opacity = 1-elapsed;
-            this.stage.draw();
-        }, dur).after(() => {
-            this.stage.remove(rr);
-            this.stage.draw();
-            if (loop) {
-                Animate.wait(loopBreakTime).after(() => {
-                    this.showExpandingEffect(color, dur, loop, loopBreakTime);
-                });
-            }
-        });
-    }
-
-    runButtonClickEffect(shouldFireClickEvent=false) {
+    runButtonClickEffect() {
 
         var rr = new mag.RoundedRect( this.absolutePos.x, this.absolutePos.y,
                                       this.absoluteSize.w, this.absoluteSize.h, this.radius );
@@ -96,7 +60,7 @@ class MenuButton extends mag.RoundedRect {
             this.stage.remove(rr);
             this.onmouseleave();
             this.stage.draw();
-            if (this.clickFunc && shouldFireClickEvent) {
+            if (this.clickFunc) {
                 this.clickFunc();
             }
         });
@@ -136,7 +100,7 @@ class MenuButton extends mag.RoundedRect {
         if (!this.hits(pos)) return;
         this._pos.y = this._origpos.y;
         this.shadowOffset = this.origShadowOffset;
-        this.runButtonClickEffect(true);
+        this.runButtonClickEffect();
         Animate.wait(50).after(() => Resource.play('fatbtn-beep'));
     }
 }
@@ -365,174 +329,83 @@ class DraggableRect extends mag.Rect {
 }
 
 class LevelCell extends MenuButton {
-    drawPositionsFor(num) {
-        const L = 0.15;
-        const T = L;
-        const R = 1.0 - L;
-        const B = R;
-        const M = 0.5;
-        const MT = (M + T) / 2.0;
-        const MB = (M + B) / 2.0;
-        const ML = (M + L) / 2.0;
-        const MR = (M + R) / 2.0;
-        const MLL = (L + ML) / 2.0;
-        const MRR = (R + MR) / 2.0;
-        let map = {
-            0: [],
-            1: [ { x: M, y: M} ],
-            2: [ { x: ML, y: MT }, { x: MR, y: MB } ],
-            3: [ { x: MRR, y: MB}, { x: M, y: MT}, { x: MLL, y: MB } ]
-        };
-        if (num in map) return map[num];
-        else {
-            //console.error('Dice pos array does not exist for number ' + num + '.');
-            return [];
-        }
-    }
     lock() {
         this.text.text = '🔒';
-        if (!this.hasChild(this.text))
-            this.addChild(this.text);
         this.color = '#666';
         this.shadowColor = 'gray';
         this.pos = { x:this.pos.x, y:this.pos.y+this.shadowOffset-8 };
         this.shadowOffset = 8;
         this.ignoreEvents = true;
     }
-    markAsIncomplete() {
-        this.setColors('Gold', 'white', 'Orange', 'Red');
-        this.ignoreEvents = false;
-        this.isIncomplete = true;
-        this.stroke.color = 'DarkRed';
-    }
-    addStars(num, strokeColor='MediumSeaGreen') {
-        let positions = this.drawPositionsFor(num);
-        for (let i = 0; i < positions.length; i++) {
-            const rad = 12 - (positions.length - 1) * 3.0;
-            let star = new mag.Star(this.size.w * positions[i].x, this.size.h * positions[i].y+2, rad, 5);
-            star.anchor = {x:0.5, y:0.5};
-            star.shadowOffset = -2;
-            star.color = Math.random() > 0.5 ? 'gold' : 'DarkSlateGray';
-            star.ignoreEvents = true;
-            star.stroke = { color:strokeColor, lineWidth:1 };
-            this.addChild(star);
-        }
-    }
 }
 class LevelSelectGrid extends mag.Rect {
-    constructor(chapterNameOrLevels, onLevelSelect) {
+    constructor(chapterName, onLevelSelect) {
         super(0, 0, 0, 0);
         this.color = null;
-        this.loadGrid(chapterNameOrLevels, onLevelSelect);
+        this.showGrid(chapterName, onLevelSelect);
     }
 
     hide(dur) {
-        if (dur > 0) {
-            let len = this.children.length;
-            this.children.forEach((c, i) => {
-                c.opacity = 1;
-                Animate.tween(c, { scale: {x:0, y:0}, opacity:0 }, (len - i - 1) * 30).after(() => {
-                    this.removeChild(c);
-                });
+        let len = this.children.length;
+        this.children.forEach((c, i) => {
+            c.opacity = 1;
+            Animate.tween(c, { scale: {x:0, y:0}, opacity:0 }, (len - i - 1) * 30).after(() => {
+                this.removeChild(c);
             });
-            return Animate.wait((len - 1) * 30);
-        } else {
-            this.children = [];
-            return Animate.wait(0);
-        }
+        });
+        return Animate.wait((len - 1) * 30);
     }
 
     gridSizeForLevelCount(n) {
-        if (n <= 8) return 80;
-        else if (n <= 14) return 60;
-        else return 44;
+        if (n <= 8) return 124;
+        else if (n <= 14) return 100;
+        else return 84;
     }
 
-    show() {
-        this.children = [];
-        for (let cell of this.cells) {
-            this.addChild(cell);
-            cell.opacity = 1.0;
-
-            // Animate cell into position.
-            cell._animation();
-        }
-        this.update();
-    }
-
-    loadGrid(chapterNameOrLevels, onselect) {
+    showGrid(chapterName, onselect) {
 
         // Layout measurement
-        var levels;
-        if (typeof chapterNameOrLevels === 'string')
-            levels = Resource.levelsForChapter(chapterNameOrLevels);
-        else
-            levels = chapterNameOrLevels.slice();
+        const levels = Resource.levelsForChapter(chapterName);
         const NUM_CELLS = levels[0].length; // total number of cells to fit on the grid
         const CELL_SIZE = this.gridSizeForLevelCount(NUM_CELLS); // width and height of each cell square, in pixels
         const SCREEN_WIDTH = GLOBAL_DEFAULT_SCREENSIZE.width; // the width of the screen to work with
-        const SCREEN_HEIGHT= GLOBAL_DEFAULT_SCREENSIZE.height; // the height of the screen to work with
         const PADDING = 20; // padding between cells
-        const GRID_MARGIN = 200; // margin bounding grid on top, left, and right sides
+        const TOP_MARGIN = 20;
+        const GRID_MARGIN = 80; // margin bounding grid on top, left, and right sides
         const NUM_COLS = Math.trunc((SCREEN_WIDTH - GRID_MARGIN*2) / (CELL_SIZE + PADDING)); // number of cells that fit horizontally on the screen
         const NUM_ROWS = Math.trunc(NUM_CELLS / NUM_COLS + 1); // number of rows
-        const GRID_LEFTPAD = (SCREEN_WIDTH - ((CELL_SIZE + PADDING) * NUM_COLS + GRID_MARGIN*2)) / 2.0 + 20;
-        const TOP_MARGIN = SCREEN_HEIGHT / 2.0 - (CELL_SIZE + PADDING) * NUM_ROWS / 2.0;
+        const GRID_LEFTPAD = (SCREEN_WIDTH - ((CELL_SIZE + PADDING) * NUM_COLS + GRID_MARGIN*2)) / 2.0;
 
         console.log(levels);
         console.log(SCREEN_WIDTH - GRID_MARGIN*2, CELL_SIZE + PADDING, NUM_CELLS, NUM_COLS, NUM_ROWS);
 
-        const start_idx = levels[1];
         const genClickCallback = (level_idx) => {
-            return () => onselect(levels[0][level_idx], start_idx + level_idx);
+            return () => onselect(levels[0][level_idx], levels[1] + level_idx);
         };
 
         const leftmost = GRID_LEFTPAD + GRID_MARGIN;
         let x = leftmost;
         let y = TOP_MARGIN;
-        this.cells = [];
 
         for (let r = 0; r < NUM_ROWS; r++) {
 
-            let last_row = r === (NUM_ROWS-1);
             let i = r * NUM_COLS;
 
             for (let c = 0; c < NUM_COLS; c++) {
 
                 // Create a level cell and add it to the grid.
-                let cell = new LevelCell(x + CELL_SIZE / 2.0 + (last_row ? ((NUM_COLS - NUM_CELLS % NUM_COLS) * (CELL_SIZE + PADDING) / 2.0) : 0),
-                                         y + CELL_SIZE / 2.0,
-                                         CELL_SIZE, CELL_SIZE, i.toString(), genClickCallback(i),
-                                         'LightGreen', 'Green', 'Green', 'DarkGreen');
-                                         //r === 0 ? 'LightGreen' : 'Gold', 'white', r === 0 ? 'Green' : 'Teal', r === 0 ? 'DarkGreen' : 'DarkMagenta');
+                let cell = new LevelCell(x + CELL_SIZE / 2.0, y + CELL_SIZE / 2.0, CELL_SIZE, CELL_SIZE, i.toString(), genClickCallback(i),
+                                         r === 0 ? 'LightGreen' : 'Gold', 'white', r === 0 ? 'Green' : 'Teal', r === 0 ? 'DarkGreen' : 'DarkMagenta');
                 cell.onDownColor = r === 0 ? 'YellowGreen' : 'Orange' ;
                 cell.anchor = { x:0.5, y:0.5 };
-
-                let idx = start_idx + i;
-                if (idx !== 0 && !completedLevels[idx]) {
-                    if (completedLevels[idx-1]) {
-                        cell.markAsIncomplete();
-                        cell.addStars(Math.trunc(Math.random() * 3 + 1), 'orange');
-                    } else {
-                        cell.lock();
-                    }
-                } else {
-                    cell.addStars(Math.trunc(Math.random() * 3 + 1));
-                }
-
                 //if (i > 5) cell.lock();
-                this.cells.push(cell);
+                this.addChild(cell);
 
-                const dur = i * 50;
-                cell._animation = function () {
-                    this.scale = { x:0.0, y:0 };
-                    Animate.wait(dur).after(() => {
-                        Animate.tween(this, { scale: { x:1, y:1 } }, 300, (elapsed) => Math.pow(elapsed, 0.5)).after(() => {
-                            if (this.isIncomplete)
-                                this.showExpandingEffect('white', 500, true, 2000);
-                        });
-                    });
-                };
+                // Animate cell into position.
+                cell.scale = { x:0.0, y:0 };
+                Animate.wait(i * 50).after(() => {
+                    Animate.tween(cell, { scale: { x:1, y:1 } }, 300, (elapsed) => Math.pow(elapsed, 0.5));
+                });
 
                 // Increment x-position.
                 x += CELL_SIZE + PADDING;
@@ -690,6 +563,16 @@ class PlanetCard extends mag.ImageRect {
         this.text = t;
         //this.addChild(t);
 
+        // Level path
+        let path = new ArrowPath();
+        path.stroke.color = 'white';
+        path.stroke.lineDash = [5*this.radius/120];
+        path.stroke.lineWidth = r / 120;
+        path.drawArrowHead = false;
+        path.ignoreEvents = true;
+        this.path = path;
+        this.addChild(path);
+
         this.pts = [];
         this.unitpos = (pos) => {
             pos = clonePos(pos);
@@ -785,6 +668,29 @@ class PlanetCard extends mag.ImageRect {
         super.drawInternal(ctx, pos, boundingSize);
     }
 
+    // Uncomment for drawing curves directly on planets (DEBUG).
+    onmousedown(pos) {
+        pos = this.unitpos(pos);
+        this.pts = [ pos ];
+        console.warn(pos);
+    }
+    onmousedrag(pos) {
+        pos = this.unitpos(pos);
+        if (this.pts.length > 0) {
+             pos.y *= -1;
+             pos.x *= -1;
+             let relpos = fromTo(pos, this.pts[0]);
+             this.pts.push(relpos);
+        }
+    }
+    onmouseup(pos) {
+        console.log(this.pts.reduce((prev, cur) => prev + '{"x":' + (cur.x) + ', "y":' + (cur.y) + '},\n', ''));
+        if(this.pts.length>2)
+            this.setCurve(this.pts);
+        this.pts = [];
+        this.stage.draw();
+    }
+
     activate() {
         this.image = this.image.replace('-locked', '');
         this.showText();
@@ -795,6 +701,51 @@ class PlanetCard extends mag.ImageRect {
         this.active = false;
         this.hideText();
         this.removeChild(this.path);
+    }
+
+    activateSpots() {
+        if (!this.spots) return;
+
+        this.addChild(this.path);
+
+        // Make all spots invisible.
+        this.spots.forEach((spot) => {
+            spot.opacity = 0;
+            spot.ignoreEvents = true;
+            this.addChild(spot);
+        });
+
+        // Animate-in how much of the path is drawn.
+        const dur = 2000;
+        this.path.percentDrawn = 0;
+        Animate.tween(this.path, { percentDrawn:1.0 }, dur);
+        Animate.run((e) => {
+            this.spots.forEach((spot) => {
+                if (spot.relPosAlongPath <= this.path.percentDrawn) {
+                    if (spot.opacity === 0) Resource.play('levelspot-activate');
+                    spot.opacity = 1.0;
+                }
+            });
+        }, dur).after(() => {
+            this.spots.forEach((spot) => {
+                if (spot.opacity === 0) Resource.play('levelspot-activate');
+                spot.opacity = 1.0;
+                spot.ignoreEvents = false;
+            });
+            this.path.percentDrawn = 1;
+            this.spots[0].enable();
+            this.spots[0].flash();
+            Resource.play('fatbtn-beep');
+        });
+    }
+
+    deactivateSpots() {
+        this.removeChild(this.path);
+
+        this.spots.forEach((spot) => {
+            spot.opacity = 0;
+            spot.ignoreEvents = true;
+        });
     }
 
     updateLevelSpots() {
@@ -825,6 +776,9 @@ class PlanetCard extends mag.ImageRect {
         });
     }
 
+    setCurve(pts) {
+        this.path.points = pts.map((p) => ({ x:p.x*this.radius+this.radius, y:p.y*this.radius+this.radius }));
+    }
 
     setLevels(levels, onLevelSelect) {
         this.startLevelIdx = levels[1];
@@ -858,42 +812,29 @@ class PlanetCard extends mag.ImageRect {
                 });
             };
         };
-        const cb = (lvl_idx) => ((genClickCallback(lvl_idx))());
 
         let md = new MobileDetect(window.navigator.userAgent);
 
-        // Level grid
-        this.grid = new LevelSelectGrid([Resource.level.slice(this.startLevelIdx, this.endLevelIdx+1), this.startLevelIdx], cb);
-        // for (let i = 1; i <= NUM_LVLS; i++) {
-        //     let spotpos = this.path.posAlongPath((i-1) / (NUM_LVLS-1));
-        //     let r = 8 * this.radius / 120;
-        //     if (__IS_MOBILE && md.phone()) {
-        //         r = 10 * this.radius / 120;
-        //     }
-        //     let spot = new LevelSpot( spotpos.x, spotpos.y, r, genClickCallback(i-1) );
-        //     spot.anchor = { x:0.5, y:0.5 };
-        //     spot.relPosAlongPath = i / NUM_LVLS;
-        //     spot.levelId = levels[1] + i-1;
-        //     spot.stroke.lineWidth = Math.max(this.radius / 120 * 2, 1.5);
-        //     spot.ignoreEvents = true;
-        //     this.spots.push(spot);
-        //
-        //     if (this.active) this.addChild(spot);
-        // }
-    }
+        // Level spots
+        this.spots = [];
+        for (let i = 1; i <= NUM_LVLS; i++) {
+            let spotpos = this.path.posAlongPath((i-1) / (NUM_LVLS-1));
+            let r = 8 * this.radius / 120;
+            if (__IS_MOBILE && md.phone()) {
+                r = 10 * this.radius / 120;
+            }
+            let spot = new LevelSpot( spotpos.x, spotpos.y, r, genClickCallback(i-1) );
+            spot.anchor = { x:0.5, y:0.5 };
+            spot.relPosAlongPath = i / NUM_LVLS;
+            spot.levelId = levels[1] + i-1;
+            spot.stroke.lineWidth = Math.max(this.radius / 120 * 2, 1.5);
+            spot.ignoreEvents = true;
+            this.spots.push(spot);
 
-    showGrid() {
-        if (!this.grid) return;
-        this.stage.add(this.grid);
-        this.grid.show();
-        console.log('showing grid', this.grid, this.stage);
-    }
-    hideGrid(dur=500) {
-        if (!this.grid) return;
-        let stage = this.stage;
-        this.grid.hide(dur).after(() => {
-            stage.remove(this.grid);
-        });
+            if (this.active) this.addChild(spot);
+        }
+
+        this.updateLevelSpots();
     }
 }
 
@@ -1471,10 +1412,8 @@ class ChapterSelectMenu extends mag.Stage {
                 if (!stage.planetParent.hasChild(p)) stage.planetParent.addChild(p);
                 if (p.active) p.showText();
                 let rad = POS_MAP[i].r;
-                p.hideGrid(0);
                 Animate.tween(p, { pos: {x:POS_MAP[i].x, y:POS_MAP[i].y}, scale:{x:1,y:1}, opacity:1.0 }, dur).after(() => {
-                    if (p.active)
-                        p.showText();
+                    if (p.active) p.showText();
                 });
             });
             this.maxPlanetX = maxPlanetX;
@@ -1518,13 +1457,12 @@ class ChapterSelectMenu extends mag.Stage {
             Animate.tween(planet, { scale:{x:scale, y:scale}, pos: center }, durationMultiplier*1000, (elapsed) => {
                 return Math.pow(elapsed, 3);
             }).after(() => {
-                planet.showGrid();
+                if (planet.spots) planet.spots.forEach((s) => { s.ignoreEvents = false; });
             });
         };
         let hide = (planet) => {
             planet.opacity = 1.0;
             planet.hideText();
-            planet.hideGrid();
             if (planet.spots) planet.spots.forEach((s) => { s.ignoreEvents = true; });
             Animate.tween(planet, { scale:{x:1, y:1}, opacity:0 }, durationMultiplier*500).after(() => {
                 stage.planetParent.removeChild(planet);
@@ -1569,7 +1507,7 @@ class ChapterSelectMenu extends mag.Stage {
                 let planet = new PlanetCard(pos.x, pos.y, pos.r, chap.name, chap.resources ? chap.resources.planet : 'planet-bagbag');
 
                 planet.color = 'white';
-                // if (i === 1) planet.path.stroke.color = 'gray';
+                if (i === 1) planet.path.stroke.color = 'gray';
                 planet.anchor = { x:0.5, y:0.5 };
                 planet.shadowOffset = 0;
                 planet.onclick = () => {
@@ -1579,6 +1517,9 @@ class ChapterSelectMenu extends mag.Stage {
                 if (chap.resources) {
                     const levels = Resource.levelsForChapter(chap.name);
 
+                    // Set path curve on planet.
+                    planet.setCurve(chap.resources.curve);
+
                     // Activate planet if applicable
                     if (Resource.isChapterUnlocked(i)) {
                         planet.activate();
@@ -1587,7 +1528,7 @@ class ChapterSelectMenu extends mag.Stage {
                         planet.deactivate();
                     }
 
-                    // Set levels for planet.
+                    // Set levels along curve.
                     planet.setLevels(levels, this.onLevelSelect);
                 }
 
