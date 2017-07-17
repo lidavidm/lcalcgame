@@ -492,6 +492,10 @@ var SpendBoard = function (_mag$Rect2) {
     _inherits(SpendBoard, _mag$Rect2);
 
     function SpendBoard() {
+        var score = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+        var textColor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'white';
+        var iconColor = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'gold';
+
         _classCallCheck(this, SpendBoard);
 
         var _this10 = _possibleConstructorReturn(this, (SpendBoard.__proto__ || Object.getPrototypeOf(SpendBoard)).call(this, 0, 0, 120, 100));
@@ -500,9 +504,9 @@ var SpendBoard = function (_mag$Rect2) {
         _this10.shadowOffset = 0;
         _this10.ignoreEvents = true;
 
-        var t = new TextExpr('3', 'Futura', 64);
+        var t = new TextExpr(score.toString(), 'Futura', 64);
         t.pos = { x: 40, y: 80 };
-        t.color = 'white';
+        t.color = textColor;
         t.anchor = { x: 1, y: 0 };
         _this10.addChild(t);
         _this10.text = t;
@@ -510,8 +514,9 @@ var SpendBoard = function (_mag$Rect2) {
         var spendIcon = new mag.Star(0, 0, 26, 5);
         spendIcon.pos = { x: t.pos.x + 10, y: 30 };
         spendIcon.ignoreEvents = true;
-        spendIcon.color = 'gold';
+        spendIcon.color = iconColor;
         spendIcon.shadowOffset = 0;
+        _this10.icon = spendIcon;
         _this10.addChild(spendIcon);
         return _this10;
     }
@@ -522,15 +527,17 @@ var SpendBoard = function (_mag$Rect2) {
             var _this11 = this;
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+            var subtract = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
-            if (!animated) this.points = this.points + 1;else {
+            var dir = subtract ? -1 : 1;
+            if (!animated) this.points = this.points + 1 * dir;else {
                 var _ret2 = function () {
                     var end_pos = _this11.text.pos;
                     var start_pos = addPos(end_pos, { x: 0, y: -20 });
                     _this11.text.pos = start_pos;
-                    _this11.points = _this11.points + 1;
+                    _this11.points = _this11.points + 1 * dir;
                     return {
-                        v: Animate.tween(_this11.text, { pos: end_pos }, 400, function (elapsed) {
+                        v: Animate.tween(_this11.text, { pos: end_pos }, 300, function (elapsed) {
                             return Math.pow(elapsed, 0.5);
                         }).after(function () {
                             _this11.text.pos = end_pos;
@@ -548,16 +555,32 @@ var SpendBoard = function (_mag$Rect2) {
 
             var animated = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
-            if (num <= 0) return;
+            if (num === 0) return;
             if (!animated) this.points = this.points + num;else {
                 (function () {
                     var left = num;
-                    _this12.addPoint(true).after(function () {
-                        left--;
+                    var subtract = left < 0;
+                    _this12.addPoint(true, subtract).after(function () {
+                        if (subtract) left++;else left--;
+                        console.log(left);
                         _this12.addPoints(left, true);
                     });
                 })();
             }
+        }
+    }, {
+        key: 'losePoints',
+        value: function losePoints(num) {
+            var animated = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+            // Convenient wrapper, even though addPoints can subtract too.
+            this.addPoints(num, animated);
+        }
+    }, {
+        key: 'losePoint',
+        value: function losePoint() {
+            var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+            // Convenient wrapper, even though addPoint can subtract too.
+            this.addPoint(animated, true);
         }
     }, {
         key: 'points',
@@ -1101,14 +1124,39 @@ var PlanetCard = function (_mag$ImageRect2) {
         value: function activate() {
             this.image = this.image.replace('-locked', '');
             this.showText();
+            this.hideCost();
             this.active = true;
         }
     }, {
         key: 'deactivate',
         value: function deactivate() {
+            var cost = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
             this.active = false;
             this.hideText();
             this.removeChild(this.path);
+
+            if (cost > 0) this.showCost(cost);
+        }
+    }, {
+        key: 'showCost',
+        value: function showCost(cost) {
+            var board = new SpendBoard(cost, 'darkgray', 'darkgray');
+            board.anchor = { x: 0.5, y: 0.5 };
+            board.pos = { x: this.size.w / 2.0 + 8, y: this.size.h / 2.0 - 4 };
+            board.scale = { x: 0.5, y: 0.5 };
+            this.cost = cost;
+            this.spendBoard = board;
+            this.addChild(board);
+        }
+    }, {
+        key: 'hideCost',
+        value: function hideCost() {
+            if (this.spendBoard) {
+                this.cost = undefined;
+                if (this.hasChild(this.spendBoard)) this.removeChild(this.spendBoard);
+                this.spendBoard = undefined;
+            }
         }
     }, {
         key: 'updateLevelSpots',
@@ -1934,9 +1982,59 @@ var ChapterSelectMenu = function (_mag$Stage2) {
             this.ctx.restore();
         }
     }, {
+        key: 'payToUnlock',
+        value: function payToUnlock(planet) {
+            var _this35 = this;
+
+            var stage = this;
+            this.panningEnabled = false;
+            var totalCost = planet.cost;
+            var explosionColors = ['gold', 'lime', 'DeepPink ', 'cyan', 'magenta'];
+            var randomColor = function randomColor() {
+                return explosionColors[Math.trunc(explosionColors.length * Math.random())];
+            };
+
+            // Animates transfer of a single spend point from board1 to board2.
+            var transferPoint = function transferPoint(board1, board2) {
+
+                // Lose the point visually.
+                board1.losePoint();
+
+                // Take the icon representing points and fly it to
+                // the icon on board2. (visually transfer)
+                var icon1 = board1.icon.clone();
+                icon1.pos = board1.icon.absolutePos;
+                icon1.anchor = board1.icon.anchor;
+                icon1.scale = board1.icon.absoluteScale;
+                icon1.color = randomColor(); // to add some visual cool
+                stage.add(icon1);
+
+                return Animate.tween(icon1, { pos: board2.icon.absolutePos, scale: board2.icon.absoluteScale }, 400, function (elapsed) {
+                    return Math.pow(elapsed, 2);
+                }).after(function () {
+                    SplosionEffect.run(icon1, icon1.color, 60);
+                    board2.losePoint();
+                });
+            };
+
+            var transferPoints = function transferPoints(cost, board1, board2) {
+                if (cost <= 0) {
+                    planet.cost = undefined;
+                    planet.activate();
+                    _this35.panningEnabled = true;
+                } else {
+                    transferPoint(board1, board2).after(function () {
+                        transferPoints(cost - 1, board1, board2);
+                    });
+                }
+            };
+
+            transferPoints(totalCost, this.spendBoard, planet.spendBoard);
+        }
+    }, {
         key: 'activatePlanet',
         value: function activatePlanet(planet) {
-            var _this35 = this;
+            var _this36 = this;
 
             var durationMultiplier = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1.0;
 
@@ -1953,15 +2051,15 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                 if (planet.onclick) planet.expandFunc = planet.onclick;
                 planet.onclick = null;
                 planet.hideText();
-                var r = Math.min(_this35.boundingSize.w / 2.2, _this35.boundingSize.h / 2.2);
+                var r = Math.min(_this36.boundingSize.w / 2.2, _this36.boundingSize.h / 2.2);
                 var center = {
-                    x: _this35.boundingSize.w / 2.0,
-                    y: _this35.boundingSize.h / 2.0
+                    x: _this36.boundingSize.w / 2.0,
+                    y: _this36.boundingSize.h / 2.0
                 };
                 // Account for camera
                 center = addPos(center, {
-                    x: -_this35.planetParent.pos.x,
-                    y: -_this35.planetParent.pos.y
+                    x: -_this36.planetParent.pos.x,
+                    y: -_this36.planetParent.pos.y
                 });
                 stage.bringToFront(planet);
 
@@ -1997,7 +2095,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                 Resource.play('zoomin');
             }
             Animate.wait(durationMultiplier * 500).after(function () {
-                _this35.add(_this35.btn_back);
+                _this36.add(_this36.btn_back);
             });
 
             return new Promise(function (resolve, reject) {
@@ -2007,7 +2105,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
     }, {
         key: 'showChapters',
         value: function showChapters() {
-            var _this36 = this;
+            var _this37 = this;
 
             // Expand and disappear animations.
             var stage = this;
@@ -2015,7 +2113,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
             // Each chapter is a 'Planet' in Starboy's Universe:
             return Resource.getChapterGraph().then(function (chapters) {
                 var planets = [];
-                var POS_MAP = layoutPlanets(chapters.transitions, _this36.boundingSize);
+                var POS_MAP = layoutPlanets(chapters.transitions, _this37.boundingSize);
 
                 var planetParent = new mag.Rect(0, 0, 0, 0);
 
@@ -2027,9 +2125,6 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                     // if (i === 1) planet.path.stroke.color = 'gray';
                     planet.anchor = { x: 0.5, y: 0.5 };
                     planet.shadowOffset = 0;
-                    planet.onclick = function () {
-                        _this36.activatePlanet(planet);
-                    };
 
                     if (chap.resources) {
                         var levels = Resource.levelsForChapter(chap.name);
@@ -2038,26 +2133,32 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                         if (Resource.isChapterUnlocked(i)) {
                             planet.activate();
                         } else {
-                            planet.deactivate();
+                            planet.deactivate(chap.cost ? chap.cost : Math.trunc(Math.random() * 12 + 1));
                         }
 
                         // Set levels for planet.
-                        planet.setLevels(levels, _this36.onLevelSelect);
+                        planet.setLevels(levels, _this37.onLevelSelect);
                     }
+
+                    planet.onclick = function () {
+                        if (planet.active) _this37.activatePlanet(planet);else if (planet.cost && _this37.spendBoard && planet.cost <= _this37.spendBoard.points) {
+                            _this37.payToUnlock(planet);
+                        }
+                    };
 
                     planetParent.addChild(planet);
                     planets.push(planet);
                 });
-                _this36.add(planetParent);
-                _this36.planetParent = planetParent;
+                _this37.add(planetParent);
+                _this37.planetParent = planetParent;
 
                 var transitionMap = {};
                 chapters.chapters.forEach(function (chap, i) {
                     transitionMap[chap.key] = i;
                 });
 
-                _this36.planets = planets;
-                _this36.setPlanetsToDefaultPos();
+                _this37.planets = planets;
+                _this37.setPlanetsToDefaultPos();
             });
         }
     }, {
@@ -2580,15 +2681,15 @@ var Mask = function (_mag$Rect4) {
 
         // cx, cy are in % of context width/height
 
-        var _this37 = _possibleConstructorReturn(this, (Mask.__proto__ || Object.getPrototypeOf(Mask)).call(this, 0, 0, 0, 0));
+        var _this38 = _possibleConstructorReturn(this, (Mask.__proto__ || Object.getPrototypeOf(Mask)).call(this, 0, 0, 0, 0));
 
-        _this37.cx = cx;
-        _this37.cy = cy;
-        _this37.radius = r;
-        _this37.opacity = 0.0;
-        _this37.ringControl = 0;
-        _this37.color = color;
-        return _this37;
+        _this38.cx = cx;
+        _this38.cy = cy;
+        _this38.radius = r;
+        _this38.opacity = 0.0;
+        _this38.ringControl = 0;
+        _this38.color = color;
+        return _this38;
     }
 
     _createClass(Mask, [{

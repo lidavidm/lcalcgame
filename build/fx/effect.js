@@ -96,6 +96,9 @@ var SplosionEffect = function () {
     _createClass(SplosionEffect, null, [{
         key: 'run',
         value: function run(node) {
+            var color = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'gold';
+            var numOfParticles = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 20;
+
 
             if (!node.stage) {
                 console.warn('@ SmashsplodeEffect: Node is not member of stage.');
@@ -113,7 +116,7 @@ var SplosionEffect = function () {
             var center = node.centerPos();
 
             // Create particles at center.
-            var PARTICLE_COUNT = 20;
+            var PARTICLE_COUNT = numOfParticles;
             var PARTICLE_MIN_RAD = 2;
             var PARTICLE_MAX_RAD = 12;
             var EXPLOSION_RAD = 100;
@@ -122,7 +125,7 @@ var SplosionEffect = function () {
 
                 // Create individual particle + add each to the stage.
                 var part = new mag.Circle(center.x, center.y, Math.floor(PARTICLE_MIN_RAD + (PARTICLE_MAX_RAD - PARTICLE_MIN_RAD) * Math.random()));
-                part.color = 'gold';
+                part.color = color;
                 part.shadowOffset = 0;
                 parts.push(part);
                 stage.add(part);

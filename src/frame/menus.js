@@ -365,15 +365,15 @@ class DraggableRect extends mag.Rect {
 }
 
 class SpendBoard extends mag.Rect {
-    constructor() {
+    constructor(score=0, textColor='white', iconColor='gold') {
         super(0,0,120,100);
         this.color = null;
         this.shadowOffset = 0;
         this.ignoreEvents = true;
 
-        let t = new TextExpr('3', 'Futura', 64);
+        let t = new TextExpr(score.toString(), 'Futura', 64);
         t.pos = {x:40, y:80};
-        t.color = 'white';
+        t.color = textColor;
         t.anchor = {x:1, y:0};
         this.addChild(t);
         this.text = t;
@@ -381,8 +381,9 @@ class SpendBoard extends mag.Rect {
         let spendIcon = new mag.Star(0, 0, 26, 5);
         spendIcon.pos = {x:t.pos.x+10, y:30};
         spendIcon.ignoreEvents = true;
-        spendIcon.color = 'gold';
+        spendIcon.color = iconColor;
         spendIcon.shadowOffset = 0;
+        this.icon = spendIcon;
         this.addChild(spendIcon);
     }
     get points() {
@@ -391,30 +392,40 @@ class SpendBoard extends mag.Rect {
     set points(pts) {
         this.text.text = pts.toString();
     }
-    addPoint(animated=true) {
+    addPoint(animated=true, subtract=false) {
+        let dir = subtract ? -1 : 1;
         if (!animated)
-            this.points = this.points + 1;
+            this.points = this.points + 1 * dir;
         else {
             const end_pos = this.text.pos;
             const start_pos = addPos(end_pos, {x:0, y:-20});
             this.text.pos = start_pos;
-            this.points = this.points + 1;
-            return Animate.tween(this.text, {pos:end_pos}, 400, (elapsed) => Math.pow(elapsed, 0.5)).after(() => {
+            this.points = this.points + 1 * dir;
+            return Animate.tween(this.text, {pos:end_pos}, 300, (elapsed) => Math.pow(elapsed, 0.5)).after(() => {
                 this.text.pos = end_pos;
             });
         }
     }
     addPoints(num, animated=true) {
-        if (num <= 0) return;
+        if (num === 0) return;
         if (!animated)
             this.points = this.points + num;
         else {
             let left = num;
-            this.addPoint(true).after(() => {
-                left--;
+            let subtract = left < 0;
+            this.addPoint(true, subtract).after(() => {
+                if (subtract) left++;
+                else left--;
+                console.log(left);
                 this.addPoints(left, true);
             })
         }
+    }
+    losePoints(num, animated=true) { // Convenient wrapper, even though addPoints can subtract too.
+        this.addPoints(num, animated);
+    }
+    losePoint(animated=true) { // Convenient wrapper, even though addPoint can subtract too.
+        this.addPoint(animated, true);
     }
 }
 
@@ -846,13 +857,35 @@ class PlanetCard extends mag.ImageRect {
     activate() {
         this.image = this.image.replace('-locked', '');
         this.showText();
+        this.hideCost();
         this.active = true;
     }
 
-    deactivate() {
+    deactivate(cost=0) {
         this.active = false;
         this.hideText();
         this.removeChild(this.path);
+
+        if (cost > 0)
+            this.showCost(cost);
+    }
+
+    showCost(cost) {
+        let board = new SpendBoard(cost, 'darkgray', 'darkgray');
+        board.anchor = {x:0.5, y:0.5};
+        board.pos = {x:this.size.w/2.0+8, y:this.size.h/2.0-4};
+        board.scale = {x:0.5, y:0.5};
+        this.cost = cost;
+        this.spendBoard = board;
+        this.addChild(board);
+    }
+    hideCost() {
+        if (this.spendBoard) {
+            this.cost = undefined;
+            if (this.hasChild(this.spendBoard))
+                this.removeChild(this.spendBoard);
+            this.spendBoard = undefined;
+        }
     }
 
     updateLevelSpots() {
@@ -1551,6 +1584,51 @@ class ChapterSelectMenu extends mag.Stage {
         this.ctx.restore();
     }
 
+    payToUnlock(planet) {
+        let stage = this;
+        this.panningEnabled = false;
+        const totalCost = planet.cost;
+        const explosionColors = [ 'gold', 'lime', 'DeepPink ', 'cyan', 'magenta' ];
+        const randomColor = () => explosionColors[Math.trunc(explosionColors.length * Math.random())];
+
+        // Animates transfer of a single spend point from board1 to board2.
+        let transferPoint = (board1, board2) => {
+
+            // Lose the point visually.
+            board1.losePoint();
+
+            // Take the icon representing points and fly it to
+            // the icon on board2. (visually transfer)
+            let icon1 = board1.icon.clone();
+            icon1.pos = board1.icon.absolutePos;
+            icon1.anchor = board1.icon.anchor;
+            icon1.scale = board1.icon.absoluteScale;
+            icon1.color = randomColor(); // to add some visual cool
+            stage.add(icon1);
+
+            return Animate.tween(icon1, {pos:board2.icon.absolutePos, scale:board2.icon.absoluteScale},
+                          400, (elapsed) => Math.pow(elapsed, 2)).after(() => {
+                              SplosionEffect.run(icon1, icon1.color, 60);
+                              board2.losePoint();
+                          });
+        };
+
+        let transferPoints = (cost, board1, board2) => {
+            if (cost <= 0) {
+                planet.cost = undefined;
+                planet.activate();
+                this.panningEnabled = true;
+            }
+            else {
+                transferPoint(board1, board2).after(() => {
+                    transferPoints(cost-1, board1, board2);
+                });
+            }
+        };
+
+        transferPoints(totalCost, this.spendBoard, planet.spendBoard);
+    }
+
     activatePlanet(planet, durationMultiplier=1.0) {
         let stage = this;
 
@@ -1635,9 +1713,6 @@ class ChapterSelectMenu extends mag.Stage {
                 // if (i === 1) planet.path.stroke.color = 'gray';
                 planet.anchor = { x:0.5, y:0.5 };
                 planet.shadowOffset = 0;
-                planet.onclick = () => {
-                    this.activatePlanet(planet);
-                };
 
                 if (chap.resources) {
                     const levels = Resource.levelsForChapter(chap.name);
@@ -1647,12 +1722,21 @@ class ChapterSelectMenu extends mag.Stage {
                         planet.activate();
                     }
                     else {
-                        planet.deactivate();
+                        planet.deactivate(chap.cost ? chap.cost : Math.trunc(Math.random() * 12 + 1));
                     }
 
                     // Set levels for planet.
                     planet.setLevels(levels, this.onLevelSelect);
                 }
+
+                planet.onclick = () => {
+                    if (planet.active)
+                        this.activatePlanet(planet);
+                    else if (planet.cost && this.spendBoard &&
+                        planet.cost <= this.spendBoard.points) {
+                        this.payToUnlock(planet);
+                    }
+                };
 
                 planetParent.addChild(planet);
                 planets.push(planet);
