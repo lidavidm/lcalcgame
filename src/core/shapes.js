@@ -207,13 +207,14 @@
          constructor(x, y, rad, points=5) {
              super(x, y, rad*2, rad*2);
              this.starPoints = points;
+             this.innerRadRatio = 0.5;
          }
          drawInternal(ctx, pos, boundingSize) {
              drawStar(ctx, pos.x+boundingSize.w/2, pos.y+boundingSize.h/2+this.shadowOffset,
-                      this.starPoints, boundingSize.w / 2, boundingSize.w / 4,
+                      this.starPoints, boundingSize.w / 2, boundingSize.w / 2 * this.innerRadRatio,
                       this.stroke, 'black');
              drawStar(ctx, pos.x+boundingSize.w/2, pos.y+boundingSize.h/2,
-                      this.starPoints, boundingSize.w / 2, boundingSize.w / 4,
+                      this.starPoints, boundingSize.w / 2, boundingSize.w / 2 * this.innerRadRatio,
                       this.stroke, this.color);
          }
      }

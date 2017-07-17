@@ -364,14 +364,15 @@ var mag = function (_) {
             var _this5 = _possibleConstructorReturn(this, (Star.__proto__ || Object.getPrototypeOf(Star)).call(this, x, y, rad * 2, rad * 2));
 
             _this5.starPoints = points;
+            _this5.innerRadRatio = 0.5;
             return _this5;
         }
 
         _createClass(Star, [{
             key: 'drawInternal',
             value: function drawInternal(ctx, pos, boundingSize) {
-                drawStar(ctx, pos.x + boundingSize.w / 2, pos.y + boundingSize.h / 2 + this.shadowOffset, this.starPoints, boundingSize.w / 2, boundingSize.w / 4, this.stroke, 'black');
-                drawStar(ctx, pos.x + boundingSize.w / 2, pos.y + boundingSize.h / 2, this.starPoints, boundingSize.w / 2, boundingSize.w / 4, this.stroke, this.color);
+                drawStar(ctx, pos.x + boundingSize.w / 2, pos.y + boundingSize.h / 2 + this.shadowOffset, this.starPoints, boundingSize.w / 2, boundingSize.w / 2 * this.innerRadRatio, this.stroke, 'black');
+                drawStar(ctx, pos.x + boundingSize.w / 2, pos.y + boundingSize.h / 2, this.starPoints, boundingSize.w / 2, boundingSize.w / 2 * this.innerRadRatio, this.stroke, this.color);
             }
         }]);
 

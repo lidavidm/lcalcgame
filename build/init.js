@@ -11,8 +11,12 @@ var canvas;
 
 var level_idx = getCookie('level_idx') || 0;
 var completedLevels = {};
+var spendUnits = 0;
 if (window.localStorage["completedLevels"]) {
     completedLevels = JSON.parse(window.localStorage["completedLevels"]);
+}
+if (window.localStorage["spendUnits"]) {
+    spendUnits = window.localStorage["spendUnits"];
 }
 if (level_idx !== 0) level_idx = parseInt(level_idx);
 var cur_menu = null;

@@ -364,6 +364,60 @@ class DraggableRect extends mag.Rect {
     }
 }
 
+class SpendBoard extends mag.Rect {
+    constructor() {
+        super(0,0,120,100);
+        this.color = null;
+        this.shadowOffset = 0;
+        this.ignoreEvents = true;
+
+        let t = new TextExpr('3', 'Futura', 64);
+        t.pos = {x:40, y:80};
+        t.color = 'white';
+        t.anchor = {x:1, y:0};
+        this.addChild(t);
+        this.text = t;
+
+        let spendIcon = new mag.Star(0, 0, 26, 5);
+        spendIcon.pos = {x:t.pos.x+10, y:30};
+        spendIcon.ignoreEvents = true;
+        spendIcon.color = 'gold';
+        spendIcon.shadowOffset = 0;
+        this.addChild(spendIcon);
+    }
+    get points() {
+        return parseInt(this.text.text);
+    }
+    set points(pts) {
+        this.text.text = pts.toString();
+    }
+    addPoint(animated=true) {
+        if (!animated)
+            this.points = this.points + 1;
+        else {
+            const end_pos = this.text.pos;
+            const start_pos = addPos(end_pos, {x:0, y:-20});
+            this.text.pos = start_pos;
+            this.points = this.points + 1;
+            return Animate.tween(this.text, {pos:end_pos}, 400, (elapsed) => Math.pow(elapsed, 0.5)).after(() => {
+                this.text.pos = end_pos;
+            });
+        }
+    }
+    addPoints(num, animated=true) {
+        if (num <= 0) return;
+        if (!animated)
+            this.points = this.points + num;
+        else {
+            let left = num;
+            this.addPoint(true).after(() => {
+                left--;
+                this.addPoints(left, true);
+            })
+        }
+    }
+}
+
 class LevelCell extends MenuButton {
     drawPositionsFor(num) {
         const L = 0.15;
@@ -412,7 +466,7 @@ class LevelCell extends MenuButton {
             let star = new mag.Star(this.size.w * positions[i].x, this.size.h * positions[i].y+2, rad, 5);
             star.anchor = {x:0.5, y:0.5};
             star.shadowOffset = -2;
-            star.color = Math.random() > 0.5 ? 'gold' : 'DarkSlateGray';
+            star.color = this.isIncomplete ? 'DarkRed' : 'gold'; //Math.random() > 0.5 ? 'gold' : 'DarkSlateGray';
             star.ignoreEvents = true;
             star.stroke = { color:strokeColor, lineWidth:1 };
             this.addChild(star);
@@ -508,16 +562,17 @@ class LevelSelectGrid extends mag.Rect {
                 cell.onDownColor = r === 0 ? 'YellowGreen' : 'Orange' ;
                 cell.anchor = { x:0.5, y:0.5 };
 
+                let numStars = Math.trunc(i / 8 + 1);
                 let idx = start_idx + i;
                 if (idx !== 0 && !completedLevels[idx]) {
                     if (completedLevels[idx-1]) {
                         cell.markAsIncomplete();
-                        cell.addStars(Math.trunc(Math.random() * 3 + 1), 'orange');
+                        cell.addStars(numStars, 'orange');
                     } else {
                         cell.lock();
                     }
                 } else {
-                    cell.addStars(Math.trunc(Math.random() * 3 + 1));
+                    cell.addStars(numStars);
                 }
 
                 //if (i > 5) cell.lock();
@@ -1241,6 +1296,15 @@ class ChapterSelectMenu extends mag.Stage {
             Resource.play('goback');
         });
         this.btn_back.opacity = 0.7;
+
+        this.spendBoard = new SpendBoard();
+        this.spendBoard.anchor = {x:1, y:1};
+        this.spendBoard.pos = {x:GLOBAL_DEFAULT_SCREENSIZE.width, y:GLOBAL_DEFAULT_SCREENSIZE.height};
+        this.add(this.spendBoard);
+
+        Animate.wait(2000).after(() => {
+            this.spendBoard.addPoints(8);
+        });
 
         this.planets = [];
         this.stars = [];
