@@ -44,6 +44,9 @@ class MenuButton extends mag.RoundedRect {
     }
 
     showExpandingEffect(color='white', dur=160, loop=false, loopBreakTime=100) {
+        if (!this.stage) return;
+        let stage = this.stage;
+
         var rr = new mag.RoundedRect( this.absolutePos.x, this.absolutePos.y,
                                       this.absoluteSize.w, this.absoluteSize.h, this.radius );
         rr.color = null;
@@ -51,16 +54,16 @@ class MenuButton extends mag.RoundedRect {
         rr.anchor = this.anchor;
         rr.ignoreEvents = true;
         rr.stroke = { color:color, lineWidth:4, opacity:1.0 };
-        this.stage.add(rr);
+        stage.add(rr);
         Animate.run((elapsed) => {
             //elapsed = elapsed * elapsed;
             rr.scale = { x:1+elapsed, y:1+elapsed };
             rr.stroke.opacity = 1-elapsed;
-            this.stage.draw();
+            stage.draw();
         }, dur).after(() => {
-            this.stage.remove(rr);
-            this.stage.draw();
-            if (loop) {
+            stage.remove(rr);
+            stage.draw();
+            if (loop && this.stage) {
                 Animate.wait(loopBreakTime).after(() => {
                     this.showExpandingEffect(color, dur, loop, loopBreakTime);
                 });
@@ -813,6 +816,7 @@ class PlanetCard extends mag.ImageRect {
             //elapsed = elapsed * elapsed;
             rr.scale = { x:1+elapsed, y:1+elapsed };
             rr.stroke.opacity = 1.0-Math.sqrt(elapsed);
+            rr.pos = this.absolutePos;
             this.stage.draw();
         }, dur).after(() => {
             this.stage.remove(rr);
@@ -1504,6 +1508,7 @@ class ChapterSelectMenu extends mag.Stage {
     onmousedrag(pos) {
         if (this.panningEnabled) {
             let dx = pos.x - this._dragStart.x;
+            dx *= 2;
             this.setCameraX(-(this.planetParent.pos.x + dx));
         }
         this._dragStart = pos;

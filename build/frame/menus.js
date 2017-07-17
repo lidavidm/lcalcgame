@@ -76,22 +76,25 @@ var MenuButton = function (_mag$RoundedRect) {
             var loop = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
             var loopBreakTime = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 100;
 
+            if (!this.stage) return;
+            var stage = this.stage;
+
             var rr = new mag.RoundedRect(this.absolutePos.x, this.absolutePos.y, this.absoluteSize.w, this.absoluteSize.h, this.radius);
             rr.color = null;
             rr.shadowOffset = 0;
             rr.anchor = this.anchor;
             rr.ignoreEvents = true;
             rr.stroke = { color: color, lineWidth: 4, opacity: 1.0 };
-            this.stage.add(rr);
+            stage.add(rr);
             Animate.run(function (elapsed) {
                 //elapsed = elapsed * elapsed;
                 rr.scale = { x: 1 + elapsed, y: 1 + elapsed };
                 rr.stroke.opacity = 1 - elapsed;
-                _this3.stage.draw();
+                stage.draw();
             }, dur).after(function () {
-                _this3.stage.remove(rr);
-                _this3.stage.draw();
-                if (loop) {
+                stage.remove(rr);
+                stage.draw();
+                if (loop && _this3.stage) {
                     Animate.wait(loopBreakTime).after(function () {
                         _this3.showExpandingEffect(color, dur, loop, loopBreakTime);
                     });
@@ -1074,6 +1077,7 @@ var PlanetCard = function (_mag$ImageRect2) {
                 //elapsed = elapsed * elapsed;
                 rr.scale = { x: 1 + elapsed, y: 1 + elapsed };
                 rr.stroke.opacity = 1.0 - Math.sqrt(elapsed);
+                rr.pos = _this21.absolutePos;
                 _this21.stage.draw();
             }, dur).after(function () {
                 _this21.stage.remove(rr);
@@ -1889,6 +1893,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
         value: function onmousedrag(pos) {
             if (this.panningEnabled) {
                 var dx = pos.x - this._dragStart.x;
+                dx *= 2;
                 this.setCameraX(-(this.planetParent.pos.x + dx));
             }
             this._dragStart = pos;
