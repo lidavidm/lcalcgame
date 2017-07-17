@@ -537,8 +537,11 @@ class LevelSelectGrid extends mag.Rect {
         console.log(SCREEN_WIDTH - GRID_MARGIN*2, CELL_SIZE + PADDING, NUM_CELLS, NUM_COLS, NUM_ROWS);
 
         const start_idx = levels[1];
-        const genClickCallback = (level_idx) => {
-            return () => onselect(levels[0][level_idx], start_idx + level_idx);
+        let genClickCallback = function (level_idx) {
+            return function() {
+                let thisButton = this; // if called by the LevelCell, 'this' will refer to the cell itself.
+                onselect(thisButton, start_idx + level_idx);
+            };
         };
 
         const leftmost = GRID_LEFTPAD + GRID_MARGIN;
@@ -562,7 +565,7 @@ class LevelSelectGrid extends mag.Rect {
                 cell.onDownColor = r === 0 ? 'YellowGreen' : 'Orange' ;
                 cell.anchor = { x:0.5, y:0.5 };
 
-                let numStars = Math.trunc(i / 8 + 1);
+                let numStars = Math.trunc(i / NUM_CELLS * 3 + 1);
                 let idx = start_idx + i;
                 if (idx !== 0 && !completedLevels[idx]) {
                     if (completedLevels[idx-1]) {
@@ -885,40 +888,36 @@ class PlanetCard extends mag.ImageRect {
         this.startLevelIdx = levels[1];
         this.endLevelIdx = levels[1] + levels[0].length - 1;
         const NUM_LVLS = levels[0].length; // total number of cells to fit on the grid
-        const genClickCallback = (level_idx) => {
-            return () => {
-                Resource.play('fatbtn-beep');
-                let spot = this.spots[level_idx];
-                let pos = spot.absolutePos;
-                let r = spot.absoluteSize.w / 2;
-                // The scale changes between the menu and stage
-                let posPercent = { x: pos.x / this.stage.boundingSize.w,
-                                   y: pos.y / this.stage.boundingSize.h };
-                let mask = new Mask(posPercent.x, posPercent.y, 20 * r);
-                this.stage.add(mask);
+        const clickCallback = (button, level_idx) => {
+            Resource.play('fatbtn-beep');
+            let pos = button.absolutePos;
+            let r = button.absoluteSize.w / 2;
+            // The scale changes between the menu and stage
+            let posPercent = { x: pos.x / this.stage.boundingSize.w,
+                               y: pos.y / this.stage.boundingSize.h };
+            let mask = new Mask(posPercent.x, posPercent.y, 20 * r);
+            this.stage.add(mask);
+            Animate.tween(mask, {
+                opacity: 1.0,
+                radius: 0.1,
+                ringControl: 100,
+            }, 500).after(() => {
+                this.stage.remove(mask);
+                onLevelSelect(Resource.level[level_idx], level_idx);
+                window.stage.add(mask);
                 Animate.tween(mask, {
-                    opacity: 1.0,
-                    radius: 0.1,
-                    ringControl: 100,
-                }, 500).after(() => {
-                    this.stage.remove(mask);
-                    onLevelSelect(levels[0][level_idx], levels[1] + level_idx);
-                    window.stage.add(mask);
-                    Animate.tween(mask, {
-                        radius: Math.max(window.stage.boundingSize.w, window.stage.boundingSize.h),
-                        ringControl: 150,
-                    }, 400).after(() => {
-                        window.stage.remove(mask);
-                    });
+                    radius: Math.max(window.stage.boundingSize.w, window.stage.boundingSize.h),
+                    ringControl: 150,
+                }, 400).after(() => {
+                    window.stage.remove(mask);
                 });
-            };
+            });
         };
-        const cb = (lvl_idx) => ((genClickCallback(lvl_idx))());
 
         let md = new MobileDetect(window.navigator.userAgent);
 
         // Level grid
-        this.grid = new LevelSelectGrid([Resource.level.slice(this.startLevelIdx, this.endLevelIdx+1), this.startLevelIdx], cb);
+        this.grid = new LevelSelectGrid([Resource.level.slice(this.startLevelIdx, this.endLevelIdx+1), this.startLevelIdx], clickCallback);
         // for (let i = 1; i <= NUM_LVLS; i++) {
         //     let spotpos = this.path.posAlongPath((i-1) / (NUM_LVLS-1));
         //     let r = 8 * this.radius / 120;
