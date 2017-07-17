@@ -532,7 +532,11 @@ var SpendBoard = function (_mag$Rect2) {
             var dir = subtract ? -1 : 1;
             if (!animated) this.points = this.points + 1 * dir;else {
                 var _ret2 = function () {
-                    var end_pos = _this11.text.pos;
+                    if (_this11._animating) _this11._animating++;else {
+                        _this11._orig_pos = _this11.text.pos;
+                        _this11._animating = 1;
+                    }
+                    var end_pos = _this11._animating > 1 ? _this11._orig_pos : _this11.text.pos;
                     var start_pos = addPos(end_pos, { x: 0, y: -20 });
                     _this11.text.pos = start_pos;
                     _this11.points = _this11.points + 1 * dir;
@@ -541,6 +545,8 @@ var SpendBoard = function (_mag$Rect2) {
                             return Math.pow(elapsed, 0.5);
                         }).after(function () {
                             _this11.text.pos = end_pos;
+                            _this11._animating--;
+                            if (_this11._animating === 0) _this11._orig_pos = null;
                         })
                     };
                 }();
@@ -1694,7 +1700,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
         });
         _this31.btn_back.opacity = 0.7;
 
-        _this31.spendBoard = new SpendBoard();
+        _this31.spendBoard = new SpendBoard(100);
         _this31.spendBoard.anchor = { x: 1, y: 1 };
         _this31.spendBoard.pos = { x: GLOBAL_DEFAULT_SCREENSIZE.width, y: GLOBAL_DEFAULT_SCREENSIZE.height };
         _this31.add(_this31.spendBoard);
@@ -2012,7 +2018,9 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                 return Animate.tween(icon1, { pos: board2.icon.absolutePos, scale: board2.icon.absoluteScale }, 400, function (elapsed) {
                     return Math.pow(elapsed, 2);
                 }).after(function () {
-                    SplosionEffect.run(icon1, icon1.color, 60);
+                    SplosionEffect.run(icon1, icon1.color, 60, 200);
+                    board2.text.color = icon1.color;
+                    board2.icon.color = icon1.color;
                     board2.losePoint();
                 });
             };

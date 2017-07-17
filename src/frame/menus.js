@@ -397,12 +397,20 @@ class SpendBoard extends mag.Rect {
         if (!animated)
             this.points = this.points + 1 * dir;
         else {
-            const end_pos = this.text.pos;
+            if (this._animating)
+                this._animating++;
+            else {
+                this._orig_pos = this.text.pos;
+                this._animating = 1;
+            }
+            const end_pos = this._animating > 1 ? this._orig_pos : this.text.pos;
             const start_pos = addPos(end_pos, {x:0, y:-20});
             this.text.pos = start_pos;
             this.points = this.points + 1 * dir;
             return Animate.tween(this.text, {pos:end_pos}, 300, (elapsed) => Math.pow(elapsed, 0.5)).after(() => {
                 this.text.pos = end_pos;
+                this._animating--;
+                if (this._animating === 0) this._orig_pos = null;
             });
         }
     }
@@ -1329,7 +1337,7 @@ class ChapterSelectMenu extends mag.Stage {
         });
         this.btn_back.opacity = 0.7;
 
-        this.spendBoard = new SpendBoard();
+        this.spendBoard = new SpendBoard(100);
         this.spendBoard.anchor = {x:1, y:1};
         this.spendBoard.pos = {x:GLOBAL_DEFAULT_SCREENSIZE.width, y:GLOBAL_DEFAULT_SCREENSIZE.height};
         this.add(this.spendBoard);
@@ -1608,7 +1616,9 @@ class ChapterSelectMenu extends mag.Stage {
 
             return Animate.tween(icon1, {pos:board2.icon.absolutePos, scale:board2.icon.absoluteScale},
                           400, (elapsed) => Math.pow(elapsed, 2)).after(() => {
-                              SplosionEffect.run(icon1, icon1.color, 60);
+                              SplosionEffect.run(icon1, icon1.color, 60, 200);
+                              board2.text.color = icon1.color;
+                              board2.icon.color = icon1.color;
                               board2.losePoint();
                           });
         };

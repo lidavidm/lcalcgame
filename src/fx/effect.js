@@ -51,7 +51,7 @@ class WatEffect {
 
 // Node disappears and is replaced by a firework-like particle explosion.
 class SplosionEffect {
-    static run(node, color='gold', numOfParticles=20) {
+    static run(node, color='gold', numOfParticles=20, explosionRadius=100) {
 
         if (!node.stage) {
             console.warn('@ SmashsplodeEffect: Node is not member of stage.');
@@ -72,7 +72,7 @@ class SplosionEffect {
         const PARTICLE_COUNT = numOfParticles;
         const PARTICLE_MIN_RAD = 2;
         const PARTICLE_MAX_RAD = 12;
-        const EXPLOSION_RAD = 100;
+        const EXPLOSION_RAD = explosionRadius;
         for (let i = 0; i < PARTICLE_COUNT; i++) {
 
             // Create individual particle + add each to the stage.

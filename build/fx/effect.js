@@ -98,6 +98,7 @@ var SplosionEffect = function () {
         value: function run(node) {
             var color = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'gold';
             var numOfParticles = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 20;
+            var explosionRadius = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 100;
 
 
             if (!node.stage) {
@@ -119,7 +120,7 @@ var SplosionEffect = function () {
             var PARTICLE_COUNT = numOfParticles;
             var PARTICLE_MIN_RAD = 2;
             var PARTICLE_MAX_RAD = 12;
-            var EXPLOSION_RAD = 100;
+            var EXPLOSION_RAD = explosionRadius;
 
             var _loop = function _loop(i) {
 
