@@ -404,7 +404,7 @@ class SpendBoard extends mag.Rect {
                 this._animating = 1;
             }
             const end_pos = this._animating > 1 ? this._orig_pos : this.text.pos;
-            const start_pos = addPos(end_pos, {x:0, y:-20});
+            const start_pos = addPos(end_pos, {x:0, y:-20*dir});
             this.text.pos = start_pos;
             this.points = this.points + 1 * dir;
             return Animate.tween(this.text, {pos:end_pos}, 300, (elapsed) => Math.pow(elapsed, 0.5)).after(() => {
@@ -586,8 +586,8 @@ class LevelSelectGrid extends mag.Rect {
 
                 let numStars = Math.trunc(i / NUM_CELLS * 3 + 1);
                 let idx = start_idx + i;
-                if (idx !== 0 && !completedLevels[idx]) {
-                    if (completedLevels[idx-1]) {
+                if (!completedLevels[idx]) {
+                    if (completedLevels[idx-1] || i === 0) {
                         cell.markAsIncomplete();
                         cell.addStars(numStars, 'orange');
                     } else {
@@ -801,6 +801,30 @@ class PlanetCard extends mag.ImageRect {
             this.removeChild(this.text);
     }
 
+    showExpandingEffect(color='white', dur=1200, loop=false, loopBreakTime=100) {
+        var rr = new mag.Circle( this.absolutePos.x, this.absolutePos.y, this.absoluteSize.w/2.0 );
+        rr.color = null;
+        rr.shadowOffset = 0;
+        rr.anchor = this.anchor;
+        rr.ignoreEvents = true;
+        rr.stroke = { color:color, lineWidth:10, opacity:1.0 };
+        this.stage.add(rr);
+        Animate.run((elapsed) => {
+            //elapsed = elapsed * elapsed;
+            rr.scale = { x:1+elapsed, y:1+elapsed };
+            rr.stroke.opacity = 1.0-Math.sqrt(elapsed);
+            this.stage.draw();
+        }, dur).after(() => {
+            this.stage.remove(rr);
+            this.stage.draw();
+            if (loop) {
+                Animate.wait(loopBreakTime).after(() => {
+                    this.showExpandingEffect(color, dur, loop, loopBreakTime);
+                });
+            }
+        });
+    }
+
     showShip(worldShip) {
         // Create ship graphic
         let ship = new mag.RotatableImageRect(0, 0, 82, 70, 'ship-large');
@@ -930,7 +954,6 @@ class PlanetCard extends mag.ImageRect {
         this.endLevelIdx = levels[1] + levels[0].length - 1;
         const NUM_LVLS = levels[0].length; // total number of cells to fit on the grid
         const clickCallback = (button, level_idx) => {
-            Resource.play('fatbtn-beep');
             let pos = button.absolutePos;
             let r = button.absoluteSize.w / 2;
             // The scale changes between the menu and stage
@@ -1564,6 +1587,11 @@ class ChapterSelectMenu extends mag.Stage {
         let stage = this;
         this.panningEnabled = true;
 
+        if (this.transitionPaths)
+            this.transitionPaths.forEach((p) => {
+                p.opacity = 1;
+            });
+
         return Resource.getChapterGraph().then((chapters) => {
             let maxPlanetX = this.boundingSize.w;
             const POS_MAP = layoutPlanets(chapters.transitions, this.boundingSize);
@@ -1593,8 +1621,10 @@ class ChapterSelectMenu extends mag.Stage {
     }
 
     payToUnlock(planet) {
+        if (planet._isUnlocking) return;
+
         let stage = this;
-        this.panningEnabled = false;
+        planet._isUnlocking = true;
         const totalCost = planet.cost;
         const explosionColors = [ 'gold', 'lime', 'DeepPink ', 'cyan', 'magenta' ];
         const randomColor = () => explosionColors[Math.trunc(explosionColors.length * Math.random())];
@@ -1617,6 +1647,7 @@ class ChapterSelectMenu extends mag.Stage {
             return Animate.tween(icon1, {pos:board2.icon.absolutePos, scale:board2.icon.absoluteScale},
                           400, (elapsed) => Math.pow(elapsed, 2)).after(() => {
                               SplosionEffect.run(icon1, icon1.color, 60, 200);
+                              Resource.play('splosion');
                               board2.text.color = icon1.color;
                               board2.icon.color = icon1.color;
                               board2.losePoint();
@@ -1627,7 +1658,20 @@ class ChapterSelectMenu extends mag.Stage {
             if (cost <= 0) {
                 planet.cost = undefined;
                 planet.activate();
+                Resource.play('unlock-planet');
                 this.panningEnabled = true;
+
+                planet.showExpandingEffect();
+                if (planet.toPaths) {
+                    const START_WIDTH = 20;
+                    for (let toPath of planet.toPaths) {
+                        toPath.stroke = {color:'gold', lineWidth:START_WIDTH, opacity:1};
+                        Animate.run((elapsed) => {
+                            toPath.stroke.lineWidth = Math.trunc((1 - elapsed) * (START_WIDTH-1) + 1);
+                        }, 1000);
+                    }
+                }
+                planet._isUnlocking = false;
             }
             else {
                 transferPoint(board1, board2).after(() => {
@@ -1692,6 +1736,10 @@ class ChapterSelectMenu extends mag.Stage {
             }
         }
 
+        this.transitionPaths.forEach((p) => {
+            p.opacity = 0.0;
+        });
+
         if (durationMultiplier > 0) {
             Resource.play('zoomin');
         }
@@ -1718,6 +1766,7 @@ class ChapterSelectMenu extends mag.Stage {
             chapters.chapters.forEach((chap, i) => {
                 let pos = i < POS_MAP.length ? POS_MAP[i] : { x:0, y:0, r:10 };
                 let planet = new PlanetCard(pos.x, pos.y, pos.r, chap.name, chap.resources ? chap.resources.planet : 'planet-bagbag');
+                planet.filename = chap.filename;
 
                 planet.color = 'white';
                 // if (i === 1) planet.path.stroke.color = 'gray';
@@ -1748,11 +1797,33 @@ class ChapterSelectMenu extends mag.Stage {
                     }
                 };
 
-                planetParent.addChild(planet);
                 planets.push(planet);
             });
+
+            let transitionPaths = [];
+            for (let fromPlanet of planets) {
+                let fromPos = fromPlanet.absolutePos;
+                let toPlanetFileNames = chapters.transitions[fromPlanet.filename];
+                let paths = [];
+                let toPlanets = planets.filter((p) => toPlanetFileNames.indexOf(p.filename) > -1)
+                for (let toPlanet of toPlanets) {
+                    let pts = [ clonePos(fromPos), toPlanet.absolutePos ];
+                    let strokeStyle;
+                    if (toPlanet.active) strokeStyle = {color:'gold', lineWidth:1, opacity:1};
+                    else                 strokeStyle = {color:'gold', lineWidth:1, lineDash:[5, 10], opacity:0.2};
+                    let path = new ArrowPath(pts, strokeStyle, 8, false);
+                    if (!toPlanet.toPaths) toPlanet.toPaths = [ path ];
+                    else                  toPlanet.toPaths.push(path);
+                    paths.push(path);
+                }
+                transitionPaths = transitionPaths.concat(paths);
+            }
+            transitionPaths.forEach((path) => planetParent.addChild(path));
+            planets.forEach((planet) => planetParent.addChild(planet));
+
             this.add(planetParent);
             this.planetParent = planetParent;
+            this.transitionPaths = transitionPaths;
 
             let transitionMap = {};
             chapters.chapters.forEach((chap, i) => {

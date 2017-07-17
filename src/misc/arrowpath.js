@@ -96,6 +96,7 @@ class ArrowPath extends mag.Node {
     // Draw path.
     drawInternal(ctx, pos) {
         if (!this.points || this.points.length === 0) return;
+        if (this.opacity != undefined && this.opacity == 0) return;
         let abs_scale = this.parent.absoluteScale;
         let lastpt = this.lastPoint; //addPos( pos, this.lastPoint );
 
@@ -125,7 +126,7 @@ class ArrowPath extends mag.Node {
                 });
             }
         }
-        if (this.stroke) ctx.stroke();
+        if (this.stroke) strokeWithOpacity(ctx, this.stroke.opacity)
 
         // Draw arrowhead.
         if (this.drawArrowHead) {

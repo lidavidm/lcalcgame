@@ -96,6 +96,7 @@ var ArrowPath = function (_mag$Node) {
         key: 'drawInternal',
         value: function drawInternal(ctx, pos) {
             if (!this.points || this.points.length === 0) return;
+            if (this.opacity != undefined && this.opacity == 0) return;
             var abs_scale = this.parent.absoluteScale;
             var lastpt = this.lastPoint; //addPos( pos, this.lastPoint );
 
@@ -125,7 +126,7 @@ var ArrowPath = function (_mag$Node) {
                     });
                 }
             }
-            if (this.stroke) ctx.stroke();
+            if (this.stroke) strokeWithOpacity(ctx, this.stroke.opacity);
 
             // Draw arrowhead.
             if (this.drawArrowHead) {

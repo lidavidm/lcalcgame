@@ -537,7 +537,7 @@ var SpendBoard = function (_mag$Rect2) {
                         _this11._animating = 1;
                     }
                     var end_pos = _this11._animating > 1 ? _this11._orig_pos : _this11.text.pos;
-                    var start_pos = addPos(end_pos, { x: 0, y: -20 });
+                    var start_pos = addPos(end_pos, { x: 0, y: -20 * dir });
                     _this11.text.pos = start_pos;
                     _this11.points = _this11.points + 1 * dir;
                     return {
@@ -804,8 +804,8 @@ var LevelSelectGrid = function (_mag$Rect3) {
 
                     var numStars = Math.trunc(i / NUM_CELLS * 3 + 1);
                     var idx = start_idx + i;
-                    if (idx !== 0 && !completedLevels[idx]) {
-                        if (completedLevels[idx - 1]) {
+                    if (!completedLevels[idx]) {
+                        if (completedLevels[idx - 1] || i === 0) {
                             cell.markAsIncomplete();
                             cell.addStars(numStars, 'orange');
                         } else {
@@ -1053,6 +1053,39 @@ var PlanetCard = function (_mag$ImageRect2) {
             if (this.children.indexOf(this.text) > -1) this.removeChild(this.text);
         }
     }, {
+        key: 'showExpandingEffect',
+        value: function showExpandingEffect() {
+            var color = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'white';
+            var dur = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1200;
+
+            var _this21 = this;
+
+            var loop = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+            var loopBreakTime = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 100;
+
+            var rr = new mag.Circle(this.absolutePos.x, this.absolutePos.y, this.absoluteSize.w / 2.0);
+            rr.color = null;
+            rr.shadowOffset = 0;
+            rr.anchor = this.anchor;
+            rr.ignoreEvents = true;
+            rr.stroke = { color: color, lineWidth: 10, opacity: 1.0 };
+            this.stage.add(rr);
+            Animate.run(function (elapsed) {
+                //elapsed = elapsed * elapsed;
+                rr.scale = { x: 1 + elapsed, y: 1 + elapsed };
+                rr.stroke.opacity = 1.0 - Math.sqrt(elapsed);
+                _this21.stage.draw();
+            }, dur).after(function () {
+                _this21.stage.remove(rr);
+                _this21.stage.draw();
+                if (loop) {
+                    Animate.wait(loopBreakTime).after(function () {
+                        _this21.showExpandingEffect(color, dur, loop, loopBreakTime);
+                    });
+                }
+            });
+        }
+    }, {
         key: 'showShip',
         value: function showShip(worldShip) {
             // Create ship graphic
@@ -1095,12 +1128,12 @@ var PlanetCard = function (_mag$ImageRect2) {
     }, {
         key: 'onmouseenter',
         value: function onmouseenter() {
-            var _this21 = this;
+            var _this22 = this;
 
             this.selected = true;
             this.glow.opacity = this.highlighted ? 0.5 : 0.0;
             Animate.tween(this.glow, { opacity: 1.0 }, 100).after(function () {
-                _this21.glow.opacity = 1;
+                _this22.glow.opacity = 1;
             });
         }
     }, {
@@ -1195,26 +1228,25 @@ var PlanetCard = function (_mag$ImageRect2) {
     }, {
         key: 'setLevels',
         value: function setLevels(levels, onLevelSelect) {
-            var _this22 = this;
+            var _this23 = this;
 
             this.startLevelIdx = levels[1];
             this.endLevelIdx = levels[1] + levels[0].length - 1;
             var NUM_LVLS = levels[0].length; // total number of cells to fit on the grid
             var clickCallback = function clickCallback(button, level_idx) {
-                Resource.play('fatbtn-beep');
                 var pos = button.absolutePos;
                 var r = button.absoluteSize.w / 2;
                 // The scale changes between the menu and stage
-                var posPercent = { x: pos.x / _this22.stage.boundingSize.w,
-                    y: pos.y / _this22.stage.boundingSize.h };
+                var posPercent = { x: pos.x / _this23.stage.boundingSize.w,
+                    y: pos.y / _this23.stage.boundingSize.h };
                 var mask = new Mask(posPercent.x, posPercent.y, 20 * r);
-                _this22.stage.add(mask);
+                _this23.stage.add(mask);
                 Animate.tween(mask, {
                     opacity: 1.0,
                     radius: 0.1,
                     ringControl: 100
                 }, 500).after(function () {
-                    _this22.stage.remove(mask);
+                    _this23.stage.remove(mask);
                     onLevelSelect(Resource.level[level_idx], level_idx);
                     window.stage.add(mask);
                     Animate.tween(mask, {
@@ -1258,14 +1290,14 @@ var PlanetCard = function (_mag$ImageRect2) {
     }, {
         key: 'hideGrid',
         value: function hideGrid() {
-            var _this23 = this;
+            var _this24 = this;
 
             var dur = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 500;
 
             if (!this.grid) return;
             var stage = this.stage;
             this.grid.hide(dur).after(function () {
-                stage.remove(_this23.grid);
+                stage.remove(_this24.grid);
             });
         }
     }, {
@@ -1296,20 +1328,20 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
     function ChapterSelectShip() {
         _classCallCheck(this, ChapterSelectShip);
 
-        var _this24 = _possibleConstructorReturn(this, (ChapterSelectShip.__proto__ || Object.getPrototypeOf(ChapterSelectShip)).call(this, 0, 0, 82, 70, 'ship-large'));
+        var _this25 = _possibleConstructorReturn(this, (ChapterSelectShip.__proto__ || Object.getPrototypeOf(ChapterSelectShip)).call(this, 0, 0, 82, 70, 'ship-large'));
 
-        _this24.pointing = { x: 1, y: 0 };
-        _this24.velocity = { x: 0, y: 0 };
+        _this25.pointing = { x: 1, y: 0 };
+        _this25.velocity = { x: 0, y: 0 };
 
-        _this24.planet = null;
+        _this25.planet = null;
 
         var trailWidth = 140;
         var trail = new RainbowTrail(0, 0, trailWidth, 30);
         trail.pos = { x: -trailWidth + 20, y: 20 };
         //trail.anchor = { x:1, y:0 };
-        _this24.trail = trail;
-        _this24.addChild(trail);
-        return _this24;
+        _this25.trail = trail;
+        _this25.addChild(trail);
+        return _this25;
     }
 
     // Fly to another planet. (entire sequence)
@@ -1318,7 +1350,7 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
     _createClass(ChapterSelectShip, [{
         key: 'flyToPlanet',
         value: function flyToPlanet(stage, startPlanet, endPlanet) {
-            var _this25 = this;
+            var _this26 = this;
 
             // Hide the local ships and make the world ship
             // the only ship visible.
@@ -1380,30 +1412,30 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
             }, 1000));
             var del = 0;
             var launchTrail = promisify(Animate.run(function (e) {
-                _this25.trail.opacity = Math.min(0.4, Math.pow(e, 0.05));
-                _this25.trail.time += (e - del) * 4000;
+                _this26.trail.opacity = Math.min(0.4, Math.pow(e, 0.05));
+                _this26.trail.time += (e - del) * 4000;
                 del = e;
             }, 1250));
 
             return launch.then(function () {
-                var p = _this25.absolutePos;
-                stage.planetParent.removeChild(_this25);
-                stage.add(_this25);
-                _this25.pos = p;
-                _this25.parent = null;
+                var p = _this26.absolutePos;
+                stage.planetParent.removeChild(_this26);
+                stage.add(_this26);
+                _this26.pos = p;
+                _this26.parent = null;
 
-                _this25.image = 'ship-large-starboy';
+                _this26.image = 'ship-large-starboy';
 
-                var rotate = promisify(Animate.tween(_this25, {
+                var rotate = promisify(Animate.tween(_this26, {
                     rotation: 0
                 }, 600));
 
                 // Zoom in on Starchild
-                var zoomShip = promisify(Animate.tween(_this25, {
+                var zoomShip = promisify(Animate.tween(_this26, {
                     scale: { x: 5, y: 5 },
                     pos: {
-                        x: stage.boundingSize.w / 2 - 2.5 * _this25.size.w,
-                        y: stage.boundingSize.h / 2 - 2.5 * _this25.size.h
+                        x: stage.boundingSize.w / 2 - 2.5 * _this26.size.w,
+                        y: stage.boundingSize.h / 2 - 2.5 * _this26.size.h
                     }
                 }, 600));
 
@@ -1424,12 +1456,12 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
                 return Promise.all([zoomShip, zoom, launchTrail, fadeOutStars, fadeInStars]);
             }).then(function () {
                 // Prepare for ignition
-                _this25.trail.time = 0;
-                return promisify(Animate.tween(_this25.trail, {
+                _this26.trail.time = 0;
+                return promisify(Animate.tween(_this26.trail, {
                     opacity: 0,
                     time: 500
                 }, 300)).then(function () {
-                    return promisify(Animate.tween(_this25.trail, {
+                    return promisify(Animate.tween(_this26.trail, {
                         opacity: 1.0,
                         time: 2500
                     }, 200));
@@ -1437,7 +1469,7 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
             }).then(function () {
                 // Enter warp space!
                 var mask = new Mask(0, 0, 0.01, "#FFFFFF");
-                _this25.stage.add(mask);
+                _this26.stage.add(mask);
 
                 var flash = after(200).then(function () {
                     return promisify(Animate.tween(mask, {
@@ -1448,18 +1480,18 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
                         opacity: 0.0
                     }, 100));
                 }).then(function () {
-                    return _this25.stage.remove(mask);
+                    return _this26.stage.remove(mask);
                 });
 
-                var jumpForward = promisify(Animate.tween(_this25, {
-                    pos: addPos(_this25.pos, { x: 300, y: 0 })
+                var jumpForward = promisify(Animate.tween(_this26, {
+                    pos: addPos(_this26.pos, { x: 300, y: 0 })
                 }, 300));
 
                 return jumpForward;
             }).then(function () {
                 // Cruising along
-                var jumpBack = promisify(Animate.tween(_this25, {
-                    pos: addPos(_this25.pos, { x: -300, y: 0 })
+                var jumpBack = promisify(Animate.tween(_this26, {
+                    pos: addPos(_this26.pos, { x: -300, y: 0 })
                 }, 1000));
 
                 var origSize = stars[0].size;
@@ -1477,7 +1509,7 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
 
                 var t0 = 0;
                 var flying = promisify(Animate.run(function (t1) {
-                    _this25.trail.time += 8000 * (t1 - t0);
+                    _this26.trail.time += 8000 * (t1 - t0);
 
                     var dx = 15000 * (t1 - t0);
                     if (t1 > deceleration) dx *= -4 * t1 + 4;
@@ -1498,12 +1530,12 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
                 return Promise.all([flying, slowing]);
             }).then(function () {
                 // Come out of warp space
-                var turnOffEngine = promisify(Animate.tween(_this25.trail, {
+                var turnOffEngine = promisify(Animate.tween(_this26.trail, {
                     opacity: 0
                 }, 400));
 
                 // Zoom back out
-                var zoomShip = promisify(Animate.tween(_this25, {
+                var zoomShip = promisify(Animate.tween(_this26, {
                     scale: { x: endScale, y: endScale },
                     pos: aboveOrbitDest
                 }, 600));
@@ -1517,7 +1549,7 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
                 }, 400));
 
                 var rotate = after(400).then(function () {
-                    return promisify(Animate.tween(_this25, {
+                    return promisify(Animate.tween(_this26, {
                         rotation: -Math.PI / 2
                     }, 600));
                 });
@@ -1528,17 +1560,17 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
 
                 return Promise.all([turnOffEngine, rotate, zoomShip, zoom, fadeOutStars, fadeInStars]);
             }).then(function () {
-                _this25.image = 'ship-large';
-                stage.remove(_this25);
-                stage.planetParent.addChild(_this25);
-                _this25.pos = relativeAboveOrbitDest;
-                var land = promisify(Animate.tween(_this25, {
+                _this26.image = 'ship-large';
+                stage.remove(_this26);
+                stage.planetParent.addChild(_this26);
+                _this26.pos = relativeAboveOrbitDest;
+                var land = promisify(Animate.tween(_this26, {
                     pos: dest
                 }, 1000));
                 return land;
             }).then(function () {
                 stage.planetParent.ignoreEvents = false;
-                endPlanet.showShip(_this25);
+                endPlanet.showShip(_this26);
                 stage.remove(starParent);
             });
         }
@@ -1555,11 +1587,11 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
     }, {
         key: 'launch',
         value: function launch() {
-            var _this26 = this;
+            var _this27 = this;
 
             this.planet = null;
             return new Promise(function (resolve, reject) {
-                _this26.moveTo(addPos(_this26.pos, { x: 0, y: -20 }), 1000).then(resolve);
+                _this27.moveTo(addPos(_this27.pos, { x: 0, y: -20 }), 1000).then(resolve);
             });
         }
 
@@ -1568,23 +1600,6 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
     }, {
         key: 'rotateTo',
         value: function rotateTo(angle) {
-            var _this27 = this;
-
-            var dur = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1000;
-            var smoothFunc = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function (e) {
-                return e;
-            };
-
-            return new Promise(function (resolve, reject) {
-                Animate.tween(_this27, { rotation: angle }, dur, smoothFunc).after(resolve);
-            });
-        }
-
-        // Move to pos (without changing rotation).
-
-    }, {
-        key: 'moveTo',
-        value: function moveTo(dest) {
             var _this28 = this;
 
             var dur = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1000;
@@ -1593,7 +1608,24 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
             };
 
             return new Promise(function (resolve, reject) {
-                Animate.tween(_this28, { pos: clonePos(dest) }, dur, smoothFunc).after(function () {
+                Animate.tween(_this28, { rotation: angle }, dur, smoothFunc).after(resolve);
+            });
+        }
+
+        // Move to pos (without changing rotation).
+
+    }, {
+        key: 'moveTo',
+        value: function moveTo(dest) {
+            var _this29 = this;
+
+            var dur = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1000;
+            var smoothFunc = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function (e) {
+                return e;
+            };
+
+            return new Promise(function (resolve, reject) {
+                Animate.tween(_this29, { pos: clonePos(dest) }, dur, smoothFunc).after(function () {
                     resolve();
                 });
             });
@@ -1604,11 +1636,11 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
     }, {
         key: 'land',
         value: function land(dest) {
-            var _this29 = this;
+            var _this30 = this;
 
             this.trail.opacity = 0;
             return this.rotateTo(-Math.PI / 2.0, 500).then(function () {
-                return _this29.moveTo(dest, 1000);
+                return _this30.moveTo(dest, 1000);
             });
         }
     }, {
@@ -1627,7 +1659,7 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
     }, {
         key: 'flyTo',
         value: function flyTo(dest, onReachingDest) {
-            var _this30 = this;
+            var _this31 = this;
 
             var FORCE = 10;
             var travelDist = distBetweenPos(this.pos, dest);
@@ -1637,8 +1669,8 @@ var ChapterSelectShip = function (_mag$RotatableImageRe) {
 
             var del = 0;
             Animate.run(function (e) {
-                _this30.trail.opacity = Math.pow(e, 0.5);
-                _this30.trail.time += (e - del) * 8000;
+                _this31.trail.opacity = Math.pow(e, 0.5);
+                _this31.trail.time += (e - del) * 8000;
                 del = e;
             }, DUR);
             this.moveTo(dest, DUR).then(onReachingDest);
@@ -1687,45 +1719,45 @@ var ChapterSelectMenu = function (_mag$Stage2) {
     function ChapterSelectMenu(canvas, onLevelSelect, flyToChapIdx) {
         _classCallCheck(this, ChapterSelectMenu);
 
-        var _this31 = _possibleConstructorReturn(this, (ChapterSelectMenu.__proto__ || Object.getPrototypeOf(ChapterSelectMenu)).call(this, canvas));
+        var _this32 = _possibleConstructorReturn(this, (ChapterSelectMenu.__proto__ || Object.getPrototypeOf(ChapterSelectMenu)).call(this, canvas));
 
-        _this31.md = new MobileDetect(window.navigator.userAgent);
-        _this31.onLevelSelect = onLevelSelect;
+        _this32.md = new MobileDetect(window.navigator.userAgent);
+        _this32.onLevelSelect = onLevelSelect;
 
-        _this31.btn_back = new mag.Button(10, 10, 50, 50, { default: 'btn-back-default', hover: 'btn-back-hover', down: 'btn-back-down' }, function () {
-            _this31.activePlanet = null;
-            _this31.remove(_this31.btn_back);
-            _this31.setPlanetsToDefaultPos(500);
+        _this32.btn_back = new mag.Button(10, 10, 50, 50, { default: 'btn-back-default', hover: 'btn-back-hover', down: 'btn-back-down' }, function () {
+            _this32.activePlanet = null;
+            _this32.remove(_this32.btn_back);
+            _this32.setPlanetsToDefaultPos(500);
             Resource.play('goback');
         });
-        _this31.btn_back.opacity = 0.7;
+        _this32.btn_back.opacity = 0.7;
 
-        _this31.spendBoard = new SpendBoard(100);
-        _this31.spendBoard.anchor = { x: 1, y: 1 };
-        _this31.spendBoard.pos = { x: GLOBAL_DEFAULT_SCREENSIZE.width, y: GLOBAL_DEFAULT_SCREENSIZE.height };
-        _this31.add(_this31.spendBoard);
+        _this32.spendBoard = new SpendBoard(100);
+        _this32.spendBoard.anchor = { x: 1, y: 1 };
+        _this32.spendBoard.pos = { x: GLOBAL_DEFAULT_SCREENSIZE.width, y: GLOBAL_DEFAULT_SCREENSIZE.height };
+        _this32.add(_this32.spendBoard);
 
         Animate.wait(2000).after(function () {
-            _this31.spendBoard.addPoints(8);
+            _this32.spendBoard.addPoints(8);
         });
 
-        _this31.planets = [];
-        _this31.stars = [];
-        _this31.activePlanet = null;
-        _this31.starParent = new mag.Rect(0, 0, 0, 0);
-        _this31.add(_this31.starParent);
+        _this32.planets = [];
+        _this32.stars = [];
+        _this32.activePlanet = null;
+        _this32.starParent = new mag.Rect(0, 0, 0, 0);
+        _this32.add(_this32.starParent);
 
-        _this31.showStarField();
+        _this32.showStarField();
 
-        _this31.onorientationchange();
+        _this32.onorientationchange();
 
-        _this31.showChapters().then(function () {
-            _this31.updateParallax();
+        _this32.showChapters().then(function () {
+            _this32.updateParallax();
 
-            _this31.offset = { x: 0, y: 0 };
-            var lastActivePlanet = _this31.lastActivePlanet;
+            _this32.offset = { x: 0, y: 0 };
+            var lastActivePlanet = _this32.lastActivePlanet;
 
-            _this31.setCameraX(lastActivePlanet.pos.x - 3 * lastActivePlanet.radius);
+            _this32.setCameraX(lastActivePlanet.pos.x - 3 * lastActivePlanet.radius);
 
             var ship = new ChapterSelectShip();
             var shipScale = lastActivePlanet.radius / 120 / 2;
@@ -1744,7 +1776,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                         var chap = _step2.value;
 
                         var newChapIdx = chap.chapterIdx;
-                        var newPlanet = _this31.planets[newChapIdx];
+                        var newPlanet = _this32.planets[newChapIdx];
                         newPlanet.highlight();
                         newPlanet.activate();
                         newPlanet.deactivateSpots();
@@ -1754,13 +1786,13 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                         newPlanet.onclick = function () {
                             newPlanet.onclick = oldOnClick;
                             newPlanet.removeHighlight();
-                            _this31.remove(ship);
-                            _this31.planetParent.addChild(ship);
+                            _this32.remove(ship);
+                            _this32.planetParent.addChild(ship);
                             var startPlanet = lastActivePlanet;
-                            ship.flyToPlanet(_this31, startPlanet, newPlanet).then(function () {
+                            ship.flyToPlanet(_this32, startPlanet, newPlanet).then(function () {
                                 return new Promise(function (resolve, reject) {
                                     Animate.wait(600).after(function () {
-                                        _this31.planetParent.removeChild(ship);
+                                        _this32.planetParent.removeChild(ship);
                                         resolve();
                                     });
                                 });
@@ -1793,20 +1825,20 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                     }
                 }
 
-                if (minNewPlanetX + _this31.planetParent.pos.x > 0.8 * _this31.boundingSize.w) {
-                    _this31.setCameraX(minNewPlanetX - 0.8 * _this31.boundingSize.w);
+                if (minNewPlanetX + _this32.planetParent.pos.x > 0.8 * _this32.boundingSize.w) {
+                    _this32.setCameraX(minNewPlanetX - 0.8 * _this32.boundingSize.w);
                 }
             } else {
                 ship.attachToPlanet(lastActivePlanet);
             }
         });
-        return _this31;
+        return _this32;
     }
 
     _createClass(ChapterSelectMenu, [{
         key: 'reset',
         value: function reset() {
-            var _this32 = this;
+            var _this33 = this;
 
             this.panningEnabled = true;
             this.starParent.children = [];
@@ -1815,10 +1847,10 @@ var ChapterSelectMenu = function (_mag$Stage2) {
             if (!lastActivePlanet) return;
             this.remove(this.btn_back);
             this.setPlanetsToDefaultPos(0).then(function () {
-                _this32.setCameraX(lastActivePlanet.pos.x - 3 * lastActivePlanet.radius);
+                _this33.setCameraX(lastActivePlanet.pos.x - 3 * lastActivePlanet.radius);
 
-                if (_this32.activePlanet) {
-                    _this32.activatePlanet(_this32.activePlanet, 0);
+                if (_this33.activePlanet) {
+                    _this33.activatePlanet(_this33.activePlanet, 0);
                 }
             });
         }
@@ -1911,11 +1943,11 @@ var ChapterSelectMenu = function (_mag$Stage2) {
     }, {
         key: 'showStarField',
         value: function showStarField() {
-            var _this33 = this;
+            var _this34 = this;
 
             var NUM_STARS = 120;
             var genRandomPt = function genRandomPt() {
-                return randomPointInRect({ x: 0, y: 0, w: 1.5 * _this33.boundingSize.w, h: _this33.boundingSize.h });
+                return randomPointInRect({ x: 0, y: 0, w: 1.5 * _this34.boundingSize.w, h: _this34.boundingSize.h });
             };
 
             var starParent = this.starParent;
@@ -1953,14 +1985,18 @@ var ChapterSelectMenu = function (_mag$Stage2) {
     }, {
         key: 'setPlanetsToDefaultPos',
         value: function setPlanetsToDefaultPos(dur) {
-            var _this34 = this;
+            var _this35 = this;
 
             var stage = this;
             this.panningEnabled = true;
 
+            if (this.transitionPaths) this.transitionPaths.forEach(function (p) {
+                p.opacity = 1;
+            });
+
             return Resource.getChapterGraph().then(function (chapters) {
-                var maxPlanetX = _this34.boundingSize.w;
-                var POS_MAP = layoutPlanets(chapters.transitions, _this34.boundingSize);
+                var maxPlanetX = _this35.boundingSize.w;
+                var POS_MAP = layoutPlanets(chapters.transitions, _this35.boundingSize);
                 stage.planets.forEach(function (p, i) {
                     maxPlanetX = Math.max(maxPlanetX, POS_MAP[i].x + p.radius);
                     p.ignoreEvents = false;
@@ -1976,7 +2012,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                         if (p.active) p.showText();
                     });
                 });
-                _this34.maxPlanetX = maxPlanetX;
+                _this35.maxPlanetX = maxPlanetX;
             });
         }
     }, {
@@ -1990,10 +2026,12 @@ var ChapterSelectMenu = function (_mag$Stage2) {
     }, {
         key: 'payToUnlock',
         value: function payToUnlock(planet) {
-            var _this35 = this;
+            var _this36 = this;
+
+            if (planet._isUnlocking) return;
 
             var stage = this;
-            this.panningEnabled = false;
+            planet._isUnlocking = true;
             var totalCost = planet.cost;
             var explosionColors = ['gold', 'lime', 'DeepPink ', 'cyan', 'magenta'];
             var randomColor = function randomColor() {
@@ -2019,6 +2057,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                     return Math.pow(elapsed, 2);
                 }).after(function () {
                     SplosionEffect.run(icon1, icon1.color, 60, 200);
+                    Resource.play('splosion');
                     board2.text.color = icon1.color;
                     board2.icon.color = icon1.color;
                     board2.losePoint();
@@ -2029,7 +2068,47 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                 if (cost <= 0) {
                     planet.cost = undefined;
                     planet.activate();
-                    _this35.panningEnabled = true;
+                    Resource.play('unlock-planet');
+                    _this36.panningEnabled = true;
+
+                    planet.showExpandingEffect();
+                    if (planet.toPaths) {
+                        (function () {
+                            var START_WIDTH = 20;
+                            var _iteratorNormalCompletion3 = true;
+                            var _didIteratorError3 = false;
+                            var _iteratorError3 = undefined;
+
+                            try {
+                                var _loop5 = function _loop5() {
+                                    var toPath = _step3.value;
+
+                                    toPath.stroke = { color: 'gold', lineWidth: START_WIDTH, opacity: 1 };
+                                    Animate.run(function (elapsed) {
+                                        toPath.stroke.lineWidth = Math.trunc((1 - elapsed) * (START_WIDTH - 1) + 1);
+                                    }, 1000);
+                                };
+
+                                for (var _iterator3 = planet.toPaths[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                                    _loop5();
+                                }
+                            } catch (err) {
+                                _didIteratorError3 = true;
+                                _iteratorError3 = err;
+                            } finally {
+                                try {
+                                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                                        _iterator3.return();
+                                    }
+                                } finally {
+                                    if (_didIteratorError3) {
+                                        throw _iteratorError3;
+                                    }
+                                }
+                            }
+                        })();
+                    }
+                    planet._isUnlocking = false;
                 } else {
                     transferPoint(board1, board2).after(function () {
                         transferPoints(cost - 1, board1, board2);
@@ -2042,7 +2121,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
     }, {
         key: 'activatePlanet',
         value: function activatePlanet(planet) {
-            var _this36 = this;
+            var _this37 = this;
 
             var durationMultiplier = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1.0;
 
@@ -2059,15 +2138,15 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                 if (planet.onclick) planet.expandFunc = planet.onclick;
                 planet.onclick = null;
                 planet.hideText();
-                var r = Math.min(_this36.boundingSize.w / 2.2, _this36.boundingSize.h / 2.2);
+                var r = Math.min(_this37.boundingSize.w / 2.2, _this37.boundingSize.h / 2.2);
                 var center = {
-                    x: _this36.boundingSize.w / 2.0,
-                    y: _this36.boundingSize.h / 2.0
+                    x: _this37.boundingSize.w / 2.0,
+                    y: _this37.boundingSize.h / 2.0
                 };
                 // Account for camera
                 center = addPos(center, {
-                    x: -_this36.planetParent.pos.x,
-                    y: -_this36.planetParent.pos.y
+                    x: -_this37.planetParent.pos.x,
+                    y: -_this37.planetParent.pos.y
                 });
                 stage.bringToFront(planet);
 
@@ -2099,11 +2178,15 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                 }
             }
 
+            this.transitionPaths.forEach(function (p) {
+                p.opacity = 0.0;
+            });
+
             if (durationMultiplier > 0) {
                 Resource.play('zoomin');
             }
             Animate.wait(durationMultiplier * 500).after(function () {
-                _this36.add(_this36.btn_back);
+                _this37.add(_this37.btn_back);
             });
 
             return new Promise(function (resolve, reject) {
@@ -2113,7 +2196,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
     }, {
         key: 'showChapters',
         value: function showChapters() {
-            var _this37 = this;
+            var _this38 = this;
 
             // Expand and disappear animations.
             var stage = this;
@@ -2121,13 +2204,14 @@ var ChapterSelectMenu = function (_mag$Stage2) {
             // Each chapter is a 'Planet' in Starboy's Universe:
             return Resource.getChapterGraph().then(function (chapters) {
                 var planets = [];
-                var POS_MAP = layoutPlanets(chapters.transitions, _this37.boundingSize);
+                var POS_MAP = layoutPlanets(chapters.transitions, _this38.boundingSize);
 
                 var planetParent = new mag.Rect(0, 0, 0, 0);
 
                 chapters.chapters.forEach(function (chap, i) {
                     var pos = i < POS_MAP.length ? POS_MAP[i] : { x: 0, y: 0, r: 10 };
                     var planet = new PlanetCard(pos.x, pos.y, pos.r, chap.name, chap.resources ? chap.resources.planet : 'planet-bagbag');
+                    planet.filename = chap.filename;
 
                     planet.color = 'white';
                     // if (i === 1) planet.path.stroke.color = 'gray';
@@ -2145,74 +2229,68 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                         }
 
                         // Set levels for planet.
-                        planet.setLevels(levels, _this37.onLevelSelect);
+                        planet.setLevels(levels, _this38.onLevelSelect);
                     }
 
                     planet.onclick = function () {
-                        if (planet.active) _this37.activatePlanet(planet);else if (planet.cost && _this37.spendBoard && planet.cost <= _this37.spendBoard.points) {
-                            _this37.payToUnlock(planet);
+                        if (planet.active) _this38.activatePlanet(planet);else if (planet.cost && _this38.spendBoard && planet.cost <= _this38.spendBoard.points) {
+                            _this38.payToUnlock(planet);
                         }
                     };
 
-                    planetParent.addChild(planet);
                     planets.push(planet);
                 });
-                _this37.add(planetParent);
-                _this37.planetParent = planetParent;
 
-                var transitionMap = {};
-                chapters.chapters.forEach(function (chap, i) {
-                    transitionMap[chap.key] = i;
-                });
-
-                _this37.planets = planets;
-                _this37.setPlanetsToDefaultPos();
-            });
-        }
-    }, {
-        key: 'lastActivePlanet',
-        get: function get() {
-            var lastActivePlanet = void 0;
-            var _iteratorNormalCompletion3 = true;
-            var _didIteratorError3 = false;
-            var _iteratorError3 = undefined;
-
-            try {
-                for (var _iterator3 = this.planets[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    var _planet = _step3.value;
-
-                    if (_planet.active && level_idx >= _planet.startLevelIdx && level_idx <= _planet.endLevelIdx) {
-                        lastActivePlanet = _planet;
-                        break;
-                    }
-                }
-            } catch (err) {
-                _didIteratorError3 = true;
-                _iteratorError3 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                        _iterator3.return();
-                    }
-                } finally {
-                    if (_didIteratorError3) {
-                        throw _iteratorError3;
-                    }
-                }
-            }
-
-            if (!lastActivePlanet) {
+                var transitionPaths = [];
                 var _iteratorNormalCompletion4 = true;
                 var _didIteratorError4 = false;
                 var _iteratorError4 = undefined;
 
                 try {
-                    for (var _iterator4 = this.planets[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                        var planet = _step4.value;
+                    var _loop6 = function _loop6() {
+                        var fromPlanet = _step4.value;
 
-                        if (planet.active) {
-                            lastActivePlanet = planet;
+                        var fromPos = fromPlanet.absolutePos;
+                        var toPlanetFileNames = chapters.transitions[fromPlanet.filename];
+                        var paths = [];
+                        var toPlanets = planets.filter(function (p) {
+                            return toPlanetFileNames.indexOf(p.filename) > -1;
+                        });
+                        var _iteratorNormalCompletion5 = true;
+                        var _didIteratorError5 = false;
+                        var _iteratorError5 = undefined;
+
+                        try {
+                            for (var _iterator5 = toPlanets[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                                var toPlanet = _step5.value;
+
+                                var pts = [clonePos(fromPos), toPlanet.absolutePos];
+                                var strokeStyle = void 0;
+                                if (toPlanet.active) strokeStyle = { color: 'gold', lineWidth: 1, opacity: 1 };else strokeStyle = { color: 'gold', lineWidth: 1, lineDash: [5, 10], opacity: 0.2 };
+                                var path = new ArrowPath(pts, strokeStyle, 8, false);
+                                if (!toPlanet.toPaths) toPlanet.toPaths = [path];else toPlanet.toPaths.push(path);
+                                paths.push(path);
+                            }
+                        } catch (err) {
+                            _didIteratorError5 = true;
+                            _iteratorError5 = err;
+                        } finally {
+                            try {
+                                if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                                    _iterator5.return();
+                                }
+                            } finally {
+                                if (_didIteratorError5) {
+                                    throw _iteratorError5;
+                                }
+                            }
                         }
+
+                        transitionPaths = transitionPaths.concat(paths);
+                    };
+
+                    for (var _iterator4 = planets[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                        _loop6();
                     }
                 } catch (err) {
                     _didIteratorError4 = true;
@@ -2225,6 +2303,86 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                     } finally {
                         if (_didIteratorError4) {
                             throw _iteratorError4;
+                        }
+                    }
+                }
+
+                transitionPaths.forEach(function (path) {
+                    return planetParent.addChild(path);
+                });
+                planets.forEach(function (planet) {
+                    return planetParent.addChild(planet);
+                });
+
+                _this38.add(planetParent);
+                _this38.planetParent = planetParent;
+                _this38.transitionPaths = transitionPaths;
+
+                var transitionMap = {};
+                chapters.chapters.forEach(function (chap, i) {
+                    transitionMap[chap.key] = i;
+                });
+
+                _this38.planets = planets;
+                _this38.setPlanetsToDefaultPos();
+            });
+        }
+    }, {
+        key: 'lastActivePlanet',
+        get: function get() {
+            var lastActivePlanet = void 0;
+            var _iteratorNormalCompletion6 = true;
+            var _didIteratorError6 = false;
+            var _iteratorError6 = undefined;
+
+            try {
+                for (var _iterator6 = this.planets[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                    var _planet = _step6.value;
+
+                    if (_planet.active && level_idx >= _planet.startLevelIdx && level_idx <= _planet.endLevelIdx) {
+                        lastActivePlanet = _planet;
+                        break;
+                    }
+                }
+            } catch (err) {
+                _didIteratorError6 = true;
+                _iteratorError6 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                        _iterator6.return();
+                    }
+                } finally {
+                    if (_didIteratorError6) {
+                        throw _iteratorError6;
+                    }
+                }
+            }
+
+            if (!lastActivePlanet) {
+                var _iteratorNormalCompletion7 = true;
+                var _didIteratorError7 = false;
+                var _iteratorError7 = undefined;
+
+                try {
+                    for (var _iterator7 = this.planets[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                        var planet = _step7.value;
+
+                        if (planet.active) {
+                            lastActivePlanet = planet;
+                        }
+                    }
+                } catch (err) {
+                    _didIteratorError7 = true;
+                    _iteratorError7 = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                            _iterator7.return();
+                        }
+                    } finally {
+                        if (_didIteratorError7) {
+                            throw _iteratorError7;
                         }
                     }
                 }
@@ -2270,13 +2428,13 @@ function layoutPlanets(adjacencyList, boundingSize) {
     // Perform a topological sort of the planets to get a layout
     var sorted = topologicalSort(adjacencyList);
     var groups = [[]];
-    var _iteratorNormalCompletion5 = true;
-    var _didIteratorError5 = false;
-    var _iteratorError5 = undefined;
+    var _iteratorNormalCompletion8 = true;
+    var _didIteratorError8 = false;
+    var _iteratorError8 = undefined;
 
     try {
-        for (var _iterator5 = sorted[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-            var group = _step5.value;
+        for (var _iterator8 = sorted[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+            var group = _step8.value;
 
             if (group.length === 1) {
                 groups[groups.length - 1] = groups[groups.length - 1].concat(group);
@@ -2286,16 +2444,16 @@ function layoutPlanets(adjacencyList, boundingSize) {
             }
         }
     } catch (err) {
-        _didIteratorError5 = true;
-        _iteratorError5 = err;
+        _didIteratorError8 = true;
+        _iteratorError8 = err;
     } finally {
         try {
-            if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                _iterator5.return();
+            if (!_iteratorNormalCompletion8 && _iterator8.return) {
+                _iterator8.return();
             }
         } finally {
-            if (_didIteratorError5) {
-                throw _iteratorError5;
+            if (_didIteratorError8) {
+                throw _iteratorError8;
             }
         }
     }
@@ -2307,13 +2465,13 @@ function layoutPlanets(adjacencyList, boundingSize) {
     var startX = 20;
     var startY = 20;
     var subgroups = [];
-    var _iteratorNormalCompletion6 = true;
-    var _didIteratorError6 = false;
-    var _iteratorError6 = undefined;
+    var _iteratorNormalCompletion9 = true;
+    var _didIteratorError9 = false;
+    var _iteratorError9 = undefined;
 
     try {
-        for (var _iterator6 = groups[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-            var _group = _step6.value;
+        for (var _iterator9 = groups[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+            var _group = _step9.value;
 
             if (_group.length > MAX_GROUP_SIZE) {
                 var numSubgroups = Math.ceil(_group.length / MAX_GROUP_SIZE);
@@ -2333,13 +2491,13 @@ function layoutPlanets(adjacencyList, boundingSize) {
                 subgroups = [_group];
             }
 
-            var _iteratorNormalCompletion7 = true;
-            var _didIteratorError7 = false;
-            var _iteratorError7 = undefined;
+            var _iteratorNormalCompletion10 = true;
+            var _didIteratorError10 = false;
+            var _iteratorError10 = undefined;
 
             try {
-                for (var _iterator7 = subgroups[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-                    var _subgroup = _step7.value;
+                for (var _iterator10 = subgroups[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+                    var _subgroup = _step10.value;
 
                     var boundingArea = {
                         x: startX,
@@ -2352,27 +2510,27 @@ function layoutPlanets(adjacencyList, boundingSize) {
                     positions = positions.concat(sublayout);
 
                     var maxOffset = 0;
-                    var _iteratorNormalCompletion8 = true;
-                    var _didIteratorError8 = false;
-                    var _iteratorError8 = undefined;
+                    var _iteratorNormalCompletion11 = true;
+                    var _didIteratorError11 = false;
+                    var _iteratorError11 = undefined;
 
                     try {
-                        for (var _iterator8 = sublayout[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-                            var _cell = _step8.value;
+                        for (var _iterator11 = sublayout[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+                            var _cell = _step11.value;
 
                             maxOffset = Math.max(maxOffset, _cell.x + _cell.r - boundingArea.x);
                         }
                     } catch (err) {
-                        _didIteratorError8 = true;
-                        _iteratorError8 = err;
+                        _didIteratorError11 = true;
+                        _iteratorError11 = err;
                     } finally {
                         try {
-                            if (!_iteratorNormalCompletion8 && _iterator8.return) {
-                                _iterator8.return();
+                            if (!_iteratorNormalCompletion11 && _iterator11.return) {
+                                _iterator11.return();
                             }
                         } finally {
-                            if (_didIteratorError8) {
-                                throw _iteratorError8;
+                            if (_didIteratorError11) {
+                                throw _iteratorError11;
                             }
                         }
                     }
@@ -2380,31 +2538,31 @@ function layoutPlanets(adjacencyList, boundingSize) {
                     startX += maxOffset;
                 }
             } catch (err) {
-                _didIteratorError7 = true;
-                _iteratorError7 = err;
+                _didIteratorError10 = true;
+                _iteratorError10 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion7 && _iterator7.return) {
-                        _iterator7.return();
+                    if (!_iteratorNormalCompletion10 && _iterator10.return) {
+                        _iterator10.return();
                     }
                 } finally {
-                    if (_didIteratorError7) {
-                        throw _iteratorError7;
+                    if (_didIteratorError10) {
+                        throw _iteratorError10;
                     }
                 }
             }
         }
     } catch (err) {
-        _didIteratorError6 = true;
-        _iteratorError6 = err;
+        _didIteratorError9 = true;
+        _iteratorError9 = err;
     } finally {
         try {
-            if (!_iteratorNormalCompletion6 && _iterator6.return) {
-                _iterator6.return();
+            if (!_iteratorNormalCompletion9 && _iterator9.return) {
+                _iterator9.return();
             }
         } finally {
-            if (_didIteratorError6) {
-                throw _iteratorError6;
+            if (_didIteratorError9) {
+                throw _iteratorError9;
             }
         }
     }
@@ -2514,89 +2672,89 @@ function topologicalSort(adjacencyList) {
     var result = [];
 
     var dependencies = {};
-    var _iteratorNormalCompletion9 = true;
-    var _didIteratorError9 = false;
-    var _iteratorError9 = undefined;
+    var _iteratorNormalCompletion12 = true;
+    var _didIteratorError12 = false;
+    var _iteratorError12 = undefined;
 
     try {
-        for (var _iterator9 = Object.keys(adjacencyList)[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-            var src = _step9.value;
+        for (var _iterator12 = Object.keys(adjacencyList)[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+            var src = _step12.value;
 
             dependencies[src] = {};
         }
     } catch (err) {
-        _didIteratorError9 = true;
-        _iteratorError9 = err;
+        _didIteratorError12 = true;
+        _iteratorError12 = err;
     } finally {
         try {
-            if (!_iteratorNormalCompletion9 && _iterator9.return) {
-                _iterator9.return();
+            if (!_iteratorNormalCompletion12 && _iterator12.return) {
+                _iterator12.return();
             }
         } finally {
-            if (_didIteratorError9) {
-                throw _iteratorError9;
+            if (_didIteratorError12) {
+                throw _iteratorError12;
             }
         }
     }
 
-    var _iteratorNormalCompletion10 = true;
-    var _didIteratorError10 = false;
-    var _iteratorError10 = undefined;
+    var _iteratorNormalCompletion13 = true;
+    var _didIteratorError13 = false;
+    var _iteratorError13 = undefined;
 
     try {
-        for (var _iterator10 = Object.keys(adjacencyList)[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
-            var _src = _step10.value;
+        for (var _iterator13 = Object.keys(adjacencyList)[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
+            var _src = _step13.value;
 
             var dsts = adjacencyList[_src];
-            var _iteratorNormalCompletion14 = true;
-            var _didIteratorError14 = false;
-            var _iteratorError14 = undefined;
+            var _iteratorNormalCompletion17 = true;
+            var _didIteratorError17 = false;
+            var _iteratorError17 = undefined;
 
             try {
-                for (var _iterator14 = dsts[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
-                    var _dst2 = _step14.value;
+                for (var _iterator17 = dsts[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {
+                    var _dst2 = _step17.value;
 
                     dependencies[_dst2][_src] = true;
                 }
             } catch (err) {
-                _didIteratorError14 = true;
-                _iteratorError14 = err;
+                _didIteratorError17 = true;
+                _iteratorError17 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion14 && _iterator14.return) {
-                        _iterator14.return();
+                    if (!_iteratorNormalCompletion17 && _iterator17.return) {
+                        _iterator17.return();
                     }
                 } finally {
-                    if (_didIteratorError14) {
-                        throw _iteratorError14;
+                    if (_didIteratorError17) {
+                        throw _iteratorError17;
                     }
                 }
             }
         }
     } catch (err) {
-        _didIteratorError10 = true;
-        _iteratorError10 = err;
+        _didIteratorError13 = true;
+        _iteratorError13 = err;
     } finally {
         try {
-            if (!_iteratorNormalCompletion10 && _iterator10.return) {
-                _iterator10.return();
+            if (!_iteratorNormalCompletion13 && _iterator13.return) {
+                _iterator13.return();
             }
         } finally {
-            if (_didIteratorError10) {
-                throw _iteratorError10;
+            if (_didIteratorError13) {
+                throw _iteratorError13;
             }
         }
     }
 
     while (true) {
         var found = [];
-        var _iteratorNormalCompletion11 = true;
-        var _didIteratorError11 = false;
-        var _iteratorError11 = undefined;
+        var _iteratorNormalCompletion14 = true;
+        var _didIteratorError14 = false;
+        var _iteratorError14 = undefined;
 
         try {
-            for (var _iterator11 = Object.keys(dependencies)[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
-                var dst = _step11.value;
+            for (var _iterator14 = Object.keys(dependencies)[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
+                var dst = _step14.value;
 
                 var deps = dependencies[dst];
                 if (Object.keys(deps).length === 0) {
@@ -2604,51 +2762,51 @@ function topologicalSort(adjacencyList) {
                 }
             }
         } catch (err) {
-            _didIteratorError11 = true;
-            _iteratorError11 = err;
+            _didIteratorError14 = true;
+            _iteratorError14 = err;
         } finally {
             try {
-                if (!_iteratorNormalCompletion11 && _iterator11.return) {
-                    _iterator11.return();
+                if (!_iteratorNormalCompletion14 && _iterator14.return) {
+                    _iterator14.return();
                 }
             } finally {
-                if (_didIteratorError11) {
-                    throw _iteratorError11;
+                if (_didIteratorError14) {
+                    throw _iteratorError14;
                 }
             }
         }
 
         if (found.length === 0) break;
 
-        var _iteratorNormalCompletion12 = true;
-        var _didIteratorError12 = false;
-        var _iteratorError12 = undefined;
+        var _iteratorNormalCompletion15 = true;
+        var _didIteratorError15 = false;
+        var _iteratorError15 = undefined;
 
         try {
-            for (var _iterator12 = found[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
-                var _dst = _step12.value;
-                var _iteratorNormalCompletion13 = true;
-                var _didIteratorError13 = false;
-                var _iteratorError13 = undefined;
+            for (var _iterator15 = found[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
+                var _dst = _step15.value;
+                var _iteratorNormalCompletion16 = true;
+                var _didIteratorError16 = false;
+                var _iteratorError16 = undefined;
 
                 try {
-                    for (var _iterator13 = Object.keys(dependencies)[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
-                        var key = _step13.value;
+                    for (var _iterator16 = Object.keys(dependencies)[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
+                        var key = _step16.value;
 
                         var _deps = dependencies[key];
                         delete _deps[_dst];
                     }
                 } catch (err) {
-                    _didIteratorError13 = true;
-                    _iteratorError13 = err;
+                    _didIteratorError16 = true;
+                    _iteratorError16 = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion13 && _iterator13.return) {
-                            _iterator13.return();
+                        if (!_iteratorNormalCompletion16 && _iterator16.return) {
+                            _iterator16.return();
                         }
                     } finally {
-                        if (_didIteratorError13) {
-                            throw _iteratorError13;
+                        if (_didIteratorError16) {
+                            throw _iteratorError16;
                         }
                     }
                 }
@@ -2658,16 +2816,16 @@ function topologicalSort(adjacencyList) {
 
             // Sort the list to give us a deterministic order
         } catch (err) {
-            _didIteratorError12 = true;
-            _iteratorError12 = err;
+            _didIteratorError15 = true;
+            _iteratorError15 = err;
         } finally {
             try {
-                if (!_iteratorNormalCompletion12 && _iterator12.return) {
-                    _iterator12.return();
+                if (!_iteratorNormalCompletion15 && _iterator15.return) {
+                    _iterator15.return();
                 }
             } finally {
-                if (_didIteratorError12) {
-                    throw _iteratorError12;
+                if (_didIteratorError15) {
+                    throw _iteratorError15;
                 }
             }
         }
@@ -2689,15 +2847,15 @@ var Mask = function (_mag$Rect4) {
 
         // cx, cy are in % of context width/height
 
-        var _this38 = _possibleConstructorReturn(this, (Mask.__proto__ || Object.getPrototypeOf(Mask)).call(this, 0, 0, 0, 0));
+        var _this39 = _possibleConstructorReturn(this, (Mask.__proto__ || Object.getPrototypeOf(Mask)).call(this, 0, 0, 0, 0));
 
-        _this38.cx = cx;
-        _this38.cy = cy;
-        _this38.radius = r;
-        _this38.opacity = 0.0;
-        _this38.ringControl = 0;
-        _this38.color = color;
-        return _this38;
+        _this39.cx = cx;
+        _this39.cy = cy;
+        _this39.radius = r;
+        _this39.opacity = 0.0;
+        _this39.ringControl = 0;
+        _this39.color = color;
+        return _this39;
     }
 
     _createClass(Mask, [{

@@ -41,6 +41,7 @@ function LOAD_REDUCT_GAMEAUDIO(Resource) {
     loadAudio('key-press-4', 'key-press-4.wav');
     loadAudio('printer', '119556__vrodge__office-printer-printing.wav');
     loadAudio('stamp', '33310__queensize__stamp.wav');
+    loadAudio('unlock-planet', '325112__fisch12345__success.wav');
 }
 
 function LOAD_REDUCT_RESOURCES(Resource) {
@@ -150,6 +151,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             // Chapters are in the same order as filenames
             for (var i = 0; i < chapters.length; i++) {
                 chapters[i].transitions = definition[filenames[i]];
+                chapters[i].filename = filenames[i];
             }
 
             // Construct the dependencies list as well
