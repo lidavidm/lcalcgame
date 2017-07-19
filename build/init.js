@@ -11,12 +11,8 @@ var canvas;
 
 var level_idx = getCookie('level_idx') || 0;
 var completedLevels = {};
-var spendUnits = 0;
 if (window.localStorage["completedLevels"]) {
     completedLevels = JSON.parse(window.localStorage["completedLevels"]);
-}
-if (window.localStorage["spendUnits"]) {
-    spendUnits = window.localStorage["spendUnits"];
 }
 if (level_idx !== 0) level_idx = parseInt(level_idx);
 var cur_menu = null;
@@ -49,6 +45,7 @@ function init() {
 
     if (!__SHOW_DEV_INFO) $('#devinfo').hide();
 
+    // Do special things with GET parameters.
     if (__GET_PARAMS || true) {
         var start_from = __GET_PARAMS.level;
         var fade_level = __GET_PARAMS.fade;
@@ -82,6 +79,9 @@ function init() {
                 Resource.afterLoadSequence('gameaudio', function () {
                     console.log('Loaded game audio resources.');
                 });
+
+                // Load player score and progress.
+                ProgressManager.load();
 
                 // Start a new log session (creating userID as necessary),
                 // and then begin the game.
@@ -173,8 +173,7 @@ function returnToMenu() {
         prepareCanvas();
         cur_menu.validate();
         console.log(cur_menu);
-        cur_menu.updateLevelSpots();
-        cur_menu.reset();
+        //cur_menu.reset();
         stage = cur_menu;
         redraw(stage);
     } else {
@@ -370,11 +369,13 @@ var prepareCanvas = function () {
 }();
 
 function saveProgress() {
+    //ProgressManager.save();
+
+    // Last level player was on...
     var cookie = getCookie('level_idx');
     if (cookie.length === 0 || level_idx > parseInt(cookie)) {
         setCookie('level_idx', level_idx);
     }
-    window.localStorage["completedLevels"] = JSON.stringify(completedLevels);
 }
 
 function initBoard() {
@@ -542,6 +543,7 @@ function next() {
             }
 
             // Otherwise...
+            ProgressManager.markLevelComplete(level_idx); // DEBUG
             level_idx++;
             initBoard();
         });

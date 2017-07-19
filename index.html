@@ -50,6 +50,7 @@
         <script src="build/misc/rainbowtrail.js" charset="utf-8"></script>
         <script src="build/expr/expression.js" charset="utf-8"></script>
         <script src="build/frame/environmentdisplay.js" charset="utf-8"></script>
+        <script src="build/frame/progressmanager.js" charset="utf-8"></script>
         <script src="build/expr/notch.js" charset="utf-8"></script>
         <script src="build/expr/apply.js" charset="utf-8"></script>
         <script src="build/expr/value.js" charset="utf-8"></script>
@@ -227,7 +228,7 @@
             <div id="duplicate_buttons" class="centered">
                 <button onclick="prev()">Prev</button>
                 <button onclick="initBoard()">Reset</button>
-                <button onclick="resetToLevel(0); initMainMenu()">Reset Completely</button>
+                <button onclick="resetToLevel(0); ProgressManager.resetProgress(); initMainMenu()">Reset Completely</button>
                 <button onclick="toggleMute()">Mute</button>
             </div>
             <!-- <div class="centered">

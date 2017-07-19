@@ -93,6 +93,7 @@ var mag = function (_) {
                 var dur = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1000;
                 var colorWeights = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [1, 1, 1];
                 var blinkCount = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 2;
+                var blinkStroke = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
 
                 if (!Array.isArray(nodes)) nodes = [nodes];
                 nodes = nodes.map(function (n) {
@@ -100,15 +101,16 @@ var mag = function (_) {
                 });
                 nodes.forEach(function (n) {
                     var last_color = null;
+                    var orig_color = n.color;
                     var twn = new Tween(function (elapsed) {
                         var gray = (Math.sin(2 * blinkCount * elapsed * Math.PI * 3 / 4) + 1) * 255 / 2;
                         var clr = colorFrom255(gray, colorWeights);
-                        n.stroke = { color: clr,
+                        if (blinkStroke) n.stroke = { color: clr,
                             lineWidth: 4,
-                            opacity: gray / 255 };
+                            opacity: gray / 255 };else n.color = clr;
                         if (n.stage) n.stage.draw();
                     }, dur).after(function () {
-                        n.stroke = null;
+                        if (blinkStroke) n.stroke = null;else n.color = orig_color;
                         if (n.stage) n.stage.draw();
                     });
                     twn.run();

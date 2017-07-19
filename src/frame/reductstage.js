@@ -32,7 +32,8 @@ class ReductStage extends mag.Stage {
         var btn_menu = new mag.Button(canvas_screen.w - 64*3 - UI_PADDING, UI_PADDING, 64, 64,
             { default:'btn-menu-default', hover:'btn-menu-hover', down:'btn-menu-down' },
             () => {
-            returnToMenu();
+            //returnToMenu();
+            initChapterSelectMenu(); 
         });
 
         var btn_reset = new mag.Button(btn_back.pos.x + btn_back.size.w, UI_PADDING, 64, 64,
@@ -103,7 +104,7 @@ class ReductStage extends mag.Stage {
                 btn_menu.pos = btn_reset.pos;
                 btn_reset.pos = btn_next.pos;
             }
-            //this.add(btn_menu);
+            this.add(btn_menu);
             this.add(btn_reset);
         }
 
@@ -234,6 +235,9 @@ class ReductStage extends mag.Stage {
                 if (!this.ranCompletionAnim) {
 
                     Logger.log( 'victory', { 'final_state':this.toString(), 'num_of_moves':undefined } );
+
+                    // Update + save player progress.
+                    ProgressManager.markLevelComplete(level_idx);
 
                     let you_win = () => {
 

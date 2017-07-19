@@ -555,8 +555,8 @@ class LevelSelectGrid extends mag.Rect {
         const GRID_LEFTPAD = (SCREEN_WIDTH - ((CELL_SIZE + PADDING) * NUM_COLS + GRID_MARGIN*2)) / 2.0 + 20;
         const TOP_MARGIN = SCREEN_HEIGHT / 2.0 - (CELL_SIZE + PADDING) * NUM_ROWS / 2.0;
 
-        console.log(levels);
-        console.log(SCREEN_WIDTH - GRID_MARGIN*2, CELL_SIZE + PADDING, NUM_CELLS, NUM_COLS, NUM_ROWS);
+        // console.log(levels);
+        // console.log(SCREEN_WIDTH - GRID_MARGIN*2, CELL_SIZE + PADDING, NUM_CELLS, NUM_COLS, NUM_ROWS);
 
         const start_idx = levels[1];
         let genClickCallback = function (level_idx) {
@@ -589,13 +589,19 @@ class LevelSelectGrid extends mag.Rect {
 
                 let numStars = Math.trunc(i / NUM_CELLS * 3 + 1);
                 let idx = start_idx + i;
-                if (!completedLevels[idx]) {
-                    if (completedLevels[idx-1] || i === 0) {
+                if (!ProgressManager.isLevelComplete(idx)) {
+                    if (i === 0 || ProgressManager.isLevelUnlocked(idx) || (idx > 0 && ProgressManager.isLevelComplete(idx-1))) {
                         cell.markAsIncomplete();
                         cell.addStars(numStars, 'orange');
+                        if (idx === 0) ProgressManager.updateLevelStatus(idx, { isUnlocked: true }); // very first level is always unlocked.
                     } else {
                         cell.lock();
                     }
+                    ProgressManager.updateLevelStatus(idx, {
+                        isComplete: false,
+                        totalWorth: numStars,
+                        remainingWorth: numStars
+                    });
                 } else {
                     cell.addStars(numStars);
                 }
@@ -859,11 +865,13 @@ class PlanetCard extends mag.ImageRect {
     }
 
     onmouseclick() {
+        if (!this.active && !this.spendBoard) return;
         if (this.onclick)
             this.onclick();
         this.selected = false;
     }
     onmouseenter() {
+        if (!this.active && !this.spendBoard) return;
         this.selected = true;
         this.glow.opacity = this.highlighted ? 0.5 : 0.0;
         Animate.tween(this.glow, { opacity:1.0 }, 100).after(() => {
@@ -871,6 +879,7 @@ class PlanetCard extends mag.ImageRect {
         });
     }
     onmouseleave(pos) {
+        if (!this.active && !this.spendBoard) return;
         if (distBetweenPos(pos, this.pos) > this.absoluteSize.h / 4.0) {
             this.selected = false;
             if (this.highlighted) {
@@ -907,6 +916,8 @@ class PlanetCard extends mag.ImageRect {
     }
 
     showCost(cost) {
+        if (typeof cost === 'undefined') cost = this.cost || 0;
+        if (this.spendBoard) this.hideCost();
         let board = new SpendBoard(cost, 'darkgray', 'darkgray');
         board.anchor = {x:0.5, y:0.5};
         board.pos = {x:this.size.w/2.0+8, y:this.size.h/2.0-4};
@@ -917,11 +928,14 @@ class PlanetCard extends mag.ImageRect {
     }
     hideCost() {
         if (this.spendBoard) {
-            this.cost = undefined;
             if (this.hasChild(this.spendBoard))
                 this.removeChild(this.spendBoard);
             this.spendBoard = undefined;
         }
+    }
+    setCost(cost) {
+        this.cost = cost;
+        if (this.spendBoard) this.spendBoard.text.text = cost.toString();
     }
 
     updateLevelSpots() {
@@ -1364,14 +1378,15 @@ class ChapterSelectMenu extends mag.Stage {
         });
         this.btn_back.opacity = 0.7;
 
-        this.spendBoard = new SpendBoard(100);
+        this.spendBoard = new SpendBoard(ProgressManager.getScore());
         this.spendBoard.anchor = {x:1, y:1};
         this.spendBoard.pos = {x:GLOBAL_DEFAULT_SCREENSIZE.width, y:GLOBAL_DEFAULT_SCREENSIZE.height};
         this.add(this.spendBoard);
 
-        Animate.wait(2000).after(() => {
-            this.spendBoard.addPoints(8);
-        });
+        // DEBUG: Add points to test unlock functions.
+        // Animate.wait(2000).after(() => {
+        //     this.spendBoard.addPoints(8);
+        // });
 
         this.planets = [];
         this.stars = [];
@@ -1661,10 +1676,20 @@ class ChapterSelectMenu extends mag.Stage {
 
         let transferPoints = (cost, board1, board2) => {
             if (cost <= 0) {
+
                 planet.cost = undefined;
                 planet.activate();
+
+                // Update + save player progress.
+                ProgressManager.updateLevelStatus(planet.startLevelIdx, {
+                    isUnlocked: true
+                });
+                ProgressManager.loseScore(totalCost);
+                ProgressManager.save();
+
                 Resource.play('unlock-planet');
                 this.panningEnabled = true;
+                this.updatePlanetSpendBoards();
 
                 planet.showExpandingEffect();
                 if (planet.toPaths) {
@@ -1686,6 +1711,36 @@ class ChapterSelectMenu extends mag.Stage {
         };
 
         transferPoints(totalCost, this.spendBoard, planet.spendBoard);
+    }
+
+    updatePlanetSpendBoards() {
+        if (!this.planets) return;
+
+        // Traverse planet tree to set costs.
+        let firstPlanet = this.planets.filter((p) => !p.fromPlanets)[0];
+        function setCostsRecursive(startPlanet, passedPlanets) {
+            if (passedPlanets.indexOf(startPlanet) > -1) return;
+            const NUM_TOPLANETS = startPlanet.toPlanets.length;
+            const COST_FOR_NEXT_PLANETS = NUM_TOPLANETS > 0 ? Math.trunc(startPlanet.worth * 0.75 / NUM_TOPLANETS) : 0;
+            console.log(startPlanet.name, COST_FOR_NEXT_PLANETS);
+            startPlanet.toPlanets.forEach((p) => {
+                p.setCost(COST_FOR_NEXT_PLANETS);
+                setCostsRecursive(p, passedPlanets);
+                passedPlanets.push(p);
+            });
+        }
+        setCostsRecursive(firstPlanet, []);
+
+        // Show costs only for planets immediately adjacent to unlocked planets.
+        this.planets.forEach((planet) => {
+            if (!planet.active && planet.fromPlanets) {
+                // Only allow player to unlock this planet if AT LEAST ONE planet
+                // that goes to it is unlocked.
+                let allowUnlock = planet.fromPlanets.filter((p) => p.active).length > 0;
+                if (allowUnlock) planet.showCost();
+                else             planet.hideCost();
+            }
+        });
     }
 
     activatePlanet(planet, durationMultiplier=1.0) {
@@ -1767,6 +1822,7 @@ class ChapterSelectMenu extends mag.Stage {
             const POS_MAP = layoutPlanets(chapters.transitions, this.boundingSize);
 
             let planetParent = new mag.Rect(0, 0, 0, 0);
+            let worth = [];
 
             chapters.chapters.forEach((chap, i) => {
                 let pos = i < POS_MAP.length ? POS_MAP[i] : { x:0, y:0, r:10 };
@@ -1779,14 +1835,27 @@ class ChapterSelectMenu extends mag.Stage {
                 planet.shadowOffset = 0;
 
                 if (chap.resources) {
-                    const levels = Resource.levelsForChapter(chap.name);
 
-                    // Activate planet if applicable
-                    if (Resource.isChapterUnlocked(i)) {
+                    // Get the levels for this chapter.
+                    const levels = Resource.levelsForChapter(chap.name);
+                    const NUM_LEVELS = levels[0].length;
+
+                    // Calculate total 'worth' of the chapter as the sum of starpoints.
+                    // * Uses each planet's internal default setting for number of starpoints
+                    // * per level, which is related to its local index. This might change in the future.
+                    worth[i] = 0;
+                    for (let n = 0.0; n < NUM_LEVELS; n += 1.0)
+                        worth[i] += Math.trunc(n / NUM_LEVELS * 3 + 1);
+                    planet.worth = worth[i];
+
+                    // Activate planet if first level unlocked or this is the very first planet.
+                    if (ProgressManager.isLevelUnlocked(chap.startIdx) || chap.startIdx === 0) {
                         planet.activate();
                     }
-                    else {
-                        planet.deactivate(chap.cost ? chap.cost : Math.trunc(Math.random() * 12 + 1));
+                    else { // Lock planet and set appropriate cost-to-unlock.
+                        // TEMPORARILY... The cost is 50% of the previous planets' worth.
+                        console.log(chap.name, worth[i-1]);
+                        planet.deactivate(i > 0 ? Math.trunc(worth[i-1] * 0.75) : 1);
                     }
 
                     // Set levels for planet.
@@ -1796,9 +1865,12 @@ class ChapterSelectMenu extends mag.Stage {
                 planet.onclick = () => {
                     if (planet.active)
                         this.activatePlanet(planet);
-                    else if (planet.cost && this.spendBoard &&
+                    else if (planet.spendBoard && planet.cost && this.spendBoard &&
                         planet.cost <= this.spendBoard.points) {
                         this.payToUnlock(planet);
+                    } else if (planet.spendBoard) {
+                        Animate.blink(planet.spendBoard.text, 1000, [1,0,0], 2, false);
+                        Animate.blink(planet.spendBoard.icon, 1000, [1,0,0], 2, false);
                     }
                 };
 
@@ -1810,7 +1882,8 @@ class ChapterSelectMenu extends mag.Stage {
                 let fromPos = fromPlanet.absolutePos;
                 let toPlanetFileNames = chapters.transitions[fromPlanet.filename];
                 let paths = [];
-                let toPlanets = planets.filter((p) => toPlanetFileNames.indexOf(p.filename) > -1)
+                let toPlanets = planets.filter((p) => toPlanetFileNames.indexOf(p.filename) > -1);
+                fromPlanet.toPlanets = toPlanets;
                 for (let toPlanet of toPlanets) {
                     let pts = [ clonePos(fromPos), toPlanet.absolutePos ];
                     let strokeStyle;
@@ -1818,7 +1891,9 @@ class ChapterSelectMenu extends mag.Stage {
                     else                 strokeStyle = {color:'gold', lineWidth:1, lineDash:[5, 10], opacity:0.2};
                     let path = new ArrowPath(pts, strokeStyle, 8, false);
                     if (!toPlanet.toPaths) toPlanet.toPaths = [ path ];
-                    else                  toPlanet.toPaths.push(path);
+                    else                   toPlanet.toPaths.push(path);
+                    if (!toPlanet.fromPlanets) toPlanet.fromPlanets = [ fromPlanet ];
+                    else                       toPlanet.fromPlanets.push(fromPlanet);
                     paths.push(path);
                 }
                 transitionPaths = transitionPaths.concat(paths);
@@ -1837,6 +1912,7 @@ class ChapterSelectMenu extends mag.Stage {
 
             this.planets = planets;
             this.setPlanetsToDefaultPos();
+            this.updatePlanetSpendBoards();
         });
     }
 }

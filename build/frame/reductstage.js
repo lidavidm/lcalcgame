@@ -49,7 +49,8 @@ var ReductStage = function (_mag$Stage) {
             });
 
             var btn_menu = new mag.Button(canvas_screen.w - 64 * 3 - UI_PADDING, UI_PADDING, 64, 64, { default: 'btn-menu-default', hover: 'btn-menu-hover', down: 'btn-menu-down' }, function () {
-                returnToMenu();
+                //returnToMenu();
+                initChapterSelectMenu();
             });
 
             var btn_reset = new mag.Button(btn_back.pos.x + btn_back.size.w, UI_PADDING, 64, 64, { default: 'btn-reset-default', hover: 'btn-reset-hover', down: 'btn-reset-down' }, function () {
@@ -111,7 +112,7 @@ var ReductStage = function (_mag$Stage) {
                     btn_menu.pos = btn_reset.pos;
                     btn_reset.pos = btn_next.pos;
                 }
-                //this.add(btn_menu);
+                this.add(btn_menu);
                 this.add(btn_reset);
             }
 
@@ -273,6 +274,9 @@ var ReductStage = function (_mag$Stage) {
                         (function () {
 
                             Logger.log('victory', { 'final_state': _this4.toString(), 'num_of_moves': undefined });
+
+                            // Update + save player progress.
+                            ProgressManager.markLevelComplete(level_idx);
 
                             var you_win = function you_win() {
 

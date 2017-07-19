@@ -54,22 +54,27 @@ var mag = (function(_) {
             return tweens[0];
         }
 
-        static blink(nodes, dur=1000, colorWeights=[1,1,1], blinkCount=2) {
+        static blink(nodes, dur=1000, colorWeights=[1,1,1], blinkCount=2, blinkStroke=true) {
             if (!Array.isArray(nodes)) nodes = [nodes];
             nodes = nodes.map((n) => {
                 return n instanceof ValueExpr ? n.graphicNode : n;
             });
             nodes.forEach((n) => {
                 var last_color = null;
+                const orig_color = n.color;
                 var twn = new Tween((elapsed) => {
                     let gray = (Math.sin(2*blinkCount*elapsed*Math.PI*3/4)+1) * 255 / 2;
                     let clr = colorFrom255(gray, colorWeights);
-                    n.stroke = { color: clr,
-                                 lineWidth:4,
-                                 opacity:gray / 255 };
+                    if (blinkStroke)
+                        n.stroke = { color: clr,
+                                     lineWidth:4,
+                                     opacity:gray / 255 };
+                    else
+                        n.color = clr;
                     if (n.stage) n.stage.draw();
                 }, dur).after(() => {
-                    n.stroke = null;
+                    if (blinkStroke) n.stroke = null;
+                    else             n.color = orig_color;
                     if (n.stage) n.stage.draw();
                 });
                 twn.run();

@@ -402,12 +402,18 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         });
     };
 
+    Resource.isLevelStartOfChapter = (idx) => {
+        var chap = Resource.chapterForLevelIdx(idx);
+        return chap != null && chap.startIdx === idx;
+    };
+
     Resource.isChapterUnlocked = (idx) => {
-        for (let depIdx of Object.keys(digraph.dependencies[idx])) {
-            if (!completedLevels[chapters[depIdx].endIdx]) {
-                return false;
-            }
-        }
-        return true;
+        return ProgressManager.isLevelUnlocked(chapters[idx].startIdx);
+        // for (let depIdx of Object.keys(digraph.dependencies[idx])) {
+        //     if (!ProgressManager.isLevelUnlocked(chapters[depIdx].endIdx)) {
+        //         return false;
+        //     }
+        // }
+        // return true;
     };
 }

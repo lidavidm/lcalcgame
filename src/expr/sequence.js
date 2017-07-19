@@ -340,7 +340,7 @@ class MultiClampSequence extends Sequence {
         this.holes.forEach((expr, i) => { // Update hole expression positions.
 
             if (i === this.breakIndices[currentBreakIdx]) {
-                x = this.getMidSize().w / 2.0 - expr.size.w / 2.0 * expr.scale.x;
+                x = i % 2 === 0 ? this.padding.left : (this.getMidSize().w / 2.0 - expr.size.w / 2.0 * expr.scale.x);
                 if (currentBreakIdx % 2 === 1) y += FILLER_INNER_HEIGHT + padding;
                 else {
                     y += expr.anchor.y * expr.size.h * expr.scale.y + padding / 2;

@@ -525,7 +525,7 @@ var MultiClampSequence = function (_Sequence3) {
                 // Update hole expression positions.
 
                 if (i === _this8.breakIndices[currentBreakIdx]) {
-                    x = _this8.getMidSize().w / 2.0 - expr.size.w / 2.0 * expr.scale.x;
+                    x = i % 2 === 0 ? _this8.padding.left : _this8.getMidSize().w / 2.0 - expr.size.w / 2.0 * expr.scale.x;
                     if (currentBreakIdx % 2 === 1) y += FILLER_INNER_HEIGHT + padding;else {
                         y += expr.anchor.y * expr.size.h * expr.scale.y + padding / 2;
                         y += (1 - expr.anchor.y) * expr.size.h * expr.scale.y / 2;
