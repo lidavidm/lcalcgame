@@ -83,6 +83,8 @@ function init() {
                 // Load player score and progress.
                 ProgressManager.load();
 
+                var afterLoad = __GET_PARAMS.level ? initBoard : initChapterSelectMenu;
+
                 // Start a new log session (creating userID as necessary),
                 // and then begin the game.
                 Logger.startSession().then(function (userinfo) {
@@ -102,7 +104,7 @@ function init() {
 
                     lockFocus();
                     return loadChapterSelect();
-                }).then(initChapterSelectMenu);
+                }).then(afterLoad);
             });
         }
     });

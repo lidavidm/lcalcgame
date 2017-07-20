@@ -33,7 +33,7 @@ class ReductStage extends mag.Stage {
             { default:'btn-menu-default', hover:'btn-menu-hover', down:'btn-menu-down' },
             () => {
             //returnToMenu();
-            initChapterSelectMenu(); 
+            initChapterSelectMenu();
         });
 
         var btn_reset = new mag.Button(btn_back.pos.x + btn_back.size.w, UI_PADDING, 64, 64,
@@ -241,7 +241,7 @@ class ReductStage extends mag.Stage {
 
                     let you_win = () => {
 
-                        //if (level_idx < 1) {
+                        if (level_idx < 1) {
                             var cmp = new mag.ImageRect(GLOBAL_DEFAULT_SCREENSIZE.w / 2, GLOBAL_DEFAULT_SCREENSIZE.h / 2, 740 / 2, 146 / 2, 'victory');
                             cmp.anchor = { x:0.5, y:0.5 };
                             this.add(cmp);
@@ -251,9 +251,9 @@ class ReductStage extends mag.Stage {
                             Animate.wait(1080).after(function () {
                                 next();
                             });
-                        //} else { // Skip victory jingle on every level after first.
-                        //    next();
-                        //}
+                        } else { // Skip victory jingle on every level after first.
+                           next();
+                        }
                     };
 
                     let pairs = level_complete;

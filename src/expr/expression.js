@@ -44,11 +44,7 @@ class Expression extends mag.RoundedRect {
         return false;
     }
     clone(parent=null) {
-        //console.log("parent");
-        //console.log(parent);
         var c = super.clone(parent);
-        //console.log("c!!!!!");
-        //console.log(c);
         var children = c.children;
         var holes = c.holes;
         c.children = [];
@@ -58,8 +54,6 @@ class Expression extends mag.RoundedRect {
         children.forEach((child) => c.addArg(child));
         //c.holes = [];
         //holes.forEach((hole) => c.addHole(hole));
-        //console.log("c.holes");
-        //console.log(c.holes);
         return c;
     }
 
@@ -98,15 +92,6 @@ class Expression extends mag.RoundedRect {
     swap(arg, anotherArg) {
         if (!arg || anotherArg === undefined) return;
         var i = this.holes.indexOf(arg);
-
-        console.log("swap: arg");
-        console.log(arg);
-        console.log("this.holes");
-        console.log(this.holes);
-
-        if (arg instanceof LambdaVarExpr) {
-            i = 0;
-        }
 
         if (i > -1) {
 

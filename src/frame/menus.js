@@ -1381,7 +1381,6 @@ class ChapterSelectMenu extends mag.Stage {
         this.spendBoard = new SpendBoard(ProgressManager.getScore());
         this.spendBoard.anchor = {x:1, y:1};
         this.spendBoard.pos = {x:GLOBAL_DEFAULT_SCREENSIZE.width, y:GLOBAL_DEFAULT_SCREENSIZE.height};
-        this.add(this.spendBoard);
 
         // DEBUG: Add points to test unlock functions.
         // Animate.wait(2000).after(() => {
@@ -1400,6 +1399,8 @@ class ChapterSelectMenu extends mag.Stage {
 
         this.showChapters().then(() => {
             this.updateParallax();
+
+            this.add(this.spendBoard);
 
             this.offset = { x:0, y:0 };
             let lastActivePlanet = this.lastActivePlanet;
@@ -1871,6 +1872,7 @@ class ChapterSelectMenu extends mag.Stage {
                     } else if (planet.spendBoard) {
                         Animate.blink(planet.spendBoard.text, 1000, [1,0,0], 2, false);
                         Animate.blink(planet.spendBoard.icon, 1000, [1,0,0], 2, false);
+                        Resource.play('fatbtn-beep2');
                     }
                 };
 

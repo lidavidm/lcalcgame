@@ -1755,7 +1755,6 @@ var ChapterSelectMenu = function (_mag$Stage2) {
         _this32.spendBoard = new SpendBoard(ProgressManager.getScore());
         _this32.spendBoard.anchor = { x: 1, y: 1 };
         _this32.spendBoard.pos = { x: GLOBAL_DEFAULT_SCREENSIZE.width, y: GLOBAL_DEFAULT_SCREENSIZE.height };
-        _this32.add(_this32.spendBoard);
 
         // DEBUG: Add points to test unlock functions.
         // Animate.wait(2000).after(() => {
@@ -1774,6 +1773,8 @@ var ChapterSelectMenu = function (_mag$Stage2) {
 
         _this32.showChapters().then(function () {
             _this32.updateParallax();
+
+            _this32.add(_this32.spendBoard);
 
             _this32.offset = { x: 0, y: 0 };
             var lastActivePlanet = _this32.lastActivePlanet;
@@ -2319,6 +2320,7 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                         } else if (planet.spendBoard) {
                             Animate.blink(planet.spendBoard.text, 1000, [1, 0, 0], 2, false);
                             Animate.blink(planet.spendBoard.icon, 1000, [1, 0, 0], 2, false);
+                            Resource.play('fatbtn-beep2');
                         }
                     };
 

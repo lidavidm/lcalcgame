@@ -71,11 +71,7 @@ var Expression = function (_mag$RoundedRect) {
         value: function clone() {
             var parent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
-            //console.log("parent");
-            //console.log(parent);
             var c = _get(Expression.prototype.__proto__ || Object.getPrototypeOf(Expression.prototype), 'clone', this).call(this, parent);
-            //console.log("c!!!!!");
-            //console.log(c);
             var children = c.children;
             var holes = c.holes;
             c.children = [];
@@ -87,8 +83,6 @@ var Expression = function (_mag$RoundedRect) {
             });
             //c.holes = [];
             //holes.forEach((hole) => c.addHole(hole));
-            //console.log("c.holes");
-            //console.log(c.holes);
             return c;
         }
 
@@ -135,15 +129,6 @@ var Expression = function (_mag$RoundedRect) {
         value: function swap(arg, anotherArg) {
             if (!arg || anotherArg === undefined) return;
             var i = this.holes.indexOf(arg);
-
-            console.log("swap: arg");
-            console.log(arg);
-            console.log("this.holes");
-            console.log(this.holes);
-
-            if (arg instanceof LambdaVarExpr) {
-                i = 0;
-            }
 
             if (i > -1) {
 

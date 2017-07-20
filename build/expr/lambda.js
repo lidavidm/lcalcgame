@@ -163,13 +163,6 @@ var LambdaHoleExpr = function (_MissingExpression) {
                     var c = node.clone();
                     //c.bindSubexpressions();
 
-                    console.log("node");
-                    console.log(node);
-                    console.log("c.parent");
-                    console.log(c.parent);
-                    console.log("expr.parent");
-                    console.log(expr.parent);
-
                     c.stage = null;
                     expr.parent.swap(expr, c); // Swap the expression for a clone of the dropped node.
                     c.parent.bindSubexpressions();
@@ -1721,7 +1714,7 @@ function findNoncapturingVarExpr(lambda, name) {
     var queue = [lambda];
     while (queue.length > 0) {
         var node = queue.pop();
-        var isVar = node instanceof VarExpr || node instanceof LambdaVarExpr || node instanceof VtableVarExpr;
+        var isVar = node instanceof VarExpr || node instanceof LambdaVarExpr || node instanceof VtableVarExpr || node instanceof HalfFadedLambdaVarExpr || node instanceof FadedLambdaVarExpr;
         if (isVar) {
             subvarexprs.push(node);
         } else if (!skipLabel && (node instanceof DisplayChest || node instanceof LabeledDisplay || node instanceof SpreadsheetDisplay)) {

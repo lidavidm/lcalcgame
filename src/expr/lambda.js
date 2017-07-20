@@ -128,13 +128,6 @@ class LambdaHoleExpr extends MissingExpression {
                 let c = node.clone();
                 //c.bindSubexpressions();
 
-                console.log("node");
-                console.log(node);
-                console.log("c.parent");
-                console.log(c.parent);
-                console.log("expr.parent");
-                console.log(expr.parent);
-
                 c.stage = null;
                 expr.parent.swap(expr, c); // Swap the expression for a clone of the dropped node.
                 c.parent.bindSubexpressions();
@@ -1279,7 +1272,7 @@ function findNoncapturingVarExpr(lambda, name, skipLambda=false, skipLabel=false
     let queue = [lambda];
     while (queue.length > 0) {
         let node = queue.pop();
-        let isVar = node instanceof VarExpr || node instanceof LambdaVarExpr || node instanceof VtableVarExpr;
+        let isVar = node instanceof VarExpr || node instanceof LambdaVarExpr || node instanceof VtableVarExpr || node instanceof HalfFadedLambdaVarExpr || node instanceof FadedLambdaVarExpr;
         if (isVar) {
             subvarexprs.push(node);
         }
