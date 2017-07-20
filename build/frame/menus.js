@@ -571,7 +571,6 @@ var SpendBoard = function (_mag$Rect2) {
                     var subtract = left < 0;
                     _this12.addPoint(true, subtract).after(function () {
                         if (subtract) left++;else left--;
-                        console.log(left);
                         _this12.addPoints(left, true);
                     });
                 })();
@@ -2164,7 +2163,6 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                 if (passedPlanets.indexOf(startPlanet) > -1) return;
                 var NUM_TOPLANETS = startPlanet.toPlanets.length;
                 var COST_FOR_NEXT_PLANETS = NUM_TOPLANETS > 0 ? Math.trunc(startPlanet.worth * 0.75 / NUM_TOPLANETS) : 0;
-                console.log(startPlanet.name, COST_FOR_NEXT_PLANETS);
                 startPlanet.toPlanets.forEach(function (p) {
                     p.setCost(COST_FOR_NEXT_PLANETS);
                     setCostsRecursive(p, passedPlanets);

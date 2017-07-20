@@ -182,7 +182,8 @@ var NamedFuncExpr = function (_Expression) {
                     // eval("while(1) {}");
                     this._javaScriptFunction = _expr.toJavaScript();
                     if (this._javaScriptFunction) {
-                        var js_code = '(' + this._javaScriptFunction + ")(" + args.map(function (a) {
+                        var headers = '__star="star";__rect="rect";';
+                        var js_code = headers + '(' + this._javaScriptFunction + ")(" + args.map(function (a) {
                             return a.toJavaScript();
                         }).join(',') + ");";
                         var geval = eval; // equivalent to calling eval in the global scope

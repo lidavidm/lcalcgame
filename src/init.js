@@ -80,7 +80,7 @@ function init() {
                 // Load player score and progress.
                 ProgressManager.load();
 
-                let afterLoad = __GET_PARAMS.level ? initBoard : initChapterSelectMenu;
+                let afterLoad = (typeof __GET_PARAMS.level !== 'undefined' || !__SHOW_MAINMENU_NAV) ? initBoard : initChapterSelectMenu;
 
                 // Start a new log session (creating userID as necessary),
                 // and then begin the game.

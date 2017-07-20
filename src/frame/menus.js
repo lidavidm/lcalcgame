@@ -427,7 +427,6 @@ class SpendBoard extends mag.Rect {
             this.addPoint(true, subtract).after(() => {
                 if (subtract) left++;
                 else left--;
-                console.log(left);
                 this.addPoints(left, true);
             })
         }
@@ -1723,7 +1722,6 @@ class ChapterSelectMenu extends mag.Stage {
             if (passedPlanets.indexOf(startPlanet) > -1) return;
             const NUM_TOPLANETS = startPlanet.toPlanets.length;
             const COST_FOR_NEXT_PLANETS = NUM_TOPLANETS > 0 ? Math.trunc(startPlanet.worth * 0.75 / NUM_TOPLANETS) : 0;
-            console.log(startPlanet.name, COST_FOR_NEXT_PLANETS);
             startPlanet.toPlanets.forEach((p) => {
                 p.setCost(COST_FOR_NEXT_PLANETS);
                 setCostsRecursive(p, passedPlanets);

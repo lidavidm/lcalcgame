@@ -103,6 +103,13 @@ var ClampExpr = function (_Expression) {
                 expr.anchor = { x: 0, y: 0.5 };
                 expr.pos = { x: x, y: y };
                 expr.scale = { x: 0.85, y: 0.85 };
+
+                if (expr instanceof IfElseBlockStatement) {
+                    // hack for now..
+                    expr.anchor = { x: 0, y: 0 };
+                    expr.pos = { x: x, y: y - 16 };
+                }
+
                 expr.update();
 
                 if (_this3._layout.direction == "vertical") {

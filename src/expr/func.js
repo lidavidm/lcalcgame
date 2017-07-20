@@ -148,7 +148,8 @@ class NamedFuncExpr extends Expression {
                 // eval("while(1) {}");
                 this._javaScriptFunction = expr.toJavaScript();
                 if (this._javaScriptFunction) {
-                    let js_code = '(' + this._javaScriptFunction + ")(" +
+                    const headers = '__star="star";__rect="rect";'
+                    let js_code = headers + '(' + this._javaScriptFunction + ")(" +
                           args.map((a) => a.toJavaScript()).join(',') +
                           ");";
                     let geval = eval; // equivalent to calling eval in the global scope

@@ -273,6 +273,9 @@ class ES6Parser {
             },
             'IfStatement': (node) => {
                 return new (ExprManager.getClass('ifelseblock'))(this.parseNode(node.test), this.parseNode(node.consequent), this.parseNode(node.alternate));
+            },
+            'ReturnStatement': (node) => {
+                return new (ExprManager.getClass('return'))(this.parseNode(node.argument));
             }
         }
 

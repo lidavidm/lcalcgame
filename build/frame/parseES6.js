@@ -302,6 +302,9 @@ var ES6Parser = function () {
                 },
                 'IfStatement': function IfStatement(node) {
                     return new (ExprManager.getClass('ifelseblock'))(_this2.parseNode(node.test), _this2.parseNode(node.consequent), _this2.parseNode(node.alternate));
+                },
+                'ReturnStatement': function ReturnStatement(node) {
+                    return new (ExprManager.getClass('return'))(_this2.parseNode(node.argument));
                 }
             };
 
