@@ -659,7 +659,7 @@ var mag = (function(_) {
             };
             var onkeypress = (e) => {
                 let event = getCBKeyEvent(e);
-                console.log(event.char);
+                // console.log(event.char);
                 stage.onkeypress(event);
             };
             var onkeyup = (e) => {

@@ -122,7 +122,8 @@ class Level {
                 // ordered by the order of the goal nodes displayed on screen. So the info needed to pair an expression to a goal node.
                 // With this we can reconstruct the actual pairing for the nodes on-screen (not clones).
                 if (exprs.length === 0 && matching.length === 1) { // Memory state match; glow the environment value instead...
-                    let pairs = [[this.environmentDisplay.getBinding(matching[0]).getExpr(), this.goalNodes[0].getValue()]];
+                    let e = this.environmentDisplay.getBinding(matching[0]).getExpr();
+                    let pairs = [[e, this.goalNodes[0].getValue()]];
                     return pairs;
                 } else {
                     let pairs = matching.map((j, i) => [ exprs[j], this.goalNodes[i] ] );
@@ -865,8 +866,8 @@ class ExpressionPattern {
 
         // Special case: Variable goals.
         if (es.length === 1 && es[0] instanceof VariableGoalDisplay) {
+            if (!envdisplay.stage || lvl_exprs.length > 0) return false;
             let v = envdisplay.getEnvironment().lookup(es[0].name);
-            console.log(v, envdisplay);
             if (v) {
                 if (compare(v, es[0].getValue())) {
                     return [ es[0].name ]; // paired match... return the name for the binding instead.

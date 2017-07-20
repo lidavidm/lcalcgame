@@ -840,7 +840,7 @@ var mag = function (_) {
             };
             var onkeypress = function onkeypress(e) {
                 var event = getCBKeyEvent(e);
-                console.log(event.char);
+                // console.log(event.char);
                 stage.onkeypress(event);
             };
             var onkeyup = function onkeyup(e) {

@@ -402,12 +402,9 @@ var SemicolonSequence = function (_Sequence2) {
         value: function clone() {
             var parent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
-            //console.log("called clone() in semicolon sequence");
             var cln = _get(SemicolonSequence.prototype.__proto__ || Object.getPrototypeOf(SemicolonSequence.prototype), "clone", this).call(this, parent);
             cln.holes = [];
             cln.children = [];
-            //console.log("this.holes");
-            //console.log(this.holes);
             //let thisHoles = this.holes.clone();
             this.holes.forEach(function (hole) {
                 return cln.holes.push(hole.clone());
@@ -450,8 +447,6 @@ var MultiClampSequence = function (_Sequence3) {
         _this7.breakIndices = breakIndices;
 
         _this7._exprsPerClamp = exprsPerClamp;
-
-        console.log(_this7);
         return _this7;
     }
 

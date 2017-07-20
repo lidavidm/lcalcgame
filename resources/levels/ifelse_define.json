@@ -9,7 +9,8 @@
             "toolbox": ["double(1)", "_t_varname(2)", "double(_t_params)"],
             "description": "Intro to block functions and reminder of doubling.",
             "fade":{
-                "define":1
+                "define":1,
+                "environment_display":1
             }
         },
         {
@@ -41,6 +42,9 @@
             },
             "board": ["_t_single"],
             "toolbox": "",
+            "globals":{
+                "x":"dying"
+            },
             "description":"Intro to writing a whole assignment statement."
         },
         {

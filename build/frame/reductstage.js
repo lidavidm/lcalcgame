@@ -323,6 +323,8 @@ var ReductStage = function (_mag$Stage) {
                                         playedSplosionAudio = true;
                                     }
 
+                                    if (node.parent instanceof SpreadsheetDisplay) node.parent.removeChild(node);
+
                                     goalNode.parent.removeChild(goalNode);
                                     num_exploded++;
                                     if (num_exploded === pairs.length) {
