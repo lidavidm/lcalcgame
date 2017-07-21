@@ -145,9 +145,9 @@ var mag = (function(_) {
 
         let muted = false;
         let bg_music_track = null;
-        // if (getCookie("muted") === "true") {
-        //     muted = true;
-        // }
+        if (getCookie("muted") === "true") {
+            muted = true;
+        }
 
         return { // TODO: Add more resource types.
             setCurrentLoadSequence:setCurrentLoadSequence,

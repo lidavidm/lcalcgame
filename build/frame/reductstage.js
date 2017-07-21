@@ -383,6 +383,12 @@ var ReductStage = function (_mag$Stage) {
                 if (key === 8) {
                     // BACKSPACE
                     this.keyEventDelegate.backspace();
+                } else if (key === 37) {
+                    // LEFT ARROW
+                    this.keyEventDelegate.leftArrow();
+                } else if (key === 39) {
+                    // RIGHT ARROW
+                    this.keyEventDelegate.rightArrow();
                 }
             }
         }

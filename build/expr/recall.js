@@ -1,8 +1,8 @@
 'use strict';
 
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -35,6 +35,14 @@ var TypeBox = function (_mag$RoundedRect) {
         _this.cursor = cursor;
         _this._origWidth = w;
 
+        // Selection highlight
+        var selection = new mag.Rect(0, cursor.pos.y, 2, cursor.size.h);
+        selection.color = "Cyan";
+        selection.opacity = 0.3;
+        selection.ignoreEvents = true;
+        selection.shadowOffset = 0;
+        _this.selection = selection;
+
         _this.onCarriageReturn = onCarriageReturn;
         _this.onTextChanged = onTextChanged;
         return _this;
@@ -45,6 +53,9 @@ var TypeBox = function (_mag$RoundedRect) {
         value: function isPlaceholder() {
             return true;
         }
+
+        /* MOUSE EVENTS */
+
     }, {
         key: 'onmouseenter',
         value: function onmouseenter(pos) {
@@ -53,9 +64,28 @@ var TypeBox = function (_mag$RoundedRect) {
             SET_CURSOR_STYLE(CONST.CURSOR.TEXT);
         }
     }, {
+        key: 'onmousedown',
+        value: function onmousedown(pos) {
+            _get(TypeBox.prototype.__proto__ || Object.getPrototypeOf(TypeBox.prototype), 'onmousedown', this).call(this, pos);
+            this.clearSelection();
+            var pos_idx = this.charIndexForCursorPos(pos);
+            this.updateCursorPosition(pos_idx);
+            this._prevMousePos = pos;
+            this._prevCursorIdx = pos_idx;
+        }
+    }, {
+        key: 'onmousedrag',
+        value: function onmousedrag(pos) {
+            var pos_idx = this.charIndexForCursorPos(addPos(this._prevMousePos, fromTo(this.absolutePos, pos)));
+            this.showSelection({ start: this._prevCursorIdx, end: pos_idx });
+            this.updateCursorPosition(pos_idx);
+        }
+    }, {
         key: 'onmouseclick',
         value: function onmouseclick(pos) {
             this.focus();
+            var pos_idx = this.charIndexForCursorPos(pos);
+            this.updateCursorPosition(pos_idx);
         }
     }, {
         key: 'onmouseleave',
@@ -64,6 +94,112 @@ var TypeBox = function (_mag$RoundedRect) {
             this.stroke = null;
             SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
         }
+
+        /* VIRTUAL CURSOR */
+        // From an absolute position within this box,
+        // calculate the index of the character that
+        // the cursor should appear to the left of.
+
+    }, {
+        key: 'charIndexForCursorPos',
+        value: function charIndexForCursorPos(pos) {
+            var num_chars = this.textExpr.text.length;
+            if (num_chars === 0) return 0;
+            var x_pos = fromTo(this.textExpr.absolutePos, pos).x;
+            var t_width = this.textExpr.absoluteSize.w;
+            var char_w = t_width / num_chars;
+            var charIdx = Math.min(num_chars, Math.round(x_pos / char_w));
+            return charIdx;
+        }
+    }, {
+        key: 'cursorXPosForCharIdx',
+        value: function cursorXPosForCharIdx(charIdx) {
+            var num_chars = this.textExpr.text.length;
+            charIdx = Math.max(0, Math.min(charIdx, num_chars)); // clip index
+            return this.textExpr.text.length > 0 ? this.textExpr.size.w * charIdx / num_chars : this.textExpr.size.w;
+        }
+    }, {
+        key: 'update',
+        value: function update() {
+            _get(TypeBox.prototype.__proto__ || Object.getPrototypeOf(TypeBox.prototype), 'update', this).call(this);
+            this.size = { w: Math.max(this._origWidth, this.textExpr.size.w + this.cursor.size.w + this.padding.right), h: this.size.h };
+        }
+    }, {
+        key: 'updateCursorPosition',
+        value: function updateCursorPosition(charIdx) {
+            var num_chars = this.textExpr.text.length;
+            if (typeof charIdx === 'undefined') charIdx = num_chars;
+            charIdx = Math.max(0, Math.min(charIdx, num_chars));
+            var x_pos = this.cursorXPosForCharIdx(charIdx);
+            if ('charIdx' in this.cursor && this.cursor.charIdx === charIdx) return; // No need to update if there's been no change.
+            this.update();
+            this.cursor.pos = { x: x_pos, y: this.cursor.pos.y };
+            this.size = { w: Math.max(this._origWidth, this.textExpr.size.w + this.cursor.size.w + this.padding.right), h: this.size.h };
+            this.cursor.resetBlinking();
+            this.cursor.charIdx = charIdx;
+        }
+    }, {
+        key: 'showSelection',
+
+
+        /* SELECTION HIGHLIGHT */
+        value: function showSelection(selrange) {
+            if (selrange.start === selrange.end) {
+                this.clearSelection();
+                return; // no selection to show
+            }
+            if (selrange.start > selrange.end) {
+                // Swap to ensure property start <= end.
+                var temp = selrange.start;
+                selrange.start = selrange.end;
+                selrange.end = temp;
+            }
+            var selection = this.selection;
+            var x1_pos = this.cursorXPosForCharIdx(selrange.start);
+            var x2_pos = this.cursorXPosForCharIdx(selrange.end);
+            selection.pos = { x: x1_pos, y: selection.pos.y };
+            selection.size = { w: x2_pos - x1_pos, h: selection.size.h };
+            selection.range = selrange;
+            if (!this.hasChild(selection)) this.addChild(selection);
+            this.update();
+        }
+    }, {
+        key: 'hasSelection',
+        value: function hasSelection() {
+            return this.hasChild(this.selection) && this.selection.range;
+        }
+    }, {
+        key: 'deleteSelectedText',
+        value: function deleteSelectedText() {
+            if (this.hasSelection()) {
+                var txt = this.text;
+                var selrange = this.selection.range;
+                if (selrange.start > 0) {
+                    if (selrange.end < txt.length) this.text = txt.substring(0, selrange.start) + txt.substring(selrange.end);else this.text = txt.substring(0, selrange.start);
+                    this.updateCursorPosition(selrange.start);
+                } else if (selrange.end < txt.length) {
+                    this.text = txt.substring(selrange.end);
+                    this.updateCursorPosition(0);
+                } else {
+                    this.text = ''; // entire text was selected, so delete it all.
+                    this.updateCursorPosition(0);
+                }
+
+                this.clearSelection();
+            }
+        }
+    }, {
+        key: 'clearSelection',
+        value: function clearSelection() {
+            if (this.hasChild(this.selection)) {
+                this.removeChild(this.selection);
+                this.selection.range = null;
+                this.update();
+            }
+        }
+
+        /* FOCUS AND BLUR */
+
     }, {
         key: 'isFocused',
         value: function isFocused() {
@@ -88,19 +224,17 @@ var TypeBox = function (_mag$RoundedRect) {
             if (this.stage && this.stage.keyEventDelegate == this) this.stage.keyEventDelegate = null;
         }
     }, {
-        key: 'updateCursorPosition',
-        value: function updateCursorPosition() {
-            this.update();
-            this.cursor.pos = { x: this.textExpr.size.w, y: this.cursor.pos.y };
-            this.size = { w: Math.max(this._origWidth, this.textExpr.size.w + this.cursor.size.w + this.padding.right), h: this.size.h };
-            this.cursor.resetBlinking();
-        }
-    }, {
         key: 'type',
         value: function type(str) {
-            this.text += str;
+            this.deleteSelectedText();
+            var txt = this.text;
+            var charIdx = this.cursorIndex;
+            if (charIdx >= txt.length) // insert at end of text
+                this.text += str;else if (charIdx > 0) // insert in between text
+                this.text = txt.substring(0, charIdx) + str + txt.substring(charIdx);else // insert at beginning of text
+                this.text = str + txt;
             Resource.play('key-press-' + Math.floor(Math.random() * 4 + 1));
-            this.updateCursorPosition();
+            this.updateCursorPosition(charIdx + 1);
             if (this.onTextChanged) this.onTextChanged();
             this.stage.update();
         }
@@ -109,11 +243,38 @@ var TypeBox = function (_mag$RoundedRect) {
         value: function backspace() {
             var num = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
+            if (this.hasSelection()) {
+                this.deleteSelectedText();
+                if (this.onTextChanged) this.onTextChanged();
+                if (this.stage) this.stage.update();
+                return;
+            }
             var txt = this.text;
-            this.text = txt.substring(0, txt.length - 1);
-            this.updateCursorPosition();
+            var charIdx = this.cursorIndex;
+            if (charIdx >= txt.length) {
+                // backspace at end of text
+                this.text = txt.substring(0, txt.length - 1);
+                charIdx = txt.length - 1;
+            } else if (charIdx > 0) {
+                // backspace in between text
+                this.text = txt.substring(0, charIdx - 1) + txt.substring(charIdx);
+                charIdx--;
+            }
+            this.updateCursorPosition(charIdx);
             if (this.onTextChanged) this.onTextChanged();
             this.stage.update();
+        }
+    }, {
+        key: 'leftArrow',
+        value: function leftArrow() {
+            this.updateCursorPosition(Math.max(0, this.cursorIndex - 1));
+            this.clearSelection();
+        }
+    }, {
+        key: 'rightArrow',
+        value: function rightArrow() {
+            this.updateCursorPosition(this.cursorIndex + 1);
+            this.clearSelection();
         }
     }, {
         key: 'carriageReturn',
@@ -138,6 +299,11 @@ var TypeBox = function (_mag$RoundedRect) {
         },
         set: function set(fs) {
             this.textExpr.fontSize = fs;
+        }
+    }, {
+        key: 'cursorIndex',
+        get: function get() {
+            return 'charIdx' in this.cursor ? this.cursor.charIdx : this.text.length;
         }
     }]);
 

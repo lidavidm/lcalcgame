@@ -18,6 +18,14 @@ class TypeBox extends mag.RoundedRect {
         this.cursor = cursor;
         this._origWidth = w;
 
+        // Selection highlight
+        let selection = new mag.Rect(0, cursor.pos.y, 2, cursor.size.h );
+        selection.color = "Cyan";
+        selection.opacity = 0.3;
+        selection.ignoreEvents = true;
+        selection.shadowOffset = 0;
+        this.selection = selection;
+
         this.onCarriageReturn = onCarriageReturn;
         this.onTextChanged = onTextChanged;
     }
@@ -38,19 +46,128 @@ class TypeBox extends mag.RoundedRect {
         return true;
     }
 
+    /* MOUSE EVENTS */
     onmouseenter(pos) {
         //this.focus();
         this.stroke = { color:'blue', lineWidth:2 };
         SET_CURSOR_STYLE(CONST.CURSOR.TEXT);
     }
+    onmousedown(pos) {
+        super.onmousedown(pos);
+        this.clearSelection();
+        const pos_idx = this.charIndexForCursorPos(pos);
+        this.updateCursorPosition(pos_idx);
+        this._prevMousePos = pos;
+        this._prevCursorIdx = pos_idx;
+    }
+    onmousedrag(pos) {
+        const pos_idx = this.charIndexForCursorPos(addPos(this._prevMousePos, fromTo(this.absolutePos, pos)));
+        this.showSelection({ start:this._prevCursorIdx, end:pos_idx });
+        this.updateCursorPosition(pos_idx);
+    }
     onmouseclick(pos) {
         this.focus();
+        const pos_idx = this.charIndexForCursorPos(pos);
+        this.updateCursorPosition(pos_idx);
     }
     onmouseleave(pos) {
         //this.blur();
         this.stroke = null;
         SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
     }
+
+    /* VIRTUAL CURSOR */
+    // From an absolute position within this box,
+    // calculate the index of the character that
+    // the cursor should appear to the left of.
+    charIndexForCursorPos(pos) {
+        const num_chars = this.textExpr.text.length;
+        if (num_chars === 0) return 0;
+        const x_pos = fromTo(this.textExpr.absolutePos, pos).x;
+        const t_width = this.textExpr.absoluteSize.w;
+        const char_w = t_width / num_chars;
+        const charIdx = Math.min(num_chars, Math.round(x_pos / char_w));
+        return charIdx;
+    }
+    cursorXPosForCharIdx(charIdx) {
+        const num_chars = this.textExpr.text.length;
+        charIdx = Math.max(0, Math.min(charIdx, num_chars)); // clip index
+        return this.textExpr.text.length > 0 ? (this.textExpr.size.w * charIdx / num_chars) : this.textExpr.size.w;
+    }
+    update() {
+        super.update();
+        this.size = { w:Math.max(this._origWidth, this.textExpr.size.w + this.cursor.size.w + this.padding.right), h:this.size.h };
+    }
+    updateCursorPosition(charIdx) {
+        const num_chars = this.textExpr.text.length;
+        if (typeof charIdx === 'undefined') charIdx = num_chars;
+        charIdx = Math.max(0, Math.min(charIdx, num_chars));
+        const x_pos = this.cursorXPosForCharIdx(charIdx);
+        if ('charIdx' in this.cursor && this.cursor.charIdx === charIdx) return; // No need to update if there's been no change.
+        this.update();
+        this.cursor.pos = { x:x_pos, y:this.cursor.pos.y };
+        this.size = { w:Math.max(this._origWidth, this.textExpr.size.w + this.cursor.size.w + this.padding.right), h:this.size.h };
+        this.cursor.resetBlinking();
+        this.cursor.charIdx = charIdx;
+    }
+    get cursorIndex() {
+        return 'charIdx' in this.cursor ? this.cursor.charIdx : this.text.length;
+    }
+
+    /* SELECTION HIGHLIGHT */
+    showSelection(selrange) {
+        if (selrange.start === selrange.end) {
+            this.clearSelection();
+            return; // no selection to show
+        }
+        if (selrange.start > selrange.end) { // Swap to ensure property start <= end.
+            const temp = selrange.start;
+            selrange.start = selrange.end;
+            selrange.end = temp;
+        }
+        let selection = this.selection;
+        const x1_pos = this.cursorXPosForCharIdx(selrange.start);
+        const x2_pos = this.cursorXPosForCharIdx(selrange.end);
+        selection.pos = { x:x1_pos, y:selection.pos.y };
+        selection.size = { w:x2_pos - x1_pos, h:selection.size.h };
+        selection.range = selrange;
+        if (!this.hasChild(selection))
+            this.addChild(selection);
+        this.update();
+    }
+    hasSelection() {
+        return this.hasChild(this.selection) && this.selection.range;
+    }
+    deleteSelectedText() {
+        if (this.hasSelection()) {
+            const txt = this.text;
+            const selrange = this.selection.range;
+            if (selrange.start > 0) {
+                if (selrange.end < txt.length)
+                    this.text = txt.substring(0, selrange.start) + txt.substring(selrange.end);
+                else
+                    this.text = txt.substring(0, selrange.start)
+                this.updateCursorPosition(selrange.start);
+            } else if (selrange.end < txt.length) {
+                this.text = txt.substring(selrange.end);
+                this.updateCursorPosition(0);
+            } else {
+                this.text = ''; // entire text was selected, so delete it all.
+                this.updateCursorPosition(0);
+            }
+
+            this.clearSelection();
+        }
+    }
+    clearSelection() {
+        if (this.hasChild(this.selection)) {
+            this.removeChild(this.selection);
+            this.selection.range = null;
+            this.update();
+        }
+    }
+
+    /* FOCUS AND BLUR */
     isFocused() {
         return this.hasChild(this.cursor);
     }
@@ -69,26 +186,49 @@ class TypeBox extends mag.RoundedRect {
         if (this.stage && this.stage.keyEventDelegate == this)
             this.stage.keyEventDelegate = null;
     }
-    updateCursorPosition() {
-        this.update();
-        this.cursor.pos = { x:this.textExpr.size.w, y:this.cursor.pos.y };
-        this.size = { w:Math.max(this._origWidth, this.textExpr.size.w + this.cursor.size.w + this.padding.right), h:this.size.h };
-        this.cursor.resetBlinking();
-    }
 
     type(str) {
-        this.text += str;
+        this.deleteSelectedText();
+        const txt = this.text;
+        const charIdx = this.cursorIndex;
+        if (charIdx >= txt.length) // insert at end of text
+            this.text += str;
+        else if (charIdx > 0) // insert in between text
+            this.text = txt.substring(0, charIdx) + str + txt.substring(charIdx);
+        else // insert at beginning of text
+            this.text = str + txt;
         Resource.play('key-press-' + Math.floor(Math.random() * 4 + 1))
-        this.updateCursorPosition();
+        this.updateCursorPosition(charIdx+1);
         if (this.onTextChanged) this.onTextChanged();
         this.stage.update();
     }
     backspace(num=1) {
-        let txt = this.text;
-        this.text = txt.substring(0, txt.length-1);
-        this.updateCursorPosition();
+        if (this.hasSelection()) {
+            this.deleteSelectedText();
+            if (this.onTextChanged) this.onTextChanged();
+            if (this.stage) this.stage.update();
+            return;
+        }
+        const txt = this.text;
+        let charIdx = this.cursorIndex;
+        if (charIdx >= txt.length) { // backspace at end of text
+            this.text = txt.substring(0, txt.length-1);
+            charIdx = txt.length-1;
+        } else if (charIdx > 0) { // backspace in between text
+            this.text = txt.substring(0, charIdx-1) + txt.substring(charIdx);
+            charIdx--;
+        }
+        this.updateCursorPosition(charIdx);
         if (this.onTextChanged) this.onTextChanged();
         this.stage.update();
+    }
+    leftArrow() {
+        this.updateCursorPosition(Math.max(0, this.cursorIndex-1));
+        this.clearSelection();
+    }
+    rightArrow() {
+        this.updateCursorPosition(this.cursorIndex+1);
+        this.clearSelection();
     }
     carriageReturn() { // Solidify block (if possible)
         if (this.onCarriageReturn)
