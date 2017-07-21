@@ -440,7 +440,7 @@ function initBoard() {
             }
         }
 
-        __DEBUG_TESTBED(stage);
+        // __DEBUG_TESTBED(stage);
 
         stage.update();
         stage.draw();

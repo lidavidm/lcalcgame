@@ -10,8 +10,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var TypeBox = function (_mag$Rect) {
-    _inherits(TypeBox, _mag$Rect);
+var TypeBox = function (_mag$RoundedRect) {
+    _inherits(TypeBox, _mag$RoundedRect);
 
     function TypeBox(x, y, w, h, onCarriageReturn, onTextChanged) {
         _classCallCheck(this, TypeBox);
@@ -31,7 +31,7 @@ var TypeBox = function (_mag$Rect) {
 
         // Blinking cursor
         var percentH = 0.8;
-        var cursor = new BlinkingCursor(_this.padding.left, h * (1 - percentH) / 2.0, 8, h * percentH);
+        var cursor = new BlinkingCursor(_this.padding.left, h * (1 - percentH) / 2.0, 2, h * percentH);
         _this.cursor = cursor;
         _this._origWidth = w;
 
@@ -50,6 +50,7 @@ var TypeBox = function (_mag$Rect) {
         value: function onmouseenter(pos) {
             //this.focus();
             this.stroke = { color: 'blue', lineWidth: 2 };
+            SET_CURSOR_STYLE(CONST.CURSOR.TEXT);
         }
     }, {
         key: 'onmouseclick',
@@ -61,6 +62,7 @@ var TypeBox = function (_mag$Rect) {
         value: function onmouseleave(pos) {
             //this.blur();
             this.stroke = null;
+            SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
         }
     }, {
         key: 'isFocused',
@@ -140,7 +142,7 @@ var TypeBox = function (_mag$Rect) {
     }]);
 
     return TypeBox;
-}(mag.Rect);
+}(mag.RoundedRect);
 
 // Summon ES6 expressions out of thin air!!
 
@@ -193,8 +195,8 @@ var SummoningTypeBox = function (_TypeBox) {
     return SummoningTypeBox;
 }(TypeBox);
 
-var BlinkingCursor = function (_mag$Rect2) {
-    _inherits(BlinkingCursor, _mag$Rect2);
+var BlinkingCursor = function (_mag$Rect) {
+    _inherits(BlinkingCursor, _mag$Rect);
 
     function BlinkingCursor(x, y, w, h) {
         _classCallCheck(this, BlinkingCursor);

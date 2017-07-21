@@ -1,5 +1,6 @@
 function LOAD_REDUCT_GAMEAUDIO(Resource) {
     var loadAudio = Resource.loadAudio;
+    var loadMusic = Resource.loadMusic;
     loadAudio('pop', 'pop.wav');
     loadAudio('poof', '208111__planman__poof-of-smoke.wav');
     loadAudio('fly-to', '60012__qubodup__swing-25.wav');
@@ -37,7 +38,11 @@ function LOAD_REDUCT_GAMEAUDIO(Resource) {
     loadAudio('key-press-4', 'key-press-4.wav');
     loadAudio('printer', '119556__vrodge__office-printer-printing.wav');
     loadAudio('stamp', '33310__queensize__stamp.wav');
-    loadAudio('unlock-planet', '325112__fisch12345__success.wav')
+    loadAudio('unlock-planet', '325112__fisch12345__success.wav');
+
+    // Bg music
+    loadMusic('bg1', 'bg-night-owl-loop.mp3');
+    loadMusic('bg-menu', 'bg-zabriskie-cylinder-nine.mp3');
 }
 
 function LOAD_REDUCT_RESOURCES(Resource) {

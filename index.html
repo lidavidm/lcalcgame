@@ -17,8 +17,9 @@
         <script src="lib/pace.min.js"></script>
 
         <!-- Audio -->
-        <script src="lib/lowLag.js"></script>
+        <script src="lib/howler.min.js"></script>
         <script src="lib/sm2/js/soundmanager2.js"></script>
+        <script src="lib/lowLag.js"></script>
 
         <!-- JQuery -->
         <script src="lib/jquery.min.js"></script>
@@ -205,7 +206,7 @@
         <br />
 
         <div class="centered" id="lvl_num_visible_box">
-            <button type="button" name="toJavaScript" onclick="__TEST();">toJavaScript()</button>
+            <!-- <button type="button" name="toJavaScript" onclick="__TEST();">toJavaScript()</button> -->
             Level #<span id="lvl_num_visible">1</span>
             / <span id="lvl_max_num_visible"></span>
         </div>
@@ -227,7 +228,7 @@
 
             <div id="duplicate_buttons" class="centered">
                 <button onclick="prev()">Prev</button>
-                <button onclick="initBoard()">Reset</button>
+                <!-- <button onclick="initBoard()">Reset</button> -->
                 <button onclick="resetToLevel(0); ProgressManager.resetProgress(); initMainMenu()">Reset Completely</button>
                 <button onclick="toggleMute()">Mute</button>
             </div>
@@ -245,9 +246,9 @@
         </div>
 
         <div class="centered">
-            <p>
+            <!-- <p>
                 <button id="writeALevel">Write your own level!</button>
-            </p>
+            </p> -->
 
             <div id="write-level-form" title="Write a level" style="display:none;">
               <p class="validateTips">Refer to <a href="writing_levels.html" target="blank">this sheet</a> for more info.</p>

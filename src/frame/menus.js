@@ -1456,6 +1456,9 @@ class ChapterSelectMenu extends mag.Stage {
                 ship.attachToPlanet(lastActivePlanet);
             }
         });
+
+        if (!Resource.isPlayingBackgroundMusic('bg-menu'))
+            Resource.playBackgroundMusic('bg-menu', 0.3);
     }
 
     get lastActivePlanet() {

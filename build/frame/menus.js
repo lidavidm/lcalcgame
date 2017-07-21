@@ -1853,6 +1853,8 @@ var ChapterSelectMenu = function (_mag$Stage2) {
                 ship.attachToPlanet(lastActivePlanet);
             }
         });
+
+        if (!Resource.isPlayingBackgroundMusic('bg-menu')) Resource.playBackgroundMusic('bg-menu', 0.3);
         return _this32;
     }
 

@@ -1,4 +1,4 @@
-class TypeBox extends mag.Rect {
+class TypeBox extends mag.RoundedRect {
     constructor(x, y, w, h, onCarriageReturn, onTextChanged) {
         super(x, y, w, h);
         this.color = 'white'; // should be pure white
@@ -14,7 +14,7 @@ class TypeBox extends mag.Rect {
 
         // Blinking cursor
         let percentH = 0.8;
-        let cursor = new BlinkingCursor(this.padding.left, h*(1 - percentH)/2.0, 8, h * percentH);
+        let cursor = new BlinkingCursor(this.padding.left, h*(1 - percentH)/2.0, 2, h * percentH);
         this.cursor = cursor;
         this._origWidth = w;
 
@@ -41,6 +41,7 @@ class TypeBox extends mag.Rect {
     onmouseenter(pos) {
         //this.focus();
         this.stroke = { color:'blue', lineWidth:2 };
+        SET_CURSOR_STYLE(CONST.CURSOR.TEXT);
     }
     onmouseclick(pos) {
         this.focus();
@@ -48,6 +49,7 @@ class TypeBox extends mag.Rect {
     onmouseleave(pos) {
         //this.blur();
         this.stroke = null;
+        SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
     }
     isFocused() {
         return this.hasChild(this.cursor);

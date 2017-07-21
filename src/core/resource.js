@@ -18,6 +18,10 @@ var mag = (function(_) {
         var audioEngineLoaded = false;
         var audioEngine = 'html5';
 
+        var musicRsc = {};
+        var musicEngine = 'howler';
+        var trackPlaying = null;
+
         var imageRsc = {};
         var animPresets = {};
 
@@ -103,6 +107,9 @@ var mag = (function(_) {
             // Cross-browser low-latency audio.
             if (window.lowLag) window.lowLag.load([__AUDIO_PATH + filename], alias);
         };
+        var loadMusic = (alias, filename) => {
+            musicRsc[alias] = __AUDIO_PATH + filename;
+        };
         var loadImage = (alias, filename) => {
             let img = new ImageProxy(alias, __GRAPHICS_PATH + filename);
             if (currentLoadSequence) {
@@ -137,6 +144,7 @@ var mag = (function(_) {
         };
 
         let muted = false;
+        let bg_music_track = null;
         // if (getCookie("muted") === "true") {
         //     muted = true;
         // }
@@ -149,6 +157,7 @@ var mag = (function(_) {
             loadAnimation:loadAnimation,
             loadImageAtlas:loadImageAtlas,
             loadAudio:loadAudio,
+            loadMusic:loadMusic,
             audio:audioRsc,
             image:imageRsc,
             path:__RESOURCE_PATH,
@@ -165,13 +174,47 @@ var mag = (function(_) {
                     lowLag.play(alias);
                 }
             },
+            isPlayingBackgroundMusic:(alias) => {
+                if (!trackPlaying) return false;
+                else if (alias)    return trackPlaying.__alias === alias;
+                else               return true;
+            },
+            playBackgroundMusic:(alias, volume, loop) => {
+                if (!(alias in musicRsc))
+                    console.error('@ Resource.playBackgroundMusic: Cannot find music for alias ', alias);
+                const playNewTrack = () => {
+                    if (trackPlaying) {
+                        trackPlaying.stop();
+                        trackPlaying.unload();
+                    }
+                    trackPlaying = new Howl({
+                        src: [musicRsc[alias]],
+                        autoplay: false,
+                        mute: muted,
+                        loop: (typeof loop !== 'undefined' ? loop : true),
+                        volume: (typeof volume !== 'undefined' ? volume : 0.8)
+                    });
+                    trackPlaying.__alias = alias;
+                    trackPlaying.play();
+                };
+                if (trackPlaying) { // Stop and unload current bg music.
+                    trackPlaying.on('fade', () => {
+                        playNewTrack();
+                    });
+                    trackPlaying.fade(trackPlaying.volume(), 0.0, 10);
+                } else {
+                    playNewTrack();
+                }
+            },
             mute: () => {
                 muted = true;
                 setCookie("muted", "true", 1000);
+                if (trackPlaying) trackPlaying.mute(true);
             },
             unmute: () => {
                 muted = false;
                 setCookie("muted", "false", 1000);
+                if (trackPlaying) trackPlaying.mute(false);
             },
             isMuted: () => { return muted; },
         };

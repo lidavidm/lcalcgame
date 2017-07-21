@@ -72,7 +72,8 @@ var CONST = {
         DEFAULT: 'auto',
         RESIZE: 'nwse-resize',
         GRAB: /Chrome|Safari/.test(navigator.userAgent) ? '-webkit-grab' : 'grab',
-        GRABBING: /Chrome|Safari/.test(navigator.userAgent) ? '-webkit-grabbing' : 'grabbing'
+        GRABBING: /Chrome|Safari/.test(navigator.userAgent) ? '-webkit-grabbing' : 'grabbing',
+        TEXT: 'text'
     }
 };
 function clonePos(pos) {

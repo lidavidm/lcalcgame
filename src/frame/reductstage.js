@@ -104,7 +104,7 @@ class ReductStage extends mag.Stage {
                 btn_menu.pos = btn_reset.pos;
                 btn_reset.pos = btn_next.pos;
             }
-            this.add(btn_menu);
+            if (__SHOW_MAINMENU_NAV) this.add(btn_menu);
             this.add(btn_reset);
         }
 
@@ -124,6 +124,9 @@ class ReductStage extends mag.Stage {
         this.uiNodes = [ btn_back, btn_reset, btn_next, btn_hamburger, toolbox, env ];
 
         this.layoutUI();
+
+        if (!Resource.isPlayingBackgroundMusic('bg1'))
+            Resource.playBackgroundMusic('bg1');
     }
 
     layoutUI() {
