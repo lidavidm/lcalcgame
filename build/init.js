@@ -200,11 +200,15 @@ function __DEBUG_TESTBED(stage) {
     //console.log(ErrorExpr);
     //ErrorEffect.run(stage, { x:300, y:250 });
 
-    if (level_idx === 0) {
-        var multiclamp = new IfElseBlockStatement(new TextExpr('(x == 3)'), new MissingExpression(), new MissingExpression());
-        multiclamp.pos = { x: 300, y: 300 };
-        stage.add(multiclamp);
-    }
+    // let clock = new ModuloClockExpr(7, 11);
+    // clock.pos = { x:200, y:200 };
+    // stage.add(clock);
+
+    // if (level_idx === 0) {
+    //     let multiclamp = new IfElseBlockStatement(new TextExpr('(x == 3)'), new MissingExpression(), new MissingExpression());
+    //     multiclamp.pos = { x:300, y:300 };
+    //     stage.add(multiclamp);
+    // }
 
     // let dropdown = new DropdownSelect( 200, 100, 120, 40, [ "A", "B", "C" ], null, "YellowGreen", "Green", "PaleGreen", false );
     // stage.add(dropdown);
@@ -436,7 +440,7 @@ function initBoard() {
             }
         }
 
-        // __DEBUG_TESTBED(stage);
+        __DEBUG_TESTBED(stage);
 
         stage.update();
         stage.draw();

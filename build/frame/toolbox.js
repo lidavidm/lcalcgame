@@ -38,6 +38,7 @@ var Toolbox = function (_mag$ImageRect) {
             var toolbox = this;
             this.items.push(e);
             e.toolbox = this;
+
             //e.onmousedrag = function (pos) {
             //    super.onmousedrag(pos); // perform whatever the drag event is on this expression
             //    toolbox.removeExpression(e); // remove this expression from the toolbox
@@ -80,6 +81,10 @@ var Toolbox = function (_mag$ImageRect) {
 
             var pos = this.leftEdgePos;
             this.items.forEach(function (e) {
+                if (e.absoluteSize.h > _this2.size.h) {
+                    var scale = _this2.size.h / e.absoluteSize.h;
+                    e.scale = { x: scale, y: scale };
+                }
                 e.update();
                 e.anchor = { x: 0, y: 0.5 };
                 if (e instanceof InfiniteExpression) pos.x += 80;
@@ -90,7 +95,7 @@ var Toolbox = function (_mag$ImageRect) {
                 } else {
                     e.pos = clonePos(pos);
                 }
-                pos.x += e.size.w + _this2.padding;
+                pos.x += e.absoluteSize.w + _this2.padding;
             });
         }
     }, {

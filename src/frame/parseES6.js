@@ -203,6 +203,13 @@ class ES6Parser {
                     }); // give it a nonexistent funcName
                     return comp;
                 }
+                else if (node.operator === '%') { // Modulo only works on integer dividends at the moment...
+                    let ModuloClass = ExprManager.getClass(node.operator);
+                    if (node.right.type === 'Literal' && Number.isNumber(node.value))
+                        return new ModuloClass(this.parseNode(node.left), node.right.value);
+                    else
+                        return new ModuloClass(this.parseNode(node.left), this.parseNode(node.right));
+                }
                 else if (ExprManager.hasClass(node.operator)) {
                     let BinaryExprClass = ExprManager.getClass(node.operator);
                     if (node.operator in CompareExpr.operatorMap())

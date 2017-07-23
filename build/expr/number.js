@@ -1,5 +1,7 @@
 'use strict';
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -18,12 +20,12 @@ var NumberExpr = function (_Expression) {
     function NumberExpr(num) {
         _classCallCheck(this, NumberExpr);
 
-        var _this = _possibleConstructorReturn(this, (NumberExpr.__proto__ || Object.getPrototypeOf(NumberExpr)).call(this, [new DiceNumber(num)]));
+        var _this2 = _possibleConstructorReturn(this, (NumberExpr.__proto__ || Object.getPrototypeOf(NumberExpr)).call(this, [new DiceNumber(num)]));
 
-        _this.number = num;
-        _this.color = 'Ivory';
-        _this.highlightColor = 'OrangeRed';
-        return _this;
+        _this2.number = num;
+        _this2.color = 'Ivory';
+        _this2.highlightColor = 'OrangeRed';
+        return _this2;
     }
 
     _createClass(NumberExpr, [{
@@ -70,13 +72,20 @@ var FadedNumberExpr = function (_NumberExpr) {
     function FadedNumberExpr(num) {
         _classCallCheck(this, FadedNumberExpr);
 
-        var _this2 = _possibleConstructorReturn(this, (FadedNumberExpr.__proto__ || Object.getPrototypeOf(FadedNumberExpr)).call(this, num));
+        var _this3 = _possibleConstructorReturn(this, (FadedNumberExpr.__proto__ || Object.getPrototypeOf(FadedNumberExpr)).call(this, num));
 
-        _this2.children = [];
-        _this2.holes = [];
-        _this2.addArg(new TextExpr(num.toString()));
-        return _this2;
+        _this3.children = [];
+        _this3.holes = [];
+        _this3.addArg(new TextExpr(num.toString()));
+        return _this3;
     }
+
+    _createClass(FadedNumberExpr, [{
+        key: 'addValue',
+        value: function addValue(num) {
+            this.holes[0].text = (parseInt(this.holes[0].text) + num).toString();
+        }
+    }]);
 
     return FadedNumberExpr;
 }(NumberExpr);
@@ -98,26 +107,26 @@ var OperatorExpr = function (_Expression2) {
     }, {
         key: 'performReduction',
         value: function performReduction() {
-            var _this4 = this;
+            var _this5 = this;
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
             return this.performSubReduction(this.leftExpr).then(function (left) {
-                return _this4.performSubReduction(_this4.rightExpr);
+                return _this5.performSubReduction(_this5.rightExpr);
             }).then(function (right) {
-                var stage = _this4.stage;
+                var stage = _this5.stage;
 
                 if (animated) {
                     return new Promise(function (resolve, _reject) {
-                        var shatter = new ShatterExpressionEffect(_this4);
+                        var shatter = new ShatterExpressionEffect(_this5);
                         shatter.run(stage, function () {
-                            _this4.ignoreEvents = false;
-                            resolve(_get(OperatorExpr.prototype.__proto__ || Object.getPrototypeOf(OperatorExpr.prototype), 'performReduction', _this4).call(_this4));
-                        }.bind(_this4));
-                        _this4.ignoreEvents = true;
+                            _this5.ignoreEvents = false;
+                            resolve(_get(OperatorExpr.prototype.__proto__ || Object.getPrototypeOf(OperatorExpr.prototype), 'performReduction', _this5).call(_this5));
+                        }.bind(_this5));
+                        _this5.ignoreEvents = true;
                     });
                 } else {
-                    return _get(OperatorExpr.prototype.__proto__ || Object.getPrototypeOf(OperatorExpr.prototype), 'performReduction', _this4).call(_this4);
+                    return _get(OperatorExpr.prototype.__proto__ || Object.getPrototypeOf(OperatorExpr.prototype), 'performReduction', _this5).call(_this5);
                 }
             });
         }
@@ -263,6 +272,323 @@ var DivisionExpr = function (_OperatorExpr4) {
     return DivisionExpr;
 }(OperatorExpr);
 
+var ModuloExpr = function (_OperatorExpr5) {
+    _inherits(ModuloExpr, _OperatorExpr5);
+
+    function ModuloExpr(left, right) {
+        _classCallCheck(this, ModuloExpr);
+
+        var op = new TextExpr("%");
+        console.log(right);
+        if (Number.isNumber(right)) right = new FadedNumberExpr(right);
+        return _possibleConstructorReturn(this, (ModuloExpr.__proto__ || Object.getPrototypeOf(ModuloExpr)).call(this, left, op, right));
+    }
+
+    _createClass(ModuloExpr, [{
+        key: 'reduce',
+        value: function reduce() {
+            if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {
+                return new (ExprManager.getClass('number'))(this.leftExpr.value() % this.rightExpr.value());
+            } else {
+                return this;
+            }
+        }
+    }]);
+
+    return ModuloExpr;
+}(OperatorExpr);
+
+var AnimatedModuloExpr = function (_ModuloExpr) {
+    _inherits(AnimatedModuloExpr, _ModuloExpr);
+
+    function AnimatedModuloExpr() {
+        _classCallCheck(this, AnimatedModuloExpr);
+
+        return _possibleConstructorReturn(this, (AnimatedModuloExpr.__proto__ || Object.getPrototypeOf(AnimatedModuloExpr)).apply(this, arguments));
+    }
+
+    _createClass(AnimatedModuloExpr, [{
+        key: 'performUserReduction',
+        value: function performUserReduction() {
+            var _this12 = this;
+
+            if (!this._reducing && this.canReduce() && this.reduce() != this) {
+                (function () {
+                    var dividend = _this12.leftExpr.value();
+                    var divisor = _this12.rightExpr.value();
+                    var reduceExpr = _this12.reduce();
+                    var clock = new ModuloClockExpr(new FadedNumberExpr(dividend), divisor, 62);
+                    clock.pos = addPos(_this12.centerPos(), { x: 0, y: -80 });
+                    clock.anchor = _this12.anchor;
+                    clock.ignoreEvents = true;
+                    clock.graphicNode.shadowOffset = 0;
+                    _this12.stage.add(clock);
+                    _this12.ignoreEvents = true;
+                    _this12.lockSubexpressions();
+                    _this12._reducing = clock.performModulo(false);
+                    // this.stage.remove(this);
+                    _this12._reducing.then(function () {
+                        _this12.stage.swap(_this12, reduceExpr);
+                        _this12._reducing = false;
+                    });
+                    _this12.animateReducingStatus();
+                })();
+            }
+        }
+    }]);
+
+    return AnimatedModuloExpr;
+}(ModuloExpr);
+
+var CircleSpinner = function (_ArrowPath) {
+    _inherits(CircleSpinner, _ArrowPath);
+
+    function CircleSpinner(radius) {
+        _classCallCheck(this, CircleSpinner);
+
+        var _this13 = _possibleConstructorReturn(this, (CircleSpinner.__proto__ || Object.getPrototypeOf(CircleSpinner)).call(this, [{ x: 0, y: 0 }, { x: 0, y: radius }]));
+
+        _this13.degree = 90;
+        _this13.radius = radius;
+        return _this13;
+    }
+
+    _createClass(CircleSpinner, [{
+        key: 'spinBy',
+        value: function spinBy(degrees) {
+            var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 300;
+
+            if (degrees === 0) return;
+            var cur_theta = toRadians(this.degree);
+            var add_theta = toRadians(degrees);
+            var r = this.radius;
+            var _this = this;
+            this.degree += degrees;
+            if (duration > 0) {
+                return new Promise(function (resolve, reject) {
+                    Animate.run(function (elapsed) {
+                        var theta = cur_theta + elapsed * add_theta;
+                        _this.points[1] = { x: r * Math.cos(theta), y: r * Math.sin(theta) };
+                        if (_this.stage) _this.stage.draw();
+                    }, duration).after(function () {
+                        var theta = cur_theta + add_theta;
+                        _this.points[1] = { x: r * Math.cos(theta), y: r * Math.sin(theta) };
+                        if (_this.stage) _this.stage.draw();
+                        resolve();
+                    });
+                });
+            } else {
+                var theta = cur_theta + add_theta;
+                this.points[1] = { x: r * Math.cos(theta), y: r * Math.sin(theta) };
+                return Promise.resolve();
+            }
+        }
+    }]);
+
+    return CircleSpinner;
+}(ArrowPath);
+
+var ModuloClock = function (_mag$Circle) {
+    _inherits(ModuloClock, _mag$Circle);
+
+    function ModuloClock(x, y, rad, divisor) {
+        _classCallCheck(this, ModuloClock);
+
+        var _this14 = _possibleConstructorReturn(this, (ModuloClock.__proto__ || Object.getPrototypeOf(ModuloClock)).call(this, x, y, rad));
+
+        var spinnerColor = '#111';
+        var numberColor = '#aaa';
+        var clockCenter = { x: rad, y: rad };
+
+        _this14.color = 'Ivory';
+        _this14.numberColor = numberColor;
+        _this14.shadowColor = spinnerColor;
+
+        var centerDot = new mag.Circle(0, 0, Math.trunc(rad / 8.0));
+        centerDot.color = spinnerColor;
+        centerDot.anchor = { x: 0.5, y: 0.5 };
+        centerDot.pos = clockCenter;
+        centerDot.shadowOffset = 0;
+        centerDot.ignoreEvents = true;
+
+        var spinner = new CircleSpinner(rad / 1.8);
+        spinner.pos = clockCenter;
+        spinner.anchor = { x: 0.5, y: 0.5 };
+        spinner.stroke = { color: spinnerColor, lineWidth: 4 };
+
+        // Display numbers on the clock
+        var numRad = rad / 1.3;
+        _this14.numbers = [];
+        for (var i = 0; i < divisor; i++) {
+            var theta = toRadians(90 + i / divisor * 360.0);
+            var num = new TextExpr(i.toString());
+            num.fontSize = 26;
+            num.color = numberColor;
+            num.anchor = { x: 0.5, y: 0.5 };
+            num.pos = addPos({ x: numRad * Math.cos(theta), y: numRad * Math.sin(theta) + 5 }, clockCenter);
+            _this14.addChild(num);
+            _this14.numbers.push(num);
+        }
+
+        _this14.addChild(spinner);
+        _this14.addChild(centerDot);
+
+        _this14.hand = spinner;
+        _this14.divisor = divisor;
+        return _this14;
+    }
+
+    _createClass(ModuloClock, [{
+        key: 'swap',
+        value: function swap(child, newChild) {
+            if (this.hasChild(child)) {
+                newChild.pos = child.pos;
+                newChild.anchor = child.anchor;
+                newChild.lock();
+                this.children.splice(this.children.indexOf(child), 1, newChild);
+                this.update();
+            }
+        }
+    }, {
+        key: 'hitsChild',
+        value: function hitsChild(pos, options) {
+            if (!this.parent.toolbox) return _get(ModuloClock.prototype.__proto__ || Object.getPrototypeOf(ModuloClock.prototype), 'hitsChild', this).call(this, pos, options);else return null;
+        }
+
+        // 'Spins' the clock hand 'dividend' number of turns,
+        // visualizing a modulo operation.
+
+    }, {
+        key: 'performModulo',
+        value: function performModulo(dividend, cbAfterEveryTurn) {
+            var divisor = this.divisor;
+            var hand = this.hand;
+            var num_turns = Math.trunc(dividend / divisor) * divisor + dividend % divisor;
+            var turn_degrees = 360.0 / divisor;
+            var turns = new Array(num_turns).fill(turn_degrees);
+            var spin_dur = num_turns > 9 ? 2000 / num_turns : 200;
+            var wait_dur = spin_dur;
+            var numbers = this.numbers;
+            var number_color = this.numberColor;
+            var turn_idx = 0;
+            var animation = turns.reduce(function (prom, degrees) {
+                return prom.then(function () {
+                    return new Promise(function (resolve, reject) {
+                        // Spin turns
+                        hand.spinBy(degrees, spin_dur).then(function () {
+                            if (cbAfterEveryTurn) cbAfterEveryTurn();
+                            numbers[turn_idx].color = number_color;
+                            turn_idx = (turn_idx + 1) % divisor;
+                            numbers[turn_idx].color = 'black';
+                            Animate.wait(wait_dur).after(resolve);
+                        });
+                    });
+                });
+            }, Promise.resolve());
+            animation.then(function () {
+                console.log('@ ModuloClock: Done animating.');
+            });
+            return animation;
+        }
+    }]);
+
+    return ModuloClock;
+}(mag.Circle);
+
+var ModuloClockExpr = function (_GraphicValueExpr) {
+    _inherits(ModuloClockExpr, _GraphicValueExpr);
+
+    function ModuloClockExpr(dividendExpr, divisor) {
+        var radius = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 72;
+
+        _classCallCheck(this, ModuloClockExpr);
+
+        var _this15 = _possibleConstructorReturn(this, (ModuloClockExpr.__proto__ || Object.getPrototypeOf(ModuloClockExpr)).call(this, new ModuloClock(0, 0, radius, divisor)));
+
+        _this15.color = 'Ivory';
+        var n = dividendExpr;
+        if (!n) n = new MissingNumberExpression();
+        n.pos = _this15.graphicNode.centerPos();
+        n.anchor = { x: 0.5, y: 0.5 };
+        if (n instanceof NumberExpr) n.lock();
+        _this15.graphicNode.addChild(n);
+        return _this15;
+    }
+
+    _createClass(ModuloClockExpr, [{
+        key: 'getDividendExpr',
+        value: function getDividendExpr() {
+            var es = this.graphicNode.children.filter(function (e) {
+                return e instanceof MissingExpression || e instanceof NumberExpr;
+            });
+            if (es.length === 0) return null;else return es[0];
+        }
+    }, {
+        key: 'performModulo',
+        value: function performModulo() {
+            var _this16 = this;
+
+            var shouldGiveNumber = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+            if (this._isAnimating) return Promise.reject();
+            var dividendExpr = this.getDividendExpr();
+            if (!dividendExpr) return Promise.reject();else if (dividendExpr instanceof MissingExpression) {
+                dividendExpr.animatePlaceholderStatus();
+                return Promise.reject();
+            } else {
+                var _ret2 = function () {
+                    _this16._isAnimating = true;
+                    var dividend = dividendExpr.value();
+                    var remainder = dividend % _this16.graphicNode.divisor;
+                    var afterTurn = function afterTurn() {
+                        dividendExpr.addValue(-1);
+                    };
+                    return {
+                        v: _this16.graphicNode.performModulo(dividend, afterTurn).then(function () {
+                            Animate.wait(200).after(function () {
+
+                                var theta = toRadians(_this16.graphicNode.hand.degree);
+                                var r = _this16.graphicNode.radius / 1.3;
+                                var stage = _this16.stage;
+
+                                var n = new FadedNumberExpr(remainder);
+                                var pos = addPos(_this16.absolutePos, { x: r * Math.cos(theta), y: r * Math.sin(theta) });
+                                n.anchor = { x: 0.5, y: 0.5 };
+
+                                //Animate.poof(this);
+
+                                if (shouldGiveNumber) {
+                                    n.pos = pos;
+                                    stage.add(n);
+                                    _this16.opacity = 1.0;
+                                    n.update();
+                                    Animate.tween(_this16, { opacity: 0 }, 1000).after(function () {
+                                        stage.remove(_this16);
+                                        stage.update();
+                                    });
+                                } else {
+                                    Animate.poof(_this16);
+                                    stage.remove(_this16);
+                                    stage.draw();
+                                }
+                            });
+                        })
+                    };
+                }();
+
+                if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
+            }
+        }
+    }, {
+        key: 'onmouseclick',
+        value: function onmouseclick(pos) {
+            this.performModulo();
+        }
+    }]);
+
+    return ModuloClockExpr;
+}(GraphicValueExpr);
+
 // Draws the circles for a dice number inside its boundary.
 
 
@@ -298,13 +624,13 @@ var DiceNumber = function (_mag$Rect) {
 
         _classCallCheck(this, DiceNumber);
 
-        var _this9 = _possibleConstructorReturn(this, (DiceNumber.__proto__ || Object.getPrototypeOf(DiceNumber)).call(this, 0, 0, 44, 44));
+        var _this17 = _possibleConstructorReturn(this, (DiceNumber.__proto__ || Object.getPrototypeOf(DiceNumber)).call(this, 0, 0, 44, 44));
 
-        _this9.number = num;
-        _this9.circlePos = DiceNumber.drawPositionsFor(num);
-        _this9.radius = radius;
-        _this9.color = 'black';
-        return _this9;
+        _this17.number = num;
+        _this17.circlePos = DiceNumber.drawPositionsFor(num);
+        _this17.radius = radius;
+        _this17.color = 'black';
+        return _this17;
     }
 
     _createClass(DiceNumber, [{
@@ -315,15 +641,15 @@ var DiceNumber = function (_mag$Rect) {
     }, {
         key: 'drawInternal',
         value: function drawInternal(ctx, pos, boundingSize) {
-            var _this10 = this;
+            var _this18 = this;
 
             if (this.circlePos && this.circlePos.length > 0) {
                 (function () {
 
-                    var rad = _this10.radius * boundingSize.w / _this10.size.w;
-                    var fill = _this10.color;
-                    var stroke = _this10.stroke;
-                    _this10.circlePos.forEach(function (relpos) {
+                    var rad = _this18.radius * boundingSize.w / _this18.size.w;
+                    var fill = _this18.color;
+                    var stroke = _this18.stroke;
+                    _this18.circlePos.forEach(function (relpos) {
                         var drawpos = { x: pos.x + boundingSize.w * relpos.x - rad, y: pos.y + boundingSize.h * relpos.y - rad };
                         drawCircle(ctx, drawpos.x, drawpos.y, rad, fill, stroke);
                     });

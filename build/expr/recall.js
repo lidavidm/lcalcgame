@@ -224,6 +224,11 @@ var TypeBox = function (_mag$RoundedRect) {
             if (this.stage && this.stage.keyEventDelegate == this) this.stage.keyEventDelegate = null;
         }
     }, {
+        key: 'animatePlaceholderStatus',
+        value: function animatePlaceholderStatus() {
+            if (this.stage && !this.stage.keyEventDelegate) this.focus();
+        }
+    }, {
         key: 'type',
         value: function type(str) {
             this.deleteSelectedText();
@@ -655,7 +660,10 @@ var TypeInTextExpr = function (_TextExpr) {
     }, {
         key: 'animatePlaceholderStatus',
         value: function animatePlaceholderStatus() {
-            if (this.typeBox) Animate.blink(this.typeBox, 1000, [1, 0, 0], 2);
+            if (this.typeBox) {
+                Animate.blink(this.typeBox, 1000, [1, 0, 0], 2);
+                this.typeBox.animatePlaceholderStatus();
+            }
         }
     }, {
         key: 'canReduce',

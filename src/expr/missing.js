@@ -278,7 +278,7 @@ class InvisibleMissingExpression extends MissingExpression {
 class MissingNumberExpression extends MissingTypedExpression {
     constructor(expr_to_miss) {
         super(expr_to_miss);
-        this.graphicNode = new mag.ImageRect(0, 0, 24, 32, 'die');
+        this.graphicNode = new mag.ImageRect(0, 0, 24, 32, (ExprManager.getFadeLevel('number') > 0 ? 'missing-number' : 'die'));
 
         this.acceptedClasses = [ VarExpr, NumberExpr, ObjectExtensionExpr , NamedExpr];
     }

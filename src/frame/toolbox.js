@@ -16,6 +16,7 @@ class Toolbox extends mag.ImageRect {
         let toolbox = this;
         this.items.push(e);
         e.toolbox = this;
+
         //e.onmousedrag = function (pos) {
         //    super.onmousedrag(pos); // perform whatever the drag event is on this expression
         //    toolbox.removeExpression(e); // remove this expression from the toolbox
@@ -46,6 +47,10 @@ class Toolbox extends mag.ImageRect {
     setLayout(animated=false) {
         var pos = this.leftEdgePos;
         this.items.forEach((e) => {
+            if (e.absoluteSize.h > this.size.h) {
+                const scale = this.size.h / e.absoluteSize.h;
+                e.scale = { x:scale, y:scale };
+            }
             e.update();
             e.anchor = { x:0, y:0.5 };
             if (e instanceof InfiniteExpression) pos.x += 80;
@@ -56,7 +61,7 @@ class Toolbox extends mag.ImageRect {
             } else {
                 e.pos = clonePos(pos);
             }
-            pos.x += e.size.w + this.padding;
+            pos.x += e.absoluteSize.w + this.padding;
         });
     }
 

@@ -501,7 +501,7 @@ var MissingNumberExpression = function (_MissingTypedExpressi4) {
 
         var _this11 = _possibleConstructorReturn(this, (MissingNumberExpression.__proto__ || Object.getPrototypeOf(MissingNumberExpression)).call(this, expr_to_miss));
 
-        _this11.graphicNode = new mag.ImageRect(0, 0, 24, 32, 'die');
+        _this11.graphicNode = new mag.ImageRect(0, 0, 24, 32, ExprManager.getFadeLevel('number') > 0 ? 'missing-number' : 'die');
 
         _this11.acceptedClasses = [VarExpr, NumberExpr, ObjectExtensionExpr, NamedExpr];
         return _this11;

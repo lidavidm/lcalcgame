@@ -149,9 +149,10 @@ class Level {
         });
         stage.toolboxNodes().forEach((n, i) => {
             let final_pos = n.pos;
+            const scale = n.scale.x;
             n.pos = addPos(n.pos, { x:400, y:0 });
             n.scale = { x:0.8, y:0.8 };
-            Animate.tween(n, { pos:final_pos, scale:{x:1,y:1} }, 500 + i * 100, (elapsed) => Math.pow(elapsed, 0.3));
+            Animate.tween(n, { pos:final_pos, scale:{x:scale,y:scale} }, 500 + i * 100, (elapsed) => Math.pow(elapsed, 0.3));
         });
 
         // Do final setup inside the nodes. This

@@ -23,8 +23,9 @@ class GraphicValueExpr extends ValueExpr {
     //get size() { return this.holes[0].size; }
     hits(pos, options) {
         if(this.ignoreEvents) return null;
-        if(this.holes[0].hits(pos, options)) return this;
-        else return null;
+        let hits = this.graphicNode.hits(pos, options);
+        if(hits == this.graphicNode) return this;
+        else return hits;
     }
     onmouseenter(pos) {
         if (this.delegateToInner) this.holes[0].onmouseenter(pos);

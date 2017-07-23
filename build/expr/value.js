@@ -65,7 +65,8 @@ var GraphicValueExpr = function (_ValueExpr) {
         key: 'hits',
         value: function hits(pos, options) {
             if (this.ignoreEvents) return null;
-            if (this.holes[0].hits(pos, options)) return this;else return null;
+            var hits = this.graphicNode.hits(pos, options);
+            if (hits == this.graphicNode) return this;else return hits;
         }
     }, {
         key: 'onmouseenter',

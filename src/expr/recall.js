@@ -186,6 +186,10 @@ class TypeBox extends mag.RoundedRect {
         if (this.stage && this.stage.keyEventDelegate == this)
             this.stage.keyEventDelegate = null;
     }
+    animatePlaceholderStatus() {
+        if (this.stage && !this.stage.keyEventDelegate)
+            this.focus();
+    }
 
     type(str) {
         this.deleteSelectedText();
@@ -496,8 +500,10 @@ class TypeInTextExpr extends TextExpr {
         return !this.isCommitted();
     }
     animatePlaceholderStatus() {
-        if (this.typeBox)
+        if (this.typeBox) {
             Animate.blink(this.typeBox, 1000, [1,0,0], 2);
+            this.typeBox.animatePlaceholderStatus();
+        }
     }
     canReduce() {
         if (this.typeBox) {

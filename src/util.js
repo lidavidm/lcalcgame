@@ -136,6 +136,10 @@ function SET_CURSOR_STYLE(style) {
          h: Math.min(b.h, a.y + a.h - b.y)
      };
  }
+ function toRadians(degree) {
+     return degree / 180.0 * Math.PI;
+ }
+
  function setStrokeStyle(ctx, stroke) {
      if (!stroke) ctx.strokeStyle = null;
      else {

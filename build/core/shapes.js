@@ -465,7 +465,7 @@ var mag = function (_) {
             key: 'drawInternal',
             value: function drawInternal(ctx, pos, boundingSize) {
                 var rad = boundingSize.w / 2.0;
-                if (this.shadowOffset !== 0) drawCircle(ctx, pos.x, pos.y + this.shadowOffset, rad, 'black', this.stroke);
+                if (this.shadowOffset !== 0) drawCircle(ctx, pos.x, pos.y + this.shadowOffset, rad, this.shadowColor, this.stroke);
                 drawCircle(ctx, pos.x, pos.y, rad, this.color, this.stroke);
                 if (this.clipChildren) {
                     ctx.save();

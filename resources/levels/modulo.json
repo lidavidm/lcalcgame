@@ -1,42 +1,104 @@
 {
-    "chapterName":"Intro to Typing",
-    "description":"It's like magic!",
+    "chapterName":"Modulo Operator %",
+    "description":"Intro to % with additional math operators / * - +",
     "language":"JavaScript",
     "levels": [
         {
-            "goal": "true",
-            "board": "_t_string == 'type'",
-            "toolbox": "",
-            "fade":{
-                "==":1,
-                "!=":1,
-                "number":1
+            "goal" : "1",
+            "board": ["_n % 2"],
+            "toolbox": ["2", "3", "4"],
+            "fade": {
+                "var": 7,
+                "assign": 2,
+                "reference_display": 2,
+                "environment_display": 1,
+                "_v": 1,
+                "number": 1
             },
             "showFade":false
         },
         {
-            "goal": "4",
-            "board": "_t_int + _t_int",
-            "toolbox": ""
+            "goal" : ["0", "0"],
+            "board": ["_n % 4", "_n % 4"],
+            "toolbox": ["2", "3", "4", "5", "6", "7", "8"]
         },
         {
-            "goal": ["true","false"],
-            "board": ["'mango' != 'pear'", "_t_string != 'apple'"],
-            "toolbox": ""
+            "goal" : "1",
+            "board": ["_n % 4"],
+            "toolbox": ["2", "3", "4", "5", "6", "7", "8"]
         },
         {
-            "goal": ["true","false"],
-            "board": ["'rect' != 'rect'", "'star' >>> 'star'"],
-            "toolbox": ""
+            "goal" : "1",
+            "board": ["_n % 4", "_n % 3", "_n % 2"],
+            "toolbox": ["3", "4", "5", "6", "7", "8", "9"]
         },
         {
-            "goal": ["true","true"],
-            "board": ["'A' >>> 'B'", "'C' >>> 'C'"],
-            "toolbox": ""
+            "goal" : "3",
+            "board": ["_n % 4", "_n % 5", "_n % 6"],
+            "toolbox": ["4", "5", "6", "7", "8", "9", "10"]
         },
         {
-            "goal": ["true","true"],
-            "board": ["(x) => _t_single", "(x) => (x == 'cat')", "'cat'", "'dog'"],
+            "goal" : ["1", "2", "3"],
+            "board": ["_n % 2", "_n % 3", "_n % 4"],
+            "toolbox": ["7", "8", "9"]
+        },
+        {
+            "goal" : ["5"],
+            "board": ["_n + _n"],
+            "toolbox": ["3 % 4", "8 % 3", "7 % 2", "12 % 6"]
+        },
+        {
+            "goal" : ["12"],
+            "board": ["_n % 4", "_n + _n"],
+            "toolbox": ["4", "5", "7", "9"]
+        },
+        {
+            "goal" : ["1"],
+            "board": ["_n % 4", "_n + _n"],
+            "toolbox": ["4", "5", "7", "9"],
+            "hint": "Add first."
+        },
+        {
+            "goal" : "3",
+            "board": ["19"],
+            "toolbox": ["_n % 2", "_n % 3", "_n % 5", "_n % 6", "_n % 10"],
+            "award": "4"
+        },
+        {
+            "goal" : ["0", "0", "0"],
+            "board": ["_n % 3", "_n % 6", "_n % 10"],
+            "toolbox": ["7", "8", "9", "10", "11", "12"],
+            "fade": {
+                "%":1
+            }
+        },
+        {
+            "goal" : ["1", "1", "1"],
+            "board": ["_n % 12", "_n % 5", "_n % 3"],
+            "toolbox": ["9", "10", "11", "12", "13", "14"]
+        },
+        {
+            "goal" : ["0", "1", "2"],
+            "board": ["_n % 3", "_n % 6", "_n % 10"],
+            "toolbox": ["8", "9", "10", "11", "12", "13"]
+        },
+        {
+            "goal" : ["true"],
+            "board": ["_n % 12", "_n % 6", "_ == _"],
+            "toolbox": ["14", "15", "16", "17", "18", "19", "20"]
+        },
+        {
+            "goal" : ["0"],
+            "board": ["_n + (_n + _n)", "100", "99", "98"],
+            "toolbox": ["_n % 2", "_n % 3", "_n % 5", "_n % 6"],
+            "fade": {
+                "%":2
+            },
+            "showFade":false
+        },
+        {
+            "goal" : ["1"],
+            "board": ["9 % _t_int"],
             "toolbox": ""
         }
     ],

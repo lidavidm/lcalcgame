@@ -231,6 +231,10 @@ var ES6Parser = function () {
                         }();
 
                         if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+                    } else if (node.operator === '%') {
+                        // Modulo only works on integer dividends at the moment...
+                        var ModuloClass = ExprManager.getClass(node.operator);
+                        if (node.right.type === 'Literal' && Number.isNumber(node.value)) return new ModuloClass(_this2.parseNode(node.left), node.right.value);else return new ModuloClass(_this2.parseNode(node.left), _this2.parseNode(node.right));
                     } else if (ExprManager.hasClass(node.operator)) {
                         var BinaryExprClass = ExprManager.getClass(node.operator);
                         if (node.operator in CompareExpr.operatorMap()) return new BinaryExprClass(_this2.parseNode(node.left), _this2.parseNode(node.right), node.operator);else return new BinaryExprClass(_this2.parseNode(node.left), _this2.parseNode(node.right));

@@ -24,6 +24,7 @@ var ExprManager = (function() {
         '+':        [AddExpr], //[StringAddExpr],
         '-':        [SubtractionExpr],
         '*':        [MultiplicationExpr],
+        '%':        [ModuloClockExpr, AnimatedModuloExpr, ModuloExpr],
         '--':       [DivisionExpr],
         '++':       [StringAddExpr],
         '!=':       [MirrorCompareExpr, FadedCompareExpr],

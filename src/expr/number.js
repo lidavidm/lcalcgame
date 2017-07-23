@@ -37,6 +37,9 @@ class FadedNumberExpr extends NumberExpr {
         this.holes = [];
         this.addArg(new TextExpr(num.toString()));
     }
+    addValue(num) {
+        this.holes[0].text = (parseInt(this.holes[0].text) + num).toString();
+    }
 }
 
 class OperatorExpr extends Expression {
@@ -168,6 +171,243 @@ class DivisionExpr extends OperatorExpr {
             console.log("reduce failed!!");
             return this;
         }
+    }
+}
+
+class ModuloExpr extends OperatorExpr {
+    constructor(left, right) {
+        let op = new TextExpr("%");
+        console.log(right);
+        if (Number.isNumber(right)) right = new FadedNumberExpr(right);
+        super(left, op, right);
+    }
+
+    reduce() {
+        if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {
+            return new (ExprManager.getClass('number'))(this.leftExpr.value() % this.rightExpr.value());
+        }
+        else {
+            return this;
+        }
+    }
+}
+
+class AnimatedModuloExpr extends ModuloExpr {
+    performUserReduction() {
+        if (!this._reducing && this.canReduce() && this.reduce() != this) {
+            const dividend = this.leftExpr.value();
+            const divisor = this.rightExpr.value();
+            const reduceExpr = this.reduce();
+            let clock = new ModuloClockExpr(new FadedNumberExpr(dividend), divisor, 62);
+            clock.pos = addPos(this.centerPos(), {x:0, y:-80});
+            clock.anchor = this.anchor;
+            clock.ignoreEvents = true;
+            clock.graphicNode.shadowOffset = 0;
+            this.stage.add(clock);
+            this.ignoreEvents = true;
+            this.lockSubexpressions();
+            this._reducing = clock.performModulo(false);
+            // this.stage.remove(this);
+            this._reducing.then(() => {
+                this.stage.swap(this, reduceExpr);
+                this._reducing = false;
+            });
+            this.animateReducingStatus();
+        }
+    }
+}
+
+class CircleSpinner extends ArrowPath {
+    constructor(radius) {
+        super([ {x:0, y:0},
+                {x:0, y:radius} ]);
+        this.degree = 90;
+        this.radius = radius;
+    }
+    spinBy(degrees, duration=300) {
+        if (degrees === 0) return;
+        const cur_theta = toRadians(this.degree);
+        const add_theta = toRadians(degrees);
+        const r = this.radius;
+        const _this = this;
+        this.degree += degrees;
+        if (duration > 0) {
+            return new Promise(function(resolve, reject) {
+                Animate.run((elapsed) => {
+                    const theta = cur_theta + elapsed * add_theta;
+                    _this.points[1] = { x:r * Math.cos(theta), y:r * Math.sin(theta) };
+                    if (_this.stage) _this.stage.draw();
+                }, duration).after(() => {
+                    const theta = cur_theta + add_theta;
+                    _this.points[1] = { x:r * Math.cos(theta), y:r * Math.sin(theta) };
+                    if (_this.stage) _this.stage.draw();
+                    resolve();
+                });
+            });
+        } else {
+            const theta = cur_theta + add_theta;
+            this.points[1] = { x:r * Math.cos(theta), y:r * Math.sin(theta) };
+            return Promise.resolve();
+        }
+    }
+}
+
+class ModuloClock extends mag.Circle {
+    constructor(x, y, rad, divisor) {
+        super(x, y, rad);
+
+        const spinnerColor = '#111';
+        const numberColor  = '#aaa';
+        const clockCenter = {x:rad, y:rad};
+
+        this.color = 'Ivory';
+        this.numberColor = numberColor;
+        this.shadowColor = spinnerColor;
+
+        let centerDot = new mag.Circle(0, 0, Math.trunc(rad / 8.0));
+        centerDot.color = spinnerColor;
+        centerDot.anchor = { x:0.5, y:0.5 };
+        centerDot.pos = clockCenter;
+        centerDot.shadowOffset = 0;
+        centerDot.ignoreEvents = true;
+
+        let spinner = new CircleSpinner(rad / 1.8);
+        spinner.pos = clockCenter;
+        spinner.anchor = { x:0.5, y:0.5 };
+        spinner.stroke = { color:spinnerColor, lineWidth:4 };
+
+        // Display numbers on the clock
+        const numRad = rad / 1.3;
+        this.numbers = [];
+        for (let i = 0; i < divisor; i++) {
+            let theta = toRadians( 90 + i / divisor * 360.0 );
+            let num = new TextExpr(i.toString())
+            num.fontSize = 26;
+            num.color = numberColor;
+            num.anchor = { x:0.5, y:0.5 };
+            num.pos = addPos({ x:numRad * Math.cos(theta), y:numRad * Math.sin(theta)+5 }, clockCenter);
+            this.addChild(num);
+            this.numbers.push(num);
+        }
+
+        this.addChild(spinner);
+        this.addChild(centerDot);
+
+        this.hand = spinner;
+        this.divisor = divisor;
+    }
+
+    swap(child, newChild) {
+        if (this.hasChild(child)) {
+            newChild.pos = child.pos;
+            newChild.anchor = child.anchor;
+            newChild.lock();
+            this.children.splice(this.children.indexOf(child), 1, newChild);
+            this.update();
+        }
+    }
+
+    hitsChild(pos, options) {
+        if (!this.parent.toolbox)
+            return super.hitsChild(pos, options);
+        else
+            return null;
+    }
+
+    // 'Spins' the clock hand 'dividend' number of turns,
+    // visualizing a modulo operation.
+    performModulo(dividend, cbAfterEveryTurn) {
+        const divisor = this.divisor;
+        const hand = this.hand;
+        const num_turns = Math.trunc(dividend / divisor) * divisor + dividend % divisor;
+        const turn_degrees = 360.0 / divisor;
+        const turns = (new Array(num_turns)).fill(turn_degrees);
+        const spin_dur = (num_turns > 9) ? (2000 / num_turns) : 200;
+        const wait_dur = spin_dur;
+        const numbers = this.numbers;
+        const number_color = this.numberColor;
+        let turn_idx = 0;
+        const animation = turns.reduce((prom, degrees) => prom.then(() => {
+            return new Promise(function(resolve, reject) { // Spin turns
+                hand.spinBy(degrees, spin_dur).then(() => {
+                    if (cbAfterEveryTurn) cbAfterEveryTurn();
+                    numbers[turn_idx].color = number_color;
+                    turn_idx = (turn_idx + 1) % divisor;
+                    numbers[turn_idx].color = 'black';
+                    Animate.wait(wait_dur).after(resolve);
+                });
+            });
+        }), Promise.resolve());
+        animation.then(() => {
+            console.log('@ ModuloClock: Done animating.');
+        });
+        return animation;
+    }
+}
+
+class ModuloClockExpr extends GraphicValueExpr {
+    constructor(dividendExpr, divisor, radius=72) {
+        super(new ModuloClock(0, 0, radius, divisor));
+        this.color = 'Ivory';
+        let n = dividendExpr;
+        if (!n) n = new MissingNumberExpression();
+        n.pos = this.graphicNode.centerPos();
+        n.anchor = {x:0.5, y:0.5};
+        if (n instanceof NumberExpr) n.lock();
+        this.graphicNode.addChild(n);
+    }
+    getDividendExpr() {
+        let es = this.graphicNode.children.filter((e) => (e instanceof MissingExpression || e instanceof NumberExpr));
+        if (es.length === 0) return null;
+        else return es[0];
+    }
+    performModulo(shouldGiveNumber=true) {
+        if (this._isAnimating) return Promise.reject();
+        let dividendExpr = this.getDividendExpr();
+        if (!dividendExpr) return Promise.reject();
+        else if (dividendExpr instanceof MissingExpression) {
+            dividendExpr.animatePlaceholderStatus();
+            return Promise.reject();
+        } else {
+            this._isAnimating = true;
+            const dividend = dividendExpr.value();
+            const remainder = dividend % this.graphicNode.divisor;
+            let afterTurn = () => {
+                dividendExpr.addValue(-1);
+            };
+            return this.graphicNode.performModulo(dividend, afterTurn).then(() => {
+                Animate.wait(200).after(() => {
+
+                    const theta = toRadians(this.graphicNode.hand.degree);
+                    const r = this.graphicNode.radius / 1.3;
+                    let stage = this.stage;
+
+                    let n = new FadedNumberExpr(remainder);
+                    let pos = addPos(this.absolutePos, { x:r * Math.cos(theta), y:r * Math.sin(theta) });
+                    n.anchor = { x:0.5, y:0.5 };
+
+                    //Animate.poof(this);
+
+                    if (shouldGiveNumber) {
+                        n.pos = pos;
+                        stage.add(n);
+                        this.opacity = 1.0;
+                        n.update();
+                        Animate.tween(this, {opacity:0}, 1000).after(() => {
+                            stage.remove(this);
+                            stage.update();
+                        });
+                    } else {
+                        Animate.poof(this);
+                        stage.remove(this);
+                        stage.draw();
+                    }
+                });
+            });
+        }
+    }
+    onmouseclick(pos) {
+        this.performModulo();
     }
 }
 
