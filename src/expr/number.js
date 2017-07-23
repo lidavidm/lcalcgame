@@ -383,7 +383,7 @@ class ModuloClockExpr extends GraphicValueExpr {
                     let stage = this.stage;
 
                     let n = new FadedNumberExpr(remainder);
-                    let pos = addPos(this.absolutePos, { x:r * Math.cos(theta), y:r * Math.sin(theta) });
+                    let pos = addPos(this.centerPos(), { x:r * Math.cos(theta), y:r * Math.sin(theta) });
                     n.anchor = { x:0.5, y:0.5 };
 
                     //Animate.poof(this);

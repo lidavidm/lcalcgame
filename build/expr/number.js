@@ -552,7 +552,7 @@ var ModuloClockExpr = function (_GraphicValueExpr) {
                                 var stage = _this16.stage;
 
                                 var n = new FadedNumberExpr(remainder);
-                                var pos = addPos(_this16.absolutePos, { x: r * Math.cos(theta), y: r * Math.sin(theta) });
+                                var pos = addPos(_this16.centerPos(), { x: r * Math.cos(theta), y: r * Math.sin(theta) });
                                 n.anchor = { x: 0.5, y: 0.5 };
 
                                 //Animate.poof(this);
