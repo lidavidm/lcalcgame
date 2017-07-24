@@ -139,6 +139,12 @@ var TypeBox = function (_mag$RoundedRect) {
     }
 
     _createClass(TypeBox, [{
+        key: 'makeMultiline',
+        value: function makeMultiline(lineWidthInChars, maxNumLines) {
+            this.textExpr.wrap = lineWidthInChars;
+            this.multiline = { lineWidth: lineWidthInChars, lineHeight: maxNumLines };
+        }
+    }, {
         key: 'isPlaceholder',
         value: function isPlaceholder() {
             return true;
@@ -211,11 +217,23 @@ var TypeBox = function (_mag$RoundedRect) {
     }, {
         key: 'charWidthPerLine',
         value: function charWidthPerLine() {
+            if (this.textExpr.text.length === 0) {
+                this.textExpr.text = 'a';
+                var w = this.textExpr.size.w;
+                this.textExpr.text = '';
+                return w;
+            }
             return this.textExpr.size.w / (this.textExpr.shouldWrap() ? this.textExpr.wrap : this.textExpr.text.length);
         }
     }, {
         key: 'charHeightPerLine',
         value: function charHeightPerLine() {
+            if (this.textExpr.text.length === 0) {
+                this.textExpr.text = 'a';
+                var h = this.textExpr.absoluteSize.h;
+                this.textExpr.text = '';
+                return h;
+            }
             return this.textExpr.absoluteSize.h / this.textExpr.getNumLines();
         }
     }, {
@@ -238,7 +256,16 @@ var TypeBox = function (_mag$RoundedRect) {
         key: 'update',
         value: function update() {
             _get(TypeBox.prototype.__proto__ || Object.getPrototypeOf(TypeBox.prototype), 'update', this).call(this);
-            this.size = { w: Math.max(this._origWidth, this.textExpr.size.w + this.cursor.size.w + this.padding.right),
+
+            this.size = this.makeSize();
+        }
+    }, {
+        key: 'makeSize',
+        value: function makeSize() {
+            if (this.multiline) {
+                return { w: this.multiline.lineWidth * this.charWidthPerLine() + this.padding.right,
+                    h: this.multiline.lineHeight * this.charHeightPerLine() };
+            } else return { w: Math.max(this._origWidth, this.textExpr.size.w + this.cursor.size.w + this.padding.right),
                 h: Math.max(this._origHeight, this.textExpr.absoluteSize.h) };
         }
     }, {
@@ -251,7 +278,7 @@ var TypeBox = function (_mag$RoundedRect) {
             if ('charIdx' in this.cursor && this.cursor.charIdx === charIdx) return; // No need to update if there's been no change.
             this.update();
             this.cursor.pos = { x: cur_pos.x, y: cur_pos.y }; //this.cursor.pos.y };
-            this.size = { w: Math.max(this._origWidth, this.textExpr.size.w + this.cursor.size.w + this.padding.right), h: this.size.h };
+            this.size = this.makeSize();
             this.cursor.resetBlinking();
             this.cursor.charIdx = charIdx;
         }

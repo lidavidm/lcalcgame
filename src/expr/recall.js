@@ -113,6 +113,11 @@ class TypeBox extends mag.RoundedRect {
         this.textExpr.fontSize = fs;
     }
 
+    makeMultiline(lineWidthInChars, maxNumLines) {
+        this.textExpr.wrap = lineWidthInChars;
+        this.multiline = { lineWidth:lineWidthInChars, lineHeight:maxNumLines };
+    }
+
     isPlaceholder() {
         return true;
     }
@@ -169,9 +174,21 @@ class TypeBox extends mag.RoundedRect {
         else return char_col_idx;
     }
     charWidthPerLine() {
+        if (this.textExpr.text.length === 0) {
+            this.textExpr.text = 'a';
+            const w = this.textExpr.size.w;
+            this.textExpr.text = '';
+            return w;
+        }
         return this.textExpr.size.w / (this.textExpr.shouldWrap() ? this.textExpr.wrap : this.textExpr.text.length);
     }
     charHeightPerLine() {
+        if (this.textExpr.text.length === 0) {
+            this.textExpr.text = 'a';
+            const h = this.textExpr.absoluteSize.h;
+            this.textExpr.text = '';
+            return h;
+        }
         return this.textExpr.absoluteSize.h / this.textExpr.getNumLines();
     }
     cursorPosForCharIdx(charIdx) {
@@ -190,7 +207,15 @@ class TypeBox extends mag.RoundedRect {
     }
     update() {
         super.update();
-        this.size = { w:Math.max(this._origWidth, this.textExpr.size.w + this.cursor.size.w + this.padding.right),
+
+        this.size = this.makeSize();
+    }
+    makeSize() {
+        if (this.multiline) {
+            return { w:this.multiline.lineWidth * this.charWidthPerLine() + this.padding.right,
+                     h:this.multiline.lineHeight * this.charHeightPerLine() };
+        }
+        else return { w:Math.max(this._origWidth, this.textExpr.size.w + this.cursor.size.w + this.padding.right),
                       h:Math.max(this._origHeight, this.textExpr.absoluteSize.h) };
     }
     updateCursorPosition(charIdx) {
@@ -201,7 +226,7 @@ class TypeBox extends mag.RoundedRect {
         if ('charIdx' in this.cursor && this.cursor.charIdx === charIdx) return; // No need to update if there's been no change.
         this.update();
         this.cursor.pos = { x:cur_pos.x, y:cur_pos.y}; //this.cursor.pos.y };
-        this.size = { w:Math.max(this._origWidth, this.textExpr.size.w + this.cursor.size.w + this.padding.right), h:this.size.h };
+        this.size = this.makeSize();
         this.cursor.resetBlinking();
         this.cursor.charIdx = charIdx;
     }
