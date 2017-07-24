@@ -139,6 +139,9 @@ function SET_CURSOR_STYLE(style) {
  function toRadians(degree) {
      return degree / 180.0 * Math.PI;
  }
+ Math.clamp = function(num, min, max) {
+     return Math.max(min, Math.min(max, num));
+ }
 
  function setStrokeStyle(ctx, stroke) {
      if (!stroke) ctx.strokeStyle = null;

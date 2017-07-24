@@ -5,6 +5,7 @@ class TextExpr extends ExpressionPlus {
         this.font = font;
         this.fontSize = fontSize; // in pixels
         this.color = 'black';
+        this.wrap = false; // set to # of characters allowed on each line
         this.shadow = null;
         this._sizeCache = null;
         this._yMultiplier = 2.2;
@@ -19,6 +20,15 @@ class TextExpr extends ExpressionPlus {
     set text(txt) {
         this._text = txt;
         this._sizeCache = null; // invalidate size
+    }
+    get fontHeight() {
+        return this.fontSize; // for now, only estimates are possible.
+    }
+    shouldWrap() {
+        return this.wrap !== false && Number.isNumber(this.wrap) && this.wrap < this.text.length;
+    }
+    getNumLines() {
+        return (this.shouldWrap() ? Math.trunc((this.text.length-1) / this.wrap) : 0) + 1;
     }
     get size() {
         var ctx = this.ctx || GLOBAL_DEFAULT_CTX;
@@ -38,16 +48,35 @@ class TextExpr extends ExpressionPlus {
         }
 
         ctx.font = this.contextFont;
-        var measure = ctx.measureText(this.text);
+
+        const shouldWrap = this.shouldWrap();
+        const txt = shouldWrap ? this.text.slice(0, this.wrap) : this.text;
+        const num_lines = this.getNumLines();
+        let measure = ctx.measureText(txt);
         this._sizeCache = {
-            size: { w: measure.width, h:DEFAULT_EXPR_HEIGHT },
+            size: { w: measure.width, h:DEFAULT_EXPR_HEIGHT * num_lines },
         };
-        return { w:measure.width+this._sizeOffset.w, h:DEFAULT_EXPR_HEIGHT+this._sizeOffset.h };
+        let sz = { w:measure.width+this._sizeOffset.w, h:DEFAULT_EXPR_HEIGHT * num_lines + this._sizeOffset.h };
+        return sz;
     }
     get contextFont() {
         return this.fontSize + 'px ' + this.font;
     }
     drawInternal(ctx, pos, boundingSize) {
+        // If wrap is specified as a number and text size exceeds wrap limit...
+        if (this.shouldWrap()) {
+            const chars_per_line = this.wrap;
+            const total_chars = this.text.length;
+            const text = this.text;
+            const line_height = this.fontHeight;
+            for (var i = 0; i < total_chars; i += chars_per_line) {
+                this.drawText(text.slice(i, i+chars_per_line), ctx, pos, boundingSize);
+                pos.y += line_height;
+            }
+        }
+        else this.drawText(this.text, ctx, pos, boundingSize);
+    }
+    drawText(text, ctx, pos, boundingSize) {
         var abs_scale = this.absoluteScale;
         ctx.save();
         ctx.font = this.contextFont;
@@ -59,7 +88,7 @@ class TextExpr extends ExpressionPlus {
             ctx.shadowBlur = this.shadow.blur;
             ctx.shadowOffsetX = this.shadow.x;
             ctx.shadowOffsetY = this.shadow.y;
-            ctx.fillText(this.text, (pos.x + this._xOffset) / abs_scale.x, pos.y / abs_scale.y + this._yMultiplier * this.fontSize * this.anchor.y);
+            ctx.fillText(text, (pos.x + this._xOffset) / abs_scale.x, pos.y / abs_scale.y + this._yMultiplier * this.fontSize * this.anchor.y);
             ctx.restore();
         }
         ctx.textBaseline = this._baseline;
@@ -67,9 +96,9 @@ class TextExpr extends ExpressionPlus {
         let y = pos.y / abs_scale.y + this._yMultiplier * this.fontSize * this.anchor.y;
         if (this.stroke) {
             setStrokeStyle(ctx, this.stroke);
-            ctx.strokeText(this.text, x, y);
+            ctx.strokeText(text, x, y);
         }
-        ctx.fillText(this.text, x, y);
+        ctx.fillText(text, x, y);
         ctx.restore();
     }
     hits(pos, options) { return false; } // disable mouse events

@@ -23,6 +23,7 @@ var TextExpr = function (_ExpressionPlus) {
         _this.font = font;
         _this.fontSize = fontSize; // in pixels
         _this.color = 'black';
+        _this.wrap = false; // set to # of characters allowed on each line
         _this.shadow = null;
         _this._sizeCache = null;
         _this._yMultiplier = 2.2;
@@ -34,8 +35,34 @@ var TextExpr = function (_ExpressionPlus) {
     }
 
     _createClass(TextExpr, [{
+        key: 'shouldWrap',
+        // for now, only estimates are possible.
+        value: function shouldWrap() {
+            return this.wrap !== false && Number.isNumber(this.wrap) && this.wrap < this.text.length;
+        }
+    }, {
+        key: 'getNumLines',
+        value: function getNumLines() {
+            return (this.shouldWrap() ? Math.trunc((this.text.length - 1) / this.wrap) : 0) + 1;
+        }
+    }, {
         key: 'drawInternal',
         value: function drawInternal(ctx, pos, boundingSize) {
+            // If wrap is specified as a number and text size exceeds wrap limit...
+            if (this.shouldWrap()) {
+                var chars_per_line = this.wrap;
+                var total_chars = this.text.length;
+                var text = this.text;
+                var line_height = this.fontHeight;
+                for (var i = 0; i < total_chars; i += chars_per_line) {
+                    this.drawText(text.slice(i, i + chars_per_line), ctx, pos, boundingSize);
+                    pos.y += line_height;
+                }
+            } else this.drawText(this.text, ctx, pos, boundingSize);
+        }
+    }, {
+        key: 'drawText',
+        value: function drawText(text, ctx, pos, boundingSize) {
             var abs_scale = this.absoluteScale;
             ctx.save();
             ctx.font = this.contextFont;
@@ -47,7 +74,7 @@ var TextExpr = function (_ExpressionPlus) {
                 ctx.shadowBlur = this.shadow.blur;
                 ctx.shadowOffsetX = this.shadow.x;
                 ctx.shadowOffsetY = this.shadow.y;
-                ctx.fillText(this.text, (pos.x + this._xOffset) / abs_scale.x, pos.y / abs_scale.y + this._yMultiplier * this.fontSize * this.anchor.y);
+                ctx.fillText(text, (pos.x + this._xOffset) / abs_scale.x, pos.y / abs_scale.y + this._yMultiplier * this.fontSize * this.anchor.y);
                 ctx.restore();
             }
             ctx.textBaseline = this._baseline;
@@ -55,9 +82,9 @@ var TextExpr = function (_ExpressionPlus) {
             var y = pos.y / abs_scale.y + this._yMultiplier * this.fontSize * this.anchor.y;
             if (this.stroke) {
                 setStrokeStyle(ctx, this.stroke);
-                ctx.strokeText(this.text, x, y);
+                ctx.strokeText(text, x, y);
             }
-            ctx.fillText(this.text, x, y);
+            ctx.fillText(text, x, y);
             ctx.restore();
         }
     }, {
@@ -96,6 +123,11 @@ var TextExpr = function (_ExpressionPlus) {
             this._sizeCache = null; // invalidate size
         }
     }, {
+        key: 'fontHeight',
+        get: function get() {
+            return this.fontSize;
+        }
+    }, {
         key: 'size',
         get: function get() {
             var ctx = this.ctx || GLOBAL_DEFAULT_CTX;
@@ -112,11 +144,16 @@ var TextExpr = function (_ExpressionPlus) {
             }
 
             ctx.font = this.contextFont;
-            var measure = ctx.measureText(this.text);
+
+            var shouldWrap = this.shouldWrap();
+            var txt = shouldWrap ? this.text.slice(0, this.wrap) : this.text;
+            var num_lines = this.getNumLines();
+            var measure = ctx.measureText(txt);
             this._sizeCache = {
-                size: { w: measure.width, h: DEFAULT_EXPR_HEIGHT }
+                size: { w: measure.width, h: DEFAULT_EXPR_HEIGHT * num_lines }
             };
-            return { w: measure.width + this._sizeOffset.w, h: DEFAULT_EXPR_HEIGHT + this._sizeOffset.h };
+            var sz = { w: measure.width + this._sizeOffset.w, h: DEFAULT_EXPR_HEIGHT * num_lines + this._sizeOffset.h };
+            return sz;
         }
     }, {
         key: 'contextFont',

@@ -1,3 +1,71 @@
+// class SelectableTextExpr extends TextExpr {
+//     constructor(str) {
+//         super(str);
+//
+//         let selection = new mag.Rect(0, cursor.pos.y, 2, cursor.size.h );
+//         selection.color = "Cyan";
+//         selection.opacity = 0.3;
+//         selection.ignoreEvents = true;
+//         selection.shadowOffset = 0;
+//         this.selection = selection;
+//     }
+// }
+
+class MultiLineSelectionRect extends mag.Rect {
+    constructor(x, y, lineWidth, lineHeight) {
+        super(x, y, 1, 1);
+        this.lineWidth = lineWidth;
+        this.lineHeight = lineHeight;
+        this.rects = [];
+
+        this.color = null;
+        this.ignoreEvents = true;
+    }
+
+    addRect(x, y, w, h) {
+        let r = new mag.Rect(x, y, w, h);
+        r.color = "Cyan";
+        r.opacity = 0.3;
+        r.shadowOffset = 0;
+        r.ignoreEvents = true;
+        this.addChild(r);
+        this.rects.push(r);
+    }
+
+    // Generates rectangles to cover highlighted area,
+    // using lineWidth and lineHeight as guides for where to fill.
+    select(x1, x2, lineStartIdx, lineEndIdx) {
+
+        this.clear();
+
+        const w = this.lineWidth;
+        const h = this.lineHeight;
+
+        if (lineStartIdx === lineEndIdx) {
+            this.addRect(x1, lineStartIdx * h, x2-x1, h);
+        } else {
+
+            // First line goes from x1 all the way to end of line
+            this.addRect(x1, lineStartIdx * h, w-x1, h);
+
+            // Middle lines (if any) select entire lines.
+            if (lineEndIdx - lineStartIdx > 1) {
+                for (let i = lineStartIdx + 1; i < lineEndIdx; i++) {
+                    this.addRect(0, i * h, w, h);
+                }
+            }
+
+            // Last line starts from left and ends at x2
+            this.addRect(0, lineEndIdx * h, x2, h);
+        }
+    }
+
+    clear() {
+        this.rects.forEach((r) => this.removeChild(r));
+        this.rects = [];
+    }
+}
+
 class TypeBox extends mag.RoundedRect {
     constructor(x, y, w, h, onCarriageReturn, onTextChanged) {
         super(x, y, w, h);
@@ -9,6 +77,7 @@ class TypeBox extends mag.RoundedRect {
         let txt = new TextExpr('');
         txt.fontSize = 22;
         txt.pos = { x:0, y:h - txt.size.h/2 };
+        // txt.wrap = 8;
         this.addChild(txt);
         this.textExpr = txt;
 
@@ -19,15 +88,17 @@ class TypeBox extends mag.RoundedRect {
         this._origWidth = w;
 
         // Selection highlight
-        let selection = new mag.Rect(0, cursor.pos.y, 2, cursor.size.h );
-        selection.color = "Cyan";
-        selection.opacity = 0.3;
-        selection.ignoreEvents = true;
-        selection.shadowOffset = 0;
+        // let selection = new mag.Rect(0, cursor.pos.y, 2, cursor.size.h );
+        // selection.color = "Cyan";
+        // selection.opacity = 0.3;
+        // selection.ignoreEvents = true;
+        // selection.shadowOffset = 0;
+        let selection = new MultiLineSelectionRect(0, cursor.pos.y, 2, cursor.size.h);
         this.selection = selection;
 
         this.onCarriageReturn = onCarriageReturn;
         this.onTextChanged = onTextChanged;
+        this._origHeight = h;
     }
     get text() {
         return this.textExpr.text;
@@ -81,31 +152,55 @@ class TypeBox extends mag.RoundedRect {
     // calculate the index of the character that
     // the cursor should appear to the left of.
     charIndexForCursorPos(pos) {
-        const num_chars = this.textExpr.text.length;
-        if (num_chars === 0) return 0;
+        const total_chars = this.textExpr.text.length;
+        const shouldWrap = this.textExpr.shouldWrap();
+        const chars_per_line = shouldWrap ? this.textExpr.wrap : total_chars;
+        if (chars_per_line === 0) return 0;
         const x_pos = fromTo(this.textExpr.absolutePos, pos).x;
         const t_width = this.textExpr.absoluteSize.w;
-        const char_w = t_width / num_chars;
-        const charIdx = Math.min(num_chars, Math.round(x_pos / char_w));
-        return charIdx;
+        const char_w = t_width / chars_per_line;
+        const char_col_idx = Math.min(chars_per_line, Math.round(x_pos / char_w));
+        if (shouldWrap) {
+            const char_h = this.charHeightPerLine();
+            const y_pos = fromTo(this.textExpr.absolutePos, pos).y;
+            const row_idx = Math.clamp(Math.round((y_pos + char_h * 0.5) / char_h), 0, this.textExpr.getNumLines()-1);
+            return char_col_idx + chars_per_line * row_idx;
+        }
+        else return char_col_idx;
     }
-    cursorXPosForCharIdx(charIdx) {
-        const num_chars = this.textExpr.text.length;
-        charIdx = Math.max(0, Math.min(charIdx, num_chars)); // clip index
-        return this.textExpr.text.length > 0 ? (this.textExpr.size.w * charIdx / num_chars) : this.textExpr.size.w;
+    charWidthPerLine() {
+        return this.textExpr.size.w / (this.textExpr.shouldWrap() ? this.textExpr.wrap : this.textExpr.text.length);
+    }
+    charHeightPerLine() {
+        return this.textExpr.absoluteSize.h / this.textExpr.getNumLines();
+    }
+    cursorPosForCharIdx(charIdx) {
+        const total_chars = this.textExpr.text.length;
+        const width = this.textExpr.size.w;
+        const y_offset = this.cursor.size.h * 0.1;
+        if (total_chars === 0) return {x:width, y:y_offset};
+        charIdx = Math.clamp(charIdx, 0, total_chars);
+        const shouldWrap = this.textExpr.shouldWrap();
+        const chars_per_line = shouldWrap ? this.textExpr.wrap : total_chars;
+        let col_idx = shouldWrap ? (charIdx % chars_per_line) : charIdx;
+        if (charIdx >= chars_per_line && col_idx === 0) col_idx = chars_per_line;
+        const height_per_line = this.charHeightPerLine();
+        const y_pos = (shouldWrap ? (height_per_line * Math.trunc((charIdx-1) / chars_per_line)) : 0) + y_offset;
+        return { x:width * col_idx / chars_per_line, y:y_pos };
     }
     update() {
         super.update();
-        this.size = { w:Math.max(this._origWidth, this.textExpr.size.w + this.cursor.size.w + this.padding.right), h:this.size.h };
+        this.size = { w:Math.max(this._origWidth, this.textExpr.size.w + this.cursor.size.w + this.padding.right),
+                      h:Math.max(this._origHeight, this.textExpr.absoluteSize.h) };
     }
     updateCursorPosition(charIdx) {
         const num_chars = this.textExpr.text.length;
         if (typeof charIdx === 'undefined') charIdx = num_chars;
         charIdx = Math.max(0, Math.min(charIdx, num_chars));
-        const x_pos = this.cursorXPosForCharIdx(charIdx);
+        const cur_pos = this.cursorPosForCharIdx(charIdx);
         if ('charIdx' in this.cursor && this.cursor.charIdx === charIdx) return; // No need to update if there's been no change.
         this.update();
-        this.cursor.pos = { x:x_pos, y:this.cursor.pos.y };
+        this.cursor.pos = { x:cur_pos.x, y:cur_pos.y}; //this.cursor.pos.y };
         this.size = { w:Math.max(this._origWidth, this.textExpr.size.w + this.cursor.size.w + this.padding.right), h:this.size.h };
         this.cursor.resetBlinking();
         this.cursor.charIdx = charIdx;
@@ -126,10 +221,16 @@ class TypeBox extends mag.RoundedRect {
             selrange.end = temp;
         }
         let selection = this.selection;
-        const x1_pos = this.cursorXPosForCharIdx(selrange.start);
-        const x2_pos = this.cursorXPosForCharIdx(selrange.end);
-        selection.pos = { x:x1_pos, y:selection.pos.y };
-        selection.size = { w:x2_pos - x1_pos, h:selection.size.h };
+        const chars_per_line = this.textExpr.shouldWrap() ? this.textExpr.wrap : this.textExpr.text.length;
+        const pos1 = this.cursorPosForCharIdx(selrange.start);
+        const pos2 = this.cursorPosForCharIdx(selrange.end);
+        const rowStartIdx = Math.trunc(selrange.start / chars_per_line);
+        const rowEndIdx = Math.trunc((selrange.end-1) / chars_per_line);
+        selection.lineWidth = this.textExpr.size.w;
+        selection.lineHeight = this.charHeightPerLine();
+        selection.select(pos1.x, pos2.x, rowStartIdx, rowEndIdx);
+        // selection.pos = { x:x1_pos, y:selection.pos.y };
+        // selection.size = { w:x2_pos - x1_pos, h:selection.size.h };
         selection.range = selrange;
         if (!this.hasChild(selection))
             this.addChild(selection);
@@ -162,6 +263,7 @@ class TypeBox extends mag.RoundedRect {
     clearSelection() {
         if (this.hasChild(this.selection)) {
             this.removeChild(this.selection);
+            this.selection.clear();
             this.selection.range = null;
             this.update();
         }
