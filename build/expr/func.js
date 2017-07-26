@@ -122,6 +122,18 @@ var NamedFuncExpr = function (_Expression) {
             } else return true;
         }
     }, {
+        key: 'getJSGlobalDefHeader',
+        value: function getJSGlobalDefHeader() {
+            var global_funcs = this.stage.functions;
+            var js_header = "";
+            for (var funcname in global_funcs) {
+                if (funcname !== this.name) {
+                    js_header += global_funcs[funcname].toJavaScript() + '\n';
+                }
+            }
+            return js_header;
+        }
+    }, {
         key: 'onmouseclick',
         value: function onmouseclick() {
             //console.log(this);
@@ -182,7 +194,7 @@ var NamedFuncExpr = function (_Expression) {
                     // eval("while(1) {}");
                     this._javaScriptFunction = _expr.toJavaScript();
                     if (this._javaScriptFunction) {
-                        var headers = '__star="star";__rect="rect";';
+                        var headers = '__star="star";\n__rect="rect";\n' + this.getJSGlobalDefHeader();
                         var js_code = headers + '(' + this._javaScriptFunction + ")(" + args.map(function (a) {
                             return a.toJavaScript();
                         }).join(',') + ");";

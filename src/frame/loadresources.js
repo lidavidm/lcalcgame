@@ -201,8 +201,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         'more_array': ['intro_string_obj'],
         'intro_string_obj': ['variable_obj_methods'],
         'variable_obj_methods': ['reverse_string'],
-        'reverse_string': ['recursion'],
-        'recursion': []
+        'reverse_string': ['recursion-js'],
+        'recursion-js': []
     };
 
     let chapter_load_prom = loadChaptersFromDigraph(chapterDigraph);

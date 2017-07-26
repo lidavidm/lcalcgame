@@ -1,16 +1,3 @@
-// class SelectableTextExpr extends TextExpr {
-//     constructor(str) {
-//         super(str);
-//
-//         let selection = new mag.Rect(0, cursor.pos.y, 2, cursor.size.h );
-//         selection.color = "Cyan";
-//         selection.opacity = 0.3;
-//         selection.ignoreEvents = true;
-//         selection.shadowOffset = 0;
-//         this.selection = selection;
-//     }
-// }
-
 class MultiLineSelectionRect extends mag.Rect {
     constructor(x, y, lineWidth, lineHeight) {
         super(x, y, 1, 1);

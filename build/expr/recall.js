@@ -10,19 +10,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-// class SelectableTextExpr extends TextExpr {
-//     constructor(str) {
-//         super(str);
-//
-//         let selection = new mag.Rect(0, cursor.pos.y, 2, cursor.size.h );
-//         selection.color = "Cyan";
-//         selection.opacity = 0.3;
-//         selection.ignoreEvents = true;
-//         selection.shadowOffset = 0;
-//         this.selection = selection;
-//     }
-// }
-
 var MultiLineSelectionRect = function (_mag$Rect) {
     _inherits(MultiLineSelectionRect, _mag$Rect);
 

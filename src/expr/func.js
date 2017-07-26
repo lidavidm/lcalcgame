@@ -86,6 +86,16 @@ class NamedFuncExpr extends Expression {
     get funcExpr() {
         return this.stage.functions[this.name];
     }
+    getJSGlobalDefHeader() {
+        let global_funcs = this.stage.functions;
+        let js_header = "";
+        for (var funcname in global_funcs) {
+            if (funcname !== this.name) {
+                js_header += global_funcs[funcname].toJavaScript() + '\n';
+            }
+        }
+        return js_header;
+    }
 
     get args() {
         let args = [];
@@ -148,7 +158,7 @@ class NamedFuncExpr extends Expression {
                 // eval("while(1) {}");
                 this._javaScriptFunction = expr.toJavaScript();
                 if (this._javaScriptFunction) {
-                    const headers = '__star="star";__rect="rect";'
+                    const headers = '__star="star";\n__rect="rect";\n' + this.getJSGlobalDefHeader();
                     let js_code = headers + '(' + this._javaScriptFunction + ")(" +
                           args.map((a) => a.toJavaScript()).join(',') +
                           ");";
