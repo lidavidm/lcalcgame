@@ -49,13 +49,6 @@ var mag = (function(_) {
                 this.children.splice(i, 1);
             }
         }
-        removeLastChild() {
-            let len = this.children.length;
-            if (len > 0) {
-                this.children[len-1].stage = null;
-                this.children.splice(len-1, 1);
-            }
-        }
         addAll(children) {
             children.forEach((child) => this.addChild(child));
         }
@@ -100,7 +93,6 @@ var mag = (function(_) {
         // Generic clone function.
         get constructorArgs() { return null; }
         clone(parent=null) {
-            //console.log("called clone in node.js");
             var ins = constructClassInstance(this.constructor, this.constructorArgs);
             //console.warn('Cloning', this.constructor);
             for (const key of Object.keys(this)) {

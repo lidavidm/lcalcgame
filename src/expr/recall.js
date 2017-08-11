@@ -86,6 +86,8 @@ class TypeBox extends mag.RoundedRect {
         this.onCarriageReturn = onCarriageReturn;
         this.onTextChanged = onTextChanged;
         this._origHeight = h;
+
+        // this.makeMultiline(10, 4);
     }
     get text() {
         return this.textExpr.text;

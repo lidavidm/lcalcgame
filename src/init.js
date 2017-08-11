@@ -1,6 +1,6 @@
 var __SHOW_DEV_INFO = true;
 var __COND = 'unknown';
-const __SHOW_MAINMENU_NAV = true;
+const __SHOW_MAINMENU_NAV = false;
 
 var GLOBAL_DEFAULT_CTX = null;
 var GLOBAL_DEFAULT_SCREENSIZE = null;
@@ -197,6 +197,10 @@ function initChapterSelectMenu(flyToChapIdx) {
 }
 
 function __DEBUG_TESTBED(stage) {
+
+    let tree = new TreeGraphic(TreeModel.test());
+    tree.pos = { x:200, y:200 };
+    stage.add(tree);
 
     //console.log(ErrorExpr);
     //ErrorEffect.run(stage, { x:300, y:250 });

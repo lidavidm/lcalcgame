@@ -1,64 +1,49 @@
 {
     "chapterName":"Sequencing",
     "description":"Sequencing",
-    "language":"JavaScript",
     "levels": [
         {
             "description": "Sequence operator",
-            "board": ["x = _; y = x + 1;", "y"],
-            "goal": "3",
-            "toolbox": ["2", "3", "4"]
+            "board": "(sequence /(assign $x _) /(assign $y $x)) ($y)",
+            "goal": "(rect)",
+            "toolbox": "(star) (rect) (triangle)"
         },
         {
             "description": "Bigger sequence",
-            "board": ["x = triangle; y = _; z = x == y;", "z"],
-            "goal": "false",
-            "toolbox": ["star", "triangle", "rect"]
+            "board": "(sequence /(assign $x /triangle) /(assign $y _) /(assign $z /(== $x $y))) ($z)",
+            "goal": "(false)",
+            "toolbox": "(star) (triangle)"
         },
         {
-            "description": "More freedom",
-            "board": ["x = _; y = _; z = x == y;", "z"],
-            "goal": "true",
-            "toolbox": ["_ + 1", "1", "2", "3", "4", "5"]
+            "description": "Bigger sequence",
+            "board": "(sequence /(assign $x _) /(assign $y _) /(assign $z /(== $x $y))) ($z)",
+            "goal": "(true)",
+            "toolbox": "(star) (star) (triangle) (triangle)"
         },
         {
             "description": "Fill in the blank",
-            "board": "z = _; _; y = x;",
-            "goal": "star",
-            "toolbox": ["star", "_v = _", "x", "y", "z"]
+            "board": "(sequence /(assign $z _) _ /(assign $y $x))",
+            "goal": "(star)",
+            "toolbox": "(star) (assign _v _) ($x) ($y) ($z)"
         },
         {
             "description": "Swap the variables",
-            "board": ["z = x; _; _; z = rect;"],
-            "goal": {
-                "x": "triangle",
-                "y": "star"
-            },
-            "toolbox": ["x = y", "z = x", "y = z", "x = z"],
+            "board": "(sequence /(assign $z $x) _ _ /(assign $z /rect))",
+            "goal": "(star)",
+            "toolbox": "($y) (assign $x $y) /(assign $y $z)",
             "globals": {
-                "x": "star",
-                "y": "triangle"
+                "x": "(star)",
+                "y": "(triangle)"
             }
         },
         {
-            "description": "String concatenation with variables.",
-            "goal" : "'zxy'",
-            "board": ["x + y + z", "x = _", "y = _", "z = _"],
-            "toolbox": ["'x'", "'y'", "'z'"]
-        },
-        {
-            "description": "Typing strings with variables.",
-            "goal" : "'hotshot'",
-            "board": ["x = _t_string", "y = _t_string", "z = x"],
-            "toolbox": ["x + y + z", "y + z + x", "z + x + y"]
-        },
-        {
-            "description": "Typing strings with sequences.",
-            "goal" : {
-                "y":"'abracadabra'"
-            },
-            "board": "x = 'a'; y = x + _t_string; z = y + x; y = z + _t_string + z;",
-            "toolbox": ""
+            "description": "Unlock the conditional",
+            "board": "(sequence /(assign $y _) /(assign $c /(== $y /rect)) /(assign $y /(if $c $x))) ($y)",
+            "goal": "(star)",
+            "toolbox": "(triangle) (rect)",
+            "globals": {
+                "x": "(star)"
+            }
         }
     ],
     "resources": {

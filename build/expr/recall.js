@@ -122,6 +122,8 @@ var TypeBox = function (_mag$RoundedRect) {
         _this3.onCarriageReturn = onCarriageReturn;
         _this3.onTextChanged = onTextChanged;
         _this3._origHeight = h;
+
+        // this.makeMultiline(10, 4);
         return _this3;
     }
 

@@ -1,47 +1,48 @@
 {
     "chapterName":"Basics",
     "description":"Identity, Destruction, and Replication",
-    "macros": {
-        "a":"star",
-        "b":"rect",
-        "c":"triangle"
-    },
     "levels": [
         {
             "description":"Introduces concept: Identity.",
-            "board":"(λx #x) (a)",
-            "goal":"(a)",
+            "board":"(λx #x) (star)",
+            "goal":"(star)",
             "toolbox":""
         },
         {
-            "description":"Reinforces concept: Identity.",
-            "board":"(λx #x) (λx #x) (λx #x) (a)",
-            "goal":"a",
+            "description":"Introduces concept: Identity.",
+            "board":"(λx #x) (λx #x) (λx #x) (star)",
+            "goal":"star",
             "toolbox":""
         },
         {
             "description":"Introduces concept: Constant functions.",
-            "board":"(λx /a) (b) (a)",
-            "goal":"(a) (a)",
+            "board":"(λx /star) (rect) (star)",
+            "goal":"(star) (star)",
             "toolbox":""
         },
         {
             "description":"Introduces concept: Toolbox. (*used to be deletion)",
             "board":"",
-            "goal":"a",
-            "toolbox":"(b) (a)"
+            "goal":"star",
+            "toolbox":"(diamond) (star)"
         },
         {
             "description":"Introduces concept: Replication.",
-            "board":"(λx #x #x) (a)",
-            "goal":"(a) (a)",
+            "board":"(λx #x #x) (star)",
+            "goal":"(star) (star)",
             "toolbox":""
         },
         {
             "description":"Toolbox can hold expressions.",
             "board":"",
-            "goal":"(b) (b)",
-            "toolbox":"(a) (b) (λx #x #x)"
+            "goal":"(diamond) (diamond)",
+            "toolbox":"(star) (diamond) (λx #x #x)"
+        },
+        {
+            "description": "Replication with free binding.",
+            "board": "(λx _ _) (#_x) (#_x)",
+            "goal": "(triangle) (triangle)",
+            "toolbox": "(triangle) (star) (rect)"
         },
         {
             "description":"Functions are first-class.",
@@ -51,15 +52,15 @@
         },
         {
             "description":"Functions are first-class!",
-            "board":"(λx #x #x #x) (λx #x) (a)",
-            "goal":"a",
+            "board":"(λx #x #x #x) (λx #x) (star)",
+            "goal":"star",
             "toolbox":""
         },
         {
             "description":"Tests knowledge of all concepts in this chapter.",
-            "board":"(b) (λx #x #x)",
-            "goal":"(a) (b)",
-            "toolbox":"(a) (λx #x)",
+            "board":"(diamond) (λx #x #x)",
+            "goal":"(star) (diamond)",
+            "toolbox":"(star) (λx #x)",
             "fade":{
                 "lambda":1
             }
