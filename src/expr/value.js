@@ -241,6 +241,46 @@ class StringValueExpr extends Expression {
     }
     value() { return this.name; }
 }
+class TypeInStringValueExpr extends Expression {
+    constructor(defaultName="") {
+        let left = new TextExpr('"');
+        left.color = "OrangeRed";
+        let right = left.clone();
+        let mid = TypeInTextExpr.fromExprCode('_t_innerstring', (final_txt) => {
+            let parent = (this.parent || this.stage);
+            let stage = this.stage;
+            let str_expr = new StringValueExpr(final_txt);
+            let locked = this.locked;
+            parent.swap(this, str_expr); // Swap this makeshift StringValueExpr for a real one...
+            if (locked) str_expr.lock();
+            stage.update();
+        });
+        mid.setDefaultWidth(22);
+        mid.typeBox.color = '#FEFCB1';
+        mid.typeBox.textColor = 'OrangeRed';
+        super([left, mid, right]);
+        this.defaultName = defaultName;
+        this.color = "gold";
+    }
+    get graphicNode() { return this.holes[0]; }
+    reduceCompletely() { return this; }
+    reduce() {
+        this.holes[1].reduce();
+        return this;
+    }
+    performReduction() {
+        return this.holes[1].performReduction();
+    }
+    canReduce() { return this.holes[1].reduce() != this.holes[1]; }
+    isValue() { return false; }
+    toString() {
+        return (this.locked ? '/' : '') + this.defaultName;
+    }
+    toJavaScript() {
+        return `"${this.defaultName}"`;
+    }
+    value() { return this.name; }
+}
 class StringStarExpr extends StringValueExpr {
     constructor() { super('star'); }
 }

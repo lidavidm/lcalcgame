@@ -6,6 +6,8 @@
  *  where each program is separated by a | (if multiple).
  */
 
+var __MACROS = null;
+
 class ES6Parser {
 
     static lockFilter(n) {
@@ -25,7 +27,7 @@ class ES6Parser {
         return new (ExprManager.getClass(prim))(...primitiveArgs[prim]);
     }
 
-    static parse(program) {
+    static parse(program, macros=null) {
         if (!esprima) {
             console.error('Cannot parse ES6 program: Esprima.js not found. \
             See http://esprima.readthedocs.io/en/latest/getting-started.html \
@@ -45,6 +47,10 @@ class ES6Parser {
             return null;
         }
 
+        // Doing this as a temp. global variable so
+        // we avoid passing macros in recursive calls.
+        __MACROS = macros;
+
         // If program has only one statement (;-separated code)
         // just parse and return that Expression.
         // Otherwise, parse all the statements into Expressions separately and
@@ -55,11 +61,13 @@ class ES6Parser {
             if (!expr) return null;
             expr.lockSubexpressions(this.lockFilter);
             expr.unlock();
+            __MACROS = null;
             return expr;
         } else {
             let exprs = statements.map((n) => this.parseNode(n));
             let seq = new (ExprManager.getClass('sequence'))(...exprs);
             seq.lockSubexpressions(this.lockFilter);
+            __MACROS = null;
             return seq;
         }
     }
@@ -73,6 +81,11 @@ class ES6Parser {
 
             /* A base-level token like 'x' */
             'Identifier': (node) => {
+
+                // First, check for any chapter-level macros
+                // (like 'a'=>'star') and swap if needed:
+                if (__MACROS && node.name in __MACROS)
+                    node.name = __MACROS[node.name];
 
                 // Check if node is a Reduct reserved identifier (MissingExpression)
                 if (node.name === '_' || node.name === '_b' || node.name === '__' || node.name === '_n') {

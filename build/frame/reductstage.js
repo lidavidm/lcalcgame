@@ -395,9 +395,34 @@ var ReductStage = function (_mag$Stage) {
     }, {
         key: 'onkeypress',
         value: function onkeypress(event) {
+            var _this5 = this;
+
             if (this.keyEventDelegate) {
                 if (event.keyCode === 13) {
                     this.keyEventDelegate.carriageReturn();
+                } else if (event.keyCode === 9) {
+                    (function () {
+                        // Tab.
+                        // Cycle to next possible keyEventDelegate...
+                        var isClose = function isClose(a, b) {
+                            return Math.abs(a - b) < 1.0;
+                        };
+                        var available_delegates = _this5.getNodesWithClass(TypeBox).sort(function (e1, e2) {
+                            var p1 = e1.absolutePos;
+                            var p2 = e2.absolutePos;
+                            if (isClose(p1.y, p2.y)) return p1.x >= p2.x;else return p1.y >= p2.y;
+                        });
+                        var cur_delegate = _this5.keyEventDelegate;
+                        _this5.keyEventDelegate.blur();
+                        console.log(available_delegates, cur_delegate);
+                        var idx_delegate = available_delegates.indexOf(cur_delegate);
+                        if (idx_delegate > -1) {
+                            var next_delegate = available_delegates[(idx_delegate + 1) % available_delegates.length];
+                            next_delegate.focus();
+                        } else {
+                            console.error('@ onkeypress: That\'s odd -- key event delegate is not inside stage...');
+                        }
+                    })();
                 } else {
                     var character = event.char;
                     this.keyEventDelegate.type(character);

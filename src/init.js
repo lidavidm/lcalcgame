@@ -198,9 +198,9 @@ function initChapterSelectMenu(flyToChapIdx) {
 
 function __DEBUG_TESTBED(stage) {
 
-    let tree = new TreeGraphic(TreeModel.test());
-    tree.pos = { x:200, y:200 };
-    stage.add(tree);
+    // let tree = new TreeGraphic(TreeModel.test());
+    // tree.pos = { x:200, y:200 };
+    // stage.add(tree);
 
     //console.log(ErrorExpr);
     //ErrorEffect.run(stage, { x:300, y:250 });

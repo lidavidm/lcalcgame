@@ -643,9 +643,10 @@ var Level = function () {
             var globals_descs = desc.globals;
             var resources = desc.resources;
             var language = desc.language;
+            var macros = desc.macros;
 
 
-            var lvl = new Level(Level.parse(expr_descs, language), new Goal(new ExpressionPattern(Level.parse(goal_descs, language)), resources.aliens), toolbox_descs ? Level.parse(toolbox_descs, language) : null, Environment.parse(globals_descs));
+            var lvl = new Level(Level.parse(expr_descs, language, macros), new Goal(new ExpressionPattern(Level.parse(goal_descs, language, macros)), resources.aliens), toolbox_descs ? Level.parse(toolbox_descs, language, macros) : null, Environment.parse(globals_descs));
             return lvl;
         }
     }, {
@@ -673,20 +674,21 @@ var Level = function () {
             var _this3 = this;
 
             var language = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "reduct-scheme";
+            var macros = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
             if (desc.length === 0) return [];else if (!Array.isArray(desc) && desc === Object(desc)) {
                 // If desc is an object, then it's a globals specifier...
                 // TODO: Expand to multiple globals.
                 console.log('Parsing variable goal...', desc);
                 var keys = Object.keys(desc);
-                return new (ExprManager.getClass('vargoal'))(keys[0], Level.parse(desc[keys[0]], language)[0]);
+                return new (ExprManager.getClass('vargoal'))(keys[0], Level.parse(desc[keys[0]], language, macros)[0]);
             }
 
             if (language === "JavaScript") {
                 // Use ES6 parser
                 if (Array.isArray(desc)) return desc.map(function (d) {
-                    return ES6Parser.parse(d);
-                });else return [ES6Parser.parse(desc)];
+                    return ES6Parser.parse(d, macros);
+                });else return [ES6Parser.parse(desc, macros)];
             } else if (language === "reduct-scheme" || !language) {
                 var descs;
 
@@ -699,7 +701,7 @@ var Level = function () {
                     // Parse expressions recursively.
 
                     var es = descs.map(function (expr_desc) {
-                        return Level.parseExpr(expr_desc);
+                        return Level.parseExpr(expr_desc, macros);
                     });
                     var LambdaClass = ExprManager.getClass('lambda_abstraction');
                     es = es.map(function (e) {
@@ -717,6 +719,8 @@ var Level = function () {
     }, {
         key: 'parseExpr',
         value: function parseExpr(desc) {
+            var macros = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
 
             var LOCK_MARKER = '/';
             var lock = function lock(e) {
@@ -774,7 +778,7 @@ var Level = function () {
                 //console.log('parsing expr with multiple args', args, toplevel_lock);
 
                 var exprs = args.map(function (arg) {
-                    return Level.parseExpr(arg);
+                    return Level.parseExpr(arg, macros);
                 });
                 //console.log(' >> inner exprs', exprs);
                 if (Array.isArray(exprs[0])) {
@@ -905,6 +909,11 @@ var Level = function () {
                     return circ;
                 }()
             };
+
+            // Macro swap:
+            if (macros && arg in macros) {
+                arg = macros[arg]; // e.g. arg = macros['a'] = 'star', if arg 'a' => 'star'.
+            }
 
             if (Number.isNumber(arg)) {
                 var numexpr = new (ExprManager.getClass('number'))(parseInt(arg));

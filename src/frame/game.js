@@ -176,12 +176,13 @@ class Level {
             globals: globals_descs,
             resources: resources,
             language: language,
+            macros: macros
         } = desc;
 
         var lvl = new Level(
-            Level.parse(expr_descs, language),
-            new Goal(new ExpressionPattern(Level.parse(goal_descs, language)), resources.aliens),
-            toolbox_descs ? Level.parse(toolbox_descs, language) : null,
+            Level.parse(expr_descs, language, macros),
+            new Goal(new ExpressionPattern(Level.parse(goal_descs, language, macros)), resources.aliens),
+            toolbox_descs ? Level.parse(toolbox_descs, language, macros) : null,
             Environment.parse(globals_descs)
         );
         return lvl;
@@ -204,19 +205,19 @@ class Level {
         if (expr_descs.length === 0) expr_descs.push(s);
         return expr_descs;
     }
-    static parse(desc, language="reduct-scheme") {
+    static parse(desc, language="reduct-scheme", macros=null) {
         if (desc.length === 0) return [];
         else if (!Array.isArray(desc) && desc === Object(desc)) { // If desc is an object, then it's a globals specifier...
             // TODO: Expand to multiple globals.
             console.log('Parsing variable goal...', desc);
             let keys = Object.keys(desc);
-            return new (ExprManager.getClass('vargoal'))(keys[0], Level.parse(desc[keys[0]], language)[0]);
+            return new (ExprManager.getClass('vargoal'))(keys[0], Level.parse(desc[keys[0]], language, macros)[0]);
         }
 
         if (language === "JavaScript") {
             // Use ES6 parser
-            if (Array.isArray(desc)) return desc.map((d) => ES6Parser.parse(d));
-            else                     return [ES6Parser.parse(desc)];
+            if (Array.isArray(desc)) return desc.map((d) => ES6Parser.parse(d, macros));
+            else                     return [ES6Parser.parse(desc, macros)];
         }
         else if (language === "reduct-scheme" || !language) {
 
@@ -225,14 +226,14 @@ class Level {
             //console.log('descs', descs);
 
             // Parse expressions recursively.
-            let es = descs.map((expr_desc) => Level.parseExpr(expr_desc));
+            let es = descs.map((expr_desc) => Level.parseExpr(expr_desc, macros));
             let LambdaClass = ExprManager.getClass('lambda_abstraction');
             es = es.map((e) => e instanceof LambdaHoleExpr ? new LambdaClass([e]) : e);
             //console.log('exprs', es);
             return es;
         }
     }
-    static parseExpr(desc) {
+    static parseExpr(desc, macros=null) {
 
         const LOCK_MARKER = '/';
         const lock = (e, locked=true) => {
@@ -288,7 +289,7 @@ class Level {
 
             //console.log('parsing expr with multiple args', args, toplevel_lock);
 
-            var exprs = args.map((arg) => Level.parseExpr(arg));
+            var exprs = args.map((arg) => Level.parseExpr(arg, macros));
             //console.log(' >> inner exprs', exprs);
             if (Array.isArray(exprs[0])) { // array of expressions
                 return lock(new Expression(exprs), toplevel_lock);
@@ -413,6 +414,11 @@ class Level {
                 return circ;
             })()
         };
+
+        // Macro swap:
+        if (macros && arg in macros) {
+            arg = macros[arg]; // e.g. arg = macros['a'] = 'star', if arg 'a' => 'star'.
+        }
 
         if (Number.isNumber(arg)) {
             let numexpr = new (ExprManager.getClass('number'))(parseInt(arg));

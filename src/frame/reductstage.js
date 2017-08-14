@@ -355,6 +355,27 @@ class ReductStage extends mag.Stage {
             if (event.keyCode === 13) {
                 this.keyEventDelegate.carriageReturn();
             }
+            else if (event.keyCode === 9) { // Tab.
+                // Cycle to next possible keyEventDelegate...
+                const isClose = (a, b) => Math.abs(a - b) < 1.0;
+                let available_delegates = this.getNodesWithClass(TypeBox)
+                    .sort((e1, e2) => {
+                        const p1 = e1.absolutePos;
+                        const p2 = e2.absolutePos;
+                        if (isClose(p1.y, p2.y)) return p1.x >= p2.x;
+                        else                     return p1.y >= p2.y;
+                });
+                let cur_delegate = this.keyEventDelegate;
+                this.keyEventDelegate.blur();
+                console.log(available_delegates, cur_delegate);
+                let idx_delegate = available_delegates.indexOf(cur_delegate);
+                if (idx_delegate > -1) {
+                    let next_delegate = available_delegates[ (idx_delegate + 1) % available_delegates.length ];
+                    next_delegate.focus();
+                } else {
+                    console.error('@ onkeypress: That\'s odd -- key event delegate is not inside stage...');
+                }
+            }
             else {
                 let character = event.char;
                 this.keyEventDelegate.type(character);

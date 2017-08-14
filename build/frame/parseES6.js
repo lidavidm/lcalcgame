@@ -16,6 +16,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  *  where each program is separated by a | (if multiple).
  */
 
+var __MACROS = null;
+
 var ES6Parser = function () {
     function ES6Parser() {
         _classCallCheck(this, ES6Parser);
@@ -46,6 +48,8 @@ var ES6Parser = function () {
         value: function parse(program) {
             var _this = this;
 
+            var macros = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
             if (!esprima) {
                 console.error('Cannot parse ES6 program: Esprima.js not found. \
             See http://esprima.readthedocs.io/en/latest/getting-started.html \
@@ -64,6 +68,10 @@ var ES6Parser = function () {
                 return null;
             }
 
+            // Doing this as a temp. global variable so
+            // we avoid passing macros in recursive calls.
+            __MACROS = macros;
+
             // If program has only one statement (;-separated code)
             // just parse and return that Expression.
             // Otherwise, parse all the statements into Expressions separately and
@@ -74,6 +82,7 @@ var ES6Parser = function () {
                 if (!expr) return null;
                 expr.lockSubexpressions(this.lockFilter);
                 expr.unlock();
+                __MACROS = null;
                 return expr;
             } else {
                 var exprs = statements.map(function (n) {
@@ -81,6 +90,7 @@ var ES6Parser = function () {
                 });
                 var seq = new (Function.prototype.bind.apply(ExprManager.getClass('sequence'), [null].concat(_toConsumableArray(exprs))))();
                 seq.lockSubexpressions(this.lockFilter);
+                __MACROS = null;
                 return seq;
             }
         }
@@ -98,6 +108,10 @@ var ES6Parser = function () {
 
                 /* A base-level token like 'x' */
                 'Identifier': function Identifier(node) {
+
+                    // First, check for any chapter-level macros
+                    // (like 'a'=>'star') and swap if needed:
+                    if (__MACROS && node.name in __MACROS) node.name = __MACROS[node.name];
 
                     // Check if node is a Reduct reserved identifier (MissingExpression)
                     if (node.name === '_' || node.name === '_b' || node.name === '__' || node.name === '_n') {

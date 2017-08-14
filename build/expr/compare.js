@@ -168,10 +168,13 @@ var CompareExpr = function (_Expression) {
         value: function drawInternal(ctx, pos, boundingSize) {
             ctx.fillStyle = 'black';
             setStrokeStyle(ctx, this.stroke);
-            if (this.shadowOffset !== 0) {
-                hexaRect(ctx, pos.x, pos.y + this.shadowOffset, boundingSize.w, boundingSize.h, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null);
-            }
+            if (this.shadowOffset !== 0) this.drawBaseShape(ctx, { x: pos.x, y: pos.y + this.shadowOffset }, boundingSize);
             ctx.fillStyle = this.color;
+            this.drawBaseShape(ctx, pos, boundingSize);
+        }
+    }, {
+        key: 'drawBaseShape',
+        value: function drawBaseShape(ctx, pos, boundingSize) {
             hexaRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null);
         }
     }, {

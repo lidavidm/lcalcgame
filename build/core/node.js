@@ -52,15 +52,6 @@ var mag = function (_) {
                 }
             }
         }, {
-            key: 'removeLastChild',
-            value: function removeLastChild() {
-                var len = this.children.length;
-                if (len > 0) {
-                    this.children[len - 1].stage = null;
-                    this.children.splice(len - 1, 1);
-                }
-            }
-        }, {
             key: 'addAll',
             value: function addAll(children) {
                 var _this = this;
@@ -168,7 +159,6 @@ var mag = function (_) {
 
                 var parent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
-                //console.log("called clone in node.js");
                 var ins = constructClassInstance(this.constructor, this.constructorArgs);
                 //console.warn('Cloning', this.constructor);
                 var _iteratorNormalCompletion = true;

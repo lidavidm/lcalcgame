@@ -158,14 +158,12 @@ class CompareExpr extends Expression {
     drawInternal(ctx, pos, boundingSize) {
         ctx.fillStyle = 'black';
         setStrokeStyle(ctx, this.stroke);
-        if (this.shadowOffset !== 0) {
-            hexaRect( ctx,
-                      pos.x, pos.y+this.shadowOffset,
-                      boundingSize.w, boundingSize.h,
-                      true, this.stroke ? true : false,
-                      this.stroke ? this.stroke.opacity : null);
-        }
+        if (this.shadowOffset !== 0)
+            this.drawBaseShape( ctx, {x:pos.x, y:pos.y+this.shadowOffset}, boundingSize );
         ctx.fillStyle = this.color;
+        this.drawBaseShape(ctx, pos, boundingSize);
+    }
+    drawBaseShape(ctx, pos, boundingSize) {
         hexaRect( ctx,
                   pos.x, pos.y,
                   boundingSize.w, boundingSize.h,
@@ -193,7 +191,7 @@ class CompareExpr extends Expression {
             '<':'a < b',
             '>=':'a >= b',
             '<=':'a <= b',
-            '>>>':'a >>> b' // typing operator... 
+            '>>>':'a >>> b' // typing operator...
         };
         if (this.funcName in js_forms) {
             let template = js_forms[this.funcName];

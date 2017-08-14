@@ -612,6 +612,88 @@ var StringValueExpr = function (_Expression3) {
     return StringValueExpr;
 }(Expression);
 
+var TypeInStringValueExpr = function (_Expression4) {
+    _inherits(TypeInStringValueExpr, _Expression4);
+
+    function TypeInStringValueExpr() {
+        var defaultName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+
+        _classCallCheck(this, TypeInStringValueExpr);
+
+        var left = new TextExpr('"');
+        left.color = "OrangeRed";
+        var right = left.clone();
+        var mid = TypeInTextExpr.fromExprCode('_t_innerstring', function (final_txt) {
+            var parent = _this18.parent || _this18.stage;
+            var stage = _this18.stage;
+            var str_expr = new StringValueExpr(final_txt);
+            var locked = _this18.locked;
+            parent.swap(_this18, str_expr); // Swap this makeshift StringValueExpr for a real one...
+            if (locked) str_expr.lock();
+            stage.update();
+        });
+        mid.setDefaultWidth(22);
+        mid.typeBox.color = '#FEFCB1';
+        mid.typeBox.textColor = 'OrangeRed';
+
+        var _this18 = _possibleConstructorReturn(this, (TypeInStringValueExpr.__proto__ || Object.getPrototypeOf(TypeInStringValueExpr)).call(this, [left, mid, right]));
+
+        _this18.defaultName = defaultName;
+        _this18.color = "gold";
+        return _this18;
+    }
+
+    _createClass(TypeInStringValueExpr, [{
+        key: 'reduceCompletely',
+        value: function reduceCompletely() {
+            return this;
+        }
+    }, {
+        key: 'reduce',
+        value: function reduce() {
+            this.holes[1].reduce();
+            return this;
+        }
+    }, {
+        key: 'performReduction',
+        value: function performReduction() {
+            return this.holes[1].performReduction();
+        }
+    }, {
+        key: 'canReduce',
+        value: function canReduce() {
+            return this.holes[1].reduce() != this.holes[1];
+        }
+    }, {
+        key: 'isValue',
+        value: function isValue() {
+            return false;
+        }
+    }, {
+        key: 'toString',
+        value: function toString() {
+            return (this.locked ? '/' : '') + this.defaultName;
+        }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return '"' + this.defaultName + '"';
+        }
+    }, {
+        key: 'value',
+        value: function value() {
+            return this.name;
+        }
+    }, {
+        key: 'graphicNode',
+        get: function get() {
+            return this.holes[0];
+        }
+    }]);
+
+    return TypeInStringValueExpr;
+}(Expression);
+
 var StringStarExpr = function (_StringValueExpr) {
     _inherits(StringStarExpr, _StringValueExpr);
 
@@ -660,8 +742,8 @@ var StringCircleExpr = function (_StringValueExpr4) {
     return StringCircleExpr;
 }(StringValueExpr);
 
-var StringAddExpr = function (_Expression4) {
-    _inherits(StringAddExpr, _Expression4);
+var StringAddExpr = function (_Expression5) {
+    _inherits(StringAddExpr, _Expression5);
 
     function StringAddExpr(left, right) {
         _classCallCheck(this, StringAddExpr);
@@ -682,20 +764,20 @@ var StringAddExpr = function (_Expression4) {
     }, {
         key: 'performReduction',
         value: function performReduction() {
-            var _this23 = this;
+            var _this24 = this;
 
             return this.performSubReduction(this.leftExpr).then(function (left) {
                 if (!(left instanceof StringValueExpr)) {
                     return Promise.reject();
                 }
-                return _this23.performSubReduction(_this23.rightExpr).then(function (right) {
+                return _this24.performSubReduction(_this24.rightExpr).then(function (right) {
                     if (!(right instanceof StringValueExpr)) {
                         return Promise.reject();
                     }
 
-                    var stage = _this23.stage;
+                    var stage = _this24.stage;
 
-                    var val = _get(StringAddExpr.prototype.__proto__ || Object.getPrototypeOf(StringAddExpr.prototype), 'performReduction', _this23).call(_this23);
+                    var val = _get(StringAddExpr.prototype.__proto__ || Object.getPrototypeOf(StringAddExpr.prototype), 'performReduction', _this24).call(_this24);
                     stage.update();
                     return val;
                 });

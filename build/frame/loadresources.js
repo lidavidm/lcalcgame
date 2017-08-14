@@ -76,8 +76,10 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     var pushChapter = function pushChapter(json, json_filename) {
         markChapter(json, json_filename, levels);
         var lang = json.language || "reduct-scheme";
+        var macros = json.macros;
         json.levels.forEach(function (lvl) {
             lvl.language = lang;
+            if (macros) lvl.macros = macros;
             if (lvl.fade) {
                 // Shorthand: specify "lambda" to fade both var and
                 // hole. If one has fewer fade levels than the other,
@@ -232,32 +234,37 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     // Add levels here:
     var chapterDigraph = {
         'intro': ['booleans'],
-        'booleans': ['conditionals'],
-        'conditionals': ['bindings', 'bags'],
-        'bindings': ['combination'],
-        'bags': ['combination'],
-        'combination': ['map-chi'],
-        'map-chi': ['intro_obj'],
-        'intro_obj': ['intro_typing'],
-        'intro_typing': ['logicalops'],
-        'logicalops': ['assign-chi'],
-        'assign-chi': ['logicalops_vars'],
-        'logicalops_vars': ['sequence'],
-        'sequence': ['loops'],
-        'loops': ['mystery'],
-        'mystery': ['modulo'],
-        'modulo': ['variables_obj'],
-        'variables_obj': ['concat'],
-        'concat': ['ifelse'],
-        'ifelse': ['ifelse_define'],
-        'ifelse_define': ['intro_string'],
-        'intro_string': ['more_array'],
-        'more_array': ['intro_string_obj'],
-        'intro_string_obj': ['variable_obj_methods'],
-        'variable_obj_methods': ['reverse_string'],
-        'reverse_string': ['recursion-js'],
-        'recursion-js': []
+        'booleans': ['strings'],
+        'strings': []
     };
+    // const chapterDigraph = {                     // BEFORE CHI '18.
+    //     'intro': ['booleans'],
+    //     'booleans': ['conditionals'],
+    //     'conditionals': ['bindings', 'bags'],
+    //     'bindings': ['combination'],
+    //     'bags': ['combination'],
+    //     'combination': ['map-chi'],
+    //     'map-chi': ['intro_obj'],
+    //     'intro_obj': ['intro_typing'],
+    //     'intro_typing': ['logicalops'],
+    //     'logicalops' : ['assign-chi'],
+    //     'assign-chi': ['logicalops_vars'],
+    //     'logicalops_vars': ['sequence'],
+    //     'sequence': ['loops'],
+    //     'loops': ['mystery'],
+    //     'mystery': ['modulo'],
+    //     'modulo': ['variables_obj'],
+    //     'variables_obj': ['concat'],
+    //     'concat': ['ifelse'],
+    //     'ifelse': ['ifelse_define'],
+    //     'ifelse_define': ['intro_string'],
+    //     'intro_string': ['more_array'],
+    //     'more_array': ['intro_string_obj'],
+    //     'intro_string_obj': ['variable_obj_methods'],
+    //     'variable_obj_methods': ['reverse_string'],
+    //     'reverse_string': ['recursion-js'],
+    //     'recursion-js': []
+    // };
 
     var chapter_load_prom = loadChaptersFromDigraph(chapterDigraph);
 

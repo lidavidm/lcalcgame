@@ -446,6 +446,14 @@ var TypeBox = function (_mag$RoundedRect) {
             this.textExpr.fontSize = fs;
         }
     }, {
+        key: 'textColor',
+        get: function get() {
+            return this.textExpr.color;
+        },
+        set: function set(clr) {
+            this.textExpr.color = clr;
+        }
+    }, {
         key: 'cursorIndex',
         get: function get() {
             return 'charIdx' in this.cursor ? this.cursor.charIdx : this.text.length;
@@ -614,9 +622,17 @@ var TypeInTextExpr = function (_TextExpr) {
         */
         value: function fromExprCode(code, afterCommit) {
             code = code.replace('_t_', ''); // remove prepend
+
+            // Special cases:
+            // Entering strings without worry about quotes...
+            if (code === 'string') return new TypeInStringValueExpr();
+
             var validators = {
-                'string': function string(txt) {
+                'fullstring': function fullstring(txt) {
                     return __PARSER.parse(txt) instanceof StringValueExpr;
+                },
+                'innerstring': function innerstring(txt) {
+                    return __PARSER.parse('"' + txt + '"') instanceof StringValueExpr;
                 },
                 'nonneg': function nonneg(txt) {
                     var i = Number.parseInt(txt, 10);
@@ -722,6 +738,16 @@ var TypeInTextExpr = function (_TextExpr) {
     }
 
     _createClass(TypeInTextExpr, [{
+        key: 'setDefaultWidth',
+        value: function setDefaultWidth(w) {
+            if (this.typeBox) {
+                this.typeBox.size = { w: w, h: this.typeBox.size.h };
+                this.typeBox._origWidth = w;
+            } else {
+                this._size = { w: w, h: this._size.h };
+            }
+        }
+    }, {
         key: 'parsedValue',
         value: function parsedValue() {
             if (this.typeBox) {

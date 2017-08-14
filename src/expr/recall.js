@@ -101,6 +101,12 @@ class TypeBox extends mag.RoundedRect {
     set fontSize(fs) {
         this.textExpr.fontSize = fs;
     }
+    get textColor() {
+        return this.textExpr.color;
+    }
+    set textColor(clr) {
+        this.textExpr.color = clr;
+    }
 
     makeMultiline(lineWidthInChars, maxNumLines) {
         this.textExpr.wrap = lineWidthInChars;
@@ -447,8 +453,14 @@ class TypeInTextExpr extends TextExpr {
     */
     static fromExprCode(code, afterCommit) {
         code = code.replace('_t_', ''); // remove prepend
+
+        // Special cases:
+        // Entering strings without worry about quotes...
+        if (code === 'string') return new TypeInStringValueExpr();
+
         let validators = {
-            'string':(txt) => (__PARSER.parse(txt) instanceof StringValueExpr),
+            'fullstring':(txt) => (__PARSER.parse(txt) instanceof StringValueExpr),
+            'innerstring':(txt) => (__PARSER.parse('"' + txt + '"') instanceof StringValueExpr),
             'nonneg':(txt) => {
                 let i = Number.parseInt(txt, 10);
                 return (!Number.isNaN(i) && i >= 0);
@@ -561,6 +573,14 @@ class TypeInTextExpr extends TextExpr {
         this.addChild(box);
         this.ignoreEvents = false;
         this.typeBox = box;
+    }
+    setDefaultWidth(w) {
+        if (this.typeBox) {
+            this.typeBox.size = { w:w, h:this.typeBox.size.h };
+            this.typeBox._origWidth = w;
+        } else {
+            this._size = { w:w, h:this._size.h };
+        }
     }
     get size() {
         if (this.typeBox) {

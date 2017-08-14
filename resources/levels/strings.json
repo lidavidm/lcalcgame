@@ -30,21 +30,27 @@
         },
         {
             "description": "Intro to typing text.",
-            "goal": "mountains",
+            "goal": "'mountains'",
             "board": "'mount' + _t_string",
             "toolbox": ""
         },
         {
-            "description": "Multiple text-enter boxes. Spaces.",
-            "goal": "volcanos scare me",
-            "board": ["_t_string + 'olca'", "'ca' + _", "_t_string + 's'", "_t_string + 'e me'"],
-            "toolbox": ["_ + _", "_ + _"]
-        },
-        {
-            "description": "Typing with ==, one side.",
+            "description": "Typing with ==, one side. Spaces.",
             "goal": "true",
             "board": ["_t_string == 'eery lakes'"],
             "toolbox": ""
+        },
+        {
+            "description": "Multiple text-enter boxes. Spaces II.",
+            "goal": "'penguin shuffle'",
+            "board": ["_t_string + 'guin'", "' '", "_ + 'shu'", "_t_string + 'fle'"],
+            "toolbox": ["_ + _", "_ + _"]
+        },
+        {
+            "description": "Multiple text-enter boxes. Spaces II.",
+            "goal": "'volcanos scare me'",
+            "board": ["_t_string + 'olca'", "'ca' + _", "_t_string + 's'", "_t_string + 'e me'"],
+            "toolbox": ["_ + _", "_ + _"]
         },
         {
             "description": "Typing with ==, both sides.",

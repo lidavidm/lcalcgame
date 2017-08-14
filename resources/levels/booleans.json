@@ -12,7 +12,13 @@
             "description": "Introduces concept: Reduction; Boolean comparison.",
             "board": ["a == a"],
             "goal": "true",
-            "toolbox": ""
+            "toolbox": "",
+            "fade": {
+                "true":1,
+                "false":1,
+                "==":1
+            },
+            "showFade": false
         },
         {
             "description": "Introduces concept: Holes.",
@@ -63,7 +69,8 @@
             "toolbox": "",
             "fade": {
                 "==":1
-            }
+            },
+            "showFade": false
         },
         {
             "description": "Our favorite hard level :)",

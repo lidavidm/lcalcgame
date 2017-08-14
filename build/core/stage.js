@@ -833,7 +833,8 @@ var mag = function (_) {
             var onkeydown = function onkeydown(e) {
                 var event = getCBKeyEvent(e);
                 stage.onkeydown(event);
-                if (e.keyCode == 32 || e.keyCode == 13) {
+                if (e.keyCode == 32 || e.keyCode == 13 || e.keyCode == 9) {
+                    // Space, tab, or...
                     stage.onkeypress(event);
                     e.preventDefault();
                 }
