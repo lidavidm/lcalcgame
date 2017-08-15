@@ -713,7 +713,7 @@ var TypeInTextExpr = function (_TextExpr) {
 
         var _thisTextExpr = _this8;
         var onCommit = function onCommit() {
-            var txt = this.text.trim(); // this.text is the TypeBox's text string, *not* the TextExpr's!
+            var txt = this.text; // this.text is the TypeBox's text string, *not* the TextExpr's!
             if (validator(txt)) {
                 _thisTextExpr.commit(txt);
                 Resource.play('carriage-return');
@@ -751,7 +751,7 @@ var TypeInTextExpr = function (_TextExpr) {
         key: 'parsedValue',
         value: function parsedValue() {
             if (this.typeBox) {
-                var txt = this.typeBox.text.trim();
+                var txt = this.typeBox.text;
                 if (this.validator(txt)) {
                     var result = __PARSER.parse(txt);
                     if (result) return result;
@@ -835,7 +835,7 @@ var TypeInTextExpr = function (_TextExpr) {
         key: 'canReduce',
         value: function canReduce() {
             if (this.typeBox) {
-                var txt = this.typeBox.text.trim();
+                var txt = this.typeBox.text;
                 var valid = this.validator(txt);
                 if (valid) {
                     this.reduce();
@@ -848,7 +848,7 @@ var TypeInTextExpr = function (_TextExpr) {
         key: 'isComplete',
         value: function isComplete() {
             if (this.typeBox) {
-                var txt = this.typeBox.text.trim();
+                var txt = this.typeBox.text;
                 return this.validator(txt);
             } else {
                 return true;

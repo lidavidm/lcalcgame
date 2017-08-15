@@ -551,7 +551,8 @@ class TypeInTextExpr extends TextExpr {
 
         let _thisTextExpr = this;
         let onCommit = function() {
-            let txt = this.text.trim(); // this.text is the TypeBox's text string, *not* the TextExpr's!
+            let txt = this.text; // this.text is the TypeBox's text string, *not* the TextExpr's!
+            console.log(txt);
             if (validator(txt)) {
                 _thisTextExpr.commit(txt);
                 Resource.play('carriage-return');
@@ -592,7 +593,7 @@ class TypeInTextExpr extends TextExpr {
 
     parsedValue() {
         if (this.typeBox) {
-            let txt = this.typeBox.text.trim();
+            let txt = this.typeBox.text;
             if (this.validator(txt)) {
                 let result = __PARSER.parse(txt);
                 if (result) return result;
@@ -643,7 +644,7 @@ class TypeInTextExpr extends TextExpr {
     }
     canReduce() {
         if (this.typeBox) {
-            let txt = this.typeBox.text.trim();
+            let txt = this.typeBox.text;
             let valid = this.validator(txt);
             if (valid) {
                 this.reduce();
@@ -655,7 +656,7 @@ class TypeInTextExpr extends TextExpr {
     }
     isComplete() {
         if (this.typeBox) {
-            let txt = this.typeBox.text.trim();
+            let txt = this.typeBox.text;
             return this.validator(txt);
         }
         else {

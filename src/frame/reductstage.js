@@ -351,20 +351,20 @@ class ReductStage extends mag.Stage {
         }
     }
     onkeypress(event) {
+        const isClose = (a, b) => Math.abs(a - b) < 1.0;
+        const topDownSort = (e1, e2) => {
+                const p1 = e1.absolutePos;
+                const p2 = e2.absolutePos;
+                if (isClose(p1.y, p2.y)) return p1.x >= p2.x;
+                else                     return p1.y >= p2.y;
+        };
         if (this.keyEventDelegate) {
             if (event.keyCode === 13) {
                 this.keyEventDelegate.carriageReturn();
             }
             else if (event.keyCode === 9) { // Tab.
                 // Cycle to next possible keyEventDelegate...
-                const isClose = (a, b) => Math.abs(a - b) < 1.0;
-                let available_delegates = this.getNodesWithClass(TypeBox)
-                    .sort((e1, e2) => {
-                        const p1 = e1.absolutePos;
-                        const p2 = e2.absolutePos;
-                        if (isClose(p1.y, p2.y)) return p1.x >= p2.x;
-                        else                     return p1.y >= p2.y;
-                });
+                let available_delegates = this.getNodesWithClass(TypeBox).sort(topDownSort);
                 let cur_delegate = this.keyEventDelegate;
                 this.keyEventDelegate.blur();
                 console.log(available_delegates, cur_delegate);
@@ -380,6 +380,10 @@ class ReductStage extends mag.Stage {
                 let character = event.char;
                 this.keyEventDelegate.type(character);
             }
+        } else if (event.keyCode === 9) { // Tab with no text box focused.
+            const available_delegates = this.getNodesWithClass(TypeBox).sort(topDownSort);
+            if (available_delegates.length > 0)
+                available_delegates[0].focus();
         }
     }
 
