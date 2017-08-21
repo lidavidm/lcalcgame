@@ -16,6 +16,21 @@ class Level {
         return stage;
     }
 
+    // For saving state.
+    // * Returns a (stringifiable) JSON object
+    // * representing the level, in a similar format to that found
+    // * in chapter JSON files.
+    serialize() {
+        const toString = e => e.toJavaScript();
+        let e = {
+            board: this.exprs.map(toString),  // Board is now a list of javascript code snippets...
+            goal:  this.goal.serialize()      // Goal is the same as it was when loaded from the JSON file.
+        };
+        if (this.toolbox) e.toolbox = this.toolbox.map(toString); // Toolbox is a list of javascript code snippets, like board.
+        if (this.globals) e.globals = this.globals.serialize();   // Environment -> key-value dict for variable bindings.
+        return e;
+    }
+
     // Builds a single Stage from the level description,
     // and returns it.
     // * The layout should be generated automatically, and consistently.
@@ -56,6 +71,8 @@ class Level {
         var lastChild = goal_node[1].children[goal_node[1].children.length-1];
         stage.add(goal_node[0]);
         stage.add(goal_node[1]);
+
+        stage._storedGoal = this.goal;
 
         //goal_node[1].children.forEach((c) => c.update());
 
@@ -176,15 +193,34 @@ class Level {
             globals: globals_descs,
             resources: resources,
             language: language,
-            macros: macros
+            macros: macros,
+            typing_options: typing_options,
+            typing_hints: typing_hints
         } = desc;
 
+        if (__USE_BLOCK_VARIANT && 'block_variant' in desc) {
+            const variant = desc.block_variant;
+            if ('board' in variant) expr_descs = variant.board;
+            if ('toolbox' in variant) toolbox_descs = variant.toolbox;
+            if ('goal' in variant) goal_descs = variant.goal;
+            if ('globals' in variant) globals_descs = variant.globals;
+        }
+
         var lvl = new Level(
-            Level.parse(expr_descs, language, macros),
-            new Goal(new ExpressionPattern(Level.parse(goal_descs, language, macros)), resources.aliens),
-            toolbox_descs ? Level.parse(toolbox_descs, language, macros) : null,
+            Level.parse(expr_descs, language, macros, typing_options),
+            new Goal(new ExpressionPattern(Level.parse(goal_descs, language, macros, typing_options)), goal_descs, resources.aliens),
+            toolbox_descs ? Level.parse(toolbox_descs, language, macros, typing_options) : null,
             Environment.parse(globals_descs)
         );
+
+        if (typing_hints) {
+            let typing_exprs = mag.Stage.getNodesWithClass(TypeInTextExpr, [], true, lvl.exprs);
+            for (let i = 0; i < typing_exprs.length && i < typing_hints.length; i++) {
+                typing_exprs[i].enforceHint(typing_hints[i]);
+                typing_exprs[i].typeBox.update();
+            }
+        }
+
         return lvl;
     }
     static splitParen(s) {
@@ -205,19 +241,19 @@ class Level {
         if (expr_descs.length === 0) expr_descs.push(s);
         return expr_descs;
     }
-    static parse(desc, language="reduct-scheme", macros=null) {
+    static parse(desc, language="reduct-scheme", macros=null, typing_options=null) {
         if (desc.length === 0) return [];
         else if (!Array.isArray(desc) && desc === Object(desc)) { // If desc is an object, then it's a globals specifier...
             // TODO: Expand to multiple globals.
-            console.log('Parsing variable goal...', desc);
+            // console.log('Parsing variable goal...', desc);
             let keys = Object.keys(desc);
             return new (ExprManager.getClass('vargoal'))(keys[0], Level.parse(desc[keys[0]], language, macros)[0]);
         }
 
         if (language === "JavaScript") {
             // Use ES6 parser
-            if (Array.isArray(desc)) return desc.map((d) => ES6Parser.parse(d, macros));
-            else                     return [ES6Parser.parse(desc, macros)];
+            if (Array.isArray(desc)) return desc.map((d) => ES6Parser.parse(d, macros, typing_options));
+            else                     return [ES6Parser.parse(desc, macros, typing_options)];
         }
         else if (language === "reduct-scheme" || !language) {
 
@@ -447,7 +483,6 @@ class Level {
                 lambdavar.ignoreEvents = false; // makes draggable
                 lambdavar.name = varname;
             }
-            console.log('produced', (ExprManager.getFadeLevel('var')));
             return lambdavar;
         } else if (arg.indexOf('$') > -1) {
             let varname = arg.replace('$', '').replace('_', '');
@@ -455,7 +490,7 @@ class Level {
             locked = !(arg.indexOf('_') > -1);
             return lock(new (ExprManager.getClass('var'))(varname), locked);
         } else if (true) {
-            let string = new StringValueExpr(arg);
+            let string = new (ExprManager.getClass('string'))(arg);
             return string;
         }
         else {
@@ -654,11 +689,16 @@ class Level {
 */
 class Goal {
 
-    constructor(accepted_patterns, alien_images=['alien-function-1']) {
+    constructor(accepted_patterns, desc, alien_images=['alien-function-1']) {
         if (!Array.isArray(accepted_patterns)) accepted_patterns = [accepted_patterns];
         this.patterns = accepted_patterns;
+        this.desc = desc; // as backup
         // Choose a random alien to serve as our "goal person"
         this.alien_image = alien_images[Math.floor(Math.random() * alien_images.length)];
+    }
+    serialize() {
+        if (typeof this.desc === 'string') return [this.desc];
+        else return this.desc;
     }
 
     get nodeRepresentation() {
@@ -802,7 +842,6 @@ class ExpressionPattern {
             }
             if (f instanceof ArrayObjectExpr && f.holes.length === 1) {
                 f = f.holes[0]; // compare only the underlying array.
-                console.log(e, f);
                 isarr = true;
             }
 

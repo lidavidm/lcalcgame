@@ -24,7 +24,7 @@ class StringObjectExpr extends ObjectExtensionExpr {
                     return stringExpr;
                 }
                 let newString = stringExpr.value().slice(numberExpr1.number, numberExpr2.number);
-                let newStringObj = new StringObjectExpr(new StringValueExpr(newString));
+                let newStringObj = new StringObjectExpr(new (ExprManager.getClass('string'))(newString));
                 return newStringObj;
             },
             'charAt': (stringExpr, numberExpr) => {
@@ -38,7 +38,7 @@ class StringObjectExpr extends ObjectExtensionExpr {
                 }
                 else {
                     let newString = stringExpr.value().charAt(numberExpr.number);
-                    let newStringObj = new StringObjectExpr(new StringValueExpr(newString));
+                    let newStringObj = new StringObjectExpr(new (ExprManager.getClass('string'))(newString));
                     return newStringObj;
                 }
             },
@@ -54,7 +54,7 @@ class StringObjectExpr extends ObjectExtensionExpr {
                 }
                 else {
                     let newString = stringExpr.value()[numberExpr.number];
-                    let newStringObj = new StringObjectExpr(new StringValueExpr(newString));
+                    let newStringObj = new StringObjectExpr(new (ExprManager.getClass('string'))(newString));
                     return newStringObj;
                 }
             },

@@ -327,6 +327,8 @@ class Expression extends mag.RoundedRect {
             if (!this.canReduce()) {
                 mag.Stage.getAllNodes([this]).forEach((n) => {
                     if (n instanceof Expression && n.isPlaceholder()) {
+                        // Something to do here
+                        console.log(n);
                         n.animatePlaceholderStatus();
                     }
                 });
@@ -395,7 +397,6 @@ class Expression extends mag.RoundedRect {
             if (!this.stage) return Promise.reject();
 
             this.stage.saveState();
-            Logger.log('state-save', this.stage.toString());
 
             // Log the reduction.
             let reduced_expr_str;
@@ -472,19 +473,16 @@ class Expression extends mag.RoundedRect {
             let afterState = stage.toString();
             Logger.log('detached-expr', {'before':beforeState, 'after':afterState, 'item':detachedExp });
             stage.saveState();
-            Logger.log('state-save', afterState);
 
             this.shell = ghost_expr;
         }
         if (this.toolbox) {
 
-            if (this.stage) {
+            if (this.stage)
                 this.stage.saveState();
-                Logger.log('state-save', this.stage.toString());
-            }
 
             this.toolbox.removeExpression(this); // remove this expression from the toolbox
-            Logger.log('toolbox-dragout', this.toString());
+            Logger.log('toolbox-dragout', this.toJavaScript());
         }
 
         if (this.lockedInteraction) {
@@ -618,10 +616,8 @@ class Expression extends mag.RoundedRect {
 
                 Logger.log('toolbox-remove', this.toString());
 
-                if (this.stage) {
+                if (this.stage)
                     this.stage.saveState();
-                    Logger.log('state-save', this.stage.toString());
-                }
             }
 
             // Snap expressions together?
@@ -781,6 +777,10 @@ class Expression extends mag.RoundedRect {
             s += this.holes[i].toString();
         }
         return s + ')';
+    }
+    toJavaScript() {
+        if (this.holes.length === 1) return this.holes[0].toJavaScript();
+        else return JSON.stringify(this.holes.map((e) => e.toJavaScript())); // this shouldn't happen, ideally...
     }
 }
 

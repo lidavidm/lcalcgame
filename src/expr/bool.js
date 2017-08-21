@@ -15,15 +15,13 @@ class BooleanPrimitive extends Expression {
     drawInternal(ctx, pos, boundingSize) {
         ctx.fillStyle = 'black';
         setStrokeStyle(ctx, this.stroke);
-        if (this.shadowOffset !== 0) {
-            hexaRect(ctx,
-                      pos.x, pos.y+this.shadowOffset,
-                      boundingSize.w, boundingSize.h,
-                      true, this.stroke ? true : false,
-                      this.stroke ? this.stroke.opacity : null);
-        }
+        if (this.shadowOffset !== 0)
+            this.drawBaseShape( ctx, {x:pos.x, y:pos.y+this.shadowOffset}, boundingSize );
         ctx.fillStyle = this.color;
-        hexaRect(ctx,
+        this.drawBaseShape(ctx, pos, boundingSize);
+    }
+    drawBaseShape(ctx, pos, boundingSize) {
+        hexaRect( ctx,
                   pos.x, pos.y,
                   boundingSize.w, boundingSize.h,
                   true, this.stroke ? true : false,
@@ -45,6 +43,34 @@ class FalseExpr extends BooleanPrimitive {
     value() { return false; }
     toString() { return (this.locked ? '/' : '') + 'false'; }
     toJavaScript() { return 'false'; }
+}
+class GraphicFadedTrueExpr extends TrueExpr {
+    constructor() {
+        super();
+        this.color = "lightgray";
+    }
+    drawBaseShape(ctx, pos, size) {
+        roundRect(ctx,
+                  pos.x, pos.y,
+                  size.w, size.h,
+                  this.radius*this.absoluteScale.x, this.color ? true : false, this.stroke ? true : false,
+                  this.stroke ? this.stroke.opacity : null,
+                  this.notches ? this.notches : null);
+    }
+}
+class GraphicFadedFalseExpr extends FalseExpr {
+    constructor() {
+        super();
+        this.color = "lightgray";
+    }
+    drawBaseShape(ctx, pos, size) {
+        roundRect(ctx,
+                  pos.x, pos.y,
+                  size.w, size.h,
+                  this.radius*this.absoluteScale.x, this.color ? true : false, this.stroke ? true : false,
+                  this.stroke ? this.stroke.opacity : null,
+                  this.notches ? this.notches : null);
+    }
 }
 
 /** Faded bool variants. */

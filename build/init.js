@@ -9,6 +9,8 @@ var GLOBAL_DEFAULT_SCREENSIZE = null;
 var stage;
 var canvas;
 
+var __USE_BLOCK_VARIANT = true;
+
 var level_idx = getCookie('level_idx') || 0;
 var completedLevels = {};
 if (window.localStorage["completedLevels"]) {

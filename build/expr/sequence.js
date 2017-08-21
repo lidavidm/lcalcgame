@@ -251,6 +251,7 @@ var Sequence = function (_Expression) {
             });
             for (var i = 0; i < es.length; i++) {
                 var e = es[i].trim();
+                // If expr doesn't already have a semicolon at the end, add one.
                 if (e[e.length - 1] !== ';') es[i] += ';';
             }
             return es.join('\n');

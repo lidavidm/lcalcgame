@@ -234,12 +234,19 @@ class StringValueExpr extends Expression {
     canReduce() { return false; }
     isValue() { return true; }
     toString() {
-        return (this.locked ? '/' : '') + this.primitiveName;
+        return (this.locked ? '/' : '') + '`' + this.primitiveName;
     }
     toJavaScript() {
-        return `"${this.primitiveName}"`;
+        return `'${this.primitiveName}'`;
     }
     value() { return this.name; }
+}
+class ColorlessStringValueExpr extends StringValueExpr {
+    constructor(name, primitiveName=null) {
+        super(name, primitiveName);
+        this.graphicNode.color = 'black';
+        this.color = 'lightgray';
+    }
 }
 class TypeInStringValueExpr extends Expression {
     constructor(defaultName="") {
@@ -249,7 +256,7 @@ class TypeInStringValueExpr extends Expression {
         let mid = TypeInTextExpr.fromExprCode('_t_innerstring', (final_txt) => {
             let parent = (this.parent || this.stage);
             let stage = this.stage;
-            let str_expr = new StringValueExpr(final_txt);
+            let str_expr = new (ExprManager.getClass('string'))(final_txt);
             let locked = this.locked;
             parent.swap(this, str_expr); // Swap this makeshift StringValueExpr for a real one...
             if (locked) str_expr.lock();
@@ -260,7 +267,15 @@ class TypeInStringValueExpr extends Expression {
         mid.typeBox.textColor = 'OrangeRed';
         super([left, mid, right]);
         this.defaultName = defaultName;
-        this.color = "gold";
+        this.color = 'gold';
+    }
+    clone() {
+        let t = new TypeInStringValueExpr(this.defaultName);
+        if (this.holes[1].typeBox)
+            t.holes[1].typeBox.text = this.holes[1].typeBox.text;
+        if (this.locked)
+            t.lock();
+        return t;
     }
     get graphicNode() { return this.holes[0]; }
     reduceCompletely() { return this; }
@@ -277,9 +292,18 @@ class TypeInStringValueExpr extends Expression {
         return (this.locked ? '/' : '') + this.defaultName;
     }
     toJavaScript() {
-        return `"${this.defaultName}"`;
+        return '_t_string';
     }
     value() { return this.name; }
+}
+class ColorlessTypeInStringValueExpr extends TypeInStringValueExpr {
+    constructor(defaultName="") {
+        super(defaultName);
+        this.holes[0].color = this.holes[2].color = 'black';
+        this.holes[1].typeBox.color = "#eee";
+        this.holes[1].typeBox.textColor = 'black';
+        this.color = 'lightgray';
+    }
 }
 class StringStarExpr extends StringValueExpr {
     constructor() { super('star'); }
@@ -357,7 +381,7 @@ class StringAddExpr extends Expression {
 
     reduce() {
         if (this.leftExpr instanceof StringValueExpr && this.rightExpr instanceof StringValueExpr) {
-            return new (StringValueExpr)(this.leftExpr.value() + this.rightExpr.value());
+            return new (ExprManager.getClass('string'))(this.leftExpr.value() + this.rightExpr.value());
         }
         else {
             return this;

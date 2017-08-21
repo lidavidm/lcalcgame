@@ -798,7 +798,7 @@ var AssignExpr = function (_Expression2) {
                     console.log("this.value.toString()" + this.value.toString());
                     var newString = originalString.slice(0, slicePosition) + this.value.value() + originalString.slice(slicePosition + 1);
                     console.log("new String: " + newString);
-                    this.value = new StringValueExpr(newString);
+                    this.value = new (ExprManager.getClass('string'))(newString);
                 }
             }
 
@@ -881,7 +881,7 @@ var AssignExpr = function (_Expression2) {
     }, {
         key: "toJavaScript",
         value: function toJavaScript() {
-            var variable = this.variable ? this.variable.toJavaScript() : '_';
+            var variable = this.variable ? this.variable.toJavaScript() : '_v';
             var value = this.value ? this.value.toJavaScript() : '_';
             return variable + " = " + value + ";";
         }

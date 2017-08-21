@@ -190,71 +190,11 @@ var ReductStage = function (_mag$Stage) {
             innerStages.forEach(function (stg) {
                 stg.build();
             });
-            var textboxes = this.getNodesWithClass(TypeInTextExpr);
-            if (textboxes.length > 0) {
-                // If one text box is on the screen, focus it!
-                textboxes[0].focus();
-            }
+            this.focusFirstTypeBox();
             this.update();
-        }
 
-        // Save state of game board and push onto undo stack.
-
-    }, {
-        key: 'saveState',
-        value: function saveState() {
-            if (!this.expressionNodes) return;
-            // TODO: DML save and restore the environment as well.
-            var board = this.expressionNodes().map(function (n) {
-                return n.clone();
-            });
-            board = board.filter(function (n) {
-                return !(n instanceof ExpressionEffect);
-            });
-            var toolbox = this.toolboxNodes().map(function (n) {
-                return n.clone();
-            });
-            this.stateStack.push({ 'board': board, 'toolbox': toolbox });
-        }
-
-        // Restore previous state of game board.
-
-    }, {
-        key: 'restoreState',
-        value: function restoreState() {
-            var _this3 = this;
-
-            if (!this.expressionNodes) return;
-            if (this.stateStack.length > 0) {
-                //this.nodes = this.stateStack.pop();
-
-                this.expressionNodes().forEach(function (n) {
-                    return _this3.remove(n);
-                });
-                this.toolboxNodes().forEach(function (n) {
-                    return _this3.remove(n);
-                });
-                var restored_state = this.stateStack.pop();
-                restored_state.board.forEach(function (n) {
-                    return _this3.add(n);
-                });
-                restored_state.toolbox.forEach(function (n) {
-                    n.toolbox = _this3.toolbox;
-                    _this3.add(n);
-                });
-
-                this.update();
-                this.draw();
-
-                Logger.log('state-restore', this.toString());
-            }
-        }
-    }, {
-        key: 'dumpState',
-        value: function dumpState() {
-            if (this.stateStack.length > 0) {
-                this.stateStack.pop();
-            }
+            // Save initial state.
+            this.saveState();
         }
 
         // Checks for level completion.
@@ -262,7 +202,7 @@ var ReductStage = function (_mag$Stage) {
     }, {
         key: 'update',
         value: function update() {
-            var _this4 = this;
+            var _this3 = this;
 
             _get(ReductStage.prototype.__proto__ || Object.getPrototypeOf(ReductStage.prototype), 'update', this).call(this);
 
@@ -275,7 +215,8 @@ var ReductStage = function (_mag$Stage) {
                     if (!this.ranCompletionAnim) {
                         (function () {
 
-                            Logger.log('victory', { 'final_state': _this4.toString(), 'num_of_moves': undefined });
+                            _this3.saveState();
+                            Logger.log('victory', { 'final_state': _this3.toString(), 'num_of_moves': undefined });
 
                             // Update + save player progress.
                             ProgressManager.markLevelComplete(level_idx);
@@ -285,8 +226,8 @@ var ReductStage = function (_mag$Stage) {
                                 if (level_idx < 1) {
                                     var cmp = new mag.ImageRect(GLOBAL_DEFAULT_SCREENSIZE.w / 2, GLOBAL_DEFAULT_SCREENSIZE.h / 2, 740 / 2, 146 / 2, 'victory');
                                     cmp.anchor = { x: 0.5, y: 0.5 };
-                                    _this4.add(cmp);
-                                    _this4.draw();
+                                    _this3.add(cmp);
+                                    _this3.draw();
 
                                     Resource.play('victory');
                                     Animate.wait(1080).after(function () {
@@ -313,7 +254,7 @@ var ReductStage = function (_mag$Stage) {
                                 Animate.blink([node, goalNode], 2500 / 2.0 * blinkCount, [0, 1, 1], blinkCount).after(function () {
                                     //Resource.play('shootwee');
 
-                                    _this4.playerWon = true;
+                                    _this3.playerWon = true;
 
                                     //Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x:200, y:300 }, () => {
                                     SplosionEffect.run(node);
@@ -336,24 +277,12 @@ var ReductStage = function (_mag$Stage) {
                                 });
                             });
 
-                            _this4.ranCompletionAnim = true;
+                            _this3.ranCompletionAnim = true;
                         })();
                     }
                 }
             }
         }
-
-        // getExprsWithCompatibleNotch(notch, excludedExprs=[], recursive=true) {
-        //     let exprs = this.expressionNodes();
-        //     let compatible_exprs = [];
-        //     exprs.filter((e) => {
-        //         if (e.notches && e.notches.length > 0 && e.notches.some((n) => n.isCompatibleWith(notch))) {
-        //             compatible_exprs.push(e);
-        //         }
-        //     });
-        //     return compatible_exprs;
-        // }
-
     }, {
         key: 'onmousedown',
         value: function onmousedown(pos) {
@@ -393,8 +322,8 @@ var ReductStage = function (_mag$Stage) {
             }
         }
     }, {
-        key: 'onkeypress',
-        value: function onkeypress(event) {
+        key: 'getTypeBoxes',
+        value: function getTypeBoxes() {
             var isClose = function isClose(a, b) {
                 return Math.abs(a - b) < 1.0;
             };
@@ -403,16 +332,27 @@ var ReductStage = function (_mag$Stage) {
                 var p2 = e2.absolutePos;
                 if (isClose(p1.y, p2.y)) return p1.x >= p2.x;else return p1.y >= p2.y;
             };
+            return this.getNodesWithClass(TypeBox).sort(topDownSort);
+        }
+    }, {
+        key: 'focusFirstTypeBox',
+        value: function focusFirstTypeBox() {
+            var available_delegates = this.getTypeBoxes();
+            if (available_delegates.length > 0) available_delegates[0].focus();
+        }
+    }, {
+        key: 'onkeypress',
+        value: function onkeypress(event) {
+
             if (this.keyEventDelegate) {
                 if (event.keyCode === 13) {
                     this.keyEventDelegate.carriageReturn();
                 } else if (event.keyCode === 9) {
                     // Tab.
                     // Cycle to next possible keyEventDelegate...
-                    var available_delegates = this.getNodesWithClass(TypeBox).sort(topDownSort);
+                    var available_delegates = this.getTypeBoxes();
                     var cur_delegate = this.keyEventDelegate;
                     this.keyEventDelegate.blur();
-                    console.log(available_delegates, cur_delegate);
                     var idx_delegate = available_delegates.indexOf(cur_delegate);
                     if (idx_delegate > -1) {
                         var next_delegate = available_delegates[(idx_delegate + 1) % available_delegates.length];
@@ -426,31 +366,105 @@ var ReductStage = function (_mag$Stage) {
                 }
             } else if (event.keyCode === 9) {
                 // Tab with no text box focused.
-                var _available_delegates = this.getNodesWithClass(TypeBox).sort(topDownSort);
-                if (_available_delegates.length > 0) _available_delegates[0].focus();
+                this.focusFirstTypeBox();
             }
         }
+
+        // Converts current state of the board into a Level (data repr.).
+
+    }, {
+        key: 'toLevel',
+        value: function toLevel() {
+            var isNotEmpty = function isNotEmpty(e) {
+                return e != null && !(e instanceof ExpressionEffect);
+            };
+            var clone = function clone(e) {
+                return e.clone();
+            };
+            var board = this.expressionNodes().filter(isNotEmpty).map(clone); // these are Expressions
+            var toolbox = this.toolboxNodes().filter(isNotEmpty).map(clone); // ''
+            var goal = this._storedGoal; // this is a Goal object
+            var globals = this.environment; // an Environment object
+            return new Level(board, goal, toolbox, globals);
+        }
+
+        // Storing and saving Reduct stages.
+
     }, {
         key: 'toString',
         value: function toString() {
-            if (!this.expressionNodes) return "[stage]";
+            return JSON.stringify(this.toLevel().serialize());
+        }
 
-            var stringify = function stringify(nodes) {
-                return nodes.reduce(function (prev, curr) {
-                    var s = curr.toString();
-                    if (s === '()') return prev; // Skip empty expressions.
-                    else return prev + curr.toString() + ' ';
-                }, '').trim();
+        // Save state of game board and push onto undo stack.
+
+    }, {
+        key: 'saveState',
+        value: function saveState() {
+            var stringify = function stringify(lvl) {
+                return JSON.stringify(lvl);
             };
+            var state = this.toLevel().serialize();
+            var json = stringify(state);
 
-            var board = this.expressionNodes();
-            var toolbox = this.toolboxNodes();
-            var exp = {
-                'board': stringify(board),
-                'toolbox': stringify(toolbox)
-            };
+            // Check if new 'state' is really new...
+            // Only if something's changed should we push onto the stateStack
+            // and save to the server.
+            if (this.stateStack.length > 0) {
+                var prev_state = this.stateStack[this.stateStack.length - 1];
+                var prev_json = stringify(prev_state);
+                if (prev_json === json) // Nothing's changed. Abort the save.
+                    return;else {
+                    console.log('State diff: ', ReductStage.stateDiff(prev_state, state));
+                }
+            } // If we reach here, then something has changed...
 
-            return JSON.stringify(exp);
+            // Push new state and save serialized version to logger.
+            this.stateStack.push(state);
+            Logger.log('state-save', json);
+        }
+
+        // Determines what's changed between states a and b, (serialized Level objects)
+        // where 'b' is assumed to come after 'a' (time-wise).
+
+    }, {
+        key: 'restoreState',
+
+
+        // Restore previous state of game board.
+        value: function restoreState() {
+            var _this4 = this;
+
+            if (this.stateStack.length > 0) {
+                //this.nodes = this.stateStack.pop();
+
+                this.expressionNodes().forEach(function (n) {
+                    return _this4.remove(n);
+                });
+                this.toolboxNodes().forEach(function (n) {
+                    return _this4.remove(n);
+                });
+                var restored_state = this.stateStack.pop(); // This is a Level object.
+                restored_state.exprs.forEach(function (n) {
+                    return _this4.add(n);
+                });
+                restored_state.toolbox.forEach(function (n) {
+                    n.toolbox = _this4.toolbox;
+                    _this4.add(n);
+                });
+
+                this.update();
+                this.draw();
+
+                Logger.log('state-restore', this.toString());
+            }
+        }
+    }, {
+        key: 'dumpState',
+        value: function dumpState() {
+            if (this.stateStack.length > 0) {
+                this.stateStack.pop();
+            }
         }
     }, {
         key: 'onorientationchange',
@@ -511,6 +525,74 @@ var ReductStage = function (_mag$Stage) {
         key: 'toolboxHeight',
         get: function get() {
             return __IS_MOBILE && this.md.phone() ? 70 : 90;
+        }
+    }], [{
+        key: 'stateDiff',
+        value: function stateDiff(a, b) {
+            var has = function has(str, arr) {
+                return arr.indexOf(str) > -1;
+            };
+            var diff = {};
+            var computeDiffArray = function computeDiffArray(a, b, key) {
+                if (!(key in diff)) diff[key] = {
+                    add: [],
+                    remove: []
+                };
+                for (var i = 0; i < a[key].length; i++) {
+                    var elem = a[key][i];
+                    if (!has(elem, b[key])) // If a's expr doesn't exist in b, then it was removed.
+                        diff[key].remove.push(elem);
+                }
+                for (var _i = 0; _i < b[key].length; _i++) {
+                    var _elem = b[key][_i];
+                    if (!has(_elem, a[key])) // If b's expr doesn't exist in a, then it was added.
+                        diff[key].add.push(_elem);
+                }
+                // Cleanup.
+                var nothingAdded = diff[key].add.length === 0;
+                var nothingRemoved = diff[key].remove.length === 0;
+                if (nothingAdded && nothingRemoved) delete diff[key];else if (nothingAdded) delete diff[key]['add'];else if (nothingRemoved) delete diff[key]['remove'];
+            };
+            var computeDiffObj = function computeDiffObj(a, b, key) {
+                if (!(key in a || key in b) || Object.keys(a[key]).length === 0 && Object.keys(b[key]).length === 0) return; // Nothing to do... empty states.
+
+                if (!(key in diff)) diff[key] = {
+                    change: {},
+                    set: {}
+                };
+
+                // So we don't get errors...
+                if (!(key in a)) a[key] = {};else if (!(key in b)) b[key] = {};
+
+                for (var varname in a[key]) {
+                    if (varname in b[key]) {
+                        if (b[key][varname] != a[key][varname]) // Variable has changed values.
+                            diff[key].change[varname] = b[key][varname];
+                    } else {
+                        // Variable was (somehow!) removed. This shouldn't be reachable atm.
+                        console.warn('Error!! Variable ', varname, ' found as removed. Weird. Skipping...');
+                    }
+                }
+                for (var _varname in b[key]) {
+                    if (!(_varname in a[key])) // New variable was declared and assigned a value.
+                        diff[key].set[_varname] = b[key][_varname];
+                }
+
+                // Cleanup.
+                var nothingChanged = Object.keys(diff[key].change).length === 0;
+                var nothingSet = Object.keys(diff[key].set).length === 0;
+                if (nothingChanged && nothingSet) delete diff[key];else if (nothingChanged) delete diff[key]['change'];else if (nothingSet) delete diff[key]['set'];
+            };
+
+            // Below is a generalized version of doing:
+            //   computeDiffArray(a, b, 'board');
+            //   computeDiffArray(a, b, 'toolbox');
+            //   computeDiffObj(a, b, 'globals');
+            for (var key in b) {
+                if (Array.isArray(b[key])) computeDiffArray(a, b, key);else computeDiffObj(a, b, key);
+            }
+
+            return diff;
         }
     }]);
 

@@ -133,6 +133,15 @@ var OperatorExpr = function (_Expression2) {
     }, {
         key: 'onmouseclick',
         value: function onmouseclick() {
+            if (this.op instanceof OpLiteral) {
+                var Class = this.op.getClass();
+                var stage = this.stage;
+                var binExpr = new Class(this.leftExpr.clone(), this.rightExpr.clone());
+                stage.swap(this, binExpr);
+                return;
+            }
+            if (this.leftExpr instanceof TypeInStringValueExpr || this.leftExpr instanceof TypeInTextExpr) this.leftExpr.performReduction();
+            if (this.rightExpr instanceof TypeInStringValueExpr || this.rightExpr instanceof TypeInTextExpr) this.rightExpr.performReduction();
             this.performUserReduction();
             //console.log("clicked Operator Expression!!");
             //if (!this._animating) {
@@ -147,7 +156,17 @@ var OperatorExpr = function (_Expression2) {
     }, {
         key: 'toJavaScript',
         value: function toJavaScript() {
-            return '(' + this.leftExpr.toJavaScript() + ' ' + this.op.text + ' ' + this.rightExpr.toJavaScript() + ')';
+            var opName = void 0;
+            if (this.op instanceof MissingOpExpression) opName = '>>';else if (this.op instanceof TypeInTextExpr) opName = this.op.typeBox.text.trim().length > 0 ? this.op.typeBox.text : '>>>';else if (this.op instanceof OpLiteral) opName = this.op.toString();else opName = this.op.text;
+
+            var isString = function isString(x) {
+                return (x.match(/\'/g) || []).length === 2 && x.indexOf("'") === 0 && x.lastIndexOf("'") === x.length - 1;
+            };
+            var wrap = function wrap(s) {
+                if (!isString(s) && /\s/g.test(s)) // if this value isn't a string and it has whitespace, we need to wrap it in parentheses...
+                    return '(' + s + ')';else return s;
+            };
+            return wrap(this.leftExpr.toJavaScript()) + ' ' + opName + ' ' + wrap(this.rightExpr.toJavaScript());
         }
     }, {
         key: 'leftExpr',
@@ -167,6 +186,60 @@ var OperatorExpr = function (_Expression2) {
     }]);
 
     return OperatorExpr;
+}(Expression);
+
+var OpLiteral = function (_Expression3) {
+    _inherits(OpLiteral, _Expression3);
+
+    function OpLiteral(op) {
+        _classCallCheck(this, OpLiteral);
+
+        var t = new TextExpr(op);
+        t.color = 'black';
+
+        var _this6 = _possibleConstructorReturn(this, (OpLiteral.__proto__ || Object.getPrototypeOf(OpLiteral)).call(this, [t]));
+
+        _this6.radius = 22;
+        return _this6;
+    }
+    // drawInternal(ctx, pos, boundingSize) {
+    //     const rad = boundingSize.h / 2.0;
+    //     if (this.shadowOffset !== 0) {
+    //         drawCircle(ctx, pos.x, pos.y + this.shadowOffset, rad, this.shadowColor, this.stroke);
+    //     }
+    //     drawCircle(ctx, pos.x, pos.y, rad, this.color, this.stroke);
+    // }
+
+
+    _createClass(OpLiteral, [{
+        key: 'getClass',
+        value: function getClass() {
+            var map = {
+                '==': ExprManager.getClass('=='),
+                '=': ExprManager.getClass('assign'),
+                '+': ExprManager.getClass('+')
+            };
+            var op = this.toString();
+            if (op in map) return map[op];else return ExprManager.getClass(op);
+        }
+    }, {
+        key: 'onmouseclick',
+        value: function onmouseclick() {
+            if (this.parent) this.parent.performUserReduction();
+        }
+    }, {
+        key: 'toString',
+        value: function toString() {
+            return this.holes[0].text;
+        }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return '_op(\'' + this.toString() + '\')';
+        }
+    }]);
+
+    return OpLiteral;
 }(Expression);
 
 var AddExpr = function (_OperatorExpr) {
@@ -310,28 +383,28 @@ var AnimatedModuloExpr = function (_ModuloExpr) {
     _createClass(AnimatedModuloExpr, [{
         key: 'performUserReduction',
         value: function performUserReduction() {
-            var _this12 = this;
+            var _this13 = this;
 
             if (!this._reducing && this.canReduce() && this.reduce() != this) {
                 (function () {
-                    var dividend = _this12.leftExpr.value();
-                    var divisor = _this12.rightExpr.value();
-                    var reduceExpr = _this12.reduce();
+                    var dividend = _this13.leftExpr.value();
+                    var divisor = _this13.rightExpr.value();
+                    var reduceExpr = _this13.reduce();
                     var clock = new ModuloClockExpr(new FadedNumberExpr(dividend), divisor, 62);
-                    clock.pos = addPos(_this12.centerPos(), { x: 0, y: -80 });
-                    clock.anchor = _this12.anchor;
+                    clock.pos = addPos(_this13.centerPos(), { x: 0, y: -80 });
+                    clock.anchor = _this13.anchor;
                     clock.ignoreEvents = true;
                     clock.graphicNode.shadowOffset = 0;
-                    _this12.stage.add(clock);
-                    _this12.ignoreEvents = true;
-                    _this12.lockSubexpressions();
-                    _this12._reducing = clock.performModulo(false);
+                    _this13.stage.add(clock);
+                    _this13.ignoreEvents = true;
+                    _this13.lockSubexpressions();
+                    _this13._reducing = clock.performModulo(false);
                     // this.stage.remove(this);
-                    _this12._reducing.then(function () {
-                        _this12.stage.swap(_this12, reduceExpr);
-                        _this12._reducing = false;
+                    _this13._reducing.then(function () {
+                        _this13.stage.swap(_this13, reduceExpr);
+                        _this13._reducing = false;
                     });
-                    _this12.animateReducingStatus();
+                    _this13.animateReducingStatus();
                 })();
             }
         }
@@ -346,11 +419,11 @@ var CircleSpinner = function (_ArrowPath) {
     function CircleSpinner(radius) {
         _classCallCheck(this, CircleSpinner);
 
-        var _this13 = _possibleConstructorReturn(this, (CircleSpinner.__proto__ || Object.getPrototypeOf(CircleSpinner)).call(this, [{ x: 0, y: 0 }, { x: 0, y: radius }]));
+        var _this14 = _possibleConstructorReturn(this, (CircleSpinner.__proto__ || Object.getPrototypeOf(CircleSpinner)).call(this, [{ x: 0, y: 0 }, { x: 0, y: radius }]));
 
-        _this13.degree = 90;
-        _this13.radius = radius;
-        return _this13;
+        _this14.degree = 90;
+        _this14.radius = radius;
+        return _this14;
     }
 
     _createClass(CircleSpinner, [{
@@ -394,15 +467,15 @@ var ModuloClock = function (_mag$Circle) {
     function ModuloClock(x, y, rad, divisor) {
         _classCallCheck(this, ModuloClock);
 
-        var _this14 = _possibleConstructorReturn(this, (ModuloClock.__proto__ || Object.getPrototypeOf(ModuloClock)).call(this, x, y, rad));
+        var _this15 = _possibleConstructorReturn(this, (ModuloClock.__proto__ || Object.getPrototypeOf(ModuloClock)).call(this, x, y, rad));
 
         var spinnerColor = '#111';
         var numberColor = '#aaa';
         var clockCenter = { x: rad, y: rad };
 
-        _this14.color = 'Ivory';
-        _this14.numberColor = numberColor;
-        _this14.shadowColor = spinnerColor;
+        _this15.color = 'Ivory';
+        _this15.numberColor = numberColor;
+        _this15.shadowColor = spinnerColor;
 
         var centerDot = new mag.Circle(0, 0, Math.trunc(rad / 8.0));
         centerDot.color = spinnerColor;
@@ -418,7 +491,7 @@ var ModuloClock = function (_mag$Circle) {
 
         // Display numbers on the clock
         var numRad = rad / 1.3;
-        _this14.numbers = [];
+        _this15.numbers = [];
         for (var i = 0; i < divisor; i++) {
             var theta = toRadians(90 + i / divisor * 360.0);
             var num = new TextExpr(i.toString());
@@ -426,16 +499,16 @@ var ModuloClock = function (_mag$Circle) {
             num.color = numberColor;
             num.anchor = { x: 0.5, y: 0.5 };
             num.pos = addPos({ x: numRad * Math.cos(theta), y: numRad * Math.sin(theta) + 5 }, clockCenter);
-            _this14.addChild(num);
-            _this14.numbers.push(num);
+            _this15.addChild(num);
+            _this15.numbers.push(num);
         }
 
-        _this14.addChild(spinner);
-        _this14.addChild(centerDot);
+        _this15.addChild(spinner);
+        _this15.addChild(centerDot);
 
-        _this14.hand = spinner;
-        _this14.divisor = divisor;
-        return _this14;
+        _this15.hand = spinner;
+        _this15.divisor = divisor;
+        return _this15;
     }
 
     _createClass(ModuloClock, [{
@@ -503,16 +576,16 @@ var ModuloClockExpr = function (_GraphicValueExpr) {
 
         _classCallCheck(this, ModuloClockExpr);
 
-        var _this15 = _possibleConstructorReturn(this, (ModuloClockExpr.__proto__ || Object.getPrototypeOf(ModuloClockExpr)).call(this, new ModuloClock(0, 0, radius, divisor)));
+        var _this16 = _possibleConstructorReturn(this, (ModuloClockExpr.__proto__ || Object.getPrototypeOf(ModuloClockExpr)).call(this, new ModuloClock(0, 0, radius, divisor)));
 
-        _this15.color = 'Ivory';
+        _this16.color = 'Ivory';
         var n = dividendExpr;
         if (!n) n = new MissingNumberExpression();
-        n.pos = _this15.graphicNode.centerPos();
+        n.pos = _this16.graphicNode.centerPos();
         n.anchor = { x: 0.5, y: 0.5 };
         if (n instanceof NumberExpr) n.lock();
-        _this15.graphicNode.addChild(n);
-        return _this15;
+        _this16.graphicNode.addChild(n);
+        return _this16;
     }
 
     _createClass(ModuloClockExpr, [{
@@ -526,7 +599,7 @@ var ModuloClockExpr = function (_GraphicValueExpr) {
     }, {
         key: 'performModulo',
         value: function performModulo() {
-            var _this16 = this;
+            var _this17 = this;
 
             var shouldGiveNumber = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
@@ -537,22 +610,22 @@ var ModuloClockExpr = function (_GraphicValueExpr) {
                 return Promise.reject();
             } else {
                 var _ret2 = function () {
-                    _this16._isAnimating = true;
+                    _this17._isAnimating = true;
                     var dividend = dividendExpr.value();
-                    var remainder = dividend % _this16.graphicNode.divisor;
+                    var remainder = dividend % _this17.graphicNode.divisor;
                     var afterTurn = function afterTurn() {
                         dividendExpr.addValue(-1);
                     };
                     return {
-                        v: _this16.graphicNode.performModulo(dividend, afterTurn).then(function () {
+                        v: _this17.graphicNode.performModulo(dividend, afterTurn).then(function () {
                             Animate.wait(200).after(function () {
 
-                                var theta = toRadians(_this16.graphicNode.hand.degree);
-                                var r = _this16.graphicNode.radius / 1.3;
-                                var stage = _this16.stage;
+                                var theta = toRadians(_this17.graphicNode.hand.degree);
+                                var r = _this17.graphicNode.radius / 1.3;
+                                var stage = _this17.stage;
 
                                 var n = new FadedNumberExpr(remainder);
-                                var pos = addPos(_this16.centerPos(), { x: r * Math.cos(theta), y: r * Math.sin(theta) });
+                                var pos = addPos(_this17.centerPos(), { x: r * Math.cos(theta), y: r * Math.sin(theta) });
                                 n.anchor = { x: 0.5, y: 0.5 };
 
                                 //Animate.poof(this);
@@ -560,15 +633,15 @@ var ModuloClockExpr = function (_GraphicValueExpr) {
                                 if (shouldGiveNumber) {
                                     n.pos = pos;
                                     stage.add(n);
-                                    _this16.opacity = 1.0;
+                                    _this17.opacity = 1.0;
                                     n.update();
-                                    Animate.tween(_this16, { opacity: 0 }, 1000).after(function () {
-                                        stage.remove(_this16);
+                                    Animate.tween(_this17, { opacity: 0 }, 1000).after(function () {
+                                        stage.remove(_this17);
                                         stage.update();
                                     });
                                 } else {
-                                    Animate.poof(_this16);
-                                    stage.remove(_this16);
+                                    Animate.poof(_this17);
+                                    stage.remove(_this17);
                                     stage.draw();
                                 }
                             });
@@ -624,13 +697,13 @@ var DiceNumber = function (_mag$Rect) {
 
         _classCallCheck(this, DiceNumber);
 
-        var _this17 = _possibleConstructorReturn(this, (DiceNumber.__proto__ || Object.getPrototypeOf(DiceNumber)).call(this, 0, 0, 44, 44));
+        var _this18 = _possibleConstructorReturn(this, (DiceNumber.__proto__ || Object.getPrototypeOf(DiceNumber)).call(this, 0, 0, 44, 44));
 
-        _this17.number = num;
-        _this17.circlePos = DiceNumber.drawPositionsFor(num);
-        _this17.radius = radius;
-        _this17.color = 'black';
-        return _this17;
+        _this18.number = num;
+        _this18.circlePos = DiceNumber.drawPositionsFor(num);
+        _this18.radius = radius;
+        _this18.color = 'black';
+        return _this18;
     }
 
     _createClass(DiceNumber, [{
@@ -641,15 +714,15 @@ var DiceNumber = function (_mag$Rect) {
     }, {
         key: 'drawInternal',
         value: function drawInternal(ctx, pos, boundingSize) {
-            var _this18 = this;
+            var _this19 = this;
 
             if (this.circlePos && this.circlePos.length > 0) {
                 (function () {
 
-                    var rad = _this18.radius * boundingSize.w / _this18.size.w;
-                    var fill = _this18.color;
-                    var stroke = _this18.stroke;
-                    _this18.circlePos.forEach(function (relpos) {
+                    var rad = _this19.radius * boundingSize.w / _this19.size.w;
+                    var fill = _this19.color;
+                    var stroke = _this19.stroke;
+                    _this19.circlePos.forEach(function (relpos) {
                         var drawpos = { x: pos.x + boundingSize.w * relpos.x - rad, y: pos.y + boundingSize.h * relpos.y - rad };
                         drawCircle(ctx, drawpos.x, drawpos.y, rad, fill, stroke);
                     });

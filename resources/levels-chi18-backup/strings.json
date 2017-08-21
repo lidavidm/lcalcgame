@@ -24,6 +24,11 @@
             "toolbox": ["'m'", "'a'", "'d'", "_ + _"]
         },
         {
+            "goal" : ["'bee'", "'kee'", "'per'"],
+            "board": ["_ + _", "(x) => xx", "(x) => xx", "'b' + _", "'k' + _", "_ + 'r'"],
+            "toolbox": ["'e'", "'e'", "'p'"]
+        },
+        {
             "description": "Intro to typing text.",
             "goal": "'mountains'",
             "board": "'mount' + _t_string",
@@ -89,7 +94,7 @@
             },
             "block_variant": {
                 "board": ["'r' >> 'r'", "'r' >> 'iver'"],
-                "toolbox": ["_op('+')", "_op('==')"]
+                "toolbox": ["_op_plus", "_op_equals"]
             }
         },
         {
@@ -102,20 +107,16 @@
             },
             "block_variant": {
                 "board": ["'r' >> _", "_ >> 'river'"],
-                "toolbox": ["'ver'", "'iver'", "'river'", "_op('+')", "_op('==')"]
+                "toolbox": ["'ver'", "'iver'", "'river'", "_op_plus", "_op_equals"]
             }
         },
         {
             "description": "Typing operators III.",
             "goal": "true",
-            "board": ["_ >>> _", "_ >>> _t_string"],
-            "toolbox": ["'b'", "'e'"],
+            "board": ["_ >>> _", "_ >>> _", "x => xxx", "_t_string"],
+            "toolbox": ["'e'", "'b'"],
             "typing_options": {
                 ">>>": ["==", "+"]
-            },
-            "block_variant": {
-                "board": ["_ >> _", "_ >> _"],
-                "toolbox": ["'b'", "'e'", "_op('+')", "_op('==')", "'be'"]
             }
         }
     ],

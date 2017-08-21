@@ -7,6 +7,7 @@
  */
 
 var __MACROS = null;
+var __TYPING_OPTIONS = {};
 
 class ES6Parser {
 
@@ -27,7 +28,7 @@ class ES6Parser {
         return new (ExprManager.getClass(prim))(...primitiveArgs[prim]);
     }
 
-    static parse(program, macros=null) {
+    static parse(program, macros=null, typing_options={}) {
         if (!esprima) {
             console.error('Cannot parse ES6 program: Esprima.js not found. \
             See http://esprima.readthedocs.io/en/latest/getting-started.html \
@@ -50,6 +51,7 @@ class ES6Parser {
         // Doing this as a temp. global variable so
         // we avoid passing macros in recursive calls.
         __MACROS = macros;
+        __TYPING_OPTIONS = typing_options ? typing_options : {};
 
         // If program has only one statement (;-separated code)
         // just parse and return that Expression.
@@ -59,15 +61,30 @@ class ES6Parser {
         if (statements.length === 1) {
             let expr = this.parseNode(statements[0]);
             if (!expr) return null;
+            else if (expr instanceof TypeInTextExpr) {
+                expr = new Expression([expr]);
+                expr.holes[0].emptyParent = true;
+            }
             expr.lockSubexpressions(this.lockFilter);
             expr.unlock();
             __MACROS = null;
+            __TYPING_OPTIONS = {};
+            return expr;
+        } else if (statements.length === 2 && statements[0].type === "ExpressionStatement" && statements[0].expression.name === '__unlimited') {
+            let expr = new InfiniteExpression(this.parseNode(statements[1]));
+            if (!expr) return null;
+            expr.graphicNode.__remain_unlocked = true;
+            expr.lockSubexpressions(this.lockFilter);
+            expr.unlock();
+            __MACROS = null;
+            __TYPING_OPTIONS = {};
             return expr;
         } else {
             let exprs = statements.map((n) => this.parseNode(n));
             let seq = new (ExprManager.getClass('sequence'))(...exprs);
             seq.lockSubexpressions(this.lockFilter);
             __MACROS = null;
+            __TYPING_OPTIONS = {};
             return seq;
         }
     }
@@ -88,7 +105,7 @@ class ES6Parser {
                     node.name = __MACROS[node.name];
 
                 // Check if node is a Reduct reserved identifier (MissingExpression)
-                if (node.name === '_' || node.name === '_b' || node.name === '__' || node.name === '_n') {
+                if (node.name === '_' || node.name === '_b' || node.name === '__' || node.name === '_n' || node.name === '_v') {
                     let missing = new (ExprManager.getClass(node.name))();
                     missing.__remain_unlocked = true;
                     return missing;
@@ -99,6 +116,8 @@ class ES6Parser {
                     return new (ExprManager.getClass('notch'))(1);
                 else if (ExprManager.isPrimitive(node.name)) // If this is the name of a Reduct primitive (like 'star')...
                     return this.makePrimitive(node.name);
+                else if (node.name.indexOf('__') === 0 && ExprManager.isPrimitive(node.name.substring(2))) // e.g. __star
+                    return this.makePrimitive(node.name.substring(2));
 
                 // Otherwise, treat this as a variable name...
                 return new (ExprManager.getClass('var'))(node.name);
@@ -152,8 +171,16 @@ class ES6Parser {
                         unlocked_expr.__remain_unlocked = true; // When all inner expressions are locked in parse(), this won't be.
                         return unlocked_expr;
                     }
+                } else if (node.callee.type === 'Identifier' && node.callee.name === '__unlimited') { // Special case: infinite resources (meant to be used in toolbox).
+                    let e = new InfiniteExpression(this.parseNode(node.arguments[0]));
+                    e.unlock();
+                    e.graphicNode.unlock();
+                    e.__remain_unlocked = true;
+                    e.graphicNode.__remain_unlocked = true;
+                    return e;
+                } else if (node.callee.type === 'Identifier' && node.callee.name === '_op') { // Special case: Operators like +, =, !=, ==, etc...
+                    return new OpLiteral(node.arguments[0].value);
                 } else if (node.callee.type === 'MemberExpression' && node.callee.property.name === 'map') {
-                    console.log(node.callee);
                     return new (ExprManager.getClass('arrayobj'))(this.parseNode(node.callee.object), 'map', this.parseNode(node.arguments[0]));
                 } else if (node.callee.type === 'Identifier') {
                     // Special case 'foo(_t_params)': Call parameters (including paretheses) will be entered by player.
@@ -211,9 +238,39 @@ class ES6Parser {
             'BinaryExpression': (node) => {
                 if (node.operator === '>>>') { // Special typing-operators expression:
                     let comp = new (ExprManager.getClass('=='))(this.parseNode(node.left), this.parseNode(node.right), '>>>');
-                    comp.holes[1] = TypeInTextExpr.fromExprCode('_t_equiv', (finalText) => {
-                        comp.funcName = finalText;
-                    }); // give it a nonexistent funcName
+                    if ('>>>' in __TYPING_OPTIONS) {
+                        const valid_operators = __TYPING_OPTIONS['>>>'].slice();
+                        const validator = (txt) => (valid_operators.indexOf(txt) > -1);
+                        comp.holes[1] = new TypeInTextExpr(validator, (finalText) => {
+                            comp.funcName = finalText;
+                            if (finalText === '+') { // If this is concat, we have to swap the CompareExpr for an AddExpr...
+                                const addExpr = new AddExpr(comp.leftExpr.clone(), comp.rightExpr.clone());
+                                const parent = (comp.parent || comp.stage);
+                                parent.swap(comp, addExpr);
+                            }
+                            else if (finalText === '=') { // If assignment, swap for AssignmentExpression.
+                                const assignExpr = new EqualsAssignExpr(comp.leftExpr.clone(), comp.rightExpr.clone());
+                                const parent = (comp.parent || comp.stage);
+                                parent.swap(comp, assignExpr);
+                            }
+                        });
+                    }
+                    else {
+                        comp.holes[1] = TypeInTextExpr.fromExprCode('_t_equiv', (finalText) => {
+                            comp.funcName = finalText;
+                        }); // give it a nonexistent funcName
+                    }
+                    comp.holes[1].typeBox.color = "#eee";
+                    comp.children[1] = comp.holes[1];
+                    comp.children[1].parent = comp; // patch child...
+                    return comp;
+                }
+                else if (node.operator === '>>') {
+                    let comp = new (ExprManager.getClass('=='))(this.parseNode(node.left), this.parseNode(node.right), '>>');
+                    let me = new MissingOpExpression();
+                    me.parent = comp;
+                    me.__remain_unlocked = true;
+                    comp.holes[1] = comp.children[1] = me;
                     return comp;
                 }
                 else if (node.operator === '%') { // Modulo only works on integer dividends at the moment...

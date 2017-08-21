@@ -90,7 +90,6 @@ var MissingExpression = function (_Expression) {
                 Logger.log('placed-expr', { 'before': beforeState, 'after': afterState, 'item': droppedExp });
 
                 stage.saveState();
-                Logger.log('state-save', afterState);
 
                 // Blink red if total reduction is not possible with this config.
                 /*var try_reduce = node.parent.reduceCompletely();
@@ -186,18 +185,6 @@ var MissingTypedExpression = function (_MissingExpression) {
         value: function ondropped(node, pos) {
             if (this.accepts(node)) _get(MissingTypedExpression.prototype.__proto__ || Object.getPrototypeOf(MissingTypedExpression.prototype), 'ondropped', this).call(this, node, pos);
         }
-
-        // graphicNode is undefined, don't use this
-        // drawInternal(ctx, pos, boundingSize) {
-        //     pos.x -= boundingSize.w / 1.2 - boundingSize.w;
-        //     pos.y -= boundingSize.h / 1.14 - boundingSize.h; // aesthetic resizing
-        //     boundingSize.w /= 1.2;
-        //     this.graphicNode.stroke = this.stroke;
-        //     this.graphicNode.color = this.color;
-        //     this.graphicNode.shadowOffset = this.shadowOffset;
-        //     this.graphicNode.drawInternal(ctx, pos, boundingSize);
-        // }
-
     }, {
         key: 'toString',
         value: function toString() {
@@ -208,18 +195,47 @@ var MissingTypedExpression = function (_MissingExpression) {
     return MissingTypedExpression;
 }(MissingExpression);
 
-var MissingBagExpression = function (_MissingTypedExpressi) {
-    _inherits(MissingBagExpression, _MissingTypedExpressi);
+var MissingOpExpression = function (_MissingTypedExpressi) {
+    _inherits(MissingOpExpression, _MissingTypedExpressi);
+
+    function MissingOpExpression(expr_to_miss) {
+        _classCallCheck(this, MissingOpExpression);
+
+        var _this3 = _possibleConstructorReturn(this, (MissingOpExpression.__proto__ || Object.getPrototypeOf(MissingOpExpression)).call(this, expr_to_miss));
+
+        _this3._size = { w: 50, h: 50 };
+        _this3.acceptedClasses = [OpLiteral];
+        _this3.radius = 26;
+        return _this3;
+    }
+
+    _createClass(MissingOpExpression, [{
+        key: 'getClass',
+        value: function getClass() {
+            return MissingOpExpression;
+        }
+    }, {
+        key: 'toString',
+        value: function toString() {
+            return '__';
+        }
+    }]);
+
+    return MissingOpExpression;
+}(MissingTypedExpression);
+
+var MissingBagExpression = function (_MissingTypedExpressi2) {
+    _inherits(MissingBagExpression, _MissingTypedExpressi2);
 
     function MissingBagExpression(expr_to_miss) {
         _classCallCheck(this, MissingBagExpression);
 
-        var _this3 = _possibleConstructorReturn(this, (MissingBagExpression.__proto__ || Object.getPrototypeOf(MissingBagExpression)).call(this, expr_to_miss));
+        var _this4 = _possibleConstructorReturn(this, (MissingBagExpression.__proto__ || Object.getPrototypeOf(MissingBagExpression)).call(this, expr_to_miss));
 
-        _this3._size = { w: 50, h: 50 };
-        _this3.graphicNode = new Bag(0, 0, 22, false);
-        _this3.acceptedClasses = [BagExpr, PutExpr];
-        return _this3;
+        _this4._size = { w: 50, h: 50 };
+        _this4.graphicNode = new Bag(0, 0, 22, false);
+        _this4.acceptedClasses = [BagExpr, PutExpr];
+        return _this4;
     }
 
     _createClass(MissingBagExpression, [{
@@ -243,10 +259,10 @@ var MissingBracketExpression = function (_MissingBagExpression) {
     function MissingBracketExpression(expr_to_miss) {
         _classCallCheck(this, MissingBracketExpression);
 
-        var _this4 = _possibleConstructorReturn(this, (MissingBracketExpression.__proto__ || Object.getPrototypeOf(MissingBracketExpression)).call(this, expr_to_miss));
+        var _this5 = _possibleConstructorReturn(this, (MissingBracketExpression.__proto__ || Object.getPrototypeOf(MissingBracketExpression)).call(this, expr_to_miss));
 
-        _this4.graphicNode = new mag.ImageRect(0, 0, 22, 22, 'missing-bracket');
-        return _this4;
+        _this5.graphicNode = new mag.ImageRect(0, 0, 22, 22, 'missing-bracket');
+        return _this5;
     }
 
     _createClass(MissingBracketExpression, [{
@@ -307,21 +323,21 @@ var MissingBracketExpression = function (_MissingBagExpression) {
     return MissingBracketExpression;
 }(MissingBagExpression);
 
-var MissingBooleanExpression = function (_MissingTypedExpressi2) {
-    _inherits(MissingBooleanExpression, _MissingTypedExpressi2);
+var MissingBooleanExpression = function (_MissingTypedExpressi3) {
+    _inherits(MissingBooleanExpression, _MissingTypedExpressi3);
 
     function MissingBooleanExpression(expr_to_miss) {
         _classCallCheck(this, MissingBooleanExpression);
 
-        var _this5 = _possibleConstructorReturn(this, (MissingBooleanExpression.__proto__ || Object.getPrototypeOf(MissingBooleanExpression)).call(this, expr_to_miss));
+        var _this6 = _possibleConstructorReturn(this, (MissingBooleanExpression.__proto__ || Object.getPrototypeOf(MissingBooleanExpression)).call(this, expr_to_miss));
 
-        _this5._size = { w: 80, h: 50 };
-        _this5.color = "#0c2c52";
+        _this6._size = { w: 80, h: 50 };
+        _this6.color = "#0c2c52";
 
-        _this5.graphicNode = new mag.HexaRect(0, 0, 44, 44);
+        _this6.graphicNode = new mag.HexaRect(0, 0, 44, 44);
 
-        _this5.acceptedClasses = [BooleanPrimitive, CompareExpr, UnaryOpExpr];
-        return _this5;
+        _this6.acceptedClasses = [BooleanPrimitive, CompareExpr, UnaryOpExpr];
+        return _this6;
     }
 
     _createClass(MissingBooleanExpression, [{
@@ -353,12 +369,12 @@ var MissingKeyExpression = function (_MissingBooleanExpres) {
     function MissingKeyExpression(expr_to_miss) {
         _classCallCheck(this, MissingKeyExpression);
 
-        var _this6 = _possibleConstructorReturn(this, (MissingKeyExpression.__proto__ || Object.getPrototypeOf(MissingKeyExpression)).call(this, expr_to_miss));
+        var _this7 = _possibleConstructorReturn(this, (MissingKeyExpression.__proto__ || Object.getPrototypeOf(MissingKeyExpression)).call(this, expr_to_miss));
 
         var keyhole = new mag.ImageRect(0, 0, 26 / 2, 42 / 2, 'lock-keyhole');
-        _this6.graphicNode.addChild(keyhole);
+        _this7.graphicNode.addChild(keyhole);
 
-        return _this6;
+        return _this7;
     }
 
     _createClass(MissingKeyExpression, [{
@@ -375,17 +391,17 @@ var MissingKeyExpression = function (_MissingBooleanExpres) {
     return MissingKeyExpression;
 }(MissingBooleanExpression);
 
-var MissingChestExpression = function (_MissingTypedExpressi3) {
-    _inherits(MissingChestExpression, _MissingTypedExpressi3);
+var MissingChestExpression = function (_MissingTypedExpressi4) {
+    _inherits(MissingChestExpression, _MissingTypedExpressi4);
 
     function MissingChestExpression(expr_to_miss) {
         _classCallCheck(this, MissingChestExpression);
 
-        var _this7 = _possibleConstructorReturn(this, (MissingChestExpression.__proto__ || Object.getPrototypeOf(MissingChestExpression)).call(this, expr_to_miss));
+        var _this8 = _possibleConstructorReturn(this, (MissingChestExpression.__proto__ || Object.getPrototypeOf(MissingChestExpression)).call(this, expr_to_miss));
 
-        _this7.initialize();
-        _this7.acceptedClasses = [VarExpr, VtableVarExpr];
-        return _this7;
+        _this8.initialize();
+        _this8.acceptedClasses = [VarExpr, VtableVarExpr];
+        return _this8;
     }
 
     _createClass(MissingChestExpression, [{
@@ -493,18 +509,18 @@ var InvisibleMissingExpression = function (_MissingExpression3) {
     return InvisibleMissingExpression;
 }(MissingExpression);
 
-var MissingNumberExpression = function (_MissingTypedExpressi4) {
-    _inherits(MissingNumberExpression, _MissingTypedExpressi4);
+var MissingNumberExpression = function (_MissingTypedExpressi5) {
+    _inherits(MissingNumberExpression, _MissingTypedExpressi5);
 
     function MissingNumberExpression(expr_to_miss) {
         _classCallCheck(this, MissingNumberExpression);
 
-        var _this11 = _possibleConstructorReturn(this, (MissingNumberExpression.__proto__ || Object.getPrototypeOf(MissingNumberExpression)).call(this, expr_to_miss));
+        var _this12 = _possibleConstructorReturn(this, (MissingNumberExpression.__proto__ || Object.getPrototypeOf(MissingNumberExpression)).call(this, expr_to_miss));
 
-        _this11.graphicNode = new mag.ImageRect(0, 0, 24, 32, ExprManager.getFadeLevel('number') > 0 ? 'missing-number' : 'die');
+        _this12.graphicNode = new mag.ImageRect(0, 0, 24, 32, ExprManager.getFadeLevel('number') > 0 ? 'missing-number' : 'die');
 
-        _this11.acceptedClasses = [VarExpr, NumberExpr, ObjectExtensionExpr, NamedExpr];
-        return _this11;
+        _this12.acceptedClasses = [VarExpr, NumberExpr, ObjectExtensionExpr, NamedExpr];
+        return _this12;
     }
 
     _createClass(MissingNumberExpression, [{

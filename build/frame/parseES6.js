@@ -17,6 +17,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  */
 
 var __MACROS = null;
+var __TYPING_OPTIONS = {};
 
 var ES6Parser = function () {
     function ES6Parser() {
@@ -49,6 +50,7 @@ var ES6Parser = function () {
             var _this = this;
 
             var macros = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+            var typing_options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
             if (!esprima) {
                 console.error('Cannot parse ES6 program: Esprima.js not found. \
@@ -71,6 +73,7 @@ var ES6Parser = function () {
             // Doing this as a temp. global variable so
             // we avoid passing macros in recursive calls.
             __MACROS = macros;
+            __TYPING_OPTIONS = typing_options ? typing_options : {};
 
             // If program has only one statement (;-separated code)
             // just parse and return that Expression.
@@ -79,11 +82,24 @@ var ES6Parser = function () {
             var statements = AST.body;
             if (statements.length === 1) {
                 var expr = this.parseNode(statements[0]);
-                if (!expr) return null;
+                if (!expr) return null;else if (expr instanceof TypeInTextExpr) {
+                    expr = new Expression([expr]);
+                    expr.holes[0].emptyParent = true;
+                }
                 expr.lockSubexpressions(this.lockFilter);
                 expr.unlock();
                 __MACROS = null;
+                __TYPING_OPTIONS = {};
                 return expr;
+            } else if (statements.length === 2 && statements[0].type === "ExpressionStatement" && statements[0].expression.name === '__unlimited') {
+                var _expr = new InfiniteExpression(this.parseNode(statements[1]));
+                if (!_expr) return null;
+                _expr.graphicNode.__remain_unlocked = true;
+                _expr.lockSubexpressions(this.lockFilter);
+                _expr.unlock();
+                __MACROS = null;
+                __TYPING_OPTIONS = {};
+                return _expr;
             } else {
                 var exprs = statements.map(function (n) {
                     return _this.parseNode(n);
@@ -91,6 +107,7 @@ var ES6Parser = function () {
                 var seq = new (Function.prototype.bind.apply(ExprManager.getClass('sequence'), [null].concat(_toConsumableArray(exprs))))();
                 seq.lockSubexpressions(this.lockFilter);
                 __MACROS = null;
+                __TYPING_OPTIONS = {};
                 return seq;
             }
         }
@@ -114,12 +131,13 @@ var ES6Parser = function () {
                     if (__MACROS && node.name in __MACROS) node.name = __MACROS[node.name];
 
                     // Check if node is a Reduct reserved identifier (MissingExpression)
-                    if (node.name === '_' || node.name === '_b' || node.name === '__' || node.name === '_n') {
+                    if (node.name === '_' || node.name === '_b' || node.name === '__' || node.name === '_n' || node.name === '_v') {
                         var missing = new (ExprManager.getClass(node.name))();
                         missing.__remain_unlocked = true;
                         return missing;
                     } else if (node.name.substring(0, 2) === '_t') return TypeInTextExpr.fromExprCode(node.name);else if (node.name === '_notch') return new (ExprManager.getClass('notch'))(1);else if (ExprManager.isPrimitive(node.name)) // If this is the name of a Reduct primitive (like 'star')...
-                        return _this2.makePrimitive(node.name);
+                        return _this2.makePrimitive(node.name);else if (node.name.indexOf('__') === 0 && ExprManager.isPrimitive(node.name.substring(2))) // e.g. __star
+                        return _this2.makePrimitive(node.name.substring(2));
 
                     // Otherwise, treat this as a variable name...
                     return new (ExprManager.getClass('var'))(node.name);
@@ -177,8 +195,18 @@ var ES6Parser = function () {
                             unlocked_expr.__remain_unlocked = true; // When all inner expressions are locked in parse(), this won't be.
                             return unlocked_expr;
                         }
+                    } else if (node.callee.type === 'Identifier' && node.callee.name === '__unlimited') {
+                        // Special case: infinite resources (meant to be used in toolbox).
+                        var e = new InfiniteExpression(_this2.parseNode(node.arguments[0]));
+                        e.unlock();
+                        e.graphicNode.unlock();
+                        e.__remain_unlocked = true;
+                        e.graphicNode.__remain_unlocked = true;
+                        return e;
+                    } else if (node.callee.type === 'Identifier' && node.callee.name === '_op') {
+                        // Special case: Operators like +, =, !=, ==, etc...
+                        return new OpLiteral(node.arguments[0].value);
                     } else if (node.callee.type === 'MemberExpression' && node.callee.property.name === 'map') {
-                        console.log(node.callee);
                         return new (ExprManager.getClass('arrayobj'))(_this2.parseNode(node.callee.object), 'map', _this2.parseNode(node.arguments[0]));
                     } else if (node.callee.type === 'Identifier') {
                         // Special case 'foo(_t_params)': Call parameters (including paretheses) will be entered by player.
@@ -236,15 +264,48 @@ var ES6Parser = function () {
                         var _ret = function () {
                             // Special typing-operators expression:
                             var comp = new (ExprManager.getClass('=='))(_this2.parseNode(node.left), _this2.parseNode(node.right), '>>>');
-                            comp.holes[1] = TypeInTextExpr.fromExprCode('_t_equiv', function (finalText) {
-                                comp.funcName = finalText;
-                            }); // give it a nonexistent funcName
+                            if ('>>>' in __TYPING_OPTIONS) {
+                                (function () {
+                                    var valid_operators = __TYPING_OPTIONS['>>>'].slice();
+                                    var validator = function validator(txt) {
+                                        return valid_operators.indexOf(txt) > -1;
+                                    };
+                                    comp.holes[1] = new TypeInTextExpr(validator, function (finalText) {
+                                        comp.funcName = finalText;
+                                        if (finalText === '+') {
+                                            // If this is concat, we have to swap the CompareExpr for an AddExpr...
+                                            var addExpr = new AddExpr(comp.leftExpr.clone(), comp.rightExpr.clone());
+                                            var parent = comp.parent || comp.stage;
+                                            parent.swap(comp, addExpr);
+                                        } else if (finalText === '=') {
+                                            // If assignment, swap for AssignmentExpression.
+                                            var assignExpr = new EqualsAssignExpr(comp.leftExpr.clone(), comp.rightExpr.clone());
+                                            var _parent = comp.parent || comp.stage;
+                                            _parent.swap(comp, assignExpr);
+                                        }
+                                    });
+                                })();
+                            } else {
+                                comp.holes[1] = TypeInTextExpr.fromExprCode('_t_equiv', function (finalText) {
+                                    comp.funcName = finalText;
+                                }); // give it a nonexistent funcName
+                            }
+                            comp.holes[1].typeBox.color = "#eee";
+                            comp.children[1] = comp.holes[1];
+                            comp.children[1].parent = comp; // patch child...
                             return {
                                 v: comp
                             };
                         }();
 
                         if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+                    } else if (node.operator === '>>') {
+                        var _comp = new (ExprManager.getClass('=='))(_this2.parseNode(node.left), _this2.parseNode(node.right), '>>');
+                        var me = new MissingOpExpression();
+                        me.parent = _comp;
+                        me.__remain_unlocked = true;
+                        _comp.holes[1] = _comp.children[1] = me;
+                        return _comp;
                     } else if (node.operator === '%') {
                         // Modulo only works on integer dividends at the moment...
                         var ModuloClass = ExprManager.getClass(node.operator);

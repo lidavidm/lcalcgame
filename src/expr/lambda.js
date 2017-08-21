@@ -336,8 +336,6 @@ class LambdaHoleExpr extends MissingExpression {
                 // Save the current state of the board.
                 stage.saveState();
 
-                Logger.log('state-save', stage.toString());
-
                 // Remove the original expression from its stage.
                 stage.remove(node);
 
@@ -570,6 +568,7 @@ class LambdaVarExpr extends ImageExpr {
 
     value() { return undefined; }
     toString() { return '#' + (this.ignoreEvents ? '' : '_') + this.name; }
+    toJavaScript() { return this.name; }
 }
 
 class LambdaExpr extends Expression {

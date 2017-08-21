@@ -669,7 +669,7 @@ class AssignExpr extends Expression {
                 let newString = originalString.slice(0, slicePosition) + this.value.value()
                     + originalString.slice(slicePosition + 1);
                 console.log("new String: " + newString);
-                this.value = new StringValueExpr(newString);
+                this.value = new (ExprManager.getClass('string'))(newString);
             }
         }
 
@@ -749,7 +749,7 @@ class AssignExpr extends Expression {
         return `${this.locked ? '/' : ''}(assign ${variable} ${value})`;
     }
     toJavaScript() {
-        let variable = this.variable ? this.variable.toJavaScript() : '_';
+        let variable = this.variable ? this.variable.toJavaScript() : '_v';
         let value = this.value ? this.value.toJavaScript() : '_';
         return `${variable} = ${value};`;
     }

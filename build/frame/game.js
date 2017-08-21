@@ -26,14 +26,34 @@ var Level = function () {
     }
 
     _createClass(Level, [{
-        key: 'build',
+        key: 'serialize',
 
+
+        // For saving state.
+        // * Returns a (stringifiable) JSON object
+        // * representing the level, in a similar format to that found
+        // * in chapter JSON files.
+        value: function serialize() {
+            var toString = function toString(e) {
+                return e.toJavaScript();
+            };
+            var e = {
+                board: this.exprs.map(toString), // Board is now a list of javascript code snippets...
+                goal: this.goal.serialize() // Goal is the same as it was when loaded from the JSON file.
+            };
+            if (this.toolbox) e.toolbox = this.toolbox.map(toString); // Toolbox is a list of javascript code snippets, like board.
+            if (this.globals) e.globals = this.globals.serialize(); // Environment -> key-value dict for variable bindings.
+            return e;
+        }
 
         // Builds a single Stage from the level description,
         // and returns it.
         // * The layout should be generated automatically, and consistently.
         // * That way a higher function can 'parse' a text file description of levels --
         // * written in code, for instance -- and generate the entire game on-the-fly.
+
+    }, {
+        key: 'build',
         value: function build(canvas) {
 
             var stage = new ReductStage(canvas);
@@ -66,6 +86,8 @@ var Level = function () {
             var lastChild = goal_node[1].children[goal_node[1].children.length - 1];
             stage.add(goal_node[0]);
             stage.add(goal_node[1]);
+
+            stage._storedGoal = this.goal;
 
             //goal_node[1].children.forEach((c) => c.update());
 
@@ -644,9 +666,28 @@ var Level = function () {
             var resources = desc.resources;
             var language = desc.language;
             var macros = desc.macros;
+            var typing_options = desc.typing_options;
+            var typing_hints = desc.typing_hints;
 
 
-            var lvl = new Level(Level.parse(expr_descs, language, macros), new Goal(new ExpressionPattern(Level.parse(goal_descs, language, macros)), resources.aliens), toolbox_descs ? Level.parse(toolbox_descs, language, macros) : null, Environment.parse(globals_descs));
+            if (__USE_BLOCK_VARIANT && 'block_variant' in desc) {
+                var variant = desc.block_variant;
+                if ('board' in variant) expr_descs = variant.board;
+                if ('toolbox' in variant) toolbox_descs = variant.toolbox;
+                if ('goal' in variant) goal_descs = variant.goal;
+                if ('globals' in variant) globals_descs = variant.globals;
+            }
+
+            var lvl = new Level(Level.parse(expr_descs, language, macros, typing_options), new Goal(new ExpressionPattern(Level.parse(goal_descs, language, macros, typing_options)), goal_descs, resources.aliens), toolbox_descs ? Level.parse(toolbox_descs, language, macros, typing_options) : null, Environment.parse(globals_descs));
+
+            if (typing_hints) {
+                var typing_exprs = mag.Stage.getNodesWithClass(TypeInTextExpr, [], true, lvl.exprs);
+                for (var i = 0; i < typing_exprs.length && i < typing_hints.length; i++) {
+                    typing_exprs[i].enforceHint(typing_hints[i]);
+                    typing_exprs[i].typeBox.update();
+                }
+            }
+
             return lvl;
         }
     }, {
@@ -671,15 +712,17 @@ var Level = function () {
     }, {
         key: 'parse',
         value: function parse(desc) {
+            var language = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "reduct-scheme";
+
             var _this3 = this;
 
-            var language = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "reduct-scheme";
             var macros = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+            var typing_options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
             if (desc.length === 0) return [];else if (!Array.isArray(desc) && desc === Object(desc)) {
                 // If desc is an object, then it's a globals specifier...
                 // TODO: Expand to multiple globals.
-                console.log('Parsing variable goal...', desc);
+                // console.log('Parsing variable goal...', desc);
                 var keys = Object.keys(desc);
                 return new (ExprManager.getClass('vargoal'))(keys[0], Level.parse(desc[keys[0]], language, macros)[0]);
             }
@@ -687,8 +730,8 @@ var Level = function () {
             if (language === "JavaScript") {
                 // Use ES6 parser
                 if (Array.isArray(desc)) return desc.map(function (d) {
-                    return ES6Parser.parse(d, macros);
-                });else return [ES6Parser.parse(desc, macros)];
+                    return ES6Parser.parse(d, macros, typing_options);
+                });else return [ES6Parser.parse(desc, macros, typing_options)];
             } else if (language === "reduct-scheme" || !language) {
                 var descs;
 
@@ -941,7 +984,6 @@ var Level = function () {
                     lambdavar.ignoreEvents = false; // makes draggable
                     lambdavar.name = _varname;
                 }
-                console.log('produced', ExprManager.getFadeLevel('var'));
                 return lambdavar;
             } else if (arg.indexOf('$') > -1) {
                 var _varname2 = arg.replace('$', '').replace('_', '');
@@ -949,7 +991,7 @@ var Level = function () {
                 locked = !(arg.indexOf('_') > -1);
                 return lock(new (ExprManager.getClass('var'))(_varname2), locked);
             } else if (true) {
-                var string = new StringValueExpr(arg);
+                var string = new (ExprManager.getClass('string'))(arg);
                 return string;
             } else {
                 console.error('Unknown argument: ', arg);
@@ -973,18 +1015,24 @@ var Level = function () {
 
 
 var Goal = function () {
-    function Goal(accepted_patterns) {
-        var alien_images = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ['alien-function-1'];
+    function Goal(accepted_patterns, desc) {
+        var alien_images = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ['alien-function-1'];
 
         _classCallCheck(this, Goal);
 
         if (!Array.isArray(accepted_patterns)) accepted_patterns = [accepted_patterns];
         this.patterns = accepted_patterns;
+        this.desc = desc; // as backup
         // Choose a random alien to serve as our "goal person"
         this.alien_image = alien_images[Math.floor(Math.random() * alien_images.length)];
     }
 
     _createClass(Goal, [{
+        key: 'serialize',
+        value: function serialize() {
+            if (typeof this.desc === 'string') return [this.desc];else return this.desc;
+        }
+    }, {
         key: 'test',
         value: function test(exprs, env) {
             var reduction_stack = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
@@ -1210,7 +1258,6 @@ var ExpressionPattern = function () {
                 }
                 if (f instanceof ArrayObjectExpr && f.holes.length === 1) {
                     f = f.holes[0]; // compare only the underlying array.
-                    console.log(e, f);
                     isarr = true;
                 }
 

@@ -16,11 +16,11 @@ var ExprManager = (function() {
         '_t':       [TypeInTextExpr],
         '_n':       [MissingNumberExpression],
         '_v':       [MissingChestExpression, MissingVariableExpression],
-        'true':     [KeyTrueExpr, TrueExpr],
-        'false':    [KeyFalseExpr, FalseExpr],
+        'true':     [KeyTrueExpr, TrueExpr, GraphicFadedTrueExpr],
+        'false':    [KeyFalseExpr, FalseExpr, GraphicFadedFalseExpr],
         'number':   [NumberExpr, FadedNumberExpr],
         'cmp':      [MirrorCompareExpr, FadedCompareExpr],
-        '==':       [MirrorCompareExpr, FadedCompareExpr],
+        '==':       [MirrorCompareExpr, FadedCompareExpr, GraphicFadedCompareExpr],
         '+':        [AddExpr], //[StringAddExpr],
         '-':        [SubtractionExpr],
         '*':        [MultiplicationExpr],
@@ -60,7 +60,8 @@ var ExprManager = (function() {
         'namedfunc':[NamedFuncExpr],
         'vargoal':  [VariableGoalDisplay],
         'return':   [ReturnStatement],
-        'string':   [StringValueExpr]
+        'string':   [StringValueExpr, ColorlessStringValueExpr],
+        'typing_str':   [TypeInStringValueExpr, ColorlessTypeInStringValueExpr]
     };
     var fade_levels = {};
     var DEFAULT_FADE_LEVEL = 0;

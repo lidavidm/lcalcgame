@@ -87,6 +87,17 @@ class OperatorExpr extends Expression {
     }
 
     onmouseclick() {
+        if (this.op instanceof OpLiteral) {
+            const Class = this.op.getClass();
+            const stage = this.stage;
+            const binExpr = new Class(this.leftExpr.clone(), this.rightExpr.clone());
+            stage.swap(this, binExpr);
+            return;
+        }
+        if (this.leftExpr instanceof TypeInStringValueExpr || this.leftExpr instanceof TypeInTextExpr)
+            this.leftExpr.performReduction();
+        if (this.rightExpr instanceof TypeInStringValueExpr || this.rightExpr instanceof TypeInTextExpr)
+            this.rightExpr.performReduction();
         this.performUserReduction();
         //console.log("clicked Operator Expression!!");
         //if (!this._animating) {
@@ -98,7 +109,61 @@ class OperatorExpr extends Expression {
         return (this.locked ? '/(' : '(') + this.op.toString() + ' ' + this.leftExpr.toString() + ' ' + this.rightExpr.toString() + ')';
     }
     toJavaScript() {
-        return `(${this.leftExpr.toJavaScript()} ${this.op.text} ${this.rightExpr.toJavaScript()})`;
+        let opName;
+        if (this.op instanceof MissingOpExpression)
+            opName = '>>';
+        else if (this.op instanceof TypeInTextExpr)
+            opName = this.op.typeBox.text.trim().length > 0 ? this.op.typeBox.text : '>>>';
+        else if (this.op instanceof OpLiteral)
+            opName = this.op.toString();
+        else
+            opName = this.op.text;
+
+        const isString = x => ((x.match(/\'/g) || []).length === 2 && x.indexOf("'") === 0 && (x.lastIndexOf("'") === (x.length-1)));
+        const wrap = s => {
+            if (!isString(s) && /\s/g.test(s)) // if this value isn't a string and it has whitespace, we need to wrap it in parentheses...
+                return '(' + s + ')';
+            else
+                return s;
+        };
+        return `${wrap(this.leftExpr.toJavaScript())} ${opName} ${wrap(this.rightExpr.toJavaScript())}`;
+    }
+}
+
+class OpLiteral extends Expression {
+    constructor(op) {
+        let t = new TextExpr(op);
+        t.color = 'black';
+        super([t]);
+        this.radius = 22;
+    }
+    // drawInternal(ctx, pos, boundingSize) {
+    //     const rad = boundingSize.h / 2.0;
+    //     if (this.shadowOffset !== 0) {
+    //         drawCircle(ctx, pos.x, pos.y + this.shadowOffset, rad, this.shadowColor, this.stroke);
+    //     }
+    //     drawCircle(ctx, pos.x, pos.y, rad, this.color, this.stroke);
+    // }
+    getClass() {
+        const map = {
+            '==': ExprManager.getClass('=='),
+            '=':  ExprManager.getClass('assign'),
+            '+':  ExprManager.getClass('+')
+        };
+        const op = this.toString();
+        if (op in map) return map[op];
+        else           return ExprManager.getClass(op);
+    }
+    onmouseclick() {
+        if (this.parent)
+            this.parent.performUserReduction();
+    }
+
+    toString() {
+        return this.holes[0].text;
+    }
+    toJavaScript() {
+        return `_op('${this.toString()}')`;
     }
 }
 

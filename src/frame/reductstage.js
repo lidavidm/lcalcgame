@@ -181,48 +181,11 @@ class ReductStage extends mag.Stage {
         innerStages.forEach((stg) => {
             stg.build();
         });
-        let textboxes = this.getNodesWithClass(TypeInTextExpr);
-        if (textboxes.length > 0) { // If one text box is on the screen, focus it!
-            textboxes[0].focus();
-        }
+        this.focusFirstTypeBox();
         this.update();
-    }
 
-    // Save state of game board and push onto undo stack.
-    saveState() {
-        if (!this.expressionNodes) return;
-        // TODO: DML save and restore the environment as well.
-        var board = this.expressionNodes().map((n) => n.clone());
-        board = board.filter((n) => !(n instanceof ExpressionEffect));
-        var toolbox = this.toolboxNodes().map((n) => n.clone());
-        this.stateStack.push( { 'board':board, 'toolbox':toolbox } );
-    }
-
-    // Restore previous state of game board.
-    restoreState() {
-        if (!this.expressionNodes) return;
-        if (this.stateStack.length > 0) {
-            //this.nodes = this.stateStack.pop();
-
-            this.expressionNodes().forEach((n) => this.remove(n));
-            this.toolboxNodes().forEach((n) => this.remove(n));
-            let restored_state = this.stateStack.pop();
-            restored_state.board.forEach((n) => this.add(n));
-            restored_state.toolbox.forEach((n) => {
-                n.toolbox = this.toolbox;
-                this.add(n);
-            });
-
-            this.update();
-            this.draw();
-
-            Logger.log('state-restore', this.toString());
-        }
-    }
-    dumpState() {
-        if (this.stateStack.length > 0) {
-            this.stateStack.pop();
-        }
+        // Save initial state.
+        this.saveState();
     }
 
     // Checks for level completion.
@@ -237,6 +200,7 @@ class ReductStage extends mag.Stage {
                 // DEBUG TEST FLYTO ANIMATION.
                 if (!this.ranCompletionAnim) {
 
+                    this.saveState();
                     Logger.log( 'victory', { 'final_state':this.toString(), 'num_of_moves':undefined } );
 
                     // Update + save player progress.
@@ -307,17 +271,6 @@ class ReductStage extends mag.Stage {
         }
     }
 
-    // getExprsWithCompatibleNotch(notch, excludedExprs=[], recursive=true) {
-    //     let exprs = this.expressionNodes();
-    //     let compatible_exprs = [];
-    //     exprs.filter((e) => {
-    //         if (e.notches && e.notches.length > 0 && e.notches.some((n) => n.isCompatibleWith(notch))) {
-    //             compatible_exprs.push(e);
-    //         }
-    //     });
-    //     return compatible_exprs;
-    // }
-
     onmousedown(pos) {
         super.onmousedown(pos);
         if (this.heldNode && this.keyEventDelegate && this.heldNode != this.keyEventDelegate) {
@@ -350,7 +303,7 @@ class ReductStage extends mag.Stage {
             }
         }
     }
-    onkeypress(event) {
+    getTypeBoxes() {
         const isClose = (a, b) => Math.abs(a - b) < 1.0;
         const topDownSort = (e1, e2) => {
                 const p1 = e1.absolutePos;
@@ -358,16 +311,24 @@ class ReductStage extends mag.Stage {
                 if (isClose(p1.y, p2.y)) return p1.x >= p2.x;
                 else                     return p1.y >= p2.y;
         };
+        return this.getNodesWithClass(TypeBox).sort(topDownSort);
+    }
+    focusFirstTypeBox() {
+        const available_delegates = this.getTypeBoxes();
+        if (available_delegates.length > 0)
+            available_delegates[0].focus();
+    }
+    onkeypress(event) {
+
         if (this.keyEventDelegate) {
             if (event.keyCode === 13) {
                 this.keyEventDelegate.carriageReturn();
             }
             else if (event.keyCode === 9) { // Tab.
                 // Cycle to next possible keyEventDelegate...
-                let available_delegates = this.getNodesWithClass(TypeBox).sort(topDownSort);
+                let available_delegates = this.getTypeBoxes();
                 let cur_delegate = this.keyEventDelegate;
                 this.keyEventDelegate.blur();
-                console.log(available_delegates, cur_delegate);
                 let idx_delegate = available_delegates.indexOf(cur_delegate);
                 if (idx_delegate > -1) {
                     let next_delegate = available_delegates[ (idx_delegate + 1) % available_delegates.length ];
@@ -381,29 +342,158 @@ class ReductStage extends mag.Stage {
                 this.keyEventDelegate.type(character);
             }
         } else if (event.keyCode === 9) { // Tab with no text box focused.
-            const available_delegates = this.getNodesWithClass(TypeBox).sort(topDownSort);
-            if (available_delegates.length > 0)
-                available_delegates[0].focus();
+            this.focusFirstTypeBox();
         }
     }
 
+    // Converts current state of the board into a Level (data repr.).
+    toLevel() {
+        const isNotEmpty = e => (e != null && !(e instanceof ExpressionEffect));
+        const clone = e => e.clone();
+        const board = this.expressionNodes().filter(isNotEmpty).map(clone); // these are Expressions
+        const toolbox = this.toolboxNodes().filter(isNotEmpty).map(clone);  // ''
+        const goal = this._storedGoal; // this is a Goal object
+        const globals = this.environment;   // an Environment object
+        return new Level(board, goal, toolbox, globals);
+    }
+
+    // Storing and saving Reduct stages.
     toString() {
-        if (!this.expressionNodes) return "[stage]";
+        return JSON.stringify(this.toLevel().serialize());
+    }
 
-        let stringify = (nodes) => nodes.reduce((prev, curr) => {
-            let s = curr.toString();
-            if (s === '()') return prev; // Skip empty expressions.
-            else            return (prev + curr.toString() + ' ');
-        }, '').trim();
+    // Save state of game board and push onto undo stack.
+    saveState() {
+        const stringify = lvl => JSON.stringify(lvl);
+        const state = this.toLevel().serialize();
+        const json = stringify(state);
 
-        let board = this.expressionNodes();
-        let toolbox = this.toolboxNodes();
-        let exp = {
-            'board': stringify(board),
-            'toolbox': stringify(toolbox)
+        // Check if new 'state' is really new...
+        // Only if something's changed should we push onto the stateStack
+        // and save to the server.
+        if (this.stateStack.length > 0) {
+            const prev_state = this.stateStack[this.stateStack.length-1];
+            const prev_json = stringify(prev_state);
+            if (prev_json === json) // Nothing's changed. Abort the save.
+                return;
+            else {
+                console.log('State diff: ', ReductStage.stateDiff(prev_state, state));
+            }
+        } // If we reach here, then something has changed...
+
+        // Push new state and save serialized version to logger.
+        this.stateStack.push( state );
+        Logger.log('state-save', json);
+    }
+
+    // Determines what's changed between states a and b, (serialized Level objects)
+    // where 'b' is assumed to come after 'a' (time-wise).
+    static stateDiff(a, b) {
+        const has = (str, arr) => (arr.indexOf(str) > -1);
+        const diff = {};
+        const computeDiffArray = (a, b, key) => {
+            if (!(key in diff))
+                diff[key] = {
+                    add: [],
+                    remove: []
+                };
+            for (let i = 0; i < a[key].length; i++) {
+                const elem = a[key][i];
+                if (!has(elem, b[key])) // If a's expr doesn't exist in b, then it was removed.
+                    diff[key].remove.push(elem);
+            }
+            for (let i = 0; i < b[key].length; i++) {
+                const elem = b[key][i];
+                if (!has(elem, a[key])) // If b's expr doesn't exist in a, then it was added.
+                    diff[key].add.push(elem);
+            }
+            // Cleanup.
+            const nothingAdded = diff[key].add.length === 0;
+            const nothingRemoved = diff[key].remove.length === 0;
+            if (nothingAdded && nothingRemoved)
+                delete diff[key];
+            else if (nothingAdded)
+                delete diff[key]['add'];
+            else if (nothingRemoved)
+                delete diff[key]['remove'];
+        };
+        const computeDiffObj = (a, b, key) => {
+            if (!((key in a) || (key in b)) ||
+                Object.keys(a[key]).length === 0 && Object.keys(b[key]).length === 0)
+                return; // Nothing to do... empty states.
+
+            if (!(key in diff))
+                diff[key] = {
+                    change: {},
+                    set: {}
+                };
+
+            // So we don't get errors...
+            if (!(key in a)) a[key] = {};
+            else if (!(key in b)) b[key] = {};
+
+            for (let varname in a[key]) {
+                if (varname in b[key]) {
+                    if (b[key][varname] != a[key][varname]) // Variable has changed values.
+                        diff[key].change[varname] = b[key][varname];
+                } else { // Variable was (somehow!) removed. This shouldn't be reachable atm.
+                    console.warn('Error!! Variable ', varname, ' found as removed. Weird. Skipping...');
+                }
+            }
+            for (let varname in b[key]) {
+                if (!(varname in a[key])) // New variable was declared and assigned a value.
+                    diff[key].set[varname] = b[key][varname];
+            }
+
+            // Cleanup.
+            const nothingChanged = Object.keys(diff[key].change).length === 0;
+            const nothingSet = Object.keys(diff[key].set).length === 0;
+            if (nothingChanged && nothingSet)
+                delete diff[key];
+            else if (nothingChanged)
+                delete diff[key]['change'];
+            else if (nothingSet)
+                delete diff[key]['set'];
         };
 
-        return JSON.stringify(exp);
+        // Below is a generalized version of doing:
+        //   computeDiffArray(a, b, 'board');
+        //   computeDiffArray(a, b, 'toolbox');
+        //   computeDiffObj(a, b, 'globals');
+        for (var key in b) {
+            if (Array.isArray(b[key]))
+                computeDiffArray(a, b, key);
+            else
+                computeDiffObj(a, b, key);
+        }
+
+        return diff;
+    }
+
+    // Restore previous state of game board.
+    restoreState() {
+        if (this.stateStack.length > 0) {
+            //this.nodes = this.stateStack.pop();
+
+            this.expressionNodes().forEach((n) => this.remove(n));
+            this.toolboxNodes().forEach((n) => this.remove(n));
+            let restored_state = this.stateStack.pop(); // This is a Level object.
+            restored_state.exprs.forEach((n) => this.add(n));
+            restored_state.toolbox.forEach((n) => {
+                n.toolbox = this.toolbox;
+                this.add(n);
+            });
+
+            this.update();
+            this.draw();
+
+            Logger.log('state-restore', this.toString());
+        }
+    }
+    dumpState() {
+        if (this.stateStack.length > 0) {
+            this.stateStack.pop();
+        }
     }
 
     onorientationchange() {

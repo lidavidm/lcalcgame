@@ -4,6 +4,15 @@
     "language":"JavaScript",
     "levels": [
         {
+            "description": "Booleans can go in variables, too!",
+            "board": ["c = _ == _", "c"],
+            "goal": "true",
+            "toolbox": ["x", "rect", "star"],
+            "globals": {
+                "x": "rect"
+            }
+        },
+        {
             "description": "Sequence operator",
             "board": ["x = _; y = x + 1;", "y"],
             "goal": "3",
@@ -39,6 +48,14 @@
                 "x": "star",
                 "y": "triangle"
             }
+        },
+        {
+            "description": "Typing strings with sequences.",
+            "goal" : {
+                "y":"'abracadabra'"
+            },
+            "board": "x = 'a'; y = x + _t_string; z = y + x; y = z + _t_string + z;",
+            "toolbox": ""
         }
     ],
     "resources": {

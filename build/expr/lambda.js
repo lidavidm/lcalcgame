@@ -418,8 +418,6 @@ var LambdaHoleExpr = function (_MissingExpression) {
                     // Save the current state of the board.
                     stage.saveState();
 
-                    Logger.log('state-save', stage.toString());
-
                     // Remove the original expression from its stage.
                     stage.remove(node);
 
@@ -665,6 +663,11 @@ var LambdaVarExpr = function (_ImageExpr) {
         key: 'toString',
         value: function toString() {
             return '#' + (this.ignoreEvents ? '' : '_') + this.name;
+        }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return this.name;
         }
     }, {
         key: 'size',

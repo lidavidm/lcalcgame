@@ -49,6 +49,20 @@ var Environment = function () {
             var set = new Set([].concat(_toConsumableArray(Object.keys(this.bindings)), _toConsumableArray(this.parent ? this.parent.names() : [])));
             return Array.from(set);
         }
+    }, {
+        key: "serialize",
+
+
+        // For saving / loading from state.
+        value: function serialize() {
+            var json = {};
+            var bindings = this.bindings;
+            for (var key in bindings) {
+                // Convert expressions into string repr. in Reduct scheme-language.
+                json[key] = bindings[key].toString();
+            }
+            return json;
+        }
     }], [{
         key: "parse",
         value: function parse(desc) {

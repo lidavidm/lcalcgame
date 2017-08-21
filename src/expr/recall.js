@@ -63,10 +63,11 @@ class TypeBox extends mag.RoundedRect {
         // Text
         let txt = new TextExpr('');
         txt.fontSize = 22;
-        txt.pos = { x:0, y:h - txt.size.h/2 };
+        this._txtOffsetX = 6;
+        txt.pos = { x:this._txtOffsetX, y:h - txt.size.h/2 };
         // txt.wrap = 8;
-        this.addChild(txt);
         this.textExpr = txt;
+        this.addChild(txt);
 
         // Blinking cursor
         let percentH = 0.8;
@@ -87,6 +88,8 @@ class TypeBox extends mag.RoundedRect {
         this.onTextChanged = onTextChanged;
         this._origHeight = h;
 
+        this.size = this.makeSize();
+
         // this.makeMultiline(10, 4);
     }
     get text() {
@@ -106,6 +109,23 @@ class TypeBox extends mag.RoundedRect {
     }
     set textColor(clr) {
         this.textExpr.color = clr;
+    }
+    hasHint() {
+        return this.hintTextExpr && this.hintTextExpr.text.length > 0;
+    }
+    setHint(str) {
+        if (this.hintTextExpr) this.removeHint(); // remove any existing hint...
+        let hint = new TextExpr(str);
+        hint.pos = this.textExpr.pos;
+        hint.color = "#bbb";
+        this.addChildAt(0, hint);
+        this.hintTextExpr = hint;
+    }
+    removeHint() {
+        if (this.hintTextExpr) {
+            this.removeChild(this.hintTextExpr);
+            this.hintTextExpr = null;
+        }
     }
 
     makeMultiline(lineWidthInChars, maxNumLines) {
@@ -198,7 +218,7 @@ class TypeBox extends mag.RoundedRect {
         if (charIdx >= chars_per_line && col_idx === 0) col_idx = chars_per_line;
         const height_per_line = this.charHeightPerLine();
         const y_pos = (shouldWrap ? (height_per_line * Math.trunc((charIdx-1) / chars_per_line)) : 0) + y_offset;
-        return { x:width * col_idx / chars_per_line, y:y_pos };
+        return { x:width * col_idx / chars_per_line + this._txtOffsetX, y:y_pos };
     }
     update() {
         super.update();
@@ -207,10 +227,10 @@ class TypeBox extends mag.RoundedRect {
     }
     makeSize() {
         if (this.multiline) {
-            return { w:this.multiline.lineWidth * this.charWidthPerLine() + this.padding.right,
+            return { w:this.multiline.lineWidth * this.charWidthPerLine() + this.padding.right + this._txtOffsetX,
                      h:this.multiline.lineHeight * this.charHeightPerLine() };
         }
-        else return { w:Math.max(this._origWidth, this.textExpr.size.w + this.cursor.size.w + this.padding.right),
+        else return { w:Math.max(this._origWidth, Math.max(this.textExpr.size.w, (this.hintTextExpr ? this.hintTextExpr.size.w : 0)) + this.cursor.size.w + this.padding.right + this._txtOffsetX),
                       h:Math.max(this._origHeight, this.textExpr.absoluteSize.h) };
     }
     updateCursorPosition(charIdx) {
@@ -298,6 +318,7 @@ class TypeBox extends mag.RoundedRect {
         this.addChild(this.cursor);
         this.cursor.startBlinking();
         this.stroke = { color:'cyan', lineWidth:2 };
+        console.log('focusing', this, this.parent);
         if (this.stage) this.stage.keyEventDelegate = this;
     }
     blur() {
@@ -359,7 +380,6 @@ class TypeBox extends mag.RoundedRect {
     carriageReturn() { // Solidify block (if possible)
         if (this.onCarriageReturn)
             this.onCarriageReturn();
-        this.blur();
         if (this.stage) this.stage.update();
     }
 }
@@ -456,11 +476,14 @@ class TypeInTextExpr extends TextExpr {
 
         // Special cases:
         // Entering strings without worry about quotes...
-        if (code === 'string') return new TypeInStringValueExpr();
+        if (code === 'string') return new (ExprManager.getClass('typing_str'))();
+
+        let transformer = null;
+        if (code === 'innerstring') transformer = txt => `"{txt}"`;
 
         let validators = {
             'fullstring':(txt) => (__PARSER.parse(txt) instanceof StringValueExpr),
-            'innerstring':(txt) => (__PARSER.parse('"' + txt + '"') instanceof StringValueExpr),
+            'innerstring':(txt) => (__PARSER.parse(transformer(txt)) instanceof StringValueExpr),
             'nonneg':(txt) => {
                 let i = Number.parseInt(txt, 10);
                 return (!Number.isNaN(i) && i >= 0);
@@ -500,6 +523,7 @@ class TypeInTextExpr extends TextExpr {
         if (code in validators) {
             let t = new TypeInTextExpr(validators[code], afterCommit);
             t._exprCode = '_t_' + code;
+            if (transformer) t.transformer = transformer;
             return t;
         } else {
             console.error('@ TypeInTextExpr.fromExprCode: Code ' + code + ' doesn\'t match any known validator.');
@@ -508,13 +532,18 @@ class TypeInTextExpr extends TextExpr {
     }
 
     constructorArgs() {
-        return [ this.validator, null, 1 ];
+        return [ this.validator, this.afterCommit ? this.afterCommit : null, 1 ];
     }
     clone() {
-        let t = new TypeInTextExpr(this.validator);
+        let t = new TypeInTextExpr(this.validator, this.afterCommit);
+        if (this.transformer)
+            t.transformer = this.transformer;
         if (this.typeBox) {
             //console.log(t.typeBox);
             t.typeBox.text = this.typeBox.text;
+            t.typeBox.color = this.typeBox.color;
+            t.typeBox.textColor = this.typeBox.textColor;
+            t.setDefaultWidth(this.typeBox._origWidth);
         } else {
             t.text = this.text;
             t.typeBox = null;
@@ -540,20 +569,29 @@ class TypeInTextExpr extends TextExpr {
                 txt = txt.replace('return', '__return =');
                 let expr = __PARSER.parse(txt);
                 if (!expr) return;
-                let parent = (this.parent || this.stage);
-                parent.swap(this, expr);
+                let parent;
+                let _this = this;
+                if (this.emptyParent) {
+                    _this = this.parent;
+                    parent = (this.parent.parent || this.parent.stage);
+                }
+                else {
+                    parent = (this.parent || this.stage);
+                }
+                parent.swap(_this, expr);
                 expr.lockSubexpressions((e) => (!(e instanceof LambdaHoleExpr)));
                 if (!(parent instanceof mag.Stage))
                     expr.lock();
                 expr.update();
             };
+            this.afterCommit = afterCommit;
         }
 
         let _thisTextExpr = this;
         let onCommit = function() {
             let txt = this.text; // this.text is the TypeBox's text string, *not* the TextExpr's!
             console.log(txt);
-            if (validator(txt)) {
+            if (_thisTextExpr.validator(txt)) {
                 _thisTextExpr.commit(txt);
                 Resource.play('carriage-return');
                 if (afterCommit) afterCommit(txt);
@@ -562,7 +600,7 @@ class TypeInTextExpr extends TextExpr {
             }
         };
         let onTextChanged = function() {
-            if (validator(this.text.trim()) === true) {
+            if (_thisTextExpr.validator(this.text) === true) {
                 //this.color = 'green';
                 this.stroke = { color:'#0f0', lineWidth:4 };
             } else
@@ -577,7 +615,8 @@ class TypeInTextExpr extends TextExpr {
     }
     setDefaultWidth(w) {
         if (this.typeBox) {
-            this.typeBox.size = { w:w, h:this.typeBox.size.h };
+            if (!this.typeBox.hintTextExpr)
+                this.typeBox.size = { w:w, h:this.typeBox.size.h };
             this.typeBox._origWidth = w;
         } else {
             this._size = { w:w, h:this._size.h };
@@ -591,10 +630,21 @@ class TypeInTextExpr extends TextExpr {
         }
     }
 
+    setHint(hintText) {
+        this.typeBox.setHint(hintText);
+    }
+    enforceHint(hintText) {
+        // Set the hint and changes the validator to only accept the hint text...
+        this.validator = (s) => (s === hintText);
+        this.setHint(hintText);
+    }
+
     parsedValue() {
         if (this.typeBox) {
             let txt = this.typeBox.text;
+            if (txt.length === 0) return null; // don't let null results at the moment...
             if (this.validator(txt)) {
+                if (this.transformer) txt = this.transformer(txt);
                 let result = __PARSER.parse(txt);
                 if (result) return result;
             }
@@ -618,10 +668,13 @@ class TypeInTextExpr extends TextExpr {
     }
 
     commit(renderedText) {
+        const stage = this.stage;
+        this.blur();
         this.text = renderedText; // this is the underlying text in the TextExpr
         this.removeChild(this.typeBox);
         this.typeBox = null;
         this.update();
+        stage.focusFirstTypeBox(); // auto-enter the next TypeBox on screen, if one exists.
         ShapeExpandEffect.run(this, 200, (e) => Math.pow(e, 1));
         ShapeExpandEffect.run(this, 350, (e) => Math.pow(e, 0.9));
         ShapeExpandEffect.run(this, 500, (e) => Math.pow(e, 0.8));

@@ -49,6 +49,15 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     const __RESOURCE_PATH = Resource.path;
     const __LEVELS_PATH = __RESOURCE_PATH + 'levels/';
 
+    // Add levels here:
+    const chapterDigraph = {
+        'intro': ['booleans'],
+        'booleans': ['strings'],
+        'strings': ['variables'],
+        'variables': ['typing_variables'],
+        'typing_variables': []
+    };
+
     var loadAudio = Resource.loadAudio;
     var loadImage = Resource.loadImage;
     var loadImageSequence = Resource.loadImageSequence;
@@ -177,12 +186,6 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     // Load preset animations from image sequences.
     loadAnimation('poof', [0, 4], 120); // Cloud 'poof' animation for destructor piece.
 
-    // Add levels here:
-    const chapterDigraph = {
-        'intro': ['booleans'],
-        'booleans': ['strings'],
-        'strings': []
-    };
     // const chapterDigraph = {                     // BEFORE CHI '18.
     //     'intro': ['booleans'],
     //     'booleans': ['conditionals'],
@@ -300,6 +303,9 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             // we will try and fade a root twice.
             let already_faded = [];
 
+            let sparkleTriggers = [];
+            let triggerFired = false;
+
             for (let border of fadedBorders) {
 
                 let unfaded_roots = unfaded.getRootNodesThatIncludeClass(border.unfadedClass)
@@ -343,19 +349,29 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                     faded.add(unfaded_root);
                     root.opacity = 0;
 
-                    Animate.wait(500).after(() => {
-                        SparkleTrigger.run(unfaded_root, () => {
+                    const afterSparkle = () => {
 
-                            Logger.log('faded-expr', { 'expr':unfaded_root.toString(), 'state':faded.toString() } );
-                            Resource.play('mutate');
+                        Logger.log('faded-expr', { 'expr':unfaded_root.toString(), 'state':faded.toString() } );
+                        Resource.play('mutate');
 
-                            Animate.tween(root, { 'opacity':1.0 }, 2000).after(() => {
-                                root.ignoreEvents = false;
-                            });
-                            Animate.tween(unfaded_root, { 'opacity':0.0 }, 1000).after(() => {
-                                faded.remove(unfaded_root);
-                            });
+                        Animate.tween(root, { 'opacity':1.0 }, 2000).after(() => {
+                            root.ignoreEvents = false;
                         });
+                        Animate.tween(unfaded_root, { 'opacity':0.0 }, 1000).after(() => {
+                            faded.remove(unfaded_root);
+                        });
+
+                        // Fire all remaining triggers.
+                        if (!triggerFired) {
+                            triggerFired = true;
+                            sparkleTriggers.forEach((trigger) => {
+                                trigger();
+                            });
+                        }
+                    };
+                    Animate.wait(500).after(() => {
+                        const cancelCb = SparkleTrigger.run(unfaded_root, afterSparkle);
+                        sparkleTriggers.push(cancelCb);
                     });
 
                     // Cross-fade old expression to new.

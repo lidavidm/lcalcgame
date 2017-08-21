@@ -87,7 +87,7 @@ var Toolbox = function (_mag$ImageRect) {
                 }
                 e.update();
                 e.anchor = { x: 0, y: 0.5 };
-                if (e instanceof InfiniteExpression) pos.x += 80;
+                //if (e instanceof InfiniteExpression) pos.x += 80;
                 if (animated) {
                     Animate.tween(e, { pos: clonePos(pos) }, 300, function (elapsed) {
                         return Math.pow(elapsed, 0.5);

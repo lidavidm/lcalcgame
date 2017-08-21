@@ -24,6 +24,12 @@
             "toolbox":""
         },
         {
+            "description":"Introduces concept: Constant functions.",
+            "board":"(λx /a) (b) (a)",
+            "goal":"(a) (a)",
+            "toolbox":""
+        },
+        {
             "description":"Introduces concept: Toolbox. (*used to be deletion)",
             "board":"",
             "goal":"a",

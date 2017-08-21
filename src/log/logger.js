@@ -280,12 +280,12 @@ var Logger = (function() {
         return pub.recordAction(actionID, data).catch((err) => {
             //console.error('@ Logger.log: ' + err);
         });
-    }
+    };
     pub.recordAction = (actionID, data) => {
         return new Promise(function(resolve, reject) {
 
             // For now...
-            //console.log('@ Logger.log: ', actionID, data);
+            console.log('@ Logger.log: ', actionID, data);
 
             if (data && typeof data === 'object')
                 data = JSON.stringify(data);

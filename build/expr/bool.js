@@ -46,10 +46,13 @@ var BooleanPrimitive = function (_Expression) {
         value: function drawInternal(ctx, pos, boundingSize) {
             ctx.fillStyle = 'black';
             setStrokeStyle(ctx, this.stroke);
-            if (this.shadowOffset !== 0) {
-                hexaRect(ctx, pos.x, pos.y + this.shadowOffset, boundingSize.w, boundingSize.h, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null);
-            }
+            if (this.shadowOffset !== 0) this.drawBaseShape(ctx, { x: pos.x, y: pos.y + this.shadowOffset }, boundingSize);
             ctx.fillStyle = this.color;
+            this.drawBaseShape(ctx, pos, boundingSize);
+        }
+    }, {
+        key: 'drawBaseShape',
+        value: function drawBaseShape(ctx, pos, boundingSize) {
             hexaRect(ctx, pos.x, pos.y, boundingSize.w, boundingSize.h, true, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null);
         }
     }]);
@@ -115,25 +118,69 @@ var FalseExpr = function (_BooleanPrimitive2) {
     return FalseExpr;
 }(BooleanPrimitive);
 
+var GraphicFadedTrueExpr = function (_TrueExpr) {
+    _inherits(GraphicFadedTrueExpr, _TrueExpr);
+
+    function GraphicFadedTrueExpr() {
+        _classCallCheck(this, GraphicFadedTrueExpr);
+
+        var _this4 = _possibleConstructorReturn(this, (GraphicFadedTrueExpr.__proto__ || Object.getPrototypeOf(GraphicFadedTrueExpr)).call(this));
+
+        _this4.color = "lightgray";
+        return _this4;
+    }
+
+    _createClass(GraphicFadedTrueExpr, [{
+        key: 'drawBaseShape',
+        value: function drawBaseShape(ctx, pos, size) {
+            roundRect(ctx, pos.x, pos.y, size.w, size.h, this.radius * this.absoluteScale.x, this.color ? true : false, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null, this.notches ? this.notches : null);
+        }
+    }]);
+
+    return GraphicFadedTrueExpr;
+}(TrueExpr);
+
+var GraphicFadedFalseExpr = function (_FalseExpr) {
+    _inherits(GraphicFadedFalseExpr, _FalseExpr);
+
+    function GraphicFadedFalseExpr() {
+        _classCallCheck(this, GraphicFadedFalseExpr);
+
+        var _this5 = _possibleConstructorReturn(this, (GraphicFadedFalseExpr.__proto__ || Object.getPrototypeOf(GraphicFadedFalseExpr)).call(this));
+
+        _this5.color = "lightgray";
+        return _this5;
+    }
+
+    _createClass(GraphicFadedFalseExpr, [{
+        key: 'drawBaseShape',
+        value: function drawBaseShape(ctx, pos, size) {
+            roundRect(ctx, pos.x, pos.y, size.w, size.h, this.radius * this.absoluteScale.x, this.color ? true : false, this.stroke ? true : false, this.stroke ? this.stroke.opacity : null, this.notches ? this.notches : null);
+        }
+    }]);
+
+    return GraphicFadedFalseExpr;
+}(FalseExpr);
+
 /** Faded bool variants. */
 
 
-var KeyTrueExpr = function (_TrueExpr) {
-    _inherits(KeyTrueExpr, _TrueExpr);
+var KeyTrueExpr = function (_TrueExpr2) {
+    _inherits(KeyTrueExpr, _TrueExpr2);
 
     function KeyTrueExpr() {
         _classCallCheck(this, KeyTrueExpr);
 
-        var _this4 = _possibleConstructorReturn(this, (KeyTrueExpr.__proto__ || Object.getPrototypeOf(KeyTrueExpr)).call(this));
+        var _this6 = _possibleConstructorReturn(this, (KeyTrueExpr.__proto__ || Object.getPrototypeOf(KeyTrueExpr)).call(this));
 
-        _this4.holes = [];
-        _this4.children = [];
+        _this6.holes = [];
+        _this6.children = [];
 
         var key = new ImageExpr(0, 0, 56, 28, 'key-icon');
         key.lock();
-        _this4.addArg(key);
-        _this4.graphicNode = key;
-        return _this4;
+        _this6.addArg(key);
+        _this6.graphicNode = key;
+        return _this6;
     }
 
     _createClass(KeyTrueExpr, [{
@@ -148,22 +195,22 @@ var KeyTrueExpr = function (_TrueExpr) {
     return KeyTrueExpr;
 }(TrueExpr);
 
-var KeyFalseExpr = function (_FalseExpr) {
-    _inherits(KeyFalseExpr, _FalseExpr);
+var KeyFalseExpr = function (_FalseExpr2) {
+    _inherits(KeyFalseExpr, _FalseExpr2);
 
     function KeyFalseExpr() {
         _classCallCheck(this, KeyFalseExpr);
 
-        var _this5 = _possibleConstructorReturn(this, (KeyFalseExpr.__proto__ || Object.getPrototypeOf(KeyFalseExpr)).call(this));
+        var _this7 = _possibleConstructorReturn(this, (KeyFalseExpr.__proto__ || Object.getPrototypeOf(KeyFalseExpr)).call(this));
 
-        _this5.holes = [];
-        _this5.children = [];
+        _this7.holes = [];
+        _this7.children = [];
 
         var key = new ImageExpr(0, 0, 56, 34, 'broken-key-icon');
         key.lock();
-        _this5.addArg(key);
-        _this5.graphicNode = key;
-        return _this5;
+        _this7.addArg(key);
+        _this7.graphicNode = key;
+        return _this7;
     }
 
     _createClass(KeyFalseExpr, [{

@@ -1,121 +1,115 @@
 {
-    "chapterName":"Intro to Strings",
-    "description":"Brief intro to strings",
-    "language":"JavaScript",
+    "chapterName":"Typing and Variables",
+    "description":"Free Form Input with Mutable State",
+    "language": "JavaScript",
     "levels": [
         {
-            "goal" : "'pineapple'",
-            "board": ["'pine'", "'apple'", "_ + _"],
-            "toolbox": ""
-        },
-        {
-            "goal" : "'crabapple'",
-            "board": ["_ + _", "_ + _"],
-            "toolbox": ["'bap'", "'app'", "'cra'", "'ple'"]
-        },
-        {
-            "goal" : "'cattywampus'",
-            "board": ["_ + 'y'", "_ + 't'", "_ + _", "'w' + _", "_ + _", "_ + 'us'"],
-            "toolbox": ["'t'", "'am'", "'cat'", "'p'"]
-        },
-        {
-            "goal" : "'adam'",
-            "board": ["_ + _", "(x) => xx"],
-            "toolbox": ["'m'", "'a'", "'d'", "_ + _"]
-        },
-        {
-            "description": "Intro to typing text.",
-            "goal": "'mountains'",
-            "board": "'mount' + _t_string",
+            "goal": "'triangle'",
+            "board": ["_t_variable = x", "z"],
             "toolbox": "",
-            "block_variant": {
-                "board": "'mount' + _",
-                "toolbox": ["'ins'", "'ains'", "'tains'"]
+            "globals": {
+                "x": "(triangle)"
             }
         },
         {
-            "description": "Multiple text-enter boxes. Spaces I.",
-            "goal": "'penguin shuffle'",
-            "board": ["_t_string + 'guin'", "' '", "_ + 'shu'", "_t_string + 'fle'"],
-            "toolbox": ["_ + _", "_ + _"],
-            "block_variant": {
-                "board": ["_ + 'guin'", "' '", "_ + 'shu'", "_ + 'fle'"],
-                "toolbox": ["'pen'", "'uff'", "'f'", "_ + _", "_ + _"]
+            "goal": "'rice'",
+            "board": ["x = _t_single; y = x", "y"],
+            "toolbox": "",
+            "globals": {
             }
         },
         {
-            "description": "Multiple text-enter boxes. Spaces II.",
-            "goal": "'volcanos scare me'",
-            "board": ["_t_string + 'olca'", "'ca' + _", "_t_string + 's'", "_t_string + 'e me'"],
-            "toolbox": ["_ + _", "_ + _"],
-            "block_variant": {
-                "board": ["_ + 'olca'", "'ca' + _", "_ + 's'", "_ + 'e me'"],
-                "toolbox": ["'v'", "'nos '", "'no'", "'r'", "_ + _", "_ + _"]
+            "goal": "false",
+            "board": ["_t_variable = 'bread'; b = 'rice'; k = a == b", "k"],
+            "toolbox": "",
+            "globals": {
             }
         },
         {
-            "description": "Typing with ==, one side.",
             "goal": "true",
-            "board": ["_t_string == 'eery lakes'"],
+            "board": ["_t_variable = _t_single; _t_variable = 'rice'; k = x == y", "k"],
             "toolbox": "",
-            "fade":{
-                "==":2,
-                "true":2,
-                "false":2
-            },
-            "block_variant": {
-                "board": ["_ == 'eery lakes'"],
-                "toolbox": ["'eerie lakes'", "'eery lakes'"]
+            "globals": {
             }
         },
         {
-            "description": "Typing with ==, both sides.",
-            "goal": ["false", "true"],
-            "board": ["_t_string == _t_string", "_t_string == _t_string"],
+            "goal": "'leftovers'",
+            "board": ["_t_variable = 'chow'; y = 'rice'; k = x == y", "k ? 'rice' : null", "'leftovers'"],
             "toolbox": "",
-            "block_variant": {
-                "board": ["_ == _", "_ == _"],
-                "toolbox": ["'a'", "'b'", "'a'", "'c'", "'b'", "'c'"]
+            "globals": {
+                "k": "(true)"
             }
         },
         {
-            "description": "Typing operators I.",
-            "goal": ["true", "'river'"],
-            "board": ["'r' >>> 'r'", "'r' >>> 'iver'"],
+            "goal": "'cat'",
+            "board": ["_t_variable = 'kitty'; _t_variable = _t_single; k = (_t_single == _t_single)", "k ? 'cat' : 'dog'"],
             "toolbox": "",
-            "typing_hints": [ "==", "+" ],
-            "typing_options": {
-                ">>>": ["==", "+"]
-            },
-            "block_variant": {
-                "board": ["'r' >> 'r'", "'r' >> 'iver'"],
-                "toolbox": ["_op('+')", "_op('==')"]
+            "globals": {
             }
         },
         {
-            "description": "Typing operators II.",
-            "goal": "true",
-            "board": ["'r' >>> _", "_ >>> 'river'", "_t_string"],
+            "goal": "'prize'",
+            "board": ["a = _t_single; b = a ? 'prize' : null", "b"],
             "toolbox": "",
-            "typing_options": {
-                ">>>": ["==", "+"]
-            },
-            "block_variant": {
-                "board": ["'r' >> _", "_ >> 'river'"],
-                "toolbox": ["'ver'", "'iver'", "'river'", "_op('+')", "_op('==')"]
+            "globals": {
             }
         },
         {
-            "description": "Typing operators III.",
-            "goal": "true",
-            "board": ["_ >>> _", "_ >>> _t_string"],
-            "toolbox": ["'b'", "'e'"],
-            "typing_options": {
-                ">>>": ["==", "+"]
+            "goal": "'prize'",
+            "board": ["_t_single; b = a ? 'prize' : null", "b"],
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "goal": "'prize'",
+            "board": ["key = true; c = key && _t_single ; _t_single; b = a ? 'prize' : null", "b"],
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "goal": "'prize'",
+            "board": ["_t_single; c = val || false ; _t_single; b = key ? 'prize' : null", "b"],
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "goal": "3",
+            "board": ["_t_single; wallet = wallet + 1; wallet = wallet + _t_single", "wallet"],
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "goal": "'rect'",
+            "board": [],
+            "toolbox": ["x", "y"],
+            "globals": {
+                "x": "(arrayobj /(bag /triangle /star))",
+                "y": "(arrayobj /(bag /star /rect))"
             },
-            "block_variant": {
-                "board": ["_ >> _", "_ >> _"],
-                "toolbox": ["'b'", "'e'", "_op('+')", "_op('==')", "'be'"]
+            "fade": {
+                "var": 8
+            }
+        },
+        {
+            "goal": "'rect'",
+            "board": [],
+            "toolbox": ["x", "y"],
+            "globals": {
+                "x": "(arrayobj /(bag /triangle /star))",
+                "y": "(arrayobj /(bag /star /rect))"
+            }
+        },
+        {
+            "goal": "'rice'",
+            "board": ["_t_single"],
+            "toolbox": [],
+            "globals": {
+                "x": "(arrayobj /(bag /rice /bread))",
+                "y": "(arrayobj /(bag /bread /rice))"
             }
         }
     ],

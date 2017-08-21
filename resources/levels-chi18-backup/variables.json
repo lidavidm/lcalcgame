@@ -128,7 +128,7 @@
         },
         {
             "description": "Equality with a variable II",
-            "board": "_ == _t_string",
+            "board": "_ == 'A'",
             "goal": "true",
             "toolbox": ["x", "y"],
             "globals": {
@@ -189,11 +189,7 @@
             "description": "Typing strings with variables.",
             "goal" : "'hotshot'",
             "board": ["x = _t_string", "y = _t_string", "z = x"],
-            "toolbox": ["x + y + z", "y + z + x", "z + x + y"],
-            "block_variant": {
-                "board": ["x = _", "y = _", "z = x"],
-                "toolbox": ["'hot'", "'s'", "'ot'", "x + y + z", "y + z + x", "z + x + y"]
-            }
+            "toolbox": ["x + y + z", "y + z + x", "z + x + y"]
         },
         {
             "description": "Confusing = and ==.",
@@ -202,33 +198,21 @@
             "typing_hints": ["=", "=="],
             "typing_options": {
                 ">>>": ["=", "==", "+"]
-            },
-            "block_variant": {
-                "board": ["a >> 'red'", "a >> 'red'"],
-                "toolbox": ["_op('=')", "_op('==')"]
             }
         },
         {
             "description": "Confusing = and == II.",
-            "board": ["a >>> 'c'", "a >>> (a + 'b')", "a >>> 'cb'"],
+            "board": ["a >>> 'c'", "a >>> a + 'b'", "a >>> 'cb'"],
             "goal": "true",
             "typing_options": {
                 ">>>": ["=", "==", "+"]
-            },
-            "block_variant": {
-                "board": ["a >> 'c'", "a >> a + 'b'", "a >> 'cb'"],
-                "toolbox": ["_op('==')", "_op('=')", "_op('==')", "_op('=')"]
             }
         },
         {
             "description": "Typing strings with quotes.",
             "board": ["b = _t_fullstring", "a = 'quotes '", "a + b"],
             "goal": "'quotes matter'",
-            "typing_hints": ["\"matter\""],
-            "block_variant": {
-                "board": ["b = _", "a = 'quotes '", "a + b"],
-                "toolbox": ["matter", "'matter'"]
-            }
+            "typing_hints": ["\"matter\""]
         },
         {
             "description": "Typing strings with quotes II.",
@@ -237,10 +221,6 @@
             "typing_hints": ["\"c\""],
             "globals": {
                 "c": "oops"
-            },
-            "block_variant": {
-                "board": ["a = 'c'", "b == a", "b = _"],
-                "toolbox": ["c", "'c'"]
             },
             "unused_variant": {
                 "description": "Typing strings with quotes III.",
@@ -253,37 +233,22 @@
             "description": "Typing assignment I.",
             "board": ["_t_single", "x"],
             "goal": "5",
-            "typing_hints": ["x = 5"],
-            "block_variant": {
-                "board": ["x = 5", "x"]
-            }
+            "typing_hints": ["x = 5"]
         },
         {
             "description": "Typing assignment II.",
             "board": ["_t_single", "pins"],
-            "goal": "'five'",
-            "block_variant": {
-                "board": ["_v = _", "pins"],
-                "toolbox": ["x", "pins", "5", "'five'"]
-            }
+            "goal": "'five'"
         },
         {
             "description": "Typing assignment III.",
             "board": ["_t_single", "a + b", "b = 30"],
-            "goal": "777",
-            "block_variant": {
-                "board": ["_v = _", "a + b", "b = 30"],
-                "toolbox": ["a", "b", "324", "717", "747"]
-            }
+            "goal": "777"
         },
         {
             "description": "Typing assignment IV: Quotes and spaces.",
             "board": ["_t_single", "_t_single", "f + g + h", "f = '3'"],
-            "goal": "'3 apple pies'",
-            "block_variant": {
-                "board": ["_v = _", "_v = _", "f + g + h", "f = '3'"],
-                "toolbox": ["g", "h", "f", "'apple'", "' pies'", "' apple'", "'pies'"]
-            }
+            "goal": "'3 apple pies'"
         },
         {
             "description": "Typing assignment V: Booleans.",
@@ -292,10 +257,6 @@
             "typing_hints": ["=="],
             "typing_options": {
                 ">>>": ["==", "+", "="]
-            },
-            "block_variant": {
-                "board": ["q == false", "_v = _", "q = c"],
-                "toolbox": ["c", "'c'", "true", "false"]
             }
         },
         {
@@ -308,10 +269,6 @@
             },
             "typing_options": {
                 ">>>": ["==", "+", "="]
-            },
-            "block_variant": {
-                "board": ["k >> 3", "j >> 'four'", "k == j"],
-                "toolbox": ["_op('==')", "_op('=')", "_op('==')", "_op('=')"]
             }
         },
         {
@@ -324,15 +281,11 @@
             },
             "typing_options": {
                 ">>>": ["==", "+", "="]
-            },
-            "block_variant": {
-                "board": ["n >> m", "n >> m", "n >> m"],
-                "toolbox": ["_op('==')", "_op('=')", "_op('==')", "_op('=')"]
             }
         },
         {
             "description": "Typing assignment VII: Booleans and typing operators and ordering.",
-            "board": ["n >>> 'nix'", "n >>> (n + m)", "n = (n + _t_single)"],
+            "board": ["n >>> 'nix'", "n >>> n + m", "n = n + _t_single"],
             "goal": ["true"],
             "globals": {
                 "n": "n",
@@ -340,10 +293,6 @@
             },
             "typing_options": {
                 ">>>": ["==", "+", "="]
-            },
-            "block_variant": {
-                "board": ["n >> 'nix'", "n >> (n + m)", "n = (n + _)"],
-                "toolbox": ["'ix'", "'n'", "'x'", "'i'", "_op('==')", "_op('=')"]
             }
         }
     ],

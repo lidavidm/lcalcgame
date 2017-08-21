@@ -48,4 +48,15 @@ class Environment {
         }
         return env;
     }
+
+    // For saving / loading from state.
+    serialize() {
+        let json = {};
+        let bindings = this.bindings;
+        for (var key in bindings) {
+            // Convert expressions into string repr. in Reduct scheme-language.
+            json[key] = bindings[key].toString();
+        }
+        return json;
+    }
 }

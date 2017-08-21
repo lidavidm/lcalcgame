@@ -14,11 +14,13 @@ class CompareExpr extends Expression {
         super([b1, compare_text, b2]);
         this.funcName = compareFuncName;
         this.color = "HotPink";
+        this._origColor = "HotPink";
         this.padding = { left:20, inner:10, right:30 };
     }
     get constructorArgs() { return [this.holes[0].clone(), this.holes[2].clone(), this.funcName]; }
     get leftExpr() { return this.holes[0]; }
     get operatorExpr() { return this.holes[1]; }
+    set operatorExpr(e) { this.holes[1] = e; }
     get rightExpr() { return this.holes[2]; }
     onmouseclick(pos) {
         console.log('Expressions are equal: ', this.compare());
@@ -44,6 +46,25 @@ class CompareExpr extends Expression {
         return this.leftExpr && this.rightExpr && this.operatorExpr.canReduce() &&
             (this.leftExpr.canReduce() || this.leftExpr.isValue()) &&
             (this.rightExpr.canReduce() || this.rightExpr.isValue());
+    }
+
+    performUserReduction() {
+        if (this.operatorExpr instanceof OpLiteral) {
+            const op = this.operatorExpr.toString();
+            const _swap = (expr) => {
+                const parent = (this.stage || this.parent);
+                parent.swap(this, expr);
+            };
+            if (op === '=')
+                _swap(new (ExprManager.getClass('assign'))(this.leftExpr.clone(), this.rightExpr.clone()));
+            else if (op === '+')
+                _swap(new (ExprManager.getClass('+'))(this.leftExpr.clone(), this.rightExpr.clone()));
+            else {
+                this.operatorExpr = new TextExpr(op);
+                this.funcName = op;
+            }
+        }
+        else super.performUserReduction();
     }
 
     performReduction(animated=true) {
@@ -86,7 +107,11 @@ class CompareExpr extends Expression {
         return Promise.reject("Cannot reduce!");
     }
     compare() {
-        if (!this.operatorExpr.canReduce()) return undefined;
+        if (this.operatorExpr instanceof OpLiteral) {
+            this.funcName = this.operatorExpr.toString();
+        } else if (!this.operatorExpr.canReduce())
+            return undefined;
+
         if (this.funcName === '==') {
             if (!this.rightExpr || !this.leftExpr) return undefined;
 
@@ -173,7 +198,7 @@ class CompareExpr extends Expression {
 
     detach() {
         super.detach();
-        this.color = "HotPink";
+        this.color = this._origColor;
     }
 
     toString() {
@@ -181,8 +206,8 @@ class CompareExpr extends Expression {
     }
     toJavaScript() {
         const js_forms = {
-            '==':'a === b',
-            '!=':'a !== b',
+            '==':'a == b',
+            '!=':'a != b',
             'and':'a && b',
             'or':'a || b',
             'or not':'a || !b',
@@ -191,12 +216,31 @@ class CompareExpr extends Expression {
             '<':'a < b',
             '>=':'a >= b',
             '<=':'a <= b',
-            '>>>':'a >>> b' // typing operator...
+            '>>>':'a >>> b', // typing operator...
+            '>>':'a >> b', // missing op expr
+            '+':'a + b'
         };
-        if (this.funcName in js_forms) {
-            let template = js_forms[this.funcName];
-            let inner_exprs = { 'a':this.leftExpr.toJavaScript(), 'b':this.rightExpr.toJavaScript() };
-            let final_expr = template.replace(/a|b/g, (match) => '(' + inner_exprs[match] + ')'); // replaces a with leftExpr and b with rightExpr
+        let opName = this.funcName;
+        if (this.operatorExpr instanceof MissingOpExpression)
+            opName = '>>';
+        else if (this.operatorExpr instanceof TypeInTextExpr)
+            opName = '>>>';
+        else if (this.op instanceof OpLiteral)
+            opName = this.op.toString();
+
+        if (opName in js_forms) {
+            let template = js_forms[opName];
+            const inner_exprs = { 'a':this.leftExpr.toJavaScript(), 'b':this.rightExpr.toJavaScript() };
+            const isString = x => ((x.match(/\'/g) || []).length === 2 && x.indexOf("'") === 0 && (x.lastIndexOf("'") === (x.length-1)));
+            let final_expr = template.replace(/a|b/g, (match) => {
+                // Replaces a with leftExpr and b with rightExpr,
+                // adding parentheses if necessary.
+                let s = inner_exprs[match];
+                if (!isString(s) && /\s/g.test(s)) // if this value isn't a string and it has whitespace, we need to wrap it in parentheses...
+                    return '(' + s + ')';
+                else
+                    return s;
+            });
             return final_expr;
         } else {
             console.error('@ CompareExpr.toJavaScript: Operator name ' + this.funcName + ' not in mappings.');
@@ -210,6 +254,21 @@ class FadedCompareExpr extends CompareExpr {
     constructor(b1, b2, compareFuncName='==') {
         super(b1, b2, compareFuncName);
         this.holes[1].text = compareFuncName;
+    }
+}
+
+class GraphicFadedCompareExpr extends FadedCompareExpr {
+    constructor(b1, b2, compareFuncName='==') {
+        super(b1, b2, compareFuncName);
+        this._color = this._origColor = "lightgray";
+    }
+    drawBaseShape(ctx, pos, size) {
+        roundRect(ctx,
+                  pos.x, pos.y,
+                  size.w, size.h,
+                  this.radius*this.absoluteScale.x, this.color ? true : false, this.stroke ? true : false,
+                  this.stroke ? this.stroke.opacity : null,
+                  this.notches ? this.notches : null);
     }
 }
 

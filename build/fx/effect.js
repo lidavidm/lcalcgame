@@ -233,20 +233,6 @@ var SparkleTrigger = function () {
                     });
                 };
                 ghostySparkle();
-
-                // Whooosh!
-                /*let flyFromCenter = () => {
-                    part.pos = clonePos(center);
-                    part.color = "blue";
-                    part.shadowOffset = 0;
-                    part.opacity = 1.0;
-                    stage.add(part);
-                    Animate.tween(part, { pos:addPos(center, rescalePos(vec, 200)), opacity:0.0 }, 400).after(() => {
-                        stage.remove(part);
-                        flyFromCenter();
-                    });
-                };
-                flyFromCenter();*/
             };
 
             for (var i = 0; i < PARTICLE_COUNT; i++) {
@@ -256,6 +242,13 @@ var SparkleTrigger = function () {
             Animate.drawUntil(stage, function () {
                 return cancelRenderLoop;
             });
+
+            return function () {
+                if (!triggered) {
+                    onTrigger();
+                    triggered = true;
+                }
+            }; // return a func you can call to cancel this effect...
         }
     }]);
 

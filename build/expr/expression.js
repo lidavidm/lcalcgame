@@ -411,6 +411,8 @@ var Expression = function (_mag$RoundedRect) {
                 if (!this.canReduce()) {
                     mag.Stage.getAllNodes([this]).forEach(function (n) {
                         if (n instanceof Expression && n.isPlaceholder()) {
+                            // Something to do here
+                            console.log(n);
                             n.animatePlaceholderStatus();
                         }
                     });
@@ -496,7 +498,6 @@ var Expression = function (_mag$RoundedRect) {
                 if (!this.stage) return Promise.reject();
 
                 this.stage.saveState();
-                Logger.log('state-save', this.stage.toString());
 
                 // Log the reduction.
                 var reduced_expr_str = void 0;
@@ -568,19 +569,15 @@ var Expression = function (_mag$RoundedRect) {
                 var afterState = _stage.toString();
                 Logger.log('detached-expr', { 'before': beforeState, 'after': afterState, 'item': detachedExp });
                 _stage.saveState();
-                Logger.log('state-save', afterState);
 
                 this.shell = ghost_expr;
             }
             if (this.toolbox) {
 
-                if (this.stage) {
-                    this.stage.saveState();
-                    Logger.log('state-save', this.stage.toString());
-                }
+                if (this.stage) this.stage.saveState();
 
                 this.toolbox.removeExpression(this); // remove this expression from the toolbox
-                Logger.log('toolbox-dragout', this.toString());
+                Logger.log('toolbox-dragout', this.toJavaScript());
             }
 
             if (this.lockedInteraction) {
@@ -746,10 +743,7 @@ var Expression = function (_mag$RoundedRect) {
 
                     Logger.log('toolbox-remove', this.toString());
 
-                    if (this.stage) {
-                        this.stage.saveState();
-                        Logger.log('state-save', this.stage.toString());
-                    }
+                    if (this.stage) this.stage.saveState();
                 }
 
                 // Snap expressions together?
@@ -944,6 +938,13 @@ var Expression = function (_mag$RoundedRect) {
                 s += this.holes[i].toString();
             }
             return s + ')';
+        }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            if (this.holes.length === 1) return this.holes[0].toJavaScript();else return JSON.stringify(this.holes.map(function (e) {
+                return e.toJavaScript();
+            })); // this shouldn't happen, ideally...
         }
     }, {
         key: 'holeCount',

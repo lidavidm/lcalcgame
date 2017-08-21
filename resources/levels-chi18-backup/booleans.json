@@ -1,126 +1,87 @@
 {
-    "chapterName":"Intro to Strings",
-    "description":"Brief intro to strings",
+    "chapterName":"Equality",
+    "description":"Boolean equality",
     "language":"JavaScript",
+    "macros": {
+        "a":"star",
+        "b":"rect",
+        "c":"triangle"
+    },
     "levels": [
         {
-            "goal" : "'pineapple'",
-            "board": ["'pine'", "'apple'", "_ + _"],
+            "description": "Introduces concept: Reduction; Boolean comparison.",
+            "board": ["a == a"],
+            "goal": "true",
+            "toolbox": "",
+            "fade": {
+                "true":1,
+                "false":1,
+                "==":1
+            },
+            "showFade": false
+        },
+        {
+            "description": "Introduces concept: Holes.",
+            "board": ["a == _", "a"],
+            "goal": "true",
             "toolbox": ""
         },
         {
-            "goal" : "'crabapple'",
-            "board": ["_ + _", "_ + _"],
-            "toolbox": ["'bap'", "'app'", "'cra'", "'ple'"]
-        },
-        {
-            "goal" : "'cattywampus'",
-            "board": ["_ + 'y'", "_ + 't'", "_ + _", "'w' + _", "_ + _", "_ + 'us'"],
-            "toolbox": ["'t'", "'am'", "'cat'", "'p'"]
-        },
-        {
-            "goal" : "'adam'",
-            "board": ["_ + _", "(x) => xx"],
-            "toolbox": ["'m'", "'a'", "'d'", "_ + _"]
-        },
-        {
-            "description": "Intro to typing text.",
-            "goal": "'mountains'",
-            "board": "'mount' + _t_string",
-            "toolbox": "",
-            "block_variant": {
-                "board": "'mount' + _",
-                "toolbox": ["'ins'", "'ains'", "'tains'"]
-            }
-        },
-        {
-            "description": "Multiple text-enter boxes. Spaces I.",
-            "goal": "'penguin shuffle'",
-            "board": ["_t_string + 'guin'", "' '", "_ + 'shu'", "_t_string + 'fle'"],
-            "toolbox": ["_ + _", "_ + _"],
-            "block_variant": {
-                "board": ["_ + 'guin'", "' '", "_ + 'shu'", "_ + 'fle'"],
-                "toolbox": ["'pen'", "'uff'", "'f'", "_ + _", "_ + _"]
-            }
-        },
-        {
-            "description": "Multiple text-enter boxes. Spaces II.",
-            "goal": "'volcanos scare me'",
-            "board": ["_t_string + 'olca'", "'ca' + _", "_t_string + 's'", "_t_string + 'e me'"],
-            "toolbox": ["_ + _", "_ + _"],
-            "block_variant": {
-                "board": ["_ + 'olca'", "'ca' + _", "_ + 's'", "_ + 'e me'"],
-                "toolbox": ["'v'", "'nos '", "'no'", "'r'", "_ + _", "_ + _"]
-            }
-        },
-        {
-            "description": "Typing with ==, one side.",
+            "description": "Introduces concept: Choice of true and false.",
+            "board": "b == _",
             "goal": "true",
-            "board": ["_t_string == 'eery lakes'"],
-            "toolbox": "",
-            "fade":{
-                "==":2,
-                "true":2,
-                "false":2
-            },
-            "block_variant": {
-                "board": ["_ == 'eery lakes'"],
-                "toolbox": ["'eerie lakes'", "'eery lakes'"]
-            }
+            "toolbox": ["b", "a"]
         },
         {
-            "description": "Typing with ==, both sides.",
-            "goal": ["false", "true"],
-            "board": ["_t_string == _t_string", "_t_string == _t_string"],
-            "toolbox": "",
-            "block_variant": {
-                "board": ["_ == _", "_ == _"],
-                "toolbox": ["'a'", "'b'", "'a'", "'c'", "'b'", "'c'"]
-            }
+            "description": "Introduces false.",
+            "board": "a == b",
+            "goal": "false",
+            "toolbox": ""
         },
         {
-            "description": "Typing operators I.",
-            "goal": ["true", "'river'"],
-            "board": ["'r' >>> 'r'", "'r' >>> 'iver'"],
-            "toolbox": "",
-            "typing_hints": [ "==", "+" ],
-            "typing_options": {
-                ">>>": ["==", "+"]
-            },
-            "block_variant": {
-                "board": ["'r' >> 'r'", "'r' >> 'iver'"],
-                "toolbox": ["_op('+')", "_op('==')"]
-            }
+            "description": "Introduces concept: More than one free slot. Also choice of false.",
+            "board": ["_ == _", "a"],
+            "goal": "false",
+            "toolbox": ["b", "a"]
         },
         {
-            "description": "Typing operators II.",
+            "description": "Partial application.",
+            "board": ["a == _", "x => xx", "b", "b"],
+            "goal": ["false", "false"],
+            "toolbox": ""
+        },
+        {
+            "description": "Applying function to boolean",
+            "board": "a == _",
+            "goal": ["true", "true"],
+            "toolbox": ["x => xx", "a", "b", "x => x"]
+        },
+        {
+            "description": "Writing a boolean expression from scratch.",
+            "board": "a",
             "goal": "true",
-            "board": ["'r' >>> _", "_ >>> 'river'", "_t_string"],
-            "toolbox": "",
-            "typing_options": {
-                ">>>": ["==", "+"]
-            },
-            "block_variant": {
-                "board": ["'r' >> _", "_ >> 'river'"],
-                "toolbox": ["'ver'", "'iver'", "'river'", "_op('+')", "_op('==')"]
-            }
+            "toolbox": ["_ == _", "x => xx", "b", "x => x"]
         },
         {
-            "description": "Typing operators III.",
-            "goal": "true",
-            "board": ["_ >>> _", "_ >>> _t_string"],
-            "toolbox": ["'b'", "'e'"],
-            "typing_options": {
-                ">>>": ["==", "+"]
+            "description": "Teaching partial binding with choice.",
+            "board": ["_ == _", "x => xx", "a", "a", "b"],
+            "goal": ["true", "false"],
+            "toolbox": "",
+            "fade": {
+                "==":1
             },
-            "block_variant": {
-                "board": ["_ >> _", "_ >> _"],
-                "toolbox": ["'b'", "'e'", "_op('+')", "_op('==')", "'be'"]
-            }
+            "showFade": false
+        },
+        {
+            "description": "Our favorite hard level :)",
+            "board": ["_ == _", "x => xx", "x => xx", "a", "b"],
+            "goal": ["true", "false"],
+            "toolbox": ""
         }
     ],
     "resources":{
         "planet":"planet-boolili",
+        "aliens":["alien-boolean-1", "alien-boolean-2", "alien-boolean-3", "alien-boolean-4", "alien-boolean-5"],
         "curve":[
             {"x":0.15820825567078808, "y":-0.6234722536626294},
             {"x":0.15820825567078808, "y":-0.6234722536626294},

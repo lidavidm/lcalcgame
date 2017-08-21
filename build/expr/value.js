@@ -590,12 +590,12 @@ var StringValueExpr = function (_Expression3) {
     }, {
         key: 'toString',
         value: function toString() {
-            return (this.locked ? '/' : '') + this.primitiveName;
+            return (this.locked ? '/' : '') + '`' + this.primitiveName;
         }
     }, {
         key: 'toJavaScript',
         value: function toJavaScript() {
-            return '"' + this.primitiveName + '"';
+            return '\'' + this.primitiveName + '\'';
         }
     }, {
         key: 'value',
@@ -612,6 +612,24 @@ var StringValueExpr = function (_Expression3) {
     return StringValueExpr;
 }(Expression);
 
+var ColorlessStringValueExpr = function (_StringValueExpr) {
+    _inherits(ColorlessStringValueExpr, _StringValueExpr);
+
+    function ColorlessStringValueExpr(name) {
+        var primitiveName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+        _classCallCheck(this, ColorlessStringValueExpr);
+
+        var _this18 = _possibleConstructorReturn(this, (ColorlessStringValueExpr.__proto__ || Object.getPrototypeOf(ColorlessStringValueExpr)).call(this, name, primitiveName));
+
+        _this18.graphicNode.color = 'black';
+        _this18.color = 'lightgray';
+        return _this18;
+    }
+
+    return ColorlessStringValueExpr;
+}(StringValueExpr);
+
 var TypeInStringValueExpr = function (_Expression4) {
     _inherits(TypeInStringValueExpr, _Expression4);
 
@@ -624,11 +642,11 @@ var TypeInStringValueExpr = function (_Expression4) {
         left.color = "OrangeRed";
         var right = left.clone();
         var mid = TypeInTextExpr.fromExprCode('_t_innerstring', function (final_txt) {
-            var parent = _this18.parent || _this18.stage;
-            var stage = _this18.stage;
-            var str_expr = new StringValueExpr(final_txt);
-            var locked = _this18.locked;
-            parent.swap(_this18, str_expr); // Swap this makeshift StringValueExpr for a real one...
+            var parent = _this19.parent || _this19.stage;
+            var stage = _this19.stage;
+            var str_expr = new (ExprManager.getClass('string'))(final_txt);
+            var locked = _this19.locked;
+            parent.swap(_this19, str_expr); // Swap this makeshift StringValueExpr for a real one...
             if (locked) str_expr.lock();
             stage.update();
         });
@@ -636,14 +654,22 @@ var TypeInStringValueExpr = function (_Expression4) {
         mid.typeBox.color = '#FEFCB1';
         mid.typeBox.textColor = 'OrangeRed';
 
-        var _this18 = _possibleConstructorReturn(this, (TypeInStringValueExpr.__proto__ || Object.getPrototypeOf(TypeInStringValueExpr)).call(this, [left, mid, right]));
+        var _this19 = _possibleConstructorReturn(this, (TypeInStringValueExpr.__proto__ || Object.getPrototypeOf(TypeInStringValueExpr)).call(this, [left, mid, right]));
 
-        _this18.defaultName = defaultName;
-        _this18.color = "gold";
-        return _this18;
+        _this19.defaultName = defaultName;
+        _this19.color = 'gold';
+        return _this19;
     }
 
     _createClass(TypeInStringValueExpr, [{
+        key: 'clone',
+        value: function clone() {
+            var t = new TypeInStringValueExpr(this.defaultName);
+            if (this.holes[1].typeBox) t.holes[1].typeBox.text = this.holes[1].typeBox.text;
+            if (this.locked) t.lock();
+            return t;
+        }
+    }, {
         key: 'reduceCompletely',
         value: function reduceCompletely() {
             return this;
@@ -677,7 +703,7 @@ var TypeInStringValueExpr = function (_Expression4) {
     }, {
         key: 'toJavaScript',
         value: function toJavaScript() {
-            return '"' + this.defaultName + '"';
+            return '_t_string';
         }
     }, {
         key: 'value',
@@ -694,8 +720,28 @@ var TypeInStringValueExpr = function (_Expression4) {
     return TypeInStringValueExpr;
 }(Expression);
 
-var StringStarExpr = function (_StringValueExpr) {
-    _inherits(StringStarExpr, _StringValueExpr);
+var ColorlessTypeInStringValueExpr = function (_TypeInStringValueExp) {
+    _inherits(ColorlessTypeInStringValueExpr, _TypeInStringValueExp);
+
+    function ColorlessTypeInStringValueExpr() {
+        var defaultName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+
+        _classCallCheck(this, ColorlessTypeInStringValueExpr);
+
+        var _this20 = _possibleConstructorReturn(this, (ColorlessTypeInStringValueExpr.__proto__ || Object.getPrototypeOf(ColorlessTypeInStringValueExpr)).call(this, defaultName));
+
+        _this20.holes[0].color = _this20.holes[2].color = 'black';
+        _this20.holes[1].typeBox.color = "#eee";
+        _this20.holes[1].typeBox.textColor = 'black';
+        _this20.color = 'lightgray';
+        return _this20;
+    }
+
+    return ColorlessTypeInStringValueExpr;
+}(TypeInStringValueExpr);
+
+var StringStarExpr = function (_StringValueExpr2) {
+    _inherits(StringStarExpr, _StringValueExpr2);
 
     function StringStarExpr() {
         _classCallCheck(this, StringStarExpr);
@@ -706,8 +752,8 @@ var StringStarExpr = function (_StringValueExpr) {
     return StringStarExpr;
 }(StringValueExpr);
 
-var StringRectExpr = function (_StringValueExpr2) {
-    _inherits(StringRectExpr, _StringValueExpr2);
+var StringRectExpr = function (_StringValueExpr3) {
+    _inherits(StringRectExpr, _StringValueExpr3);
 
     function StringRectExpr() {
         _classCallCheck(this, StringRectExpr);
@@ -718,8 +764,8 @@ var StringRectExpr = function (_StringValueExpr2) {
     return StringRectExpr;
 }(StringValueExpr);
 
-var StringTriangleExpr = function (_StringValueExpr3) {
-    _inherits(StringTriangleExpr, _StringValueExpr3);
+var StringTriangleExpr = function (_StringValueExpr4) {
+    _inherits(StringTriangleExpr, _StringValueExpr4);
 
     function StringTriangleExpr() {
         _classCallCheck(this, StringTriangleExpr);
@@ -730,8 +776,8 @@ var StringTriangleExpr = function (_StringValueExpr3) {
     return StringTriangleExpr;
 }(StringValueExpr);
 
-var StringCircleExpr = function (_StringValueExpr4) {
-    _inherits(StringCircleExpr, _StringValueExpr4);
+var StringCircleExpr = function (_StringValueExpr5) {
+    _inherits(StringCircleExpr, _StringValueExpr5);
 
     function StringCircleExpr() {
         _classCallCheck(this, StringCircleExpr);
@@ -764,20 +810,20 @@ var StringAddExpr = function (_Expression5) {
     }, {
         key: 'performReduction',
         value: function performReduction() {
-            var _this24 = this;
+            var _this26 = this;
 
             return this.performSubReduction(this.leftExpr).then(function (left) {
                 if (!(left instanceof StringValueExpr)) {
                     return Promise.reject();
                 }
-                return _this24.performSubReduction(_this24.rightExpr).then(function (right) {
+                return _this26.performSubReduction(_this26.rightExpr).then(function (right) {
                     if (!(right instanceof StringValueExpr)) {
                         return Promise.reject();
                     }
 
-                    var stage = _this24.stage;
+                    var stage = _this26.stage;
 
-                    var val = _get(StringAddExpr.prototype.__proto__ || Object.getPrototypeOf(StringAddExpr.prototype), 'performReduction', _this24).call(_this24);
+                    var val = _get(StringAddExpr.prototype.__proto__ || Object.getPrototypeOf(StringAddExpr.prototype), 'performReduction', _this26).call(_this26);
                     stage.update();
                     return val;
                 });
@@ -806,7 +852,7 @@ var StringAddExpr = function (_Expression5) {
         key: 'reduce',
         value: function reduce() {
             if (this.leftExpr instanceof StringValueExpr && this.rightExpr instanceof StringValueExpr) {
-                return new StringValueExpr(this.leftExpr.value() + this.rightExpr.value());
+                return new (ExprManager.getClass('string'))(this.leftExpr.value() + this.rightExpr.value());
             } else {
                 return this;
             }

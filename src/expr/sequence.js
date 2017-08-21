@@ -131,6 +131,7 @@ class Sequence extends Expression {
         let es = this.subexpressions.map((x) => x.toJavaScript());
         for (let i = 0; i < es.length; i++) {
             let e = es[i].trim();
+             // If expr doesn't already have a semicolon at the end, add one.
             if (e[e.length-1] !== ';')
                 es[i] += ';';
         }

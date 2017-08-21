@@ -40,7 +40,7 @@ var StringObjectExpr = function (_ObjectExtensionExpr) {
                     return stringExpr;
                 }
                 var newString = stringExpr.value().slice(numberExpr1.number, numberExpr2.number);
-                var newStringObj = new StringObjectExpr(new StringValueExpr(newString));
+                var newStringObj = new StringObjectExpr(new (ExprManager.getClass('string'))(newString));
                 return newStringObj;
             },
             'charAt': function charAt(stringExpr, numberExpr) {
@@ -50,7 +50,7 @@ var StringObjectExpr = function (_ObjectExtensionExpr) {
                     return stringExpr;
                 } else {
                     var newString = stringExpr.value().charAt(numberExpr.number);
-                    var newStringObj = new StringObjectExpr(new StringValueExpr(newString));
+                    var newStringObj = new StringObjectExpr(new (ExprManager.getClass('string'))(newString));
                     return newStringObj;
                 }
             },
@@ -62,7 +62,7 @@ var StringObjectExpr = function (_ObjectExtensionExpr) {
                     return stringExpr; //TODO: return undefined
                 } else {
                         var newString = stringExpr.value()[numberExpr.number];
-                        var newStringObj = new StringObjectExpr(new StringValueExpr(newString));
+                        var newStringObj = new StringObjectExpr(new (ExprManager.getClass('string'))(newString));
                         return newStringObj;
                     }
             }

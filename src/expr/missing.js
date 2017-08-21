@@ -56,7 +56,6 @@ class MissingExpression extends Expression {
             Logger.log('placed-expr', {'before':beforeState, 'after':afterState, 'item':droppedExp });
 
             stage.saveState();
-            Logger.log('state-save', afterState);
 
             // Blink red if total reduction is not possible with this config.
             /*var try_reduce = node.parent.reduceCompletely();
@@ -105,18 +104,17 @@ class MissingTypedExpression extends MissingExpression {
             super.ondropped(node, pos);
     }
 
-    // graphicNode is undefined, don't use this
-    // drawInternal(ctx, pos, boundingSize) {
-    //     pos.x -= boundingSize.w / 1.2 - boundingSize.w;
-    //     pos.y -= boundingSize.h / 1.14 - boundingSize.h; // aesthetic resizing
-    //     boundingSize.w /= 1.2;
-    //     this.graphicNode.stroke = this.stroke;
-    //     this.graphicNode.color = this.color;
-    //     this.graphicNode.shadowOffset = this.shadowOffset;
-    //     this.graphicNode.drawInternal(ctx, pos, boundingSize);
-    // }
-
     toString() { return '_'; }
+}
+class MissingOpExpression extends MissingTypedExpression {
+    constructor(expr_to_miss) {
+        super(expr_to_miss);
+        this._size = { w:50, h:50 };
+        this.acceptedClasses = [ OpLiteral ];
+        this.radius = 26;
+    }
+    getClass() { return MissingOpExpression; }
+    toString() { return '__'; }
 }
 
 class MissingBagExpression extends MissingTypedExpression {
