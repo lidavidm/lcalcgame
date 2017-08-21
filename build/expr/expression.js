@@ -502,9 +502,9 @@ var Expression = function (_mag$RoundedRect) {
                 // Log the reduction.
                 var reduced_expr_str = void 0;
                 if (reduced_expr === null) reduced_expr_str = '()';else if (Array.isArray(reduced_expr)) reduced_expr_str = reduced_expr.reduce(function (prev, curr) {
-                    return prev + curr.toString() + ' ';
-                }, '').trim();else reduced_expr_str = reduced_expr.toString();
-                Logger.log('reduction', { 'before': this.toString(), 'after': reduced_expr_str });
+                    return prev + curr.toJavaScript() + '; ';
+                }, '').trim();else reduced_expr_str = reduced_expr.toJavaScript();
+                Logger.log('reduction', { 'before': this.toJavaScript(), 'after': reduced_expr_str });
 
                 var parent = this.parent ? this.parent : this.stage;
                 if (reduced_expr) reduced_expr.ignoreEvents = this.ignoreEvents; // the new expression should inherit whatever this expression was capable of as input

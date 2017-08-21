@@ -26,7 +26,7 @@ var ReductStage = function (_mag$Stage) {
         var _this = _possibleConstructorReturn(this, (ReductStage.__proto__ || Object.getPrototypeOf(ReductStage)).call(this, canvas));
 
         _this.color = '#eee';
-        _this.stateStack = [];
+        _this.stateGraph = new mag.Network();
         _this.environment = new Environment();
         _this.functions = {};
         _this.md = new MobileDetect(window.navigator.userAgent);
@@ -397,10 +397,14 @@ var ReductStage = function (_mag$Stage) {
         }
 
         // Save state of game board and push onto undo stack.
+        // * You can provide some extra data for the 'edge' going from
+        // * the previous state (if any) to the new state.
 
     }, {
         key: 'saveState',
         value: function saveState() {
+            var changeData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
             var stringify = function stringify(lvl) {
                 return JSON.stringify(lvl);
             };
@@ -410,18 +414,20 @@ var ReductStage = function (_mag$Stage) {
             // Check if new 'state' is really new...
             // Only if something's changed should we push onto the stateStack
             // and save to the server.
-            if (this.stateStack.length > 0) {
-                var prev_state = this.stateStack[this.stateStack.length - 1];
-                var prev_json = stringify(prev_state);
-                if (prev_json === json) // Nothing's changed. Abort the save.
-                    return;else {
-                    console.log('State diff: ', ReductStage.stateDiff(prev_state, state));
-                }
+            if (this.stateGraph.length > 0) {
+                // if (this.stateGraph.has({data: state})) // Nothing's changed. Abort the save.
+                //     return;
+                // else {
+                console.log('State diff: ', ReductStage.stateDiff(this.stateGraph.lastAddedNode.data, state));
+                // }
             } // If we reach here, then something has changed...
 
             // Push new state and save serialized version to logger.
-            this.stateStack.push(state);
+            // * This will automatically check for duplicates...
+            this.stateGraph.push(state, changeData);
             Logger.log('state-save', json);
+
+            Logger.log('state-path-save', this.stateGraph.toString());
         }
 
         // Determines what's changed between states a and b, (serialized Level objects)
@@ -462,9 +468,10 @@ var ReductStage = function (_mag$Stage) {
     }, {
         key: 'dumpState',
         value: function dumpState() {
-            if (this.stateStack.length > 0) {
-                this.stateStack.pop();
-            }
+            console.warn('no longer implemented');
+            // if (this.stateStack.length > 0) {
+            //     this.stateStack.pop();
+            // }
         }
     }, {
         key: 'onorientationchange',

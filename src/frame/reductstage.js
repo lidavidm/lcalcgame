@@ -6,7 +6,7 @@ class ReductStage extends mag.Stage {
     constructor(canvas=null) {
         super(canvas);
         this.color = '#eee';
-        this.stateStack = [];
+        this.stateGraph = new mag.Network();
         this.environment = new Environment();
         this.functions = {};
         this.md = new MobileDetect(window.navigator.userAgent);
@@ -363,7 +363,9 @@ class ReductStage extends mag.Stage {
     }
 
     // Save state of game board and push onto undo stack.
-    saveState() {
+    // * You can provide some extra data for the 'edge' going from
+    // * the previous state (if any) to the new state.
+    saveState(changeData=null) {
         const stringify = lvl => JSON.stringify(lvl);
         const state = this.toLevel().serialize();
         const json = stringify(state);
@@ -371,19 +373,20 @@ class ReductStage extends mag.Stage {
         // Check if new 'state' is really new...
         // Only if something's changed should we push onto the stateStack
         // and save to the server.
-        if (this.stateStack.length > 0) {
-            const prev_state = this.stateStack[this.stateStack.length-1];
-            const prev_json = stringify(prev_state);
-            if (prev_json === json) // Nothing's changed. Abort the save.
-                return;
-            else {
-                console.log('State diff: ', ReductStage.stateDiff(prev_state, state));
-            }
+        if (this.stateGraph.length > 0) {
+            // if (this.stateGraph.has({data: state})) // Nothing's changed. Abort the save.
+            //     return;
+            // else {
+            console.log('State diff: ', ReductStage.stateDiff(this.stateGraph.lastAddedNode.data, state));
+            // }
         } // If we reach here, then something has changed...
 
         // Push new state and save serialized version to logger.
-        this.stateStack.push( state );
+        // * This will automatically check for duplicates...
+        this.stateGraph.push( state, changeData );
         Logger.log('state-save', json);
+
+        Logger.log('state-path-save', this.stateGraph.toString());
     }
 
     // Determines what's changed between states a and b, (serialized Level objects)
@@ -491,9 +494,10 @@ class ReductStage extends mag.Stage {
         }
     }
     dumpState() {
-        if (this.stateStack.length > 0) {
-            this.stateStack.pop();
-        }
+        console.warn('no longer implemented');
+        // if (this.stateStack.length > 0) {
+        //     this.stateStack.pop();
+        // }
     }
 
     onorientationchange() {
