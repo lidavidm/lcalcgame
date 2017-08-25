@@ -9,7 +9,32 @@ var GLOBAL_DEFAULT_SCREENSIZE = null;
 var stage;
 var canvas;
 
-var __USE_BLOCK_VARIANT = true;
+var __USE_BLOCK_VARIANT = false;
+var __DEBUG_DISPLAY_STATEGRAPH = false;
+
+var __VIS_CANVAS_ID = 'stateGraphCanvas';
+var __STATEGRAPH_DISPLAY_EDGES = false;
+var __UPDATE_NETWORK_CB = function __UPDATE_NETWORK_CB(networkData) {
+    var container = document.getElementById(__VIS_CANVAS_ID);
+    var options = {
+        edges: {
+            arrows: {
+                to: { 'enabled': true, 'scaleFactor': 1 }
+            },
+            font: {
+                color: 'lightgray',
+                strokeWidth: 0,
+                background: '#222'
+            }
+        },
+        nodes: {
+            shape: 'box'
+        }
+    };
+    console.log(container, networkData);
+    var network = new vis.Network(container, networkData, options);
+    console.log('visualizing', networkData);
+};
 
 var level_idx = getCookie('level_idx') || 0;
 var completedLevels = {};
@@ -45,7 +70,12 @@ function init() {
     Resource.setCurrentLoadSequence('init');
     LOAD_REDUCT_RESOURCES(Resource);
 
-    if (!__SHOW_DEV_INFO) $('#devinfo').hide();
+    if (!__SHOW_DEV_INFO) {
+        $('#devinfo').hide();
+    }
+    if (!__DEBUG_DISPLAY_STATEGRAPH) {
+        $('#stateGraphCanvas').hide();
+    }
 
     // Do special things with GET parameters.
     if (__GET_PARAMS || true) {

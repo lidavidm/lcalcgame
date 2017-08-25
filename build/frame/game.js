@@ -206,10 +206,10 @@ var Level = function () {
                     return n.toolbox && n.toolbox instanceof Toolbox && !n.fadingOut;
                 });
             }.bind(stage);
-            stage.isCompleted = function () {
+
+            stage.testBoard = function (exprs) {
                 var _this2 = this;
 
-                var exprs = this.expressionNodes();
                 var matching = goal.test(exprs.map(function (n) {
                     return n.clone();
                 }), this.environmentDisplay);
@@ -231,6 +231,9 @@ var Level = function () {
                     }
                 }
                 return false;
+            }.bind(stage);
+            stage.isCompleted = function () {
+                return this.testBoard(this.expressionNodes());
             }.bind(stage);
 
             // Default animation on expression creation:

@@ -20,6 +20,7 @@ var mag = (function(_) {
             // For internal ordering purposes.
             // (e.g. to trace the player's moves precisely)
             this.unusedEdgeId = 0;
+            this.lastEdgeId = 0;
 
             this.startTS = Date.now();
         }
@@ -34,7 +35,16 @@ var mag = (function(_) {
                 const new_edge = {from:from, to:to, uid:this.unusedEdgeId, ts:(Date.now() - this.startTS)};
                 if (data !== null) new_edge.data = data;
                 this.edges.push(new_edge);
+                this.lastEdgeId = this.unusedEdgeId;
                 this.unusedEdgeId += 1;
+            }
+        }
+        setEdgeData(uid, data) {
+            for (let i = 0; i < this.edges.length; i++) {
+                if (this.edges[i].uid === uid) {
+                    this.edges[i].data = data;
+                    break;
+                }
             }
         }
         // * Note that this will return 'false' if data differs.
@@ -58,7 +68,7 @@ var mag = (function(_) {
             const typeY = typeof y;
             if (Array.isArray(x)) {
                 if (Array.isArray(y)) {
-                    return setCompare(x, y, ((a, b) => a === b));
+                    return setCompare(x, y, (a, b) => this.compare(a, b));
                 } else {
                     return false;
                 }
@@ -103,6 +113,7 @@ var mag = (function(_) {
                     }
                 }
             }
+            console.log('match', matches);
             return matches;
         }
         has(pattern) {
@@ -121,7 +132,6 @@ var mag = (function(_) {
             else                 return ns[0];
         }
         get lastAddedNode() {
-            console.log(this.lastNodeId, this.nodes);
             return this.nodeForId(this.lastNodeId);
         }
 
@@ -136,9 +146,14 @@ var mag = (function(_) {
             const dup_id = this.nodeIdFor({data: stateData});
             if (dup_id > -1) { // If we've already seen this state...
                 console.log('dup state');
-                if (dup_id === prevNodeId) // We haven't actually moved, so do nothing.
-                    return;
-                else {                     // We've gone back to a previous state, so add an edge.
+                if (dup_id === prevNodeId) { // We haven't actually moved, so do nothing.
+                    if (changeData !== null) {
+                        this.setEdgeData(this.lastEdgeId, changeData); // belated setting of edge data
+                        return true;
+                    }
+                    else
+                        return false;
+                } else {                     // We've gone back to a previous state, so add an edge.
                     console.log('went back to ', dup_id);
                     this.addEdge(prevNodeId, dup_id, changeData);
                     this.lastNodeId = dup_id; // This is the id of the 'current node' (state) in the 'stack'...
@@ -151,6 +166,8 @@ var mag = (function(_) {
                 this.unusedNodeId += 1; // This id has been used, so increment to the next.
                 this.lastNodeId = nid;
             }
+
+            return true;
         }
 
         // Exporting methods
@@ -162,6 +179,75 @@ var mag = (function(_) {
         }
         toString() {
             return JSON.stringify(this.serialize());
+        }
+        toVisJSNetworkData(toLabel) {
+            if (!('vis' in window)) {
+                console.error('Vis.js not found.');
+                return {};
+            }
+
+            const clean = s => s.replace(/__/g, '');
+            const toEdgeLabel = e => {
+                const d = e.data;
+                if (typeof d === 'object') {
+                    if ('before' in d && 'after' in d)
+                        if ('item' in d)
+                            return `(${clean(d.before)}) (${clean(d.item)}) -> ${clean(d.after)}`;
+                        else
+                            return clean(d.before) + ' -> ' + clean(d.after);
+                    else if ('item' in d && 'name' in d)
+                        return d.name + ': ' + clean(d.item);
+                    else
+                        return JSON.stringify(d);
+                } else return d;
+            };
+
+            if (typeof toLabel === 'undefined')
+                toLabel = n => {
+                    let s = n.data.board.map(clean).join(') (');
+                    if (n.data.board.length > 1)
+                        s = '(' + s + ')';
+                    return s;
+                };
+
+
+            const lastNodeId = this.lastNodeId;
+            let nodes = new vis.DataSet(this.nodes.map(n => {
+                let v = { id:       n.id,
+                         label:     toLabel(n) };
+                if (n.id === lastNodeId && n.data && // Check for victory state.
+                  this.compare(n.data.goal, n.data.board)) {
+                    v.final = true;
+                    v.color = {
+                        background: 'Gold',
+                        border: 'Orange',
+                        highlight: {
+                            background: 'Yellow',
+                            border: 'OrangeRed'
+                        }
+                    };
+                } else if (n.id === 0) {                 // Mark initial state.
+                    v.initial = true;
+                    v.color = {
+                        background: 'LightGreen',
+                        border: 'green',
+                        highlight: {
+                            background: 'Aquamarine',
+                            border: 'LightSeaGreen'
+                        }
+                    };
+                }
+                return v;
+            }));
+            let edges = new vis.DataSet(this.edges.map(e => {
+                return { from:      e.from,
+                         to:        e.to,
+                         label:     (__STATEGRAPH_DISPLAY_EDGES && e.data && e.data !== null) ? toEdgeLabel(e) : undefined }
+            }));
+            return {
+                nodes:nodes,
+                edges:edges
+            };
         }
     }
 

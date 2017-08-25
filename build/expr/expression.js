@@ -488,6 +488,8 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'performReduction',
         value: function performReduction() {
+            var logChangeData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
             //console.log("called performReduction");
             var reduced_expr = this.reduce();
             if (reduced_expr !== undefined && reduced_expr != this) {
@@ -497,7 +499,10 @@ var Expression = function (_mag$RoundedRect) {
 
                 if (!this.stage) return Promise.reject();
 
-                this.stage.saveState();
+                var _stage = this.stage;
+
+                // Before performing the reduction, save the state of the board...
+                _stage.saveState();
 
                 // Log the reduction.
                 var reduced_expr_str = void 0;
@@ -505,6 +510,8 @@ var Expression = function (_mag$RoundedRect) {
                     return prev + curr.toJavaScript() + '; ';
                 }, '').trim();else reduced_expr_str = reduced_expr.toJavaScript();
                 Logger.log('reduction', { 'before': this.toJavaScript(), 'after': reduced_expr_str });
+
+                if (logChangeData === null) logChangeData = { name: 'reduction', before: this.toJavaScript(), after: reduced_expr_str };
 
                 var parent = this.parent ? this.parent : this.stage;
                 if (reduced_expr) reduced_expr.ignoreEvents = this.ignoreEvents; // the new expression should inherit whatever this expression was capable of as input
@@ -519,6 +526,9 @@ var Expression = function (_mag$RoundedRect) {
                 }
 
                 if (reduced_expr) reduced_expr.update();
+
+                // After performing the reduction, save the new state of the board.
+                _stage.saveState(logChangeData);
 
                 return Promise.resolve(reduced_expr);
             }
@@ -555,20 +565,20 @@ var Expression = function (_mag$RoundedRect) {
                 var ghost_expr;
                 if (this.droppedInClass) ghost_expr = new this.droppedInClass(this);else ghost_expr = new MissingExpression(this);
 
-                var _stage = this.parent.stage;
-                var beforeState = _stage.toString();
+                var _stage2 = this.parent.stage;
+                var beforeState = _stage2.toString();
                 var detachedExp = this.toString();
                 var parent = this.parent;
 
                 parent.swap(this, ghost_expr);
 
                 this.parent = null;
-                _stage.add(this);
-                _stage.bringToFront(this);
+                _stage2.add(this);
+                _stage2.bringToFront(this);
 
-                var afterState = _stage.toString();
+                var afterState = _stage2.toString();
                 Logger.log('detached-expr', { 'before': beforeState, 'after': afterState, 'item': detachedExp });
-                _stage.saveState();
+                _stage2.saveState();
 
                 this.shell = ghost_expr;
             }
@@ -743,7 +753,7 @@ var Expression = function (_mag$RoundedRect) {
 
                     Logger.log('toolbox-remove', this.toString());
 
-                    if (this.stage) this.stage.saveState();
+                    if (this.stage) this.stage.saveState({ name: 'toolbox-remove', item: this.toJavaScript() });
                 }
 
                 // Snap expressions together?

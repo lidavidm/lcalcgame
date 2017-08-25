@@ -62,6 +62,9 @@ var ES6Parser = function () {
             if (program.trim().length === 0) return null;
             // * if we reach here, we can assume single program...
 
+            // Special game-only cases.
+            if (program === 'x => x x x') program = 'x => xxx';else if (program === 'x => x x') program = 'x => xx';
+
             // Parse into AST using Esprima.js.
             var AST = void 0;
             try {

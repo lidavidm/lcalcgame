@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -32,8 +32,10 @@ var LambdaHoleExpr = function (_MissingExpression) {
     }
 
     _createClass(LambdaHoleExpr, [{
-        key: 'colorForVarName',
-        //'IndianRed';
+        key: "colorForVarName",
+
+        //if (v === 'x') return 'lightgray';
+        //else           return 'white'; //'IndianRed';
 
         // return {
         //
@@ -50,7 +52,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
         // Draw special circle representing a hole.
 
     }, {
-        key: 'drawInternal',
+        key: "drawInternal",
         value: function drawInternal(ctx, pos, boundingSize) {
             var rad = boundingSize.w / 2.0;
             ctx.beginPath();
@@ -97,7 +99,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
         // Accessibility
 
     }, {
-        key: 'open',
+        key: "open",
         value: function open() {
             var _this3 = this;
 
@@ -115,7 +117,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
             }
         }
     }, {
-        key: 'close',
+        key: "close",
         value: function close() {
             var _this4 = this;
 
@@ -133,19 +135,19 @@ var LambdaHoleExpr = function (_MissingExpression) {
             }
         }
     }, {
-        key: 'hits',
+        key: "hits",
         value: function hits(pos) {
             var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
 
             if (this.isOpen) {
                 if (this.parent && this.parent.parent) return null;
-                return _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'hits', this).call(this, pos, options);
+                return _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), "hits", this).call(this, pos, options);
             } else {
                 return null;
             }
         }
     }, {
-        key: 'applyExpr',
+        key: "applyExpr",
         value: function applyExpr(node) {
             var _this5 = this;
 
@@ -228,7 +230,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
         // Events
 
     }, {
-        key: 'onmousedown',
+        key: "onmousedown",
         value: function onmousedown(pos) {
             if (this.parent) {
                 pos = addPos(pos, fromTo(this.absolutePos, this.parent.absolutePos));
@@ -236,7 +238,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
             }
         }
     }, {
-        key: 'onmouseup',
+        key: "onmouseup",
         value: function onmouseup(pos) {
             if (this.parent) {
                 pos = addPos(pos, fromTo(this.absolutePos, this.parent.absolutePos));
@@ -244,7 +246,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
             }
         }
     }, {
-        key: 'onmousedrag',
+        key: "onmousedrag",
         value: function onmousedrag(pos) {
             if (this.parent) {
                 pos = addPos(pos, fromTo(this.absolutePos, this.parent.absolutePos));
@@ -252,17 +254,17 @@ var LambdaHoleExpr = function (_MissingExpression) {
             }
         }
     }, {
-        key: 'onmouseenter',
+        key: "onmouseenter",
         value: function onmouseenter(pos) {
-            _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'onmouseenter', this).call(this, pos);
+            _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), "onmouseenter", this).call(this, pos);
         }
     }, {
-        key: 'onmouseleave',
+        key: "onmouseleave",
         value: function onmouseleave() {
-            _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'onmouseleave', this).call(this);
+            _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), "onmouseleave", this).call(this);
         }
     }, {
-        key: 'ondropenter',
+        key: "ondropenter",
         value: function ondropenter(node, pos) {
             var _this6 = this;
 
@@ -271,7 +273,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
             if (node instanceof VarExpr || node instanceof AssignExpr || node instanceof VtableVarExpr) return;
             // Disallow interaction with nested lambdas
             if (this.parent && this.parent.parent instanceof LambdaExpr) return;
-            _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'ondropenter', this).call(this, node, pos);
+            _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), "ondropenter", this).call(this, node, pos);
 
             // Special case: Funnel representation of 'map' hovered over hole.
             // if (node instanceof FunnelMapFunc) {
@@ -323,13 +325,13 @@ var LambdaHoleExpr = function (_MissingExpression) {
             }
         }
     }, {
-        key: 'ondropexit',
+        key: "ondropexit",
         value: function ondropexit(node, pos) {
             if (node instanceof LambdaHoleExpr) node = node.parent;
             if (node instanceof VarExpr || node instanceof AssignExpr || node instanceof VtableVarExpr) return;
             if (this.parent && this.parent.parent instanceof LambdaExpr) return;
 
-            _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), 'ondropexit', this).call(this, node, pos);
+            _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), "ondropexit", this).call(this, node, pos);
 
             // if (node instanceof FunnelMapFunc) {
             //     return;
@@ -339,7 +341,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
             if (this.close_opened_subexprs) this.close_opened_subexprs();
         }
     }, {
-        key: 'ondropped',
+        key: "ondropped",
         value: function ondropped(node, pos) {
             var _this7 = this;
 
@@ -358,6 +360,9 @@ var LambdaHoleExpr = function (_MissingExpression) {
                 var afterDrop = function afterDrop() {
 
                     var stage = node.stage;
+
+                    // Save the current state of the board.
+                    stage.saveState();
 
                     var preview_nodes = _this7.preview_nodes;
                     var is_replication_expr = _this7.is_replication_expr;
@@ -415,9 +420,6 @@ var LambdaHoleExpr = function (_MissingExpression) {
                     // Clone the dropped expression.
                     var dropped_expr = node.clone();
 
-                    // Save the current state of the board.
-                    stage.saveState();
-
                     // Remove the original expression from its stage.
                     stage.remove(node);
 
@@ -445,12 +447,12 @@ var LambdaHoleExpr = function (_MissingExpression) {
                             }).after(function () {
                                 stage.remove(parent);
                                 stage.update();
+                                stage.saveState();
                             });
                         }
 
                         // Log the reduction.
                         Logger.log('reduction-lambda', { 'before': orig_exp_str, 'applied': dropped_exp_str, 'after': parent.toString() });
-                        Logger.log('state-save', stage.toString());
 
                         if (parent.children.length === 0) {
 
@@ -460,7 +462,9 @@ var LambdaHoleExpr = function (_MissingExpression) {
 
                             // (b) Remove expression from the parent stage.
                             (parent.parent || parent.stage).remove(parent);
-                        } else stage.dumpState();
+                        }
+                        // } else
+                        //     stage.dumpState();
 
                         return null;
                     } else {
@@ -481,12 +485,12 @@ var LambdaHoleExpr = function (_MissingExpression) {
             }
         }
     }, {
-        key: 'toString',
+        key: "toString",
         value: function toString() {
             return 'λ' + this.name;
         }
     }, {
-        key: 'name',
+        key: "name",
         get: function get() {
             return this._name;
         },
@@ -494,10 +498,10 @@ var LambdaHoleExpr = function (_MissingExpression) {
             this._name = n;
         }
     }], [{
-        key: 'colorForVarName',
+        key: "colorForVarName",
         value: function colorForVarName(v) {
 
-            if (v === 'x') return 'lightgray';else return 'white';
+            return 'lightgray';
         }
     }]);
 
@@ -514,7 +518,7 @@ var DelayedLambdaHoleExpr = function (_LambdaHoleExpr) {
     }
 
     _createClass(DelayedLambdaHoleExpr, [{
-        key: 'ondropped',
+        key: "ondropped",
         value: function ondropped(node, pos) {
             if (node instanceof LambdaHoleExpr) node = node.parent;
             // Disallow interaction with nested lambda
@@ -557,15 +561,15 @@ var LambdaVarExpr = function (_ImageExpr) {
     }
 
     _createClass(LambdaVarExpr, [{
-        key: 'clone',
+        key: "clone",
         value: function clone() {
-            var c = _get(LambdaVarExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaVarExpr.prototype), 'clone', this).call(this);
+            var c = _get(LambdaVarExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaVarExpr.prototype), "clone", this).call(this);
             c._stateGraph = null;
             c.stateGraph.enter('closed');
             return c;
         }
     }, {
-        key: 'onmouseclick',
+        key: "onmouseclick",
         value: function onmouseclick(pos) {
             // TODO: DML enable reduction, but make sure we are not bound
             // by a lambda
@@ -574,7 +578,7 @@ var LambdaVarExpr = function (_ImageExpr) {
             }
         }
     }, {
-        key: 'open',
+        key: "open",
         value: function open() {
             var _this10 = this;
 
@@ -607,7 +611,7 @@ var LambdaVarExpr = function (_ImageExpr) {
             }
         }
     }, {
-        key: 'close',
+        key: "close",
         value: function close() {
             if (this.stateGraph.currentState !== 'closed') {
                 var stage = this.stage;
@@ -617,7 +621,7 @@ var LambdaVarExpr = function (_ImageExpr) {
             }
         }
     }, {
-        key: 'reduce',
+        key: "reduce",
         value: function reduce() {
             var environment = this.getEnvironment();
             var value = environment.lookup(this.name);
@@ -645,9 +649,9 @@ var LambdaVarExpr = function (_ImageExpr) {
         //onmousedrag() {}
 
     }, {
-        key: 'drawInternal',
+        key: "drawInternal",
         value: function drawInternal(ctx, pos, boundingSize) {
-            _get(LambdaVarExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaVarExpr.prototype), 'drawInternal', this).call(this, ctx, pos, boundingSize);
+            _get(LambdaVarExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaVarExpr.prototype), "drawInternal", this).call(this, ctx, pos, boundingSize);
             if (ctx && !this.parent) {
                 this.scale = { x: 0.8, y: 0.8 };
                 drawCircle(ctx, pos.x, pos.y + this.handleOffset + this.shadowOffset, boundingSize.w / 2.0, 'black', this.graphicNode.stroke);
@@ -655,39 +659,39 @@ var LambdaVarExpr = function (_ImageExpr) {
             }
         }
     }, {
-        key: 'value',
+        key: "value",
         value: function value() {
             return undefined;
         }
     }, {
-        key: 'toString',
+        key: "toString",
         value: function toString() {
             return '#' + (this.ignoreEvents ? '' : '_') + this.name;
         }
     }, {
-        key: 'toJavaScript',
+        key: "toJavaScript",
         value: function toJavaScript() {
             return this.name;
         }
     }, {
-        key: 'size',
+        key: "size",
         get: function get() {
-            var sz = _get(LambdaVarExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaVarExpr.prototype), 'size', this);
+            var sz = _get(LambdaVarExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaVarExpr.prototype), "size", this);
             sz.h = 54;
             return sz;
         }
     }, {
-        key: 'openImage',
+        key: "openImage",
         get: function get() {
             return this.name === 'x' ? 'lambda-pipe-open' : 'lambda-pipe-white-open';
         }
     }, {
-        key: 'closedImage',
+        key: "closedImage",
         get: function get() {
             return this.name === 'x' ? 'lambda-pipe' : 'lambda-pipe-white';
         }
     }, {
-        key: 'openingAnimation',
+        key: "openingAnimation",
         get: function get() {
             var anim = new mag.Animation();
             anim.addFrame('lambda-pipe-opening0', 50);
@@ -696,7 +700,7 @@ var LambdaVarExpr = function (_ImageExpr) {
             return anim;
         }
     }, {
-        key: 'closingAnimation',
+        key: "closingAnimation",
         get: function get() {
             var anim = new mag.Animation();
             anim.addFrame('lambda-pipe-opening1', 50);
@@ -705,7 +709,7 @@ var LambdaVarExpr = function (_ImageExpr) {
             return anim;
         }
     }, {
-        key: 'stateGraph',
+        key: "stateGraph",
         get: function get() {
             var _this11 = this;
 
@@ -760,21 +764,21 @@ var LambdaExpr = function (_Expression) {
     }
 
     _createClass(LambdaExpr, [{
-        key: 'isValue',
+        key: "isValue",
         value: function isValue() {
-            return true;
+            return false;
         }
     }, {
-        key: 'getEnvironment',
+        key: "getEnvironment",
         value: function getEnvironment() {
-            var env = _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'getEnvironment', this).call(this);
+            var env = _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), "getEnvironment", this).call(this);
             if (!env.parent && this.stage) {
                 env.parent = this.stage.environment;
             }
             return env;
         }
     }, {
-        key: 'applyExpr',
+        key: "applyExpr",
         value: function applyExpr(node) {
             var animated = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
@@ -783,16 +787,16 @@ var LambdaExpr = function (_Expression) {
             } else return this;
         }
     }, {
-        key: 'numOfNestedLambdas',
+        key: "numOfNestedLambdas",
         value: function numOfNestedLambdas() {
             if (!this.takesArgument || !this.fullyDefined) return 0;else if (this.holes.length < 2) return 1;else {
                 return 1 + (this.holes[1] instanceof LambdaExpr ? this.holes[1].numOfNestedLambdas() : 0);
             }
         }
     }, {
-        key: 'addChild',
+        key: "addChild",
         value: function addChild(c) {
-            _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'addChild', this).call(this, c);
+            _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), "addChild", this).call(this, c);
 
             // Color all subvarexpr's of child consistently with their names.
             if (this.takesArgument) {
@@ -808,7 +812,7 @@ var LambdaExpr = function (_Expression) {
             }
         }
     }, {
-        key: 'updateHole',
+        key: "updateHole",
         value: function updateHole() {
             // Determine whether this LambdaExpr has any MissingExpressions:
             if (this.holes[0].name !== 'x') this.color = this.holes[0].color;
@@ -825,9 +829,9 @@ var LambdaExpr = function (_Expression) {
         // Close lambda holes appropriately.
 
     }, {
-        key: 'swap',
+        key: "swap",
         value: function swap(node, otherNode) {
-            _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'swap', this).call(this, node, otherNode);
+            _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), "swap", this).call(this, node, otherNode);
             if (this.takesArgument) {
                 if (otherNode instanceof MissingExpression) {
                     // if expression was removed...
@@ -839,26 +843,26 @@ var LambdaExpr = function (_Expression) {
             }
         }
     }, {
-        key: 'onmouseclick',
+        key: "onmouseclick",
         value: function onmouseclick(pos) {
             this.performReduction(true);
         }
     }, {
-        key: 'hitsChild',
+        key: "hitsChild",
         value: function hitsChild(pos) {
             if (this.isParentheses) return null;
-            return _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'hitsChild', this).call(this, pos);
+            return _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), "hitsChild", this).call(this, pos);
         }
     }, {
-        key: 'reduce',
+        key: "reduce",
         value: function reduce() {
             // Remove 'parentheses':
             if (this.isParentheses) {
                 return this.holes;
-            } else return _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'reduce', this).call(this);
+            } else return _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), "reduce", this).call(this);
         }
     }, {
-        key: 'performReduction',
+        key: "performReduction",
         value: function performReduction() {
             var _this13 = this;
 
@@ -930,9 +934,9 @@ var LambdaExpr = function (_Expression) {
             if (reduced_expr && reduced_expr != this) {
                 // Only swap if reduction returns something > null.
 
-                if (this.stage) this.stage.saveState();
-
+                var stage = this.stage;
                 var parent;
+
                 if (Array.isArray(reduced_expr)) {
                     if (reduced_expr.length === 1) {
                         reduced_expr = reduced_expr[0];
@@ -944,6 +948,7 @@ var LambdaExpr = function (_Expression) {
                                     if (_this13.locked) e.lock();else e.unlock();
                                 });
                                 parent.swap(this, reduced_expr); // swap 'this' (on the board) with an array of its reduced expressions
+                                parent.saveState();
                                 return reduced_expr;
                             }
                 }
@@ -961,11 +966,13 @@ var LambdaExpr = function (_Expression) {
                     }
                 }
 
+                if (stage) stage.saveState();
+
                 return reduced_expr;
             }
         }
     }, {
-        key: 'reduceCompletely',
+        key: "reduceCompletely",
         value: function reduceCompletely() {
             // Try to reduce this expression and its subexpressions as completely as possible.
 
@@ -974,12 +981,12 @@ var LambdaExpr = function (_Expression) {
 
                 console.error('HELLO');
                 return null;
-            } else return _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'reduceCompletely', this).call(this);
+            } else return _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), "reduceCompletely", this).call(this);
         }
     }, {
-        key: 'drawInternal',
+        key: "drawInternal",
         value: function drawInternal(ctx, pos, boundingSize) {
-            _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'drawInternal', this).call(this, ctx, pos, boundingSize);
+            _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), "drawInternal", this).call(this, ctx, pos, boundingSize);
             if (this.shadowOffset == 0 && this.parent) {
                 setStrokeStyle(ctx, {
                     color: 'gray',
@@ -990,31 +997,33 @@ var LambdaExpr = function (_Expression) {
             }
         }
     }, {
-        key: 'toString',
+        key: "toString",
         value: function toString() {
-            if (this.holes.length === 1 && this.holes[0] instanceof LambdaHoleExpr) return (this.locked ? '/' : '') + '(' + _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'toString', this).call(this) + ')';else return (this.locked ? '/' : '') + _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), 'toString', this).call(this);
+            if (this.holes.length === 1 && this.holes[0] instanceof LambdaHoleExpr) return (this.locked ? '/' : '') + '(' + _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), "toString", this).call(this) + ')';else return (this.locked ? '/' : '') + _get(LambdaExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaExpr.prototype), "toString", this).call(this);
         }
     }, {
-        key: 'toJavaScript',
+        key: "toJavaScript",
         value: function toJavaScript() {
             var param_name = this.hole.name;
             var bodyJS = this.holes.length > 2 ? this.holes.slice(1).map(function (e) {
                 return e.toJavaScript();
             }).join('') : this.body.toJavaScript();
-            return '(function (' + param_name + ') { return ' + bodyJS + '; })';
+            if (bodyJS.indexOf(' ') > -1) bodyJS = "(" + bodyJS + ")";
+            var funcJS = param_name + " => " + bodyJS;
+            return funcJS;
         }
     }, {
-        key: 'isParentheses',
+        key: "isParentheses",
         get: function get() {
             return this.holes.length > 0 && !this.takesArgument;
         }
     }, {
-        key: 'takesArgument',
+        key: "takesArgument",
         get: function get() {
             return this.holes.length > 0 && this.holes[0] instanceof LambdaHoleExpr;
         }
     }, {
-        key: 'fullyDefined',
+        key: "fullyDefined",
         get: function get() {
             // If one arg is MissingExpression, this will be false.
             if (this.holes.length < 2) return true;
@@ -1023,17 +1032,17 @@ var LambdaExpr = function (_Expression) {
             }, true);
         }
     }, {
-        key: 'isConstantFunction',
+        key: "isConstantFunction",
         get: function get() {
             return this.takesArgument && mag.Stage.getNodesWithClass(VarExpr, [], true, [this]).length === 0;
         }
     }, {
-        key: 'body',
+        key: "body",
         get: function get() {
             return this.takesArgument ? this.holes[1] : null;
         }
     }, {
-        key: 'hole',
+        key: "hole",
         get: function get() {
             return this.takesArgument ? this.holes[0] : null;
         }
@@ -1057,7 +1066,7 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
     }
 
     _createClass(EnvironmentLambdaExpr, [{
-        key: 'removeArg',
+        key: "removeArg",
         value: function removeArg(arg) {
             // Save the hole for later - we want to keep the parameter
             // visible while we are reducing (if we are animating)
@@ -1065,10 +1074,10 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
                 arg.isOpen = false;
                 this._originalArg = arg;
             }
-            _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'removeArg', this).call(this, arg);
+            _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), "removeArg", this).call(this, arg);
         }
     }, {
-        key: 'hits',
+        key: "hits",
 
         // We can't check isOpen because that confuses
         // LambdaExpr#hitsChild (which means that we can't do things
@@ -1076,80 +1085,80 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
         value: function hits(pos) {
             var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
 
-            if (this.parent) return _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'hits', this).call(this, pos, options);
+            if (this.parent) return _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), "hits", this).call(this, pos, options);
 
-            var result = _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'hits', this).call(this, pos, options) || this.environmentDisplay.hits(pos, options);
+            var result = _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), "hits", this).call(this, pos, options) || this.environmentDisplay.hits(pos, options);
             if (result == this.environmentDisplay) {
                 return this;
             }
             return result;
         }
     }, {
-        key: 'onmousedown',
+        key: "onmousedown",
         value: function onmousedown(pos) {
-            if (this.parent) _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmousedown', this).call(this, pos);
+            if (this.parent) _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), "onmousedown", this).call(this, pos);
 
-            if (_get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'hits', this).call(this, pos)) {
+            if (_get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), "hits", this).call(this, pos)) {
                 this._eventTarget = this;
-                _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmousedown', this).call(this, pos);
+                _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), "onmousedown", this).call(this, pos);
             } else {
                 this._eventTarget = this.environmentDisplay;
                 this.environmentDisplay.onmousedown(pos);
             }
         }
     }, {
-        key: 'onmousedrag',
+        key: "onmousedrag",
         value: function onmousedrag(pos) {
-            if (this.parent) _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmousedrag', this).call(this, pos);
+            if (this.parent) _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), "onmousedrag", this).call(this, pos);
 
             if (!this._eventTarget) return;
             if (this._eventTarget == this) {
-                _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmousedrag', this).call(this, pos);
+                _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), "onmousedrag", this).call(this, pos);
             } else {
                 this._eventTarget.onmousedrag(pos);
             }
         }
     }, {
-        key: 'onmouseup',
+        key: "onmouseup",
         value: function onmouseup(pos) {
-            if (this.parent) _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmouseup', this).call(this, pos);
+            if (this.parent) _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), "onmouseup", this).call(this, pos);
 
             if (!this._eventTarget) return;
             if (this._eventTarget == this) {
-                _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'onmouseup', this).call(this, pos);
+                _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), "onmouseup", this).call(this, pos);
             } else {
                 this._eventTarget.onmouseup(pos);
             }
             this._eventTarget = null;
         }
     }, {
-        key: 'update',
+        key: "update",
         value: function update() {
-            _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'update', this).call(this);
+            _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), "update", this).call(this);
             this.environmentDisplay.update();
         }
     }, {
-        key: 'draw',
+        key: "draw",
         value: function draw(ctx) {
             if (!this.parent) {
                 this.environmentDisplay.parent = this;
                 this.environmentDisplay.draw(ctx);
             }
-            _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'draw', this).call(this, ctx);
+            _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), "draw", this).call(this, ctx);
         }
     }, {
-        key: 'onmouseclick',
+        key: "onmouseclick",
         value: function onmouseclick() {
             // Don't let the player manually reduce (whatever that even means)
         }
     }, {
-        key: 'reduceCompletely',
+        key: "reduceCompletely",
         value: function reduceCompletely() {
             // Do not allow reduction under the lambda!
             return this;
         }
     }, {
-        key: 'performReduction',
+        key: "performReduction",
         value: function performReduction() {
             var _this15 = this;
 
@@ -1161,7 +1170,7 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
             }
 
             if (!animated) {
-                return _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'performReduction', this).call(this, false);
+                return _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), "performReduction", this).call(this, false);
             }
 
             // Add the parameter back, so it's visible while we reduce.
@@ -1239,17 +1248,17 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
                 stepReduction().then(function () {
                     window.setTimeout(function () {
                         // Get rid of the parameter
-                        _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'removeArg', _this15).call(_this15, _this15.holes[0]);
+                        _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), "removeArg", _this15).call(_this15, _this15.holes[0]);
 
                         Animate.poof(_this15);
-                        _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), 'performReduction', _this15).call(_this15);
+                        _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), "performReduction", _this15).call(_this15);
                         resolve();
                     }, 600);
                 });
             });
         }
     }, {
-        key: 'takesArgument',
+        key: "takesArgument",
         get: function get() {
             // Since the hole isn't removed by our override of removeArg,
             // account for that when deciding whether the lambda is
@@ -1280,7 +1289,7 @@ var InlineEnvironmentDisplay = function (_SpreadsheetEnvironme) {
     }
 
     _createClass(InlineEnvironmentDisplay, [{
-        key: 'openDrawer',
+        key: "openDrawer",
         value: function openDrawer() {
             var _this17 = this;
 
@@ -1298,7 +1307,7 @@ var InlineEnvironmentDisplay = function (_SpreadsheetEnvironme) {
             }
         }
     }, {
-        key: 'closeDrawer',
+        key: "closeDrawer",
         value: function closeDrawer() {
             var _this18 = this;
 
@@ -1316,7 +1325,7 @@ var InlineEnvironmentDisplay = function (_SpreadsheetEnvironme) {
             }
         }
     }, {
-        key: 'onmouseup',
+        key: "onmouseup",
         value: function onmouseup() {
             if (this._state === 'open') {
                 this.closeDrawer();
@@ -1325,15 +1334,15 @@ var InlineEnvironmentDisplay = function (_SpreadsheetEnvironme) {
             }
         }
     }, {
-        key: 'onmousedrag',
+        key: "onmousedrag",
         value: function onmousedrag(pos) {}
     }, {
-        key: 'getEnvironment',
+        key: "getEnvironment",
         value: function getEnvironment() {
             return this.lambda.getEnvironment();
         }
     }, {
-        key: 'draw',
+        key: "draw",
         value: function draw(ctx) {
             var _this19 = this;
 
@@ -1355,7 +1364,7 @@ var InlineEnvironmentDisplay = function (_SpreadsheetEnvironme) {
             ctx.restore();
         }
     }, {
-        key: 'drawInternal',
+        key: "drawInternal",
         value: function drawInternal(ctx, pos, boundingSize) {
             this.drawBackground(ctx, pos, boundingSize);
             if (this._state === "open") {
@@ -1363,7 +1372,7 @@ var InlineEnvironmentDisplay = function (_SpreadsheetEnvironme) {
             }
         }
     }, {
-        key: 'pos',
+        key: "pos",
         get: function get() {
             return { x: 5, y: this.lambda.size.h - 5 };
         },
@@ -1371,16 +1380,16 @@ var InlineEnvironmentDisplay = function (_SpreadsheetEnvironme) {
             this._pos = p;
         }
     }, {
-        key: 'size',
+        key: "size",
         get: function get() {
-            var size = _get(InlineEnvironmentDisplay.prototype.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay.prototype), '_origSize', this);
+            var size = _get(InlineEnvironmentDisplay.prototype.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay.prototype), "_origSize", this);
             size.w += this.padding.left + this.padding.right;
             return size;
         }
     }, {
-        key: 'absoluteSize',
+        key: "absoluteSize",
         get: function get() {
-            var size = _get(InlineEnvironmentDisplay.prototype.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay.prototype), 'absoluteSize', this);
+            var size = _get(InlineEnvironmentDisplay.prototype.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay.prototype), "absoluteSize", this);
             size.h = Math.max(25, this._height * size.h);
             return size;
         }
@@ -1407,16 +1416,16 @@ var FadedLambdaHoleExpr = function (_LambdaHoleExpr2) {
     }
 
     _createClass(FadedLambdaHoleExpr, [{
-        key: 'open',
+        key: "open",
         value: function open() {
             if (!this.isOpen) {
                 this.label.color = "#000";
                 this.label.shadow = null;
             }
-            _get(FadedLambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(FadedLambdaHoleExpr.prototype), 'open', this).call(this);
+            _get(FadedLambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(FadedLambdaHoleExpr.prototype), "open", this).call(this);
         }
     }, {
-        key: 'close',
+        key: "close",
         value: function close() {
             if (this.isOpen) {
                 this.label.color = "#565656";
@@ -1427,10 +1436,10 @@ var FadedLambdaHoleExpr = function (_LambdaHoleExpr2) {
                     blur: 0
                 };
             }
-            _get(FadedLambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(FadedLambdaHoleExpr.prototype), 'close', this).call(this);
+            _get(FadedLambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(FadedLambdaHoleExpr.prototype), "close", this).call(this);
         }
     }, {
-        key: 'drawInternal',
+        key: "drawInternal",
         value: function drawInternal(ctx, pos, boundingSize) {
             var rad = boundingSize.w / 2.0;
             ctx.beginPath();
@@ -1439,12 +1448,12 @@ var FadedLambdaHoleExpr = function (_LambdaHoleExpr2) {
             if (this.stroke) ctx.stroke();
         }
     }, {
-        key: 'label',
+        key: "label",
         get: function get() {
             return this.holes[0];
         }
     }, {
-        key: 'size',
+        key: "size",
         get: function get() {
             return {
                 w: 50,
@@ -1473,28 +1482,28 @@ var HalfFadedLambdaHoleExpr = function (_LambdaHoleExpr3) {
     }
 
     _createClass(HalfFadedLambdaHoleExpr, [{
-        key: 'open',
+        key: "open",
         value: function open() {
             if (!this.isOpen) {
                 this.label.color = "#FFF";
             }
-            _get(HalfFadedLambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr.prototype), 'open', this).call(this);
+            _get(HalfFadedLambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr.prototype), "open", this).call(this);
         }
     }, {
-        key: 'close',
+        key: "close",
         value: function close() {
             if (this.isOpen) {
                 this.label.color = "#565656";
             }
-            _get(HalfFadedLambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr.prototype), 'close', this).call(this);
+            _get(HalfFadedLambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr.prototype), "close", this).call(this);
         }
     }, {
-        key: 'label',
+        key: "label",
         get: function get() {
             return this.holes[0];
         }
     }, {
-        key: 'size',
+        key: "size",
         get: function get() {
             return {
                 w: 50,
@@ -1519,7 +1528,7 @@ var FadedES6LambdaHoleExpr = function (_LambdaHoleExpr4) {
         var _this22 = _possibleConstructorReturn(this, (FadedES6LambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedES6LambdaHoleExpr)).call(this, varname));
 
         _this22.padding.left = 5;
-        _this22.addArg(new TextExpr("(" + varname + ")"));
+        _this22.addArg(new TextExpr(" " + varname + " "));
         _this22.addArg(new TextExpr("=>"));
         _this22.label.color = "#000";
         _this22.arrow.color = "#000";
@@ -1527,7 +1536,7 @@ var FadedES6LambdaHoleExpr = function (_LambdaHoleExpr4) {
     }
 
     _createClass(FadedES6LambdaHoleExpr, [{
-        key: 'hits',
+        key: "hits",
 
 
         // Events
@@ -1540,9 +1549,9 @@ var FadedES6LambdaHoleExpr = function (_LambdaHoleExpr4) {
             if (pointInRect(pos, rectFromPosAndSize(upperLeftPos, boundingSize))) return this;else return null;
         }
     }, {
-        key: 'update',
+        key: "update",
         value: function update() {
-            _get(FadedES6LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(FadedES6LambdaHoleExpr.prototype), 'update', this).call(this);
+            _get(FadedES6LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(FadedES6LambdaHoleExpr.prototype), "update", this).call(this);
             this.label.pos = {
                 x: this.label.pos.x,
                 y: 22
@@ -1556,7 +1565,7 @@ var FadedES6LambdaHoleExpr = function (_LambdaHoleExpr4) {
         // Draw special round rect around just x term.
 
     }, {
-        key: 'drawInternal',
+        key: "drawInternal",
         value: function drawInternal(ctx, pos, boundingSize) {
             setStrokeStyle(ctx, this.stroke);
             ctx.fillStyle = this.color;
@@ -1565,12 +1574,12 @@ var FadedES6LambdaHoleExpr = function (_LambdaHoleExpr4) {
             }
         }
     }, {
-        key: 'label',
+        key: "label",
         get: function get() {
             return this.holes[0];
         }
     }, {
-        key: 'arrow',
+        key: "arrow",
         get: function get() {
             return this.holes[1];
         }
@@ -1589,7 +1598,7 @@ var DelayedFadedES6LambdaHoleExpr = function (_FadedES6LambdaHoleEx) {
     }
 
     _createClass(DelayedFadedES6LambdaHoleExpr, [{
-        key: 'ondropped',
+        key: "ondropped",
         value: function ondropped(node, pos) {
             if (node instanceof LambdaHoleExpr) node = node.parent;
             // Disallow interaction with nested lambda
@@ -1624,12 +1633,12 @@ var HalfFadedLambdaVarExpr = function (_LambdaVarExpr) {
     }
 
     _createClass(HalfFadedLambdaVarExpr, [{
-        key: 'openImage',
+        key: "openImage",
         get: function get() {
             return 'lambda-pipe-open';
         }
     }, {
-        key: 'closedImage',
+        key: "closedImage",
         get: function get() {
             return this.name === 'x' ? 'lambda-pipe-xside-closed' : 'lambda-pipe-xside-closed';
         }
@@ -1653,7 +1662,7 @@ var FadedLambdaVarExpr = function (_LambdaVarExpr2) {
     }
 
     _createClass(FadedLambdaVarExpr, [{
-        key: 'open',
+        key: "open",
         value: function open() {
             var preview_expr = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
@@ -1672,17 +1681,17 @@ var FadedLambdaVarExpr = function (_LambdaVarExpr2) {
             }
         }
     }, {
-        key: 'openImage',
+        key: "openImage",
         get: function get() {
             return 'lambda-pipe-x-open';
         }
     }, {
-        key: 'closedImage',
+        key: "closedImage",
         get: function get() {
             return this.name === 'x' ? 'lambda-pipe-x' : 'lambda-pipe-x';
         }
     }, {
-        key: 'openingAnimation',
+        key: "openingAnimation",
         get: function get() {
             var anim = new mag.Animation();
             anim.addFrame('lambda-pipe-x-opening0', 50);
@@ -1691,7 +1700,7 @@ var FadedLambdaVarExpr = function (_LambdaVarExpr2) {
             return anim;
         }
     }, {
-        key: 'closingAnimation',
+        key: "closingAnimation",
         get: function get() {
             var anim = new mag.Animation();
             anim.addFrame('lambda-pipe-x-opening1', 50);

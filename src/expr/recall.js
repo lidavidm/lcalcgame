@@ -88,7 +88,15 @@ class TypeBox extends mag.RoundedRect {
         this.onTextChanged = onTextChanged;
         this._origHeight = h;
 
-        this.size = this.makeSize();
+        // 'Empty text' icon, to indicate this is a typing box.
+        let icon = new ImageExpr(0, 0, 64, 64, 'empty-typebox');
+        icon.pos = { x:this.size.w/2, y:this.size.h/2 };
+        icon.anchor = { x:0.5, y:0.5 };
+        icon.ignoreEvents = true;
+        this.icon = icon;
+        this.showEmptyIcon();
+
+        this.update();
 
         // this.makeMultiline(10, 4);
     }
@@ -120,11 +128,36 @@ class TypeBox extends mag.RoundedRect {
         hint.color = "#bbb";
         this.addChildAt(0, hint);
         this.hintTextExpr = hint;
+        this.hideEmptyIcon();
     }
     removeHint() {
         if (this.hintTextExpr) {
             this.removeChild(this.hintTextExpr);
             this.hintTextExpr = null;
+        }
+    }
+    hasIcon() {
+        return this.icon && this.icon.parent !== null;
+    }
+    showEmptyIcon() {
+        if (this.icon && !this.icon.parent && !this.hasHint()) {
+            this.addChild(this.icon);
+            this.update();
+            if (this.stage) {
+                this.stage.update();
+                this.stage.draw();
+            }
+        }
+    }
+    hideEmptyIcon() {
+        if (this.icon && this.icon.parent) {
+            this.removeChild(this.icon);
+            this.icon.parent = null;
+            this.update();
+            if (this.stage) {
+                this.stage.update();
+                this.stage.draw();
+            }
         }
     }
 
@@ -230,8 +263,13 @@ class TypeBox extends mag.RoundedRect {
             return { w:this.multiline.lineWidth * this.charWidthPerLine() + this.padding.right + this._txtOffsetX,
                      h:this.multiline.lineHeight * this.charHeightPerLine() };
         }
-        else return { w:Math.max(this._origWidth, Math.max(this.textExpr.size.w, (this.hintTextExpr ? this.hintTextExpr.size.w : 0)) + this.cursor.size.w + this.padding.right + this._txtOffsetX),
-                      h:Math.max(this._origHeight, this.textExpr.absoluteSize.h) };
+        else {
+            let dyn_w = Math.max(this.textExpr.size.w, (this.hintTextExpr ? this.hintTextExpr.size.w : 0)) + this.cursor.size.w + this.padding.right + this._txtOffsetX;
+            if (!this.hasHint() && this.icon && this.icon.parent !== null)
+                dyn_w = Math.max(dyn_w, 48);
+            return { w:Math.max(this._origWidth, dyn_w),
+                     h:Math.max(this._origHeight, this.textExpr.absoluteSize.h) };
+        }
     }
     updateCursorPosition(charIdx) {
         const num_chars = this.textExpr.text.length;
@@ -315,10 +353,10 @@ class TypeBox extends mag.RoundedRect {
     }
     focus() {
         if (this.isFocused()) return;
+        this.hideEmptyIcon();
         this.addChild(this.cursor);
         this.cursor.startBlinking();
         this.stroke = { color:'cyan', lineWidth:2 };
-        console.log('focusing', this, this.parent);
         if (this.stage) this.stage.keyEventDelegate = this;
     }
     blur() {
@@ -328,6 +366,8 @@ class TypeBox extends mag.RoundedRect {
         this.stroke = null;
         if (this.stage && this.stage.keyEventDelegate == this)
             this.stage.keyEventDelegate = null;
+        if (this.text === '')
+            this.showEmptyIcon();
     }
     animatePlaceholderStatus() {
         if (this.stage && !this.stage.keyEventDelegate)
@@ -615,7 +655,7 @@ class TypeInTextExpr extends TextExpr {
     }
     setDefaultWidth(w) {
         if (this.typeBox) {
-            if (!this.typeBox.hintTextExpr)
+            if (!this.typeBox.hasHint() && !this.typeBox.hasIcon())
                 this.typeBox.size = { w:w, h:this.typeBox.size.h };
             this.typeBox._origWidth = w;
         } else {

@@ -131,8 +131,8 @@ class Level {
         stage.toolboxNodes = function() {
             return this.nodes.filter((n) => n.toolbox && n.toolbox instanceof Toolbox && !n.fadingOut);
         }.bind(stage);
-        stage.isCompleted = function() {
-            let exprs = this.expressionNodes();
+
+        stage.testBoard = function(exprs) {
             let matching = goal.test(exprs.map((n) => n.clone()), this.environmentDisplay);
             if (matching) { // Pair nodes so that goal nodes reference the actual nodes on-screen (they aren't clones).
                 // goal.test returns an array of indexes, referring to the indexes of the expressions passed into the test,
@@ -148,6 +148,9 @@ class Level {
                 }
             }
             return false;
+        }.bind(stage);
+        stage.isCompleted = function() {
+            return this.testBoard(this.expressionNodes());
         }.bind(stage);
 
         // Default animation on expression creation:

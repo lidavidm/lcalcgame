@@ -64,7 +64,10 @@ class CompareExpr extends Expression {
                 this.funcName = op;
             }
         }
-        else super.performUserReduction();
+        else if (this.operatorExpr instanceof TypeInTextExpr && !this.operatorExpr.isCommitted()) {
+            this.operatorExpr.typeBox.carriageReturn();
+            super.performUserReduction();
+        } else super.performUserReduction();
     }
 
     performReduction(animated=true) {

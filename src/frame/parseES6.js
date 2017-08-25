@@ -40,6 +40,12 @@ class ES6Parser {
             return null;
         // * if we reach here, we can assume single program...
 
+        // Special game-only cases.
+        if (program === 'x => x x x')
+            program = 'x => xxx';
+        else if (program === 'x => x x')
+            program = 'x => xx';
+
         // Parse into AST using Esprima.js.
         let AST;
         try {

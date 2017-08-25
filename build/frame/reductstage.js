@@ -197,6 +197,71 @@ var ReductStage = function (_mag$Stage) {
             this.saveState();
         }
 
+        // Determines whether the remaining expressions
+        // can possibly solve the level. Has to iterate over
+        // powerset of toolbox-board combos.
+        // * ASSUMES LEVEL IS NOT COMPLETE (board != goal). *
+        // > This is not perfect, hence why it's prefaced with 'might'.
+
+    }, {
+        key: 'mightBeCompleted',
+        value: function mightBeCompleted() {
+            var exprs = this.expressionNodes();
+            var toolbox_exprs = this.toolboxNodes();
+            var remaining_exprs = exprs.concat(toolbox_exprs);
+
+            // If every expression is a value, nothing can be reduced,
+            // so continue with check.
+            var contains_reducable_expr = remaining_exprs.some(function (e) {
+                return !e.isValue();
+            });
+
+            // Quit if there's an expression in the game
+            // that can be reduced, like == or lambda.
+            if (contains_reducable_expr) return true;
+
+            // If there's nothing in the toolbox,
+            // we can assume level is incomplete.
+            if (toolbox_exprs.length === 0) return false;
+
+            // If there's only one thing,
+            // add it to board and test new board against the Goal.
+            if (toolbox_exprs.length === 1) return this.testBoard(remaining_exprs);
+
+            // Construct list of all possible board states
+            // using powerset of toolbox exprs.
+            var subsets = powerset(toolbox_exprs);
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = subsets[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var s = _step.value;
+
+                    if (s.length === 0) continue; // empty set falls under our assumption, so skip it.
+                    if (this.testBoard(exprs.concat(s)) !== false) return true; // if at least one possible board state works, this level can be solved.
+                }
+
+                // None of the possible board states could be solved.
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         // Checks for level completion.
 
     }, {
@@ -206,80 +271,103 @@ var ReductStage = function (_mag$Stage) {
 
             _get(ReductStage.prototype.__proto__ || Object.getPrototypeOf(ReductStage.prototype), 'update', this).call(this);
 
-            if (this.isCompleted) {
-                var level_complete = this.isCompleted();
+            if (!this.isCompleted || this.ranResetNotifier) return;
 
-                if (level_complete) {
+            var level_complete = this.isCompleted();
 
-                    // DEBUG TEST FLYTO ANIMATION.
-                    if (!this.ranCompletionAnim) {
-                        (function () {
+            if (!level_complete) {
 
-                            _this3.saveState();
-                            Logger.log('victory', { 'final_state': _this3.toString(), 'num_of_moves': undefined });
+                // Check if the level might be completed with the remaining exprs on board and in toolbox.
+                // * If not, we've reached a leaf of the state graph, and we can prompt
+                // * the player to reset.
+                if (!this.mightBeCompleted()) {
+                    // Goal state cannot be reached. Prompt player to reset.
+                    var btn_reset = this.uiNodes[1];
+                    this.remove(btn_reset);
+                    var r = new mag.Rect(0, 0, GLOBAL_DEFAULT_SCREENSIZE.w, GLOBAL_DEFAULT_SCREENSIZE.h);
+                    r.color = "black";
+                    r.opacity = 0.0;
+                    this.add(r);
+                    this.add(btn_reset); // puts the button over r
+                    this.ranResetNotifier = true;
 
-                            // Update + save player progress.
-                            ProgressManager.markLevelComplete(level_idx);
+                    Animate.tween(r, { opacity: 0.2 }, 1000);
 
-                            var you_win = function you_win() {
+                    btn_reset.images.default = "btn-reset-force";
+                    btn_reset.image = btn_reset.images.default;
+                    this.draw();
+                }
+            } else {
+                // Level is completed.
 
-                                if (level_idx < 1) {
-                                    var cmp = new mag.ImageRect(GLOBAL_DEFAULT_SCREENSIZE.w / 2, GLOBAL_DEFAULT_SCREENSIZE.h / 2, 740 / 2, 146 / 2, 'victory');
-                                    cmp.anchor = { x: 0.5, y: 0.5 };
-                                    _this3.add(cmp);
-                                    _this3.draw();
+                // DEBUG TEST FLYTO ANIMATION.
+                if (!this.ranCompletionAnim) {
+                    (function () {
 
-                                    Resource.play('victory');
-                                    Animate.wait(1080).after(function () {
-                                        next();
-                                    });
-                                } else {
-                                    // Skip victory jingle on every level after first.
+                        _this3.saveState();
+                        Logger.log('victory', { 'final_state': _this3.toString(), 'num_of_moves': undefined });
+
+                        // Update + save player progress.
+                        ProgressManager.markLevelComplete(level_idx);
+
+                        var you_win = function you_win() {
+
+                            if (level_idx < 1) {
+                                var cmp = new mag.ImageRect(GLOBAL_DEFAULT_SCREENSIZE.w / 2, GLOBAL_DEFAULT_SCREENSIZE.h / 2, 740 / 2, 146 / 2, 'victory');
+                                cmp.anchor = { x: 0.5, y: 0.5 };
+                                _this3.add(cmp);
+                                _this3.draw();
+
+                                Resource.play('victory');
+                                Animate.wait(1080).after(function () {
                                     next();
-                                }
-                            };
-
-                            var pairs = level_complete;
-                            var num_exploded = 0;
-                            var playedSplosionAudio = false;
-
-                            pairs.forEach(function (pair, idx) {
-                                var node = pair[0];
-                                var goalNode = pair[1];
-                                node.ignoreEvents = true;
-
-                                Resource.play('matching-goal');
-
-                                var blinkCount = level_idx === 0 ? 2 : 1;
-                                Animate.blink([node, goalNode], 2500 / 2.0 * blinkCount, [0, 1, 1], blinkCount).after(function () {
-                                    //Resource.play('shootwee');
-
-                                    _this3.playerWon = true;
-
-                                    //Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x:200, y:300 }, () => {
-                                    SplosionEffect.run(node);
-                                    SplosionEffect.run(goalNode);
-
-                                    if (!playedSplosionAudio) {
-                                        // Play sFx.
-                                        Resource.play('splosion');
-                                        playedSplosionAudio = true;
-                                    }
-
-                                    if (node.parent instanceof SpreadsheetDisplay) node.parent.removeChild(node);
-
-                                    goalNode.parent.removeChild(goalNode);
-                                    num_exploded++;
-                                    if (num_exploded === pairs.length) {
-                                        Animate.wait(500).after(you_win);
-                                    }
-                                    //});
                                 });
-                            });
+                            } else {
+                                // Skip victory jingle on every level after first.
+                                next();
+                            }
+                        };
 
-                            _this3.ranCompletionAnim = true;
-                        })();
-                    }
+                        var pairs = level_complete;
+                        var num_exploded = 0;
+                        var playedSplosionAudio = false;
+
+                        pairs.forEach(function (pair, idx) {
+                            var node = pair[0];
+                            var goalNode = pair[1];
+                            node.ignoreEvents = true;
+
+                            Resource.play('matching-goal');
+
+                            var blinkCount = level_idx === 0 ? 2 : 1;
+                            Animate.blink([node, goalNode], 2500 / 2.0 * blinkCount, [0, 1, 1], blinkCount).after(function () {
+                                //Resource.play('shootwee');
+
+                                _this3.playerWon = true;
+
+                                //Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x:200, y:300 }, () => {
+                                SplosionEffect.run(node);
+                                SplosionEffect.run(goalNode);
+
+                                if (!playedSplosionAudio) {
+                                    // Play sFx.
+                                    Resource.play('splosion');
+                                    playedSplosionAudio = true;
+                                }
+
+                                if (node.parent instanceof SpreadsheetDisplay) node.parent.removeChild(node);
+
+                                goalNode.parent.removeChild(goalNode);
+                                num_exploded++;
+                                if (num_exploded === pairs.length) {
+                                    Animate.wait(500).after(you_win);
+                                }
+                                //});
+                            });
+                        });
+
+                        _this3.ranCompletionAnim = true;
+                    })();
                 }
             }
         }
@@ -287,7 +375,7 @@ var ReductStage = function (_mag$Stage) {
         key: 'onmousedown',
         value: function onmousedown(pos) {
             _get(ReductStage.prototype.__proto__ || Object.getPrototypeOf(ReductStage.prototype), 'onmousedown', this).call(this, pos);
-            if (this.heldNode && this.keyEventDelegate && this.heldNode != this.keyEventDelegate) {
+            if (this.heldNode && this.keyEventDelegate && this.heldNode != this.keyEventDelegate || !this.heldNode && this.keyEventDelegate) {
                 this.keyEventDelegate.blur();
                 this.keyEventDelegate = null;
             }
@@ -424,10 +512,14 @@ var ReductStage = function (_mag$Stage) {
 
             // Push new state and save serialized version to logger.
             // * This will automatically check for duplicates...
-            this.stateGraph.push(state, changeData);
+            var changed = this.stateGraph.push(state, changeData);
             Logger.log('state-save', json);
 
             Logger.log('state-path-save', this.stateGraph.toString());
+
+            // Debug --
+            // Live display of state graph as game is played. (Only update if there's been a change!)
+            if (__DEBUG_DISPLAY_STATEGRAPH && changed) __UPDATE_NETWORK_CB(this.stateGraph.toVisJSNetworkData());
         }
 
         // Determines what's changed between states a and b, (serialized Level objects)
@@ -493,13 +585,13 @@ var ReductStage = function (_mag$Stage) {
                 var bs = this.boundingSize;
                 if (this.environmentDisplay) bs.w -= this.environmentDisplay.size.w;
                 if (this.toolbox) bs.h -= this.toolbox.size.h;
-                var _iteratorNormalCompletion = true;
-                var _didIteratorError = false;
-                var _iteratorError = undefined;
+                var _iteratorNormalCompletion2 = true;
+                var _didIteratorError2 = false;
+                var _iteratorError2 = undefined;
 
                 try {
-                    for (var _iterator = this.expressionNodes()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                        var node = _step.value;
+                    for (var _iterator2 = this.expressionNodes()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                        var node = _step2.value;
 
                         // Check if node offstage or obscured
                         var p = node.pos;
@@ -513,16 +605,16 @@ var ReductStage = function (_mag$Stage) {
                         node.pos = p;
                     }
                 } catch (err) {
-                    _didIteratorError = true;
-                    _iteratorError = err;
+                    _didIteratorError2 = true;
+                    _iteratorError2 = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion && _iterator.return) {
-                            _iterator.return();
+                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                            _iterator2.return();
                         }
                     } finally {
-                        if (_didIteratorError) {
-                            throw _iteratorError;
+                        if (_didIteratorError2) {
+                            throw _iteratorError2;
                         }
                     }
                 }

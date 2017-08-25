@@ -1,361 +1,76 @@
 {
-    "chapterName":"Intro to Variables",
-    "description":"Variables and Assigment",
-    "language": "JavaScript",
+    "chapterName":"Name confusion",
+    "description":"Strings, bindings, and parameter names other than 'x'",
+    "language":"JavaScript",
     "levels": [
         {
-            "description": "Reducing a variable.",
-            "board": "x",
-            "goal": "rect",
-            "globals": {
-                "x": "rect"
-            },
+            "description": "Parameters can be something other than x.",
+            "board": ["y => y + ' world'", "'hello'"],
+            "goal": "'hello world'",
+            "toolbox": "",
             "fade": {
-                "var": 4,
-                "primitives": 1
+                "var":7
             },
             "showFade":false
         },
         {
-            "description": "Variables can be reduced multiple times.",
-            "board": ["x", "x"],
-            "goal": ["rect", "rect"],
-            "globals": {
-                "x": "rect"
-            }
-        },
-        {
-            "description": "Multiple variables can be reduced. Variables can have different names.",
-            "board": ["x", "apple"],
-            "goal": ["rect", "star"],
-            "globals": {
-                "x": "rect",
-                "apple": "star"
-            }
-        },
-        {
-            "description": "Assign to a variable.",
-            "board": ["x = star", "x"],
-            "goal": "star",
-            "globals": {
-                "x": "rect"
-            }
-        },
-        {
-            "description": "Choose what to assign.",
-            "board": ["x = _", "x"],
-            "goal": "star",
-            "toolbox": ["triangle", "star"],
-            "globals": {
-                "x": "rect"
-            },
-            "fade": {
-                "assign": 1,
-                "var": 5
-            }
-        },
-        {
-            "description": "Assign to an undefined variable.",
-            "board": "y",
-            "goal": "triangle",
-            "toolbox": ["y = _", "star", "triangle", "rect"]
-        },
-        {
-            "description": "Multiple assignment.",
-            "board": ["x = _", "y = _", "x", "y"],
-            "goal": ["'a'", "'b'"],
-            "toolbox": ["'a'", "'b'", "'c'", "'d'"]
-        },
-        {
-            "description": "Assignment order matters.",
-            "board": ["x = y", "y = star", "x"],
-            "goal": "star",
-            "globals": {
-                "x": "rect"
-            },
-            "fade": {
-                "assign": 2,
-                "var": 6,
-                "reference_display": 1,
-                "number":1
-            }
-        },
-        {
-            "description": "Order of evaluation and what you start with matters.",
-            "board": ["x = _", "y = _", "x", "y"],
-            "goal": ["'e'"],
-            "toolbox": ["'a'", "'b'", "'c'", "'d'"],
-            "globals": {
-                "x": "e"
-            }
-        },
-        {
-            "description": "Assignment order still matters.",
-            "board": ["x = y", "y = 1"],
-            "goal": ["7", "3", "1"],
-            "toolbox": ["x", "x", "y"],
-            "globals": {
-                "x": "3",
-                "y": "7"
-            }
-        },
-        {
-            "description": "Choose where to assign.",
-            "board": ["_v = star"],
-            "goal": ["star", "triangle"],
-            "toolbox": ["x", "x", "y", "y"],
-            "globals": {
-                "x": "triangle",
-                "y": "rect"
-            }
-        },
-        {
-            "description": "Swap I.",
-            "board": ["x = y", "y = triangle"],
-            "goal": "triangle",
-            "toolbox": "x",
-            "globals": {
-                "y": "star"
-            }
-        },
-        {
-            "description": "Confusing = and ==.",
-            "board": ["x >>> 'red'", "x >>> 'red'"],
-            "goal": "true",
-            "typing_hints": ["=", "=="],
-            "typing_options": {
-                ">>>": ["=", "==", "+"]
-            },
-            "block_variant": {
-                "board": ["x >> 'red'", "x >> 'red'"],
-                "toolbox": ["_op('=')", "_op('==')"]
-            },
-            "fade": {
-                "==":2,
-                "true":2,
-                "false":2
-            },
-            "showFade":false
-        },
-        {
-            "description": "Equality with a variable",
-            "board": "x == _",
-            "goal": "true",
-            "toolbox": ["rect", "star", "triangle"],
-            "globals": {
-                "x": "triangle"
-            }
-        },
-        {
-            "description": "Equality with a variable II",
-            "board": "_ == _t_string",
-            "goal": "true",
-            "toolbox": ["x", "y"],
-            "globals": {
-                "x": "A",
-                "y": "B"
-            }
-        },
-        {
-            "description": "Equality with variables",
-            "board": ["x == _", "_ == _", "_ == y"],
-            "goal": ["true", "false", "false"],
-            "toolbox": ["__unlimited; x;", "__unlimited; y;"],
-            "globals": {
-                "x": "1",
-                "y": "4"
-            }
-        },
-        {
-            "description": "Make things equal first",
-            "board": "k == n",
-            "goal": "true",
-            "toolbox": ["_v = _", "k", "n"],
-            "globals": {
-                "k": "cat",
-                "n": "dog"
-            },
-            "fade": {
-                "var": 7,
-                "assign": 2,
-                "reference_display": 2,
-                "environment_display": 1,
-                "_v": 1
-            }
-        },
-        {
-            "description": "Swap.",
-            "board": "x == k",
-            "goal": "true",
-            "toolbox": ["z = y", "k = z", "y = x", "y = z"],
-            "globals": {
-                "x": "cat",
-                "y": "dog",
-                "z": "fish",
-                "k": "bird"
-            }
-        },
-        {
-            "description": "String concatenation with variables.",
-            "goal" : "'zxy'",
-            "board": ["x + y + z", "x = _", "y = _", "z = _"],
-            "toolbox": ["'x'", "'y'", "'z'"]
-        },
-        {
-            "description": "Typing strings with variables.",
-            "goal" : "'hotshot'",
-            "board": ["x = _t_string", "y = _t_string", "z = x"],
-            "toolbox": ["x + y + z", "y + z + x", "z + x + y"],
-            "block_variant": {
-                "board": ["x = _", "y = _", "z = x"],
-                "toolbox": ["'hot'", "'s'", "'ot'", "x + y + z", "y + z + x", "z + x + y"]
-            }
-        },
-        {
-            "description": "Confusing = and == II.",
-            "board": ["a >>> 'c'", "a >>> (a + 'b')", "a >>> 'cb'"],
-            "goal": "true",
-            "typing_options": {
-                ">>>": ["=", "==", "+"]
-            },
-            "block_variant": {
-                "board": ["a >> 'c'", "a >> a + 'b'", "a >> 'cb'"],
-                "toolbox": ["_op('==')", "_op('=')", "_op('==')", "_op('=')"]
-            }
-        },
-        {
-            "description": "Typing strings with quotes.",
-            "board": ["b = _t_fullstring", "a = 'quotes '", "a + b"],
-            "goal": "'quotes matter'",
+            "description": "Confusion III.",
+            "board": ["matter => matter + _t_fullstring", "'quotes '"],
+            "goal": ["'quotes matter'"],
             "typing_hints": ["\"matter\""],
-            "block_variant": {
-                "board": ["b = _", "a = 'quotes '", "a + b"],
-                "toolbox": ["matter", "'matter'"]
-            },
+            "toolbox": [],
             "fade": {
                 "string": 1,
                 "typing_str": 1
             }
         },
         {
-            "description": "Typing strings with quotes II.",
-            "board": ["a = _t_fullstring", "b == a", "b = _t_single"],
-            "goal": "true",
-            "typing_hints": ["\"c\""],
-            "globals": {
-                "c": "oops"
-            },
-            "block_variant": {
-                "board": ["a = 'c'", "b == a", "b = _"],
-                "toolbox": ["c", "'c'"]
-            },
-            "unused_variant": {
-                "description": "Typing strings with quotes III.",
-                "board": ["a = _t_fullstring", "b = _t_varname", "a == b", "c = 'c'"],
-                "goal": "true",
-                "typing_hints": ["\"c\"", "c"]
-            }
+            "description": "Confusion I.",
+            "board": ["o => o + 'o' + o"],
+            "goal": "'pop'",
+            "toolbox": ["'o'", "'p'", "'pop'", "'op'"]
         },
         {
-            "description": "Typing assignment I.",
-            "board": ["_t_single", "x"],
-            "goal": "5",
-            "typing_hints": ["x = 5"],
-            "block_variant": {
-                "board": ["x = 5", "x"]
-            }
+            "description": "Confusion I.1.",
+            "board": ["e => e", "b => 'b'", "b => b", "'e'", "'b'", "'k'"],
+            "goal": ["'e'", "'b'", "'b'"],
+            "toolbox": []
         },
         {
-            "description": "Typing assignment II.",
-            "board": ["_t_single", "pins"],
-            "goal": "'five'",
-            "block_variant": {
-                "board": ["_v = _", "pins"],
-                "toolbox": ["x", "pins", "5", "'five'"]
-            }
+            "description": "Confusion II.",
+            "board": ["'a'", "'b'", "'c'"],
+            "goal": ["'aa'", "'bb'", "'cc'"],
+            "toolbox": ["b => 'b' + b", "a => a + a", "c => 'c' + 'c'"]
         },
         {
-            "description": "Typing assignment III.",
-            "board": ["_t_single", "a + b", "b = 30"],
-            "goal": "777",
-            "block_variant": {
-                "board": ["_v = _", "a + b", "b = 30"],
-                "toolbox": ["a", "b", "324", "717", "747"]
-            }
+            "description": "Confusion IV.",
+            "board": ["a => _t_fullstring + a", "b => _t_single + 'oo'"],
+            "goal": ["'at'", "'zoo'"],
+            "typing_hints": ["\"a\""],
+            "toolbox": ["'z'", "'a'", "'t'", "'b'", "'x'"]
         },
         {
-            "description": "Typing assignment IV: Quotes and spaces.",
-            "board": ["_t_single", "_t_single", "f + g + h", "f = '3'"],
-            "goal": "'3 apple pies'",
-            "block_variant": {
-                "board": ["_v = _", "_v = _", "f + g + h", "f = '3'"],
-                "toolbox": ["g", "h", "f", "'apple'", "' pies'", "' apple'", "'pies'"]
-            }
+            "description": "Confusion V: Typing function bodies.",
+            "board": ["b => _t_single", "x => x x x"],
+            "goal": ["'bee'", "'see'", "'Lee'"],
+            "typing_hints": ["b + 'ee'"],
+            "toolbox": ["'b'", "'s'", "'L'"]
         },
         {
-            "description": "Typing assignment V: Booleans.",
-            "board": ["q >>> false", "_t_single", "q = c"],
-            "goal": "true",
-            "typing_hints": ["=="],
-            "typing_options": {
-                ">>>": ["==", "+", "="]
-            },
-            "block_variant": {
-                "board": ["q == false", "_v = _", "q = c"],
-                "toolbox": ["c", "'c'", "true", "false"]
-            }
+            "description": "Confusion VI: Constructing functions.",
+            "board": ["b => _t_single", "x => x x x"],
+            "goal": ["'knew'", "'knave'", "'know'"],
+            "toolbox": ["'ew'", "'ave'", "'ow'"]
         },
         {
-            "description": "Typing assignment VI: Booleans and typing operators.",
-            "board": ["k >>> 3", "j >>> 'four'", "k == j"],
-            "goal": ["true", "false"],
-            "globals": {
-                "j": "3",
-                "k": "five"
-            },
-            "typing_options": {
-                ">>>": ["==", "+", "="]
-            },
-            "block_variant": {
-                "board": ["k >> 3", "j >> 'four'", "k == j"],
-                "toolbox": ["_op('==')", "_op('=')", "_op('==')", "_op('=')"]
-            }
-        },
-        {
-            "description": "Typing assignment VII: Booleans and typing operators and ordering.",
-            "board": ["n >>> m", "n >>> m", "n >>> m"],
-            "goal": ["true", "false"],
-            "globals": {
-                "n": "n",
-                "m": "m"
-            },
-            "typing_options": {
-                ">>>": ["==", "+", "="]
-            },
-            "block_variant": {
-                "board": ["n >> m", "n >> m", "n >> m"],
-                "toolbox": ["_op('==')", "_op('=')", "_op('==')", "_op('=')"]
-            }
-        },
-        {
-            "description": "Typing assignment VII: Booleans and typing operators and ordering.",
-            "board": ["n >>> 'nix'", "n >>> (n + m)", "n = (n + _t_single)"],
-            "goal": ["true"],
-            "globals": {
-                "n": "n",
-                "m": "x"
-            },
-            "typing_options": {
-                ">>>": ["==", "+", "="]
-            },
-            "block_variant": {
-                "board": ["n >> 'nix'", "n >> (n + m)", "n = (n + _)"],
-                "toolbox": ["'ix'", "'n'", "'x'", "'i'", "_op('==')", "_op('=')"]
-            }
+            "description": "Confusion VII: Constructing functions II: Triple concat.",
+            "board": ["w => _t_single", "x => x x x"],
+            "goal": ["'widow'", "'willow'", "'window'"],
+            "toolbox": ["'d'", "'ll'", "'nd'"]
         }
     ],
     "resources":{
-        "planet":"planet-variablana",
+        "planet":"planet-bagbag",
         "curve":[
             {"x":0.13872777749830897, "y":-0.608504985521738},
             {"x":0.13872777749830897, "y":-0.608504985521738},

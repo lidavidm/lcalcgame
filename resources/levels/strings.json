@@ -5,7 +5,7 @@
     "levels": [
         {
             "goal" : "'pineapple'",
-            "board": ["'pine'", "'apple'", "_ + _"],
+            "board": ["_ + _", "'pine'", "'apple'"],
             "toolbox": ""
         },
         {
@@ -15,7 +15,7 @@
         },
         {
             "goal" : "'cattywampus'",
-            "board": ["_ + 'y'", "_ + 't'", "_ + _", "'w' + _", "_ + _", "_ + 'us'"],
+            "board": ["_ + 'y'", "_ + 't'", "_ + _ + _", "'w' + _", "_ + 'us'"],
             "toolbox": ["'t'", "'am'", "'cat'", "'p'"]
         },
         {

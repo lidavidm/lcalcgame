@@ -86,6 +86,9 @@ var CompareExpr = function (_Expression) {
                     this.operatorExpr = new TextExpr(op);
                     this.funcName = op;
                 }
+            } else if (this.operatorExpr instanceof TypeInTextExpr && !this.operatorExpr.isCommitted()) {
+                this.operatorExpr.typeBox.carriageReturn();
+                _get(CompareExpr.prototype.__proto__ || Object.getPrototypeOf(CompareExpr.prototype), 'performUserReduction', this).call(this);
             } else _get(CompareExpr.prototype.__proto__ || Object.getPrototypeOf(CompareExpr.prototype), 'performUserReduction', this).call(this);
         }
     }, {

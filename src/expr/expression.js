@@ -387,7 +387,7 @@ class Expression extends mag.RoundedRect {
     }
 
     // * Swaps this expression for its reduction (if one exists) in the expression hierarchy.
-    performReduction() {
+    performReduction(logChangeData=null) {
         //console.log("called performReduction");
         var reduced_expr = this.reduce();
         if (reduced_expr !== undefined && reduced_expr != this) { // Only swap if reduction returns something > null.
@@ -396,7 +396,10 @@ class Expression extends mag.RoundedRect {
 
             if (!this.stage) return Promise.reject();
 
-            this.stage.saveState();
+            const stage = this.stage;
+
+            // Before performing the reduction, save the state of the board...
+            stage.saveState();
 
             // Log the reduction.
             let reduced_expr_str;
@@ -406,6 +409,9 @@ class Expression extends mag.RoundedRect {
                 reduced_expr_str = reduced_expr.reduce((prev,curr) => (prev + curr.toJavaScript() + '; '), '').trim();
             else reduced_expr_str = reduced_expr.toJavaScript();
             Logger.log('reduction', { 'before':this.toJavaScript(), 'after':reduced_expr_str });
+
+            if (logChangeData === null)
+                logChangeData = { name:'reduction', before:this.toJavaScript(), after:reduced_expr_str };
 
             var parent = this.parent ? this.parent : this.stage;
             if (reduced_expr) reduced_expr.ignoreEvents = this.ignoreEvents; // the new expression should inherit whatever this expression was capable of as input
@@ -421,6 +427,9 @@ class Expression extends mag.RoundedRect {
 
             if (reduced_expr)
                 reduced_expr.update();
+
+            // After performing the reduction, save the new state of the board.
+            stage.saveState(logChangeData);
 
             return Promise.resolve(reduced_expr);
         }
@@ -617,7 +626,7 @@ class Expression extends mag.RoundedRect {
                 Logger.log('toolbox-remove', this.toString());
 
                 if (this.stage)
-                    this.stage.saveState();
+                    this.stage.saveState({name:'toolbox-remove', item:this.toJavaScript()});
             }
 
             // Snap expressions together?

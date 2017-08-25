@@ -80,7 +80,10 @@ class RectExpr extends GraphicValueExpr {
 }
 class ImageExpr extends GraphicValueExpr {
     constructor(x, y, w, h, resource_key) {
-        super(new mag.ImageRect(x, y, w, h, resource_key));
+        if (arguments.length === 1 && typeof x === 'string')
+            super(new mag.ImageRect(x));
+        else
+            super(new mag.ImageRect(x, y, w, h, resource_key));
         this._image = resource_key;
     }
     get image() { return this._image; }
@@ -265,6 +268,7 @@ class TypeInStringValueExpr extends Expression {
         mid.setDefaultWidth(22);
         mid.typeBox.color = '#FEFCB1';
         mid.typeBox.textColor = 'OrangeRed';
+        mid.typeBox.icon.image = 'empty-typebox-string';
         super([left, mid, right]);
         this.defaultName = defaultName;
         this.color = 'gold';

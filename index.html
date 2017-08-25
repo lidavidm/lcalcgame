@@ -16,6 +16,11 @@
         <link rel="stylesheet" href="lib/pace.css" media="screen" charset="utf-8">
         <script src="lib/pace.min.js"></script>
 
+        <!-- Vis.js library for live state graph visualization.
+             NOTE: You can comment this out for production.       -->
+        <link rel="stylesheet" href="lib/vis.min.css" media="screen" charset="utf-8">
+        <script src="lib/vis.min.js"></script>
+
         <!-- Audio -->
         <script src="lib/howler.min.js"></script>
         <script src="lib/sm2/js/soundmanager2.js"></script>
@@ -107,6 +112,22 @@
                 margin-right: auto;
                 display: block;
             }
+            #canvasWrapper {
+                padding: 0;
+                margin-left: auto;
+                margin-right: auto;
+                display: block;
+            }
+            #stateGraphCanvas {
+                padding: 0;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width:400px;
+                height:400px;
+                /*border: 1px solid blue;*/
+                background: #111;
+            }
             #progressBarContainer {
                 display: block;
                 width:800px;
@@ -193,7 +214,10 @@
         </div> -->
 
         <div id="canvasContainer">
-            <canvas id="canvas" onmousedown="" width="800" height="600" style="background-color:#534764;"></canvas>
+            <div id="canvasWrapper">
+                <canvas id="canvas" onmousedown="" width="800" height="600" style="background-color:#534764;"></canvas>
+                <div id="stateGraphCanvas"></div>
+            </div>
             <div id="help" class="textOverlay centered">
                 <h3>Drop the star into the (x).</h3>
             </div>

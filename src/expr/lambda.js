@@ -16,8 +16,9 @@ class LambdaHoleExpr extends MissingExpression {
 
     static colorForVarName(v) {
 
-        if (v === 'x') return 'lightgray';
-        else           return 'white'; //'IndianRed';
+        return 'lightgray';
+        //if (v === 'x') return 'lightgray';
+        //else           return 'white'; //'IndianRed';
 
         // return {
         //
@@ -283,6 +284,9 @@ class LambdaHoleExpr extends MissingExpression {
 
                 var stage = node.stage;
 
+                // Save the current state of the board.
+                stage.saveState();
+
                 let preview_nodes = this.preview_nodes;
                 let is_replication_expr = this.is_replication_expr;
                 if (this.close_opened_subexprs) {
@@ -333,9 +337,6 @@ class LambdaHoleExpr extends MissingExpression {
                 // Clone the dropped expression.
                 var dropped_expr = node.clone();
 
-                // Save the current state of the board.
-                stage.saveState();
-
                 // Remove the original expression from its stage.
                 stage.remove(node);
 
@@ -361,12 +362,12 @@ class LambdaHoleExpr extends MissingExpression {
                         Animate.tween(parent, { opacity:0 }, 200, (elapsed) => Math.pow(elapsed, 0.5)).after(() => {
                             stage.remove(parent);
                             stage.update();
+                            stage.saveState();
                         });
                     }
 
                     // Log the reduction.
                     Logger.log('reduction-lambda', { 'before':orig_exp_str, 'applied':dropped_exp_str, 'after':parent.toString() });
-                    Logger.log('state-save', stage.toString());
 
                     if (parent.children.length === 0) {
 
@@ -377,8 +378,9 @@ class LambdaHoleExpr extends MissingExpression {
                         // (b) Remove expression from the parent stage.
                         (parent.parent || parent.stage).remove(parent);
 
-                    } else
-                        stage.dumpState();
+                    }
+                    // } else
+                    //     stage.dumpState();
 
                     return null;
 
@@ -584,7 +586,7 @@ class LambdaExpr extends Expression {
         this.addArg(txt);*/
     }
     isValue() {
-        return true;
+        return false;
     }
     getEnvironment() {
         let env = super.getEnvironment();
@@ -696,9 +698,9 @@ class LambdaExpr extends Expression {
         var reduced_expr = this.reduce();
         if (reduced_expr && reduced_expr != this) { // Only swap if reduction returns something > null.
 
-            if (this.stage) this.stage.saveState();
-
+            var stage = this.stage;
             var parent;
+
             if (Array.isArray(reduced_expr)) {
                 if (reduced_expr.length === 1) { reduced_expr = reduced_expr[0]; } // reduce to single argument
                 else if (this.parent) return; // cannot reduce a parenthetical expression with > 1 subexpression.
@@ -709,6 +711,7 @@ class LambdaExpr extends Expression {
                         else             e.unlock();
                     });
                     parent.swap(this, reduced_expr); // swap 'this' (on the board) with an array of its reduced expressions
+                    parent.saveState();
                     return reduced_expr;
                 }
             }
@@ -725,6 +728,8 @@ class LambdaExpr extends Expression {
                     Animate.blink(reduced_expr.parent, 400, [0,1,0]);
                 }
             }
+
+            if (stage) stage.saveState();
 
             return reduced_expr;
         }
@@ -768,7 +773,9 @@ class LambdaExpr extends Expression {
     toJavaScript() {
         let param_name = this.hole.name;
         let bodyJS = this.holes.length > 2 ? this.holes.slice(1).map((e) => e.toJavaScript()).join('') : this.body.toJavaScript();
-        return `(function (${param_name}) { return ${bodyJS}; })`;
+        if (bodyJS.indexOf(' ') > -1) bodyJS = `(${bodyJS})`
+        let funcJS = `${param_name} => ${bodyJS}`;
+        return funcJS;
     }
 }
 
@@ -1142,7 +1149,7 @@ class FadedES6LambdaHoleExpr extends LambdaHoleExpr {
     constructor(varname) {
         super(varname);
         this.padding.left = 5;
-        this.addArg(new TextExpr("(" + varname + ")"));
+        this.addArg(new TextExpr(" " + varname + " "));
         this.addArg(new TextExpr("=>"));
         this.label.color = "#000";
         this.arrow.color = "#000";

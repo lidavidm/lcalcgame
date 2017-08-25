@@ -124,7 +124,15 @@ var TypeBox = function (_mag$RoundedRect) {
         _this4.onTextChanged = onTextChanged;
         _this4._origHeight = h;
 
-        _this4.size = _this4.makeSize();
+        // 'Empty text' icon, to indicate this is a typing box.
+        var icon = new ImageExpr(0, 0, 64, 64, 'empty-typebox');
+        icon.pos = { x: _this4.size.w / 2, y: _this4.size.h / 2 };
+        icon.anchor = { x: 0.5, y: 0.5 };
+        icon.ignoreEvents = true;
+        _this4.icon = icon;
+        _this4.showEmptyIcon();
+
+        _this4.update();
 
         // this.makeMultiline(10, 4);
         return _this4;
@@ -144,6 +152,7 @@ var TypeBox = function (_mag$RoundedRect) {
             hint.color = "#bbb";
             this.addChildAt(0, hint);
             this.hintTextExpr = hint;
+            this.hideEmptyIcon();
         }
     }, {
         key: 'removeHint',
@@ -151,6 +160,36 @@ var TypeBox = function (_mag$RoundedRect) {
             if (this.hintTextExpr) {
                 this.removeChild(this.hintTextExpr);
                 this.hintTextExpr = null;
+            }
+        }
+    }, {
+        key: 'hasIcon',
+        value: function hasIcon() {
+            return this.icon && this.icon.parent !== null;
+        }
+    }, {
+        key: 'showEmptyIcon',
+        value: function showEmptyIcon() {
+            if (this.icon && !this.icon.parent && !this.hasHint()) {
+                this.addChild(this.icon);
+                this.update();
+                if (this.stage) {
+                    this.stage.update();
+                    this.stage.draw();
+                }
+            }
+        }
+    }, {
+        key: 'hideEmptyIcon',
+        value: function hideEmptyIcon() {
+            if (this.icon && this.icon.parent) {
+                this.removeChild(this.icon);
+                this.icon.parent = null;
+                this.update();
+                if (this.stage) {
+                    this.stage.update();
+                    this.stage.draw();
+                }
             }
         }
     }, {
@@ -280,8 +319,12 @@ var TypeBox = function (_mag$RoundedRect) {
             if (this.multiline) {
                 return { w: this.multiline.lineWidth * this.charWidthPerLine() + this.padding.right + this._txtOffsetX,
                     h: this.multiline.lineHeight * this.charHeightPerLine() };
-            } else return { w: Math.max(this._origWidth, Math.max(this.textExpr.size.w, this.hintTextExpr ? this.hintTextExpr.size.w : 0) + this.cursor.size.w + this.padding.right + this._txtOffsetX),
-                h: Math.max(this._origHeight, this.textExpr.absoluteSize.h) };
+            } else {
+                var dyn_w = Math.max(this.textExpr.size.w, this.hintTextExpr ? this.hintTextExpr.size.w : 0) + this.cursor.size.w + this.padding.right + this._txtOffsetX;
+                if (!this.hasHint() && this.icon && this.icon.parent !== null) dyn_w = Math.max(dyn_w, 48);
+                return { w: Math.max(this._origWidth, dyn_w),
+                    h: Math.max(this._origHeight, this.textExpr.absoluteSize.h) };
+            }
         }
     }, {
         key: 'updateCursorPosition',
@@ -375,10 +418,10 @@ var TypeBox = function (_mag$RoundedRect) {
         key: 'focus',
         value: function focus() {
             if (this.isFocused()) return;
+            this.hideEmptyIcon();
             this.addChild(this.cursor);
             this.cursor.startBlinking();
             this.stroke = { color: 'cyan', lineWidth: 2 };
-            console.log('focusing', this, this.parent);
             if (this.stage) this.stage.keyEventDelegate = this;
         }
     }, {
@@ -389,6 +432,7 @@ var TypeBox = function (_mag$RoundedRect) {
             this.removeChild(this.cursor);
             this.stroke = null;
             if (this.stage && this.stage.keyEventDelegate == this) this.stage.keyEventDelegate = null;
+            if (this.text === '') this.showEmptyIcon();
         }
     }, {
         key: 'animatePlaceholderStatus',
@@ -786,7 +830,7 @@ var TypeInTextExpr = function (_TextExpr) {
         key: 'setDefaultWidth',
         value: function setDefaultWidth(w) {
             if (this.typeBox) {
-                if (!this.typeBox.hintTextExpr) this.typeBox.size = { w: w, h: this.typeBox.size.h };
+                if (!this.typeBox.hasHint() && !this.typeBox.hasIcon()) this.typeBox.size = { w: w, h: this.typeBox.size.h };
                 this.typeBox._origWidth = w;
             } else {
                 this._size = { w: w, h: this._size.h };

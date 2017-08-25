@@ -72,8 +72,9 @@ var MissingExpression = function (_Expression) {
                 if (node instanceof ChoiceExpr || node instanceof Snappable) return;
 
                 var stage = this.stage;
-                var beforeState = stage.toString();
-                var droppedExp = node.toString();
+                var beforeNode = this.rootParent.toJavaScript();
+                var droppedExp = node.toJavaScript();
+                var parent = this.parent;
 
                 // Unset toolbox flag even when dragging directly to a hole
                 if (node.toolbox) {
@@ -84,12 +85,11 @@ var MissingExpression = function (_Expression) {
                 Resource.play('pop');
                 node.stage.remove(node);
                 node.droppedInClass = this.getClass();
-                this.parent.swap(this, node); // put it back
+                parent.swap(this, node); // put it back
 
-                var afterState = stage.toString();
-                Logger.log('placed-expr', { 'before': beforeState, 'after': afterState, 'item': droppedExp });
+                // Logger.log('placed-expr', {'before':beforeNode, 'after':afterState, 'item':droppedExp });
 
-                stage.saveState();
+                stage.saveState({ name: "placed-expr", before: beforeNode, item: droppedExp, after: parent.rootParent.toJavaScript() });
 
                 // Blink red if total reduction is not possible with this config.
                 /*var try_reduce = node.parent.reduceCompletely();

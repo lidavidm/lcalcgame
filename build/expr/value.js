@@ -243,10 +243,16 @@ var ImageExpr = function (_GraphicValueExpr6) {
     function ImageExpr(x, y, w, h, resource_key) {
         _classCallCheck(this, ImageExpr);
 
-        var _this8 = _possibleConstructorReturn(this, (ImageExpr.__proto__ || Object.getPrototypeOf(ImageExpr)).call(this, new mag.ImageRect(x, y, w, h, resource_key)));
+        if (arguments.length === 1 && typeof x === 'string') {
+            ;
 
-        _this8._image = resource_key;
-        return _this8;
+            var _this8 = _possibleConstructorReturn(this, (ImageExpr.__proto__ || Object.getPrototypeOf(ImageExpr)).call(this, new mag.ImageRect(x)));
+        } else {
+            ;
+
+            var _this8 = _possibleConstructorReturn(this, (ImageExpr.__proto__ || Object.getPrototypeOf(ImageExpr)).call(this, new mag.ImageRect(x, y, w, h, resource_key)));
+        }_this8._image = resource_key;
+        return _possibleConstructorReturn(_this8);
     }
 
     _createClass(ImageExpr, [{
@@ -653,6 +659,7 @@ var TypeInStringValueExpr = function (_Expression4) {
         mid.setDefaultWidth(22);
         mid.typeBox.color = '#FEFCB1';
         mid.typeBox.textColor = 'OrangeRed';
+        mid.typeBox.icon.image = 'empty-typebox-string';
 
         var _this19 = _possibleConstructorReturn(this, (TypeInStringValueExpr.__proto__ || Object.getPrototypeOf(TypeInStringValueExpr)).call(this, [left, mid, right]));
 

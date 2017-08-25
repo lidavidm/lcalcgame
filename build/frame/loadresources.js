@@ -54,10 +54,21 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     var __LEVELS_PATH = __RESOURCE_PATH + 'levels/';
 
     // Add levels here:
+    // const chapterDigraph = {
+    //     'intro': ['booleans'],
+    //     'booleans': ['strings'],
+    //     'strings': ['variables'],
+    //     'variables': ['typing_variables'],
+    //     'typing_variables': []
+    // };
     var chapterDigraph = {
         'intro': ['booleans'],
         'booleans': ['strings'],
-        'strings': ['variables'],
+        'strings': ['bindings'],
+        'bindings': ['confusing_strings'],
+        'confusing_strings': ['map'],
+        'map': ['conditionals'],
+        'conditionals': ['variables'],
         'variables': ['typing_variables'],
         'typing_variables': []
     };

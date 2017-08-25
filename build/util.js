@@ -206,6 +206,25 @@ function computeVariance(arr) {
     }, 0) / (arr.length - 1);
 }
 
+// Thanks to Nina Scholz @ SO:
+// https://stackoverflow.com/a/42774126
+// Generates all array subsets (its powerset).
+function powerset(array) {
+
+    function fork(i, t) {
+        if (i === array.length) {
+            result.push(t);
+            return;
+        }
+        fork(i + 1, t.concat([array[i]]));
+        fork(i + 1, t);
+    }
+
+    var result = [];
+    fork(0, []);
+    return result;
+}
+
 /** Thanks to Gumbo @ SO:
     http://stackoverflow.com/a/10865042 */
 function flatten(arr_of_arrays) {

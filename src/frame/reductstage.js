@@ -188,92 +188,159 @@ class ReductStage extends mag.Stage {
         this.saveState();
     }
 
+    // Determines whether the remaining expressions
+    // can possibly solve the level. Has to iterate over
+    // powerset of toolbox-board combos.
+    // * ASSUMES LEVEL IS NOT COMPLETE (board != goal). *
+    // > This is not perfect, hence why it's prefaced with 'might'.
+    mightBeCompleted() {
+        const exprs = this.expressionNodes();
+        const toolbox_exprs = this.toolboxNodes();
+        const remaining_exprs = exprs.concat(toolbox_exprs);
+
+        // If every expression is a value, nothing can be reduced,
+        // so continue with check.
+        const contains_reducable_expr = remaining_exprs.some(e => (!e.isValue()));
+
+        // Quit if there's an expression in the game
+        // that can be reduced, like == or lambda.
+        if (contains_reducable_expr)
+            return true;
+
+        // If there's nothing in the toolbox,
+        // we can assume level is incomplete.
+        if (toolbox_exprs.length === 0)
+            return false;
+
+        // If there's only one thing,
+        // add it to board and test new board against the Goal.
+        if (toolbox_exprs.length === 1)
+            return this.testBoard(remaining_exprs);
+
+        // Construct list of all possible board states
+        // using powerset of toolbox exprs.
+        const subsets = powerset(toolbox_exprs);
+        for (let s of subsets) {
+            if (s.length === 0) continue; // empty set falls under our assumption, so skip it.
+            if (this.testBoard(exprs.concat(s)) !== false)
+                return true; // if at least one possible board state works, this level can be solved.
+        }
+
+        // None of the possible board states could be solved.
+        return false;
+    }
+
     // Checks for level completion.
     update() {
         super.update();
 
-        if (this.isCompleted) {
-            let level_complete = this.isCompleted();
+        if (!this.isCompleted || this.ranResetNotifier) return;
 
-            if (level_complete) {
+        let level_complete = this.isCompleted();
 
-                // DEBUG TEST FLYTO ANIMATION.
-                if (!this.ranCompletionAnim) {
+        if (!level_complete) {
 
-                    this.saveState();
-                    Logger.log( 'victory', { 'final_state':this.toString(), 'num_of_moves':undefined } );
+            // Check if the level might be completed with the remaining exprs on board and in toolbox.
+            // * If not, we've reached a leaf of the state graph, and we can prompt
+            // * the player to reset.
+            if (!this.mightBeCompleted()) {
+                // Goal state cannot be reached. Prompt player to reset.
+                let btn_reset = this.uiNodes[1];
+                this.remove(btn_reset);
+                let r = new mag.Rect(0,0,GLOBAL_DEFAULT_SCREENSIZE.w, GLOBAL_DEFAULT_SCREENSIZE.h);
+                r.color = "black";
+                r.opacity = 0.0;
+                this.add(r);
+                this.add(btn_reset); // puts the button over r
+                this.ranResetNotifier = true;
 
-                    // Update + save player progress.
-                    ProgressManager.markLevelComplete(level_idx);
+                Animate.tween(r, {opacity:0.2}, 1000);
 
-                    let you_win = () => {
+                btn_reset.images.default = "btn-reset-force";
+                btn_reset.image = btn_reset.images.default;
+                this.draw();
+            }
 
-                        if (level_idx < 1) {
-                            var cmp = new mag.ImageRect(GLOBAL_DEFAULT_SCREENSIZE.w / 2, GLOBAL_DEFAULT_SCREENSIZE.h / 2, 740 / 2, 146 / 2, 'victory');
-                            cmp.anchor = { x:0.5, y:0.5 };
-                            this.add(cmp);
-                            this.draw();
+        }
+        else { // Level is completed.
 
-                            Resource.play('victory');
-                            Animate.wait(1080).after(function () {
-                                next();
-                            });
-                        } else { // Skip victory jingle on every level after first.
-                           next();
-                        }
-                    };
+            // DEBUG TEST FLYTO ANIMATION.
+            if (!this.ranCompletionAnim) {
 
-                    let pairs = level_complete;
-                    let num_exploded = 0;
-                    let playedSplosionAudio = false;
+                this.saveState();
+                Logger.log( 'victory', { 'final_state':this.toString(), 'num_of_moves':undefined } );
 
-                    pairs.forEach((pair, idx) => {
-                        var node = pair[0];
-                        var goalNode = pair[1];
-                        node.ignoreEvents = true;
+                // Update + save player progress.
+                ProgressManager.markLevelComplete(level_idx);
 
-                        Resource.play('matching-goal');
+                let you_win = () => {
 
-                        var blinkCount = level_idx === 0 ? 2 : 1;
-                        Animate.blink([node, goalNode], 2500 / 2.0 * blinkCount, [0, 1, 1], blinkCount).after(() => {
-                            //Resource.play('shootwee');
+                    if (level_idx < 1) {
+                        var cmp = new mag.ImageRect(GLOBAL_DEFAULT_SCREENSIZE.w / 2, GLOBAL_DEFAULT_SCREENSIZE.h / 2, 740 / 2, 146 / 2, 'victory');
+                        cmp.anchor = { x:0.5, y:0.5 };
+                        this.add(cmp);
+                        this.draw();
 
-                            this.playerWon = true;
-
-                            //Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x:200, y:300 }, () => {
-                                SplosionEffect.run(node);
-                                SplosionEffect.run(goalNode);
-
-                                if (!playedSplosionAudio) {
-                                    // Play sFx.
-                                    Resource.play('splosion');
-                                    playedSplosionAudio = true;
-                                }
-
-                                if (node.parent instanceof SpreadsheetDisplay)
-                                    node.parent.removeChild(node);
-
-                                goalNode.parent.removeChild(goalNode);
-                                num_exploded++;
-                                if (num_exploded === pairs.length) {
-                                    Animate.wait(500).after(you_win);
-                                }
-                            //});
-
+                        Resource.play('victory');
+                        Animate.wait(1080).after(function () {
+                            next();
                         });
+                    } else { // Skip victory jingle on every level after first.
+                       next();
+                    }
+                };
 
+                let pairs = level_complete;
+                let num_exploded = 0;
+                let playedSplosionAudio = false;
+
+                pairs.forEach((pair, idx) => {
+                    var node = pair[0];
+                    var goalNode = pair[1];
+                    node.ignoreEvents = true;
+
+                    Resource.play('matching-goal');
+
+                    var blinkCount = level_idx === 0 ? 2 : 1;
+                    Animate.blink([node, goalNode], 2500 / 2.0 * blinkCount, [0, 1, 1], blinkCount).after(() => {
+                        //Resource.play('shootwee');
+
+                        this.playerWon = true;
+
+                        //Animate.flyToTarget(node, goalNode.absolutePos, 2500.0, { x:200, y:300 }, () => {
+                            SplosionEffect.run(node);
+                            SplosionEffect.run(goalNode);
+
+                            if (!playedSplosionAudio) {
+                                // Play sFx.
+                                Resource.play('splosion');
+                                playedSplosionAudio = true;
+                            }
+
+                            if (node.parent instanceof SpreadsheetDisplay)
+                                node.parent.removeChild(node);
+
+                            goalNode.parent.removeChild(goalNode);
+                            num_exploded++;
+                            if (num_exploded === pairs.length) {
+                                Animate.wait(500).after(you_win);
+                            }
+                        //});
 
                     });
 
-                    this.ranCompletionAnim = true;
-                }
+
+                });
+
+                this.ranCompletionAnim = true;
             }
         }
     }
 
     onmousedown(pos) {
         super.onmousedown(pos);
-        if (this.heldNode && this.keyEventDelegate && this.heldNode != this.keyEventDelegate) {
+        if ((this.heldNode && this.keyEventDelegate && this.heldNode != this.keyEventDelegate) ||
+            (!this.heldNode && this.keyEventDelegate)) {
             this.keyEventDelegate.blur();
             this.keyEventDelegate = null;
         }
@@ -383,10 +450,15 @@ class ReductStage extends mag.Stage {
 
         // Push new state and save serialized version to logger.
         // * This will automatically check for duplicates...
-        this.stateGraph.push( state, changeData );
+        const changed = this.stateGraph.push( state, changeData );
         Logger.log('state-save', json);
 
         Logger.log('state-path-save', this.stateGraph.toString());
+
+        // Debug --
+        // Live display of state graph as game is played. (Only update if there's been a change!)
+        if (__DEBUG_DISPLAY_STATEGRAPH && changed)
+            __UPDATE_NETWORK_CB(this.stateGraph.toVisJSNetworkData());
     }
 
     // Determines what's changed between states a and b, (serialized Level objects)
