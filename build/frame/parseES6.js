@@ -212,6 +212,13 @@ var ES6Parser = function () {
                     } else if (node.callee.type === 'MemberExpression' && node.callee.property.name === 'map') {
                         return new (ExprManager.getClass('arrayobj'))(_this2.parseNode(node.callee.object), 'map', _this2.parseNode(node.arguments[0]));
                     } else if (node.callee.type === 'Identifier') {
+
+                        if (node.callee.name.substring(0, 2) === '_t') {
+                            var type_expr = TypeInTextExpr.fromExprCode(node.name);
+                            if (node.arguments.length === 1 && node.arguments[0].type === 'Literal') type_expr.typeBox.text = node.arguments[0].value;
+                            return type_expr;
+                        }
+
                         // Special case 'foo(_t_params)': Call parameters (including paretheses) will be entered by player.
                         if (node.arguments.length === 1 && node.arguments[0].type === 'Identifier' && node.arguments[0].name === '_t_params') return new NamedFuncExpr(node.callee.name, '_t_params');else // All other cases, including special case _t_varname(...) specifying that call name will be entered by player.
                             return new (Function.prototype.bind.apply(NamedFuncExpr, [null].concat([node.callee.name, null], _toConsumableArray(node.arguments.map(function (a) {
@@ -274,17 +281,20 @@ var ES6Parser = function () {
                                         return valid_operators.indexOf(txt) > -1;
                                     };
                                     comp.holes[1] = new TypeInTextExpr(validator, function (finalText) {
+                                        var locked = comp.locked;
                                         comp.funcName = finalText;
                                         if (finalText === '+') {
                                             // If this is concat, we have to swap the CompareExpr for an AddExpr...
                                             var addExpr = new AddExpr(comp.leftExpr.clone(), comp.rightExpr.clone());
                                             var parent = comp.parent || comp.stage;
                                             parent.swap(comp, addExpr);
+                                            if (locked) addExpr.lock();
                                         } else if (finalText === '=') {
                                             // If assignment, swap for AssignmentExpression.
                                             var assignExpr = new EqualsAssignExpr(comp.leftExpr.clone(), comp.rightExpr.clone());
                                             var _parent = comp.parent || comp.stage;
                                             _parent.swap(comp, assignExpr);
+                                            if (locked) assignExpr.lock();
                                         }
                                     });
                                 })();

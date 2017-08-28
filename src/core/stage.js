@@ -532,9 +532,6 @@ var mag = (function(_) {
                         }
                     }
 
-                    if (n instanceof LambdaHoleExpr && node instanceof LambdaExpr)
-                        console.log('lambda intersects', node, n);
-
                     // Get the intersection rectangle and its center point:
                     const intersection = rectFromIntersection(nodeBounds, hitNodeBounds);
                     const center = { x:intersection.x + intersection.w / 2.0, y:intersection.y + intersection.h / 2.0 };

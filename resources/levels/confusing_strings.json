@@ -53,7 +53,7 @@
             "description": "Confusion V: Typing function bodies.",
             "board": ["b => _t_single", "x => x x x"],
             "goal": ["'bee'", "'see'", "'Lee'"],
-            "typing_hints": ["b + 'ee'"],
+            "typing_hints": ["b + \"ee\""],
             "toolbox": ["'b'", "'s'", "'L'"]
         },
         {

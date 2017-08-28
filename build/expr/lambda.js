@@ -306,6 +306,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
                             preview_nodes.push(preview_node);
                         }
                     });
+
                     _this6.opened_subexprs = subvarexprs;
                     _this6.preview_nodes = preview_nodes;
                     _this6.is_replication_expr = is_replication_expr && _this6.preview_nodes.length > 0;
@@ -346,6 +347,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
             var _this7 = this;
 
             if (node instanceof LambdaHoleExpr) node = node.parent;
+
             // Disallow interaction with nested lambda
             if (this.parent && this.parent.parent instanceof LambdaExpr) {
                 return null;
@@ -353,6 +355,26 @@ var LambdaHoleExpr = function (_MissingExpression) {
 
             // Disallow dropping non-values
             if (node instanceof VarExpr || node instanceof AssignExpr || node instanceof VtableVarExpr) return null;
+
+            // Disallow dropping if lambda body has incomplete textbox.
+            var lambdaExpr = this.parent;
+            var hasTextbox = function hasTextbox(n) {
+                if (n && n.hasPlaceholderChildren()) {
+                    var placeholders = n.getPlaceholderChildren();
+                    if (placeholders.every(function (e) {
+                        return e instanceof MissingExpression;
+                    })) return false;else {
+                        // Blink the relevant placeholders.
+                        n.animatePlaceholderChildren();
+                        _this7.ondropexit(node, pos);
+                        console.log(n);
+                        return true;
+                    }
+                }
+                return false;
+            };
+            if (hasTextbox(node)) return null;
+            if (hasTextbox(lambdaExpr)) return null;
 
             if (node.dragging) {
                 // Make sure node is being dragged by the user.
@@ -369,6 +391,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
                     if (_this7.close_opened_subexprs) {
                         if (is_replication_expr && preview_nodes.length > 0) {
                             (function () {
+
                                 var final_nodes = [];
                                 preview_nodes.forEach(function (n) {
                                     var c = n.clone();
@@ -378,6 +401,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
                                     var pos = addPos(c.pos, { x: 0, y: -40 });
                                     final_nodes.push(c);
                                 });
+
                                 var overlap_layout = false;
                                 for (var i = 0; i < final_nodes.length - 1; i++) {
                                     var a = final_nodes[i];
@@ -389,23 +413,42 @@ var LambdaHoleExpr = function (_MissingExpression) {
                                         break;
                                     }
                                 }
+
                                 var len = final_nodes.length;
                                 var total_width = final_nodes.reduce(function (prev, n) {
                                     return prev + n.size.w;
                                 }, 0);
+                                var total_height = final_nodes.reduce(function (prev, n) {
+                                    return prev + n.size.h;
+                                }, 0);
                                 var mid_xpos = final_nodes.reduce(function (prev, n) {
                                     return prev + n.pos.x;
                                 }, 0) / len;
-                                final_nodes.forEach(function (c, i) {
-                                    var final_pos = void 0;
-                                    if (overlap_layout) final_pos = { x: mid_xpos + (len - i - 1) / len * total_width - total_width / 4.0, y: c.pos.y - 40 };else final_pos = { x: c.pos.x, y: c.pos.y - 40 };
-                                    stage.add(c);
-                                    Animate.tween(c, { scale: { x: 1, y: 1 }, pos: final_pos }, 300, function (e) {
-                                        return Math.pow(e, 0.5);
-                                    }).after(function () {
-                                        c.onmouseleave();
+
+                                var layout_vertical = overlap_layout && total_width > 420;
+                                if (layout_vertical) {
+                                    final_nodes.forEach(function (c, i) {
+                                        var final_pos = { x: mid_xpos,
+                                            y: c.pos.y - 60 - (len - i - 1) / len * total_height + i * 10 };
+                                        stage.add(c);
+                                        Animate.tween(c, { scale: { x: 1, y: 1 }, pos: final_pos }, 300, function (e) {
+                                            return Math.pow(e, 0.5);
+                                        }).after(function () {
+                                            c.onmouseleave();
+                                        });
                                     });
-                                });
+                                } else {
+                                    final_nodes.forEach(function (c, i) {
+                                        var final_pos = void 0;
+                                        if (overlap_layout) final_pos = { x: mid_xpos + (len - i - 1) / len * total_width - total_width / 4.0, y: c.pos.y - 40 };else final_pos = { x: c.pos.x, y: c.pos.y - 40 };
+                                        stage.add(c);
+                                        Animate.tween(c, { scale: { x: 1, y: 1 }, pos: final_pos }, 300, function (e) {
+                                            return Math.pow(e, 0.5);
+                                        }).after(function () {
+                                            c.onmouseleave();
+                                        });
+                                    });
+                                }
                             })();
                         }
                         _this7.close_opened_subexprs();
@@ -946,6 +989,7 @@ var LambdaExpr = function (_Expression) {
                                 parent = this.stage;
                                 reduced_expr.forEach(function (e) {
                                     if (_this13.locked) e.lock();else e.unlock();
+                                    e.lockSubexpressions();
                                 });
                                 parent.swap(this, reduced_expr); // swap 'this' (on the board) with an array of its reduced expressions
                                 parent.saveState();
@@ -957,6 +1001,7 @@ var LambdaExpr = function (_Expression) {
                 if (this.locked) reduced_expr.lock(); // the new expression should inherit whatever this expression was capable of as input
                 else reduced_expr.unlock();
                 //console.warn(this, reduced_expr);
+                reduced_expr.lockSubexpressions();
                 if (parent) parent.swap(this, reduced_expr);
 
                 if (reduced_expr.parent) {
@@ -1013,6 +1058,15 @@ var LambdaExpr = function (_Expression) {
             return funcJS;
         }
     }, {
+        key: "getPlaceholderChildren",
+        value: function getPlaceholderChildren() {
+            var _this14 = this;
+
+            return mag.Stage.getAllNodes([this]).filter(function (e) {
+                return e instanceof Expression && e.isPlaceholder() && e != _this14.hole && !(e instanceof LambdaVarExpr || e instanceof VtableVarExpr || e instanceof LabeledVarExpr || e instanceof VarExpr || e instanceof LambdaHoleExpr);
+            });
+        }
+    }, {
         key: "isParentheses",
         get: function get() {
             return this.holes.length > 0 && !this.takesArgument;
@@ -1057,12 +1111,12 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
     function EnvironmentLambdaExpr(exprs) {
         _classCallCheck(this, EnvironmentLambdaExpr);
 
-        var _this14 = _possibleConstructorReturn(this, (EnvironmentLambdaExpr.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr)).call(this, exprs));
+        var _this15 = _possibleConstructorReturn(this, (EnvironmentLambdaExpr.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr)).call(this, exprs));
 
-        _this14.environmentDisplay = new InlineEnvironmentDisplay(_this14);
-        _this14.environmentDisplay.scale = { x: 0.85, y: 0.85 };
-        _this14._originalArg = null;
-        return _this14;
+        _this15.environmentDisplay = new InlineEnvironmentDisplay(_this15);
+        _this15.environmentDisplay.scale = { x: 0.85, y: 0.85 };
+        _this15._originalArg = null;
+        return _this15;
     }
 
     _createClass(EnvironmentLambdaExpr, [{
@@ -1160,7 +1214,7 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
     }, {
         key: "performReduction",
         value: function performReduction() {
-            var _this15 = this;
+            var _this16 = this;
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
@@ -1179,12 +1233,12 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
             }
 
             return new Promise(function (resolve, _reject) {
-                _this15._animating = true;
-                _this15.environmentDisplay.openDrawer({ force: true, speed: 100 });
+                _this16._animating = true;
+                _this16.environmentDisplay.openDrawer({ force: true, speed: 100 });
 
                 // Perform substitution, but stop at the 'boundary' of another lambda.
-                var varExprs = findNoncapturingVarExpr(_this15, null, true, true);
-                var environment = _this15.getEnvironment();
+                var varExprs = findNoncapturingVarExpr(_this16, null, true, true);
+                var environment = _this16.getEnvironment();
 
                 var _iteratorNormalCompletion4 = true;
                 var _didIteratorError4 = false;
@@ -1224,7 +1278,7 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
                             var expr = varExprs.pop();
                             var result = void 0;
                             if (expr instanceof LabeledVarExpr) {
-                                result = expr.animateReduction(_this15.environmentDisplay.bindings[expr.name]);
+                                result = expr.animateReduction(_this16.environmentDisplay.bindings[expr.name]);
                             } else {
                                 result = expr.performReduction();
                             }
@@ -1237,7 +1291,7 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
                                 }, function () {
                                     innerreject();
                                     _reject();
-                                    _this15._animating = false;
+                                    _this16._animating = false;
                                 });
                             } else {
                                 return stepReduction();
@@ -1248,10 +1302,10 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
                 stepReduction().then(function () {
                     window.setTimeout(function () {
                         // Get rid of the parameter
-                        _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), "removeArg", _this15).call(_this15, _this15.holes[0]);
+                        _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), "removeArg", _this16).call(_this16, _this16.holes[0]);
 
-                        Animate.poof(_this15);
-                        _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), "performReduction", _this15).call(_this15);
+                        Animate.poof(_this16);
+                        _get(EnvironmentLambdaExpr.prototype.__proto__ || Object.getPrototypeOf(EnvironmentLambdaExpr.prototype), "performReduction", _this16).call(_this16);
                         resolve();
                     }, 600);
                 });
@@ -1276,22 +1330,22 @@ var InlineEnvironmentDisplay = function (_SpreadsheetEnvironme) {
     function InlineEnvironmentDisplay(lambda) {
         _classCallCheck(this, InlineEnvironmentDisplay);
 
-        var _this16 = _possibleConstructorReturn(this, (InlineEnvironmentDisplay.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay)).call(this, []));
+        var _this17 = _possibleConstructorReturn(this, (InlineEnvironmentDisplay.__proto__ || Object.getPrototypeOf(InlineEnvironmentDisplay)).call(this, []));
 
-        _this16.lambda = lambda;
-        _this16.parent = lambda;
-        _this16.padding = { left: 0, right: 10, inner: 10 };
+        _this17.lambda = lambda;
+        _this17.parent = lambda;
+        _this17.padding = { left: 0, right: 10, inner: 10 };
 
-        _this16._state = 'open';
-        _this16._height = 1.0;
-        _this16._animation = null;
-        return _this16;
+        _this17._state = 'open';
+        _this17._height = 1.0;
+        _this17._animation = null;
+        return _this17;
     }
 
     _createClass(InlineEnvironmentDisplay, [{
         key: "openDrawer",
         value: function openDrawer() {
-            var _this17 = this;
+            var _this18 = this;
 
             var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
@@ -1301,15 +1355,15 @@ var InlineEnvironmentDisplay = function (_SpreadsheetEnvironme) {
                 if (this._animation) this._animation.cancelWithoutFiringCallbacks();
                 this._state = 'opening';
                 this._animation = Animate.tween(this, { _height: 1.0 }, speed).after(function () {
-                    _this17._state = 'open';
-                    _this17._animation = null;
+                    _this18._state = 'open';
+                    _this18._animation = null;
                 });
             }
         }
     }, {
         key: "closeDrawer",
         value: function closeDrawer() {
-            var _this18 = this;
+            var _this19 = this;
 
             var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
@@ -1319,8 +1373,8 @@ var InlineEnvironmentDisplay = function (_SpreadsheetEnvironme) {
                 if (this._animation) this._animation.cancelWithoutFiringCallbacks();
                 this._state = 'closing';
                 this._animation = Animate.tween(this, { _height: 0.0 }, speed).after(function () {
-                    _this18._state = 'closed';
-                    _this18._animation = null;
+                    _this19._state = 'closed';
+                    _this19._animation = null;
                 });
             }
         }
@@ -1344,7 +1398,7 @@ var InlineEnvironmentDisplay = function (_SpreadsheetEnvironme) {
     }, {
         key: "draw",
         value: function draw(ctx) {
-            var _this19 = this;
+            var _this20 = this;
 
             if (!ctx) return;
             ctx.save();
@@ -1357,7 +1411,7 @@ var InlineEnvironmentDisplay = function (_SpreadsheetEnvironme) {
             this.drawInternal(ctx, upperLeftPos, boundingSize);
             if (this._state === 'open') {
                 this.children.forEach(function (child) {
-                    child.parent = _this19;
+                    child.parent = _this20;
                     child.draw(ctx);
                 });
             }
@@ -1407,12 +1461,12 @@ var FadedLambdaHoleExpr = function (_LambdaHoleExpr2) {
     function FadedLambdaHoleExpr(varname) {
         _classCallCheck(this, FadedLambdaHoleExpr);
 
-        var _this20 = _possibleConstructorReturn(this, (FadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedLambdaHoleExpr)).call(this, varname));
+        var _this21 = _possibleConstructorReturn(this, (FadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedLambdaHoleExpr)).call(this, varname));
 
-        _this20.padding.left = 5;
-        _this20.addArg(new TextExpr("λ" + varname + "."));
-        _this20.label.color = "#000";
-        return _this20;
+        _this21.padding.left = 5;
+        _this21.addArg(new TextExpr("λ" + varname + "."));
+        _this21.label.color = "#000";
+        return _this21;
     }
 
     _createClass(FadedLambdaHoleExpr, [{
@@ -1471,14 +1525,14 @@ var HalfFadedLambdaHoleExpr = function (_LambdaHoleExpr3) {
     function HalfFadedLambdaHoleExpr(varname) {
         _classCallCheck(this, HalfFadedLambdaHoleExpr);
 
-        var _this21 = _possibleConstructorReturn(this, (HalfFadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr)).call(this, varname));
+        var _this22 = _possibleConstructorReturn(this, (HalfFadedLambdaHoleExpr.__proto__ || Object.getPrototypeOf(HalfFadedLambdaHoleExpr)).call(this, varname));
 
         var txt = new TextExpr(varname);
         txt._xOffset = 6;
         txt.fontSize = 32;
-        _this21.addArg(txt);
-        _this21.label.color = "#FFF";
-        return _this21;
+        _this22.addArg(txt);
+        _this22.label.color = "#FFF";
+        return _this22;
     }
 
     _createClass(HalfFadedLambdaHoleExpr, [{
@@ -1525,14 +1579,14 @@ var FadedES6LambdaHoleExpr = function (_LambdaHoleExpr4) {
     function FadedES6LambdaHoleExpr(varname) {
         _classCallCheck(this, FadedES6LambdaHoleExpr);
 
-        var _this22 = _possibleConstructorReturn(this, (FadedES6LambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedES6LambdaHoleExpr)).call(this, varname));
+        var _this23 = _possibleConstructorReturn(this, (FadedES6LambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedES6LambdaHoleExpr)).call(this, varname));
 
-        _this22.padding.left = 5;
-        _this22.addArg(new TextExpr(" " + varname + " "));
-        _this22.addArg(new TextExpr("=>"));
-        _this22.label.color = "#000";
-        _this22.arrow.color = "#000";
-        return _this22;
+        _this23.padding.left = 5;
+        _this23.addArg(new TextExpr(" " + varname + " "));
+        _this23.addArg(new TextExpr("=>"));
+        _this23.label.color = "#000";
+        _this23.arrow.color = "#000";
+        return _this23;
     }
 
     _createClass(FadedES6LambdaHoleExpr, [{
@@ -1653,12 +1707,12 @@ var FadedLambdaVarExpr = function (_LambdaVarExpr2) {
     function FadedLambdaVarExpr(varname) {
         _classCallCheck(this, FadedLambdaVarExpr);
 
-        var _this25 = _possibleConstructorReturn(this, (FadedLambdaVarExpr.__proto__ || Object.getPrototypeOf(FadedLambdaVarExpr)).call(this, varname));
+        var _this26 = _possibleConstructorReturn(this, (FadedLambdaVarExpr.__proto__ || Object.getPrototypeOf(FadedLambdaVarExpr)).call(this, varname));
 
-        _this25.graphicNode.size = _this25.name === 'x' ? { w: 24, h: 24 } : { w: 24, h: 30 };
-        _this25.graphicNode.offset = _this25.name === 'x' ? { x: 0, y: 0 } : { x: 0, y: 2 };
-        _this25.handleOffset = 2;
-        return _this25;
+        _this26.graphicNode.size = _this26.name === 'x' ? { w: 24, h: 24 } : { w: 24, h: 30 };
+        _this26.graphicNode.offset = _this26.name === 'x' ? { x: 0, y: 0 } : { x: 0, y: 2 };
+        _this26.handleOffset = 2;
+        return _this26;
     }
 
     _createClass(FadedLambdaVarExpr, [{

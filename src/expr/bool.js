@@ -48,6 +48,7 @@ class GraphicFadedTrueExpr extends TrueExpr {
     constructor() {
         super();
         this.color = "lightgray";
+        this.holes[0].color = SyntaxColor.for('bool');
     }
     drawBaseShape(ctx, pos, size) {
         roundRect(ctx,
@@ -62,6 +63,7 @@ class GraphicFadedFalseExpr extends FalseExpr {
     constructor() {
         super();
         this.color = "lightgray";
+        this.holes[0].color = SyntaxColor.for('bool');
     }
     drawBaseShape(ctx, pos, size) {
         roundRect(ctx,

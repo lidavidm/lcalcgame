@@ -443,11 +443,12 @@ class ObjectExtensionExpr extends ExpressionPlus {
                 if (arg.canReduce()) {
                     args[i] = arg.reduceCompletely();
                 }
-                else if (!arg.isValue()) {
+                else if (!arg.isValue() && !(arg instanceof LambdaExpr)) {
                     console.warn("Can't call method; argument cannot reduce");
                     return this;
                 }
             }
+
             let args0 = this.holes[0];
             if (args0.canReduce()) {
                 args0 = args0.reduceCompletely();
@@ -595,7 +596,6 @@ class ArrayObjectExpr extends ObjectExtensionExpr {
                 'map':(arrayExpr, lambdaExpr) => {
                     let mapped = arrayExpr.map(lambdaExpr);
                     if (mapped) {
-                        mapped.items = mapped.items.map((i) => i.reduceCompletely());
                         return mapped;
                     }
                     else return arrayExpr;

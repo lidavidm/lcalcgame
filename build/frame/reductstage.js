@@ -522,6 +522,19 @@ var ReductStage = function (_mag$Stage) {
             if (__DEBUG_DISPLAY_STATEGRAPH && changed) __UPDATE_NETWORK_CB(this.stateGraph.toVisJSNetworkData());
         }
 
+        // For pushing minor (intermediate) data onto the current state
+
+    }, {
+        key: 'saveSubstate',
+        value: function saveSubstate() {
+            var changeData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+            if (this.stateGraph.length > 0) {
+                var state = this.toLevel().serialize();
+                this.stateGraph.pushAddendumToCurrentState({ state: state, data: changeData });
+            }
+        }
+
         // Determines what's changed between states a and b, (serialized Level objects)
         // where 'b' is assumed to come after 'a' (time-wise).
 

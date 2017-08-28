@@ -71,8 +71,8 @@ var arcLerp = function arcLerp(y0, y1) {
 /// Variable nodes - separate from lambda variable expressions, for
 /// now.
 
-var VarExpr = function (_Expression) {
-    _inherits(VarExpr, _Expression);
+var VarExpr = function (_ExpressionPlus) {
+    _inherits(VarExpr, _ExpressionPlus);
 
     function VarExpr(name) {
         _classCallCheck(this, VarExpr);
@@ -87,12 +87,28 @@ var VarExpr = function (_Expression) {
 
     _createClass(VarExpr, [{
         key: "open",
-        value: function open(preview) {
+        value: function open(preview_expr) {
             var animate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+            if (this.preview) this.close();
+            var scale = this.size.w / preview_expr.size.w * 1.2;
+            preview_expr.pos = { x: this.size.w / 2.0, y: this.size.h / 2.0 };
+            preview_expr.scale = { x: scale, y: scale };
+            preview_expr.anchor = { x: 0.5, y: 0.5 };
+            preview_expr.stroke = null;
+            this.addChild(preview_expr);
+            this.preview = preview_expr;
+            stage.update();
+            stage.draw();
         }
     }, {
         key: "close",
-        value: function close() {}
+        value: function close() {
+            if (this.preview) {
+                this.removeChild(this.preview);
+                stage.draw();
+            }
+        }
     }, {
         key: "value",
         value: function value() {
@@ -160,7 +176,7 @@ var VarExpr = function (_Expression) {
     }]);
 
     return VarExpr;
-}(Expression);
+}(ExpressionPlus);
 
 var LabeledVarExpr = function (_VarExpr) {
     _inherits(LabeledVarExpr, _VarExpr);
@@ -546,8 +562,8 @@ var LabeledChestVarExpr = function (_ChestVarExpr2) {
     return LabeledChestVarExpr;
 }(ChestVarExpr);
 
-var AssignExpr = function (_Expression2) {
-    _inherits(AssignExpr, _Expression2);
+var AssignExpr = function (_Expression) {
+    _inherits(AssignExpr, _Expression);
 
     function AssignExpr(variable, value) {
         _classCallCheck(this, AssignExpr);

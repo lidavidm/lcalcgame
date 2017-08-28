@@ -461,6 +461,14 @@ class ReductStage extends mag.Stage {
             __UPDATE_NETWORK_CB(this.stateGraph.toVisJSNetworkData());
     }
 
+    // For pushing minor (intermediate) data onto the current state
+    saveSubstate(changeData=null) {
+        if (this.stateGraph.length > 0) {
+            const state = this.toLevel().serialize();
+            this.stateGraph.pushAddendumToCurrentState( { state:state, data:changeData } );
+        }
+    }
+
     // Determines what's changed between states a and b, (serialized Level objects)
     // where 'b' is assumed to come after 'a' (time-wise).
     static stateDiff(a, b) {

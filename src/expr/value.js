@@ -247,7 +247,7 @@ class StringValueExpr extends Expression {
 class ColorlessStringValueExpr extends StringValueExpr {
     constructor(name, primitiveName=null) {
         super(name, primitiveName);
-        this.graphicNode.color = 'black';
+        this.graphicNode.color = SyntaxColor.for('string');
         this.color = 'lightgray';
     }
 }

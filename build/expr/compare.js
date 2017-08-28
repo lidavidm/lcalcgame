@@ -77,15 +77,19 @@ var CompareExpr = function (_Expression) {
             var _this2 = this;
 
             if (this.operatorExpr instanceof OpLiteral) {
-                var op = this.operatorExpr.toString();
-                var _swap = function _swap(expr) {
-                    var parent = _this2.stage || _this2.parent;
-                    parent.swap(_this2, expr);
-                };
-                if (op === '=') _swap(new (ExprManager.getClass('assign'))(this.leftExpr.clone(), this.rightExpr.clone()));else if (op === '+') _swap(new (ExprManager.getClass('+'))(this.leftExpr.clone(), this.rightExpr.clone()));else {
-                    this.operatorExpr = new TextExpr(op);
-                    this.funcName = op;
-                }
+                (function () {
+                    var op = _this2.operatorExpr.toString();
+                    var locked = _this2.locked;
+                    var _swap = function _swap(expr) {
+                        var parent = _this2.stage || _this2.parent;
+                        if (locked) expr.lock();
+                        parent.swap(_this2, expr);
+                    };
+                    if (op === '=') _swap(new (ExprManager.getClass('assign'))(_this2.leftExpr.clone(), _this2.rightExpr.clone()));else if (op === '+') _swap(new (ExprManager.getClass('+'))(_this2.leftExpr.clone(), _this2.rightExpr.clone()));else {
+                        _this2.operatorExpr = new TextExpr(op);
+                        _this2.funcName = op;
+                    }
+                })();
             } else if (this.operatorExpr instanceof TypeInTextExpr && !this.operatorExpr.isCommitted()) {
                 this.operatorExpr.typeBox.carriageReturn();
                 _get(CompareExpr.prototype.__proto__ || Object.getPrototypeOf(CompareExpr.prototype), 'performUserReduction', this).call(this);
@@ -236,7 +240,7 @@ var CompareExpr = function (_Expression) {
             if (this.operatorExpr instanceof MissingOpExpression) opName = '>>';else if (this.operatorExpr instanceof TypeInTextExpr) opName = '>>>';else if (this.op instanceof OpLiteral) opName = this.op.toString();
 
             if (opName in js_forms) {
-                var _ret = function () {
+                var _ret2 = function () {
                     var template = js_forms[opName];
                     var inner_exprs = { 'a': _this4.leftExpr.toJavaScript(), 'b': _this4.rightExpr.toJavaScript() };
                     var isString = function isString(x) {
@@ -254,7 +258,7 @@ var CompareExpr = function (_Expression) {
                     };
                 }();
 
-                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+                if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
             } else {
                 console.error('@ CompareExpr.toJavaScript: Operator name ' + this.funcName + ' not in mappings.');
                 return '__ERROR()';
@@ -319,6 +323,7 @@ var GraphicFadedCompareExpr = function (_FadedCompareExpr) {
         var _this6 = _possibleConstructorReturn(this, (GraphicFadedCompareExpr.__proto__ || Object.getPrototypeOf(GraphicFadedCompareExpr)).call(this, b1, b2, compareFuncName));
 
         _this6._color = _this6._origColor = "lightgray";
+        _this6.operatorExpr.color = SyntaxColor.for('operator');
         return _this6;
     }
 
@@ -395,7 +400,7 @@ var UnaryOpExpr = function (_Expression2) {
 
 
             if (this.rightExpr && !this.rightExpr.isValue() && !this._animating) {
-                var _ret2 = function () {
+                var _ret3 = function () {
                     _this8._animating = true;
                     var before = _this8.rightExpr;
                     return {
@@ -408,7 +413,7 @@ var UnaryOpExpr = function (_Expression2) {
                     };
                 }();
 
-                if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
+                if ((typeof _ret3 === 'undefined' ? 'undefined' : _typeof(_ret3)) === "object") return _ret3.v;
             }
 
             if (this.reduce() != this) {

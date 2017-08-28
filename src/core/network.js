@@ -113,7 +113,6 @@ var mag = (function(_) {
                     }
                 }
             }
-            console.log('match', matches);
             return matches;
         }
         has(pattern) {
@@ -126,7 +125,6 @@ var mag = (function(_) {
         }
         nodeForId(id) {
             if (id === null || typeof id === 'undefined') return null;
-            console.log(id, this.nodes);
             const ns = this.nodesMatching({id:id});
             if (ns.length === 0) return null;
             else                 return ns[0];
@@ -145,7 +143,7 @@ var mag = (function(_) {
             // If we already have this node...
             const dup_id = this.nodeIdFor({data: stateData});
             if (dup_id > -1) { // If we've already seen this state...
-                console.log('dup state');
+                // console.log('dup state');
                 if (dup_id === prevNodeId) { // We haven't actually moved, so do nothing.
                     if (changeData !== null) {
                         this.setEdgeData(this.lastEdgeId, changeData); // belated setting of edge data
@@ -154,7 +152,7 @@ var mag = (function(_) {
                     else
                         return false;
                 } else {                     // We've gone back to a previous state, so add an edge.
-                    console.log('went back to ', dup_id);
+                    // console.log('went back to ', dup_id);
                     this.addEdge(prevNodeId, dup_id, changeData);
                     this.lastNodeId = dup_id; // This is the id of the 'current node' (state) in the 'stack'...
                 }
@@ -168,6 +166,15 @@ var mag = (function(_) {
             }
 
             return true;
+        }
+
+        // For logging minor changes that occur _within_ the current game-state.
+        pushAddendumToCurrentState(data) {
+            let currentNode = this.lastAddedNode;
+            if ('subchanges' in currentNode)
+                currentNode.subchanges.push( data );
+            else
+                currentNode.subchanges = [ data ];
         }
 
         // Exporting methods

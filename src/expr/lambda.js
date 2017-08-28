@@ -237,6 +237,7 @@ class LambdaHoleExpr extends MissingExpression {
                     preview_nodes.push(preview_node);
                 }
             });
+
             this.opened_subexprs = subvarexprs;
             this.preview_nodes = preview_nodes;
             this.is_replication_expr = is_replication_expr && this.preview_nodes.length > 0;
@@ -269,14 +270,39 @@ class LambdaHoleExpr extends MissingExpression {
         if (this.close_opened_subexprs) this.close_opened_subexprs();
     }
     ondropped(node, pos) {
+
         if (node instanceof LambdaHoleExpr) node = node.parent;
+
         // Disallow interaction with nested lambda
         if (this.parent && this.parent.parent instanceof LambdaExpr) {
             return null;
         }
 
         // Disallow dropping non-values
-        if (node instanceof VarExpr || node instanceof AssignExpr || node instanceof VtableVarExpr) return null;
+        if (node instanceof VarExpr ||
+            node instanceof AssignExpr ||
+            node instanceof VtableVarExpr)
+            return null;
+
+        // Disallow dropping if lambda body has incomplete textbox.
+        const lambdaExpr = this.parent;
+        const hasTextbox = (n) => {
+            if (n && n.hasPlaceholderChildren()) {
+                const placeholders = n.getPlaceholderChildren();
+                if (placeholders.every((e) => e instanceof MissingExpression))
+                    return false;
+                else {
+                    // Blink the relevant placeholders.
+                    n.animatePlaceholderChildren();
+                    this.ondropexit(node, pos);
+                    console.log(n);
+                    return true;
+                }
+            }
+            return false;
+        };
+        if (hasTextbox(node))  return null;
+        if (hasTextbox(lambdaExpr)) return null;
 
         if (node.dragging) { // Make sure node is being dragged by the user.
 
@@ -291,6 +317,7 @@ class LambdaHoleExpr extends MissingExpression {
                 let is_replication_expr = this.is_replication_expr;
                 if (this.close_opened_subexprs) {
                     if (is_replication_expr && preview_nodes.length > 0) {
+
                         let final_nodes = [];
                         preview_nodes.forEach((n) => {
                             let c = n.clone();
@@ -300,6 +327,7 @@ class LambdaHoleExpr extends MissingExpression {
                             let pos = addPos(c.pos, {x:0, y:-40})
                             final_nodes.push( c );
                         });
+
                         let overlap_layout = false;
                         for (let i = 0; i < final_nodes.length - 1; i++) {
                             let a = final_nodes[i];
@@ -310,20 +338,36 @@ class LambdaHoleExpr extends MissingExpression {
                                 break;
                             }
                         }
+
                         const len = final_nodes.length;
                         const total_width = final_nodes.reduce((prev, n) => prev + n.size.w, 0);
+                        const total_height = final_nodes.reduce((prev, n) => prev + n.size.h, 0);
                         const mid_xpos = final_nodes.reduce((prev, n) => prev + n.pos.x, 0) / len;
-                        final_nodes.forEach((c, i) => {
-                            let final_pos;
-                            if (overlap_layout)
-                                final_pos = { x:mid_xpos + (len - i - 1) / len * total_width - total_width / 4.0, y:c.pos.y - 40 };
-                            else
-                                final_pos = { x:c.pos.x, y:c.pos.y - 40 };
-                            stage.add(c);
-                            Animate.tween(c, {scale:{x:1, y:1}, pos:final_pos}, 300, (e) => Math.pow(e, 0.5)).after(() => {
-                                c.onmouseleave();
+
+                        const layout_vertical = overlap_layout && total_width > 420;
+                        if (layout_vertical) {
+                            final_nodes.forEach((c, i) => {
+                                let final_pos = { x:mid_xpos,
+                                                  y:c.pos.y - 60 - ((len - i - 1) / len * total_height) + i * 10 };
+                                stage.add(c);
+                                Animate.tween(c, {scale:{x:1, y:1}, pos:final_pos}, 300, (e) => Math.pow(e, 0.5)).after(() => {
+                                    c.onmouseleave();
+                                });
                             });
-                        });
+                        }
+                        else {
+                            final_nodes.forEach((c, i) => {
+                                let final_pos;
+                                if (overlap_layout)
+                                    final_pos = { x:mid_xpos + (len - i - 1) / len * total_width - total_width / 4.0, y:c.pos.y - 40 };
+                                else
+                                    final_pos = { x:c.pos.x, y:c.pos.y - 40 };
+                                stage.add(c);
+                                Animate.tween(c, {scale:{x:1, y:1}, pos:final_pos}, 300, (e) => Math.pow(e, 0.5)).after(() => {
+                                    c.onmouseleave();
+                                });
+                            });
+                        }
                     }
                     this.close_opened_subexprs();
                 }
@@ -709,6 +753,7 @@ class LambdaExpr extends Expression {
                     reduced_expr.forEach((e) => {
                         if (this.locked) e.lock();
                         else             e.unlock();
+                        e.lockSubexpressions();
                     });
                     parent.swap(this, reduced_expr); // swap 'this' (on the board) with an array of its reduced expressions
                     parent.saveState();
@@ -720,6 +765,7 @@ class LambdaExpr extends Expression {
             if (this.locked) reduced_expr.lock(); // the new expression should inherit whatever this expression was capable of as input
             else             reduced_expr.unlock();
             //console.warn(this, reduced_expr);
+            reduced_expr.lockSubexpressions();
             if (parent) parent.swap(this, reduced_expr);
 
             if (reduced_expr.parent) {
@@ -776,6 +822,19 @@ class LambdaExpr extends Expression {
         if (bodyJS.indexOf(' ') > -1) bodyJS = `(${bodyJS})`
         let funcJS = `${param_name} => ${bodyJS}`;
         return funcJS;
+    }
+
+    getPlaceholderChildren() {
+        return mag.Stage.getAllNodes([this]).filter(
+            (e) => e instanceof Expression &&
+                e.isPlaceholder() &&
+                e != this.hole &&
+              !(e instanceof LambdaVarExpr ||
+                e instanceof VtableVarExpr ||
+                e instanceof LabeledVarExpr ||
+                e instanceof VarExpr ||
+                e instanceof LambdaHoleExpr)
+        );
     }
 }
 

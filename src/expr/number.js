@@ -45,6 +45,8 @@ class FadedNumberExpr extends NumberExpr {
 class OperatorExpr extends Expression {
     constructor(left, op, right) {
         super([left, op, right]);
+        // if (op instanceof TextExpr)
+        //     op.color = "#660037";
     }
 
     canReduce() {
@@ -86,7 +88,7 @@ class OperatorExpr extends Expression {
         });
     }
 
-    onmouseclick() {
+    performUserReduction() {
         if (this.op instanceof OpLiteral) {
             const Class = this.op.getClass();
             const stage = this.stage;
@@ -98,11 +100,11 @@ class OperatorExpr extends Expression {
             this.leftExpr.performReduction();
         if (this.rightExpr instanceof TypeInStringValueExpr || this.rightExpr instanceof TypeInTextExpr)
             this.rightExpr.performReduction();
+        super.performUserReduction();
+    }
+
+    onmouseclick() {
         this.performUserReduction();
-        //console.log("clicked Operator Expression!!");
-        //if (!this._animating) {
-        //    this.performReduction();
-        //}
     }
 
     toString() {

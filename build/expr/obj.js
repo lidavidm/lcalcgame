@@ -591,11 +591,12 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
                     var arg = args[i];
                     if (arg.canReduce()) {
                         args[i] = arg.reduceCompletely();
-                    } else if (!arg.isValue()) {
+                    } else if (!arg.isValue() && !(arg instanceof LambdaExpr)) {
                         console.warn("Can't call method; argument cannot reduce");
                         return this;
                     }
                 }
+
                 var args0 = this.holes[0];
                 if (args0.canReduce()) {
                     args0 = args0.reduceCompletely();
@@ -765,9 +766,6 @@ var ArrayObjectExpr = function (_ObjectExtensionExpr) {
             'map': function map(arrayExpr, lambdaExpr) {
                 var mapped = arrayExpr.map(lambdaExpr);
                 if (mapped) {
-                    mapped.items = mapped.items.map(function (i) {
-                        return i.reduceCompletely();
-                    });
                     return mapped;
                 } else return arrayExpr;
             },

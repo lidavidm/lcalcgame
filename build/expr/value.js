@@ -628,7 +628,7 @@ var ColorlessStringValueExpr = function (_StringValueExpr) {
 
         var _this18 = _possibleConstructorReturn(this, (ColorlessStringValueExpr.__proto__ || Object.getPrototypeOf(ColorlessStringValueExpr)).call(this, name, primitiveName));
 
-        _this18.graphicNode.color = 'black';
+        _this18.graphicNode.color = SyntaxColor.for('string');
         _this18.color = 'lightgray';
         return _this18;
     }

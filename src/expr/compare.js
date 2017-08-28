@@ -51,8 +51,10 @@ class CompareExpr extends Expression {
     performUserReduction() {
         if (this.operatorExpr instanceof OpLiteral) {
             const op = this.operatorExpr.toString();
+            const locked = this.locked;
             const _swap = (expr) => {
                 const parent = (this.stage || this.parent);
+                if (locked) expr.lock();
                 parent.swap(this, expr);
             };
             if (op === '=')
@@ -264,6 +266,7 @@ class GraphicFadedCompareExpr extends FadedCompareExpr {
     constructor(b1, b2, compareFuncName='==') {
         super(b1, b2, compareFuncName);
         this._color = this._origColor = "lightgray";
+        this.operatorExpr.color = SyntaxColor.for('operator');
     }
     drawBaseShape(ctx, pos, size) {
         roundRect(ctx,

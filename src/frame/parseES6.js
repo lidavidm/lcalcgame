@@ -189,6 +189,14 @@ class ES6Parser {
                 } else if (node.callee.type === 'MemberExpression' && node.callee.property.name === 'map') {
                     return new (ExprManager.getClass('arrayobj'))(this.parseNode(node.callee.object), 'map', this.parseNode(node.arguments[0]));
                 } else if (node.callee.type === 'Identifier') {
+
+                    if (node.callee.name.substring(0, 2) === '_t') {
+                        let type_expr = TypeInTextExpr.fromExprCode(node.name);
+                        if (node.arguments.length === 1 && node.arguments[0].type === 'Literal')
+                            type_expr.typeBox.text = node.arguments[0].value;
+                        return type_expr;
+                    }
+
                     // Special case 'foo(_t_params)': Call parameters (including paretheses) will be entered by player.
                     if (node.arguments.length === 1 && node.arguments[0].type === 'Identifier' && node.arguments[0].name === '_t_params')
                         return new NamedFuncExpr(node.callee.name, '_t_params');
@@ -248,16 +256,19 @@ class ES6Parser {
                         const valid_operators = __TYPING_OPTIONS['>>>'].slice();
                         const validator = (txt) => (valid_operators.indexOf(txt) > -1);
                         comp.holes[1] = new TypeInTextExpr(validator, (finalText) => {
+                            const locked = comp.locked;
                             comp.funcName = finalText;
                             if (finalText === '+') { // If this is concat, we have to swap the CompareExpr for an AddExpr...
                                 const addExpr = new AddExpr(comp.leftExpr.clone(), comp.rightExpr.clone());
                                 const parent = (comp.parent || comp.stage);
                                 parent.swap(comp, addExpr);
+                                if (locked) addExpr.lock()
                             }
                             else if (finalText === '=') { // If assignment, swap for AssignmentExpression.
                                 const assignExpr = new EqualsAssignExpr(comp.leftExpr.clone(), comp.rightExpr.clone());
                                 const parent = (comp.parent || comp.stage);
                                 parent.swap(comp, assignExpr);
+                                if (locked) assignExpr.lock()
                             }
                         });
                     }

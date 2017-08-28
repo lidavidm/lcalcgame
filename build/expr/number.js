@@ -97,6 +97,8 @@ var OperatorExpr = function (_Expression2) {
         _classCallCheck(this, OperatorExpr);
 
         return _possibleConstructorReturn(this, (OperatorExpr.__proto__ || Object.getPrototypeOf(OperatorExpr)).call(this, [left, op, right]));
+        // if (op instanceof TextExpr)
+        //     op.color = "#660037";
     }
 
     _createClass(OperatorExpr, [{
@@ -131,8 +133,8 @@ var OperatorExpr = function (_Expression2) {
             });
         }
     }, {
-        key: 'onmouseclick',
-        value: function onmouseclick() {
+        key: 'performUserReduction',
+        value: function performUserReduction() {
             if (this.op instanceof OpLiteral) {
                 var Class = this.op.getClass();
                 var stage = this.stage;
@@ -142,11 +144,12 @@ var OperatorExpr = function (_Expression2) {
             }
             if (this.leftExpr instanceof TypeInStringValueExpr || this.leftExpr instanceof TypeInTextExpr) this.leftExpr.performReduction();
             if (this.rightExpr instanceof TypeInStringValueExpr || this.rightExpr instanceof TypeInTextExpr) this.rightExpr.performReduction();
+            _get(OperatorExpr.prototype.__proto__ || Object.getPrototypeOf(OperatorExpr.prototype), 'performUserReduction', this).call(this);
+        }
+    }, {
+        key: 'onmouseclick',
+        value: function onmouseclick() {
             this.performUserReduction();
-            //console.log("clicked Operator Expression!!");
-            //if (!this._animating) {
-            //    this.performReduction();
-            //}
         }
     }, {
         key: 'toString',

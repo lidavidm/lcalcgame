@@ -210,37 +210,45 @@ var TypeBox = function (_mag$RoundedRect) {
         key: 'onmouseenter',
         value: function onmouseenter(pos) {
             //this.focus();
+            this._logState('mouse-enter');
             this.stroke = { color: 'blue', lineWidth: 2 };
             SET_CURSOR_STYLE(CONST.CURSOR.TEXT);
         }
     }, {
         key: 'onmousedown',
         value: function onmousedown(pos) {
+            this._logState('mouse-down');
             _get(TypeBox.prototype.__proto__ || Object.getPrototypeOf(TypeBox.prototype), 'onmousedown', this).call(this, pos);
             this.clearSelection();
             var pos_idx = this.charIndexForCursorPos(pos);
             this.updateCursorPosition(pos_idx);
             this._prevMousePos = pos;
             this._prevCursorIdx = pos_idx;
+            this._logState('after-mouse-down');
         }
     }, {
         key: 'onmousedrag',
         value: function onmousedrag(pos) {
+            this._logState('mouse-drag');
             var pos_idx = this.charIndexForCursorPos(addPos(this._prevMousePos, fromTo(this.absolutePos, pos)));
             this.showSelection({ start: this._prevCursorIdx, end: pos_idx });
             this.updateCursorPosition(pos_idx);
+            this._logState('after-mouse-drag');
         }
     }, {
         key: 'onmouseclick',
         value: function onmouseclick(pos) {
+            this._logState('clicked');
             this.focus();
             var pos_idx = this.charIndexForCursorPos(pos);
             this.updateCursorPosition(pos_idx);
+            this._logState('after-clicked');
         }
     }, {
         key: 'onmouseleave',
         value: function onmouseleave(pos) {
             //this.blur();
+            this._logState('mouse-leave');
             this.stroke = null;
             SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
         }
@@ -423,6 +431,7 @@ var TypeBox = function (_mag$RoundedRect) {
             this.cursor.startBlinking();
             this.stroke = { color: 'cyan', lineWidth: 2 };
             if (this.stage) this.stage.keyEventDelegate = this;
+            this._logState('focused');
         }
     }, {
         key: 'blur',
@@ -433,15 +442,20 @@ var TypeBox = function (_mag$RoundedRect) {
             this.stroke = null;
             if (this.stage && this.stage.keyEventDelegate == this) this.stage.keyEventDelegate = null;
             if (this.text === '') this.showEmptyIcon();
+            this._logState('blurred');
         }
     }, {
         key: 'animatePlaceholderStatus',
         value: function animatePlaceholderStatus() {
             if (this.stage && !this.stage.keyEventDelegate) this.focus();
         }
+
+        /* KEY EVENTS */
+
     }, {
         key: 'type',
         value: function type(str) {
+            this._logState('key-press', str);
             this.deleteSelectedText();
             var txt = this.text;
             var charIdx = this.cursorIndex;
@@ -453,12 +467,14 @@ var TypeBox = function (_mag$RoundedRect) {
             this.updateCursorPosition(charIdx + 1);
             if (this.onTextChanged) this.onTextChanged();
             this.stage.update();
+            this._logState('after-key-press', str);
         }
     }, {
         key: 'backspace',
         value: function backspace() {
             var num = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
+            this._logState('backspace');
             if (this.hasSelection()) {
                 this.deleteSelectedText();
                 if (this.onTextChanged) this.onTextChanged();
@@ -479,25 +495,54 @@ var TypeBox = function (_mag$RoundedRect) {
             this.updateCursorPosition(charIdx);
             if (this.onTextChanged) this.onTextChanged();
             this.stage.update();
+            this._logState('after-backspace');
         }
     }, {
         key: 'leftArrow',
         value: function leftArrow() {
+            this._logState('left-arrow');
             this.updateCursorPosition(Math.max(0, this.cursorIndex - 1));
             this.clearSelection();
+            this._logState('after-left-arrow');
         }
     }, {
         key: 'rightArrow',
         value: function rightArrow() {
+            this._logState('right-arrow');
             this.updateCursorPosition(this.cursorIndex + 1);
             this.clearSelection();
+            this._logState('after-right-arrow');
         }
+
+        // Only call after the player has pressed ENTER when this box is focused.
+
     }, {
         key: 'carriageReturn',
         value: function carriageReturn() {
             // Solidify block (if possible)
+            this._logState('carriage-return');
             if (this.onCarriageReturn) this.onCarriageReturn();
             if (this.stage) this.stage.update();
+            this._logState('after-carriage-return');
+        }
+
+        // Simulates carriage return but without the logging of a CR,
+        // which is reserved for actually pressing the ENTER key.
+
+    }, {
+        key: 'simulateCarriageReturn',
+        value: function simulateCarriageReturn() {
+            if (this.onCarriageReturn) this.onCarriageReturn();
+            if (this.stage) this.stage.update();
+        }
+    }, {
+        key: '_logState',
+        value: function _logState(desc, extraDatum) {
+            var rootParent = this.rootParent;
+            var data = { 'text': this.text, 'rootParent': rootParent ? rootParent.toJavaScript() : 'UNKNOWN', 'isFocused': this.isFocused(), 'cursorIndex': this.cursorIndex };
+            if (extraDatum) data['data'] = extraDatum;
+            if (this.hasSelection()) data['selection'] = { start: this.selection.range.start, end: this.selection.range.end };else data['selection'] = 'none';
+            Logger.log('tb-' + desc, data);
         }
     }, {
         key: 'text',
@@ -668,7 +713,12 @@ var TypeInTextExpr = function (_TextExpr) {
     }, {
         key: 'toString',
         value: function toString() {
-            return this._exprCode ? this._exprCode : '_t';
+            if (!this.typeBox) return this.text; // finalized typebox returns its text
+            var code = this._exprCode ? this._exprCode : '_t';
+            if (this.typeBox && this.typeBox.text.length > 0) {
+                var safe_text = this.typeBox.text.replace(/'/g, '"'); // convert all single-quotes to double for safety.
+                return code + '(\'' + safe_text + '\')'; // records state as argument of a function call.
+            } else return code;
         }
     }, {
         key: 'toJavaScript',
@@ -726,7 +776,6 @@ var TypeInTextExpr = function (_TextExpr) {
                 'single': function single(txt) {
                     txt = txt.replace('return', '__return =');
                     var res = __PARSER.parse(txt);
-                    console.log(txt, res);
                     return res && !(res instanceof Sequence);
                 },
                 'variable': function variable(txt) {
@@ -774,7 +823,11 @@ var TypeInTextExpr = function (_TextExpr) {
 
         var _this9 = _possibleConstructorReturn(this, (TypeInTextExpr.__proto__ || Object.getPrototypeOf(TypeInTextExpr)).call(this, " "));
 
-        _this9.validator = validator;
+        _this9.validator = function (txt) {
+            var valid = validator(txt);
+            Logger.log('check-validity', { 'text': txt, 'isValid': valid === true });
+            return valid;
+        };
 
         if (!afterCommit) {
             afterCommit = function afterCommit(txt) {
@@ -804,9 +857,18 @@ var TypeInTextExpr = function (_TextExpr) {
             var txt = this.text; // this.text is the TypeBox's text string, *not* the TextExpr's!
             console.log(txt);
             if (_thisTextExpr.validator(txt)) {
+                var rootParent = _thisTextExpr.rootParent;
+                var stage = _thisTextExpr.stage;
                 _thisTextExpr.commit(txt);
                 Resource.play('carriage-return');
                 if (afterCommit) afterCommit(txt);
+
+                Logger.log('after-commit-text', { 'text': txt, 'rootParent': rootParent ? rootParent.toJavaScript() : 'UNKNOWN' });
+                if (stage) stage.saveState();
+
+                // Also reduce the root parent if possible
+                // (removes need for redundant clicking)
+                if (rootParent && !rootParent.hasPlaceholderChildren() && !(rootParent instanceof LambdaExpr)) rootParent.performUserReduction();
             } else {
                 Animate.blink(this, 1000, [1, 0, 0], 2); // blink red
             }
@@ -816,6 +878,8 @@ var TypeInTextExpr = function (_TextExpr) {
                 //this.color = 'green';
                 this.stroke = { color: '#0f0', lineWidth: 4 };
             } else this.stroke = null;
+
+            if (_thisTextExpr.stage) _thisTextExpr.stage.saveSubstate();
         };
 
         var box = new TypeBox(0, 0, 52, _this9.size.h, onCommit, onTextChanged);
@@ -869,7 +933,7 @@ var TypeInTextExpr = function (_TextExpr) {
         value: function reduce() {
             var value = this.parsedValue();
             if (value) {
-                this.typeBox.carriageReturn();
+                this.typeBox.simulateCarriageReturn();
                 return value;
             }
             return this;
@@ -885,6 +949,7 @@ var TypeInTextExpr = function (_TextExpr) {
         key: 'commit',
         value: function commit(renderedText) {
             var stage = this.stage;
+            var rootParent = this.rootParent;
             this.blur();
             this.text = renderedText; // this is the underlying text in the TextExpr
             this.removeChild(this.typeBox);
@@ -900,6 +965,8 @@ var TypeInTextExpr = function (_TextExpr) {
             ShapeExpandEffect.run(this, 500, function (e) {
                 return Math.pow(e, 0.8);
             });
+
+            Logger.log('commit-text', { 'text': renderedText, 'rootParent': rootParent ? rootParent.toJavaScript() : 'UNKNOWN' });
         }
     }, {
         key: 'isCommitted',

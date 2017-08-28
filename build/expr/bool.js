@@ -127,6 +127,7 @@ var GraphicFadedTrueExpr = function (_TrueExpr) {
         var _this4 = _possibleConstructorReturn(this, (GraphicFadedTrueExpr.__proto__ || Object.getPrototypeOf(GraphicFadedTrueExpr)).call(this));
 
         _this4.color = "lightgray";
+        _this4.holes[0].color = SyntaxColor.for('bool');
         return _this4;
     }
 
@@ -149,6 +150,7 @@ var GraphicFadedFalseExpr = function (_FalseExpr) {
         var _this5 = _possibleConstructorReturn(this, (GraphicFadedFalseExpr.__proto__ || Object.getPrototypeOf(GraphicFadedFalseExpr)).call(this));
 
         _this5.color = "lightgray";
+        _this5.holes[0].color = SyntaxColor.for('bool');
         return _this5;
     }
 

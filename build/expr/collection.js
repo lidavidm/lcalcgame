@@ -147,9 +147,10 @@ var BagExpr = function (_CollectionExpr) {
                 return undefined;
             }
             var bag = this.clone();
-            //bag.graphicNode.children = [ bag.graphicNode.children[0] ];
-            //bag.graphicNode.holes = [ bag.graphicNode.children[0] ];
-            var items = bag.items;
+            bag.graphicNode.reset();
+            var items = this.items.map(function (i) {
+                return i.clone();
+            });
             bag.items = [];
             var new_items = [];
             items.forEach(function (item) {
@@ -169,13 +170,13 @@ var BagExpr = function (_CollectionExpr) {
                     for (var _iterator = new_funcs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                         var new_func = _step.value;
 
-                        _this5.stage.remove(new_func);
                         new_func.pos = pos;
                         new_func.unlockSubexpressions();
                         new_func.lockSubexpressions(function (expr) {
                             return expr instanceof ValueExpr || expr instanceof FadedValueExpr || expr instanceof BooleanPrimitive;
                         }); // lock primitives
-                        bag.addItem(new_func);
+                        bag.addItem(new_func.reduceCompletely());
+                        _this5.stage.remove(new_func);
                     }
                 } catch (err) {
                     _didIteratorError = true;

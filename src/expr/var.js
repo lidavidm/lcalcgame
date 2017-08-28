@@ -44,7 +44,7 @@ const arcLerp = (y0, y1, arc=120) => {
 
 /// Variable nodes - separate from lambda variable expressions, for
 /// now.
-class VarExpr extends Expression {
+class VarExpr extends ExpressionPlus {
     constructor(name) {
         super([]);
         this.name = name;
@@ -52,10 +52,24 @@ class VarExpr extends Expression {
         this.equivalentClasses = [VarExpr];
     }
 
-    open(preview, animate=true) {
+    open(preview_expr, animate=true) {
+        if (this.preview) this.close();
+        const scale = this.size.w / preview_expr.size.w * 1.2;
+        preview_expr.pos = { x:this.size.w/2.0, y:this.size.h/2.0 };
+        preview_expr.scale = { x:scale, y:scale };
+        preview_expr.anchor = { x:0.5, y:0.5 };
+        preview_expr.stroke = null;
+        this.addChild(preview_expr);
+        this.preview = preview_expr;
+        stage.update();
+        stage.draw();
     }
 
     close() {
+        if (this.preview) {
+            this.removeChild(this.preview)
+            stage.draw();
+        }
     }
 
     value() {

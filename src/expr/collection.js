@@ -92,9 +92,8 @@ class BagExpr extends CollectionExpr {
             return undefined;
         }
         let bag = this.clone();
-        //bag.graphicNode.children = [ bag.graphicNode.children[0] ];
-        //bag.graphicNode.holes = [ bag.graphicNode.children[0] ];
-        let items = bag.items;
+        bag.graphicNode.reset();
+        let items = this.items.map((i) => i.clone());
         bag.items = [];
         let new_items = [];
         items.forEach((item) => {
@@ -107,11 +106,11 @@ class BagExpr extends CollectionExpr {
             if (!Array.isArray(new_funcs)) new_funcs = [ new_funcs ];
 
             for (let new_func of new_funcs) {
-                this.stage.remove(new_func);
                 new_func.pos = pos;
                 new_func.unlockSubexpressions();
                 new_func.lockSubexpressions((expr) => (expr instanceof ValueExpr || expr instanceof FadedValueExpr || expr instanceof BooleanPrimitive)); // lock primitives
-                bag.addItem(new_func);
+                bag.addItem(new_func.reduceCompletely());
+                this.stage.remove(new_func);
             }
         });
         //bag.items = new_items;
