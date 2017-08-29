@@ -382,6 +382,9 @@ class ObjectExtensionExpr extends ExpressionPlus {
         this.objMethods = objMethods;
         // TBI
 
+        // Keep track of what the current state is (whether we have a
+        // method call and what the call is)
+        this._currentMethod = null;
     }
     onmousedrag(pos) {
         super.onmousedrag(pos);
@@ -548,6 +551,11 @@ class ObjectExtensionExpr extends ExpressionPlus {
 
         this.removeChild(this.drawer);
         this.drawer = null;
+
+        this._currentMethod = {
+            name: methodText,
+            args: argExprs,
+        };
     }
 
     isValue() { return !this.subReduceMethod; }
@@ -564,7 +572,15 @@ class ObjectExtensionExpr extends ExpressionPlus {
     }
 
     toJavaScript() {
-        return '__OBJECT_EXT_EXPR()'; // TO BE IMPLEMENTED!
+        let methodText = "";
+        if (this._currentMethod !== null) {
+            const parts = [];
+            for (let arg of this._currentMethod.args) {
+                parts.push(arg.toJavaScript());
+            }
+            methodText = `.${this._currentMethod.name}(${parts.join(", ")})`;
+        }
+        return `${this.holes[0].toJavaScript()}${methodText}`;
     }
 }
 
