@@ -377,6 +377,7 @@ class ES6Parser {
         if (ASTNode.type in typeSwitcher)
             return typeSwitcher[ASTNode.type](ASTNode);
         else {
+            console.log(ASTNode);
             console.error('@ ES6Parser.parseNode: No converter specified for AST Node of type ' + ASTNode.type);
             return null;
         }

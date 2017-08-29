@@ -142,8 +142,8 @@ var OperatorExpr = function (_Expression2) {
                 stage.swap(this, binExpr);
                 return;
             }
-            if (this.leftExpr instanceof TypeInStringValueExpr || this.leftExpr instanceof TypeInTextExpr) this.leftExpr.performReduction();
-            if (this.rightExpr instanceof TypeInStringValueExpr || this.rightExpr instanceof TypeInTextExpr) this.rightExpr.performReduction();
+            if (this.leftExpr instanceof ContextualTypeInTextExpr || this.leftExpr instanceof TypeInTextExpr) this.leftExpr.performReduction();
+            if (this.rightExpr instanceof ContextualTypeInTextExpr || this.rightExpr instanceof TypeInTextExpr) this.rightExpr.performReduction();
             _get(OperatorExpr.prototype.__proto__ || Object.getPrototypeOf(OperatorExpr.prototype), 'performUserReduction', this).call(this);
         }
     }, {

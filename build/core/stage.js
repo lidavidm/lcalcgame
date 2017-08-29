@@ -615,7 +615,7 @@ var mag = function (_) {
                     if (intersects(nodeBounds, hitNodeBounds)) {
 
                         // Give priority to intersections with child nodes (recursively)
-                        //console.log('intersects', node, n);
+                        // console.log('intersects', node, n);
                         var holes = n.holes ? n.holes.filter(function (e) {
                             return e instanceof Expression;
                         }) : [];

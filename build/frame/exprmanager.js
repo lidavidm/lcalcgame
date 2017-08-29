@@ -63,7 +63,8 @@ var ExprManager = function () {
         'vargoal': [VariableGoalDisplay],
         'return': [ReturnStatement],
         'string': [StringValueExpr, ColorlessStringValueExpr],
-        'typing_str': [TypeInStringValueExpr, ColorlessTypeInStringValueExpr]
+        'typing_str': [TypeInStringValueExpr, ColorlessTypeInStringValueExpr],
+        'typing_array': [TypeInArrayExpr]
     };
     var fade_levels = {};
     var DEFAULT_FADE_LEVEL = 0;

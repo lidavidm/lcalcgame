@@ -636,48 +636,48 @@ var ColorlessStringValueExpr = function (_StringValueExpr) {
     return ColorlessStringValueExpr;
 }(StringValueExpr);
 
-var TypeInStringValueExpr = function (_Expression4) {
-    _inherits(TypeInStringValueExpr, _Expression4);
+var ContextualTypeInTextExpr = function (_Expression4) {
+    _inherits(ContextualTypeInTextExpr, _Expression4);
 
-    function TypeInStringValueExpr() {
-        var defaultName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+    function ContextualTypeInTextExpr(left_text, right_text, type_expr_code, reduce_cb) {
+        var defaultName = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : "";
 
-        _classCallCheck(this, TypeInStringValueExpr);
+        _classCallCheck(this, ContextualTypeInTextExpr);
 
-        var left = new TextExpr('"');
-        left.color = "OrangeRed";
+        var left = new TextExpr(left_text);
+        left.color = 'black';
         var right = left.clone();
-        var mid = TypeInTextExpr.fromExprCode('_t_innerstring', function (final_txt) {
+        var mid = TypeInTextExpr.fromExprCode(type_expr_code, function (final_txt) {
             var parent = _this19.parent || _this19.stage;
             var stage = _this19.stage;
-            var str_expr = new (ExprManager.getClass('string'))(final_txt);
+            var replace_expr = reduce_cb(final_txt);
             var locked = _this19.locked;
-            parent.swap(_this19, str_expr); // Swap this makeshift StringValueExpr for a real one...
-            if (locked) str_expr.lock();
+            parent.swap(_this19, replace_expr); // Swap this makeshift textbox expr for a real one...
+            if (locked) replace_expr.lock();
             stage.update();
         });
-        mid.setDefaultWidth(22);
-        mid.typeBox.color = '#FEFCB1';
-        mid.typeBox.textColor = 'OrangeRed';
-        mid.typeBox.icon.image = 'empty-typebox-string';
 
-        var _this19 = _possibleConstructorReturn(this, (TypeInStringValueExpr.__proto__ || Object.getPrototypeOf(TypeInStringValueExpr)).call(this, [left, mid, right]));
+        var _this19 = _possibleConstructorReturn(this, (ContextualTypeInTextExpr.__proto__ || Object.getPrototypeOf(ContextualTypeInTextExpr)).call(this, [left, mid, right]));
 
+        _this19.exprCode = type_expr_code;
         _this19.defaultName = defaultName;
-        _this19.color = 'gold';
+        _this19.color = 'lightgray';
         return _this19;
     }
 
-    _createClass(TypeInStringValueExpr, [{
-        key: 'clone',
-        value: function clone() {
-            var t = new TypeInStringValueExpr(this.defaultName);
-            if (this.holes[1].typeBox) t.holes[1].typeBox.text = this.holes[1].typeBox.text;
-            if (this.locked) t.lock();
-            return t;
-        }
-    }, {
+    _createClass(ContextualTypeInTextExpr, [{
         key: 'reduceCompletely',
+
+
+        // clone() {
+        //     let t = new ContextualTypeInTextExpr(this.defaultName);
+        //     if (this.holes[1].typeBox)
+        //         t.holes[1].typeBox.text = this.holes[1].typeBox.text;
+        //     if (this.locked)
+        //         t.lock();
+        //     return t;
+        // }
+
         value: function reduceCompletely() {
             return this;
         }
@@ -710,7 +710,7 @@ var TypeInStringValueExpr = function (_Expression4) {
     }, {
         key: 'toJavaScript',
         value: function toJavaScript() {
-            return '_t_string';
+            return this.exprCode;
         }
     }, {
         key: 'value',
@@ -722,10 +722,51 @@ var TypeInStringValueExpr = function (_Expression4) {
         get: function get() {
             return this.holes[0];
         }
+    }, {
+        key: 'leftExpr',
+        get: function get() {
+            return this.holes[0];
+        }
+    }, {
+        key: 'typeExpr',
+        get: function get() {
+            return this.holes[1];
+        }
+    }, {
+        key: 'rightExpr',
+        get: function get() {
+            return this.holes[2];
+        }
     }]);
 
-    return TypeInStringValueExpr;
+    return ContextualTypeInTextExpr;
 }(Expression);
+
+var TypeInStringValueExpr = function (_ContextualTypeInText) {
+    _inherits(TypeInStringValueExpr, _ContextualTypeInText);
+
+    function TypeInStringValueExpr() {
+        var defaultName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+
+        _classCallCheck(this, TypeInStringValueExpr);
+
+        var _this20 = _possibleConstructorReturn(this, (TypeInStringValueExpr.__proto__ || Object.getPrototypeOf(TypeInStringValueExpr)).call(this, '"', '"', '_t_innerstring', function (final_txt) {
+            return new (ExprManager.getClass('string'))(final_txt);
+        }, defaultName));
+
+        var mid = _this20.typeExpr;
+        mid.setDefaultWidth(22);
+        mid.typeBox.color = '#FEFCB1';
+        mid.typeBox.textColor = 'OrangeRed';
+        mid.typeBox.icon.image = 'empty-typebox-string';
+
+        _this20.leftExpr.color = "OrangeRed";
+        _this20.color = 'gold';
+        return _this20;
+    }
+
+    return TypeInStringValueExpr;
+}(ContextualTypeInTextExpr);
 
 var ColorlessTypeInStringValueExpr = function (_TypeInStringValueExp) {
     _inherits(ColorlessTypeInStringValueExpr, _TypeInStringValueExp);
@@ -735,17 +776,44 @@ var ColorlessTypeInStringValueExpr = function (_TypeInStringValueExp) {
 
         _classCallCheck(this, ColorlessTypeInStringValueExpr);
 
-        var _this20 = _possibleConstructorReturn(this, (ColorlessTypeInStringValueExpr.__proto__ || Object.getPrototypeOf(ColorlessTypeInStringValueExpr)).call(this, defaultName));
+        var _this21 = _possibleConstructorReturn(this, (ColorlessTypeInStringValueExpr.__proto__ || Object.getPrototypeOf(ColorlessTypeInStringValueExpr)).call(this, defaultName));
 
-        _this20.holes[0].color = _this20.holes[2].color = 'black';
-        _this20.holes[1].typeBox.color = "#eee";
-        _this20.holes[1].typeBox.textColor = 'black';
-        _this20.color = 'lightgray';
-        return _this20;
+        _this21.leftExpr.color = _this21.rightExpr.color = 'black';
+        _this21.typeExpr.typeBox.color = "#eee";
+        _this21.typeExpr.typeBox.textColor = 'black';
+        _this21.color = 'lightgray';
+        return _this21;
     }
 
     return ColorlessTypeInStringValueExpr;
 }(TypeInStringValueExpr);
+
+var TypeInArrayExpr = function (_ContextualTypeInText2) {
+    _inherits(TypeInArrayExpr, _ContextualTypeInText2);
+
+    function TypeInArrayExpr() {
+        _classCallCheck(this, TypeInArrayExpr);
+
+        var _this22 = _possibleConstructorReturn(this, (TypeInArrayExpr.__proto__ || Object.getPrototypeOf(TypeInArrayExpr)).call(this, '[', ']', '_t_innerarray', function (final_txt) {
+            return __PARSER.parse('[' + final_txt + ']');
+        }));
+
+        _this22.leftExpr.text = '[';
+        _this22.rightExpr.text = ']';
+        return _this22;
+    }
+
+    _createClass(TypeInArrayExpr, [{
+        key: 'update',
+        value: function update() {
+            var sz = this.size;
+            _get(TypeInArrayExpr.prototype.__proto__ || Object.getPrototypeOf(TypeInArrayExpr.prototype), 'update', this).call(this);
+            var sz_after = this.size;
+        }
+    }]);
+
+    return TypeInArrayExpr;
+}(ContextualTypeInTextExpr);
 
 var StringStarExpr = function (_StringValueExpr2) {
     _inherits(StringStarExpr, _StringValueExpr2);
@@ -817,20 +885,20 @@ var StringAddExpr = function (_Expression5) {
     }, {
         key: 'performReduction',
         value: function performReduction() {
-            var _this26 = this;
+            var _this28 = this;
 
             return this.performSubReduction(this.leftExpr).then(function (left) {
                 if (!(left instanceof StringValueExpr)) {
                     return Promise.reject();
                 }
-                return _this26.performSubReduction(_this26.rightExpr).then(function (right) {
+                return _this28.performSubReduction(_this28.rightExpr).then(function (right) {
                     if (!(right instanceof StringValueExpr)) {
                         return Promise.reject();
                     }
 
-                    var stage = _this26.stage;
+                    var stage = _this28.stage;
 
-                    var val = _get(StringAddExpr.prototype.__proto__ || Object.getPrototypeOf(StringAddExpr.prototype), 'performReduction', _this26).call(_this26);
+                    var val = _get(StringAddExpr.prototype.__proto__ || Object.getPrototypeOf(StringAddExpr.prototype), 'performReduction', _this28).call(_this28);
                     stage.update();
                     return val;
                 });

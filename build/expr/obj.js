@@ -534,7 +534,7 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
                     var cln = _get(ObjectExtensionExpr.prototype.__proto__ || Object.getPrototypeOf(ObjectExtensionExpr.prototype), 'clone', _this8).call(_this8, parent);
                     cln.holes = [];
                     _this8.holes.forEach(function (hole) {
-                        return cln.holes.push(hole);
+                        return cln.holes.push(hole.clone());
                     });
                     return {
                         v: cln
@@ -672,7 +672,11 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
             this._argumentExpressions = argExprs.slice();
             if (argExprs && argExprs.length > 0) {
 
+                // DEBUG: ERROR: Add .clone to fix array resize error w/ text entering.
+                // HOWEVER, adding this breaks typing inside arguments,
+                // because clone() does not work (?) on TypeInTextExprs (?)... :(((
                 this.addArg(argExprs[0]);
+
                 for (var i = 1; i < argExprs.length; i++) {
                     var comma = new TextExpr(','); // comma to separate arguments
                     comma.fontSize = methodtxt.fontSize;
@@ -765,9 +769,7 @@ var ArrayObjectExpr = function (_ObjectExtensionExpr) {
             },
             'map': function map(arrayExpr, lambdaExpr) {
                 var mapped = arrayExpr.map(lambdaExpr);
-                if (mapped) {
-                    return mapped;
-                } else return arrayExpr;
+                if (mapped) return mapped;else return arrayExpr;
             },
             'length': {
                 'isProperty': true,

@@ -96,9 +96,9 @@ class OperatorExpr extends Expression {
             stage.swap(this, binExpr);
             return;
         }
-        if (this.leftExpr instanceof TypeInStringValueExpr || this.leftExpr instanceof TypeInTextExpr)
+        if (this.leftExpr instanceof ContextualTypeInTextExpr || this.leftExpr instanceof TypeInTextExpr)
             this.leftExpr.performReduction();
-        if (this.rightExpr instanceof TypeInStringValueExpr || this.rightExpr instanceof TypeInTextExpr)
+        if (this.rightExpr instanceof ContextualTypeInTextExpr || this.rightExpr instanceof TypeInTextExpr)
             this.rightExpr.performReduction();
         super.performUserReduction();
     }

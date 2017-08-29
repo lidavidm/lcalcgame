@@ -251,37 +251,40 @@ class ColorlessStringValueExpr extends StringValueExpr {
         this.color = 'lightgray';
     }
 }
-class TypeInStringValueExpr extends Expression {
-    constructor(defaultName="") {
-        let left = new TextExpr('"');
-        left.color = "OrangeRed";
+class ContextualTypeInTextExpr extends Expression {
+    constructor(left_text, right_text, type_expr_code, reduce_cb, defaultName="") {
+        let left = new TextExpr(left_text);
+        left.color = 'black';
         let right = left.clone();
-        let mid = TypeInTextExpr.fromExprCode('_t_innerstring', (final_txt) => {
+        let mid = TypeInTextExpr.fromExprCode(type_expr_code, (final_txt) => {
             let parent = (this.parent || this.stage);
             let stage = this.stage;
-            let str_expr = new (ExprManager.getClass('string'))(final_txt);
+            let replace_expr = reduce_cb(final_txt);
             let locked = this.locked;
-            parent.swap(this, str_expr); // Swap this makeshift StringValueExpr for a real one...
-            if (locked) str_expr.lock();
+            parent.swap(this, replace_expr); // Swap this makeshift textbox expr for a real one...
+            if (locked) replace_expr.lock();
             stage.update();
         });
-        mid.setDefaultWidth(22);
-        mid.typeBox.color = '#FEFCB1';
-        mid.typeBox.textColor = 'OrangeRed';
-        mid.typeBox.icon.image = 'empty-typebox-string';
         super([left, mid, right]);
+        this.exprCode = type_expr_code;
         this.defaultName = defaultName;
-        this.color = 'gold';
+        this.color = 'lightgray';
     }
-    clone() {
-        let t = new TypeInStringValueExpr(this.defaultName);
-        if (this.holes[1].typeBox)
-            t.holes[1].typeBox.text = this.holes[1].typeBox.text;
-        if (this.locked)
-            t.lock();
-        return t;
-    }
+
     get graphicNode() { return this.holes[0]; }
+    get leftExpr() { return this.holes[0]; }
+    get typeExpr() { return this.holes[1]; }
+    get rightExpr() { return this.holes[2]; }
+
+    // clone() {
+    //     let t = new ContextualTypeInTextExpr(this.defaultName);
+    //     if (this.holes[1].typeBox)
+    //         t.holes[1].typeBox.text = this.holes[1].typeBox.text;
+    //     if (this.locked)
+    //         t.lock();
+    //     return t;
+    // }
+
     reduceCompletely() { return this; }
     reduce() {
         this.holes[1].reduce();
@@ -296,17 +299,48 @@ class TypeInStringValueExpr extends Expression {
         return (this.locked ? '/' : '') + this.defaultName;
     }
     toJavaScript() {
-        return '_t_string';
+        return this.exprCode;
     }
     value() { return this.name; }
+}
+class TypeInStringValueExpr extends ContextualTypeInTextExpr {
+    constructor(defaultName="") {
+
+        super('"', '"', '_t_innerstring', (final_txt) => {
+            return new (ExprManager.getClass('string'))(final_txt);
+        }, defaultName);
+
+        const mid = this.typeExpr;
+        mid.setDefaultWidth(22);
+        mid.typeBox.color = '#FEFCB1';
+        mid.typeBox.textColor = 'OrangeRed';
+        mid.typeBox.icon.image = 'empty-typebox-string';
+
+        this.leftExpr.color = "OrangeRed";
+        this.color = 'gold';
+    }
 }
 class ColorlessTypeInStringValueExpr extends TypeInStringValueExpr {
     constructor(defaultName="") {
         super(defaultName);
-        this.holes[0].color = this.holes[2].color = 'black';
-        this.holes[1].typeBox.color = "#eee";
-        this.holes[1].typeBox.textColor = 'black';
+        this.leftExpr.color = this.rightExpr.color = 'black';
+        this.typeExpr.typeBox.color = "#eee";
+        this.typeExpr.typeBox.textColor = 'black';
         this.color = 'lightgray';
+    }
+}
+class TypeInArrayExpr extends ContextualTypeInTextExpr {
+    constructor() {
+        super('[', ']', '_t_innerarray', (final_txt) => {
+            return __PARSER.parse('[' + final_txt + ']');
+        });
+        this.leftExpr.text = '[';
+        this.rightExpr.text = ']';
+    }
+    update() {
+        let sz = this.size;
+        super.update();
+        let sz_after = this.size;
     }
 }
 class StringStarExpr extends StringValueExpr {

@@ -560,9 +560,12 @@ class TypeInTextExpr extends TextExpr {
         // Special cases:
         // Entering strings without worry about quotes...
         if (code === 'string') return new (ExprManager.getClass('typing_str'))();
+        // Entering arrays without brackets...
+        else if (code === 'array') return new (ExprManager.getClass('typing_array'))();
 
         let transformer = null;
-        if (code === 'innerstring') transformer = txt => `"{txt}"`;
+        if (code === 'innerstring') transformer = txt => `"${txt}"`;
+        else if (code === 'innerarray')  transformer = txt => `[${txt}]`;
 
         let validators = {
             'fullstring':(txt) => (__PARSER.parse(txt) instanceof StringValueExpr),
@@ -571,6 +574,7 @@ class TypeInTextExpr extends TextExpr {
                 let i = Number.parseInt(txt, 10);
                 return (!Number.isNaN(i) && i >= 0);
             },
+            'innerarray':(txt) => (__PARSER.parse(transformer(txt)) instanceof BracketArrayExpr),
             'int':(txt) => (!Number.isNaN(Number.parseInt(txt, 10))),
             'equiv':(txt) => (['==','!=','===','!==', 'or', 'and', 'or not', 'and not'].indexOf(txt) > -1),
             'single':(txt) => {
@@ -689,6 +693,7 @@ class TypeInTextExpr extends TextExpr {
                 const stage = _thisTextExpr.stage;
                 _thisTextExpr.commit(txt);
                 Resource.play('carriage-return');
+
                 if (afterCommit) afterCommit(txt);
 
                 Logger.log('after-commit-text', {'text': txt, 'rootParent':rootParent ? rootParent.toJavaScript() : 'UNKNOWN' });
@@ -710,8 +715,9 @@ class TypeInTextExpr extends TextExpr {
             } else
                 this.stroke = null;
 
-            if (_thisTextExpr.stage)
+            if (_thisTextExpr.stage) {
                 _thisTextExpr.stage.saveSubstate();
+            }
         };
 
         let box = new TypeBox(0, 0, 52, this.size.h, onCommit, onTextChanged);

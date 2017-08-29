@@ -396,7 +396,7 @@ class ObjectExtensionExpr extends ExpressionPlus {
         } else {
             let cln = super.clone(parent);
             cln.holes = [];
-            this.holes.forEach((hole) => cln.holes.push(hole));
+            this.holes.forEach((hole) => cln.holes.push(hole.clone()));
             return cln;
         }
     }
@@ -524,7 +524,11 @@ class ObjectExtensionExpr extends ExpressionPlus {
         this._argumentExpressions = argExprs.slice();
         if (argExprs && argExprs.length > 0) {
 
+            // DEBUG: ERROR: Add .clone to fix array resize error w/ text entering.
+            // HOWEVER, adding this breaks typing inside arguments,
+            // because clone() does not work (?) on TypeInTextExprs (?)... :(((
             this.addArg(argExprs[0]);
+
             for (let i = 1; i < argExprs.length; i++) {
                 let comma = new TextExpr(','); // comma to separate arguments
                 comma.fontSize = methodtxt.fontSize;
@@ -595,9 +599,7 @@ class ArrayObjectExpr extends ObjectExtensionExpr {
                 },
                 'map':(arrayExpr, lambdaExpr) => {
                     let mapped = arrayExpr.map(lambdaExpr);
-                    if (mapped) {
-                        return mapped;
-                    }
+                    if (mapped) return mapped;
                     else return arrayExpr;
                 },
                   'length': {
@@ -649,7 +651,9 @@ class ArrayObjectExpr extends ObjectExtensionExpr {
         this.defaultMethodArgs = defaultMethodArgs;
         this.baseArray = baseArray;
     }
-    get constructorArgs() { return [this.holes[0].clone(), this.defaultMethodCall, this.defaultMethodArgs]; }
+    get constructorArgs() {
+        return [this.holes[0].clone(), this.defaultMethodCall, this.defaultMethodArgs];
+    }
     reduce() {
         let r = super.reduce();
         if (r != this && r instanceof BracketArrayExpr) {

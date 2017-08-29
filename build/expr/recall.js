@@ -750,10 +750,14 @@ var TypeInTextExpr = function (_TextExpr) {
             // Special cases:
             // Entering strings without worry about quotes...
             if (code === 'string') return new (ExprManager.getClass('typing_str'))();
+            // Entering arrays without brackets...
+            else if (code === 'array') return new (ExprManager.getClass('typing_array'))();
 
             var transformer = null;
             if (code === 'innerstring') transformer = function transformer(txt) {
-                return '"{txt}"';
+                return '"' + txt + '"';
+            };else if (code === 'innerarray') transformer = function transformer(txt) {
+                return '[' + txt + ']';
             };
 
             var validators = {
@@ -766,6 +770,9 @@ var TypeInTextExpr = function (_TextExpr) {
                 'nonneg': function nonneg(txt) {
                     var i = Number.parseInt(txt, 10);
                     return !Number.isNaN(i) && i >= 0;
+                },
+                'innerarray': function innerarray(txt) {
+                    return __PARSER.parse(transformer(txt)) instanceof BracketArrayExpr;
                 },
                 'int': function int(txt) {
                     return !Number.isNaN(Number.parseInt(txt, 10));
@@ -861,6 +868,7 @@ var TypeInTextExpr = function (_TextExpr) {
                 var stage = _thisTextExpr.stage;
                 _thisTextExpr.commit(txt);
                 Resource.play('carriage-return');
+
                 if (afterCommit) afterCommit(txt);
 
                 Logger.log('after-commit-text', { 'text': txt, 'rootParent': rootParent ? rootParent.toJavaScript() : 'UNKNOWN' });
@@ -879,7 +887,9 @@ var TypeInTextExpr = function (_TextExpr) {
                 this.stroke = { color: '#0f0', lineWidth: 4 };
             } else this.stroke = null;
 
-            if (_thisTextExpr.stage) _thisTextExpr.stage.saveSubstate();
+            if (_thisTextExpr.stage) {
+                _thisTextExpr.stage.saveSubstate();
+            }
         };
 
         var box = new TypeBox(0, 0, 52, _this9.size.h, onCommit, onTextChanged);

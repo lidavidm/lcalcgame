@@ -10,16 +10,39 @@
             "toolbox": ""
         },
         {
-            "description": "Intro to map: Typing.",
-            "board": "[0, 1, 0, 1].map(x => _t_single)",
-            "goal": "[false, true, false, true]",
+            "description": "Function placement.",
+            "board": "[0, 1, 0].map(_)",
+            "goal": "[false, true, false]",
+            "toolbox": ["n => 0 == n", "m => 1 == m", "k => 1 + k"]
+        },
+        {
+            "description": "Intro to map: Typing function body.",
+            "board": "[0, 1, 0, 1].map(i => _t_single)",
+            "goal": "[true, false, true, false]",
             "toolbox": ""
         },
         {
-            "description": "Intro to map II.",
-            "board": "['ne', 'li', 'be'].map(x => _t_single)",
+            "description": "Intro to map: Typing II.",
+            "board": "['ne', 'li', 'be'].map(s => _t_single)",
             "goal": "['near', 'liar', 'bear']",
             "toolbox": ""
+        },
+        {
+            "description": "Intro to map: Choosing arrays.",
+            "board": "__.map(a => _t_single)",
+            "goal": "['met', 'net']",
+            "toolbox": ["['b', 'a']", "['n', 'm']", "['m', 'n']"]
+        },
+        {
+            "description": "Intro to map: Choosing arrays II.",
+            "board": "__.map(_t_single)",
+            "goal": "[false, true]",
+            "toolbox": ["['0', '1']", "[0, 0]", "['a', 'b']", "[3, 5]"]
+        },
+        {
+            "description": "Typing arrays.",
+            "board": ["_t_array.map(x => x + 'er')"],
+            "goal": "['better', 'faster', 'stronger']"
         }
     ],
     "resources":{
