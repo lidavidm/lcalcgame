@@ -175,6 +175,12 @@ class AddExpr extends OperatorExpr {
         super(left, op, right);
     }
 
+    canReduce() {
+        // Disallow booleans
+        return super.canReduce() && (this.left && !(this.left instanceof BooleanPrimitive))
+            && (this.right && !(this.right instanceof BooleanPrimitive));
+    }
+
     /* This 'add' should work for string concatenation as well. */
     reduce() {
         if (!this.canReduce()) return this;
@@ -212,6 +218,12 @@ class MultiplicationExpr extends OperatorExpr {
         super(left, op, right);
     }
 
+    canReduce() {
+        // Disallow booleans
+        return super.canReduce() && (this.left && !(this.left instanceof BooleanPrimitive))
+            && (this.right && !(this.right instanceof BooleanPrimitive));
+    }
+
     reduce() {
         if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {
             return new (ExprManager.getClass('number'))(this.leftExpr.value() * this.rightExpr.value());
@@ -226,6 +238,12 @@ class DivisionExpr extends OperatorExpr {
     constructor(left, right) {
         let op = new TextExpr("/");
         super(left, op, right);
+    }
+
+    canReduce() {
+        // Disallow booleans
+        return super.canReduce() && (this.left && !(this.left instanceof BooleanPrimitive))
+            && (this.right && !(this.right instanceof BooleanPrimitive));
     }
 
     reduce() {
@@ -247,6 +265,12 @@ class ModuloExpr extends OperatorExpr {
         console.log(right);
         if (Number.isNumber(right)) right = new FadedNumberExpr(right);
         super(left, op, right);
+    }
+
+    canReduce() {
+        // Disallow booleans
+        return super.canReduce() && (this.left && !(this.left instanceof BooleanPrimitive))
+            && (this.right && !(this.right instanceof BooleanPrimitive));
     }
 
     reduce() {
