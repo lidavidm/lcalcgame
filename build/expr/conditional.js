@@ -55,7 +55,7 @@ var IfStatement = function (_Expression) {
         key: 'playUnlockAnimation',
         value: function playUnlockAnimation(onComplete) {
             Resource.play('key-unlock');
-            Animate.wait(150).after(onComplete);
+            Animate.wait(750).after(onComplete);
         }
     }, {
         key: 'canReduce',
@@ -95,6 +95,8 @@ var IfStatement = function (_Expression) {
                 if (reduction != _this2) {
                     (function () {
 
+                        var abs_pos = _this2.parent ? null : reduction.centerPos();
+
                         var stage = _this2.stage;
                         var afterEffects = function afterEffects() {
                             _this2.ignoreEvents = false;
@@ -105,6 +107,7 @@ var IfStatement = function (_Expression) {
                                 if (rtn === null) {
                                     rtn = new FadedNullExpr();
                                 }
+                                if (abs_pos) rtn.pos = abs_pos;
                                 resolve(rtn);
                                 stage.update();
                                 return rtn;
@@ -123,6 +126,17 @@ var IfStatement = function (_Expression) {
                             });
                             //this.playJimmyAnimation(afterEffects);
                         } else {
+                                if (_this2.cond.value() === true) {
+                                    _this2.branch.stroke = { color: 'blue', lineWidth: 4 };
+                                    ShapeExpandEffect.run(_this2.branch, 500, function (e) {
+                                        return Math.pow(e, 0.5);
+                                    }, 'blue', 1.5);
+                                } else {
+                                    _this2.elseBranch.stroke = { color: 'blue', lineWidth: 4 };
+                                    ShapeExpandEffect.run(_this2.elseBranch, 500, function (e) {
+                                        return Math.pow(e, 0.5);
+                                    }, 'blue', 1.5);
+                                }
                                 _this2.playUnlockAnimation(afterEffects);
                             }
 

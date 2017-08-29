@@ -37,6 +37,12 @@ var BooleanPrimitive = function (_Expression) {
             return this;
         }
     }, {
+        key: 'onmouseclick',
+        value: function onmouseclick() {
+            if (this.parent) // Bubble click events if possible.
+                this.parent.onmouseclick();
+        }
+    }, {
         key: 'isValue',
         value: function isValue() {
             return true;

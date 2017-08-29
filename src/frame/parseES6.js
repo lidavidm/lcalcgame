@@ -262,13 +262,15 @@ class ES6Parser {
                                 const addExpr = new AddExpr(comp.leftExpr.clone(), comp.rightExpr.clone());
                                 const parent = (comp.parent || comp.stage);
                                 parent.swap(comp, addExpr);
-                                if (locked) addExpr.lock()
+                                if (locked) addExpr.lock();
+                                if (!addExpr.hasPlaceholderChildren())
+                                    addExpr.performUserReduction();
                             }
                             else if (finalText === '=') { // If assignment, swap for AssignmentExpression.
                                 const assignExpr = new EqualsAssignExpr(comp.leftExpr.clone(), comp.rightExpr.clone());
                                 const parent = (comp.parent || comp.stage);
                                 parent.swap(comp, assignExpr);
-                                if (locked) assignExpr.lock()
+                                if (locked) assignExpr.lock();
                             }
                         });
                     }

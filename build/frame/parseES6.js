@@ -289,6 +289,7 @@ var ES6Parser = function () {
                                             var parent = comp.parent || comp.stage;
                                             parent.swap(comp, addExpr);
                                             if (locked) addExpr.lock();
+                                            if (!addExpr.hasPlaceholderChildren()) addExpr.performUserReduction();
                                         } else if (finalText === '=') {
                                             // If assignment, swap for AssignmentExpression.
                                             var assignExpr = new EqualsAssignExpr(comp.leftExpr.clone(), comp.rightExpr.clone());

@@ -36,7 +36,7 @@ class IfStatement extends Expression {
     }
     playUnlockAnimation(onComplete) {
         Resource.play('key-unlock');
-        Animate.wait(150).after(onComplete);
+        Animate.wait(750).after(onComplete);
     }
 
     canReduce() {
@@ -71,6 +71,8 @@ class IfStatement extends Expression {
             var reduction = this.reduce();
             if (reduction != this) {
 
+                const abs_pos = this.parent ? null : reduction.centerPos();
+
                 let stage = this.stage;
                 let afterEffects = () => {
                     this.ignoreEvents = false;
@@ -81,6 +83,7 @@ class IfStatement extends Expression {
                         if (rtn === null) {
                             rtn = new FadedNullExpr();
                         }
+                        if (abs_pos) rtn.pos = abs_pos;
                         resolve(rtn);
                         stage.update();
                         return rtn;
@@ -101,6 +104,13 @@ class IfStatement extends Expression {
                     //this.playJimmyAnimation(afterEffects);
                 }
                 else {
+                    if (this.cond.value() === true) {
+                        this.branch.stroke = { color:'blue', lineWidth:4 };
+                        ShapeExpandEffect.run(this.branch, 500, (e) => Math.pow(e, 0.5), 'blue', 1.5);
+                    } else {
+                        this.elseBranch.stroke = { color:'blue', lineWidth:4 };
+                        ShapeExpandEffect.run(this.elseBranch, 500, (e) => Math.pow(e, 0.5), 'blue', 1.5);
+                    }
                     this.playUnlockAnimation(afterEffects);
                 }
 

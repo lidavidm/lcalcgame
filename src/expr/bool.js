@@ -10,6 +10,11 @@ class BooleanPrimitive extends Expression {
     reduce() { return this; }
     reduceCompletely() { return this; }
 
+    onmouseclick() {
+        if (this.parent) // Bubble click events if possible. 
+            this.parent.onmouseclick();
+    }
+
     isValue() { return true; }
 
     drawInternal(ctx, pos, boundingSize) {

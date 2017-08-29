@@ -60,11 +60,11 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     const chapterDigraph = {
         'intro': ['booleans'],
         'booleans': ['strings'],
-        'strings': ['bindings'],
+        'strings': ['conditionals'],
+        'conditionals': ['bindings'],
         'bindings': ['confusing_strings'],
         'confusing_strings': ['map'],
-        'map': ['conditionals'],
-        'conditionals': ['variables'],
+        'map': ['variables'],
         'variables': ['typing_variables'],
         'typing_variables': []
     };
