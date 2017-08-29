@@ -69,7 +69,8 @@ var CompareExpr = function (_Expression) {
     }, {
         key: 'canReduce',
         value: function canReduce() {
-            return this.leftExpr && this.rightExpr && this.operatorExpr.canReduce() && (this.leftExpr.canReduce() || this.leftExpr.isValue()) && (this.rightExpr.canReduce() || this.rightExpr.isValue());
+            // Allow comparisons with lambdas.
+            return this.leftExpr && this.rightExpr && this.operatorExpr.canReduce() && (this.leftExpr.canReduce() || this.leftExpr.isValue() || this.leftExpr instanceof LambdaExpr) && (this.rightExpr.canReduce() || this.rightExpr.isValue()) || this.rightExpr instanceof LambdaExpr;
         }
     }, {
         key: 'performUserReduction',
@@ -110,8 +111,8 @@ var CompareExpr = function (_Expression) {
                         if (result != before) return Promise.resolve();else return Promise.reject("@ CompareExpr.performReduction: Subexpression did not reduce!");
                     });
                 };
-                if (!this.leftExpr.isValue()) animations.push(genSubreduceAnimation(this.leftExpr));
-                if (!this.rightExpr.isValue()) animations.push(genSubreduceAnimation(this.rightExpr));
+                if (!this.leftExpr.isValue() && !(this.leftExpr instanceof LambdaExpr)) animations.push(genSubreduceAnimation(this.leftExpr));
+                if (!this.rightExpr.isValue() && !(this.rightExpr instanceof LambdaExpr)) animations.push(genSubreduceAnimation(this.rightExpr));
                 return Promise.all(animations).then(function () {
                     if (_this3.reduce() != _this3) {
                         return after(500).then(function () {
@@ -146,8 +147,8 @@ var CompareExpr = function (_Expression) {
             if (this.funcName === '==') {
                 if (!this.rightExpr || !this.leftExpr) return undefined;
 
-                var lval = this.leftExpr.value();
-                var rval = this.rightExpr.value();
+                var lval = this.leftExpr instanceof LambdaExpr ? this.leftExpr.toString() : this.leftExpr.value();
+                var rval = this.rightExpr instanceof LambdaExpr ? this.rightExpr.toString() : this.rightExpr.value();
 
                 // Variables that are equal reduce to TRUE, regardless of whether they are bound!!
                 if (!lval && !rval && this.leftExpr instanceof LambdaVarExpr && this.rightExpr instanceof LambdaVarExpr) return this.leftExpr.name === this.rightExpr.name;

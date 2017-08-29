@@ -45,6 +45,12 @@ class IfStatement extends Expression {
     }
 
     performReduction(animated=true) {
+
+        if (this.hasPlaceholderChildren()) {
+            this.animatePlaceholderChildren();
+            return Promise.reject("IfExpr: placeholders exist.");
+        }
+
         if (this.cond && this.cond.canReduce()) {
             return this.performSubReduction(this.cond, animated).then(() => {
                 return this.performReduction();

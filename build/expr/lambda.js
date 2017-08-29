@@ -398,6 +398,10 @@ var LambdaHoleExpr = function (_MissingExpression) {
                                     c.anchor = n.anchor;
                                     c.pos = n.absolutePos;
                                     c.scale = n.absoluteScale;
+                                    // Lock child nodes that are not placeholders
+                                    c.lockSubexpressions(function (e) {
+                                        return !(e.isPlaceholder() || e instanceof LambdaHoleExpr);
+                                    });
                                     var pos = addPos(c.pos, { x: 0, y: -40 });
                                     final_nodes.push(c);
                                 });
@@ -989,7 +993,9 @@ var LambdaExpr = function (_Expression) {
                                 parent = this.stage;
                                 reduced_expr.forEach(function (e) {
                                     if (_this13.locked) e.lock();else e.unlock();
-                                    e.lockSubexpressions();
+                                    e.lockSubexpressions(function (node) {
+                                        return !(node.isPlaceholder() || node instanceof LambdaHoleExpr);
+                                    });
                                 });
                                 parent.swap(this, reduced_expr); // swap 'this' (on the board) with an array of its reduced expressions
                                 parent.saveState();
@@ -1001,7 +1007,10 @@ var LambdaExpr = function (_Expression) {
                 if (this.locked) reduced_expr.lock(); // the new expression should inherit whatever this expression was capable of as input
                 else reduced_expr.unlock();
                 //console.warn(this, reduced_expr);
-                reduced_expr.lockSubexpressions();
+                reduced_expr.lockSubexpressions(function (node) {
+                    return !(node.isPlaceholder() || node instanceof LambdaHoleExpr);
+                });
+
                 if (parent) parent.swap(this, reduced_expr);
 
                 if (reduced_expr.parent) {

@@ -69,6 +69,12 @@ var IfStatement = function (_Expression) {
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
+
+            if (this.hasPlaceholderChildren()) {
+                this.animatePlaceholderChildren();
+                return Promise.reject("IfExpr: placeholders exist.");
+            }
+
             if (this.cond && this.cond.canReduce()) {
                 return this.performSubReduction(this.cond, animated).then(function () {
                     return _this2.performReduction();

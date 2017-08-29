@@ -432,6 +432,8 @@ var TypeBox = function (_mag$RoundedRect) {
             this.stroke = { color: 'cyan', lineWidth: 2 };
             if (this.stage) this.stage.keyEventDelegate = this;
             this._logState('focused');
+
+            if (this.onFocus) this.onFocus();
         }
     }, {
         key: 'blur',
@@ -443,6 +445,8 @@ var TypeBox = function (_mag$RoundedRect) {
             if (this.stage && this.stage.keyEventDelegate == this) this.stage.keyEventDelegate = null;
             if (this.text === '') this.showEmptyIcon();
             this._logState('blurred');
+
+            if (this.onBlur) this.onBlur();
         }
     }, {
         key: 'animatePlaceholderStatus',
@@ -855,6 +859,11 @@ var TypeInTextExpr = function (_TextExpr) {
                 });
                 if (!(parent instanceof mag.Stage)) expr.lock();
                 expr.update();
+                // Make sure everything updates & everything gets laid out properly
+                while (parent) {
+                    parent.update();
+                    parent = parent.parent;
+                }
             };
             _this9.afterCommit = afterCommit;
         }

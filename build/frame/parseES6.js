@@ -302,6 +302,12 @@ var ES6Parser = function () {
                                             if (locked) assignExpr.lock();
                                         }
                                     });
+                                    comp.holes[1].typeBox.onFocus = function () {
+                                        if (!this.hasHint()) showHintText('== or +');
+                                    };
+                                    comp.holes[1].typeBox.onBlur = function () {
+                                        hideHintText();
+                                    };
                                 })();
                             } else {
                                 comp.holes[1] = TypeInTextExpr.fromExprCode('_t_equiv', function (finalText) {

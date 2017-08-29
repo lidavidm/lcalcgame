@@ -520,6 +520,15 @@ function hideHelpText() {
     $('#help').hide();
 }
 
+function showHintText(txt) {
+    var hint = $('#hint');
+    if (txt) hint.text(txt);
+    $('#type_help').show();
+}
+function hideHintText() {
+    $('#type_help').hide();
+}
+
 function toggleDevInfo() {
     var devinfo = $('#devinfo');
     var txt = $('#devInfoBtnText');

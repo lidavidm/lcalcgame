@@ -508,6 +508,9 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
         _this7.objMethods = objMethods;
         // TBI
 
+        // Keep track of what the current state is (whether we have a
+        // method call and what the call is)
+        _this7._currentMethod = null;
         return _this7;
     }
 
@@ -699,6 +702,11 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
 
             this.removeChild(this.drawer);
             this.drawer = null;
+
+            this._currentMethod = {
+                name: methodText,
+                args: argExprs
+            };
         }
     }, {
         key: 'isValue',
@@ -721,7 +729,37 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
     }, {
         key: 'toJavaScript',
         value: function toJavaScript() {
-            return '__OBJECT_EXT_EXPR()'; // TO BE IMPLEMENTED!
+            var methodText = "";
+            if (this._currentMethod !== null) {
+                var parts = [];
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
+
+                try {
+                    for (var _iterator = this._currentMethod.args[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        var arg = _step.value;
+
+                        parts.push(arg.toJavaScript());
+                    }
+                } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion && _iterator.return) {
+                            _iterator.return();
+                        }
+                    } finally {
+                        if (_didIteratorError) {
+                            throw _iteratorError;
+                        }
+                    }
+                }
+
+                methodText = '.' + this._currentMethod.name + '(' + parts.join(", ") + ')';
+            }
+            return '' + this.holes[0].toJavaScript() + methodText;
         }
     }, {
         key: 'constructorArgs',

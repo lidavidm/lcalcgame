@@ -367,6 +367,8 @@ class TypeBox extends mag.RoundedRect {
         this.stroke = { color:'cyan', lineWidth:2 };
         if (this.stage) this.stage.keyEventDelegate = this;
         this._logState('focused');
+
+        if (this.onFocus) this.onFocus();
     }
     blur() {
         if (!this.isFocused()) return;
@@ -378,6 +380,8 @@ class TypeBox extends mag.RoundedRect {
         if (this.text === '')
             this.showEmptyIcon();
         this._logState('blurred');
+
+        if (this.onBlur) this.onBlur();
     }
     animatePlaceholderStatus() {
         if (this.stage && !this.stage.keyEventDelegate)
