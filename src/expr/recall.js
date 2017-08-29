@@ -680,6 +680,11 @@ class TypeInTextExpr extends TextExpr {
                 if (!(parent instanceof mag.Stage))
                     expr.lock();
                 expr.update();
+                // Make sure everything updates & everything gets laid out properly
+                while (parent) {
+                    parent.update();
+                    parent = parent.parent;
+                }
             };
             this.afterCommit = afterCommit;
         }

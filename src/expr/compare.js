@@ -43,9 +43,12 @@ class CompareExpr extends Expression {
     }
 
     canReduce() {
+        // Allow comparisons with lambdas.
         return this.leftExpr && this.rightExpr && this.operatorExpr.canReduce() &&
-            (this.leftExpr.canReduce() || this.leftExpr.isValue()) &&
-            (this.rightExpr.canReduce() || this.rightExpr.isValue());
+            (this.leftExpr.canReduce() || this.leftExpr.isValue() ||
+             this.leftExpr instanceof LambdaExpr) &&
+            (this.rightExpr.canReduce() || this.rightExpr.isValue()) ||
+            this.rightExpr instanceof LambdaExpr;
     }
 
     performUserReduction() {
@@ -84,9 +87,9 @@ class CompareExpr extends Expression {
                         return Promise.reject("@ CompareExpr.performReduction: Subexpression did not reduce!");
                 });
             };
-            if (!this.leftExpr.isValue())
+            if (!this.leftExpr.isValue() && !(this.leftExpr instanceof LambdaExpr))
                 animations.push(genSubreduceAnimation(this.leftExpr));
-            if (!this.rightExpr.isValue())
+            if (!this.rightExpr.isValue() && !(this.rightExpr instanceof LambdaExpr))
                 animations.push(genSubreduceAnimation(this.rightExpr));
             return Promise.all(animations).then(() => {
                 if (this.reduce() != this) {
@@ -120,8 +123,10 @@ class CompareExpr extends Expression {
         if (this.funcName === '==') {
             if (!this.rightExpr || !this.leftExpr) return undefined;
 
-            var lval = this.leftExpr.value();
-            var rval = this.rightExpr.value();
+            var lval = this.leftExpr instanceof LambdaExpr ?
+                this.leftExpr.toString() : this.leftExpr.value();
+            var rval = this.rightExpr instanceof LambdaExpr ?
+                this.rightExpr.toString() : this.rightExpr.value();
 
             // Variables that are equal reduce to TRUE, regardless of whether they are bound!!
             if (!lval && !rval && this.leftExpr instanceof LambdaVarExpr && this.rightExpr instanceof LambdaVarExpr)
