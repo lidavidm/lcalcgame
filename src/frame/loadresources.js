@@ -373,7 +373,6 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                             else {
                                 root.ignoreEvents = false;
                             }
-                            console.log(root);
                         });
                         Animate.tween(unfaded_root, { 'opacity':0.0 }, 1000).after(() => {
                             faded.remove(unfaded_root);
