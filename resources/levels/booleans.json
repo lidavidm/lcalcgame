@@ -3,9 +3,9 @@
     "description":"Boolean equality",
     "language":"JavaScript",
     "macros": {
-        "a":"star",
-        "b":"rect",
-        "c":"triangle"
+        "a":"'A'",
+        "b":"'B'",
+        "c":"'C'"
     },
     "levels": [
         {
@@ -16,67 +16,89 @@
             "fade": {
                 "true":1,
                 "false":1,
-                "==":1
+                "==":1,
+                "number":1
             },
             "showFade": false
         },
         {
             "description": "Introduces concept: Holes.",
-            "board": ["a == _", "a"],
+            "board": ["'apple' == _", "'apple'"],
             "goal": "true",
             "toolbox": ""
         },
         {
             "description": "Introduces concept: Choice of true and false.",
-            "board": "b == _",
+            "board": "3 == _",
             "goal": "true",
-            "toolbox": ["b", "a"]
+            "toolbox": ["0", "1", "2", "3", "4"]
         },
         {
             "description": "Introduces false.",
-            "board": "a == b",
+            "board": "'hi' == 'bye'",
             "goal": "false",
             "toolbox": ""
         },
         {
             "description": "Introduces concept: More than one free slot. Also choice of false.",
-            "board": ["_ == _", "a"],
+            "board": ["_ == _", "'small'"],
             "goal": "false",
-            "toolbox": ["b", "a"]
+            "toolbox": ["'large'", "'small'"]
+        },
+        {
+            "description": "Typing with ==, one side.",
+            "goal": "true",
+            "board": ["_t_string == 'jupiter'"],
+            "toolbox": "",
+            "block_variant": {
+                "board": ["_ == 'jupiter'"],
+                "toolbox": ["'jupiter'", "'saturn'"]
+            },
+            "help_text": "Press ENTER when finished typing."
+        },
+        {
+            "description": "Typing with ==, twice. Spaces.",
+            "goal": ["false", "true"],
+            "board": ["'hot' == _t_string", "'cold' == _t_string"],
+            "toolbox": ""
         },
         {
             "description": "Partial application.",
-            "board": ["a == _", "x => xx", "b", "b"],
+            "board": ["'sun' == _", "x => xx", "'moon'", "'moon'"],
             "goal": ["false", "false"],
             "toolbox": ""
         },
         {
             "description": "Applying function to boolean",
-            "board": "a == _",
+            "board": "'cat' == _",
             "goal": ["true", "true"],
-            "toolbox": ["x => xx", "a", "b", "x => x"]
+            "toolbox": ["x => xx", "'cat'", "'dog'", "x => x"]
         },
         {
             "description": "Writing a boolean expression from scratch.",
-            "board": "a",
+            "board": "2",
             "goal": "true",
-            "toolbox": ["_ == _", "x => xx", "b", "x => x"]
+            "toolbox": ["_ == _", "x => xx", "4", "x => x"]
+        },
+        {
+            "description": "Typing with ==, both sides.",
+            "goal": ["false", "true"],
+            "board": ["_t_string == _t_string", "_t_string == _t_string"],
+            "toolbox": "",
+            "block_variant": {
+                "board": ["_ == _", "_ == _"],
+                "toolbox": ["'a'", "'b'", "'a'", "'c'", "'b'", "'c'"]
+            }
         },
         {
             "description": "Teaching partial binding with choice.",
-            "board": ["_ == _", "x => xx", "a", "a", "b"],
+            "board": ["_ == _", "x => xx", "'left'", "'left'", "'right'"],
             "goal": ["true", "false"],
             "toolbox": "",
             "fade": {
                 "==":1
             },
             "showFade": false
-        },
-        {
-            "description": "Our favorite hard level :)",
-            "board": ["_ == _", "x => xx", "x => xx", "a", "b"],
-            "goal": ["true", "false"],
-            "toolbox": ""
         }
     ],
     "resources":{

@@ -19,15 +19,15 @@
         },
         {
             "description": "intro to if; false",
-            "board": ["_b ? 'apple' : 'pear'"],
-            "goal": "'pear'",
+            "board": ["_b ? 'juice' : 'pie'", "false ? 'grape' : 'cherry'"],
+            "goal": ["'cherry'", "'pie'"],
             "toolbox": ["true", "false"]
         },
         {
-            "description":"Choice of boolean",
-            "board":["_b ? 'i' : 'n'", "_b ? 'i' : 't'"],
-            "goal": "'it'",
-            "toolbox":["true", "false", "_ + _"]
+            "description": "intro to if; selective destruction + replication",
+            "board": ["_b ? 'b' : 'a'", "x => xx", "true", "false"],
+            "goal": ["'a'", "'b'"],
+            "toolbox": ""
         },
         {
             "description": "intro to booleans with conditionals",
@@ -37,21 +37,15 @@
         },
         {
             "description": "choice of else branch",
-            "board": ["_ == _", "_b ? 'a' : _"],
+            "board": ["_ == _", "_b ? 'a' : _t_string"],
             "goal": "'c'",
             "toolbox": ["'a'", "'a'", "'b'", "'b'", "'c'"]
         },
         {
             "description": "choice of branches",
-            "board": ["'well' == _", "_b ? _ : _"],
+            "board": ["'okay' == _t_string", "_b ? _t_string : _t_string"],
             "goal": "'yes'",
-            "toolbox": ["'well'", "'no'", "'yes'"]
-        },
-        {
-            "description": "intro to if; selective destruction + replication",
-            "board": ["_b ? 'b' : 'a'", "x => xx", "true", "false"],
-            "goal": ["'a'", "'b'"],
-            "toolbox": ""
+            "toolbox": []
         },
         {
             "description": "conditionals inside booleans; i.e. ternary operator",

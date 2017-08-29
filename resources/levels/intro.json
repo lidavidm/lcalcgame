@@ -2,9 +2,9 @@
     "chapterName":"Basics",
     "description":"Identity, Destruction, and Replication",
     "macros": {
-        "a":"star",
-        "b":"rect",
-        "c":"triangle"
+        "a":"A",
+        "b":"B",
+        "c":"C"
     },
     "levels": [
         {

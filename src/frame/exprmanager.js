@@ -11,7 +11,7 @@ var ExprManager = (function() {
         'circle':   [CircleExpr],//, FadedCircleExpr, StringCircleExpr],
         'diamond':  [RectExpr],//, FadedRectExpr, StringRectExpr],
         '_':        [MissingExpression],
-        '__':       [MissingBagExpression, MissingBracketExpression],
+        '__':       [MissingBracketExpression],
         '_b':       [MissingKeyExpression, MissingBooleanExpression],
         '_t':       [TypeInTextExpr],
         '_n':       [MissingNumberExpression],

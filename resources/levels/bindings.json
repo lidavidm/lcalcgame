@@ -5,7 +5,7 @@
     "levels": [
         {
             "description": "Introduces concept: Pipes outside of pure lambdas.",
-            "board": ["x => x == x", "star"],
+            "board": ["x => x == x", "'A'"],
             "goal": "true",
             "toolbox": "",
             "fade": {
@@ -18,27 +18,20 @@
         },
         {
             "description": "Intro II.",
-            "board": ["x => x == star", "x => x", "rect"],
+            "board": ["x => x == 'A'", "x => x", "'B'"],
             "goal": "false",
             "toolbox": ""
+        },
+        {
+            "description": "Choice of function w/ typing.",
+            "board": ["'cat'", "x => x == _t_string"],
+            "goal": "false"
         },
         {
             "description": "Reinforces concept: Pipes outside of pure lambdas.",
             "board": ["x => x == 'a'", "x => x == _t_string"],
             "goal": ["true", "true"],
             "toolbox": ["'c'", "'b'", "'a'"]
-        },
-        {
-            "description": "Choice of function.",
-            "board": "star",
-            "goal": "false",
-            "toolbox": ["x => x == rect", "x => x == star"]
-        },
-        {
-            "description": "Constructing a function.",
-            "board": ["x => x == _"],
-            "goal": "true",
-            "toolbox": ["star", "rect", "star", "rect"]
         },
         {
             "description": "Must be solved with free binding.",
@@ -65,10 +58,10 @@
             }
         },
         {
-            "description": "The same function, different inputs, can have different output.",
-            "board": ["x => x == rect", "x => xxx"],
+            "description": "Replicating functions (test cases I).",
+            "board": ["x => x == 0", "x => xxx"],
             "goal": ["true", "false", "false"],
-            "toolbox": ["rect", "star", "rect", "star", "rect", "star"],
+            "toolbox": ["1", "0", "1", "0", "1", "0"],
             "fade": {
                 "==":1,
                 "true":1,
@@ -96,29 +89,23 @@
             "toolbox": ["10", "10", "20", "20", "30", "30"]
         },
         {
-            "description": "Intro to typing entire statements in bindings IV",
-            "board": ["x => xxx", "x => _t_single"],
-            "goal": ["true", "true", "true"],
-            "toolbox": ["1", "2", "3", "4"]
-        },
-        {
-            "description": "Typing entire lines II.",
+            "description": "Typing entire lines I.",
             "board": ["x => xx", "_t_single"],
             "typing_hints": ["x => x + x"],
             "goal": ["66", "88"],
             "toolbox": ["33", "44", "55"]
         },
         {
-            "description": "Typing entire lines III.",
-            "board": ["_t_single", "x => xxx"],
-            "goal": ["20", "30", "40"],
-            "toolbox": ["10", "20", "30"]
-        },
-        {
-            "description": "Typing entire lines I.",
+            "description": "Typing one entire line without hint text.",
             "board": ["_t_single", "_t_single", "1", "2"],
             "typing_hints": ["x => x == 1"],
             "goal": ["true", "true"]
+        },
+        {
+            "description": "Typing entire line without any hints.",
+            "board": ["_t_single", "x => xxx"],
+            "goal": ["20", "30", "40"],
+            "toolbox": ["10", "20", "30"]
         },
         {
             "description": "Typing entire lines IV: Functions as deleters.",

@@ -14,14 +14,15 @@
             "toolbox": ["'bap'", "'app'", "'cra'", "'ple'"]
         },
         {
-            "goal" : "'cattywampus'",
-            "board": ["_ + 'y'", "_ + 't'", "_ + _ + _", "'w' + _", "_ + 'us'"],
-            "toolbox": ["'t'", "'am'", "'cat'", "'p'"]
-        },
-        {
             "goal" : "'adam'",
             "board": ["_ + _", "(x) => xx"],
             "toolbox": ["'m'", "'a'", "'d'", "_ + _"]
+        },
+        {
+            "description":"Choice of boolean",
+            "board":["_b ? 'i' : 'n'", "_b ? 'i' : 't'"],
+            "goal": "'it'",
+            "toolbox":["true", "false", "_ + _"]
         },
         {
             "description": "Intro to typing text.",
@@ -54,31 +55,6 @@
             }
         },
         {
-            "description": "Typing with ==, one side.",
-            "goal": "true",
-            "board": ["_t_string == 'eery lakes'"],
-            "toolbox": "",
-            "fade":{
-                "==":2,
-                "true":2,
-                "false":2
-            },
-            "block_variant": {
-                "board": ["_ == 'eery lakes'"],
-                "toolbox": ["'eerie lakes'", "'eery lakes'"]
-            }
-        },
-        {
-            "description": "Typing with ==, both sides.",
-            "goal": ["false", "true"],
-            "board": ["_t_string == _t_string", "_t_string == _t_string"],
-            "toolbox": "",
-            "block_variant": {
-                "board": ["_ == _", "_ == _"],
-                "toolbox": ["'a'", "'b'", "'a'", "'c'", "'b'", "'c'"]
-            }
-        },
-        {
             "description": "Typing operators I.",
             "goal": ["true", "'river'"],
             "board": ["'r' >>> 'r'", "'r' >>> 'iver'"],
@@ -87,6 +63,12 @@
             "typing_options": {
                 ">>>": ["==", "+"]
             },
+            "fade":{
+                "==":2,
+                "true":2,
+                "false":2
+            },
+            "showFade":false,
             "block_variant": {
                 "board": ["'r' >> 'r'", "'r' >> 'iver'"],
                 "toolbox": ["_op('+')", "_op('==')"]
@@ -97,12 +79,22 @@
             "goal": "true",
             "board": ["'r' >>> _", "_ >>> 'river'", "_t_string"],
             "toolbox": "",
+            "typing_hints": [ "+", "==" ],
             "typing_options": {
                 ">>>": ["==", "+"]
             },
             "block_variant": {
                 "board": ["'r' >> _", "_ >> 'river'"],
                 "toolbox": ["'ver'", "'iver'", "'river'", "_op('+')", "_op('==')"]
+            }
+        },
+        {
+            "description": "Typing operators III.",
+            "goal": "true",
+            "board": ["_ >>> 'time'", "_ >>> 'spacetime'", "_t_string"],
+            "toolbox": "",
+            "typing_options": {
+                ">>>": ["==", "+"]
             }
         },
         {

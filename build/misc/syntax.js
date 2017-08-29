@@ -14,7 +14,7 @@ var _SyntaxColorManager = function () {
 
         if (!syntaxColorProfile) this.profile = {
             operator: 'black',
-            bool: 'HotPink',
+            bool: 'DeepPink',
             string: 'Red',
             call: 'YellowGreen'
         };else this.profile = syntaxColorProfile;

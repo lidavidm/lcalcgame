@@ -59,9 +59,9 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     // };
     const chapterDigraph = {
         'intro': ['booleans'],
-        'booleans': ['strings'],
-        'strings': ['conditionals'],
-        'conditionals': ['bindings'],
+        'booleans': ['conditionals'],
+        'conditionals': ['strings'],
+        'strings': ['bindings'],
         'bindings': ['confusing_strings'],
         'confusing_strings': ['map'],
         'map': ['variables'],

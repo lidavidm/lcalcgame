@@ -7,7 +7,7 @@ class _SyntaxColorManager {
         if (!syntaxColorProfile)
             this.profile = {
                 operator: 'black',
-                bool: 'HotPink',
+                bool: 'DeepPink',
                 string: 'Red',
                 call: 'YellowGreen'
             };

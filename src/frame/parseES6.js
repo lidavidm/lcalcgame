@@ -107,8 +107,13 @@ class ES6Parser {
 
                 // First, check for any chapter-level macros
                 // (like 'a'=>'star') and swap if needed:
-                if (__MACROS && node.name in __MACROS)
-                    node.name = __MACROS[node.name];
+                if (__MACROS && node.name in __MACROS) {
+                    const m = __MACROS[node.name];
+                    if (m.indexOf("'") > -1) // Strings...
+                        return this.parseNode( {type:'Literal', raw:m, value:m.replace(/'/g, "")} );
+                    else
+                        node.name = __MACROS[node.name];
+                }
 
                 // Check if node is a Reduct reserved identifier (MissingExpression)
                 if (node.name === '_' || node.name === '_b' || node.name === '__' || node.name === '_n' || node.name === '_v') {
@@ -263,7 +268,7 @@ class ES6Parser {
                                 const parent = (comp.parent || comp.stage);
                                 parent.swap(comp, addExpr);
                                 if (locked) addExpr.lock();
-                                if (!addExpr.hasPlaceholderChildren())
+                                if (!addExpr.parent && !addExpr.hasPlaceholderChildren())
                                     addExpr.performUserReduction();
                             }
                             else if (finalText === '=') { // If assignment, swap for AssignmentExpression.
