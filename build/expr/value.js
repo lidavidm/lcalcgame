@@ -761,6 +761,7 @@ var TypeInStringValueExpr = function (_ContextualTypeInText) {
         mid.typeBox.icon.image = 'empty-typebox-string';
 
         _this20.leftExpr.color = "OrangeRed";
+        _this20.rightExpr.color = "OrangeRed";
         _this20.color = 'gold';
         return _this20;
     }

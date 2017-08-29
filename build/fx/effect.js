@@ -21,6 +21,7 @@ var ShapeExpandEffect = function () {
                 return e;
             };
             var color = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'white';
+            var maxScale = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 4;
 
 
             if (!node.stage) {
@@ -39,10 +40,14 @@ var ShapeExpandEffect = function () {
             rect.stroke = { color: color, lineWidth: 2 };
             rect.opacity = 1.0;
             rect.anchor = { x: 0.5, y: 0.5 };
+            rect.ignoreEvents = true;
             stage.add(rect);
 
+            // Scale x equally to y (i.e. change in w = change in h)
+            var scaleX = sz.h * (maxScale - 1.0) / sz.w + 1.0;
+
             // Expand and fadeout effect
-            Animate.tween(rect, { scale: { x: 4, y: 4 }, opacity: 0.0 }, dur, smoothFunc).after(function () {
+            Animate.tween(rect, { scale: { x: scaleX, y: maxScale }, opacity: 0.0 }, dur, smoothFunc).after(function () {
                 stage.remove(rect);
             });
         }

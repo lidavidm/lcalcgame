@@ -625,6 +625,8 @@ class Expression extends mag.RoundedRect {
 
                 Logger.log('toolbox-remove', this.toString());
 
+                ShapeExpandEffect.run(this, 500, (e) => Math.pow(e, 0.5), 'white', 1.5);
+
                 if (this.stage)
                     this.stage.saveState({name:'toolbox-remove', item:this.toJavaScript()});
             }

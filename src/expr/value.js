@@ -317,6 +317,7 @@ class TypeInStringValueExpr extends ContextualTypeInTextExpr {
         mid.typeBox.icon.image = 'empty-typebox-string';
 
         this.leftExpr.color = "OrangeRed";
+        this.rightExpr.color = "OrangeRed";
         this.color = 'gold';
     }
 }

@@ -534,7 +534,7 @@ class ObjectExtensionExpr extends ExpressionPlus {
                 comma.fontSize = methodtxt.fontSize;
                 comma._yMultiplier = methodtxt._yMultiplier;
                 this.addArg(comma);
-                this.addArg(argExprs[i]);
+                this.addArg(argExprs[i]); // similar, we should add .clone here...
             }
             //let closingParen = new TextExpr(')'); // comma to separate arguments
             let closingParen = new TextExpr(isIndicesNotation ? ']' : ')'); // comma to separate arguments

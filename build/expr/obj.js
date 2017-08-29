@@ -682,7 +682,7 @@ var ObjectExtensionExpr = function (_ExpressionPlus2) {
                     comma.fontSize = methodtxt.fontSize;
                     comma._yMultiplier = methodtxt._yMultiplier;
                     this.addArg(comma);
-                    this.addArg(argExprs[i]);
+                    this.addArg(argExprs[i]); // similar, we should add .clone here...
                 }
                 //let closingParen = new TextExpr(')'); // comma to separate arguments
                 var closingParen = new TextExpr(isIndicesNotation ? ']' : ')'); // comma to separate arguments
