@@ -259,6 +259,7 @@ class ES6Parser {
                     let comp = new (ExprManager.getClass('=='))(this.parseNode(node.left), this.parseNode(node.right), '>>>');
                     if ('>>>' in __TYPING_OPTIONS) {
                         const valid_operators = __TYPING_OPTIONS['>>>'].slice();
+                        const hint_text = valid_operators.join(' or ');
                         const validator = (txt) => (valid_operators.indexOf(txt) > -1);
                         comp.holes[1] = new TypeInTextExpr(validator, (finalText) => {
                             const locked = comp.locked;
@@ -280,7 +281,7 @@ class ES6Parser {
                         });
                         comp.holes[1].typeBox.onFocus = function () {
                             if (!this.hasHint())
-                                showHintText('== or +');
+                                showHintText(hint_text);
                         };
                         comp.holes[1].typeBox.onBlur = function () {
                             hideHintText();

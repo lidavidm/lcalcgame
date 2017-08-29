@@ -281,6 +281,7 @@ var ES6Parser = function () {
                             if ('>>>' in __TYPING_OPTIONS) {
                                 (function () {
                                     var valid_operators = __TYPING_OPTIONS['>>>'].slice();
+                                    var hint_text = valid_operators.join(' or ');
                                     var validator = function validator(txt) {
                                         return valid_operators.indexOf(txt) > -1;
                                     };
@@ -303,7 +304,7 @@ var ES6Parser = function () {
                                         }
                                     });
                                     comp.holes[1].typeBox.onFocus = function () {
-                                        if (!this.hasHint()) showHintText('== or +');
+                                        if (!this.hasHint()) showHintText(hint_text);
                                     };
                                     comp.holes[1].typeBox.onBlur = function () {
                                         hideHintText();

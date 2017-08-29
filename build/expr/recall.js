@@ -140,6 +140,9 @@ var TypeBox = function (_mag$RoundedRect) {
 
     _createClass(TypeBox, [{
         key: 'hasHint',
+
+
+        // HINTS
         value: function hasHint() {
             return this.hintTextExpr && this.hintTextExpr.text.length > 0;
         }
@@ -162,6 +165,9 @@ var TypeBox = function (_mag$RoundedRect) {
                 this.hintTextExpr = null;
             }
         }
+
+        // ICONS
+
     }, {
         key: 'hasIcon',
         value: function hasIcon() {
@@ -453,6 +459,39 @@ var TypeBox = function (_mag$RoundedRect) {
         value: function animatePlaceholderStatus() {
             if (this.stage && !this.stage.keyEventDelegate) this.focus();
         }
+    }, {
+        key: 'updateHintErrorBox',
+        value: function updateHintErrorBox() {
+            var _this5 = this;
+
+            if (!this.hasHint()) return;
+
+            if (this.hintErrorBoxes) {
+                this.hintErrorBoxes.map(function (b) {
+                    return _this5.removeChild(b);
+                });
+                this.hintErrorBoxes = null;
+            }
+
+            // Verify text against hint text:
+            var txt = this.text;
+            var hint = this.hintTextExpr.text;
+            var char_w = this.charWidthPerLine();
+            for (var i = 0; i < txt.length; i++) {
+                var c = txt[i];
+                if (i >= hint.length || c != hint[i]) {
+                    // Create error box for this char.
+                    var pos = this.cursorPosForCharIdx(i);
+                    var box = new mag.Rect(pos.x, pos.y, char_w, 40);
+                    box.color = 'red';
+                    box.shadowOffset = 0;
+                    box.opacity = 0.3;
+                    this.addChild(box);
+                    if (!this.hintErrorBoxes) this.hintErrorBoxes = [];
+                    this.hintErrorBoxes.push(box);
+                }
+            }
+        }
 
         /* KEY EVENTS */
 
@@ -470,6 +509,7 @@ var TypeBox = function (_mag$RoundedRect) {
             Resource.play('key-press-' + Math.floor(Math.random() * 4 + 1));
             this.updateCursorPosition(charIdx + 1);
             if (this.onTextChanged) this.onTextChanged();
+            this.updateHintErrorBox();
             this.stage.update();
             this._logState('after-key-press', str);
         }
@@ -482,6 +522,7 @@ var TypeBox = function (_mag$RoundedRect) {
             if (this.hasSelection()) {
                 this.deleteSelectedText();
                 if (this.onTextChanged) this.onTextChanged();
+                this.updateHintErrorBox();
                 if (this.stage) this.stage.update();
                 return;
             }
@@ -498,6 +539,7 @@ var TypeBox = function (_mag$RoundedRect) {
             }
             this.updateCursorPosition(charIdx);
             if (this.onTextChanged) this.onTextChanged();
+            this.updateHintErrorBox();
             this.stage.update();
             this._logState('after-backspace');
         }
@@ -592,7 +634,7 @@ var SummoningTypeBox = function (_TypeBox) {
         _classCallCheck(this, SummoningTypeBox);
 
         var onCommit = function onCommit() {
-            var _this6 = this;
+            var _this7 = this;
 
             var txt = this.text.trim();
             var expr_desc = null;
@@ -624,7 +666,7 @@ var SummoningTypeBox = function (_TypeBox) {
 
             var fx = new ShatterExpressionEffect(block);
             fx.run(this.stage, function () {
-                _this6.stage.add(block);
+                _this7.stage.add(block);
             }, function () {});
         };
         return _possibleConstructorReturn(this, (SummoningTypeBox.__proto__ || Object.getPrototypeOf(SummoningTypeBox)).call(this, x, y, w, h, onCommit));
@@ -639,24 +681,24 @@ var BlinkingCursor = function (_mag$Rect2) {
     function BlinkingCursor(x, y, w, h) {
         _classCallCheck(this, BlinkingCursor);
 
-        var _this7 = _possibleConstructorReturn(this, (BlinkingCursor.__proto__ || Object.getPrototypeOf(BlinkingCursor)).call(this, x, y, w, h));
+        var _this8 = _possibleConstructorReturn(this, (BlinkingCursor.__proto__ || Object.getPrototypeOf(BlinkingCursor)).call(this, x, y, w, h));
 
-        _this7.color = 'black';
-        _this7.opacity = 1;
-        _this7.ignoreEvents = true;
-        return _this7;
+        _this8.color = 'black';
+        _this8.opacity = 1;
+        _this8.ignoreEvents = true;
+        return _this8;
     }
 
     _createClass(BlinkingCursor, [{
         key: 'startBlinking',
         value: function startBlinking() {
-            var _this8 = this;
+            var _this9 = this;
 
             var blink = function blink() {
-                _this8.blinkTween = Animate.tween(_this8, { opacity: 0 }, 1000, function (e) {
+                _this9.blinkTween = Animate.tween(_this9, { opacity: 0 }, 1000, function (e) {
                     return Math.pow(e, 2);
                 }).after(function () {
-                    _this8.blinkTween = Animate.tween(_this8, { opacity: 1 }, 400, function (e) {
+                    _this9.blinkTween = Animate.tween(_this9, { opacity: 1 }, 400, function (e) {
                         return Math.pow(e, 2);
                     }).after(function () {
                         blink();
@@ -832,9 +874,9 @@ var TypeInTextExpr = function (_TextExpr) {
 
         _classCallCheck(this, TypeInTextExpr);
 
-        var _this9 = _possibleConstructorReturn(this, (TypeInTextExpr.__proto__ || Object.getPrototypeOf(TypeInTextExpr)).call(this, " "));
+        var _this10 = _possibleConstructorReturn(this, (TypeInTextExpr.__proto__ || Object.getPrototypeOf(TypeInTextExpr)).call(this, " "));
 
-        _this9.validator = function (txt) {
+        _this10.validator = function (txt) {
             var valid = validator(txt);
             Logger.log('check-validity', { 'text': txt, 'isValid': valid === true });
             return valid;
@@ -846,12 +888,12 @@ var TypeInTextExpr = function (_TextExpr) {
                 var expr = __PARSER.parse(txt);
                 if (!expr) return;
                 var parent = void 0;
-                var _this = _this9;
-                if (_this9.emptyParent) {
-                    _this = _this9.parent;
-                    parent = _this9.parent.parent || _this9.parent.stage;
+                var _this = _this10;
+                if (_this10.emptyParent) {
+                    _this = _this10.parent;
+                    parent = _this10.parent.parent || _this10.parent.stage;
                 } else {
-                    parent = _this9.parent || _this9.stage;
+                    parent = _this10.parent || _this10.stage;
                 }
                 parent.swap(_this, expr);
                 expr.lockSubexpressions(function (e) {
@@ -865,10 +907,10 @@ var TypeInTextExpr = function (_TextExpr) {
                     parent = parent.parent;
                 }
             };
-            _this9.afterCommit = afterCommit;
+            _this10.afterCommit = afterCommit;
         }
 
-        var _thisTextExpr = _this9;
+        var _thisTextExpr = _this10;
         var onCommit = function onCommit() {
             var txt = this.text; // this.text is the TypeBox's text string, *not* the TextExpr's!
             console.log(txt);
@@ -901,12 +943,12 @@ var TypeInTextExpr = function (_TextExpr) {
             }
         };
 
-        var box = new TypeBox(0, 0, 52, _this9.size.h, onCommit, onTextChanged);
-        box.fontSize = _this9.fontSize;
-        _this9.addChild(box);
-        _this9.ignoreEvents = false;
-        _this9.typeBox = box;
-        return _this9;
+        var box = new TypeBox(0, 0, 52, _this10.size.h, onCommit, onTextChanged);
+        box.fontSize = _this10.fontSize;
+        _this10.addChild(box);
+        _this10.ignoreEvents = false;
+        _this10.typeBox = box;
+        return _this10;
     }
 
     _createClass(TypeInTextExpr, [{

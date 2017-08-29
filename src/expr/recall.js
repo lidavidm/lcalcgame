@@ -118,6 +118,8 @@ class TypeBox extends mag.RoundedRect {
     set textColor(clr) {
         this.textExpr.color = clr;
     }
+
+    // HINTS
     hasHint() {
         return this.hintTextExpr && this.hintTextExpr.text.length > 0;
     }
@@ -136,6 +138,8 @@ class TypeBox extends mag.RoundedRect {
             this.hintTextExpr = null;
         }
     }
+
+    // ICONS
     hasIcon() {
         return this.icon && this.icon.parent !== null;
     }
@@ -388,6 +392,35 @@ class TypeBox extends mag.RoundedRect {
             this.focus();
     }
 
+    updateHintErrorBox() {
+        if (!this.hasHint()) return;
+
+        if (this.hintErrorBoxes) {
+            this.hintErrorBoxes.map((b) => this.removeChild(b));
+            this.hintErrorBoxes = null;
+        }
+
+        // Verify text against hint text:
+        const txt = this.text;
+        const hint = this.hintTextExpr.text;
+        const char_w = this.charWidthPerLine();
+        for (let i = 0; i < txt.length; i++) {
+            const c = txt[i];
+            if (i >= hint.length ||
+                c != hint[i]) {
+                    // Create error box for this char.
+                    const pos = this.cursorPosForCharIdx(i);
+                    let box = new mag.Rect(pos.x, pos.y, char_w, 40);
+                    box.color = 'red';
+                    box.shadowOffset = 0;
+                    box.opacity = 0.3;
+                    this.addChild(box);
+                    if (!this.hintErrorBoxes) this.hintErrorBoxes = [];
+                    this.hintErrorBoxes.push(box);
+                }
+        }
+    }
+
     /* KEY EVENTS */
     type(str) {
         this._logState('key-press', str);
@@ -403,6 +436,7 @@ class TypeBox extends mag.RoundedRect {
         Resource.play('key-press-' + Math.floor(Math.random() * 4 + 1))
         this.updateCursorPosition(charIdx+1);
         if (this.onTextChanged) this.onTextChanged();
+        this.updateHintErrorBox();
         this.stage.update();
         this._logState('after-key-press', str);
     }
@@ -411,6 +445,7 @@ class TypeBox extends mag.RoundedRect {
         if (this.hasSelection()) {
             this.deleteSelectedText();
             if (this.onTextChanged) this.onTextChanged();
+            this.updateHintErrorBox();
             if (this.stage) this.stage.update();
             return;
         }
@@ -425,6 +460,7 @@ class TypeBox extends mag.RoundedRect {
         }
         this.updateCursorPosition(charIdx);
         if (this.onTextChanged) this.onTextChanged();
+        this.updateHintErrorBox();
         this.stage.update();
         this._logState('after-backspace');
     }
