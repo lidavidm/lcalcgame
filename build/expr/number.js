@@ -255,10 +255,16 @@ var AddExpr = function (_OperatorExpr) {
         return _possibleConstructorReturn(this, (AddExpr.__proto__ || Object.getPrototypeOf(AddExpr)).call(this, left, op, right));
     }
 
-    /* This 'add' should work for string concatenation as well. */
-
-
     _createClass(AddExpr, [{
+        key: 'canReduce',
+        value: function canReduce() {
+            // Disallow booleans
+            return _get(AddExpr.prototype.__proto__ || Object.getPrototypeOf(AddExpr.prototype), 'canReduce', this).call(this) && this.leftExpr && !(this.leftExpr instanceof BooleanPrimitive) && this.rightExpr && !(this.rightExpr instanceof BooleanPrimitive);
+        }
+
+        /* This 'add' should work for string concatenation as well. */
+
+    }, {
         key: 'reduce',
         value: function reduce() {
             if (!this.canReduce()) return this;else if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {
@@ -308,6 +314,12 @@ var MultiplicationExpr = function (_OperatorExpr3) {
     }
 
     _createClass(MultiplicationExpr, [{
+        key: 'canReduce',
+        value: function canReduce() {
+            // Disallow booleans
+            return _get(MultiplicationExpr.prototype.__proto__ || Object.getPrototypeOf(MultiplicationExpr.prototype), 'canReduce', this).call(this) && this.leftExpr && !(this.leftExpr instanceof BooleanPrimitive) && this.rightExpr && !(this.rightExpr instanceof BooleanPrimitive);
+        }
+    }, {
         key: 'reduce',
         value: function reduce() {
             if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {
@@ -332,6 +344,12 @@ var DivisionExpr = function (_OperatorExpr4) {
     }
 
     _createClass(DivisionExpr, [{
+        key: 'canReduce',
+        value: function canReduce() {
+            // Disallow booleans
+            return _get(DivisionExpr.prototype.__proto__ || Object.getPrototypeOf(DivisionExpr.prototype), 'canReduce', this).call(this) && this.leftExpr && !(this.leftExpr instanceof BooleanPrimitive) && this.rightExpr && !(this.rightExpr instanceof BooleanPrimitive);
+        }
+    }, {
         key: 'reduce',
         value: function reduce() {
             if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {
@@ -361,6 +379,12 @@ var ModuloExpr = function (_OperatorExpr5) {
     }
 
     _createClass(ModuloExpr, [{
+        key: 'canReduce',
+        value: function canReduce() {
+            // Disallow booleans
+            return _get(ModuloExpr.prototype.__proto__ || Object.getPrototypeOf(ModuloExpr.prototype), 'canReduce', this).call(this) && this.leftExpr && !(this.leftExpr instanceof BooleanPrimitive) && this.rightExpr && !(this.rightExpr instanceof BooleanPrimitive);
+        }
+    }, {
         key: 'reduce',
         value: function reduce() {
             if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {

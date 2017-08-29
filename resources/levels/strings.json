@@ -65,8 +65,8 @@
             },
             "fade":{
                 "==":2,
-                "true":2,
-                "false":2
+                "true":1,
+                "false":1
             },
             "showFade":false,
             "block_variant": {
