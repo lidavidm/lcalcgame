@@ -510,7 +510,7 @@ function showHelpText(txt) {
     var help = $('#help');
     var size = canvas.getBoundingClientRect();
     help.css({ top: size.height / 1.3, color: '#AAA' });
-    if (txt) help.text(txt);
+    if (txt) $('#help_text').text(txt);
     help.show();
 }
 function hideHelpText() {

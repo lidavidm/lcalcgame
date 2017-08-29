@@ -209,6 +209,10 @@ class Level {
             if ('globals' in variant) globals_descs = variant.globals;
         }
 
+        if ('help_text' in desc) {
+            showHelpText(desc['help_text']);
+        }
+
         var lvl = new Level(
             Level.parse(expr_descs, language, macros, typing_options),
             new Goal(new ExpressionPattern(Level.parse(goal_descs, language, macros, typing_options)), goal_descs, resources.aliens),

@@ -25,7 +25,7 @@
             "toolbox":["true", "false", "_ + _"]
         },
         {
-            "description": "Intro to typing text.",
+            "description": "Intro to typing text with concat.",
             "goal": "'mountains'",
             "board": "'mount' + _t_string",
             "toolbox": "",
