@@ -366,7 +366,14 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                         Resource.play('mutate');
 
                         Animate.tween(root, { 'opacity':1.0 }, 2000).after(() => {
-                            root.ignoreEvents = false;
+                            const inGoal = root.stage && root.stage.goalNodes.indexOf(root) > -1;
+                            if (inGoal) {
+                                root.lockInteraction();
+                            }
+                            else {
+                                root.ignoreEvents = false;
+                            }
+                            console.log(root);
                         });
                         Animate.tween(unfaded_root, { 'opacity':0.0 }, 1000).after(() => {
                             faded.remove(unfaded_root);
