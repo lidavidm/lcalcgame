@@ -325,11 +325,7 @@ class LambdaHoleExpr extends MissingExpression {
                             c.pos = n.absolutePos;
                             c.scale = n.absoluteScale;
                             // Lock child nodes that are not placeholders
-                            mag.Stage.getAllNodes([c]).forEach((node) => {
-                                if (node instanceof Expression && !node.isPlaceholder()) {
-                                    node.lock();
-                                }
-                            });
+                            c.lockSubexpressions((e) => !e.isPlaceholder());
                             let pos = addPos(c.pos, {x:0, y:-40});
                             final_nodes.push( c );
                         });
