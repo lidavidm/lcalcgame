@@ -362,6 +362,9 @@ class ReductStage extends mag.Stage {
             if (key === 8) { // BACKSPACE
                 this.keyEventDelegate.backspace();
             }
+            else if (key === 46 || key === 127) { // DELETE
+                this.keyEventDelegate.backspace(-1);
+            }
             else if (key === 37) { // LEFT ARROW
                 this.keyEventDelegate.leftArrow();
             }
@@ -390,6 +393,11 @@ class ReductStage extends mag.Stage {
         if (this.keyEventDelegate) {
             if (event.keyCode === 13) {
                 this.keyEventDelegate.carriageReturn();
+            }
+            else if (event.keyCode === 8 || event.keyCode === 46 ||
+                     event.keyCode === 37 || event.keyCode === 39 ||
+                     event.keyCode === 127) {
+                // Special character, do nothing
             }
             else if (event.keyCode === 9) { // Tab.
                 // Cycle to next possible keyEventDelegate...
