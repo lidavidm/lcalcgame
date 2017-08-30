@@ -68,9 +68,10 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         'strings': ['bindings'],
         'bindings': ['confusing_strings'],
         'confusing_strings': ['map'],
-        'map': ['variables'],
-        'variables': ['typing_variables'],
-        'typing_variables': []
+        'map': []
+        // 'map': ['variables'],
+        // 'variables': ['typing_variables'],
+        // 'typing_variables': []
     };
 
     var loadAudio = Resource.loadAudio;

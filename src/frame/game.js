@@ -198,7 +198,8 @@ class Level {
             language: language,
             macros: macros,
             typing_options: typing_options,
-            typing_hints: typing_hints
+            typing_hints: typing_hints,
+            typing_help: typing_help
         } = desc;
 
         if (__USE_BLOCK_VARIANT && 'block_variant' in desc) {
@@ -226,6 +227,20 @@ class Level {
                 typing_exprs[i].enforceHint(typing_hints[i]);
                 typing_exprs[i].typeBox.update();
             }
+        }
+        if (typing_help) {
+            const hint_text = typing_help;
+            const onFocus = function() {
+                showHintText(hint_text);
+            };
+            const onBlur = function() {
+                hideHintText();
+            };
+            let typing_exprs = mag.Stage.getNodesWithClass(TypeInTextExpr, [], true, lvl.exprs);
+            typing_exprs.forEach((e) => {
+                e.typeBox.onFocus = onFocus;
+                e.typeBox.onBlur  = onBlur;
+            });
         }
 
         return lvl;

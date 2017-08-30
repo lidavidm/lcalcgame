@@ -46,6 +46,28 @@
             "toolbox": ["'large'", "'small'"]
         },
         {
+            "description": "Partial application.",
+            "board": ["'sun' == _", "x => xx", "'moon'", "'moon'"],
+            "goal": ["false", "false"],
+            "toolbox": ""
+        },
+        {
+            "description": "Applying function to boolean",
+            "board": "'cat' == _",
+            "goal": ["true", "true"],
+            "toolbox": ["x => xx", "'cat'", "'dog'", "x => x"]
+        },
+        {
+            "description": "Teaching partial binding with choice.",
+            "board": ["_ == _", "x => xx", "'left'", "'left'", "'right'"],
+            "goal": ["true", "false"],
+            "toolbox": "",
+            "fade": {
+                "==":1
+            },
+            "showFade": false
+        },
+        {
             "description": "Typing with ==, one side.",
             "goal": "true",
             "board": ["_t_string == 'jupiter'"],
@@ -63,24 +85,6 @@
             "toolbox": ""
         },
         {
-            "description": "Partial application.",
-            "board": ["'sun' == _", "x => xx", "'moon'", "'moon'"],
-            "goal": ["false", "false"],
-            "toolbox": ""
-        },
-        {
-            "description": "Applying function to boolean",
-            "board": "'cat' == _",
-            "goal": ["true", "true"],
-            "toolbox": ["x => xx", "'cat'", "'dog'", "x => x"]
-        },
-        {
-            "description": "Writing a boolean expression from scratch.",
-            "board": "2",
-            "goal": "true",
-            "toolbox": ["_ == _", "x => xx", "4", "x => x"]
-        },
-        {
             "description": "Typing with ==, both sides.",
             "goal": ["false", "true"],
             "board": ["_t_string == _t_string", "_t_string == _t_string"],
@@ -89,16 +93,6 @@
                 "board": ["_ == _", "_ == _"],
                 "toolbox": ["'a'", "'b'", "'a'", "'c'", "'b'", "'c'"]
             }
-        },
-        {
-            "description": "Teaching partial binding with choice.",
-            "board": ["_ == _", "x => xx", "'left'", "'left'", "'right'"],
-            "goal": ["true", "false"],
-            "toolbox": "",
-            "fade": {
-                "==":1
-            },
-            "showFade": false
         }
     ],
     "resources":{

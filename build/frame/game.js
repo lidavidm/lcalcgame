@@ -671,6 +671,7 @@ var Level = function () {
             var macros = desc.macros;
             var typing_options = desc.typing_options;
             var typing_hints = desc.typing_hints;
+            var typing_help = desc.typing_help;
 
 
             if (__USE_BLOCK_VARIANT && 'block_variant' in desc) {
@@ -693,6 +694,22 @@ var Level = function () {
                     typing_exprs[i].enforceHint(typing_hints[i]);
                     typing_exprs[i].typeBox.update();
                 }
+            }
+            if (typing_help) {
+                (function () {
+                    var hint_text = typing_help;
+                    var onFocus = function onFocus() {
+                        showHintText(hint_text);
+                    };
+                    var onBlur = function onBlur() {
+                        hideHintText();
+                    };
+                    var typing_exprs = mag.Stage.getNodesWithClass(TypeInTextExpr, [], true, lvl.exprs);
+                    typing_exprs.forEach(function (e) {
+                        e.typeBox.onFocus = onFocus;
+                        e.typeBox.onBlur = onBlur;
+                    });
+                })();
             }
 
             return lvl;
@@ -742,7 +759,7 @@ var Level = function () {
             } else if (language === "reduct-scheme" || !language) {
                 var descs;
 
-                var _ret = function () {
+                var _ret2 = function () {
 
                     // Split string by top-level parentheses.
                     descs = _this3.splitParen(desc);
@@ -763,7 +780,7 @@ var Level = function () {
                     };
                 }();
 
-                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+                if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
             }
         }
     }, {
@@ -864,7 +881,7 @@ var Level = function () {
                         op_class.pos = { x: 0, y: 80 };
                         return op_class;
                     } else if (op_class instanceof BagExpr) {
-                        var _ret2 = function () {
+                        var _ret3 = function () {
                             var bag = op_class;
                             var sz = bag.graphicNode.size;
                             var topsz = bag.graphicNode.topSize ? bag.graphicNode.topSize(sz.w / 2.0) : { w: 0, h: 0 };
@@ -890,7 +907,7 @@ var Level = function () {
                             };
                         }();
 
-                        if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
+                        if ((typeof _ret3 === 'undefined' ? 'undefined' : _typeof(_ret3)) === "object") return _ret3.v;
                     } else if (args[0] in CompareExpr.operatorMap()) {
                         // op name is supported comparison operation like ==, !=, etc
                         //console.log('constructing comparator ' + args[0] + ' with exprs ', exprs.slice(1));

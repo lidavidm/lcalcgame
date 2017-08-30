@@ -67,6 +67,20 @@
             "board": ["w => _t_single", "x => x x x"],
             "goal": ["'widow'", "'willow'", "'window'"],
             "toolbox": ["'d'", "'ll'", "'nd'"]
+        },
+        {
+            "description": "Typing conditionals I.",
+            "board": ["_t_single", "x => xx"],
+            "goal": ["1", "0"],
+            "toolbox": ["true", "false", "true", "false"],
+            "typing_hints": ["n => n ? 1 : 0"]
+        },
+        {
+            "description": "Typing conditionals II.",
+            "board": ["_t_single", "x => xxx"],
+            "goal": ["'yes'", "'no'", "'no'"],
+            "toolbox": ["true", "false", "true", "false"],
+            "typing_help": ["You'll have to use =>, ?, and :"]
         }
     ],
     "resources":{

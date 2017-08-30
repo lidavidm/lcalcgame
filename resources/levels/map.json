@@ -17,7 +17,7 @@
         },
         {
             "description": "Intro to map: Typing function body.",
-            "board": "[0, 1, 0, 1].map(i => _t_single)",
+            "board": "[0, 1, 0, 1].map(n => _t_single)",
             "goal": "[true, false, true, false]",
             "toolbox": ""
         },
@@ -43,6 +43,20 @@
             "description": "Typing arrays.",
             "board": ["_t_array.map(x => x + 'er')"],
             "goal": "['better', 'faster', 'stronger']"
+        },
+        {
+            "description": "Typing conditionals inside map.",
+            "board": ["['A', 'F', 'F'].map(_t_single)"],
+            "goal": ["['pass', 'fail', 'fail']"],
+            "toolbox": "",
+            "typing_help": ["You'll have to use =>, ?, and :"]
+        },
+        {
+            "description": "Typing both array and function inside map. Using conditonals in map II.",
+            "board": ["_t_array.map(_t_single)"],
+            "goal": ["['two', 'one', 'two']"],
+            "toolbox": "",
+            "typing_help": ["You'll have to use =>, ?, and :"]
         }
     ],
     "resources":{
