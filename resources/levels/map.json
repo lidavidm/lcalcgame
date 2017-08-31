@@ -7,7 +7,11 @@
             "description": "Intro to map, leveraging math knowledge.",
             "board": "[1, 2, 3].map(x => x + 1)",
             "goal": "[2, 3, 4]",
-            "toolbox": ""
+            "toolbox": "",
+            "fade": {
+                "map": 1
+            },
+            "showFade": false
         },
         {
             "description": "Intro to map: Typing.",

@@ -187,7 +187,7 @@ class ES6Parser {
                 } else if (node.callee.type === 'Identifier' && node.callee.name === '_op') { // Special case: Operators like +, =, !=, ==, etc...
                     return new OpLiteral(node.arguments[0].value);
                 } else if (node.callee.type === 'MemberExpression' && node.callee.property.name === 'map') {
-                    return new (ExprManager.getClass('arrayobj'))(this.parseNode(node.callee.object), 'map', this.parseNode(node.arguments[0]));
+                    return new (ExprManager.getClass('map'))(this.parseNode(node.arguments[0]), this.parseNode(node.callee.object));
                 } else if (node.callee.type === 'Identifier') {
 
                     if (node.callee.name.substring(0, 2) === '_t') {
