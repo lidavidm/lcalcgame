@@ -88,6 +88,26 @@ class MapFunc extends FuncExpr {
         return `${this.bag.toJavaScript()}.map(${this.func.toJavaScript()})`;
     }
 
+    canReduce() {
+        if (!this.bag || !this.func) {
+            return false;
+        }
+
+        if (this.func.hasPlaceholderChildren()) {
+            const placeholders = this.func.getPlaceholderChildren();
+            for (const placeholder of placeholders) {
+                // If the placeholder is filled and valid, lock it
+                if (placeholder instanceof TypeInTextExpr) {
+                    if (placeholder.canReduce()) {
+                        continue;
+                    }
+                }
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     reduce() {
         this.update();
