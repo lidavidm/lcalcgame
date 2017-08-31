@@ -293,7 +293,7 @@ class LambdaHoleExpr extends MissingExpression {
                     // If the placeholder is filled and valid, lock it
                     if (placeholder instanceof TypeInTextExpr) {
                         if (placeholder.canReduce()) {
-
+                            continue;
                         }
                         else {
                             // Blink the relevant placeholders.
@@ -310,8 +310,35 @@ class LambdaHoleExpr extends MissingExpression {
             }
             return false;
         };
+        // Disallow dropping if lambda body has missing expression.
+        const hasPlaceholder = (n) => {
+            if (n && n.hasPlaceholderChildren()) {
+                const placeholders = n.getPlaceholderChildren();
+                outer:
+                for (const placeholder of placeholders) {
+                    if (placeholder instanceof MissingExpression) {
+                        // Check that it's not a child of a VarExpr
+                        // (which would imply that it's a preview, not
+                        // actually part of the lambda)
+                        let current = placeholder;
+                        while (current) {
+                            if (current instanceof LambdaVarExpr ||
+                                current instanceof VarExpr ||
+                                current instanceof VtableVarExpr) {
+                                continue outer;
+                            }
+                            current = current.parent;
+                        }
+                        n.animatePlaceholderChildren();
+                        this.ondropexit(node, pos);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        };
         if (hasTextbox(node))  return null;
-        if (hasTextbox(lambdaExpr)) return null;
+        if (hasTextbox(lambdaExpr) || hasPlaceholder(lambdaExpr))  return null;
 
         if (node.dragging) { // Make sure node is being dragged by the user.
 
@@ -589,7 +616,7 @@ class LambdaVarExpr extends ImageExpr {
             let stage = this.stage;
             this.stateGraph.enter('closing');
             this.graphicNode.children = [];
-            stage.draw();
+            if (stage) stage.draw();
         }
     }
 
