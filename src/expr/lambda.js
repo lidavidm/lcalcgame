@@ -456,6 +456,10 @@ class LambdaHoleExpr extends MissingExpression {
         }
     }
 
+    isPlaceholder() {
+        return false;
+    }
+
     toString() { return 'λ' + this.name; }
 }
 
