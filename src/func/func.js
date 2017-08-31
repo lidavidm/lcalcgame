@@ -16,7 +16,7 @@ class FuncExpr extends Expression {
     }
 
     onmouseclick(pos) {
-        this.performReduction();
+        this.performUserReduction();
     }
 
     draw(ctx, offset) {
