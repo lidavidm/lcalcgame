@@ -88,6 +88,26 @@ class MapFunc extends FuncExpr {
         return `${this.bag.toJavaScript()}.map(${this.func.toJavaScript()})`;
     }
 
+    canReduce() {
+        if (!this.bag || !this.func) {
+            return false;
+        }
+
+        if (this.func.hasPlaceholderChildren()) {
+            const placeholders = this.func.getPlaceholderChildren();
+            for (const placeholder of placeholders) {
+                // If the placeholder is filled and valid, lock it
+                if (placeholder instanceof TypeInTextExpr) {
+                    if (placeholder.canReduce()) {
+                        continue;
+                    }
+                }
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     reduce() {
         this.update();
@@ -129,10 +149,9 @@ class MapFunc extends FuncExpr {
 
                 // debug
                 if (!this.animatedReduction) {
-                    superReduce().then(() => {
-                        this.bag.spill(false); // don't log this spill
-                        stage.remove(this.bag);
-                    });
+                    // Don't spill the bag onto the board - leave the
+                    // array as is
+                    superReduce();
                     return;
                 }
                 else this.bag.lock();

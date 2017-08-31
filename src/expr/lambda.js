@@ -289,14 +289,23 @@ class LambdaHoleExpr extends MissingExpression {
         const hasTextbox = (n) => {
             if (n && n.hasPlaceholderChildren()) {
                 const placeholders = n.getPlaceholderChildren();
-                if (placeholders.every((e) => e instanceof MissingExpression))
-                    return false;
-                else {
-                    // Blink the relevant placeholders.
-                    n.animatePlaceholderChildren();
-                    this.ondropexit(node, pos);
-                    console.log(n);
-                    return true;
+                for (const placeholder of placeholders) {
+                    // If the placeholder is filled and valid, lock it
+                    if (placeholder instanceof TypeInTextExpr) {
+                        if (placeholder.canReduce()) {
+
+                        }
+                        else {
+                            // Blink the relevant placeholders.
+                            n.animatePlaceholderChildren();
+                            this.ondropexit(node, pos);
+                            console.log(n);
+                            return true;
+                        }
+                    }
+                    else {
+                        return false;
+                    }
                 }
             }
             return false;
@@ -445,6 +454,10 @@ class LambdaHoleExpr extends MissingExpression {
             } else
                 return afterDrop();
         }
+    }
+
+    isPlaceholder() {
+        return false;
     }
 
     toString() { return 'λ' + this.name; }

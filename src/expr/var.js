@@ -173,7 +173,9 @@ class LabeledVarExpr extends VarExpr {
         if (value != this) {
             value = value.clone();
             let parent = this.parent ? this.parent : this.stage;
+            const stage = this.stage;
             parent.swap(this, value);
+            stage.saveState();
             return Promise.resolve(value);
         }
         else {
@@ -280,7 +282,9 @@ class ChestVarExpr extends VarExpr {
         if (value != this) {
             if (!animated) {
                 let parent = this.parent ? this.parent : this.stage;
+                const stage = this.stage;
                 parent.swap(this, value);
+                this.stage.saveState();
                 return Promise.resolve(value);
             }
             this._animating = true;
@@ -345,6 +349,7 @@ class ChestVarExpr extends VarExpr {
                     }
                     stage.draw();
                     stage.update();
+                    stage.saveState();
                     resolve(value);
                 }, 200);
             });
@@ -394,12 +399,16 @@ class JumpingChestVarExpr extends ChestVarExpr {
         };
         let lerp = arcLerp(value.absolutePos.y, this.absolutePos.y);
         Resource.play('fall-to');
+
+        const stage = this.stage;
+
         return new Promise((resolve, _reject) => {
             Animate.tween(value, target, 600, (x) => x, true, lerp).after(() => {
                 this.stage.remove(value);
                 this.stage.draw();
                 window.setTimeout(() => {
                     super.performReduction(true).then((value) => {
+                        stage.saveState();
                         resolve(value);
                     });
                 }, 100);
@@ -544,6 +553,9 @@ class AssignExpr extends Expression {
         });
         this.stage.update();
         this.stage.draw();
+        const stage = this.stage;
+        stage.swap(this, null);
+        stage.saveState();
     }
 
     animateReduction() {
