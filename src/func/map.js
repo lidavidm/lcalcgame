@@ -149,10 +149,9 @@ class MapFunc extends FuncExpr {
 
                 // debug
                 if (!this.animatedReduction) {
-                    superReduce().then(() => {
-                        this.bag.spill(false); // don't log this spill
-                        stage.remove(this.bag);
-                    });
+                    // Don't spill the bag onto the board - leave the
+                    // array as is
+                    superReduce();
                     return;
                 }
                 else this.bag.lock();
