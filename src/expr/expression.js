@@ -324,6 +324,17 @@ class Expression extends mag.RoundedRect {
     // Wrapper for performReduction intended for interactive use
     performUserReduction() {
         if (!this._reducing) {
+            // Text boxes simulate a user click, causing us to reduce
+            // twice. We temporarily set the reducing flag to prevent
+            // re-entrant reduction, which causes problems for
+            // expressions that have side effects upon reduction
+            // (e.g. Sequences).
+            this._reducing = true;
+            mag.Stage.getNodesWithClass(TypeInTextExpr, [], true, [this]).forEach((n) => {
+                if (n.canReduce()) {
+                    n.reduce();
+                }
+            });
             if (!this.canReduce()) {
                 mag.Stage.getAllNodes([this]).forEach((n) => {
                     if (n instanceof Expression && n.isPlaceholder()) {
@@ -332,6 +343,7 @@ class Expression extends mag.RoundedRect {
                         n.animatePlaceholderStatus();
                     }
                 });
+                this._reducing = false;
                 return Promise.reject("Expression: expression cannot reduce");
             }
             console.log('Can reduce?: ', this.canReduce());
