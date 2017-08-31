@@ -350,11 +350,15 @@ class Expression extends mag.RoundedRect {
 
             this.animateReducingStatus();
 
+            const stage = this.stage;
+
             this._reducing = this.performReduction(true);
             this._reducing.then(() => {
                 this._reducing = false;
+		if (stage) stage.saveState();
             }, () => {
                 this._reducing = false;
+		if (stage) stage.saveState();
             });
         }
         return this._reducing;
