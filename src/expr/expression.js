@@ -636,6 +636,7 @@ class Expression extends mag.RoundedRect {
             Logger.log('detach-commit', this.toString());
         }
         let toplevel = this.rootParent;
+        if (!toplevel) toplevel = this;
         if (this.dragging || toplevel.dragging) {
              if (toplevel.toolbox && !toplevel.toolbox.hits(pos)) {
                 toplevel.toolbox = null;
