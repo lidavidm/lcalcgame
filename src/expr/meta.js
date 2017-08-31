@@ -44,6 +44,7 @@ class InfiniteExpression extends GraphicValueExpr {
         // and let the user drag the clone.
         let c = this.graphicNode.clone();
         this.stage.add(c);
+        this.stage.saveState();
         Resource.play('place');
         c.onmouseenter(pos);
         c.onmousedrag(pos);
