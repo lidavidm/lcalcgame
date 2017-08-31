@@ -100,7 +100,12 @@ class BagExpr extends CollectionExpr {
             let c = item.clone();
             let pos = item.pos;
             let func = lambdaExpr.clone();
-            this.stage.add(func);
+	    // Do not add the lambda to the stage - it should not need
+	    // this global state, and it can cause problems if it
+	    // tries to trigger a save point (since it may be in an
+	    // inconsistent state)
+	    
+            // this.stage.add(func);
             func.update();
             let new_funcs = func.applyExpr(c);
             if (!Array.isArray(new_funcs)) new_funcs = [ new_funcs ];

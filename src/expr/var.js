@@ -175,7 +175,7 @@ class LabeledVarExpr extends VarExpr {
             let parent = this.parent ? this.parent : this.stage;
             const stage = this.stage;
             parent.swap(this, value);
-            stage.saveState();
+            if (stage) stage.saveState();
             return Promise.resolve(value);
         }
         else {
@@ -284,7 +284,7 @@ class ChestVarExpr extends VarExpr {
                 let parent = this.parent ? this.parent : this.stage;
                 const stage = this.stage;
                 parent.swap(this, value);
-                this.stage.saveState();
+                if (stage) stage.saveState();
                 return Promise.resolve(value);
             }
             this._animating = true;
@@ -408,7 +408,7 @@ class JumpingChestVarExpr extends ChestVarExpr {
                 this.stage.draw();
                 window.setTimeout(() => {
                     super.performReduction(true).then((value) => {
-                        stage.saveState();
+                        if (stage) stage.saveState();
                         resolve(value);
                     });
                 }, 100);
