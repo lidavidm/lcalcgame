@@ -7,7 +7,7 @@ var GLOBAL_DEFAULT_SCREENSIZE = null;
 var stage;
 var canvas;
 
-var __USE_BLOCK_VARIANT = false;
+var __ACTIVE_LEVEL_VARIANT = null;
 const __DEBUG_DISPLAY_STATEGRAPH = false;
 
 const __VIS_CANVAS_ID = 'stateGraphCanvas';
@@ -47,6 +47,20 @@ function __TEST() {
 }
 
 function init() {
+
+    // DEBUG: Level variant radio buttons.
+    if (__ACTIVE_LEVEL_VARIANT === null)
+        $('#typing_variant').prop('checked', true);
+    else
+        $('#' + __ACTIVE_LEVEL_VARIANT).prop('checked', true);
+
+    $('input[type=radio][name=variant]').change(function() {
+        if (this.value != '')
+            __ACTIVE_LEVEL_VARIANT = this.value;
+        else
+            __ACTIVE_LEVEL_VARIANT = null;
+        initBoard();
+    });
 
     // -- TEST CORS --
     // $.ajax({

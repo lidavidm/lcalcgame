@@ -672,18 +672,24 @@ var Level = function () {
             var typing_options = desc.typing_options;
             var typing_hints = desc.typing_hints;
             var typing_help = desc.typing_help;
+            var help_text = desc.help_text;
 
 
-            if (__USE_BLOCK_VARIANT && 'block_variant' in desc) {
-                var variant = desc.block_variant;
+            var setupVariant = function setupVariant(variant) {
                 if ('board' in variant) expr_descs = variant.board;
                 if ('toolbox' in variant) toolbox_descs = variant.toolbox;
                 if ('goal' in variant) goal_descs = variant.goal;
                 if ('globals' in variant) globals_descs = variant.globals;
+                if ('typing_hints' in variant) typing_hints = variant.typing_hints;
+                if ('help_text' in variant) help_text = variant.help_text;
+            };
+
+            if (__ACTIVE_LEVEL_VARIANT && __ACTIVE_LEVEL_VARIANT in desc) {
+                setupVariant(desc[__ACTIVE_LEVEL_VARIANT]);
             }
 
-            if ('help_text' in desc) {
-                showHelpText(desc['help_text']);
+            if (help_text && help_text.length > 0) {
+                showHelpText(help_text);
             }
 
             var lvl = new Level(Level.parse(expr_descs, language, macros, typing_options), new Goal(new ExpressionPattern(Level.parse(goal_descs, language, macros, typing_options)), goal_descs, resources.aliens), toolbox_descs ? Level.parse(toolbox_descs, language, macros, typing_options) : null, Environment.parse(globals_descs));

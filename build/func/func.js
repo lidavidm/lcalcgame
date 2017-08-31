@@ -37,7 +37,7 @@ var FuncExpr = function (_Expression) {
     }, {
         key: 'onmouseclick',
         value: function onmouseclick(pos) {
-            this.performReduction();
+            this.performUserReduction();
         }
     }, {
         key: 'draw',

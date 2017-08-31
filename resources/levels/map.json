@@ -23,44 +23,94 @@
             "description": "Intro to map: Typing function body.",
             "board": "[0, 1, 0, 1].map(n => _t_single)",
             "goal": "[true, false, true, false]",
-            "toolbox": ""
+            "toolbox": "",
+            "block_variant": {
+                "board": "[0, 1, 0, 1].map(n => _)",
+                "toolbox": ["n == 1", "n == 0", "n == 2", "n == n"]
+            },
+            "verbatim_variant": {
+                "typing_hints": ["n == 0"]
+            }
         },
         {
             "description": "Intro to map: Typing II.",
             "board": "['ne', 'li', 'be'].map(s => _t_single)",
             "goal": "['near', 'liar', 'bear']",
-            "toolbox": ""
+            "toolbox": "",
+            "block_variant": {
+                "board": "['ne', 'li', 'be'].map(s => _)",
+                "toolbox": ["'ar' + s", "s + 'ar'", "s == 'ar'"]
+            },
+            "verbatim_variant": {
+                "typing_hints": ["s + \"ar\""]
+            }
         },
         {
             "description": "Intro to map: Choosing arrays.",
             "board": "__.map(a => _t_single)",
             "goal": "['met', 'net']",
-            "toolbox": ["['b', 'a']", "['n', 'm']", "['m', 'n']"]
+            "toolbox": ["['b', 'a']", "['n', 'm']", "['m', 'n']"],
+            "block_variant": {
+                "board": "__.map(a => _)",
+                "toolbox": ["['b', 'a']", "['n', 'm']", "['m', 'n']", "a + 'et'"]
+            },
+            "verbatim_variant": {
+                "typing_hints": ["a + \"et\""]
+            }
         },
         {
             "description": "Intro to map: Choosing arrays II.",
             "board": "__.map(_t_single)",
             "goal": "[false, true]",
-            "toolbox": ["['0', '1']", "[0, 0]", "['a', 'b']", "[3, 5]"]
+            "toolbox": ["['0', '1']", "[0, 0]", "['a', 'b']", "[3, 5]"],
+            "block_variant": {
+                "board": "__.map(_)",
+                "toolbox": ["x => x == _", "0", "1", "['0', '1']", "[1, 0]"]
+            },
+            "verbatim_variant": {
+                "typing_hints": ["x => x == \"b\""]
+            }
         },
         {
             "description": "Typing arrays.",
             "board": ["_t_array.map(x => x + 'er')"],
-            "goal": "['better', 'faster', 'stronger']"
+            "goal": "['better', 'faster', 'stronger']",
+            "block_variant": {
+                "board": "__.map(x => x + 'er')",
+                "toolbox": ["['bet', 'fas', 'stron']", "['bett', 'fast', 'strong']"]
+            },
+            "verbatim_variant": {
+                "typing_hints": ["\"bett\", \"fast\", \"strong\""]
+            }
         },
         {
             "description": "Typing conditionals inside map.",
             "board": ["['A', 'F', 'F'].map(_t_single)"],
             "goal": ["['pass', 'fail', 'fail']"],
             "toolbox": "",
-            "typing_help": ["You'll have to use =>, ?, and :"]
+            "typing_help": ["You'll have to use =>, ?, and :"],
+            "block_variant": {
+                "board": ["['A', 'F', 'F'].map(_)", "'pass'", "'fail'"],
+                "toolbox": ["y => _", "y == 'A'", "_b ? _ : _"]
+            },
+            "verbatim_variant": {
+                "typing_hints": ["x => x == \"A\" ? \"pass\" : \"fail\""],
+                "typing_help": null
+            }
         },
         {
             "description": "Typing both array and function inside map. Using conditonals in map II.",
             "board": ["_t_array.map(_t_single)"],
             "goal": ["['two', 'one', 'two']"],
             "toolbox": "",
-            "typing_help": ["You'll have to use =>, ?, and :"]
+            "typing_help": ["You'll have to use =>, ?, and :"],
+            "block_variant": {
+                "board": ["__.map(_)", "x => _", "x == _", "'two'", "'one'" ],
+                "toolbox": ["[1, 2, 1]", "1", "2", "_b ? _ : _"]
+            },
+            "verbatim_variant": {
+                "typing_hints": ["2, 1, 2", "n => n == 2 ? \"two\" : \"one\""]
+            }
         }
     ],
     "resources":{

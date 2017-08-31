@@ -22,6 +22,10 @@
             "fade": {
                 "string": 1,
                 "typing_str": 1
+            },
+            "block_variant": {
+                "board": ["matter => matter + _", "'quotes '"],
+                "toolbox": ["matter", "'matter'"]
             }
         },
         {
@@ -47,40 +51,79 @@
             "board": ["a => _t_fullstring + a", "b => _t_single + 'oo'"],
             "goal": ["'at'", "'zoo'"],
             "typing_hints": ["\"a\""],
-            "toolbox": ["'z'", "'a'", "'t'", "'b'", "'x'"]
+            "toolbox": ["'z'", "'a'", "'t'", "'b'", "'x'"],
+            "block_variant": {
+                "board": ["a => 'a' + a", "b => _ + 'oo'"],
+                "toolbox": ["'z'", "z", "'a'", "'t'", "'b'", "b"]
+            },
+            "verbatim_variant": {
+                "board": ["a => _t_fullstring + a", "b => _t_single + 'oo'"],
+                "typing_hints": ["\"a\"", "b"]
+            }
         },
         {
             "description": "Confusion V: Typing function bodies.",
             "board": ["b => _t_single", "x => x x x"],
             "goal": ["'bee'", "'see'", "'Lee'"],
             "typing_hints": ["b + \"ee\""],
-            "toolbox": ["'b'", "'s'", "'L'"]
+            "toolbox": ["'b'", "'s'", "'L'"],
+            "block_variant": {
+                "board": ["b => _", "x => x x x"],
+                "toolbox": ["b + _", "'ee'", "'b'", "'s'", "'L'"]
+            }
         },
         {
             "description": "Confusion VI: Constructing functions.",
             "board": ["b => _t_single", "x => x x x"],
             "goal": ["'knew'", "'knave'", "'know'"],
-            "toolbox": ["'ew'", "'ave'", "'ow'"]
+            "toolbox": ["'ew'", "'ave'", "'ow'"],
+            "block_variant": {
+                "board": ["b => _", "x => x x x"],
+                "toolbox": ["_ + b", "'kn'", "'ew'", "'ave'", "'ow'"]
+            },
+            "verbatim_variant": {
+                "board": ["b => _t_single", "x => x x x"],
+                "typing_hints": ["\"kn\" + b"]
+            }
         },
         {
             "description": "Confusion VII: Constructing functions II: Triple concat.",
             "board": ["w => _t_single", "x => x x x"],
             "goal": ["'widow'", "'willow'", "'window'"],
-            "toolbox": ["'d'", "'ll'", "'nd'"]
+            "toolbox": ["'d'", "'ll'", "'nd'"],
+            "block_variant": {
+                "board": ["w => _", "x => x x x"],
+                "toolbox": ["_ + _ + _", "w", "'wi'", "'d'", "'ll'", "'ow'", "'nd'"]
+            },
+            "verbatim_variant": {
+                "board": ["w => _t_single", "x => x x x"],
+                "typing_hints": ["\"wi\" + w + \"ow\""]
+            }
         },
         {
             "description": "Typing conditionals I.",
             "board": ["_t_single", "x => xx"],
             "goal": ["1", "0"],
             "toolbox": ["true", "false", "true", "false"],
-            "typing_hints": ["n => n ? 1 : 0"]
+            "typing_hints": ["n => n ? 1 : 0"],
+            "block_variant": {
+                "board": ["n => n ? 1 : 0", "x => xx"]
+            }
         },
         {
             "description": "Typing conditionals II.",
             "board": ["_t_single", "x => xxx"],
             "goal": ["'yes'", "'no'", "'no'"],
             "toolbox": ["true", "false", "true", "false"],
-            "typing_help": ["You'll have to use =>, ?, and :"]
+            "typing_help": ["You'll have to use =>, ?, and :"],
+            "block_variant": {
+                "board": ["b => _ ? _ : _", "x => xxx"],
+                "toolbox": ["b", "'yes'", "'no'", "true", "false", "false"]
+            },
+            "verbatim_variant": {
+                "board": ["_t_single", "x => xxx"],
+                "typing_hints": ["x => x ? \"yes\" : \"no\""]
+            }
         }
     ],
     "resources":{

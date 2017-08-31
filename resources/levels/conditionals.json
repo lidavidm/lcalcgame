@@ -36,22 +36,40 @@
             "toolbox": ["'eat'", "'cry'", "'bite'"]
         },
         {
+            "description": "conditionals inside booleans; i.e. ternary operator",
+            "board": ["'yup' == _", "_b ? 'yup' : 'nope'", "true"],
+            "goal": "true",
+            "toolbox": ""
+        },
+        {
             "description": "choice of else branch",
             "board": ["_ == _", "_b ? 'a' : _t_string"],
             "goal": "'c'",
-            "toolbox": ["'a'", "'a'", "'b'", "'b'", "'c'"]
+            "toolbox": ["'a'", "'a'", "'b'", "'b'", "'c'"],
+            "block_variant": {
+                "board": ["_ == _", "_b ? 'a' : _"],
+                "toolbox": ["'a'", "'a'", "'b'", "'b'", "'c'", "'c'"]
+            },
+            "verbatim_variant": {
+                "board": ["_ == _", "_b ? _t_string : _"],
+                "toolbox": ["'a'", "'a'", "'b'", "'b'", "'c'", "'c'"],
+                "typing_hints": [ "a" ]
+            }
         },
         {
             "description": "choice of branches",
             "board": ["'okay' == _t_string", "_b ? _t_string : _t_string"],
             "goal": "'yes'",
-            "toolbox": []
-        },
-        {
-            "description": "conditionals inside booleans; i.e. ternary operator",
-            "board": ["'yup' == _", "_b ? 'yup' : 'nope'", "true"],
-            "goal": "true",
-            "toolbox": ""
+            "toolbox": [],
+            "block_variant": {
+                "board": ["'okay' == _", "_b ? _ : _"],
+                "toolbox": ["'yes'", "'no'", "'maybe'", "'okay'"]
+            },
+            "verbatim_variant": {
+                "board": ["_t_string == _", "_b ? _ : _"],
+                "toolbox": ["'yes'", "'no'", "'maybe'", "'okay'"],
+                "typing_hints": [ "okay" ]
+            }
         }
     ],
     "resources":{

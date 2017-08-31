@@ -74,7 +74,13 @@
             "toolbox": "",
             "block_variant": {
                 "board": ["_ == 'jupiter'"],
-                "toolbox": ["'jupiter'", "'saturn'"]
+                "toolbox": ["'saturn'", "'jupiter'", "'neptune'"],
+                "help_text": ""
+            },
+            "verbatim_variant": {
+                "board": ["_t_string == 'jupiter'"],
+                "toolbox": "",
+                "typing_hints": [ "jupiter" ]
             },
             "help_text": "Press ENTER when finished typing."
         },
@@ -82,7 +88,16 @@
             "description": "Typing with ==, twice. Spaces.",
             "goal": ["false", "true"],
             "board": ["'hot' == _t_string", "'cold' == _t_string"],
-            "toolbox": ""
+            "toolbox": "",
+            "block_variant": {
+                "board": ["'hot' == _", "'cold' == _"],
+                "toolbox": ["'lukewarm'", "'cold'", "'hot'", "'chilly'"]
+            },
+            "verbatim_variant": {
+                "board": ["_t_string == _", "_t_string == _"],
+                "toolbox": ["'lukewarm'", "'cold'", "'hot'", "'chilly'"],
+                "typing_hints": [ "hot", "cold" ]
+            }
         },
         {
             "description": "Typing with ==, both sides.",
@@ -92,6 +107,11 @@
             "block_variant": {
                 "board": ["_ == _", "_ == _"],
                 "toolbox": ["'a'", "'b'", "'a'", "'c'", "'b'", "'c'"]
+            },
+            "verbatim_variant": {
+                "board": ["_ == _", "_ == _", "_t_string", "_t_string"],
+                "toolbox": ["'a'", "'b'", "'c'", "'b'", "'c'"],
+                "typing_hints": [ "a", "c" ]
             }
         }
     ],

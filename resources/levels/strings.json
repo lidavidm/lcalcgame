@@ -32,6 +32,11 @@
             "block_variant": {
                 "board": "'mount' + _",
                 "toolbox": ["'ins'", "'ains'", "'tains'"]
+            },
+            "verbatim_variant": {
+                "board": "_t_string + _",
+                "toolbox": ["'ins'", "'ains'", "'tains'"],
+                "typing_hints": [ "mount" ]
             }
         },
         {
@@ -42,16 +47,26 @@
             "block_variant": {
                 "board": ["_ + 'guin'", "' '", "_ + 'shu'", "_ + 'fle'"],
                 "toolbox": ["'pen'", "'uff'", "'f'", "_ + _", "_ + _"]
+            },
+            "verbatim_variant": {
+                "board": ["_ + _t_string", "' '", "_ + _t_string", "_ + _t_string"],
+                "toolbox": ["'pen'", "'uff'", "'f'", "_ + _", "_ + _"],
+                "typing_hints": [ "guin", "shu", "fle" ]
             }
         },
         {
             "description": "Multiple text-enter boxes. Spaces II.",
-            "goal": "'volcanos scare me'",
+            "goal": "'volcanoes scare me'",
             "board": ["_t_string + 'olca'", "'ca' + _", "_t_string + 's'", "_t_string + 'e me'"],
             "toolbox": ["_ + _", "_ + _"],
             "block_variant": {
                 "board": ["_ + 'olca'", "'ca' + _", "_ + 's'", "_ + 'e me'"],
-                "toolbox": ["'v'", "'nos '", "'no'", "'r'", "_ + _", "_ + _"]
+                "toolbox": ["'v'", "'noes '", "'no'", "'r'", "_ + _", "_ + _"]
+            },
+            "verbatim_variant": {
+                "board": ["_ + _t_string", "'ca' + _", "_ + 's'", "_ + _t_string"],
+                "toolbox": ["'v'", "'noes '", "'no'", "'r'", "_ + _", "_ + _"],
+                "typing_hints": [ "olca", "e me" ]
             }
         },
         {
@@ -86,6 +101,10 @@
             "block_variant": {
                 "board": ["'r' >> _", "_ >> 'river'"],
                 "toolbox": ["'ver'", "'iver'", "'river'", "_op('+')", "_op('==')"]
+            },
+            "verbatim_variant": {
+                "board": ["'r' >>> _", "_ >>> 'river'"],
+                "toolbox": ["iver", "r", "river"]
             }
         },
         {
@@ -95,6 +114,15 @@
             "toolbox": "",
             "typing_options": {
                 ">>>": ["==", "+"]
+            },
+            "block_variant": {
+                "board": ["_ >> 'time'", "_ >> 'spacetime'"],
+                "toolbox": ["'space'", "'time'", "_op('+')", "_op('==')"]
+            },
+            "verbatim_variant": {
+                "board": ["_ >>> 'time'", "_ >>> 'spacetime'"],
+                "toolbox": ["'space'", "'time'"],
+                "typing_hints": [ "+", "==" ]
             }
         },
         {
@@ -108,6 +136,11 @@
             "block_variant": {
                 "board": ["_ >> _", "_ >> _"],
                 "toolbox": ["'b'", "'e'", "_op('+')", "_op('==')", "'be'"]
+            },
+            "verbatim_variant": {
+                "board": ["_ >>> _", "_ >>> _"],
+                "toolbox": ["'b'", "'e'", "'be'"],
+                "typing_hints": [ "==", "+" ]
             }
         }
     ],

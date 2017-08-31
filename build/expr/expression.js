@@ -408,26 +408,48 @@ var Expression = function (_mag$RoundedRect) {
             var _this5 = this;
 
             if (!this._reducing) {
-                if (!this.canReduce()) {
-                    mag.Stage.getAllNodes([this]).forEach(function (n) {
-                        if (n instanceof Expression && n.isPlaceholder()) {
-                            // Something to do here
-                            console.log(n);
-                            n.animatePlaceholderStatus();
+                var _ret = function () {
+                    // Text boxes simulate a user click, causing us to reduce
+                    // twice. We temporarily set the reducing flag to prevent
+                    // re-entrant reduction, which causes problems for
+                    // expressions that have side effects upon reduction
+                    // (e.g. Sequences).
+                    _this5._reducing = true;
+                    mag.Stage.getNodesWithClass(TypeInTextExpr, [], true, [_this5]).forEach(function (n) {
+                        if (n.canReduce()) {
+                            n.reduce();
                         }
                     });
-                    return Promise.reject("Expression: expression cannot reduce");
-                }
-                console.log('Can reduce?: ', this.canReduce());
+                    if (!_this5.canReduce()) {
+                        mag.Stage.getAllNodes([_this5]).forEach(function (n) {
+                            if (n instanceof Expression && n.isPlaceholder()) {
+                                // Something to do here
+                                console.log(n);
+                                n.animatePlaceholderStatus();
+                            }
+                        });
+                        _this5._reducing = false;
+                        return {
+                            v: Promise.reject("Expression: expression cannot reduce")
+                        };
+                    }
+                    console.log('Can reduce?: ', _this5.canReduce());
 
-                this.animateReducingStatus();
+                    _this5.animateReducingStatus();
 
-                this._reducing = this.performReduction(true);
-                this._reducing.then(function () {
-                    _this5._reducing = false;
-                }, function () {
-                    _this5._reducing = false;
-                });
+                    var stage = _this5.stage;
+
+                    _this5._reducing = _this5.performReduction(true);
+                    _this5._reducing.then(function () {
+                        _this5._reducing = false;
+                        if (stage) stage.saveState();
+                    }, function () {
+                        _this5._reducing = false;
+                        if (stage) stage.saveState();
+                    });
+                }();
+
+                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
             }
             return this._reducing;
         }
@@ -1111,7 +1133,7 @@ var ExpressionPlus = function (_Expression) {
             var parent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
             if (this.drawer) {
-                var _ret2 = function () {
+                var _ret3 = function () {
                     var extras = [];
                     _this14.children.forEach(function (c) {
                         if (_this14.holes.indexOf(c) === -1) extras.push(c);
@@ -1128,7 +1150,7 @@ var ExpressionPlus = function (_Expression) {
                     };
                 }();
 
-                if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
+                if ((typeof _ret3 === 'undefined' ? 'undefined' : _typeof(_ret3)) === "object") return _ret3.v;
             } else return _get(ExpressionPlus.prototype.__proto__ || Object.getPrototypeOf(ExpressionPlus.prototype), 'clone', this).call(this, parent);
         }
     }]);

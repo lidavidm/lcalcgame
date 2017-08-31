@@ -240,6 +240,7 @@ var LabeledVarExpr = function (_VarExpr) {
             if (value != this) {
                 value = value.clone();
                 var _parent = this.parent ? this.parent : this.stage;
+                var _stage = this.stage;
                 _parent.swap(this, value);
                 return Promise.resolve(value);
             } else {
@@ -359,6 +360,7 @@ var ChestVarExpr = function (_VarExpr2) {
             if (value != this) {
                 if (!animated) {
                     var _parent2 = this.parent ? this.parent : this.stage;
+                    var _stage2 = this.stage;
                     _parent2.swap(this, value);
                     return Promise.resolve(value);
                 }
@@ -503,6 +505,9 @@ var JumpingChestVarExpr = function (_ChestVarExpr) {
             };
             var lerp = arcLerp(value.absolutePos.y, this.absolutePos.y);
             Resource.play('fall-to');
+
+            var stage = this.stage;
+
             return new Promise(function (resolve, _reject) {
                 Animate.tween(value, target, 600, function (x) {
                     return x;
@@ -670,6 +675,9 @@ var AssignExpr = function (_Expression) {
             });
             this.stage.update();
             this.stage.draw();
+            var stage = this.stage;
+            stage.swap(this, null);
+            stage.saveState();
         }
     }, {
         key: "animateReduction",

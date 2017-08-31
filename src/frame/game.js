@@ -199,19 +199,26 @@ class Level {
             macros: macros,
             typing_options: typing_options,
             typing_hints: typing_hints,
-            typing_help: typing_help
+            typing_help: typing_help,
+            help_text: help_text
         } = desc;
 
-        if (__USE_BLOCK_VARIANT && 'block_variant' in desc) {
-            const variant = desc.block_variant;
+        const setupVariant = (variant) => {
             if ('board' in variant) expr_descs = variant.board;
             if ('toolbox' in variant) toolbox_descs = variant.toolbox;
             if ('goal' in variant) goal_descs = variant.goal;
             if ('globals' in variant) globals_descs = variant.globals;
+            if ('typing_hints' in variant) typing_hints = variant.typing_hints;
+            if ('help_text' in variant) help_text = variant.help_text;
+        };
+
+        if (__ACTIVE_LEVEL_VARIANT &&
+            __ACTIVE_LEVEL_VARIANT in desc) {
+            setupVariant(desc[__ACTIVE_LEVEL_VARIANT]);
         }
 
-        if ('help_text' in desc) {
-            showHelpText(desc['help_text']);
+        if (help_text && help_text.length > 0) {
+            showHelpText(help_text);
         }
 
         var lvl = new Level(

@@ -25,13 +25,27 @@
         {
             "description": "Choice of function w/ typing.",
             "board": ["'cat'", "x => x == _t_string"],
-            "goal": "false"
+            "goal": "false",
+            "block_variant": {
+                "board": ["'cat'", "x => x == _"],
+                "toolbox": ["'poodle'", "'cat'", "'ferret'", "'wombat'"]
+            },
+            "verbatim_variant": {
+                "typing_hints": ["cat"]
+            }
         },
         {
             "description": "Reinforces concept: Pipes outside of pure lambdas.",
             "board": ["x => x == 'a'", "x => x == _t_string"],
             "goal": ["true", "true"],
-            "toolbox": ["'c'", "'b'", "'a'"]
+            "toolbox": ["'c'", "'b'", "'a'"],
+            "block_variant": {
+                "board": ["x => x == 'a'", "x => x == _"],
+                "toolbox": ["'c'", "'c'", "'b'", "'b'", "'a'", "'a'"]
+            },
+            "verbatim_variant": {
+                "typing_hints": ["b"]
+            }
         },
         {
             "description": "Must be solved with free binding.",
@@ -41,6 +55,10 @@
             "toolbox": ["'E'", "'B'", "'M'"],
             "typing_options": {
                 ">>>": ["==", "+"]
+            },
+            "block_variant": {
+                "board": ["x => x + 'E'", "x => x == 'E'"],
+                "toolbox": ["'E'", "'B'", "'M'"]
             },
             "fade": {
                 "==":2,
@@ -55,6 +73,13 @@
             "toolbox": ["'O'", "'E'", "'L'", "'S'", "'E'"],
             "typing_options": {
                 ">>>": ["==", "+"]
+            },
+            "block_variant": {
+                "board": ["x => x >> 'R'", "x => x >> ' ELSE!'"],
+                "toolbox": ["_op('+')", "_op('==')", "'O'", "'E'", "'L'"]
+            },
+            "verbatim_variant": {
+                "typing_hints": ["+", "=="]
             }
         },
         {
@@ -74,43 +99,85 @@
             "board": ["x => _t_single", "x => xxx"],
             "typing_hints": ["x + 1"],
             "goal": ["2", "3", "4"],
-            "toolbox": ["1", "2", "3", "4", "5"]
+            "toolbox": ["1", "2", "3", "4", "5"],
+            "block_variant": {
+                "board": ["x => x + 1", "x => xxx"]
+            }
         },
         {
             "description": "Intro to typing entire statements in bindings II",
             "board": ["x => _t_single", "x => xxx"],
             "goal": ["6", "8", "10"],
-            "toolbox": ["2", "3", "4", "5", "6"]
+            "toolbox": ["2", "3", "4", "5", "6"],
+            "block_variant": {
+                "board": ["x => _", "x => xxx"],
+                "toolbox": ["x + _", "2", "3", "4", "4", "5", "6"]
+            },
+            "verbatim_variant": {
+                "typing_hints": ["x + 4"]
+            }
         },
         {
             "description": "Intro to typing entire statements in bindings III",
             "board": ["x => _t_single", "x => xxx"],
             "goal": ["true", "true", "false"],
-            "toolbox": ["10", "10", "20", "20", "30", "30"]
+            "toolbox": ["10", "10", "20", "20", "30", "30"],
+            "block_variant": {
+                "board": ["x => _", "x => xxx"],
+                "toolbox": ["x == _", "10", "10", "10", "20", "20", "20"]
+            },
+            "verbatim_variant": {
+                "typing_hints": ["x == 20"]
+            }
         },
         {
             "description": "Typing entire lines I.",
             "board": ["_t_single", "x => xx"],
             "typing_hints": ["x => x + x"],
             "goal": ["66", "88"],
-            "toolbox": ["33", "44", "55"]
+            "toolbox": ["33", "44", "55"],
+            "block_variant": {
+                "board": ["x => x + x", "x => xxx"]
+            }
         },
         {
             "description": "Typing one entire line without hint text.",
             "board": ["_t_single", "_t_single", "1", "2"],
             "typing_hints": ["x => x == 1"],
-            "goal": ["true", "true"]
+            "toolbox": "",
+            "goal": ["true", "true"],
+            "block_variant": {
+                "board": ["1", "2", "x => x == 1", "x => _"],
+                "toolbox": ["x == _", "1", "2"]
+            },
+            "verbatim_variant": {
+                "typing_hints": ["x => x == 1", "x => x == 2"]
+            }
         },
         {
             "description": "Typing entire line without any hints.",
             "board": ["_t_single", "x => xxx"],
             "goal": ["20", "30", "40"],
-            "toolbox": ["10", "20", "30"]
+            "toolbox": ["10", "20", "30"],
+            "block_variant": {
+                "board": ["x => xxx"],
+                "toolbox": ["x => _", "_ + x", "10", "10", "20", "30"]
+            },
+            "verbatim_variant": {
+                "typing_hints": ["x => x + 10"]
+            }
         },
         {
             "description": "Typing entire lines IV: Functions as deleters.",
             "board": ["_t_single", "_t_single", "_t_single", "7", "13", "29"],
-            "goal": ["true", "20", "false"]
+            "goal": ["true", "20", "false"],
+            "block_variant": {
+                "board": ["7", "13", "29", "x => x == 3"],
+                "toolbox": ["x => x == 7", "x => x + 7", "x => x + 9"]
+            },
+            "verbatim_variant": {
+                "typing_hints": ["x => x == 7", "x => x + 7", "x => x == 3"]
+            }
         }
     ],
     "resources":{

@@ -98,6 +98,49 @@ var MapFunc = function (_FuncExpr) {
             return this.bag.toJavaScript() + '.map(' + this.func.toJavaScript() + ')';
         }
     }, {
+        key: 'canReduce',
+        value: function canReduce() {
+            if (!this.bag || !this.func) {
+                return false;
+            }
+
+            if (this.func.hasPlaceholderChildren()) {
+                var placeholders = this.func.getPlaceholderChildren();
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
+
+                try {
+                    for (var _iterator = placeholders[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        var placeholder = _step.value;
+
+                        // If the placeholder is filled and valid, lock it
+                        if (placeholder instanceof TypeInTextExpr) {
+                            if (placeholder.canReduce()) {
+                                continue;
+                            }
+                        }
+                        return false;
+                    }
+                } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion && _iterator.return) {
+                            _iterator.return();
+                        }
+                    } finally {
+                        if (_didIteratorError) {
+                            throw _iteratorError;
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+    }, {
         key: 'reduce',
         value: function reduce() {
             this.update();
@@ -159,12 +202,10 @@ var MapFunc = function (_FuncExpr) {
 
                         // debug
                         if (!_this3.animatedReduction) {
-                            superReduce().then(function () {
-                                _this3.bag.spill(false); // don't log this spill
-                                stage.remove(_this3.bag);
-                            });
+                            // Don't spill the bag onto the board - leave the
+                            // array as is
                             return {
-                                v: void 0
+                                v: superReduce()
                             };
                         } else _this3.bag.lock();
 

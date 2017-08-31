@@ -925,9 +925,11 @@ var TypeInTextExpr = function (_TextExpr) {
                 Logger.log('after-commit-text', { 'text': txt, 'rootParent': rootParent ? rootParent.toJavaScript() : 'UNKNOWN' });
                 if (stage) stage.saveState();
 
-                // Also reduce the root parent if possible
-                // (removes need for redundant clicking)
-                if (rootParent && !rootParent.hasPlaceholderChildren() && !(rootParent instanceof LambdaExpr)) rootParent.performUserReduction();
+                // Also reduce the root parent if possible (removes
+                // need for redundant clicking). Don't reduce things
+                // that are already in the process of reducing,
+                // though.
+                if (rootParent && !rootParent.hasPlaceholderChildren() && !(rootParent instanceof LambdaExpr) && !rootParent._reducting) rootParent.performUserReduction();
             } else {
                 Animate.blink(this, 1000, [1, 0, 0], 2); // blink red
             }
