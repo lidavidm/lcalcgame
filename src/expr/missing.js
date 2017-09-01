@@ -57,7 +57,7 @@ class MissingExpression extends Expression {
                 const root = parent.rootParent || parent;
                 let hasMissing = false;
                 for (const placeholder of root.getPlaceholderChildren()) {
-                    if (placeholder instanceof MissingExpression) {
+                    if (placeholder instanceof MissingExpression || placeholder instanceof TypeInTextExpr) {
                         hasMissing = true;
                         break;
                     }

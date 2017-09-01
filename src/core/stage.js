@@ -671,7 +671,7 @@ var mag = (function(_) {
                 let event = getCBKeyEvent(e);
                 stage.onkeydown(event);
                 if(e.keyCode == 32 || e.keyCode == 13 || e.keyCode == 9) { // Space, tab, or...
-                    // Chrome reports charCode as 0 for these characters?
+                    // Browsers report charCode as 0 for these characters?
                     event.charCode = event.keyCode;
                     stage.onkeypress(event);
                     e.preventDefault();
