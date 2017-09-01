@@ -70,15 +70,15 @@ class MissingExpression extends Expression {
                     const wrapper = new Expression([challenge]);
                     wrapper.holes[0].emptyParent = true;
 
+                    stage.saveState({name:"placed-expr", before:beforeNode, item:droppedExp, after: root.toJavaScript()});
                     root.stage.swap(root, wrapper);
                     challenge.focus();
+                    return;
                 }
             }
-            else {
-                // Logger.log('placed-expr', {'before':beforeNode, 'after':afterState, 'item':droppedExp });
+            // Logger.log('placed-expr', {'before':beforeNode, 'after':afterState, 'item':droppedExp });
 
-                stage.saveState({name:"placed-expr", before:beforeNode, item:droppedExp, after:parent.rootParent.toJavaScript()});
-            }
+            stage.saveState({name:"placed-expr", before:beforeNode, item:droppedExp, after:parent.rootParent.toJavaScript()});
 
             // Blink red if total reduction is not possible with this config.
             /*var try_reduce = node.parent.reduceCompletely();
