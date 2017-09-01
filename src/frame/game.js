@@ -212,9 +212,9 @@ class Level {
             if ('help_text' in variant) help_text = variant.help_text;
         };
 
-        if (__ACTIVE_LEVEL_VARIANT &&
-            __ACTIVE_LEVEL_VARIANT in desc) {
-            setupVariant(desc[__ACTIVE_LEVEL_VARIANT]);
+        const variant = __ACTIVE_LEVEL_VARIANT == "verbatim_variant" ? "block_variant" : __ACTIVE_LEVEL_VARIANT;
+        if (variant && variant in desc) {
+            setupVariant(desc[variant]);
         }
 
         if (help_text && help_text.length > 0) {
