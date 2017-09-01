@@ -65,7 +65,21 @@ class MissingExpression extends Expression {
 
                 if (!hasMissing) {
                     const challenge = new TypeInTextExpr();
-                    challenge.enforceHint(root.toJavaScript());
+                    let code = root.toJavaScript();
+                    if (window.escodegen) {
+                        code = window.escodegen.generate(window.esprima.parse(code, {
+                            raw: true,
+                            tokens: true,
+                            range: true,
+                        }), {
+                            comment: false,
+                            format: {
+                                quotes: "double",
+                            },
+                        });
+                        code = code.slice(0, -1);  // Remove trailing semicolon
+                    }
+                    challenge.enforceHint(code);
                     challenge.typeBox.update();
                     const wrapper = new Expression([challenge]);
                     wrapper.holes[0].emptyParent = true;
