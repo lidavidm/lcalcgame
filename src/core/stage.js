@@ -298,7 +298,25 @@ var mag = (function(_) {
 
         /** Update all nodes on the stage. */
         update() {
-            this.nodes.forEach((n) => n.update());
+            this.nodes.forEach((n) => {
+                n.update();
+                // TODO: resize nodes
+                const left = n.pos.x - n.anchor.x * n.size.w;
+                const right = left + n.size.w;
+
+                if (n.size.w * n.scale.x > this.boundingSize.w) {
+                    let scale = this.boundingSize.w / n.size.w;
+                    if (scale > 0.2) scale -= 0.05;
+                    n.scale = { x: scale, y: scale };
+                    n.pos = { x: 0, y : n.pos.y };
+                }
+                else if (left < 0) {
+
+                }
+                else if (right > this.boundingSize.w) {
+
+                }
+            });
         }
 
         // Recursive functions that grab nodes on this stage with the specified class.
