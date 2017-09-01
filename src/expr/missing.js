@@ -74,10 +74,18 @@ class MissingExpression extends Expression {
                         }), {
                             comment: false,
                             format: {
+                                // Have it preserve spaces, but don't
+                                // put things across multiple lines.
+                                compact: false,
+                                indent: {
+                                    style: "",
+                                },
+                                newline: " ",
+                                // Remove trailing semicolon
+                                semicolons: false,
                                 quotes: "double",
                             },
                         });
-                        code = code.slice(0, -1);  // Remove trailing semicolon
                     }
                     challenge.enforceHint(code);
                     challenge.typeBox.update();
