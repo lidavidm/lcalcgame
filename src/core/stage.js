@@ -260,8 +260,23 @@ var mag = (function(_) {
                         pos = addPos({x:0, y:an.size.h + 6}, pos);
                     });
                 }
-                if (pos.x > this.boundingSize.w) {
-                    let offset = pos.x - this.boundingSize.w;
+
+                // If it extends off screen (horizontally), bounce it
+                // back inside
+                let maxWidth = 0;
+                let leastX = 0;
+                for (const n of anotherNode) {
+                    maxWidth = Math.max(maxWidth, (1 - n.anchor.x) * n.size.w);
+                    leastX = Math.min(leastX, n.pos.x - n.anchor.x * n.size.w);
+                }
+                let offset;
+                if (pos.x + maxWidth > this.boundingSize.w) {
+                    offset = pos.x + maxWidth - this.boundingSize.w;
+                }
+                if (leastX < 0) {
+                    offset = leastX;
+                }
+                if (Number.isNumber(offset) && !Number.isNaN(offset) && offset != 0) {
                     anotherNode.forEach((n) => {
                         let p = n.pos;
                         n.pos = { x:p.x - offset, y:p.y };
