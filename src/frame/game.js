@@ -46,12 +46,12 @@ class Level {
 
         var canvas_screen = stage.boundingSize;
 
-        const varNodesOnBoard = mag.Stage.getNodesWithClass(VarExpr, [], true, this.exprs);
-        const varNodesInToolbox = mag.Stage.getNodesWithClass(VarExpr, [], true, this.toolbox);
+        const assignNodesOnBoard = mag.Stage.getNodesWithClass(AssignExpr, [], true, this.exprs);
+        const assignNodesInToolbox = mag.Stage.getNodesWithClass(AssignExpr, [], true, this.toolbox);
         const showEnvironment = this.globals &&
               (Object.keys(this.globals.bindings).length > 0
-               || (varNodesOnBoard && varNodesOnBoard.length > 0)
-               || (varNodesInToolbox && varNodesInToolbox.length > 0));
+               || (assignNodesOnBoard && assignNodesOnBoard.length > 0)
+               || (assignNodesInToolbox && assignNodesInToolbox.length > 0));
         const envDisplayWidth = showEnvironment ? 0.10 * canvas_screen.w : 0;
 
         GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
