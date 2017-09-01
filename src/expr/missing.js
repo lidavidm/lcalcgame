@@ -53,9 +53,32 @@ class MissingExpression extends Expression {
             node.droppedInClass = this.getClass();
             parent.swap(this, node); // put it back
 
-            // Logger.log('placed-expr', {'before':beforeNode, 'after':afterState, 'item':droppedExp });
+            if (__ACTIVE_LEVEL_VARIANT === "verbatim_variant") {
+                const root = parent.rootParent || parent;
+                let hasMissing = false;
+                for (const placeholder of root.getPlaceholderChildren()) {
+                    if (placeholder instanceof MissingExpression) {
+                        hasMissing = true;
+                        break;
+                    }
+                }
 
-            stage.saveState({name:"placed-expr", before:beforeNode, item:droppedExp, after:parent.rootParent.toJavaScript()});
+                if (!hasMissing) {
+                    const challenge = new TypeInTextExpr();
+                    challenge.enforceHint(root.toJavaScript());
+                    challenge.typeBox.update();
+                    challenge.focus();
+                    const wrapper = new Expression([challenge]);
+                    wrapper.holes[0].emptyParent = true;
+
+                    root.stage.swap(root, wrapper);
+                }
+            }
+            else {
+                // Logger.log('placed-expr', {'before':beforeNode, 'after':afterState, 'item':droppedExp });
+
+                stage.saveState({name:"placed-expr", before:beforeNode, item:droppedExp, after:parent.rootParent.toJavaScript()});
+            }
 
             // Blink red if total reduction is not possible with this config.
             /*var try_reduce = node.parent.reduceCompletely();
