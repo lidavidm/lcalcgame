@@ -639,6 +639,12 @@ var mag = (function(_) {
                 let character = String.fromCharCode(keycode || e.charCode);
                 return {
                     keyCode:keycode,
+                    // Although deprecated, charCode is the best way
+                    // to distinguish between special characters and
+                    // normal characters. Note that Firefox fires the
+                    // keypress event for keys like Backspace, while
+                    // Chrome seems not to.
+                    charCode: e.charCode,
                     char:character,
                     shiftKey: e.shiftKey,
                     ctrlKey: e.ctrlKey,
@@ -650,6 +656,8 @@ var mag = (function(_) {
                 let event = getCBKeyEvent(e);
                 stage.onkeydown(event);
                 if(e.keyCode == 32 || e.keyCode == 13 || e.keyCode == 9) { // Space, tab, or...
+                    // Chrome reports charCode as 0 for these characters?
+                    event.charCode = event.keyCode;
                     stage.onkeypress(event);
                     e.preventDefault();
                 }

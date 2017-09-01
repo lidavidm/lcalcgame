@@ -394,9 +394,7 @@ class ReductStage extends mag.Stage {
             if (event.keyCode === 13) {
                 this.keyEventDelegate.carriageReturn();
             }
-            else if (event.keyCode === 8 || event.keyCode === 46 ||
-                     event.keyCode === 37 || event.keyCode === 39 ||
-                     event.keyCode === 127) {
+            else if (!event.charCode || event.charCode === 127) {
                 // Special character, do nothing
             }
             else if (event.keyCode === 9) { // Tab.
