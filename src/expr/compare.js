@@ -235,8 +235,8 @@ class CompareExpr extends Expression {
             opName = '>>';
         else if (this.operatorExpr instanceof TypeInTextExpr)
             opName = '>>>';
-        else if (this.op instanceof OpLiteral)
-            opName = this.op.toString();
+        else if (this.operatorExpr instanceof OpLiteral)
+            opName = this.operatorExpr.toString();
 
         if (opName in js_forms) {
             let template = js_forms[opName];
