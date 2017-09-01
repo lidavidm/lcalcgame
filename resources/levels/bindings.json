@@ -76,7 +76,7 @@
             },
             "block_variant": {
                 "board": ["x => x >> 'R'", "x => x >> ' ELSE!'"],
-                "toolbox": ["_op('+')", "_op('==')", "'O'", "'E'", "'L'"]
+                "toolbox": ["_op('+')", "_op('+')", "_op('==')", "_op('==')", "'O'", "'E'", "'L'"]
             },
             "verbatim_variant": {
                 "typing_hints": ["+", "=="]
