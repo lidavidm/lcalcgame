@@ -67,11 +67,11 @@ class MissingExpression extends Expression {
                     const challenge = new TypeInTextExpr();
                     challenge.enforceHint(root.toJavaScript());
                     challenge.typeBox.update();
-                    challenge.focus();
                     const wrapper = new Expression([challenge]);
                     wrapper.holes[0].emptyParent = true;
 
                     root.stage.swap(root, wrapper);
+                    challenge.focus();
                 }
             }
             else {
