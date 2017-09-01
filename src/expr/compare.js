@@ -76,7 +76,7 @@ class CompareExpr extends Expression {
     }
 
     performReduction(animated=true) {
-        if (this.leftExpr && this.rightExpr && !this._reducing && !(this.leftExpr.isValue() && this.rightExpr.isValue())) {
+        if (this.leftExpr && this.rightExpr && !(this.leftExpr.isValue() && this.rightExpr.isValue())) {
             let animations = [];
             let genSubreduceAnimation = (expr) => {
                 let before = expr;
