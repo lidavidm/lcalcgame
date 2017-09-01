@@ -485,19 +485,21 @@ class Expression extends mag.RoundedRect {
                 ghost_expr = new MissingExpression(this);
 
             let stage = this.parent.stage;
-            let beforeState = stage.toString();
+            let beforeState = stage ? stage.toString() : null;
             let detachedExp = this.toString();
             let parent = this.parent;
 
             parent.swap(this, ghost_expr);
 
             this.parent = null;
-            stage.add(this);
-            stage.bringToFront(this);
+            if (stage) {
+                stage.add(this);
+                stage.bringToFront(this);
 
-            let afterState = stage.toString();
-            Logger.log('detached-expr', {'before':beforeState, 'after':afterState, 'item':detachedExp });
-            stage.saveState();
+                let afterState = stage.toString();
+                Logger.log('detached-expr', {'before':beforeState, 'after':afterState, 'item':detachedExp });
+                stage.saveState();
+            }
 
             this.shell = ghost_expr;
         }
@@ -601,7 +603,7 @@ class Expression extends mag.RoundedRect {
         if (!this.dragging) {
             this.detach();
             this.posBeforeDrag = this.absolutePos;
-            this.stage.bringToFront(this);
+            if (this.stage) this.stage.bringToFront(this);
             this.dragging = true;
         }
 
