@@ -320,10 +320,13 @@ var mag = (function(_) {
                 }
                 // Reposition nodes that go off the edge
                 else if (left < 0) {
-
+                    const p = n.pos;
+                    n.pos = { x: p.x - left, y: p.y };
                 }
                 else if (right > this.boundingSize.w) {
-
+                    const overhang = right - this.boundingSize.w;
+                    const p = n.pos;
+                    n.pos = { x: p.x - overhang, y: p.y };
                 }
             });
         }
