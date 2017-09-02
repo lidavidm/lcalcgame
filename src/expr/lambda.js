@@ -340,13 +340,17 @@ class LambdaHoleExpr extends MissingExpression {
                         });
 
                         let overlap_layout = false;
+                        let off_screen = false;
                         for (let i = 0; i < final_nodes.length - 1; i++) {
                             let a = final_nodes[i];
                             let b = final_nodes[i+1];
+                            const right = a.pos.x - a.scale.x * a.size.w + a.size.w;
                             if (Math.abs(b.pos.x - a.pos.x) < a.size.w) { // If these two nodes will overlap...
                                 console.log('overlap', a.pos, b.pos, a.size);
                                 overlap_layout = true;
-                                break;
+                            }
+                            if (right > this.stage.boundingSize.w) {
+                                off_screen = true;
                             }
                         }
 
@@ -355,7 +359,7 @@ class LambdaHoleExpr extends MissingExpression {
                         const total_height = final_nodes.reduce((prev, n) => prev + n.size.h, 0);
                         const mid_xpos = final_nodes.reduce((prev, n) => prev + n.pos.x, 0) / len;
 
-                        const layout_vertical = overlap_layout && total_width > 420;
+                        const layout_vertical = (overlap_layout && total_width > 420) || off_screen;
                         if (layout_vertical) {
                             final_nodes.forEach((c, i) => {
                                 let final_pos = { x:mid_xpos,
