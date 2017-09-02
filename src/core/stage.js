@@ -266,8 +266,8 @@ var mag = (function(_) {
                 let maxWidth = 0;
                 let leastX = 0;
                 for (const n of anotherNode) {
-                    maxWidth = Math.max(maxWidth, (1 - n.anchor.x) * n.size.w);
-                    leastX = Math.min(leastX, n.pos.x - n.anchor.x * n.size.w);
+                    maxWidth = Math.max(maxWidth, (1 - n.anchor.x) * n.absoluteSize.w);
+                    leastX = Math.min(leastX, n.pos.x - n.anchor.x * n.absoluteSize.w);
                 }
                 let offset;
                 if (pos.x + maxWidth > this.boundingSize.w) {
@@ -280,6 +280,10 @@ var mag = (function(_) {
                     anotherNode.forEach((n) => {
                         let p = n.pos;
                         n.pos = { x:p.x - offset, y:p.y };
+                        const hidden = n.absolutePos.x - n.anchor.x * n.absoluteSize.w;
+                        if (hidden < 0) {
+                            n.pos = { x: n.pos.x + Math.abs(hidden), y: p.y };
+                        }
                     });
                 }
             }
