@@ -80,7 +80,7 @@ class MissingExpression extends Expression {
                                 indent: {
                                     style: "",
                                 },
-                                newline: " ",
+                                newline: "",
                                 // Remove trailing semicolon
                                 semicolons: false,
                                 quotes: "double",
