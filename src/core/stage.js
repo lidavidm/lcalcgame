@@ -260,11 +260,30 @@ var mag = (function(_) {
                         pos = addPos({x:0, y:an.size.h + 6}, pos);
                     });
                 }
-                if (pos.x > this.boundingSize.w) {
-                    let offset = pos.x - this.boundingSize.w;
+
+                // If it extends off screen (horizontally), bounce it
+                // back inside
+                let maxWidth = 0;
+                let leastX = 0;
+                for (const n of anotherNode) {
+                    maxWidth = Math.max(maxWidth, (1 - n.anchor.x) * n.absoluteSize.w);
+                    leastX = Math.min(leastX, n.pos.x - n.anchor.x * n.absoluteSize.w);
+                }
+                let offset;
+                if (pos.x + maxWidth > this.boundingSize.w) {
+                    offset = pos.x + maxWidth - this.boundingSize.w;
+                }
+                if (leastX < 0) {
+                    offset = leastX;
+                }
+                if (Number.isNumber(offset) && !Number.isNaN(offset) && offset != 0) {
                     anotherNode.forEach((n) => {
                         let p = n.pos;
                         n.pos = { x:p.x - offset, y:p.y };
+                        const hidden = n.absolutePos.x - n.anchor.x * n.absoluteSize.w;
+                        if (hidden < 0) {
+                            n.pos = { x: n.pos.x + Math.abs(hidden), y: p.y };
+                        }
                     });
                 }
             }
@@ -283,7 +302,33 @@ var mag = (function(_) {
 
         /** Update all nodes on the stage. */
         update() {
-            this.nodes.forEach((n) => n.update());
+            this.nodes.forEach((n) => {
+                n.update();
+
+                // Ignore nodes that are not expressions
+                if (!(n instanceof Expression) || n.toolbox) return;
+
+                const left = n.pos.x - n.anchor.x * n.absoluteSize.w;
+                const right = left + n.absoluteSize.w;
+
+                // Resize nodes that are too large
+                if (n.absoluteSize.w > this.boundingSize.w) {
+                    let scale = this.boundingSize.w / n.size.w;
+                    if (scale > 0.2) scale -= 0.05;
+                    n.scale = { x: scale, y: scale };
+                    n.pos = { x: 0, y : n.pos.y };
+                }
+                // Reposition nodes that go off the edge
+                else if (left < 0) {
+                    const p = n.pos;
+                    n.pos = { x: p.x - left, y: p.y };
+                }
+                else if (right > this.boundingSize.w) {
+                    const overhang = right - this.boundingSize.w;
+                    const p = n.pos;
+                    n.pos = { x: p.x - overhang, y: p.y };
+                }
+            });
         }
 
         // Recursive functions that grab nodes on this stage with the specified class.
@@ -639,6 +684,12 @@ var mag = (function(_) {
                 let character = String.fromCharCode(keycode || e.charCode);
                 return {
                     keyCode:keycode,
+                    // Although deprecated, charCode is the best way
+                    // to distinguish between special characters and
+                    // normal characters. Note that Firefox fires the
+                    // keypress event for keys like Backspace, while
+                    // Chrome seems not to.
+                    charCode: e.charCode,
                     char:character,
                     shiftKey: e.shiftKey,
                     ctrlKey: e.ctrlKey,
@@ -650,6 +701,8 @@ var mag = (function(_) {
                 let event = getCBKeyEvent(e);
                 stage.onkeydown(event);
                 if(e.keyCode == 32 || e.keyCode == 13 || e.keyCode == 9) { // Space, tab, or...
+                    // Browsers report charCode as 0 for these characters?
+                    event.charCode = event.keyCode;
                     stage.onkeypress(event);
                     e.preventDefault();
                 }

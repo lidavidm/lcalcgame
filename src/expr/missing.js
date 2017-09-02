@@ -53,6 +53,51 @@ class MissingExpression extends Expression {
             node.droppedInClass = this.getClass();
             parent.swap(this, node); // put it back
 
+            if (__ACTIVE_LEVEL_VARIANT === "verbatim_variant") {
+                const root = parent.rootParent || parent;
+                let hasMissing = false;
+                for (const placeholder of root.getPlaceholderChildren()) {
+                    if (placeholder instanceof MissingExpression || placeholder instanceof TypeInTextExpr) {
+                        hasMissing = true;
+                        break;
+                    }
+                }
+
+                if (!hasMissing) {
+                    const challenge = new TypeInTextExpr();
+                    let code = root.toJavaScript();
+                    if (window.escodegen) {
+                        code = window.escodegen.generate(window.esprima.parse(code, {
+                            raw: true,
+                            tokens: true,
+                            range: true,
+                        }), {
+                            comment: false,
+                            format: {
+                                // Have it preserve spaces, but don't
+                                // put things across multiple lines.
+                                compact: false,
+                                indent: {
+                                    style: "",
+                                },
+                                newline: " ",
+                                // Remove trailing semicolon
+                                semicolons: false,
+                                quotes: "double",
+                            },
+                        });
+                    }
+                    challenge.enforceHint(code);
+                    challenge.typeBox.update();
+                    const wrapper = new Expression([challenge]);
+                    wrapper.holes[0].emptyParent = true;
+
+                    stage.saveState({name:"placed-expr", before:beforeNode, item:droppedExp, after: root.toJavaScript()});
+                    root.stage.swap(root, wrapper);
+                    challenge.focus();
+                    return;
+                }
+            }
             // Logger.log('placed-expr', {'before':beforeNode, 'after':afterState, 'item':droppedExp });
 
             stage.saveState({name:"placed-expr", before:beforeNode, item:droppedExp, after:parent.rootParent.toJavaScript()});

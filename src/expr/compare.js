@@ -76,7 +76,7 @@ class CompareExpr extends Expression {
     }
 
     performReduction(animated=true) {
-        if (this.leftExpr && this.rightExpr && !this._reducing && !(this.leftExpr.isValue() && this.rightExpr.isValue())) {
+        if (this.leftExpr && this.rightExpr && !(this.leftExpr.isValue() && this.rightExpr.isValue())) {
             let animations = [];
             let genSubreduceAnimation = (expr) => {
                 let before = expr;
@@ -235,8 +235,8 @@ class CompareExpr extends Expression {
             opName = '>>';
         else if (this.operatorExpr instanceof TypeInTextExpr)
             opName = '>>>';
-        else if (this.op instanceof OpLiteral)
-            opName = this.op.toString();
+        else if (this.operatorExpr instanceof OpLiteral)
+            opName = this.operatorExpr.toString();
 
         if (opName in js_forms) {
             let template = js_forms[opName];
