@@ -635,18 +635,21 @@ class Expression extends mag.RoundedRect {
 
             Logger.log('detach-commit', this.toString());
         }
-        if (this.dragging) {
-            if (this.toolbox && !this.toolbox.hits(pos)) {
-                this.toolbox = null;
+        let toplevel = this.rootParent;
+        if (!toplevel) toplevel = this;
+        if (this.dragging || toplevel.dragging) {
+             if (toplevel.toolbox && !toplevel.toolbox.hits(pos)) {
+                toplevel.toolbox = null;
 
-                Logger.log('toolbox-remove', this.toString());
+                Logger.log('toolbox-remove', toplevel.toString());
 
-                ShapeExpandEffect.run(this, 500, (e) => Math.pow(e, 0.5), 'white', 1.5);
+                ShapeExpandEffect.run(toplevel, 500, (e) => Math.pow(e, 0.5), 'white', 1.5);
 
-                if (this.stage)
-                    this.stage.saveState({name:'toolbox-remove', item:this.toJavaScript()});
+                if (toplevel.stage)
+                    toplevel.stage.saveState({name:'toolbox-remove', item:toplevel.toJavaScript()});
             }
-
+        }
+        if (this.dragging) {
             // Snap expressions together?
             if (this._prev_notch_objs && this._prev_notch_objs.length > 0) {
                 let closest = Array.minimum(this._prev_notch_objs, 'dist');
