@@ -588,19 +588,21 @@ var Expression = function (_mag$RoundedRect) {
                 if (this.droppedInClass) ghost_expr = new this.droppedInClass(this);else ghost_expr = new MissingExpression(this);
 
                 var _stage2 = this.parent.stage;
-                var beforeState = _stage2.toString();
+                var beforeState = _stage2 ? _stage2.toString() : null;
                 var detachedExp = this.toString();
                 var parent = this.parent;
 
                 parent.swap(this, ghost_expr);
 
                 this.parent = null;
-                _stage2.add(this);
-                _stage2.bringToFront(this);
+                if (_stage2) {
+                    _stage2.add(this);
+                    _stage2.bringToFront(this);
 
-                var afterState = _stage2.toString();
-                Logger.log('detached-expr', { 'before': beforeState, 'after': afterState, 'item': detachedExp });
-                _stage2.saveState();
+                    var afterState = _stage2.toString();
+                    Logger.log('detached-expr', { 'before': beforeState, 'after': afterState, 'item': detachedExp });
+                    _stage2.saveState();
+                }
 
                 this.shell = ghost_expr;
             }
@@ -717,7 +719,7 @@ var Expression = function (_mag$RoundedRect) {
             if (!this.dragging) {
                 this.detach();
                 this.posBeforeDrag = this.absolutePos;
-                this.stage.bringToFront(this);
+                if (this.stage) this.stage.bringToFront(this);
                 this.dragging = true;
             }
 
@@ -769,19 +771,22 @@ var Expression = function (_mag$RoundedRect) {
 
                 Logger.log('detach-commit', this.toString());
             }
-            if (this.dragging) {
-                if (this.toolbox && !this.toolbox.hits(pos)) {
-                    this.toolbox = null;
+            var toplevel = this.rootParent;
+            if (!toplevel) toplevel = this;
+            if (this.dragging || toplevel.dragging) {
+                if (toplevel.toolbox && !toplevel.toolbox.hits(pos)) {
+                    toplevel.toolbox = null;
 
-                    Logger.log('toolbox-remove', this.toString());
+                    Logger.log('toolbox-remove', toplevel.toString());
 
-                    ShapeExpandEffect.run(this, 500, function (e) {
+                    ShapeExpandEffect.run(toplevel, 500, function (e) {
                         return Math.pow(e, 0.5);
                     }, 'white', 1.5);
 
-                    if (this.stage) this.stage.saveState({ name: 'toolbox-remove', item: this.toJavaScript() });
+                    if (toplevel.stage) toplevel.stage.saveState({ name: 'toolbox-remove', item: toplevel.toJavaScript() });
                 }
-
+            }
+            if (this.dragging) {
                 // Snap expressions together?
                 if (this._prev_notch_objs && this._prev_notch_objs.length > 0) {
                     var closest = Array.minimum(this._prev_notch_objs, 'dist');

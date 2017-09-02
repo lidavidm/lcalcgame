@@ -105,8 +105,8 @@
             "toolbox": "",
             "typing_help": ["You'll have to use =>, ?, and :"],
             "block_variant": {
-                "board": ["__.map(_)", "x => _", "x == _", "'two'", "'one'" ],
-                "toolbox": ["[1, 2, 1]", "1", "2", "_b ? _ : _"]
+                "board": ["__.map(_)", "x => _" ],
+                "toolbox": ["[1, 2, 1]", "['a', 'b', 'b']", "1", "2", "'a'", "'b'", "_b ? _ : _", "'two'", "'one'", "_v => _", "x", "n", "_ == _"]
             },
             "verbatim_variant": {
                 "typing_hints": ["2, 1, 2", "n => n == 2 ? \"two\" : \"one\""]

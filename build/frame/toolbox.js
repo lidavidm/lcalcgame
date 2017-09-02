@@ -2,6 +2,8 @@
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -22,6 +24,8 @@ var Toolbox = function (_mag$ImageRect) {
 
         _this.items = exprs;
         _this.padding = 20;
+        _this.numRows = 1;
+        _this.rowHeight = Toolbox.defaultRowHeight;
         return _this;
     }
 
@@ -70,33 +74,110 @@ var Toolbox = function (_mag$ImageRect) {
             }
         }
 
+        // Returns the number of toolbox 'rows' required
+        // to fit all the given expressions on the screen.
+        // * Note: You should scale them beforehand!
+
+    }, {
+        key: 'getNumRowsToFit',
+        value: function getNumRowsToFit(exprs) {
+            var padding = this.padding;
+            var sum = function sum(arr, f) {
+                return arr.reduce(function (a, b) {
+                    return a + f(b);
+                }, 0);
+            };
+            var total_w = sum(exprs, function (e) {
+                return e.absoluteSize.w + padding;
+            });
+            var toolbox_w = this.absoluteSize.w - padding * 4;
+            var rows = Math.trunc(total_w / toolbox_w) + 1;
+            console.log(total_w, toolbox_w, total_w / toolbox_w);
+            return rows;
+        }
+    }, {
+        key: 'getCenterYPosForRow',
+        value: function getCenterYPosForRow(i) {
+            var h = this.rowHeight;
+            if (typeof this.numRows === 'undefined' || this.numRows === 1) return this.pos.y - h / 2.0;else return this.pos.y - h * (this.numRows - i - 1) - h / 2.0;
+        }
+    }, {
+        key: 'setNumRows',
+        value: function setNumRows(num_rows) {
+            this.numRows = num_rows;
+            this.updateRowHeightToItems();
+            this.size = { w: this.size.w, h: this.rowHeight * num_rows };
+        }
+    }, {
+        key: 'updateRowHeightToItems',
+        value: function updateRowHeightToItems() {
+            var row_h = Math.max.apply(Math, _toConsumableArray(this.items.map(function (i) {
+                return i.absoluteSize.h;
+            }))) + this.padding;
+            if (this.numRows === 1 && row_h < Toolbox.defaultRowHeight) row_h = Toolbox.defaultRowHeight;
+            this.rowHeight = row_h;
+        }
+    }, {
+        key: 'resizeToFitItems',
+        value: function resizeToFitItems() {
+            var _this2 = this;
+
+            this.items.forEach(function (i) {
+                return i.update();
+            });
+
+            var rows = this.getNumRowsToFit(this.items);
+            if (rows > 1) {
+                (function () {
+
+                    // Now rescale expressions if rows is > 1,
+                    // to fit more expressions on the screen:
+                    var row_scale = Math.pow(1.0 / rows, 0.2);
+                    _this2.items.forEach(function (e) {
+                        e.scale = { x: row_scale, y: row_scale };
+                    });
+
+                    // Now recalculate the number of rows given this new scale factor...
+                    rows = _this2.getNumRowsToFit(_this2.items);
+                })();
+            }
+
+            this.setNumRows(rows);
+            this.setLayout();
+        }
+
         // Set expression positions in toolbox.
 
     }, {
         key: 'setLayout',
         value: function setLayout() {
-            var _this2 = this;
+            var _this3 = this;
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-            var pos = this.leftEdgePos;
+            var pos = this.topLeftEdgePos;
+            var currentRow = 0;
+            var num_rows = this.numRows;
+            var leftmost_x = pos.x;
+            var toolbox_w = this.size.w;
+            this.updateRowHeightToItems();
             this.items.forEach(function (e) {
-                if (e.absoluteSize.h > _this2.size.h) {
-                    var scale = _this2.size.h / e.absoluteSize.h;
-                    e.scale = { x: scale, y: scale };
-                }
                 e.update();
                 e.anchor = { x: 0, y: 0.5 };
-                //if (e instanceof InfiniteExpression) pos.x += 80;
+                if (pos.x + e.absoluteSize.w > toolbox_w) {
+                    // move to next row
+                    currentRow += 1;
+                    pos.y = _this3.getCenterYPosForRow(currentRow);
+                    pos.x = leftmost_x;
+                }
                 if (animated) {
                     Animate.tween(e, { pos: clonePos(pos) }, 300, function (elapsed) {
                         return Math.pow(elapsed, 0.5);
                     });
-                } else {
-                    e.pos = clonePos(pos);
-                }
-                pos.x += e.absoluteSize.w + _this2.padding;
+                } else e.pos = clonePos(pos);
+                pos.x += e.absoluteSize.w + _this3.padding;
             });
+            //this.resizeToFitItems();
         }
     }, {
         key: 'ondropped',
@@ -121,9 +202,24 @@ var Toolbox = function (_mag$ImageRect) {
             Logger.log('toolbox-addback', node.toString());
         }
     }, {
-        key: 'leftEdgePos',
+        key: 'leftmostX',
         get: function get() {
-            return { x: this.padding * 2 + this.pos.x, y: this.size.h / 2.0 + this.pos.y };
+            return this.padding * 2 + this.pos.x;
+        }
+    }, {
+        key: 'bottomLeftEdgePos',
+        get: function get() {
+            return { x: this.leftmostX, y: this.pos.y - this.rowHeight / 2.0 };
+        }
+    }, {
+        key: 'topLeftEdgePos',
+        get: function get() {
+            return { x: this.leftmostX, y: this.getCenterYPosForRow(0) };
+        }
+    }], [{
+        key: 'defaultRowHeight',
+        get: function get() {
+            return __IS_MOBILE && this.md.phone() ? 70 : 90;
         }
     }]);
 

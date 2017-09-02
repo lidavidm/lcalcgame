@@ -5,9 +5,14 @@ class Toolbox extends mag.ImageRect {
         super(x, y, w, h, 'toolbox-bg');
         this.items = exprs;
         this.padding = 20;
+        this.numRows = 1;
+        this.rowHeight = Toolbox.defaultRowHeight;
     }
 
-    get leftEdgePos() { return { x:this.padding * 2 + this.pos.x, y:this.size.h / 2.0 + this.pos.y }; }
+    static get defaultRowHeight() { return (__IS_MOBILE && this.md.phone()) ? 70 : 90; }
+    get leftmostX() { return this.padding * 2 + this.pos.x; }
+    get bottomLeftEdgePos() { return { x:this.leftmostX, y:this.pos.y - this.rowHeight / 2.0 }; }
+    get topLeftEdgePos() { return { x:this.leftmostX, y:this.getCenterYPosForRow(0) }; }
 
     // Adds an expression to the toolbox. Animates to new position.
     addExpression(e, animated=true) {
@@ -43,26 +48,81 @@ class Toolbox extends mag.ImageRect {
         }
     }
 
+    // Returns the number of toolbox 'rows' required
+    // to fit all the given expressions on the screen.
+    // * Note: You should scale them beforehand!
+    getNumRowsToFit(exprs) {
+        const padding = this.padding;
+        const sum = (arr, f) => arr.reduce((a, b) => a + f(b), 0);
+        const total_w = sum(exprs, (e) => e.absoluteSize.w + padding);
+        const toolbox_w = this.absoluteSize.w - padding * 4;
+        const rows = Math.trunc(total_w / toolbox_w) + 1;
+        console.log(total_w, toolbox_w, total_w / toolbox_w);
+        return rows;
+    }
+    getCenterYPosForRow(i) {
+        const h = this.rowHeight;
+        if (typeof this.numRows === 'undefined' || this.numRows === 1)
+            return this.pos.y - h / 2.0;
+        else return this.pos.y - h * (this.numRows - i - 1) - h / 2.0;
+    }
+    setNumRows(num_rows) {
+        this.numRows = num_rows;
+        this.updateRowHeightToItems();
+        this.size = { w:this.size.w, h:this.rowHeight * num_rows };
+    }
+    updateRowHeightToItems() {
+        let row_h = Math.max(...this.items.map((i) => i.absoluteSize.h)) + this.padding;
+        if (this.numRows === 1 && row_h < Toolbox.defaultRowHeight)
+            row_h = Toolbox.defaultRowHeight;
+        this.rowHeight = row_h;
+    }
+    resizeToFitItems() {
+        this.items.forEach((i) => i.update());
+
+        let rows = this.getNumRowsToFit(this.items);
+        if (rows > 1) {
+
+            // Now rescale expressions if rows is > 1,
+            // to fit more expressions on the screen:
+            const row_scale = Math.pow(1.0 / rows, 0.2);
+            this.items.forEach((e) => {
+                e.scale = { x:row_scale, y:row_scale };
+            });
+
+            // Now recalculate the number of rows given this new scale factor...
+            rows = this.getNumRowsToFit(this.items);
+        }
+
+        this.setNumRows(rows);
+        this.setLayout();
+    }
+
     // Set expression positions in toolbox.
     setLayout(animated=false) {
-        var pos = this.leftEdgePos;
+        let pos = this.topLeftEdgePos;
+        let currentRow = 0;
+        const num_rows = this.numRows;
+        const leftmost_x = pos.x;
+        const toolbox_w = this.size.w;
+        this.updateRowHeightToItems();
         this.items.forEach((e) => {
-            if (e.absoluteSize.h > this.size.h) {
-                const scale = this.size.h / e.absoluteSize.h;
-                e.scale = { x:scale, y:scale };
-            }
             e.update();
             e.anchor = { x:0, y:0.5 };
-            //if (e instanceof InfiniteExpression) pos.x += 80;
+            if (pos.x + e.absoluteSize.w > toolbox_w) { // move to next row
+                currentRow += 1;
+                pos.y = this.getCenterYPosForRow(currentRow);
+                pos.x = leftmost_x;
+            }
             if (animated) {
                 Animate.tween(e, { pos:clonePos(pos) }, 300, (elapsed) => {
                     return Math.pow(elapsed, 0.5);
                 });
-            } else {
+            } else
                 e.pos = clonePos(pos);
-            }
             pos.x += e.absoluteSize.w + this.padding;
         });
+        //this.resizeToFitItems();
     }
 
     ondropped(node, pos) {

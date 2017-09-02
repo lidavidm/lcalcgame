@@ -7,7 +7,7 @@ var GLOBAL_DEFAULT_SCREENSIZE = null;
 var stage;
 var canvas;
 
-var __ACTIVE_LEVEL_VARIANT = null;
+var __ACTIVE_LEVEL_VARIANT = 'block_variant';
 const __DEBUG_DISPLAY_STATEGRAPH = false;
 
 const __VIS_CANVAS_ID = 'stateGraphCanvas';

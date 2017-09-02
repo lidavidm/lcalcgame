@@ -103,7 +103,7 @@ var CompareExpr = function (_Expression) {
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
-            if (this.leftExpr && this.rightExpr && !this._reducing && !(this.leftExpr.isValue() && this.rightExpr.isValue())) {
+            if (this.leftExpr && this.rightExpr && !(this.leftExpr.isValue() && this.rightExpr.isValue())) {
                 var animations = [];
                 var genSubreduceAnimation = function genSubreduceAnimation(expr) {
                     var before = expr;
@@ -238,7 +238,7 @@ var CompareExpr = function (_Expression) {
                 '+': 'a + b'
             };
             var opName = this.funcName;
-            if (this.operatorExpr instanceof MissingOpExpression) opName = '>>';else if (this.operatorExpr instanceof TypeInTextExpr) opName = '>>>';else if (this.op instanceof OpLiteral) opName = this.op.toString();
+            if (this.operatorExpr instanceof MissingOpExpression) opName = '>>';else if (this.operatorExpr instanceof TypeInTextExpr) opName = '>>>';else if (this.operatorExpr instanceof OpLiteral) opName = this.operatorExpr.toString();
 
             if (opName in js_forms) {
                 var _ret2 = function () {

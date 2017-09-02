@@ -87,6 +87,72 @@ var MissingExpression = function (_Expression) {
                 node.droppedInClass = this.getClass();
                 parent.swap(this, node); // put it back
 
+                if (__ACTIVE_LEVEL_VARIANT === "verbatim_variant") {
+                    var root = parent.rootParent || parent;
+                    var hasMissing = false;
+                    var _iteratorNormalCompletion = true;
+                    var _didIteratorError = false;
+                    var _iteratorError = undefined;
+
+                    try {
+                        for (var _iterator = root.getPlaceholderChildren()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                            var placeholder = _step.value;
+
+                            if (placeholder instanceof MissingExpression || placeholder instanceof TypeInTextExpr) {
+                                hasMissing = true;
+                                break;
+                            }
+                        }
+                    } catch (err) {
+                        _didIteratorError = true;
+                        _iteratorError = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion && _iterator.return) {
+                                _iterator.return();
+                            }
+                        } finally {
+                            if (_didIteratorError) {
+                                throw _iteratorError;
+                            }
+                        }
+                    }
+
+                    if (!hasMissing) {
+                        var challenge = new TypeInTextExpr();
+                        var code = root.toJavaScript();
+                        if (window.escodegen) {
+                            code = window.escodegen.generate(window.esprima.parse(code, {
+                                raw: true,
+                                tokens: true,
+                                range: true
+                            }), {
+                                comment: false,
+                                format: {
+                                    // Have it preserve spaces, but don't
+                                    // put things across multiple lines.
+                                    compact: false,
+                                    indent: {
+                                        style: ""
+                                    },
+                                    newline: " ",
+                                    // Remove trailing semicolon
+                                    semicolons: false,
+                                    quotes: "double"
+                                }
+                            });
+                        }
+                        challenge.enforceHint(code);
+                        challenge.typeBox.update();
+                        var wrapper = new Expression([challenge]);
+                        wrapper.holes[0].emptyParent = true;
+
+                        stage.saveState({ name: "placed-expr", before: beforeNode, item: droppedExp, after: root.toJavaScript() });
+                        root.stage.swap(root, wrapper);
+                        challenge.focus();
+                        return;
+                    }
+                }
                 // Logger.log('placed-expr', {'before':beforeNode, 'after':afterState, 'item':droppedExp });
 
                 stage.saveState({ name: "placed-expr", before: beforeNode, item: droppedExp, after: parent.rootParent.toJavaScript() });
@@ -145,27 +211,27 @@ var MissingTypedExpression = function (_MissingExpression) {
     }, {
         key: 'accepts',
         value: function accepts(expr) {
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
 
             try {
-                for (var _iterator = this.acceptedClasses[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var c = _step.value;
+                for (var _iterator2 = this.acceptedClasses[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var c = _step2.value;
 
                     if (expr instanceof c) return true;
                 }
             } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
                     }
                 } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
                     }
                 }
             }

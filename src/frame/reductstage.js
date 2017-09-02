@@ -13,12 +13,8 @@ class ReductStage extends mag.Stage {
         this.onorientationchange();
     }
 
-    get toolboxHeight() {
-        return (__IS_MOBILE && this.md.phone()) ? 70 : 90;
-    }
-
     buildUI(showEnvironment, envDisplayWidth) {
-        const TOOLBOX_HEIGHT = this.toolboxHeight;
+        const TOOLBOX_HEIGHT = Toolbox.defaultRowHeight;
 
         let canvas_screen = this.boundingSize;
 
@@ -109,7 +105,8 @@ class ReductStage extends mag.Stage {
         }
 
         // Toolbox
-        var toolbox = new Toolbox(0, canvas_screen.h - TOOLBOX_HEIGHT, canvas_screen.w, TOOLBOX_HEIGHT);
+        var toolbox = new Toolbox(0, canvas_screen.h, canvas_screen.w, TOOLBOX_HEIGHT);
+        toolbox.anchor = { x:0, y:1 };
         this.add(toolbox);
         this.toolbox = toolbox;
 
@@ -135,6 +132,7 @@ class ReductStage extends mag.Stage {
         if (!this.uiNodes) return;
 
         let canvas_screen = this.boundingSize;
+        const toolboxHeight = Toolbox.defaultRowHeight;
 
         let btn_back = this.uiNodes[0];
         //let btn_menu = this.uiNodes[1];
@@ -158,13 +156,17 @@ class ReductStage extends mag.Stage {
 
         this.toolbox.pos = {
             x: 0,
-            y: canvas_screen.h - this.toolboxHeight,
+            y: canvas_screen.h,
+        };
+        this.toolbox.anchor = {
+            x: 0,
+            y: 1,
         };
         this.toolbox.size = {
             w: canvas_screen.w,
-            h: this.toolboxHeight,
+            h: toolboxHeight,
         };
-
+        
         let yOffset = btn_reset.absoluteSize.h + btn_reset.absolutePos.y + 20;
         this.environmentDisplay._pos = {
             x: canvas_screen.w - this.environmentDisplay.size.w,
@@ -172,7 +174,7 @@ class ReductStage extends mag.Stage {
         };
         this.environmentDisplay._size = {
             w: this.environmentDisplay.size.w,
-            h: canvas_screen.h - this.toolboxHeight - yOffset,
+            h: canvas_screen.h - toolboxHeight - yOffset,
         };
     }
 

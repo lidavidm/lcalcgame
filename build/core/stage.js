@@ -1,5 +1,7 @@
 'use strict';
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -269,62 +271,114 @@ var mag = function (_) {
 
                 var i = this.nodes.indexOf(node);
                 if (i > -1) {
-
-                    // just delete the node...
-                    if (anotherNodeOrNodes === null) {
-                        this.nodes.splice(i, 1);
-                        return;
-                    }
-
-                    this.nodes[i].stage = null;
-                    var origpos = this.nodes[i].upperLeftPos(this.nodes[i].absolutePos, this.nodes[i].absoluteSize);
+                    var origpos;
                     var pos;
-                    var total_width = 0;
+                    var total_width;
                     var rightpos;
-                    var scale = this.nodes[i].scale;
+                    var scale;
+                    var anotherNode;
+                    var an;
 
-                    var anotherNode = anotherNodeOrNodes;
-                    if (!Array.isArray(anotherNode)) {
-                        anotherNode = [anotherNode];
-                        origpos = this.nodes[i].centerPos();
-                    }
+                    var _ret = function () {
 
-                    pos = clonePos(origpos);
+                        // just delete the node...
+                        if (anotherNodeOrNodes === null) {
+                            _this4.nodes.splice(i, 1);
+                            return {
+                                v: void 0
+                            };
+                        }
 
-                    for (var j = 0; j < anotherNode.length; j++) {
-                        var an = anotherNode[j];
-                        an.unlock();
-                        an.pos = pos;
-                        an.parent = null;
-                        an.stage = this;
-                        an.scale = this.nodes[i].scale;
-                        if (anotherNode.length === 1) an.anchor = { x: 0.5, y: 0.5 };
-                        an.onmouseleave();
-                        pos = addPos({ x: an.size.w + 6, y: 0 }, pos);
-                        total_width += an.size.w + 6;
-                        if (j === 0) this.nodes.splice(i, 1, an);else this.nodes.splice(i + j, 0, an);
-                    }
+                        _this4.nodes[i].stage = null;
+                        origpos = _this4.nodes[i].upperLeftPos(_this4.nodes[i].absolutePos, _this4.nodes[i].absoluteSize);
+                        total_width = 0;
+                        scale = _this4.nodes[i].scale;
+                        anotherNode = anotherNodeOrNodes;
 
-                    // Can't duplicate horizontally or we'll go off-screen.
-                    // So, duplicate vertically.
-                    if (origpos.x + total_width > this.boundingSize.w) {
+                        if (!Array.isArray(anotherNode)) {
+                            anotherNode = [anotherNode];
+                            origpos = _this4.nodes[i].centerPos();
+                        }
+
                         pos = clonePos(origpos);
-                        anotherNode.forEach(function (n) {
-                            var p = n.pos;
-                            n.pos = pos;
-                            n.anchor = { x: 0, y: 0.5 };
-                            pos = addPos({ x: 0, y: an.size.h + 6 }, pos);
-                        });
-                    }
-                    if (pos.x > this.boundingSize.w) {
-                        (function () {
-                            var offset = pos.x - _this4.boundingSize.w;
+
+                        for (var j = 0; j < anotherNode.length; j++) {
+                            an = anotherNode[j];
+
+                            an.unlock();
+                            an.pos = pos;
+                            an.parent = null;
+                            an.stage = _this4;
+                            an.scale = _this4.nodes[i].scale;
+                            if (anotherNode.length === 1) an.anchor = { x: 0.5, y: 0.5 };
+                            an.onmouseleave();
+                            pos = addPos({ x: an.size.w + 6, y: 0 }, pos);
+                            total_width += an.size.w + 6;
+                            if (j === 0) _this4.nodes.splice(i, 1, an);else _this4.nodes.splice(i + j, 0, an);
+                        }
+
+                        // Can't duplicate horizontally or we'll go off-screen.
+                        // So, duplicate vertically.
+                        if (origpos.x + total_width > _this4.boundingSize.w) {
+                            pos = clonePos(origpos);
+                            anotherNode.forEach(function (n) {
+                                var p = n.pos;
+                                n.pos = pos;
+                                n.anchor = { x: 0, y: 0.5 };
+                                pos = addPos({ x: 0, y: an.size.h + 6 }, pos);
+                            });
+                        }
+
+                        // If it extends off screen (horizontally), bounce it
+                        // back inside
+                        var maxWidth = 0;
+                        var leastX = 0;
+                        var _iteratorNormalCompletion = true;
+                        var _didIteratorError = false;
+                        var _iteratorError = undefined;
+
+                        try {
+                            for (var _iterator = anotherNode[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                                var n = _step.value;
+
+                                maxWidth = Math.max(maxWidth, (1 - n.anchor.x) * n.absoluteSize.w);
+                                leastX = Math.min(leastX, n.pos.x - n.anchor.x * n.absoluteSize.w);
+                            }
+                        } catch (err) {
+                            _didIteratorError = true;
+                            _iteratorError = err;
+                        } finally {
+                            try {
+                                if (!_iteratorNormalCompletion && _iterator.return) {
+                                    _iterator.return();
+                                }
+                            } finally {
+                                if (_didIteratorError) {
+                                    throw _iteratorError;
+                                }
+                            }
+                        }
+
+                        var offset = void 0;
+                        if (pos.x + maxWidth > _this4.boundingSize.w) {
+                            offset = pos.x + maxWidth - _this4.boundingSize.w;
+                        }
+                        if (leastX < 0) {
+                            offset = leastX;
+                        }
+                        if (Number.isNumber(offset) && !Number.isNaN(offset) && offset != 0) {
                             anotherNode.forEach(function (n) {
                                 var p = n.pos;
                                 n.pos = { x: p.x - offset, y: p.y };
+                                var hidden = n.absolutePos.x - n.anchor.x * n.absoluteSize.w;
+                                if (hidden < 0) {
+                                    n.pos = { x: n.pos.x + Math.abs(hidden), y: p.y };
+                                }
                             });
-                        })();
-                    }
+                        }
+                    }();
+
+                    if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
                 }
 
                 this.update();
@@ -346,8 +400,33 @@ var mag = function (_) {
         }, {
             key: 'update',
             value: function update() {
+                var _this5 = this;
+
                 this.nodes.forEach(function (n) {
-                    return n.update();
+                    n.update();
+
+                    // Ignore nodes that are not expressions
+                    if (!(n instanceof Expression) || n.toolbox) return;
+
+                    var left = n.pos.x - n.anchor.x * n.absoluteSize.w;
+                    var right = left + n.absoluteSize.w;
+
+                    // Resize nodes that are too large
+                    if (n.absoluteSize.w > _this5.boundingSize.w) {
+                        var scale = _this5.boundingSize.w / n.size.w;
+                        if (scale > 0.2) scale -= 0.05;
+                        n.scale = { x: scale, y: scale };
+                        n.pos = { x: 0, y: n.pos.y };
+                    }
+                    // Reposition nodes that go off the edge
+                    else if (left < 0) {
+                            var p = n.pos;
+                            n.pos = { x: p.x - left, y: p.y };
+                        } else if (right > _this5.boundingSize.w) {
+                            var overhang = right - _this5.boundingSize.w;
+                            var _p = n.pos;
+                            n.pos = { x: _p.x - overhang, y: _p.y };
+                        }
                 });
             }
 
@@ -397,7 +476,7 @@ var mag = function (_) {
         }, {
             key: 'draw',
             value: function draw() {
-                var _this5 = this;
+                var _this6 = this;
 
                 // To avoid redundant draws, when someone calls draw, we
                 // instead try to schedule an actual redraw. Another
@@ -408,8 +487,8 @@ var mag = function (_) {
                 if (!this.requested) {
                     this.requested = true;
                     window.requestAnimationFrame(function () {
-                        _this5.drawImpl();
-                        _this5.requested = false;
+                        _this6.drawImpl();
+                        _this6.requested = false;
                     });
                 }
             }
@@ -596,7 +675,7 @@ var mag = function (_) {
         }, {
             key: 'getHitNodesIntersecting',
             value: function getHitNodesIntersecting(node) {
-                var _this6 = this;
+                var _this7 = this;
 
                 var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
                 var startingNodes = arguments[2];
@@ -622,7 +701,7 @@ var mag = function (_) {
                         //if (n instanceof LambdaExpr) holes = holes.filter((e) => (e instanceof LambdaHoleExpr || e instanceof MissingExpression));
                         if (!(n instanceof BracketArrayExpr || n instanceof FadedES6LambdaHoleExpr)) {
                             if (holes.length > 0) {
-                                var subintersections = _this6.getHitNodesIntersecting(node, options, holes);
+                                var subintersections = _this7.getHitNodesIntersecting(node, options, holes);
                                 if (subintersections.length > 0) {
                                     hits = hits.concat(subintersections);
                                     return;
@@ -687,7 +766,7 @@ var mag = function (_) {
             value: function getNodesWithClass(Class) {
                 var excludedNodes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
-                var _this7 = this;
+                var _this8 = this;
 
                 var recursive = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
                 var nodes = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
@@ -701,7 +780,7 @@ var mag = function (_) {
                     });
                     if (excluded) return;else if (n instanceof Class) rt.push(n);
                     if (recursive && n.children.length > 0) {
-                        var childs = _this7.getNodesWithClass(Class, excludedNodes, true, n.children);
+                        var childs = _this8.getNodesWithClass(Class, excludedNodes, true, n.children);
                         childs.forEach(function (c) {
                             return rt.push(c);
                         });
@@ -821,6 +900,12 @@ var mag = function (_) {
                 var character = String.fromCharCode(keycode || e.charCode);
                 return {
                     keyCode: keycode,
+                    // Although deprecated, charCode is the best way
+                    // to distinguish between special characters and
+                    // normal characters. Note that Firefox fires the
+                    // keypress event for keys like Backspace, while
+                    // Chrome seems not to.
+                    charCode: e.charCode,
                     char: character,
                     shiftKey: e.shiftKey,
                     ctrlKey: e.ctrlKey,
@@ -833,6 +918,8 @@ var mag = function (_) {
                 stage.onkeydown(event);
                 if (e.keyCode == 32 || e.keyCode == 13 || e.keyCode == 9) {
                     // Space, tab, or...
+                    // Browsers report charCode as 0 for these characters?
+                    event.charCode = event.keyCode;
                     stage.onkeypress(event);
                     e.preventDefault();
                 }
@@ -848,27 +935,27 @@ var mag = function (_) {
             };
             // Keep track of listeners so we can unregister them
             window.listeners = window.listeners || {};
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
 
             try {
-                for (var _iterator = Object.keys(window.listeners)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var _key = _step.value;
+                for (var _iterator2 = Object.keys(window.listeners)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var _key = _step2.value;
 
                     window.removeEventListener(_key, window.listeners[_key], false);
                 }
             } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
                     }
                 } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
                     }
                 }
             }
@@ -916,27 +1003,27 @@ var mag = function (_) {
             if (canvas.listeners) {
                 // Remove prior listeners to prevent events from being
                 // fired multiple times
-                var _iteratorNormalCompletion2 = true;
-                var _didIteratorError2 = false;
-                var _iteratorError2 = undefined;
+                var _iteratorNormalCompletion3 = true;
+                var _didIteratorError3 = false;
+                var _iteratorError3 = undefined;
 
                 try {
-                    for (var _iterator2 = Object.keys(canvas.listeners)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                        var key = _step2.value;
+                    for (var _iterator3 = Object.keys(canvas.listeners)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                        var key = _step3.value;
 
                         canvas.removeEventListener(key, canvas.listeners[key], false);
                     }
                 } catch (err) {
-                    _didIteratorError2 = true;
-                    _iteratorError2 = err;
+                    _didIteratorError3 = true;
+                    _iteratorError3 = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                            _iterator2.return();
+                        if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                            _iterator3.return();
                         }
                     } finally {
-                        if (_didIteratorError2) {
-                            throw _iteratorError2;
+                        if (_didIteratorError3) {
+                            throw _iteratorError3;
                         }
                     }
                 }

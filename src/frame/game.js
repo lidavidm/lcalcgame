@@ -90,6 +90,7 @@ class Level {
                 stage.add(item);
                 stage.toolbox.addExpression(item, false);
             });
+            stage.toolbox.resizeToFitItems();
         }
         // Environment
         if (this.globals) {

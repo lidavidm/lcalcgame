@@ -371,7 +371,9 @@ var LambdaHoleExpr = function (_MissingExpression) {
 
                             // If the placeholder is filled and valid, lock it
                             if (placeholder instanceof TypeInTextExpr) {
-                                if (placeholder.canReduce()) {} else {
+                                if (placeholder.canReduce()) {
+                                    continue;
+                                } else {
                                     // Blink the relevant placeholders.
                                     n.animatePlaceholderChildren();
                                     _this7.ondropexit(node, pos);
@@ -399,8 +401,53 @@ var LambdaHoleExpr = function (_MissingExpression) {
                 }
                 return false;
             };
+            // Disallow dropping if lambda body has missing expression.
+            var hasPlaceholder = function hasPlaceholder(n) {
+                if (n && n.hasPlaceholderChildren()) {
+                    var placeholders = n.getPlaceholderChildren();
+                    var _iteratorNormalCompletion3 = true;
+                    var _didIteratorError3 = false;
+                    var _iteratorError3 = undefined;
+
+                    try {
+                        outer: for (var _iterator3 = placeholders[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                            var placeholder = _step3.value;
+
+                            if (placeholder instanceof MissingExpression) {
+                                // Check that it's not a child of a VarExpr
+                                // (which would imply that it's a preview, not
+                                // actually part of the lambda)
+                                var current = placeholder;
+                                while (current) {
+                                    if (current instanceof LambdaVarExpr || current instanceof VarExpr || current instanceof VtableVarExpr) {
+                                        continue outer;
+                                    }
+                                    current = current.parent;
+                                }
+                                n.animatePlaceholderChildren();
+                                _this7.ondropexit(node, pos);
+                                return true;
+                            }
+                        }
+                    } catch (err) {
+                        _didIteratorError3 = true;
+                        _iteratorError3 = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                                _iterator3.return();
+                            }
+                        } finally {
+                            if (_didIteratorError3) {
+                                throw _iteratorError3;
+                            }
+                        }
+                    }
+                }
+                return false;
+            };
             if (hasTextbox(node)) return null;
-            if (hasTextbox(lambdaExpr)) return null;
+            if (hasTextbox(lambdaExpr) || hasPlaceholder(lambdaExpr)) return null;
 
             if (node.dragging) {
                 // Make sure node is being dragged by the user.
@@ -433,14 +480,18 @@ var LambdaHoleExpr = function (_MissingExpression) {
                                 });
 
                                 var overlap_layout = false;
+                                var off_screen = false;
                                 for (var i = 0; i < final_nodes.length - 1; i++) {
                                     var a = final_nodes[i];
                                     var b = final_nodes[i + 1];
+                                    var right = a.pos.x - a.scale.x * a.size.w + a.size.w;
                                     if (Math.abs(b.pos.x - a.pos.x) < a.size.w) {
                                         // If these two nodes will overlap...
                                         console.log('overlap', a.pos, b.pos, a.size);
                                         overlap_layout = true;
-                                        break;
+                                    }
+                                    if (right > _this7.stage.boundingSize.w) {
+                                        off_screen = true;
                                     }
                                 }
 
@@ -455,7 +506,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
                                     return prev + n.pos.x;
                                 }, 0) / len;
 
-                                var layout_vertical = overlap_layout && total_width > 420;
+                                var layout_vertical = overlap_layout && total_width > 420 || off_screen;
                                 if (layout_vertical) {
                                     final_nodes.forEach(function (c, i) {
                                         var final_pos = { x: mid_xpos,
@@ -695,7 +746,7 @@ var LambdaVarExpr = function (_ImageExpr) {
                 var stage = this.stage;
                 this.stateGraph.enter('closing');
                 this.graphicNode.children = [];
-                stage.draw();
+                if (stage) stage.draw();
             }
         }
     }, {
@@ -955,43 +1006,15 @@ var LambdaExpr = function (_Expression) {
             // Perform substitution, but stop at the 'boundary' of another lambda.
             var varExprs = findNoncapturingVarExpr(this, null, true, true);
             var environment = this.getEnvironment();
-            var _iteratorNormalCompletion3 = true;
-            var _didIteratorError3 = false;
-            var _iteratorError3 = undefined;
-
-            try {
-                for (var _iterator3 = varExprs[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    var expr = _step3.value;
-
-                    expr.performReduction(animated);
-                }
-            } catch (err) {
-                _didIteratorError3 = true;
-                _iteratorError3 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                        _iterator3.return();
-                    }
-                } finally {
-                    if (_didIteratorError3) {
-                        throw _iteratorError3;
-                    }
-                }
-            }
-
             var _iteratorNormalCompletion4 = true;
             var _didIteratorError4 = false;
             var _iteratorError4 = undefined;
 
             try {
-                for (var _iterator4 = this.holes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                    var child = _step4.value;
+                for (var _iterator4 = varExprs[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                    var expr = _step4.value;
 
-                    if (child instanceof LambdaExpr) {
-                        // TODO: need to recurse down into children, but not children of lambdas
-                        child.environment.parent = this.environment;
-                    }
+                    expr.performReduction(animated);
                 }
             } catch (err) {
                 _didIteratorError4 = true;
@@ -1004,6 +1027,34 @@ var LambdaExpr = function (_Expression) {
                 } finally {
                     if (_didIteratorError4) {
                         throw _iteratorError4;
+                    }
+                }
+            }
+
+            var _iteratorNormalCompletion5 = true;
+            var _didIteratorError5 = false;
+            var _iteratorError5 = undefined;
+
+            try {
+                for (var _iterator5 = this.holes[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                    var child = _step5.value;
+
+                    if (child instanceof LambdaExpr) {
+                        // TODO: need to recurse down into children, but not children of lambdas
+                        child.environment.parent = this.environment;
+                    }
+                }
+            } catch (err) {
+                _didIteratorError5 = true;
+                _iteratorError5 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                        _iterator5.return();
+                    }
+                } finally {
+                    if (_didIteratorError5) {
+                        throw _iteratorError5;
                     }
                 }
             }
@@ -1280,13 +1331,13 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
                 var varExprs = findNoncapturingVarExpr(_this16, null, true, true);
                 var environment = _this16.getEnvironment();
 
-                var _iteratorNormalCompletion5 = true;
-                var _didIteratorError5 = false;
-                var _iteratorError5 = undefined;
+                var _iteratorNormalCompletion6 = true;
+                var _didIteratorError6 = false;
+                var _iteratorError6 = undefined;
 
                 try {
-                    for (var _iterator5 = varExprs[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                        var v = _step5.value;
+                    for (var _iterator6 = varExprs[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                        var v = _step6.value;
 
                         if (!v.canReduce()) {
                             // Play the animation
@@ -1296,16 +1347,16 @@ var EnvironmentLambdaExpr = function (_LambdaExpr) {
                         }
                     }
                 } catch (err) {
-                    _didIteratorError5 = true;
-                    _iteratorError5 = err;
+                    _didIteratorError6 = true;
+                    _iteratorError6 = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                            _iterator5.return();
+                        if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                            _iterator6.return();
                         }
                     } finally {
-                        if (_didIteratorError5) {
-                            throw _iteratorError5;
+                        if (_didIteratorError6) {
+                            throw _iteratorError6;
                         }
                     }
                 }

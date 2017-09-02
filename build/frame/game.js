@@ -64,9 +64,9 @@ var Level = function () {
 
             var canvas_screen = stage.boundingSize;
 
-            var varNodesOnBoard = mag.Stage.getNodesWithClass(VarExpr, [], true, this.exprs);
-            var varNodesInToolbox = mag.Stage.getNodesWithClass(VarExpr, [], true, this.toolbox);
-            var showEnvironment = this.globals && (Object.keys(this.globals.bindings).length > 0 || varNodesOnBoard && varNodesOnBoard.length > 0 || varNodesInToolbox && varNodesInToolbox.length > 0);
+            var assignNodesOnBoard = mag.Stage.getNodesWithClass(AssignExpr, [], true, this.exprs);
+            var assignNodesInToolbox = mag.Stage.getNodesWithClass(AssignExpr, [], true, this.toolbox);
+            var showEnvironment = this.globals && (Object.keys(this.globals.bindings).length > 0 || assignNodesOnBoard && assignNodesOnBoard.length > 0 || assignNodesInToolbox && assignNodesInToolbox.length > 0);
             var envDisplayWidth = showEnvironment ? 0.10 * canvas_screen.w : 0;
 
             GLOBAL_DEFAULT_SCREENSIZE = stage.boundingSize;
@@ -105,6 +105,7 @@ var Level = function () {
                     stage.add(item);
                     stage.toolbox.addExpression(item, false);
                 });
+                stage.toolbox.resizeToFitItems();
             }
             // Environment
             if (this.globals) {
@@ -684,8 +685,9 @@ var Level = function () {
                 if ('help_text' in variant) help_text = variant.help_text;
             };
 
-            if (__ACTIVE_LEVEL_VARIANT && __ACTIVE_LEVEL_VARIANT in desc) {
-                setupVariant(desc[__ACTIVE_LEVEL_VARIANT]);
+            var variant = __ACTIVE_LEVEL_VARIANT == "verbatim_variant" ? "block_variant" : __ACTIVE_LEVEL_VARIANT;
+            if (variant && variant in desc) {
+                setupVariant(desc[variant]);
             }
 
             if (help_text && help_text.length > 0) {

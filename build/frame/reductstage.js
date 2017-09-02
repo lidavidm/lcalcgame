@@ -39,7 +39,7 @@ var ReductStage = function (_mag$Stage) {
         value: function buildUI(showEnvironment, envDisplayWidth) {
             var _this2 = this;
 
-            var TOOLBOX_HEIGHT = this.toolboxHeight;
+            var TOOLBOX_HEIGHT = Toolbox.defaultRowHeight;
 
             var canvas_screen = this.boundingSize;
 
@@ -117,7 +117,8 @@ var ReductStage = function (_mag$Stage) {
             }
 
             // Toolbox
-            var toolbox = new Toolbox(0, canvas_screen.h - TOOLBOX_HEIGHT, canvas_screen.w, TOOLBOX_HEIGHT);
+            var toolbox = new Toolbox(0, canvas_screen.h, canvas_screen.w, TOOLBOX_HEIGHT);
+            toolbox.anchor = { x: 0, y: 1 };
             this.add(toolbox);
             this.toolbox = toolbox;
 
@@ -143,6 +144,7 @@ var ReductStage = function (_mag$Stage) {
             if (!this.uiNodes) return;
 
             var canvas_screen = this.boundingSize;
+            var toolboxHeight = Toolbox.defaultRowHeight;
 
             var btn_back = this.uiNodes[0];
             //let btn_menu = this.uiNodes[1];
@@ -166,11 +168,15 @@ var ReductStage = function (_mag$Stage) {
 
             this.toolbox.pos = {
                 x: 0,
-                y: canvas_screen.h - this.toolboxHeight
+                y: canvas_screen.h
+            };
+            this.toolbox.anchor = {
+                x: 0,
+                y: 1
             };
             this.toolbox.size = {
                 w: canvas_screen.w,
-                h: this.toolboxHeight
+                h: toolboxHeight
             };
 
             var yOffset = btn_reset.absoluteSize.h + btn_reset.absolutePos.y + 20;
@@ -180,7 +186,7 @@ var ReductStage = function (_mag$Stage) {
             };
             this.environmentDisplay._size = {
                 w: this.environmentDisplay.size.w,
-                h: canvas_screen.h - this.toolboxHeight - yOffset
+                h: canvas_screen.h - toolboxHeight - yOffset
             };
         }
     }, {
@@ -438,7 +444,7 @@ var ReductStage = function (_mag$Stage) {
             if (this.keyEventDelegate) {
                 if (event.keyCode === 13) {
                     this.keyEventDelegate.carriageReturn();
-                } else if (event.keyCode === 8 || event.keyCode === 46 || event.keyCode === 37 || event.keyCode === 39 || event.keyCode === 127) {
+                } else if (!event.charCode || event.charCode === 127) {
                     // Special character, do nothing
                 } else if (event.keyCode === 9) {
                         // Tab.
@@ -637,11 +643,6 @@ var ReductStage = function (_mag$Stage) {
                     }
                 }
             }
-        }
-    }, {
-        key: 'toolboxHeight',
-        get: function get() {
-            return __IS_MOBILE && this.md.phone() ? 70 : 90;
         }
     }], [{
         key: 'stateDiff',
