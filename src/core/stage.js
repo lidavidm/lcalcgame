@@ -304,16 +304,21 @@ var mag = (function(_) {
         update() {
             this.nodes.forEach((n) => {
                 n.update();
-                // TODO: resize nodes
-                const left = n.pos.x - n.anchor.x * n.size.w;
-                const right = left + n.size.w;
 
-                if (n.size.w * n.scale.x > this.boundingSize.w) {
+                // Ignore nodes that are not expressions
+                if (!(n instanceof Expression) || n.toolbox) return;
+
+                const left = n.pos.x - n.anchor.x * n.absoluteSize.w;
+                const right = left + n.absoluteSize.w;
+
+                // Resize nodes that are too large
+                if (n.absoluteSize.w > this.boundingSize.w) {
                     let scale = this.boundingSize.w / n.size.w;
                     if (scale > 0.2) scale -= 0.05;
                     n.scale = { x: scale, y: scale };
                     n.pos = { x: 0, y : n.pos.y };
                 }
+                // Reposition nodes that go off the edge
                 else if (left < 0) {
 
                 }
