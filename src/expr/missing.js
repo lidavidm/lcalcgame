@@ -17,6 +17,12 @@ class MissingExpression extends Expression {
             this.parent.onmousedrag(pos);
         }
     }
+    onmouseup(pos) {
+        if (this.parent && this.parent.dragging) {
+            pos = addPos(pos, fromTo(this.absolutePos, this.parent.absolutePos));
+            this.parent.onmouseup(pos);
+        }
+    }
     ondropenter(node, pos) {
         if (node instanceof ChoiceExpr || node instanceof Snappable) return;
         this.onmouseenter(pos);

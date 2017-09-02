@@ -43,6 +43,8 @@ var Toolbox = function (_mag$ImageRect) {
             this.items.push(e);
             e.toolbox = this;
 
+            if (this.standardScale) e.scale = { x: this.standardScale, y: this.standardScale };
+
             //e.onmousedrag = function (pos) {
             //    super.onmousedrag(pos); // perform whatever the drag event is on this expression
             //    toolbox.removeExpression(e); // remove this expression from the toolbox
@@ -71,6 +73,7 @@ var Toolbox = function (_mag$ImageRect) {
                 e.scale = { x: 1, y: 1 };
                 // Restore the onclick handler
                 e.onmouseclick = e._origonmouseclick;
+                console.log('removed', e);
             }
         }
 
@@ -122,6 +125,8 @@ var Toolbox = function (_mag$ImageRect) {
         value: function resizeToFitItems() {
             var _this2 = this;
 
+            var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
             this.items.forEach(function (i) {
                 return i.update();
             });
@@ -136,6 +141,7 @@ var Toolbox = function (_mag$ImageRect) {
                     _this2.items.forEach(function (e) {
                         e.scale = { x: row_scale, y: row_scale };
                     });
+                    _this2.standardScale = row_scale;
 
                     // Now recalculate the number of rows given this new scale factor...
                     rows = _this2.getNumRowsToFit(_this2.items);
@@ -143,7 +149,8 @@ var Toolbox = function (_mag$ImageRect) {
             }
 
             this.setNumRows(rows);
-            this.setLayout();
+            this.updateRowHeightToItems();
+            this.setLayout(animated);
         }
 
         // Set expression positions in toolbox.
@@ -160,7 +167,6 @@ var Toolbox = function (_mag$ImageRect) {
             var num_rows = this.numRows;
             var leftmost_x = pos.x;
             var toolbox_w = this.size.w;
-            this.updateRowHeightToItems();
             this.items.forEach(function (e) {
                 e.update();
                 e.anchor = { x: 0, y: 0.5 };
@@ -177,17 +183,19 @@ var Toolbox = function (_mag$ImageRect) {
                 } else e.pos = clonePos(pos);
                 pos.x += e.absoluteSize.w + _this3.padding;
             });
-            //this.resizeToFitItems();
         }
     }, {
         key: 'ondropped',
         value: function ondropped(node, pos) {
 
+            // Fix for if the player is dragging a child, like MissingExpression.
+            node = node.rootParent;
+
             if (!node.toolbox) {
                 // Can't drag nodes onto toolbox that aren't already elements --
                 // once it's placed on the board, you can't drag it back.
                 Logger.log('toolbox-reject', node.toString());
-                Animate.tween(node, { pos: { x: node.pos.x, y: this.pos.y - node.size.h * 1.2 } }, 200, function (elapsed) {
+                Animate.tween(node, { pos: { x: node.pos.x, y: this.topLeftEdgePos.y - node.size.h * 1.2 } }, 200, function (elapsed) {
                     return Math.pow(elapsed, 2);
                 });
                 return;
@@ -198,8 +206,10 @@ var Toolbox = function (_mag$ImageRect) {
 
             // User changed their minds about removing item from toolbox.
             // Add item back to the toolbox.
+            console.log('adding back', node);
             this.addExpression(node);
-            Logger.log('toolbox-addback', node.toString());
+            console.log(this.items);
+            Logger.log('toolbox-addback', node.toJavaScript());
         }
     }, {
         key: 'leftmostX',

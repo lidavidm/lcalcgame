@@ -47,6 +47,14 @@ var MissingExpression = function (_Expression) {
             }
         }
     }, {
+        key: 'onmouseup',
+        value: function onmouseup(pos) {
+            if (this.parent && this.parent.dragging) {
+                pos = addPos(pos, fromTo(this.absolutePos, this.parent.absolutePos));
+                this.parent.onmouseup(pos);
+            }
+        }
+    }, {
         key: 'ondropenter',
         value: function ondropenter(node, pos) {
             if (node instanceof ChoiceExpr || node instanceof Snappable) return;
@@ -135,7 +143,7 @@ var MissingExpression = function (_Expression) {
                                     indent: {
                                         style: ""
                                     },
-                                    newline: " ",
+                                    newline: "",
                                     // Remove trailing semicolon
                                     semicolons: false,
                                     quotes: "double"

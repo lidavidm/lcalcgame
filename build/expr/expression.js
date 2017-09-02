@@ -606,12 +606,14 @@ var Expression = function (_mag$RoundedRect) {
 
                 this.shell = ghost_expr;
             }
-            if (this.toolbox) {
+
+            var toplevel = this.rootParent;
+            if (toplevel.toolbox) {
 
                 if (this.stage) this.stage.saveState();
 
-                this.toolbox.removeExpression(this); // remove this expression from the toolbox
-                Logger.log('toolbox-dragout', this.toJavaScript());
+                this.toolbox.removeExpression(toplevel); // remove this expression from the toolbox
+                Logger.log('toolbox-dragout', toplevel.toJavaScript());
             }
 
             if (this.lockedInteraction) {

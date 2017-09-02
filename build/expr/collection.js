@@ -626,17 +626,26 @@ var BracketArrayExpr = function (_BagExpr) {
     }, {
         key: 'ondropenter',
         value: function ondropenter(node, pos) {
+            // DISABLE bag add for now.
+            return;
+
             this.onmouseenter(pos);
         }
     }, {
         key: 'ondropexit',
         value: function ondropexit(node, pos) {
+            // DISABLE bag add for now.
+            return;
+
             this.onmouseleave(pos);
         }
     }, {
         key: 'ondropped',
         value: function ondropped(node, pos) {
             this.ondropexit(node, pos);
+
+            // DISABLE bag add for now.
+            return;
 
             if (this.parent) return;
 

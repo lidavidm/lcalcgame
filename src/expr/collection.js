@@ -104,7 +104,7 @@ class BagExpr extends CollectionExpr {
 	    // this global state, and it can cause problems if it
 	    // tries to trigger a save point (since it may be in an
 	    // inconsistent state)
-	    
+
             // this.stage.add(func);
             func.update();
             let new_funcs = func.applyExpr(c);
@@ -452,15 +452,24 @@ class BracketArrayExpr extends BagExpr {
     }
 
     ondropenter(node, pos) {
+        // DISABLE bag add for now.
+        return;
+
         this.onmouseenter(pos);
 
     }
     ondropexit(node, pos) {
+        // DISABLE bag add for now.
+        return;
+        
         this.onmouseleave(pos);
 
     }
     ondropped(node, pos) {
         this.ondropexit(node, pos);
+
+        // DISABLE bag add for now.
+        return;
 
         if (this.parent) return;
 

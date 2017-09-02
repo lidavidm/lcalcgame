@@ -26,7 +26,7 @@
             "toolbox": "",
             "block_variant": {
                 "board": "[0, 1, 0, 1].map(n => _)",
-                "toolbox": ["n == 1", "n == 0", "n == 2", "n == n"]
+                "toolbox": ["0", "1", "2", "3", "4", "_ == _", "_ == _", "n", "n", "true", "false", "_b ? _ : _"]
             },
             "verbatim_variant": {
                 "typing_hints": ["n == 0"]
@@ -39,7 +39,7 @@
             "toolbox": "",
             "block_variant": {
                 "board": "['ne', 'li', 'be'].map(s => _)",
-                "toolbox": ["'ar' + s", "s + 'ar'", "s == 'ar'"]
+                "toolbox": ["_ + _", "_ == _", "'ar'", "s", "s", "_b ? _ : _", "x => _"]
             },
             "verbatim_variant": {
                 "typing_hints": ["s + \"ar\""]
@@ -77,7 +77,7 @@
             "goal": "['better', 'faster', 'stronger']",
             "block_variant": {
                 "board": "__.map(x => x + 'er')",
-                "toolbox": ["['bet', 'fas', 'stron']", "['bett', 'fast', 'strong']"]
+                "toolbox": ["['bet', 'fas', 'stron']", "['bett', 'fast', 'strong']", "['be', 'fa', 'stro']", "['better', 'faster', 'stronget']"]
             },
             "verbatim_variant": {
                 "typing_hints": ["\"bett\", \"fast\", \"strong\""]
@@ -105,8 +105,8 @@
             "toolbox": "",
             "typing_help": ["You'll have to use =>, ?, and :"],
             "block_variant": {
-                "board": ["__.map(_)", "x => _" ],
-                "toolbox": ["[1, 2, 1]", "['a', 'b', 'b']", "1", "2", "'a'", "'b'", "_b ? _ : _", "'two'", "'one'", "_v => _", "x", "n", "_ == _"]
+                "board": ["__.map(_)" ],
+                "toolbox": ["[1, 2, 1]", "['a', 'b', 'b']", "1", "2", "'a'", "'b'", "x", "n", "_b ? _ : _", "'two'", "'one'", "x => _", "n => _", "_ == _"]
             },
             "verbatim_variant": {
                 "typing_hints": ["2, 1, 2", "n => n == 2 ? \"two\" : \"one\""]
