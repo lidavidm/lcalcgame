@@ -490,6 +490,8 @@ class Expression extends mag.RoundedRect {
             let parent = this.parent;
 
             parent.swap(this, ghost_expr);
+            
+            this.shadowOffset = 4;
 
             this.parent = null;
             if (stage) {

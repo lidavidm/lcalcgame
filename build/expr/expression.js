@@ -594,6 +594,8 @@ var Expression = function (_mag$RoundedRect) {
 
                 parent.swap(this, ghost_expr);
 
+                this.shadowOffset = 4;
+
                 this.parent = null;
                 if (_stage2) {
                     _stage2.add(this);

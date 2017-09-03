@@ -224,7 +224,20 @@ var ReductStage = function (_mag$Stage) {
 
             // Quit if there's an expression in the game
             // that can be reduced, like == or lambda.
-            if (contains_reducable_expr) return true;
+            if (contains_reducable_expr) {
+
+                // Secondary test:
+                // * This is only valid in the CHI '18 version.
+                // If the goal is an array, and no MapExprs remain,
+                // then this level can't be completed no matter what is left.
+                if (this.goalNodes.every(function (e) {
+                    return e instanceof BracketArrayExpr;
+                }) && !remaining_exprs.some(function (e) {
+                    return e instanceof MapFunc;
+                })) return false;
+
+                return true;
+            }
 
             // If there's nothing in the toolbox,
             // we can assume level is incomplete.

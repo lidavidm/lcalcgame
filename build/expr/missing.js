@@ -93,7 +93,8 @@ var MissingExpression = function (_Expression) {
                 Resource.play('pop');
                 node.stage.remove(node);
                 node.droppedInClass = this.getClass();
-                parent.swap(this, node); // put it back
+                node.shadowOffset = 2;
+                parent.swap(this, node);
 
                 if (__ACTIVE_LEVEL_VARIANT === "verbatim_variant") {
                     var root = parent.rootParent || parent;

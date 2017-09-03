@@ -166,7 +166,7 @@ class ReductStage extends mag.Stage {
             w: canvas_screen.w,
             h: toolboxHeight,
         };
-        
+
         let yOffset = btn_reset.absoluteSize.h + btn_reset.absolutePos.y + 20;
         this.environmentDisplay._pos = {
             x: canvas_screen.w - this.environmentDisplay.size.w,
@@ -206,8 +206,18 @@ class ReductStage extends mag.Stage {
 
         // Quit if there's an expression in the game
         // that can be reduced, like == or lambda.
-        if (contains_reducable_expr)
+        if (contains_reducable_expr) {
+
+            // Secondary test:
+            // * This is only valid in the CHI '18 version.
+            // If the goal is an array, and no MapExprs remain,
+            // then this level can't be completed no matter what is left.
+            if (this.goalNodes.every(e => e instanceof BracketArrayExpr) &&
+                !(remaining_exprs.some(e => e instanceof MapFunc)))
+                return false;
+
             return true;
+        }
 
         // If there's nothing in the toolbox,
         // we can assume level is incomplete.
