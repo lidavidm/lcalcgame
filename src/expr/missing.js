@@ -9,6 +9,10 @@ class MissingExpression extends Expression {
     }
     isPlaceholder() { return true; }
     getClass() { return MissingExpression; }
+    accepts(expr) {
+        // Never accept special exprs in normal holes. Subclass to accept these types of exprs...
+        return !(expr instanceof OpLiteral || expr instanceof ChoiceExpr || expr instanceof Snappable);
+    }
     onmousedrag(pos) {
         // disable drag
         // forward it to parent
@@ -24,11 +28,11 @@ class MissingExpression extends Expression {
         }
     }
     ondropenter(node, pos) {
-        if (node instanceof ChoiceExpr || node instanceof Snappable) return;
+        if (!this.accepts(node)) return;
         this.onmouseenter(pos);
     }
     ondropexit(node, pos) {
-        if (node instanceof ChoiceExpr || node instanceof Snappable) return;
+        if (!this.accepts(node)) return;
         this.onmouseleave(pos);
     }
     ondropped(node, pos) {
@@ -36,6 +40,9 @@ class MissingExpression extends Expression {
         // (so you can still drag a parent by its hole...)
         if (node instanceof MissingExpression)
             node = node.rootParent;
+
+        if (!this.accepts(node))
+            return;
 
         super.ondropped(node, pos);
         if (node.dragging) { // Reattach node.

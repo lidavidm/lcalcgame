@@ -1,8 +1,8 @@
 "use strict";
 
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -186,18 +186,17 @@ var LabeledVarExpr = function (_VarExpr) {
 
         var _this2 = _possibleConstructorReturn(this, (LabeledVarExpr.__proto__ || Object.getPrototypeOf(LabeledVarExpr)).call(this, name));
 
-        _this2.label = new TextExpr(name);
-        _this2.addArg(_this2.label);
+        _this2.addArg(new TextExpr(name));
         return _this2;
     }
 
-    // Used by EnvironmentLambdaExpr
-    // TODO: better name
-    // TODO: tweak this animation (side arc?)
-
-
     _createClass(LabeledVarExpr, [{
         key: "animateReduction",
+
+
+        // Used by EnvironmentLambdaExpr
+        // TODO: better name
+        // TODO: tweak this animation (side arc?)
         value: function animateReduction(display) {
             var _this3 = this;
 
@@ -244,29 +243,32 @@ var LabeledVarExpr = function (_VarExpr) {
                 _parent.swap(this, value);
                 return Promise.resolve(value);
             } else {
-                var _ret2 = function () {
-                    var wat = new TextExpr("?");
-                    _this4.stage.add(wat);
-                    wat.pos = _this4.label.absolutePos;
-                    Animate.tween(wat, {
-                        pos: {
-                            x: wat.pos.x,
-                            y: wat.pos.y - 50
-                        }
-                    }, 250);
-                    window.setTimeout(function () {
-                        Animate.poof(wat);
-                        _this4.stage.remove(wat);
-                        _this4.stage.draw();
-                        _this4.stage.update();
-                    }, 500);
-                    return {
-                        v: Promise.reject("Cannot reduce undefined variable")
-                    };
-                }();
-
-                if ((typeof _ret2 === "undefined" ? "undefined" : _typeof(_ret2)) === "object") return _ret2.v;
+                if (this.stage) {
+                    (function () {
+                        var wat = new TextExpr("?");
+                        _this4.stage.add(wat);
+                        wat.pos = _this4.label.absolutePos;
+                        Animate.tween(wat, {
+                            pos: {
+                                x: wat.pos.x,
+                                y: wat.pos.y - 50
+                            }
+                        }, 250);
+                        window.setTimeout(function () {
+                            Animate.poof(wat);
+                            _this4.stage.remove(wat);
+                            _this4.stage.draw();
+                            _this4.stage.update();
+                        }, 500);
+                    })();
+                }
+                return Promise.reject("Cannot reduce undefined variable");
             }
+        }
+    }, {
+        key: "label",
+        get: function get() {
+            return this.children[0];
         }
     }]);
 
@@ -538,9 +540,9 @@ var LabeledChestVarExpr = function (_ChestVarExpr2) {
         var _this10 = _possibleConstructorReturn(this, (LabeledChestVarExpr.__proto__ || Object.getPrototypeOf(LabeledChestVarExpr)).call(this, name));
 
         _this10.equivalentClasses = [LabeledChestVarExpr];
-        _this10.label = new TextExpr(name);
-        _this10.label.color = 'white';
-        _this10.holes.push(_this10.label);
+        var label = new TextExpr(name);
+        label.color = 'white';
+        _this10.addArg(_this10.label);
         return _this10;
     }
 
@@ -561,6 +563,11 @@ var LabeledChestVarExpr = function (_ChestVarExpr2) {
             };
 
             _get(LabeledChestVarExpr.prototype.__proto__ || Object.getPrototypeOf(LabeledChestVarExpr.prototype), "drawInternal", this).call(this, ctx, pos, boundingSize);
+        }
+    }, {
+        key: "label",
+        get: function get() {
+            return this.children[0];
         }
     }]);
 
@@ -583,8 +590,7 @@ var AssignExpr = function (_Expression) {
             _this11.addArg(missing);
         }
 
-        _this11.arrowLabel = new TextExpr("←");
-        _this11.addArg(_this11.arrowLabel);
+        _this11.addArg(new TextExpr("←"));
 
         if (value) {
             _this11.addArg(value);
@@ -908,6 +914,11 @@ var AssignExpr = function (_Expression) {
             var variable = this.variable ? this.variable.toJavaScript() : '_v';
             var value = this.value ? this.value.toJavaScript() : '_';
             return variable + " = " + value + ";";
+        }
+    }, {
+        key: "arrowLabel",
+        get: function get() {
+            return this.holes[1];
         }
     }, {
         key: "variable",

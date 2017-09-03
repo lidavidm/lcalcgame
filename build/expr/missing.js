@@ -37,6 +37,12 @@ var MissingExpression = function (_Expression) {
             return MissingExpression;
         }
     }, {
+        key: 'accepts',
+        value: function accepts(expr) {
+            // Never accept special exprs in normal holes. Subclass to accept these types of exprs...
+            return !(expr instanceof OpLiteral || expr instanceof ChoiceExpr || expr instanceof Snappable);
+        }
+    }, {
         key: 'onmousedrag',
         value: function onmousedrag(pos) {
             // disable drag
@@ -57,13 +63,13 @@ var MissingExpression = function (_Expression) {
     }, {
         key: 'ondropenter',
         value: function ondropenter(node, pos) {
-            if (node instanceof ChoiceExpr || node instanceof Snappable) return;
+            if (!this.accepts(node)) return;
             this.onmouseenter(pos);
         }
     }, {
         key: 'ondropexit',
         value: function ondropexit(node, pos) {
-            if (node instanceof ChoiceExpr || node instanceof Snappable) return;
+            if (!this.accepts(node)) return;
             this.onmouseleave(pos);
         }
     }, {
@@ -72,6 +78,8 @@ var MissingExpression = function (_Expression) {
             // Forward drop events from dragged MissingExpression's to their root exprs.
             // (so you can still drag a parent by its hole...)
             if (node instanceof MissingExpression) node = node.rootParent;
+
+            if (!this.accepts(node)) return;
 
             _get(MissingExpression.prototype.__proto__ || Object.getPrototypeOf(MissingExpression.prototype), 'ondropped', this).call(this, node, pos);
             if (node.dragging) {

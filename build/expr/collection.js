@@ -141,8 +141,6 @@ var BagExpr = function (_CollectionExpr) {
     }, {
         key: 'map',
         value: function map(lambdaExpr) {
-            var _this5 = this;
-
             if (!(lambdaExpr instanceof LambdaExpr) || !lambdaExpr.takesArgument) {
                 console.error('@ BagExpr.applyFunc: Func expr does not take argument.');
                 return undefined;
@@ -154,52 +152,102 @@ var BagExpr = function (_CollectionExpr) {
             });
             bag.items = [];
             var new_items = [];
-            items.forEach(function (item) {
-                var c = item.clone();
-                var pos = item.pos;
-                var func = lambdaExpr.clone();
-                // Do not add the lambda to the stage - it should not need
-                // this global state, and it can cause problems if it
-                // tries to trigger a save point (since it may be in an
-                // inconsistent state)
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
 
-                // this.stage.add(func);
-                func.update();
-                var new_funcs = func.applyExpr(c);
-                if (!Array.isArray(new_funcs)) new_funcs = [new_funcs];
+            try {
+                for (var _iterator = items[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var item = _step.value;
 
-                var _iteratorNormalCompletion = true;
-                var _didIteratorError = false;
-                var _iteratorError = undefined;
+                    var c = item.clone();
+                    var pos = item.pos;
+                    var func = lambdaExpr.clone();
+                    // Do not add the lambda to the stage - it should not need
+                    // this global state, and it can cause problems if it
+                    // tries to trigger a save point (since it may be in an
+                    // inconsistent state)
 
-                try {
-                    for (var _iterator = new_funcs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                        var new_func = _step.value;
+                    // this.stage.add(func);
+                    func.update();
+                    var new_funcs = func.applyExpr(c);
+                    if (!Array.isArray(new_funcs)) new_funcs = [new_funcs];
 
-                        new_func.pos = pos;
-                        new_func.unlockSubexpressions();
-                        new_func.lockSubexpressions(function (expr) {
-                            return expr instanceof ValueExpr || expr instanceof FadedValueExpr || expr instanceof BooleanPrimitive;
-                        }); // lock primitives
-                        bag.addItem(new_func.reduceCompletely());
-                        _this5.stage.remove(new_func);
-                    }
-                } catch (err) {
-                    _didIteratorError = true;
-                    _iteratorError = err;
-                } finally {
+                    // Check for null values - this means the lambda could not reduce
+                    var _iteratorNormalCompletion2 = true;
+                    var _didIteratorError2 = false;
+                    var _iteratorError2 = undefined;
+
                     try {
-                        if (!_iteratorNormalCompletion && _iterator.return) {
-                            _iterator.return();
+                        for (var _iterator2 = new_funcs[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                            var new_func = _step2.value;
+
+                            if (new_func === null || typeof new_func === "undefined") {
+                                WatEffect.run(lambdaExpr);
+                                return undefined;
+                            }
                         }
+                    } catch (err) {
+                        _didIteratorError2 = true;
+                        _iteratorError2 = err;
                     } finally {
-                        if (_didIteratorError) {
-                            throw _iteratorError;
+                        try {
+                            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                                _iterator2.return();
+                            }
+                        } finally {
+                            if (_didIteratorError2) {
+                                throw _iteratorError2;
+                            }
+                        }
+                    }
+
+                    var _iteratorNormalCompletion3 = true;
+                    var _didIteratorError3 = false;
+                    var _iteratorError3 = undefined;
+
+                    try {
+                        for (var _iterator3 = new_funcs[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                            var _new_func = _step3.value;
+
+                            _new_func.pos = pos;
+                            _new_func.unlockSubexpressions();
+                            _new_func.lockSubexpressions(function (expr) {
+                                return expr instanceof ValueExpr || expr instanceof FadedValueExpr || expr instanceof BooleanPrimitive;
+                            }); // lock primitives
+                            bag.addItem(_new_func.reduceCompletely());
+                            this.stage.remove(_new_func);
+                        }
+                    } catch (err) {
+                        _didIteratorError3 = true;
+                        _iteratorError3 = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                                _iterator3.return();
+                            }
+                        } finally {
+                            if (_didIteratorError3) {
+                                throw _iteratorError3;
+                            }
                         }
                     }
                 }
-            });
-            //bag.items = new_items;
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+
             return bag;
         }
     }, {
@@ -213,7 +261,7 @@ var BagExpr = function (_CollectionExpr) {
     }, {
         key: 'spill',
         value: function spill() {
-            var _this6 = this;
+            var _this5 = this;
 
             var logspill = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
@@ -245,7 +293,7 @@ var BagExpr = function (_CollectionExpr) {
             items.forEach(function (item, index) {
                 item = item.clone();
                 var theta = index / items.length * Math.PI * 2;
-                var rad = _this6.size.w * 1.5;
+                var rad = _this5.size.w * 1.5;
                 var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
 
                 targetPos = clipToRect(targetPos, item.absoluteSize, { x: 25, y: 0 }, { w: GLOBAL_DEFAULT_SCREENSIZE.width - 25,
@@ -257,7 +305,7 @@ var BagExpr = function (_CollectionExpr) {
                 });
                 //item.pos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) });
                 item.parent = null;
-                _this6.graphicNode.removeItem(item);
+                _this5.graphicNode.removeItem(item);
                 item.scale = { x: 1, y: 1 };
                 stage.add(item);
             });
@@ -407,14 +455,14 @@ var BagExpr = function (_CollectionExpr) {
             return this._items.slice();
         },
         set: function set(items) {
-            var _this7 = this;
+            var _this6 = this;
 
             this._items.forEach(function (item) {
-                return _this7.graphicNode.removeItem(item);
+                return _this6.graphicNode.removeItem(item);
             });
             this._items = [];
             items.forEach(function (item) {
-                _this7.addItem(item);
+                _this6.addItem(item);
             });
         }
     }, {
@@ -433,15 +481,15 @@ var BracketBag = function (_Expression) {
     function BracketBag() {
         _classCallCheck(this, BracketBag);
 
-        var _this8 = _possibleConstructorReturn(this, (BracketBag.__proto__ || Object.getPrototypeOf(BracketBag)).call(this));
+        var _this7 = _possibleConstructorReturn(this, (BracketBag.__proto__ || Object.getPrototypeOf(BracketBag)).call(this));
 
-        _this8.l_brak = new TextExpr('[');
-        _this8.r_brak = new TextExpr(']');
-        _this8.addArg(_this8.l_brak);
-        _this8.addArg(_this8.r_brak);
+        _this7.l_brak = new TextExpr('[');
+        _this7.r_brak = new TextExpr(']');
+        _this7.addArg(_this7.l_brak);
+        _this7.addArg(_this7.r_brak);
 
-        _this8.padding = { left: 10, inner: 0, right: 20 };
-        return _this8;
+        _this7.padding = { left: 10, inner: 0, right: 20 };
+        return _this7;
     }
 
     _createClass(BracketBag, [{
@@ -480,18 +528,18 @@ var BracketArrayExpr = function (_BagExpr) {
 
         _classCallCheck(this, BracketArrayExpr);
 
-        var _this9 = _possibleConstructorReturn(this, (BracketArrayExpr.__proto__ || Object.getPrototypeOf(BracketArrayExpr)).call(this, x, y, w, h, holding));
+        var _this8 = _possibleConstructorReturn(this, (BracketArrayExpr.__proto__ || Object.getPrototypeOf(BracketArrayExpr)).call(this, x, y, w, h, holding));
 
-        _this9.holes = [];
-        _this9.children = [];
+        _this8.holes = [];
+        _this8.children = [];
 
         // This becomes graphicNode.
-        _this9.addArg(new BracketBag());
+        _this8.addArg(new BracketBag());
 
-        _this9._items = holding;
-        _this9._spillDisabled = true;
+        _this8._items = holding;
+        _this8._spillDisabled = true;
         //this.color = "tan";
-        return _this9;
+        return _this8;
     }
 
     _createClass(BracketArrayExpr, [{
@@ -559,7 +607,7 @@ var BracketArrayExpr = function (_BagExpr) {
     }, {
         key: 'spill',
         value: function spill() {
-            var _this10 = this;
+            var _this9 = this;
 
             var logspill = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
@@ -596,7 +644,7 @@ var BracketArrayExpr = function (_BagExpr) {
 
                 item = item.clone();
                 var theta = index / items.length * Math.PI * 2;
-                var rad = _this10.size.h * 2.0;
+                var rad = _this9.size.h * 2.0;
                 var targetPos = addPos(pos, { x: rad * Math.cos(theta), y: rad * Math.sin(theta) });
 
                 targetPos = clipToRect(targetPos, item.absoluteSize, { x: 25, y: 0 }, { w: GLOBAL_DEFAULT_SCREENSIZE.width - 25,
@@ -608,7 +656,7 @@ var BracketArrayExpr = function (_BagExpr) {
                 });
                 //item.pos = addPos(pos, { x:rad*Math.cos(theta), y:rad*Math.sin(theta) });
                 item.parent = null;
-                _this10.graphicNode.removeChild(item);
+                _this9.graphicNode.removeChild(item);
                 item.scale = { x: 1, y: 1 };
                 stage.add(item);
             });
@@ -687,14 +735,14 @@ var BracketArrayExpr = function (_BagExpr) {
             return this._items.slice();
         },
         set: function set(items) {
-            var _this11 = this;
+            var _this10 = this;
 
             this._items.forEach(function (item) {
-                return _this11.graphicNode.removeArg(item);
+                return _this10.graphicNode.removeArg(item);
             });
             this._items = [];
             items.forEach(function (item) {
-                _this11.addItem(item);
+                _this10.addItem(item);
             });
         }
     }, {
@@ -721,10 +769,10 @@ var PutExpr = function (_Expression2) {
         txt_put.color = 'black';
         txt_in.color = 'black';
 
-        var _this12 = _possibleConstructorReturn(this, (PutExpr.__proto__ || Object.getPrototypeOf(PutExpr)).call(this, [txt_put, item, txt_in, collection]));
+        var _this11 = _possibleConstructorReturn(this, (PutExpr.__proto__ || Object.getPrototypeOf(PutExpr)).call(this, [txt_put, item, txt_in, collection]));
 
-        _this12.color = 'violet';
-        return _this12;
+        _this11.color = 'violet';
+        return _this11;
     }
 
     _createClass(PutExpr, [{
@@ -779,10 +827,10 @@ var PopExpr = function (_Expression3) {
         var txt_pop = new TextExpr('pop');
         txt_pop.color = 'black';
 
-        var _this13 = _possibleConstructorReturn(this, (PopExpr.__proto__ || Object.getPrototypeOf(PopExpr)).call(this, [txt_pop, collection]));
+        var _this12 = _possibleConstructorReturn(this, (PopExpr.__proto__ || Object.getPrototypeOf(PopExpr)).call(this, [txt_pop, collection]));
 
-        _this13.color = 'violet';
-        return _this13;
+        _this12.color = 'violet';
+        return _this12;
     }
 
     _createClass(PopExpr, [{

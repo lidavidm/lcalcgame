@@ -234,7 +234,7 @@ var ReductStage = function (_mag$Stage) {
                     return e instanceof BracketArrayExpr;
                 }) && !remaining_exprs.some(function (e) {
                     return e instanceof MapFunc;
-                })) return false;
+                }) && this.getNodesWithClass(TypeInTextExpr).length === 0) return false;
 
                 return true;
             }

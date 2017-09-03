@@ -53,7 +53,7 @@
 			"spriteSourceSize": {"x":0,"y":0,"w":853,"h":853},
 			"sourceSize": {"w":853,"h":853}
 		},
-		"ship-large.png":
+		"ship-large-starboy.png":
 		{
 			"frame": {"x":2,"y":1815,"w":818,"h":700},
 			"rotated": false,
@@ -61,7 +61,7 @@
 			"spriteSourceSize": {"x":0,"y":0,"w":818,"h":700},
 			"sourceSize": {"w":818,"h":700}
 		},
-		"ship-large-starboy.png":
+		"ship-large.png":
 		{
 			"frame": {"x":824,"y":1815,"w":818,"h":700},
 			"rotated": false,

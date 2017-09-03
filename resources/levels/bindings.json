@@ -12,7 +12,8 @@
                 "==":1,
                 "true":1,
                 "false":1,
-                "number":1
+                "number":1,
+                "var": 7
             },
             "showFade":false
         },

@@ -508,16 +508,36 @@ var LambdaHoleExpr = function (_MissingExpression) {
 
                                 var layout_vertical = overlap_layout && total_width > 420 || off_screen;
                                 if (layout_vertical) {
-                                    final_nodes.forEach(function (c, i) {
-                                        var final_pos = { x: mid_xpos,
-                                            y: c.pos.y - 60 - (len - i - 1) / len * total_height + i * 10 };
-                                        stage.add(c);
-                                        Animate.tween(c, { scale: { x: 1, y: 1 }, pos: final_pos }, 300, function (e) {
-                                            return Math.pow(e, 0.5);
-                                        }).after(function () {
-                                            c.onmouseleave();
+                                    (function () {
+                                        // If goes off screen vertically, use the
+                                        // space below the lambda instead
+
+                                        var yPos = function yPos(c, i) {
+                                            return c.pos.y - 60 - (len - i - 1) / len * total_height + i * 10;
+                                        };
+
+                                        for (var _i = 0; _i < final_nodes.length; _i++) {
+                                            var c = final_nodes[_i];
+                                            var y = yPos(c, _i);
+                                            if (y - c.scale.y * c.size.h < 0) {
+                                                yPos = function yPos(c, i) {
+                                                    return c.pos.y + 60 - (len - i - 1) / len * total_height + i * 10;
+                                                };
+                                                break;
+                                            }
+                                        }
+
+                                        final_nodes.forEach(function (c, i) {
+                                            var final_pos = { x: mid_xpos,
+                                                y: yPos(c, i) };
+                                            stage.add(c);
+                                            Animate.tween(c, { scale: { x: 1, y: 1 }, pos: final_pos }, 300, function (e) {
+                                                return Math.pow(e, 0.5);
+                                            }).after(function () {
+                                                c.onmouseleave();
+                                            });
                                         });
-                                    });
+                                    })();
                                 } else {
                                     final_nodes.forEach(function (c, i) {
                                         var final_pos = void 0;
@@ -531,6 +551,13 @@ var LambdaHoleExpr = function (_MissingExpression) {
                                     });
                                 }
                             })();
+                        } else {
+                            // There are variables without a value
+                            mag.Stage.getAllNodes([lambdaExpr]).forEach(function (n) {
+                                if (n instanceof LambdaVarExpr) {
+                                    Animate.blink(n, 500, [1, 0, 0], 1);
+                                }
+                            });
                         }
                         _this7.close_opened_subexprs();
                     }

@@ -205,7 +205,14 @@ var MapFunc = function (_FuncExpr) {
                             // Don't spill the bag onto the board - leave the
                             // array as is
                             return {
-                                v: superReduce()
+                                v: new Promise(function (resolve, _reject) {
+                                    var shatter = new ShatterExpressionEffect(_this3);
+                                    shatter.run(stage, function () {
+                                        _this3.ignoreEvents = false;
+                                        resolve(superReduce());
+                                    }.bind(_this3));
+                                    _this3.ignoreEvents = true;
+                                })
                             };
                         } else _this3.bag.lock();
 
@@ -330,7 +337,12 @@ var MapFunc = function (_FuncExpr) {
                 }();
 
                 if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+            } else if (!(this.func instanceof LambdaExpr)) {
+                WatEffect.run(this.func);
+                return Promise.reject("Cannot reduce map; attempting to apply non-function");
             }
+
+            return Promise.reject("Cannot reduce Map");
         }
 
         // Sizes to match its children.
