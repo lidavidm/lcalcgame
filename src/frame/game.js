@@ -33,10 +33,11 @@ class Level {
 
     // Builds a single Stage from the level description,
     // and returns it.
+    // FUTURE: (Should take a state graph to persist the state logs across resets to a level.)
     // * The layout should be generated automatically, and consistently.
     // * That way a higher function can 'parse' a text file description of levels --
     // * written in code, for instance -- and generate the entire game on-the-fly.
-    build(canvas) {
+    build(canvas, priorStateGraph=null) {
 
         var stage = new ReductStage(canvas);
 

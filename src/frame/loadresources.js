@@ -275,7 +275,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         ExprManager.clearFadeLevels();
         ExprManager.setFadeLevelMap(progression);
     };
-    Resource.buildLevel = (level_desc, canvas) => {
+    Resource.buildLevel = (level_desc, canvas, priorStateGraph) => {
         Resource.compileFadeLevels();
 
         // if ('fade' in level_desc) {
@@ -296,7 +296,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             let unfaded = Level.make(level_desc).build(canvas);
             ExprManager.fadesAtBorder = true;
             console.log('Making faded level...');
-            let faded = Level.make(level_desc).build(canvas);
+            let faded = Level.make(level_desc).build(canvas, priorStateGraph);
 
             let unfaded_exprs = unfaded.nodes;
             let faded_exprs   = faded.nodes;
@@ -408,7 +408,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
             return faded;
         }
         else {
-            return Level.make(level_desc).build(canvas);
+            return Level.make(level_desc).build(canvas, priorStateGraph);
         }
     };
     Resource.level = levels;

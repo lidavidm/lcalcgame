@@ -48,6 +48,7 @@ var Level = function () {
 
         // Builds a single Stage from the level description,
         // and returns it.
+        // FUTURE: (Should take a state graph to persist the state logs across resets to a level.)
         // * The layout should be generated automatically, and consistently.
         // * That way a higher function can 'parse' a text file description of levels --
         // * written in code, for instance -- and generate the entire game on-the-fly.
@@ -55,6 +56,8 @@ var Level = function () {
     }, {
         key: 'build',
         value: function build(canvas) {
+            var priorStateGraph = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
 
             var stage = new ReductStage(canvas);
 
@@ -385,7 +388,7 @@ var Level = function () {
 
                     var wPadding = (screen.width - width) / (_row.length + 1);
 
-                    var _x3 = screen.x + wPadding;
+                    var _x4 = screen.x + wPadding;
                     var _iteratorNormalCompletion7 = true;
                     var _didIteratorError7 = false;
                     var _iteratorError7 = undefined;
@@ -400,12 +403,12 @@ var Level = function () {
                             // padding. This helps make it look a little less
                             // grid-based.
                             _e2.pos = {
-                                x: _x3 + (Math.seededRandom() - 0.5) * 0.8 * wPadding,
+                                x: _x4 + (Math.seededRandom() - 0.5) * 0.8 * wPadding,
                                 y: y + (Math.seededRandom() - 0.5) * 0.8 * hPadding
                             };
                             result.push(_e2);
 
-                            _x3 += wPadding + _size.w;
+                            _x4 += wPadding + _size.w;
                             _dy = Math.max(_dy, _size.h);
                         }
                     } catch (err) {

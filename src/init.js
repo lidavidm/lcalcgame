@@ -436,7 +436,7 @@ function saveProgress() {
     }
 }
 
-function initBoard() {
+function initBoard( prevStateGraph ) {
 
     canvas = document.getElementById('canvas');
 
@@ -451,7 +451,7 @@ function initBoard() {
         $('#chap_name').text(Resource.chapterForLevelIdx(level_idx).name);
         $('#lvl_max_num_visible').text(Resource.level.length);
 
-        stage = Resource.buildLevel(Resource.level[level_idx], canvas);
+        stage = Resource.buildLevel(Resource.level[level_idx], canvas, prevStateGraph);
 
         Logger.transitionToTask(level_idx, stage.toString()).then(function() {
 

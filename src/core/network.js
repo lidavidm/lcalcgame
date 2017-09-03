@@ -211,12 +211,12 @@ var mag = (function(_) {
 
             if (typeof toLabel === 'undefined')
                 toLabel = n => {
+                    if (typeof n.data === 'string') return n.data;
                     let s = n.data.board.map(clean).join(') (');
                     if (n.data.board.length > 1)
                         s = '(' + s + ')';
                     return s;
                 };
-
 
             const lastNodeId = this.lastNodeId;
             let nodes = new vis.DataSet(this.nodes.map(n => {
@@ -241,6 +241,16 @@ var mag = (function(_) {
                         highlight: {
                             background: 'Aquamarine',
                             border: 'LightSeaGreen'
+                        }
+                    };
+                } else if (n.data === 'reset') {        // Mark reset state.
+                    v.reset = true;
+                    v.color = {
+                        background: '#BDAEC6',
+                        border: '#732C7B',
+                        highlight: {
+                            background: '#BDAEC6',
+                            border: 'Indigo'
                         }
                     };
                 }

@@ -54,6 +54,10 @@ var ReductStage = function (_mag$Stage) {
             });
 
             var btn_reset = new mag.Button(btn_back.pos.x + btn_back.size.w, UI_PADDING, 64, 64, { default: 'btn-reset-default', hover: 'btn-reset-hover', down: 'btn-reset-down' }, function () {
+
+                // Push 'reset' state to log:
+                _this2.saveResetState();
+
                 initBoard(); // reset board state; see index.html.
             });
 
@@ -300,7 +304,11 @@ var ReductStage = function (_mag$Stage) {
                 // * If not, we've reached a leaf of the state graph, and we can prompt
                 // * the player to reset.
                 if (!this.mightBeCompleted()) {
+
                     // Goal state cannot be reached. Prompt player to reset.
+                    Logger.log('prompt-reset', { 'dead_end': this.toString() });
+                    this.saveSubstate('dead_end');
+
                     var btn_reset = this.uiNodes[1];
                     this.remove(btn_reset);
                     var r = new mag.Rect(0, 0, GLOBAL_DEFAULT_SCREENSIZE.w, GLOBAL_DEFAULT_SCREENSIZE.h);
@@ -537,8 +545,8 @@ var ReductStage = function (_mag$Stage) {
             // Push new state and save serialized version to logger.
             // * This will automatically check for duplicates...
             var changed = this.stateGraph.push(state, changeData);
-            Logger.log('state-save', json);
 
+            Logger.log('state-save', json);
             Logger.log('state-path-save', this.stateGraph.toString());
 
             // Debug --
@@ -546,8 +554,7 @@ var ReductStage = function (_mag$Stage) {
             if (__DEBUG_DISPLAY_STATEGRAPH && changed) __UPDATE_NETWORK_CB(this.stateGraph.toVisJSNetworkData());
         }
 
-        // For pushing minor (intermediate) data onto the current state
-
+        // For pushing minor (intermediate) data _onto_ the current state, like typing before commits:
     }, {
         key: 'saveSubstate',
         value: function saveSubstate() {
@@ -557,6 +564,17 @@ var ReductStage = function (_mag$Stage) {
                 var state = this.toLevel().serialize();
                 this.stateGraph.pushAddendumToCurrentState({ state: state, data: changeData });
             }
+        }
+
+        // For marking a level 'reset'
+
+    }, {
+        key: 'saveResetState',
+        value: function saveResetState() {
+            this.stateGraph.push('reset');
+            Logger.log('state-save', 'reset');
+            Logger.log('state-path-save', this.stateGraph.toString());
+            if (__DEBUG_DISPLAY_STATEGRAPH) __UPDATE_NETWORK_CB(this.stateGraph.toVisJSNetworkData());
         }
 
         // Determines what's changed between states a and b, (serialized Level objects)

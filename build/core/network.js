@@ -241,6 +241,7 @@ var mag = function (_) {
                 };
 
                 if (typeof toLabel === 'undefined') toLabel = function toLabel(n) {
+                    if (typeof n.data === 'string') return n.data;
                     var s = n.data.board.map(clean).join(') (');
                     if (n.data.board.length > 1) s = '(' + s + ')';
                     return s;
@@ -270,6 +271,17 @@ var mag = function (_) {
                             highlight: {
                                 background: 'Aquamarine',
                                 border: 'LightSeaGreen'
+                            }
+                        };
+                    } else if (n.data === 'reset') {
+                        // Mark reset state.
+                        v.reset = true;
+                        v.color = {
+                            background: '#BDAEC6',
+                            border: '#732C7B',
+                            highlight: {
+                                background: '#BDAEC6',
+                                border: 'Indigo'
                             }
                         };
                     }
