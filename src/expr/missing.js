@@ -303,6 +303,18 @@ class MissingVariableExpression extends MissingChestExpression {
     }
 }
 
+class MissingLambdaExpression extends MissingTypedExpression {
+    getClass() { return MissingLambdaExpression; }
+    hitsChild() { return null; }
+    constructor(e) {
+        super(e);
+        this.acceptedClasses = [ LambdaExpr ];
+        this.label = new TextExpr("=>");
+        this.label.color = "#000";
+        this.addArg(this.label);
+    }
+}
+
 class MissingSequenceExpression extends MissingExpression {
     constructor() {
         super(new Expression());

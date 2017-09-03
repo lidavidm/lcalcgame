@@ -138,7 +138,8 @@ var ES6Parser = function () {
                     }
 
                     // Check if node is a Reduct reserved identifier (MissingExpression)
-                    if (node.name === '_' || node.name === '_b' || node.name === '__' || node.name === '_n' || node.name === '_v') {
+                    var valid_missing_exprs = ['_', '_b', '__', '_n', '_v', '_l'];
+                    if (valid_missing_exprs.indexOf(node.name) > -1) {
                         var missing = new (ExprManager.getClass(node.name))();
                         missing.__remain_unlocked = true;
                         return missing;

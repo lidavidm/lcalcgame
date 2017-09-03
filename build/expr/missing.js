@@ -539,6 +539,36 @@ var MissingVariableExpression = function (_MissingChestExpressi) {
     return MissingVariableExpression;
 }(MissingChestExpression);
 
+var MissingLambdaExpression = function (_MissingTypedExpressi5) {
+    _inherits(MissingLambdaExpression, _MissingTypedExpressi5);
+
+    _createClass(MissingLambdaExpression, [{
+        key: 'getClass',
+        value: function getClass() {
+            return MissingLambdaExpression;
+        }
+    }, {
+        key: 'hitsChild',
+        value: function hitsChild() {
+            return null;
+        }
+    }]);
+
+    function MissingLambdaExpression(e) {
+        _classCallCheck(this, MissingLambdaExpression);
+
+        var _this10 = _possibleConstructorReturn(this, (MissingLambdaExpression.__proto__ || Object.getPrototypeOf(MissingLambdaExpression)).call(this, e));
+
+        _this10.acceptedClasses = [LambdaExpr];
+        _this10.label = new TextExpr("=>");
+        _this10.label.color = "#000";
+        _this10.addArg(_this10.label);
+        return _this10;
+    }
+
+    return MissingLambdaExpression;
+}(MissingTypedExpression);
+
 var MissingSequenceExpression = function (_MissingExpression2) {
     _inherits(MissingSequenceExpression, _MissingExpression2);
 
@@ -592,18 +622,18 @@ var InvisibleMissingExpression = function (_MissingExpression3) {
     return InvisibleMissingExpression;
 }(MissingExpression);
 
-var MissingNumberExpression = function (_MissingTypedExpressi5) {
-    _inherits(MissingNumberExpression, _MissingTypedExpressi5);
+var MissingNumberExpression = function (_MissingTypedExpressi6) {
+    _inherits(MissingNumberExpression, _MissingTypedExpressi6);
 
     function MissingNumberExpression(expr_to_miss) {
         _classCallCheck(this, MissingNumberExpression);
 
-        var _this12 = _possibleConstructorReturn(this, (MissingNumberExpression.__proto__ || Object.getPrototypeOf(MissingNumberExpression)).call(this, expr_to_miss));
+        var _this13 = _possibleConstructorReturn(this, (MissingNumberExpression.__proto__ || Object.getPrototypeOf(MissingNumberExpression)).call(this, expr_to_miss));
 
-        _this12.graphicNode = new mag.ImageRect(0, 0, 24, 32, ExprManager.getFadeLevel('number') > 0 ? 'missing-number' : 'die');
+        _this13.graphicNode = new mag.ImageRect(0, 0, 24, 32, ExprManager.getFadeLevel('number') > 0 ? 'missing-number' : 'die');
 
-        _this12.acceptedClasses = [VarExpr, NumberExpr, ObjectExtensionExpr, NamedExpr];
-        return _this12;
+        _this13.acceptedClasses = [VarExpr, NumberExpr, ObjectExtensionExpr, NamedExpr];
+        return _this13;
     }
 
     _createClass(MissingNumberExpression, [{
