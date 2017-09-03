@@ -85,11 +85,13 @@ var CompareExpr = function (_Expression) {
                         var parent = _this2.stage || _this2.parent;
                         if (locked) expr.lock();
                         parent.swap(_this2, expr);
+                        expr.lockSubexpressions();
                         expr.performUserReduction();
                     };
                     if (op === '=') _swap(new (ExprManager.getClass('assign'))(_this2.leftExpr.clone(), _this2.rightExpr.clone()));else if (op === '+') _swap(new (ExprManager.getClass('+'))(_this2.leftExpr.clone(), _this2.rightExpr.clone()));else {
                         _this2.operatorExpr = new TextExpr(op);
                         _this2.funcName = op;
+                        _this2.lockSubexpressions();
                         _get(CompareExpr.prototype.__proto__ || Object.getPrototypeOf(CompareExpr.prototype), 'performUserReduction', _this2).call(_this2);
                     }
                 })();

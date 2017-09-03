@@ -236,6 +236,11 @@ class StringValueExpr extends Expression {
     reduce() { return this; }
     canReduce() { return false; }
     isValue() { return true; }
+    onmouseclick(pos) {
+        super.onmouseclick(pos);
+        // Bubble mouse clicks to parent. 
+        if (this.parent) this.parent.onmouseclick(pos);
+    }
     toString() {
         return (this.locked ? '/' : '') + '`' + this.primitiveName;
     }

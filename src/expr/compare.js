@@ -59,6 +59,7 @@ class CompareExpr extends Expression {
                 const parent = (this.stage || this.parent);
                 if (locked) expr.lock();
                 parent.swap(this, expr);
+                expr.lockSubexpressions();
                 expr.performUserReduction();
             };
             if (op === '=')
@@ -68,6 +69,7 @@ class CompareExpr extends Expression {
             else {
                 this.operatorExpr = new TextExpr(op);
                 this.funcName = op;
+                this.lockSubexpressions();
                 super.performUserReduction();
             }
         }

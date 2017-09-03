@@ -594,6 +594,13 @@ var StringValueExpr = function (_Expression3) {
             return true;
         }
     }, {
+        key: 'onmouseclick',
+        value: function onmouseclick(pos) {
+            _get(StringValueExpr.prototype.__proto__ || Object.getPrototypeOf(StringValueExpr.prototype), 'onmouseclick', this).call(this, pos);
+            // Bubble mouse clicks to parent.
+            if (this.parent) this.parent.onmouseclick(pos);
+        }
+    }, {
         key: 'toString',
         value: function toString() {
             return (this.locked ? '/' : '') + '`' + this.primitiveName;
