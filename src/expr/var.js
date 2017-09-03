@@ -130,8 +130,11 @@ class VarExpr extends ExpressionPlus {
 class LabeledVarExpr extends VarExpr {
     constructor(name) {
         super(name);
-        this.label = new TextExpr(name);
-        this.addArg(this.label);
+        this.addArg(new TextExpr(name));
+    }
+
+    get label() {
+        return this.children[0];
     }
 
     // Used by EnvironmentLambdaExpr
@@ -418,9 +421,13 @@ class LabeledChestVarExpr extends ChestVarExpr {
         super(name);
         // See MissingTypedExpression#constructor
         this.equivalentClasses = [LabeledChestVarExpr];
-        this.label = new TextExpr(name);
-        this.label.color = 'white';
-        this.holes.push(this.label);
+        let label = new TextExpr(name);
+        label.color = 'white';
+        this.addArg(this.label);
+    }
+
+    get label() {
+        return this.children[0];
     }
 
     open(preview, animate=true) {
@@ -451,8 +458,7 @@ class AssignExpr extends Expression {
             this.addArg(missing);
         }
 
-        this.arrowLabel = new TextExpr("←");
-        this.addArg(this.arrowLabel);
+        this.addArg(new TextExpr("←"));
 
         if (value) {
             this.addArg(value);
@@ -463,6 +469,10 @@ class AssignExpr extends Expression {
 
         this._animating = false;
         this.animatedValue = value;
+    }
+
+    get arrowLabel() {
+        return this.holes[1];
     }
 
     get variable() {
