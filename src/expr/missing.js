@@ -32,6 +32,11 @@ class MissingExpression extends Expression {
         this.onmouseleave(pos);
     }
     ondropped(node, pos) {
+        // Forward drop events from dragged MissingExpression's to their root exprs.
+        // (so you can still drag a parent by its hole...)
+        if (node instanceof MissingExpression)
+            node = node.rootParent;
+
         super.ondropped(node, pos);
         if (node.dragging) { // Reattach node.
 

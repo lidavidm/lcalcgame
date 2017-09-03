@@ -69,6 +69,10 @@ var MissingExpression = function (_Expression) {
     }, {
         key: 'ondropped',
         value: function ondropped(node, pos) {
+            // Forward drop events from dragged MissingExpression's to their root exprs.
+            // (so you can still drag a parent by its hole...)
+            if (node instanceof MissingExpression) node = node.rootParent;
+
             _get(MissingExpression.prototype.__proto__ || Object.getPrototypeOf(MissingExpression.prototype), 'ondropped', this).call(this, node, pos);
             if (node.dragging) {
                 // Reattach node.
