@@ -388,9 +388,27 @@ class LambdaHoleExpr extends MissingExpression {
 
                         const layout_vertical = (overlap_layout && total_width > 420) || off_screen;
                         if (layout_vertical) {
+                            // If goes off screen vertically, use the
+                            // space below the lambda instead
+
+                            let yPos = (c, i) => {
+                                return c.pos.y - 60 - ((len - i - 1) / len * total_height) + i * 10;
+                            };
+
+                            for (let i = 0; i < final_nodes.length; i++) {
+                                const c = final_nodes[i];
+                                let y = yPos(c, i);
+                                if (y - c.scale.y * c.size.h < 0) {
+                                    yPos = (c, i) => {
+                                        return c.pos.y + 60 - ((len - i - 1) / len * total_height) + i * 10;
+                                    };
+                                    break;
+                                }
+                            }
+
                             final_nodes.forEach((c, i) => {
                                 let final_pos = { x:mid_xpos,
-                                                  y:c.pos.y - 60 - ((len - i - 1) / len * total_height) + i * 10 };
+                                                  y:yPos(c, i) };
                                 stage.add(c);
                                 Animate.tween(c, {scale:{x:1, y:1}, pos:final_pos}, 300, (e) => Math.pow(e, 0.5)).after(() => {
                                     c.onmouseleave();
