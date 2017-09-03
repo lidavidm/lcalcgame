@@ -151,7 +151,14 @@ class MapFunc extends FuncExpr {
                 if (!this.animatedReduction) {
                     // Don't spill the bag onto the board - leave the
                     // array as is
-                    return superReduce();
+                    return new Promise((resolve, _reject) => {
+                        var shatter = new ShatterExpressionEffect(this);
+                        shatter.run(stage, (() => {
+                            this.ignoreEvents = false;
+                            resolve(superReduce());
+                        }).bind(this));
+                        this.ignoreEvents = true;
+                    });
                 }
                 else this.bag.lock();
 
@@ -271,6 +278,12 @@ class MapFunc extends FuncExpr {
             }
 
         }
+        else if (!(this.func instanceof LambdaExpr)) {
+            WatEffect.run(this.func);
+            return Promise.reject("Cannot reduce map; attempting to apply non-function");
+        }
+
+        return Promise.reject("Cannot reduce Map");
     }
 
     // Sizes to match its children.

@@ -97,7 +97,7 @@ class BagExpr extends CollectionExpr {
         let items = this.items.map((i) => i.clone());
         bag.items = [];
         let new_items = [];
-        items.forEach((item) => {
+        for (let item of items) {
             let c = item.clone();
             let pos = item.pos;
             let func = lambdaExpr.clone();
@@ -111,6 +111,14 @@ class BagExpr extends CollectionExpr {
             let new_funcs = func.applyExpr(c);
             if (!Array.isArray(new_funcs)) new_funcs = [ new_funcs ];
 
+            // Check for null values - this means the lambda could not reduce
+            for (let new_func of new_funcs) {
+                if (new_func === null || typeof new_func === "undefined") {
+                    WatEffect.run(lambdaExpr);
+                    return undefined;
+                }
+            }
+
             for (let new_func of new_funcs) {
                 new_func.pos = pos;
                 new_func.unlockSubexpressions();
@@ -118,8 +126,7 @@ class BagExpr extends CollectionExpr {
                 bag.addItem(new_func.reduceCompletely());
                 this.stage.remove(new_func);
             }
-        });
-        //bag.items = new_items;
+        }
         return bag;
     }
 

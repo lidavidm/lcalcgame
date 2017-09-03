@@ -213,7 +213,8 @@ class ReductStage extends mag.Stage {
             // If the goal is an array, and no MapExprs remain,
             // then this level can't be completed no matter what is left.
             if (this.goalNodes.every(e => e instanceof BracketArrayExpr) &&
-                !(remaining_exprs.some(e => e instanceof MapFunc)))
+                !(remaining_exprs.some(e => e instanceof MapFunc)) &&
+                this.getNodesWithClass(TypeInTextExpr).length === 0)
                 return false;
 
             return true;

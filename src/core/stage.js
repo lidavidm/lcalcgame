@@ -309,6 +309,7 @@ var mag = (function(_) {
                 if (!(n instanceof Expression) || n.toolbox) return;
 
                 const left = n.pos.x - n.anchor.x * n.absoluteSize.w;
+                const top = n.pos.y - n.anchor.y * n.absoluteSize.h;
                 const right = left + n.absoluteSize.w;
 
                 // Resize nodes that are too large
@@ -327,6 +328,10 @@ var mag = (function(_) {
                     const overhang = right - this.boundingSize.w;
                     const p = n.pos;
                     n.pos = { x: p.x - overhang, y: p.y };
+                }
+
+                if (top < 0) {
+                    n.pos = { x: n.pos.x, y: n.pos.y - top };
                 }
             });
         }

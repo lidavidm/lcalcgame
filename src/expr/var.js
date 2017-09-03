@@ -181,21 +181,23 @@ class LabeledVarExpr extends VarExpr {
             return Promise.resolve(value);
         }
         else {
-            let wat = new TextExpr("?");
-            this.stage.add(wat);
-            wat.pos = this.label.absolutePos;
-            Animate.tween(wat, {
-                pos: {
-                    x: wat.pos.x,
-                    y: wat.pos.y - 50,
-                },
-            }, 250);
-            window.setTimeout(() => {
-                Animate.poof(wat);
-                this.stage.remove(wat);
-                this.stage.draw();
-                this.stage.update();
-            }, 500);
+            if (this.stage) {
+                let wat = new TextExpr("?");
+                this.stage.add(wat);
+                wat.pos = this.label.absolutePos;
+                Animate.tween(wat, {
+                    pos: {
+                        x: wat.pos.x,
+                        y: wat.pos.y - 50,
+                    },
+                }, 250);
+                window.setTimeout(() => {
+                    Animate.poof(wat);
+                    this.stage.remove(wat);
+                    this.stage.draw();
+                    this.stage.update();
+                }, 500);
+            }
             return Promise.reject("Cannot reduce undefined variable");
         }
     }

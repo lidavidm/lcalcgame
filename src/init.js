@@ -8,7 +8,7 @@ var stage;
 var canvas;
 
 var __ACTIVE_LEVEL_VARIANT = 'block_variant';
-const __DEBUG_DISPLAY_STATEGRAPH = false;
+const __DEBUG_DISPLAY_STATEGRAPH = true;
 
 const __VIS_CANVAS_ID = 'stateGraphCanvas';
 const __STATEGRAPH_DISPLAY_EDGES = false;
