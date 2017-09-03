@@ -278,6 +278,24 @@ class MapFunc extends FuncExpr {
             }
 
         }
+        else if (!(this.func instanceof LambdaExpr)) {
+            let wat = new TextExpr("?");
+            this.stage.add(wat);
+            wat.pos = this.func.absolutePos;
+            Animate.tween(wat, {
+                pos: {
+                    x: wat.pos.x,
+                    y: wat.pos.y - 50,
+                },
+            }, 250);
+            window.setTimeout(() => {
+                Animate.poof(wat);
+                this.stage.remove(wat);
+                this.stage.draw();
+                this.stage.update();
+            }, 500);
+            return Promise.reject("Cannot reduce map; attempting to apply non-function");
+        }
 
         return Promise.reject("Cannot reduce Map");
     }
