@@ -100,6 +100,10 @@ var MissingExpression = function (_Expression) {
                 node.shadowOffset = 2;
                 parent.swap(this, node);
 
+                ShapeExpandEffect.run(node, 300, function (e) {
+                    return Math.pow(e, 0.5);
+                }, 'white', 1.5);
+
                 if (__ACTIVE_LEVEL_VARIANT === "verbatim_variant") {
                     var root = parent.rootParent || parent;
                     var hasMissing = false;
