@@ -177,7 +177,7 @@ var Toolbox = function (_mag$ImageRect) {
                     pos.x = leftmost_x;
                 }
                 if (animated) {
-                    Animate.tween(e, { pos: clonePos(pos) }, 300, function (elapsed) {
+                    Animate.tween(e, { pos: clonePos(pos) }, 200, function (elapsed) {
                         return Math.pow(elapsed, 0.5);
                     });
                 } else e.pos = clonePos(pos);

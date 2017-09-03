@@ -165,7 +165,7 @@ class MissingOpExpression extends MissingTypedExpression {
         this.radius = 26;
     }
     getClass() { return MissingOpExpression; }
-    toString() { return '__'; }
+    toString() { return '>>'; }
 }
 
 class MissingBagExpression extends MissingTypedExpression {

@@ -120,7 +120,7 @@ class Toolbox extends mag.ImageRect {
                 pos.x = leftmost_x;
             }
             if (animated) {
-                Animate.tween(e, { pos:clonePos(pos) }, 300, (elapsed) => {
+                Animate.tween(e, { pos:clonePos(pos) }, 200, (elapsed) => {
                     return Math.pow(elapsed, 0.5);
                 });
             } else

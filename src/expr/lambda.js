@@ -291,8 +291,8 @@ class LambdaHoleExpr extends MissingExpression {
                 const placeholders = n.getPlaceholderChildren();
                 for (const placeholder of placeholders) {
                     // If the placeholder is filled and valid, lock it
-                    if (placeholder instanceof TypeInTextExpr) {
-                        if (placeholder.canReduce()) {
+                    if (placeholder instanceof TypeInTextExpr || placeholder instanceof TypeInStringValueExpr) {
+                        if (placeholder.canReduce() && (!placeholder.typeBox || !placeholder.typeBox.hasIcon())) {
                             continue;
                         }
                         else {

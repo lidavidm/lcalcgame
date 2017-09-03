@@ -291,7 +291,7 @@ var MissingOpExpression = function (_MissingTypedExpressi) {
     }, {
         key: 'toString',
         value: function toString() {
-            return '__';
+            return '>>';
         }
     }]);
 

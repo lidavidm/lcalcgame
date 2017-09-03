@@ -137,7 +137,7 @@
             "goal": ["66", "88"],
             "toolbox": ["33", "44", "55"],
             "block_variant": {
-                "board": ["x => x + x", "x => xxx"]
+                "board": ["x => x + x", "x => xx"]
             }
         },
         {
@@ -148,7 +148,7 @@
             "goal": ["true", "true"],
             "block_variant": {
                 "board": ["1", "2", "x => x == 1", "x => _"],
-                "toolbox": ["x == _", "1", "2"]
+                "toolbox": ["_ == _", "_ + _", "x", "x", "n", "0", "1", "2"]
             },
             "verbatim_variant": {
                 "typing_hints": ["x => x == 1", "x => x == 2"]
@@ -161,7 +161,7 @@
             "toolbox": ["10", "20", "30"],
             "block_variant": {
                 "board": ["x => xxx"],
-                "toolbox": ["x => _", "_ + x", "10", "10", "20", "30"]
+                "toolbox": ["x => _", "_ + _", "x", "x", "n", "10", "10", "20", "20", "30", "30"]
             },
             "verbatim_variant": {
                 "typing_hints": ["x => x + 10"]
@@ -172,8 +172,8 @@
             "board": ["_t_single", "_t_single", "_t_single", "7", "13", "29"],
             "goal": ["true", "20", "false"],
             "block_variant": {
-                "board": ["7", "13", "29", "x => x == 3"],
-                "toolbox": ["x => x == 7", "x => x + 7", "x => x + 9"]
+                "board": ["7", "13", "29"],
+                "toolbox": ["x => _ == _", "x => _ + _", "x => _ == _", "x => _ + _", "x", "x", "x", "x", "3", "3", "7", "7", "9", "9"]
             },
             "verbatim_variant": {
                 "typing_hints": ["x => x == 7", "x => x + 7", "x => x == 3"]

@@ -255,12 +255,19 @@ var Level = function () {
                     return Math.pow(elapsed, 0.3);
                 });
             });
-            stage.toolboxNodes().forEach(function (n, i) {
+            var toolboxNodes = stage.toolboxNodes();
+            var numToolboxNodes = toolboxNodes.length;
+            toolboxNodes.forEach(function (n, i) {
                 var final_pos = n.pos;
                 var scale = n.scale.x;
+                var delay = numToolboxNodes <= 8 ? function (i) {
+                    return 500 + i * 100;
+                } : function (i) {
+                    return 300 + i * 50;
+                };
                 n.pos = addPos(n.pos, { x: 400, y: 0 });
                 n.scale = { x: 0.8, y: 0.8 };
-                Animate.tween(n, { pos: final_pos, scale: { x: scale, y: scale } }, 500 + i * 100, function (elapsed) {
+                Animate.tween(n, { pos: final_pos, scale: { x: scale, y: scale } }, delay(i), function (elapsed) {
                     return Math.pow(elapsed, 0.3);
                 });
             });
