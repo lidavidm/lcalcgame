@@ -411,6 +411,14 @@ class LambdaHoleExpr extends MissingExpression {
                             });
                         }
                     }
+                    else {
+                        // There are variables without a value
+                        mag.Stage.getAllNodes([lambdaExpr]).forEach((n) => {
+                            if (n instanceof LambdaVarExpr) {
+                                Animate.blink(n, 500, [1, 0, 0], 1);
+                            }
+                        });
+                    }
                     this.close_opened_subexprs();
                 }
 
