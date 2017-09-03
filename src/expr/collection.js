@@ -16,6 +16,7 @@ class BagExpr extends CollectionExpr {
         //this.graphicNode.clipBackground = 'bag-background';
 
         this.anchor = { x:0.5, y:0.5 };
+        this._spillDisabled = true;
     }
     get items() { return this._items.slice(); }
     set items(items) {
@@ -326,7 +327,7 @@ class BracketArrayExpr extends BagExpr {
         this.addArg(new BracketBag());
 
         this._items = holding;
-
+        this._spillDisabled = true;
         //this.color = "tan";
     }
     get items() { return this._items.slice(); }
@@ -400,7 +401,7 @@ class BracketArrayExpr extends BagExpr {
             console.warn('@ BracketArrayExpr.spill: Cannot spill array while it\'s inside the toolbox.');
             return;
         } else if (this._spillDisabled) {
-            alert('You can no longer spill collections onto the board.\n\nInstead, try .pop().');
+            // alert('You can no longer spill collections onto the board.\n\nInstead, try .pop().');
             return;
         }
 
@@ -461,7 +462,7 @@ class BracketArrayExpr extends BagExpr {
     ondropexit(node, pos) {
         // DISABLE bag add for now.
         return;
-        
+
         this.onmouseleave(pos);
 
     }

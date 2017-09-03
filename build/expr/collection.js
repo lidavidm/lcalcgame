@@ -47,6 +47,7 @@ var BagExpr = function (_CollectionExpr) {
         //this.graphicNode.clipBackground = 'bag-background';
 
         _this2.anchor = { x: 0.5, y: 0.5 };
+        _this2._spillDisabled = true;
         return _this2;
     }
 
@@ -488,7 +489,7 @@ var BracketArrayExpr = function (_BagExpr) {
         _this9.addArg(new BracketBag());
 
         _this9._items = holding;
-
+        _this9._spillDisabled = true;
         //this.color = "tan";
         return _this9;
     }
@@ -573,7 +574,7 @@ var BracketArrayExpr = function (_BagExpr) {
                 console.warn('@ BracketArrayExpr.spill: Cannot spill array while it\'s inside the toolbox.');
                 return;
             } else if (this._spillDisabled) {
-                alert('You can no longer spill collections onto the board.\n\nInstead, try .pop().');
+                // alert('You can no longer spill collections onto the board.\n\nInstead, try .pop().');
                 return;
             }
 
