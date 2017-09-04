@@ -171,6 +171,7 @@ class MissingTypedExpression extends MissingExpression {
     }
 
     toString() { return '_'; }
+    toJavaScript() { return this.toString(); }
 }
 class MissingOpExpression extends MissingTypedExpression {
     constructor(expr_to_miss) {

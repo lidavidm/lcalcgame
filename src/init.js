@@ -453,13 +453,14 @@ function initBoard( prevStateGraph ) {
 
         stage = Resource.buildLevel(Resource.level[level_idx], canvas, prevStateGraph);
 
-        Logger.transitionToTask(level_idx, stage.toString()).then(function() {
-
+        const afterLogStartTask = () => {
+            // Save the initial state.
+            stage.saveState();
             Logger.log('condition', __COND);
-
-        }).catch(function (err) {
-            //console.error(err);
-        });
+        };
+        Logger.transitionToTask(level_idx, stage.toString())
+              .then(afterLogStartTask)
+              .catch(afterLogStartTask);
 
         /*var es = stage.getNodesWithClass(Expression, [], true);
         var tes = stage.getNodesWithClass(TextExpr, [], true);

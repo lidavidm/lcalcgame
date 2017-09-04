@@ -229,7 +229,7 @@ var mag = function (_) {
                 }
 
                 var clean = function clean(s) {
-                    return s.replace(/__/g, '');
+                    return s.replace(/__(star|rect|tri|triangle|diamond|circle|dot)/g, '');
                 };
                 var toEdgeLabel = function toEdgeLabel(e) {
                     var d = e.data;

@@ -193,7 +193,7 @@ var mag = (function(_) {
                 return {};
             }
 
-            const clean = s => s.replace(/__/g, '');
+            const clean = s => s.replace(/__(star|rect|tri|triangle|diamond|circle|dot)/g, '');
             const toEdgeLabel = e => {
                 const d = e.data;
                 if (typeof d === 'object') {

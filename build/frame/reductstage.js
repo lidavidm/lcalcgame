@@ -202,9 +202,6 @@ var ReductStage = function (_mag$Stage) {
             });
             this.focusFirstTypeBox();
             this.update();
-
-            // Save initial state.
-            this.saveState();
         }
 
         // Determines whether the remaining expressions
@@ -306,8 +303,8 @@ var ReductStage = function (_mag$Stage) {
                 if (!this.mightBeCompleted()) {
 
                     // Goal state cannot be reached. Prompt player to reset.
-                    Logger.log('prompt-reset', { 'dead_end': this.toString() });
-                    this.saveSubstate('dead_end');
+                    this.saveSubstate('dead-end');
+                    Logger.log('dead-end', { 'final_state': this.toString() });
 
                     var btn_reset = this.uiNodes[1];
                     this.remove(btn_reset);

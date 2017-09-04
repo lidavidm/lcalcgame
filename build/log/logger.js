@@ -14,7 +14,7 @@ var Logger = function () {
     var __VERSION_ID = 0.54;
     var __OFFLINE_NAME_PROMPT = false;
     var __RUNNING_LOCALLY = location.hostname === "localhost" || location.hostname === "127.0.0.1";
-    var __LOCAL_LOGGING = false && __RUNNING_LOCALLY;
+    var __LOCAL_LOGGING = __RUNNING_LOCALLY;
     var __LOCAL_LOGGER_PORT = 3333;
     var __GDIAC_BASEURL = 'http://gdiac.cs.cornell.edu/research_games/';
     var __PAGE_LOAD_URL = __GDIAC_BASEURL + 'page_load.php';

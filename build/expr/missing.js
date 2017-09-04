@@ -281,6 +281,11 @@ var MissingTypedExpression = function (_MissingExpression) {
         value: function toString() {
             return '_';
         }
+    }, {
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return this.toString();
+        }
     }]);
 
     return MissingTypedExpression;
