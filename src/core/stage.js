@@ -219,7 +219,7 @@ var mag = (function(_) {
                 }
 
                 this.nodes[i].stage = null;
-                var origpos = this.nodes[i].upperLeftPos(this.nodes[i].absolutePos, this.nodes[i].absoluteSize);
+                var origpos = this.nodes[i].centerPos();
                 var pos;
                 var total_width = 0;
                 var rightpos;
@@ -228,7 +228,6 @@ var mag = (function(_) {
                 var anotherNode = anotherNodeOrNodes;
                 if (!Array.isArray(anotherNode)) {
                     anotherNode = [anotherNode];
-                    origpos = this.nodes[i].centerPos();
                 }
 
                 pos = clonePos(origpos);
@@ -270,7 +269,7 @@ var mag = (function(_) {
                     leastX = Math.min(leastX, n.pos.x - n.anchor.x * n.absoluteSize.w);
                 }
                 let offset;
-                if (pos.x + maxWidth > this.boundingSize.w) {
+                if (pos.x > this.boundingSize.w) {
                     offset = pos.x + maxWidth - this.boundingSize.w;
                 }
                 if (leastX < 0) {
