@@ -50,6 +50,10 @@ var Expression = function (_mag$RoundedRect) {
                 _this.addChild(hole);
             });
         }
+
+        // DEBUG
+        //this.forceTypingOnFill = true;
+        //this.stroke = { color:'magenta', lineWidth:4 };
         return _this2;
     }
 
@@ -695,6 +699,16 @@ var Expression = function (_mag$RoundedRect) {
             var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
 
             if (this.locked) return this.hitsChild(pos, options);else return _get(Expression.prototype.__proto__ || Object.getPrototypeOf(Expression.prototype), 'hits', this).call(this, pos, options);
+        }
+    }, {
+        key: 'onmouseenter',
+        value: function onmouseenter(pos) {
+            if (this.forceTypingOnFill) this.stroke = { color: 'purple', lineWidth: 4 };else _get(Expression.prototype.__proto__ || Object.getPrototypeOf(Expression.prototype), 'onmouseenter', this).call(this, pos);
+        }
+    }, {
+        key: 'onmouseleave',
+        value: function onmouseleave(pos) {
+            if (this.forceTypingOnFill) this.stroke = { color: 'magenta', lineWidth: 4 };else this.stroke = null;
         }
     }, {
         key: 'onmousedrag',

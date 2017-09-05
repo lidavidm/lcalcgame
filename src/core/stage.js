@@ -225,6 +225,9 @@ var mag = (function(_) {
                 var rightpos;
                 var scale = this.nodes[i].scale;
 
+                const _pos = this.nodes[i].pos;
+                const _anchor = this.nodes[i].anchor;
+
                 var anotherNode = anotherNodeOrNodes;
                 if (!Array.isArray(anotherNode)) {
                     anotherNode = [anotherNode];
@@ -239,8 +242,9 @@ var mag = (function(_) {
                     an.parent = null;
                     an.stage = this;
                     an.scale = this.nodes[i].scale;
-                    if (anotherNode.length === 1)
+                    if (anotherNode.length === 1) {
                         an.anchor = { x:0.5, y:0.5 };
+                    }
                     an.onmouseleave();
                     pos = addPos({ x:an.size.w + 6, y:0 }, pos);
                     total_width += an.size.w + 6;

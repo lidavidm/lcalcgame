@@ -29,6 +29,10 @@ class Expression extends mag.RoundedRect {
                 _this.addChild(hole);
             });
         }
+
+        // DEBUG
+        //this.forceTypingOnFill = true;
+        //this.stroke = { color:'magenta', lineWidth:4 };
     }
     equals(otherNode) {
         if (otherNode instanceof Expression && this.holes.length === otherNode.holes.length) {
@@ -490,7 +494,7 @@ class Expression extends mag.RoundedRect {
             let parent = this.parent;
 
             parent.swap(this, ghost_expr);
-            
+
             this.shadowOffset = 4;
 
             this.parent = null;
@@ -580,6 +584,19 @@ class Expression extends mag.RoundedRect {
     hits(pos, options=undefined) {
         if (this.locked) return this.hitsChild(pos, options);
         else             return super.hits(pos, options);
+    }
+
+    onmouseenter(pos) {
+        if (this.forceTypingOnFill)
+            this.stroke = { color:'purple', lineWidth:4 };
+        else
+            super.onmouseenter(pos);
+    }
+    onmouseleave(pos) {
+        if (this.forceTypingOnFill)
+            this.stroke = { color:'magenta', lineWidth:4 };
+        else
+            this.stroke = null;
     }
 
     onmousedrag(pos) {

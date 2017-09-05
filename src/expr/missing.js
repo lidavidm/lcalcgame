@@ -74,8 +74,10 @@ class MissingExpression extends Expression {
 
             ShapeExpandEffect.run(node, 300, (e) => Math.pow(e, 0.5), 'white', 1.5);
 
-            if (__ACTIVE_LEVEL_VARIANT === "verbatim_variant") {
-                const root = parent.rootParent || parent;
+            const root = parent.rootParent || parent;
+            if (__ACTIVE_LEVEL_VARIANT === "verbatim_variant" &&
+                root.forceTypingOnFill) {
+
                 let hasMissing = false;
                 for (const placeholder of root.getPlaceholderChildren()) {
                     if (placeholder instanceof MissingExpression || placeholder instanceof TypeInTextExpr) {
@@ -111,10 +113,17 @@ class MissingExpression extends Expression {
                     challenge.enforceHint(code);
                     challenge.typeBox.update();
                     const wrapper = new Expression([challenge]);
+                    const pos = root.pos;
+                    const anchor = root.anchor;
                     wrapper.holes[0].emptyParent = true;
 
                     stage.saveState({name:"placed-expr", before:beforeNode, item:droppedExp, after: root.toJavaScript()});
                     root.stage.swap(root, wrapper);
+                    wrapper.pos = pos;
+                    wrapper.anchor = anchor;
+
+                    ShapeExpandEffect.run(wrapper, 500, (e) => Math.pow(e, 0.5), 'magenta', 1.5);
+
                     challenge.focus();
                     return;
                 }

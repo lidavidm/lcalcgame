@@ -94,15 +94,29 @@ var ES6Parser = function () {
                 __MACROS = null;
                 __TYPING_OPTIONS = {};
                 return expr;
-            } else if (statements.length === 2 && statements[0].type === "ExpressionStatement" && statements[0].expression.name === '__unlimited') {
-                var _expr = new InfiniteExpression(this.parseNode(statements[1]));
-                if (!_expr) return null;
-                _expr.graphicNode.__remain_unlocked = true;
-                _expr.lockSubexpressions(this.lockFilter);
-                _expr.unlock();
-                __MACROS = null;
-                __TYPING_OPTIONS = {};
-                return _expr;
+            } else if (statements.length === 2 && statements[0].type === "ExpressionStatement") {
+                if (statements[0].expression.name === '__unlimited') {
+                    var _expr = new InfiniteExpression(this.parseNode(statements[1]));
+                    if (!_expr) return null;
+                    _expr.graphicNode.__remain_unlocked = true;
+                    _expr.lockSubexpressions(this.lockFilter);
+                    _expr.unlock();
+                    __MACROS = null;
+                    __TYPING_OPTIONS = {};
+                    return _expr;
+                } else if (statements[0].expression.name === '__verbatim') {
+                    var _expr2 = this.parseNode(statements[1]);
+                    if (!_expr2) return null;
+                    if (__ACTIVE_LEVEL_VARIANT === "verbatim_variant") {
+                        _expr2.forceTypingOnFill = true;
+                        _expr2.stroke = { color: 'magenta', lineWidth: 4 };
+                    }
+                    _expr2.lockSubexpressions(this.lockFilter);
+                    _expr2.unlock();
+                    __MACROS = null;
+                    __TYPING_OPTIONS = {};
+                    return _expr2;
+                }
             } else {
                 var exprs = statements.map(function (n) {
                     return _this.parseNode(n);

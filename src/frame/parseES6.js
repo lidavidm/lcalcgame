@@ -76,15 +76,29 @@ class ES6Parser {
             __MACROS = null;
             __TYPING_OPTIONS = {};
             return expr;
-        } else if (statements.length === 2 && statements[0].type === "ExpressionStatement" && statements[0].expression.name === '__unlimited') {
-            let expr = new InfiniteExpression(this.parseNode(statements[1]));
-            if (!expr) return null;
-            expr.graphicNode.__remain_unlocked = true;
-            expr.lockSubexpressions(this.lockFilter);
-            expr.unlock();
-            __MACROS = null;
-            __TYPING_OPTIONS = {};
-            return expr;
+        } else if (statements.length === 2 && statements[0].type === "ExpressionStatement") {
+            if (statements[0].expression.name === '__unlimited') {
+                let expr = new InfiniteExpression(this.parseNode(statements[1]));
+                if (!expr) return null;
+                expr.graphicNode.__remain_unlocked = true;
+                expr.lockSubexpressions(this.lockFilter);
+                expr.unlock();
+                __MACROS = null;
+                __TYPING_OPTIONS = {};
+                return expr;
+            } else if (statements[0].expression.name === '__verbatim') {
+                let expr = this.parseNode(statements[1]);
+                if (!expr) return null;
+                if (__ACTIVE_LEVEL_VARIANT === "verbatim_variant") {
+                    expr.forceTypingOnFill = true;
+                    expr.stroke = { color:'magenta', lineWidth:4 };
+                }
+                expr.lockSubexpressions(this.lockFilter);
+                expr.unlock();
+                __MACROS = null;
+                __TYPING_OPTIONS = {};
+                return expr;
+            }
         } else {
             let exprs = statements.map((n) => this.parseNode(n));
             let seq = new (ExprManager.getClass('sequence'))(...exprs);

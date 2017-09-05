@@ -293,6 +293,11 @@ var mag = function (_) {
                         origpos = _this4.nodes[i].centerPos();
                         total_width = 0;
                         scale = _this4.nodes[i].scale;
+
+
+                        var _pos = _this4.nodes[i].pos;
+                        var _anchor = _this4.nodes[i].anchor;
+
                         anotherNode = anotherNodeOrNodes;
 
                         if (!Array.isArray(anotherNode)) {
@@ -309,7 +314,9 @@ var mag = function (_) {
                             an.parent = null;
                             an.stage = _this4;
                             an.scale = _this4.nodes[i].scale;
-                            if (anotherNode.length === 1) an.anchor = { x: 0.5, y: 0.5 };
+                            if (anotherNode.length === 1) {
+                                an.anchor = { x: 0.5, y: 0.5 };
+                            }
                             an.onmouseleave();
                             pos = addPos({ x: an.size.w + 6, y: 0 }, pos);
                             total_width += an.size.w + 6;

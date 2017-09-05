@@ -91,7 +91,7 @@
             "typing_help": ["You'll have to use =>, ?, and :"],
             "block_variant": {
                 "board": ["['A', 'F', 'F'].map(_l)", "'pass'", "'fail'"],
-                "toolbox": ["y => _", "y == 'A'", "_b ? _ : _"]
+                "toolbox": ["y => _", "_ == _", "y", "y", "'A'", "'F'", "_b ? _ : _"]
             },
             "verbatim_variant": {
                 "typing_hints": ["x => x == \"A\" ? \"pass\" : \"fail\""],

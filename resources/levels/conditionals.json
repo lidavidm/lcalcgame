@@ -19,7 +19,7 @@
         },
         {
             "description": "intro to if; false",
-            "board": ["_b ? 'juice' : 'pie'", "false ? 'grape' : 'cherry'"],
+            "board": ["__verbatim; _b ? 'juice' : 'pie';", "false ? 'grape' : 'cherry'"],
             "goal": ["'cherry'", "'pie'"],
             "toolbox": ["true", "false"]
         },

@@ -112,8 +112,9 @@ var MissingExpression = function (_Expression) {
                     return Math.pow(e, 0.5);
                 }, 'white', 1.5);
 
-                if (__ACTIVE_LEVEL_VARIANT === "verbatim_variant") {
-                    var root = parent.rootParent || parent;
+                var root = parent.rootParent || parent;
+                if (__ACTIVE_LEVEL_VARIANT === "verbatim_variant" && root.forceTypingOnFill) {
+
                     var hasMissing = false;
                     var _iteratorNormalCompletion = true;
                     var _didIteratorError = false;
@@ -170,10 +171,19 @@ var MissingExpression = function (_Expression) {
                         challenge.enforceHint(code);
                         challenge.typeBox.update();
                         var wrapper = new Expression([challenge]);
+                        var _pos = root.pos;
+                        var anchor = root.anchor;
                         wrapper.holes[0].emptyParent = true;
 
                         stage.saveState({ name: "placed-expr", before: beforeNode, item: droppedExp, after: root.toJavaScript() });
                         root.stage.swap(root, wrapper);
+                        wrapper.pos = _pos;
+                        wrapper.anchor = anchor;
+
+                        ShapeExpandEffect.run(wrapper, 500, function (e) {
+                            return Math.pow(e, 0.5);
+                        }, 'magenta', 1.5);
+
                         challenge.focus();
                         return;
                     }
