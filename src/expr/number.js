@@ -72,7 +72,7 @@ class OperatorExpr extends Expression {
         }).then((right) => {
             let stage = this.stage;
 
-            if (animated) {
+            if (animated && stage) {
                 return new Promise((resolve, _reject) => {
                     var shatter = new ShatterExpressionEffect(this);
                     shatter.run(stage, (() => {

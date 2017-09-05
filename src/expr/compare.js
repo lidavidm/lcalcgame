@@ -39,47 +39,50 @@ class CompareExpr extends Expression {
         var cmp = this.compare();
         if (cmp === true)       return new (ExprManager.getClass('true'))();
         else if (cmp === false) return new (ExprManager.getClass('false'))();
+        else if (this.funcName === "+" || this.funcName === "=") return true;
         else                    return this;
     }
 
     canReduce() {
         // Allow comparisons with lambdas.
-        return this.leftExpr && this.rightExpr && this.operatorExpr.canReduce() &&
+        return this.leftExpr && this.rightExpr &&
+            (this.operatorExpr.canReduce() || this.operatorExpr instanceof OpLiteral) &&
             (this.leftExpr.canReduce() || this.leftExpr.isValue() ||
              this.leftExpr instanceof LambdaExpr) &&
             (this.rightExpr.canReduce() || this.rightExpr.isValue()) ||
             this.rightExpr instanceof LambdaExpr;
     }
 
-    performUserReduction() {
+    performReduction(animated=true) {
         if (this.operatorExpr instanceof OpLiteral) {
             const op = this.operatorExpr.toString();
             const locked = this.locked;
             const _swap = (expr) => {
-                const parent = (this.stage || this.parent);
+                const parent = this.parent || this.stage;
                 if (locked) expr.lock();
                 parent.swap(this, expr);
                 expr.lockSubexpressions();
-                expr.performUserReduction();
             };
-            if (op === '=')
-                _swap(new (ExprManager.getClass('assign'))(this.leftExpr.clone(), this.rightExpr.clone()));
-            else if (op === '+')
-                _swap(new (ExprManager.getClass('+'))(this.leftExpr.clone(), this.rightExpr.clone()));
+            if (op === '=') {
+                const assign = new (ExprManager.getClass('assign'))(this.leftExpr.clone(), this.rightExpr.clone());
+                _swap(assign);
+                return assign.performReduction();
+            }
+            else if (op === '+') {
+                const add = new (ExprManager.getClass('+'))(this.leftExpr.clone(), this.rightExpr.clone());
+                _swap(add);
+                return add.performReduction();
+            }
             else {
                 this.operatorExpr = new TextExpr(op);
                 this.funcName = op;
                 this.lockSubexpressions();
-                super.performUserReduction();
             }
         }
         else if (this.operatorExpr instanceof TypeInTextExpr && !this.operatorExpr.isCommitted()) {
             this.operatorExpr.typeBox.carriageReturn();
-            super.performUserReduction();
-        } else super.performUserReduction();
-    }
+        }
 
-    performReduction(animated=true) {
         if (this.leftExpr && this.rightExpr && !(this.leftExpr.isValue() && this.rightExpr.isValue())) {
             let animations = [];
             let genSubreduceAnimation = (expr) => {
