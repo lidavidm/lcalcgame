@@ -118,7 +118,7 @@ var OperatorExpr = function (_Expression2) {
             }).then(function (right) {
                 var stage = _this5.stage;
 
-                if (animated) {
+                if (animated && stage) {
                     return new Promise(function (resolve, _reject) {
                         var shatter = new ShatterExpressionEffect(_this5);
                         shatter.run(stage, function () {

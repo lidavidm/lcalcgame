@@ -446,7 +446,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
                 }
                 return false;
             };
-            if (hasTextbox(node)) return null;
+            if (hasTextbox(node) || hasPlaceholder(node)) return null;
             if (hasTextbox(lambdaExpr) || hasPlaceholder(lambdaExpr)) return null;
 
             if (node.dragging) {

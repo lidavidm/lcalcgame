@@ -14,11 +14,6 @@
             "toolbox": ["'bap'", "'app'", "'cra'", "'ple'"]
         },
         {
-            "goal" : "'adam'",
-            "board": ["_ + _", "(x) => xx"],
-            "toolbox": ["'m'", "'a'", "'d'", "_ + _"]
-        },
-        {
             "description":"Choice of boolean",
             "board":["_b ? 'i' : 'n'", "_b ? 'i' : 't'"],
             "goal": "'it'",
@@ -52,21 +47,6 @@
                 "board": ["_ + _t_string", "' '", "_ + _t_string", "_ + _t_string"],
                 "toolbox": ["'pen'", "'uff'", "'f'", "_ + _", "_ + _"],
                 "typing_hints": [ "guin", "shu", "fle" ]
-            }
-        },
-        {
-            "description": "Multiple text-enter boxes. Spaces II.",
-            "goal": "'volcanoes scare me'",
-            "board": ["_t_string + 'olca'", "'ca' + _", "_t_string + 's'", "_t_string + 'e me'"],
-            "toolbox": ["_ + _", "_ + _"],
-            "block_variant": {
-                "board": ["_ + 'olca'", "'ca' + _", "_ + 's'", "_ + 'e me'"],
-                "toolbox": ["'v'", "'noes '", "'no'", "'r'", "_ + _", "_ + _"]
-            },
-            "verbatim_variant": {
-                "board": ["_ + _t_string", "'ca' + _", "_ + 's'", "_ + _t_string"],
-                "toolbox": ["'v'", "'noes '", "'no'", "'r'", "_ + _", "_ + _"],
-                "typing_hints": [ "olca", "e me" ]
             }
         },
         {
@@ -117,7 +97,7 @@
             },
             "block_variant": {
                 "board": ["_ >> 'time'", "_ >> 'spacetime'"],
-                "toolbox": ["'space'", "'time'", "_op('+')", "_op('==')"]
+                "toolbox": ["'space'", "'time'", "_op('+')", "_op('+')", "_op('==')", "_op('==')"]
             },
             "verbatim_variant": {
                 "board": ["_ >>> 'time'", "_ >>> 'spacetime'"],
@@ -135,7 +115,7 @@
             },
             "block_variant": {
                 "board": ["_ >> _", "_ >> _"],
-                "toolbox": ["'b'", "'e'", "_op('+')", "_op('==')", "'be'"]
+                "toolbox": ["'b'", "'e'", "_op('+')", "_op('==')", "_op('+')", "_op('==')", "'be'"]
             },
             "verbatim_variant": {
                 "board": ["_ >>> _", "_ >>> _"],

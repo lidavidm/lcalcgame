@@ -64,63 +64,69 @@ var CompareExpr = function (_Expression) {
         key: 'reduce',
         value: function reduce() {
             var cmp = this.compare();
-            if (cmp === true) return new (ExprManager.getClass('true'))();else if (cmp === false) return new (ExprManager.getClass('false'))();else return this;
+            if (cmp === true) return new (ExprManager.getClass('true'))();else if (cmp === false) return new (ExprManager.getClass('false'))();else if (this.funcName === "+" || this.funcName === "=") return true;else return this;
         }
     }, {
         key: 'canReduce',
         value: function canReduce() {
             // Allow comparisons with lambdas.
-            return this.leftExpr && this.rightExpr && this.operatorExpr.canReduce() && (this.leftExpr.canReduce() || this.leftExpr.isValue() || this.leftExpr instanceof LambdaExpr) && (this.rightExpr.canReduce() || this.rightExpr.isValue()) || this.rightExpr instanceof LambdaExpr;
-        }
-    }, {
-        key: 'performUserReduction',
-        value: function performUserReduction() {
-            var _this2 = this;
-
-            if (this.operatorExpr instanceof OpLiteral) {
-                (function () {
-                    var op = _this2.operatorExpr.toString();
-                    var locked = _this2.locked;
-                    var _swap = function _swap(expr) {
-                        var parent = _this2.stage || _this2.parent;
-                        if (locked) expr.lock();
-                        parent.swap(_this2, expr);
-                        expr.lockSubexpressions();
-                        expr.performUserReduction();
-                    };
-                    if (op === '=') _swap(new (ExprManager.getClass('assign'))(_this2.leftExpr.clone(), _this2.rightExpr.clone()));else if (op === '+') _swap(new (ExprManager.getClass('+'))(_this2.leftExpr.clone(), _this2.rightExpr.clone()));else {
-                        _this2.operatorExpr = new TextExpr(op);
-                        _this2.funcName = op;
-                        _this2.lockSubexpressions();
-                        _get(CompareExpr.prototype.__proto__ || Object.getPrototypeOf(CompareExpr.prototype), 'performUserReduction', _this2).call(_this2);
-                    }
-                })();
-            } else if (this.operatorExpr instanceof TypeInTextExpr && !this.operatorExpr.isCommitted()) {
-                this.operatorExpr.typeBox.carriageReturn();
-                _get(CompareExpr.prototype.__proto__ || Object.getPrototypeOf(CompareExpr.prototype), 'performUserReduction', this).call(this);
-            } else _get(CompareExpr.prototype.__proto__ || Object.getPrototypeOf(CompareExpr.prototype), 'performUserReduction', this).call(this);
+            return this.leftExpr && this.rightExpr && (this.operatorExpr.canReduce() || this.operatorExpr instanceof OpLiteral) && (this.leftExpr.canReduce() || this.leftExpr.isValue() || this.leftExpr instanceof LambdaExpr) && (this.rightExpr.canReduce() || this.rightExpr.isValue()) || this.rightExpr instanceof LambdaExpr;
         }
     }, {
         key: 'performReduction',
         value: function performReduction() {
-            var _this3 = this;
+            var _this2 = this;
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+            if (this.operatorExpr instanceof OpLiteral) {
+                var _ret = function () {
+                    var op = _this2.operatorExpr.toString();
+                    var locked = _this2.locked;
+                    var _swap = function _swap(expr) {
+                        var parent = _this2.parent || _this2.stage;
+                        if (locked) expr.lock();
+                        parent.swap(_this2, expr);
+                        expr.lockSubexpressions();
+                    };
+                    if (op === '=') {
+                        var assign = new (ExprManager.getClass('assign'))(_this2.leftExpr.clone(), _this2.rightExpr.clone());
+                        _swap(assign);
+                        return {
+                            v: assign.performReduction()
+                        };
+                    } else if (op === '+') {
+                        var add = new (ExprManager.getClass('+'))(_this2.leftExpr.clone(), _this2.rightExpr.clone());
+                        _swap(add);
+                        return {
+                            v: add.performReduction()
+                        };
+                    } else {
+                        _this2.operatorExpr = new TextExpr(op);
+                        _this2.funcName = op;
+                        _this2.lockSubexpressions();
+                    }
+                }();
+
+                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+            } else if (this.operatorExpr instanceof TypeInTextExpr && !this.operatorExpr.isCommitted()) {
+                this.operatorExpr.typeBox.carriageReturn();
+            }
 
             if (this.leftExpr && this.rightExpr && !(this.leftExpr.isValue() && this.rightExpr.isValue())) {
                 var animations = [];
                 var genSubreduceAnimation = function genSubreduceAnimation(expr) {
                     var before = expr;
-                    return _this3.performSubReduction(expr, true).then(function (result) {
+                    return _this2.performSubReduction(expr, true).then(function (result) {
                         if (result != before) return Promise.resolve();else return Promise.reject("@ CompareExpr.performReduction: Subexpression did not reduce!");
                     });
                 };
                 if (!this.leftExpr.isValue() && !(this.leftExpr instanceof LambdaExpr)) animations.push(genSubreduceAnimation(this.leftExpr));
                 if (!this.rightExpr.isValue() && !(this.rightExpr instanceof LambdaExpr)) animations.push(genSubreduceAnimation(this.rightExpr));
                 return Promise.all(animations).then(function () {
-                    if (_this3.reduce() != _this3) {
+                    if (_this2.reduce() != _this2) {
                         return after(500).then(function () {
-                            return _this3.performReduction(animated);
+                            return _this2.performReduction(animated);
                         });
                     }
                     return Promise.reject("@ CompareExpr.performReduction: Subexpressions did not reduce!");
@@ -130,12 +136,12 @@ var CompareExpr = function (_Expression) {
                 console.log('reducing');
                 if (animated) {
                     return new Promise(function (resolve, _reject) {
-                        var shatter = new ShatterExpressionEffect(_this3);
+                        var shatter = new ShatterExpressionEffect(_this2);
                         shatter.run(stage, function () {
-                            _this3.ignoreEvents = false;
-                            resolve(_get(CompareExpr.prototype.__proto__ || Object.getPrototypeOf(CompareExpr.prototype), 'performReduction', _this3).call(_this3));
-                        }.bind(_this3));
-                        _this3.ignoreEvents = true;
+                            _this2.ignoreEvents = false;
+                            resolve(_get(CompareExpr.prototype.__proto__ || Object.getPrototypeOf(CompareExpr.prototype), 'performReduction', _this2).call(_this2));
+                        }.bind(_this2));
+                        _this2.ignoreEvents = true;
                     });
                 } else _get(CompareExpr.prototype.__proto__ || Object.getPrototypeOf(CompareExpr.prototype), 'performReduction', this).call(this);
             }
@@ -224,7 +230,7 @@ var CompareExpr = function (_Expression) {
     }, {
         key: 'toJavaScript',
         value: function toJavaScript() {
-            var _this4 = this;
+            var _this3 = this;
 
             var js_forms = {
                 '==': 'a == b',
@@ -247,7 +253,7 @@ var CompareExpr = function (_Expression) {
             if (opName in js_forms) {
                 var _ret2 = function () {
                     var template = js_forms[opName];
-                    var inner_exprs = { 'a': _this4.leftExpr.toJavaScript(), 'b': _this4.rightExpr.toJavaScript() };
+                    var inner_exprs = { 'a': _this3.leftExpr.toJavaScript(), 'b': _this3.rightExpr.toJavaScript() };
                     var isString = function isString(x) {
                         return (x.match(/\'/g) || []).length === 2 && x.indexOf("'") === 0 && x.lastIndexOf("'") === x.length - 1;
                     };
@@ -308,10 +314,10 @@ var FadedCompareExpr = function (_CompareExpr) {
 
         _classCallCheck(this, FadedCompareExpr);
 
-        var _this5 = _possibleConstructorReturn(this, (FadedCompareExpr.__proto__ || Object.getPrototypeOf(FadedCompareExpr)).call(this, b1, b2, compareFuncName));
+        var _this4 = _possibleConstructorReturn(this, (FadedCompareExpr.__proto__ || Object.getPrototypeOf(FadedCompareExpr)).call(this, b1, b2, compareFuncName));
 
-        _this5.holes[1].text = compareFuncName;
-        return _this5;
+        _this4.holes[1].text = compareFuncName;
+        return _this4;
     }
 
     return FadedCompareExpr;
@@ -325,11 +331,11 @@ var GraphicFadedCompareExpr = function (_FadedCompareExpr) {
 
         _classCallCheck(this, GraphicFadedCompareExpr);
 
-        var _this6 = _possibleConstructorReturn(this, (GraphicFadedCompareExpr.__proto__ || Object.getPrototypeOf(GraphicFadedCompareExpr)).call(this, b1, b2, compareFuncName));
+        var _this5 = _possibleConstructorReturn(this, (GraphicFadedCompareExpr.__proto__ || Object.getPrototypeOf(GraphicFadedCompareExpr)).call(this, b1, b2, compareFuncName));
 
-        _this6._color = _this6._origColor = "lightgray";
-        _this6.operatorExpr.color = SyntaxColor.for('operator');
-        return _this6;
+        _this5._color = _this5._origColor = "lightgray";
+        _this5.operatorExpr.color = SyntaxColor.for('operator');
+        return _this5;
     }
 
     _createClass(GraphicFadedCompareExpr, [{
@@ -356,12 +362,12 @@ var UnaryOpExpr = function (_Expression2) {
         var compare_text = new TextExpr(unaryOpName);
         compare_text.color = 'black';
 
-        var _this7 = _possibleConstructorReturn(this, (UnaryOpExpr.__proto__ || Object.getPrototypeOf(UnaryOpExpr)).call(this, [compare_text, b]));
+        var _this6 = _possibleConstructorReturn(this, (UnaryOpExpr.__proto__ || Object.getPrototypeOf(UnaryOpExpr)).call(this, [compare_text, b]));
 
-        _this7.funcName = unaryOpName;
-        _this7.color = "HotPink";
-        _this7.padding = { left: 20, inner: 10, right: 30 };
-        return _this7;
+        _this6.funcName = unaryOpName;
+        _this6.color = "HotPink";
+        _this6.padding = { left: 20, inner: 10, right: 30 };
+        return _this6;
     }
 
     _createClass(UnaryOpExpr, [{
@@ -399,20 +405,20 @@ var UnaryOpExpr = function (_Expression2) {
     }, {
         key: 'performReduction',
         value: function performReduction() {
-            var _this8 = this;
+            var _this7 = this;
 
             var animated = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
 
             if (this.rightExpr && !this.rightExpr.isValue() && !this._animating) {
                 var _ret3 = function () {
-                    _this8._animating = true;
-                    var before = _this8.rightExpr;
+                    _this7._animating = true;
+                    var before = _this7.rightExpr;
                     return {
-                        v: _this8.performSubReduction(_this8.rightExpr, true).then(function () {
-                            _this8._animating = false;
-                            if (_this8.rightExpr != before) {
-                                return _this8.performReduction();
+                        v: _this7.performSubReduction(_this7.rightExpr, true).then(function () {
+                            _this7._animating = false;
+                            if (_this7.rightExpr != before) {
+                                return _this7.performReduction();
                             }
                         })
                     };
@@ -424,12 +430,12 @@ var UnaryOpExpr = function (_Expression2) {
             if (this.reduce() != this) {
                 if (animated) {
                     return new Promise(function (resolve, _reject) {
-                        var shatter = new ShatterExpressionEffect(_this8);
+                        var shatter = new ShatterExpressionEffect(_this7);
                         shatter.run(stage, function () {
-                            _this8.ignoreEvents = false;
-                            resolve(_get(UnaryOpExpr.prototype.__proto__ || Object.getPrototypeOf(UnaryOpExpr.prototype), 'performReduction', _this8).call(_this8));
-                        }.bind(_this8));
-                        _this8.ignoreEvents = true;
+                            _this7.ignoreEvents = false;
+                            resolve(_get(UnaryOpExpr.prototype.__proto__ || Object.getPrototypeOf(UnaryOpExpr.prototype), 'performReduction', _this7).call(_this7));
+                        }.bind(_this7));
+                        _this7.ignoreEvents = true;
                     });
                 } else _get(UnaryOpExpr.prototype.__proto__ || Object.getPrototypeOf(UnaryOpExpr.prototype), 'performReduction', this).call(this);
             }
@@ -484,21 +490,21 @@ var MirrorCompareExpr = function (_CompareExpr2) {
 
         _classCallCheck(this, MirrorCompareExpr);
 
-        var _this9 = _possibleConstructorReturn(this, (MirrorCompareExpr.__proto__ || Object.getPrototypeOf(MirrorCompareExpr)).call(this, b1, b2, compareFuncName));
+        var _this8 = _possibleConstructorReturn(this, (MirrorCompareExpr.__proto__ || Object.getPrototypeOf(MirrorCompareExpr)).call(this, b1, b2, compareFuncName));
 
-        _this9.children = [];
-        _this9.holes = [];
-        _this9.padding = { left: 20, inner: 0, right: 40 };
+        _this8.children = [];
+        _this8.holes = [];
+        _this8.padding = { left: 20, inner: 0, right: 40 };
 
-        _this9.addArg(b1);
+        _this8.addArg(b1);
 
         // Mirror graphic
         var mirror = new MirrorExpr(0, 0, 86, 86);
         mirror.exprInMirror = b2.clone();
-        _this9.addArg(mirror);
+        _this8.addArg(mirror);
 
-        _this9.addArg(b2);
-        return _this9;
+        _this8.addArg(b2);
+        return _this8;
     }
 
     _createClass(MirrorCompareExpr, [{
@@ -527,18 +533,18 @@ var MirrorCompareExpr = function (_CompareExpr2) {
     }, {
         key: 'performReduction',
         value: function performReduction() {
-            var _this10 = this;
+            var _this9 = this;
 
             return new Promise(function (resolve, reject) {
-                if (!_this10.isReducing && _this10.reduce() != _this10) {
-                    var stage = _this10.stage;
-                    var shatter = new MirrorShatterEffect(_this10.mirror);
+                if (!_this9.isReducing && _this9.reduce() != _this9) {
+                    var stage = _this9.stage;
+                    var shatter = new MirrorShatterEffect(_this9.mirror);
                     shatter.run(stage, function () {
-                        _this10.ignoreEvents = false;
-                        resolve(_get(MirrorCompareExpr.prototype.__proto__ || Object.getPrototypeOf(MirrorCompareExpr.prototype), 'performReduction', _this10).call(_this10, false));
-                    }.bind(_this10));
-                    _this10.ignoreEvents = true;
-                    _this10.isReducing = true;
+                        _this9.ignoreEvents = false;
+                        resolve(_get(MirrorCompareExpr.prototype.__proto__ || Object.getPrototypeOf(MirrorCompareExpr.prototype), 'performReduction', _this9).call(_this9, false));
+                    }.bind(_this9));
+                    _this9.ignoreEvents = true;
+                    _this9.isReducing = true;
                 } else {
                     reject();
                 }

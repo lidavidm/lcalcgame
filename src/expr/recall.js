@@ -547,6 +547,7 @@ class SummoningTypeBox extends TypeBox {
         };
         super(x, y, w, h, onCommit);
     }
+    toJavaScript() { return '__summoning'; }
 }
 
 class BlinkingCursor extends mag.Rect {

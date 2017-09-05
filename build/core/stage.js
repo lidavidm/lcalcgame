@@ -290,14 +290,13 @@ var mag = function (_) {
                         }
 
                         _this4.nodes[i].stage = null;
-                        origpos = _this4.nodes[i].upperLeftPos(_this4.nodes[i].absolutePos, _this4.nodes[i].absoluteSize);
+                        origpos = _this4.nodes[i].centerPos();
                         total_width = 0;
                         scale = _this4.nodes[i].scale;
                         anotherNode = anotherNodeOrNodes;
 
                         if (!Array.isArray(anotherNode)) {
                             anotherNode = [anotherNode];
-                            origpos = _this4.nodes[i].centerPos();
                         }
 
                         pos = clonePos(origpos);
@@ -360,7 +359,7 @@ var mag = function (_) {
                         }
 
                         var offset = void 0;
-                        if (pos.x + maxWidth > _this4.boundingSize.w) {
+                        if (pos.x > _this4.boundingSize.w) {
                             offset = pos.x + maxWidth - _this4.boundingSize.w;
                         }
                         if (leastX < 0) {

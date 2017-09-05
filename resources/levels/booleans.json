@@ -17,7 +17,8 @@
                 "true":1,
                 "false":1,
                 "==":1,
-                "number":1
+                "number":1,
+                "primitives":1
             },
             "showFade": false
         },
@@ -46,26 +47,10 @@
             "toolbox": ["'large'", "'small'"]
         },
         {
-            "description": "Partial application.",
-            "board": ["'sun' == _", "x => xx", "'moon'", "'moon'"],
-            "goal": ["false", "false"],
-            "toolbox": ""
-        },
-        {
             "description": "Applying function to boolean",
             "board": "'cat' == _",
             "goal": ["true", "true"],
             "toolbox": ["x => xx", "'cat'", "'dog'", "x => x"]
-        },
-        {
-            "description": "Teaching partial binding with choice.",
-            "board": ["_ == _", "x => xx", "'left'", "'left'", "'right'"],
-            "goal": ["true", "false"],
-            "toolbox": "",
-            "fade": {
-                "==":1
-            },
-            "showFade": false
         },
         {
             "description": "Typing with ==, one side.",

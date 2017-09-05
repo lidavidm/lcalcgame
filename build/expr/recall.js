@@ -672,6 +672,13 @@ var SummoningTypeBox = function (_TypeBox) {
         return _possibleConstructorReturn(this, (SummoningTypeBox.__proto__ || Object.getPrototypeOf(SummoningTypeBox)).call(this, x, y, w, h, onCommit));
     }
 
+    _createClass(SummoningTypeBox, [{
+        key: 'toJavaScript',
+        value: function toJavaScript() {
+            return '__summoning';
+        }
+    }]);
+
     return SummoningTypeBox;
 }(TypeBox);
 

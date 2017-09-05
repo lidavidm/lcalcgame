@@ -23,6 +23,7 @@
                 "string": 1,
                 "typing_str": 1
             },
+            "showFade": false,
             "block_variant": {
                 "board": ["matter => matter + _", "'quotes '"],
                 "toolbox": ["matter", "'matter'"]
@@ -79,7 +80,7 @@
             "toolbox": ["'ew'", "'ave'", "'ow'"],
             "block_variant": {
                 "board": ["b => _", "x => x x x"],
-                "toolbox": ["_ + b", "'kn'", "'ew'", "'ave'", "'ow'"]
+                "toolbox": ["b", "b", "_ + _", "_ == _", "'kn'", "'ew'", "'ave'", "'ow'"]
             },
             "verbatim_variant": {
                 "board": ["b => _t_single", "x => x x x"],
@@ -93,7 +94,7 @@
             "toolbox": ["'d'", "'ll'", "'nd'"],
             "block_variant": {
                 "board": ["w => _", "x => x x x"],
-                "toolbox": ["_ + _ + _", "w", "'wi'", "'d'", "'ll'", "'ow'", "'nd'"]
+                "toolbox": ["_ + _ + _", "w", "w", "w", "'wi'", "'d'", "'ll'", "'ow'", "'nd'"]
             },
             "verbatim_variant": {
                 "board": ["w => _t_single", "x => x x x"],
@@ -118,7 +119,7 @@
             "typing_help": ["You'll have to use =>, ?, and :"],
             "block_variant": {
                 "board": ["b => _ ? _ : _", "x => xxx"],
-                "toolbox": ["b", "'yes'", "'no'", "true", "false", "false"]
+                "toolbox": ["_ == _", "b", "b", "'yes'", "'no'", "true", "false", "false"]
             },
             "verbatim_variant": {
                 "board": ["_t_single", "x => xxx"],

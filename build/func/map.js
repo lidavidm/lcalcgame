@@ -527,6 +527,8 @@ var FadedMapFunc = function (_FadedSimpleMapFunc) {
         _this6.heightScalar = 1.0;
         _this6.exprOffsetY = 0;
         _this6.animatedReduction = false;
+        _this6.padding.inner = 0;
+        _this6.update();
         return _this6;
     }
 
@@ -534,6 +536,48 @@ var FadedMapFunc = function (_FadedSimpleMapFunc) {
         key: 'updateArrowPaths',
         value: function updateArrowPaths() {} // remove arrow
 
+    }, {
+        key: 'update',
+        value: function update() {
+            var _this7 = this;
+
+            this.children = [];
+
+            this.holes.forEach(function (expr) {
+                return _this7.addChild(expr);
+            });
+            // In the centering calculation below, we need this expr's
+            // size to be stable. So we first set the scale on our
+            // children, then compute our size once to lay out the
+            // children.
+            this.holes.forEach(function (expr) {
+                expr.anchor = { x: 0, y: 0.5 };
+                expr.scale = { x: _this7._subexpScale, y: _this7._subexpScale };
+                expr.update();
+            });
+            var size = this.size;
+            var x = this.padding.left;
+            var y = this.size.h / 2.0 + (this.exprOffsetY ? this.exprOffsetY : 0);
+
+            this.holes.forEach(function (expr, idx) {
+                // Update hole expression positions.
+                expr.anchor = { x: 0, y: 0.5 };
+                expr.pos = { x: x, y: y };
+                if (idx === 1 || idx === 3) {
+                    expr.scale = { x: _this7._subexpScale * _this7._subexpScale,
+                        y: _this7._subexpScale * _this7._subexpScale };
+                } else {
+                    expr.scale = { x: _this7._subexpScale, y: _this7._subexpScale };
+                }
+                expr.update();
+                x += expr.size.w * expr.scale.x;
+                if (idx === 0 && !expr.isPlaceholder()) {
+                    x -= 10;
+                }
+            });
+
+            this.children = this.holes; // for rendering
+        }
     }]);
 
     return FadedMapFunc;
@@ -548,31 +592,31 @@ var FunnelMapFunc = function (_MapFunc2) {
     function FunnelMapFunc(oneParamFunc, bag) {
         _classCallCheck(this, FunnelMapFunc);
 
-        var _this7 = _possibleConstructorReturn(this, (FunnelMapFunc.__proto__ || Object.getPrototypeOf(FunnelMapFunc)).call(this, oneParamFunc, bag));
+        var _this8 = _possibleConstructorReturn(this, (FunnelMapFunc.__proto__ || Object.getPrototypeOf(FunnelMapFunc)).call(this, oneParamFunc, bag));
 
-        _this7.children = [];
-        _this7.holes = [];
+        _this8.children = [];
+        _this8.holes = [];
         //this.animatedReduction = false;
 
         // Expression it fits over.
         oneParamFunc.unlock();
-        _this7.addArg(oneParamFunc);
+        _this8.addArg(oneParamFunc);
 
         // Funnel graphic.
         var funnel = new FunnelExpr(0, 0, 198 / 2, 281 / 2);
-        _this7.funnel = funnel;
-        _this7.addArg(funnel);
+        _this8.funnel = funnel;
+        _this8.addArg(funnel);
 
         // Bag.
         //bag.unlock();
-        _this7.addArg(bag);
-        return _this7;
+        _this8.addArg(bag);
+        return _this8;
     }
 
     _createClass(FunnelMapFunc, [{
         key: 'update',
         value: function update() {
-            var _this8 = this;
+            var _this9 = this;
 
             if (this.func && this.funnel) {
                 this.func.pos = { x: this.funnel.size.w * 38 / 200, y: this.funnel.size.h / 2.0 - this.func.size.h / 1.3 };
@@ -590,7 +634,7 @@ var FunnelMapFunc = function (_MapFunc2) {
             }
             this.children = [];
             this.holes.forEach(function (h) {
-                _this8.addChild(h);
+                _this9.addChild(h);
             });
         }
     }, {
@@ -656,13 +700,13 @@ var ReduceFunc = function (_FuncExpr2) {
 
         console.log('constructing ReduceFunc with ', twoParamFunc, iterable, initializer);
 
-        var _this9 = _possibleConstructorReturn(this, (ReduceFunc.__proto__ || Object.getPrototypeOf(ReduceFunc)).call(this, [iterable, initializer, twoParamFunc]));
+        var _this10 = _possibleConstructorReturn(this, (ReduceFunc.__proto__ || Object.getPrototypeOf(ReduceFunc)).call(this, [iterable, initializer, twoParamFunc]));
 
-        _this9.exprOffsetY = DEFAULT_EXPR_HEIGHT / 8.0;
-        _this9.update();
+        _this10.exprOffsetY = DEFAULT_EXPR_HEIGHT / 8.0;
+        _this10.update();
 
-        _this9.color = "YellowGreen";
-        return _this9;
+        _this10.color = "YellowGreen";
+        return _this10;
     }
 
     _createClass(ReduceFunc, [{

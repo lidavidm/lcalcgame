@@ -25,9 +25,9 @@
         },
         {
             "description": "intro to if; selective destruction + replication",
-            "board": ["_b ? 'b' : 'a'", "x => xx", "true", "false"],
+            "board": ["_b ? 'b' : 'a'", "_b ? 'a' : 'b'"],
             "goal": ["'a'", "'b'"],
-            "toolbox": ""
+            "toolbox": ["true", "false", "true", "false"]
         },
         {
             "description": "intro to booleans with conditionals",
