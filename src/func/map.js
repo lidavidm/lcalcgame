@@ -402,8 +402,47 @@ class FadedMapFunc extends FadedSimpleMapFunc {
         this.heightScalar = 1.0;
         this.exprOffsetY = 0;
         this.animatedReduction = false;
+        this.padding.inner = 0;
+        this.update();
     }
     updateArrowPaths() { } // remove arrow
+
+    update() {
+        this.children = [];
+
+        this.holes.forEach((expr) => this.addChild(expr));
+        // In the centering calculation below, we need this expr's
+        // size to be stable. So we first set the scale on our
+        // children, then compute our size once to lay out the
+        // children.
+        this.holes.forEach((expr) => {
+            expr.anchor = { x:0, y:0.5 };
+            expr.scale = { x: this._subexpScale, y: this._subexpScale };
+            expr.update();
+        });
+        var size = this.size;
+        var x = this.padding.left;
+        var y = this.size.h / 2.0 + (this.exprOffsetY ? this.exprOffsetY : 0);
+
+        this.holes.forEach((expr, idx) => { // Update hole expression positions.
+            expr.anchor = { x:0, y:0.5 };
+            expr.pos = { x:x, y:y };
+            if (idx === 1 || idx === 3) {
+                expr.scale = { x: this._subexpScale * this._subexpScale,
+                               y: this._subexpScale * this._subexpScale };
+            }
+            else {
+                expr.scale = { x: this._subexpScale, y: this._subexpScale };
+            }
+            expr.update();
+            x += expr.size.w * expr.scale.x;
+            if (idx === 0 && !expr.isPlaceholder()) {
+                x -= 10;
+            }
+        });
+
+        this.children = this.holes; // for rendering
+    }
 }
 
 // Fully-concrete map function.
