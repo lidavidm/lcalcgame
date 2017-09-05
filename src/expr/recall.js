@@ -716,7 +716,13 @@ class TypeInTextExpr extends TextExpr {
                 else {
                     parent = (this.parent || this.stage);
                 }
+                const pos = _this.pos;
+                const anchor = _this.anchor;
                 parent.swap(_this, expr);
+                if (parent instanceof mag.Stage) {
+                    expr.pos = pos;
+                    expr.anchor = anchor;
+                }
                 expr.lockSubexpressions((e) => (!(e instanceof LambdaHoleExpr)));
                 if (!(parent instanceof mag.Stage))
                     expr.lock();

@@ -179,6 +179,7 @@ var MissingExpression = function (_Expression) {
                         root.stage.swap(root, wrapper);
                         wrapper.pos = _pos;
                         wrapper.anchor = anchor;
+                        wrapper.color = 'purple';
 
                         ShapeExpandEffect.run(wrapper, 500, function (e) {
                             return Math.pow(e, 0.5);

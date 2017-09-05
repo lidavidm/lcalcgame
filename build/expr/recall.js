@@ -902,7 +902,13 @@ var TypeInTextExpr = function (_TextExpr) {
                 } else {
                     parent = _this10.parent || _this10.stage;
                 }
+                var pos = _this.pos;
+                var anchor = _this.anchor;
                 parent.swap(_this, expr);
+                if (parent instanceof mag.Stage) {
+                    expr.pos = pos;
+                    expr.anchor = anchor;
+                }
                 expr.lockSubexpressions(function (e) {
                     return !(e instanceof LambdaHoleExpr);
                 });
