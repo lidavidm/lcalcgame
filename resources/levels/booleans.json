@@ -58,7 +58,7 @@
             "board": ["_t_string == 'jupiter'"],
             "toolbox": "",
             "block_variant": {
-                "board": ["_ == 'jupiter'"],
+                "board": ["__verbatim; _ == 'jupiter';"],
                 "toolbox": ["'saturn'", "'jupiter'", "'neptune'"],
                 "help_text": ""
             },
@@ -75,7 +75,7 @@
             "board": ["'hot' == _t_string", "'cold' == _t_string"],
             "toolbox": "",
             "block_variant": {
-                "board": ["'hot' == _", "'cold' == _"],
+                "board": ["'hot' == _", "__verbatim; 'cold' == _;"],
                 "toolbox": ["'lukewarm'", "'cold'", "'hot'", "'chilly'"]
             },
             "verbatim_variant": {
@@ -90,7 +90,7 @@
             "board": ["_t_string == _t_string", "_t_string == _t_string"],
             "toolbox": "",
             "block_variant": {
-                "board": ["_ == _", "_ == _"],
+                "board": ["__verbatim; _ == _;", "__verbatim; _ == _;"],
                 "toolbox": ["'a'", "'b'", "'a'", "'c'", "'b'", "'c'"]
             },
             "verbatim_variant": {

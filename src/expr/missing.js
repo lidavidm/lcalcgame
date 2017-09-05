@@ -121,7 +121,7 @@ class MissingExpression extends Expression {
                     root.stage.swap(root, wrapper);
                     wrapper.pos = pos;
                     wrapper.anchor = anchor;
-                    wrapper.color = 'purple';
+                    //wrapper.color = 'magenta';
 
                     ShapeExpandEffect.run(wrapper, 500, (e) => Math.pow(e, 0.5), 'magenta', 1.5);
 

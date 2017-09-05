@@ -25,7 +25,7 @@
             "board": "'mount' + _t_string",
             "toolbox": "",
             "block_variant": {
-                "board": "'mount' + _",
+                "board": "__verbatim; 'mount' + _;",
                 "toolbox": ["'ins'", "'ains'", "'tains'"]
             },
             "verbatim_variant": {
@@ -40,7 +40,7 @@
             "board": ["_t_string + 'guin'", "' '", "_ + 'shu'", "_t_string + 'fle'"],
             "toolbox": ["_ + _", "_ + _"],
             "block_variant": {
-                "board": ["_ + 'guin'", "' '", "_ + 'shu'", "_ + 'fle'"],
+                "board": ["__verbatim; _ + 'guin';", "' '", "_ + 'shu'", "__verbatim; _ + 'fle';"],
                 "toolbox": ["'pen'", "'uff'", "'f'", "_ + _", "_ + _"]
             },
             "verbatim_variant": {
@@ -79,7 +79,7 @@
                 ">>>": ["==", "+"]
             },
             "block_variant": {
-                "board": ["'r' >> _", "_ >> 'river'"],
+                "board": ["'r' >> _", "__verbatim; _ >> 'river';"],
                 "toolbox": ["'ver'", "'iver'", "'river'", "_op('+')", "_op('==')"]
             },
             "verbatim_variant": {
@@ -96,7 +96,7 @@
                 ">>>": ["==", "+"]
             },
             "block_variant": {
-                "board": ["_ >> 'time'", "_ >> 'spacetime'"],
+                "board": ["__verbatim; _ >> 'time';", "_ >> 'spacetime'"],
                 "toolbox": ["'space'", "'time'", "_op('+')", "_op('+')", "_op('==')", "_op('==')"]
             },
             "verbatim_variant": {
@@ -114,7 +114,7 @@
                 ">>>": ["==", "+"]
             },
             "block_variant": {
-                "board": ["_ >> _", "_ >> _"],
+                "board": ["__verbatim; _ >> _;", "__verbatim; _ >> _;"],
                 "toolbox": ["'b'", "'e'", "_op('+')", "_op('==')", "_op('+')", "_op('==')", "'be'"]
             },
             "verbatim_variant": {

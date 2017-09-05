@@ -25,7 +25,7 @@
             "goal": "[true, false, true, false]",
             "toolbox": "",
             "block_variant": {
-                "board": "[0, 1, 0, 1].map(n => _)",
+                "board": "__verbatim; [0, 1, 0, 1].map(n => _);",
                 "toolbox": ["0", "1", "2", "3", "4", "_ == _", "_ == _", "n", "n", "true", "false", "_b ? _ : _"]
             },
             "verbatim_variant": {
@@ -38,7 +38,7 @@
             "goal": "['near', 'liar', 'bear']",
             "toolbox": "",
             "block_variant": {
-                "board": "['ne', 'li', 'be'].map(s => _)",
+                "board": "__verbatim; ['ne', 'li', 'be'].map(s => _);",
                 "toolbox": ["_ + _", "_ == _", "'ar'", "s", "s", "_b ? _ : _", "x => _"]
             },
             "verbatim_variant": {
@@ -51,7 +51,7 @@
             "goal": "['met', 'net']",
             "toolbox": ["['b', 'a']", "['n', 'm']", "['m', 'n']"],
             "block_variant": {
-                "board": "__.map(a => _)",
+                "board": "__verbatim; __.map(a => _);",
                 "toolbox": ["['b', 'a']", "['n', 'm']", "['m', 'n']", "a + 'et'"]
             },
             "verbatim_variant": {
@@ -64,7 +64,7 @@
             "goal": "[false, true]",
             "toolbox": ["['0', '1']", "[0, 0]", "['a', 'b']", "[3, 5]"],
             "block_variant": {
-                "board": "__.map(_l)",
+                "board": "__verbatim; __.map(_l);",
                 "toolbox": ["x => x == _", "0", "1", "['0', '1']", "[1, 0]"]
             },
             "verbatim_variant": {
@@ -76,7 +76,7 @@
             "board": ["_t_array.map(x => x + 'er')"],
             "goal": "['better', 'faster', 'stronger']",
             "block_variant": {
-                "board": "__.map(x => x + 'er')",
+                "board": "__verbatim; __.map(x => x + 'er');",
                 "toolbox": ["['bet', 'fas', 'stron']", "['bett', 'fast', 'strong']", "['be', 'fa', 'stro']", "['better', 'faster', 'stronget']"]
             },
             "verbatim_variant": {
@@ -90,7 +90,7 @@
             "toolbox": "",
             "typing_help": ["You'll have to use =>, ?, and :"],
             "block_variant": {
-                "board": ["['A', 'F', 'F'].map(_l)", "'pass'", "'fail'"],
+                "board": ["__verbatim; ['A', 'F', 'F'].map(_l);", "'pass'", "'fail'"],
                 "toolbox": ["y => _", "_ == _", "y", "y", "'A'", "'F'", "_b ? _ : _"]
             },
             "verbatim_variant": {
@@ -105,7 +105,7 @@
             "toolbox": "",
             "typing_help": ["You'll have to use =>, ?, and :"],
             "block_variant": {
-                "board": ["__.map(_l)" ],
+                "board": ["__verbatim; __.map(_l);" ],
                 "toolbox": ["[1, 2, 1]", "['a', 'b', 'b']", "1", "2", "'a'", "'b'", "x", "n", "_b ? _ : _", "'two'", "'one'", "x => _", "n => _", "_ == _"]
             },
             "verbatim_variant": {

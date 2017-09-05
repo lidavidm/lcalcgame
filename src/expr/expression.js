@@ -441,7 +441,7 @@ class Expression extends mag.RoundedRect {
             if (reduced_expr && reduced_expr.parent) {
                 var try_reduce = reduced_expr.parent.reduceCompletely();
                 if (try_reduce != reduced_expr.parent && try_reduce !== null) {
-                    Animate.blink(reduced_expr.parent, 400, [0,1,0], 1);
+                    //Animate.blink(reduced_expr.parent, 400, [0,1,0], 1);
                 }
             }
 

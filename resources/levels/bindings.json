@@ -28,7 +28,7 @@
             "board": ["'cat'", "x => x == _t_string"],
             "goal": "false",
             "block_variant": {
-                "board": ["'cat'", "x => x == _"],
+                "board": ["'cat'", "__verbatim; x => x == _;"],
                 "toolbox": ["'poodle'", "'cat'", "'ferret'", "'wombat'"]
             },
             "verbatim_variant": {
@@ -41,7 +41,7 @@
             "goal": ["true", "true"],
             "toolbox": ["'c'", "'b'", "'a'"],
             "block_variant": {
-                "board": ["x => x == 'a'", "x => x == _"],
+                "board": ["x => x == 'a'", "__verbatim; x => x == _;"],
                 "toolbox": ["'c'", "'c'", "'b'", "'b'", "'a'", "'a'"]
             },
             "verbatim_variant": {
@@ -76,7 +76,7 @@
                 ">>>": ["==", "+"]
             },
             "block_variant": {
-                "board": ["x => x >> 'R'", "x => x >> ' ELSE!'"],
+                "board": ["__verbatim; x => x >> 'R';", "x => x >> ' ELSE!'"],
                 "toolbox": ["_op('+')", "_op('+')", "_op('==')", "_op('==')", "'O'", "'E'", "'L'"]
             },
             "verbatim_variant": {
@@ -111,7 +111,7 @@
             "goal": ["6", "8", "10"],
             "toolbox": ["2", "3", "4", "5", "6"],
             "block_variant": {
-                "board": ["x => _", "x => xxx"],
+                "board": ["__verbatim; x => _;", "x => xxx"],
                 "toolbox": ["x", "x", "_ + _", "_ == _", "2", "3", "4", "4", "5", "6"]
             },
             "verbatim_variant": {
@@ -124,7 +124,7 @@
             "goal": ["true", "true", "false"],
             "toolbox": ["10", "10", "20", "20", "30", "30"],
             "block_variant": {
-                "board": ["x => _", "x => xxx"],
+                "board": ["__verbatim; x => _;", "x => xxx"],
                 "toolbox": ["x", "x", "_ + _", "_ == _", "10", "10", "10", "20", "20", "20"]
             },
             "verbatim_variant": {
@@ -148,7 +148,7 @@
             "toolbox": "",
             "goal": ["true", "true"],
             "block_variant": {
-                "board": ["1", "2", "x => x == 1", "x => _"],
+                "board": ["1", "2", "x => x == 1", "__verbatim; x => _;"],
                 "toolbox": ["_ == _", "_ + _", "x", "x", "n", "0", "1", "2"]
             },
             "verbatim_variant": {
@@ -162,7 +162,7 @@
             "toolbox": ["10", "20", "30"],
             "block_variant": {
                 "board": ["x => xxx"],
-                "toolbox": ["x => _", "_ + _", "x", "x", "n", "10", "10", "20", "20", "30", "30"]
+                "toolbox": ["__verbatim; x => _;", "_ + _", "x", "x", "n", "10", "10", "20", "20", "30", "30"]
             },
             "verbatim_variant": {
                 "typing_hints": ["x => x + 10"]
@@ -174,7 +174,7 @@
             "goal": ["true", "20", "false"],
             "block_variant": {
                 "board": ["7", "13", "29"],
-                "toolbox": ["x => _ == _", "x => _ + _", "x => _ == _", "x => _ + _", "x", "x", "x", "x", "3", "3", "7", "7", "9", "9"]
+                "toolbox": ["__verbatim; x => _ == _;", "__verbatim; x => _ + _;", "__verbatim; x => _ == _;", "__verbatim; x => _ + _;", "x", "x", "x", "x", "3", "3", "7", "7", "9", "9"]
             },
             "verbatim_variant": {
                 "typing_hints": ["x => x == 7", "x => x + 7", "x => x == 3"]

@@ -47,7 +47,7 @@
             "goal": "'c'",
             "toolbox": ["'a'", "'a'", "'b'", "'b'", "'c'"],
             "block_variant": {
-                "board": ["_ == _", "_b ? 'a' : _"],
+                "board": ["_ == _", "__verbatim; _b ? 'a' : _;"],
                 "toolbox": ["'a'", "'a'", "'b'", "'b'", "'c'", "'c'"]
             },
             "verbatim_variant": {
@@ -62,7 +62,7 @@
             "goal": "'yes'",
             "toolbox": [],
             "block_variant": {
-                "board": ["'okay' == _", "_b ? _ : _"],
+                "board": ["__verbatim; 'okay' == _;", "__verbatim; _b ? _ : _;"],
                 "toolbox": ["'yes'", "'no'", "'maybe'", "'okay'"]
             },
             "verbatim_variant": {
