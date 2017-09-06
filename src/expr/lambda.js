@@ -202,7 +202,7 @@ class LambdaHoleExpr extends MissingExpression {
         // Variables must be reduced before application
         if (node instanceof VarExpr || node instanceof AssignExpr || node instanceof VtableVarExpr) return;
         // Disallow interaction with nested lambdas
-        if (this.parent && this.parent.parent instanceof LambdaExpr) return;
+        if (this.parent && this.parent.parent) return;
         super.ondropenter(node, pos);
 
         // Special case: Funnel representation of 'map' hovered over hole.
@@ -274,7 +274,7 @@ class LambdaHoleExpr extends MissingExpression {
         if (node instanceof LambdaHoleExpr) node = node.parent;
 
         // Disallow interaction with nested lambda
-        if (this.parent && this.parent.parent instanceof LambdaExpr) {
+        if (this.parent && this.parent.parent) {
             return null;
         }
 
