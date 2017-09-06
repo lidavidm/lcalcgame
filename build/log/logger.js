@@ -288,7 +288,7 @@ var Logger = function () {
         return new Promise(function (resolve, reject) {
 
             // For now...
-            // console.log('@ Logger.log: ', actionID, data);
+            console.log('@ Logger.log: ', actionID, data);
 
             if (data && (typeof data === "undefined" ? "undefined" : _typeof(data)) === 'object') data = JSON.stringify(data);
 

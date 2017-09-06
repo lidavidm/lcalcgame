@@ -52,11 +52,14 @@ function __TEST() {
 
 function init() {
 
+    Logger.log('active-variant', __ACTIVE_LEVEL_VARIANT);
+
     // DEBUG: Level variant radio buttons.
     if (__ACTIVE_LEVEL_VARIANT === null) $('#typing_variant').prop('checked', true);else $('#' + __ACTIVE_LEVEL_VARIANT).prop('checked', true);
 
     $('input[type=radio][name=variant]').change(function () {
         if (this.value != '') __ACTIVE_LEVEL_VARIANT = this.value;else __ACTIVE_LEVEL_VARIANT = null;
+        Logger.log('active-variant', __ACTIVE_LEVEL_VARIANT);
         initBoard();
     });
 

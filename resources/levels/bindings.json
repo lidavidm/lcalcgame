@@ -119,10 +119,25 @@
             }
         },
         {
+            "description": "Typing one entire line without hint text.",
+            "board": ["_t_single", "_t_single", "1", "2"],
+            "typing_hints": ["x => x == 1"],
+            "toolbox": "",
+            "goal": ["true", "true"],
+            "block_variant": {
+                "board": ["1", "2", "x => x == 1", "__verbatim; x => _;"],
+                "toolbox": ["_ == _", "_ + _", "x", "x", "n", "0", "1", "2"]
+            },
+            "verbatim_variant": {
+                "typing_hints": ["x => x == 1", "x => x == 2"]
+            }
+        },
+        {
             "description": "Intro to typing entire statements in bindings III",
             "board": ["x => _t_single", "x => xxx"],
             "goal": ["true", "true", "false"],
             "toolbox": ["10", "10", "20", "20", "30", "30"],
+            "typing_help": ["There's a == or + in there somewhere."],
             "block_variant": {
                 "board": ["__verbatim; x => _;", "x => xxx"],
                 "toolbox": ["x", "x", "_ + _", "_ == _", "10", "10", "10", "20", "20", "20"]
@@ -142,20 +157,6 @@
             }
         },
         {
-            "description": "Typing one entire line without hint text.",
-            "board": ["_t_single", "_t_single", "1", "2"],
-            "typing_hints": ["x => x == 1"],
-            "toolbox": "",
-            "goal": ["true", "true"],
-            "block_variant": {
-                "board": ["1", "2", "x => x == 1", "__verbatim; x => _;"],
-                "toolbox": ["_ == _", "_ + _", "x", "x", "n", "0", "1", "2"]
-            },
-            "verbatim_variant": {
-                "typing_hints": ["x => x == 1", "x => x == 2"]
-            }
-        },
-        {
             "description": "Typing entire line without any hints.",
             "board": ["_t_single", "x => xxx"],
             "goal": ["20", "30", "40"],
@@ -171,6 +172,7 @@
         {
             "description": "Typing entire lines IV: Functions as deleters.",
             "board": ["_t_single", "_t_single", "_t_single", "7", "13", "29"],
+            "typing_help": ["Remember =>"],
             "goal": ["true", "20", "false"],
             "block_variant": {
                 "board": ["7", "13", "29"],

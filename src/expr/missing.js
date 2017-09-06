@@ -118,12 +118,16 @@ class MissingExpression extends Expression {
                     wrapper.holes[0].emptyParent = true;
 
                     stage.saveState({name:"placed-expr", before:beforeNode, item:droppedExp, after: root.toJavaScript()});
+
                     root.stage.swap(root, wrapper);
                     wrapper.pos = pos;
                     wrapper.anchor = anchor;
                     //wrapper.color = 'magenta';
 
                     showHelpText("Press ENTER when finished typing.");
+
+                    stage.saveState({name:"verbatim-prompt", text:code});
+                    Logger.log('verbatim-prompt', {text: code});
 
                     ShapeExpandEffect.run(wrapper, 500, (e) => Math.pow(e, 0.5), 'magenta', 1.5);
 

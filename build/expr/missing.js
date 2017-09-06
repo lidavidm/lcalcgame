@@ -176,10 +176,14 @@ var MissingExpression = function (_Expression) {
                         wrapper.holes[0].emptyParent = true;
 
                         stage.saveState({ name: "placed-expr", before: beforeNode, item: droppedExp, after: root.toJavaScript() });
+
                         root.stage.swap(root, wrapper);
                         wrapper.pos = _pos;
                         wrapper.anchor = anchor;
                         //wrapper.color = 'magenta';
+
+                        stage.saveState({ name: "verbatim-prompt", text: code });
+                        Logger.log('verbatim-prompt', { text: code });
 
                         ShapeExpandEffect.run(wrapper, 500, function (e) {
                             return Math.pow(e, 0.5);
