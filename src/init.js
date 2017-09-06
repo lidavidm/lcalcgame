@@ -8,7 +8,7 @@ var stage;
 var canvas;
 
 var __ACTIVE_LEVEL_VARIANT = 'block_variant';
-const __DEBUG_DISPLAY_STATEGRAPH = false;
+const __DEBUG_DISPLAY_STATEGRAPH = true;
 
 const __VIS_CANVAS_ID = 'stateGraphCanvas';
 const __STATEGRAPH_DISPLAY_EDGES = false;
@@ -48,6 +48,8 @@ function __TEST() {
 
 function init() {
 
+    Logger.log('active-variant', __ACTIVE_LEVEL_VARIANT);
+
     // DEBUG: Level variant radio buttons.
     if (__ACTIVE_LEVEL_VARIANT === null)
         $('#typing_variant').prop('checked', true);
@@ -59,6 +61,7 @@ function init() {
             __ACTIVE_LEVEL_VARIANT = this.value;
         else
             __ACTIVE_LEVEL_VARIANT = null;
+        Logger.log('active-variant', __ACTIVE_LEVEL_VARIANT);
         initBoard();
     });
 
