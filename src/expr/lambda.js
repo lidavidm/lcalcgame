@@ -361,7 +361,9 @@ class LambdaHoleExpr extends MissingExpression {
                             c.pos = n.absolutePos;
                             c.scale = n.absoluteScale;
                             // Lock child nodes that are not placeholders
-                            c.lockSubexpressions((e) => !(e.isPlaceholder() || e instanceof LambdaHoleExpr));
+                            c.lockSubexpressions(
+                                (e) => !(e.isPlaceholder() || e instanceof LambdaHoleExpr) ||
+                                    e instanceof VarExpr);
                             let pos = addPos(c.pos, {x:0, y:-40});
                             final_nodes.push( c );
                         });
@@ -825,8 +827,10 @@ class LambdaExpr extends Expression {
                     reduced_expr.forEach((e) => {
                         if (this.locked) e.lock();
                         else             e.unlock();
-                        e.lockSubexpressions((node) => !(node.isPlaceholder() ||
-                                                         node instanceof LambdaHoleExpr));
+                        e.lockSubexpressions(
+                            (node) => !(node.isPlaceholder() ||
+                                        node instanceof LambdaHoleExpr) ||
+                                node instanceof VarExpr);
                     });
                     parent.swap(this, reduced_expr); // swap 'this' (on the board) with an array of its reduced expressions
                     parent.saveState();
@@ -838,8 +842,10 @@ class LambdaExpr extends Expression {
             if (this.locked) reduced_expr.lock(); // the new expression should inherit whatever this expression was capable of as input
             else             reduced_expr.unlock();
             //console.warn(this, reduced_expr);
-            reduced_expr.lockSubexpressions((node) => !(node.isPlaceholder() ||
-                                                        node instanceof LambdaHoleExpr));
+            reduced_expr.lockSubexpressions(
+                (node) => !(node.isPlaceholder() ||
+                            node instanceof LambdaHoleExpr) ||
+                    node instanceof VarExpr);
 
             if (parent) parent.swap(this, reduced_expr);
 
