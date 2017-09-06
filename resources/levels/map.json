@@ -24,6 +24,7 @@
             "board": "[0, 1, 0, 1].map(n => _t_single)",
             "goal": "[true, false, true, false]",
             "toolbox": "",
+            "typing_help": ["Remember =="],
             "block_variant": {
                 "board": "__verbatim; [0, 1, 0, 1].map(n => _);",
                 "toolbox": ["0", "1", "2", "3", "4", "_ == _", "_ == _", "n", "n", "true", "false", "_b ? _ : _"]
