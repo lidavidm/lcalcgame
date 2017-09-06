@@ -10,7 +10,7 @@ var stage;
 var canvas;
 
 var __ACTIVE_LEVEL_VARIANT = 'block_variant';
-var __DEBUG_DISPLAY_STATEGRAPH = true;
+var __DEBUG_DISPLAY_STATEGRAPH = false;
 
 var __VIS_CANVAS_ID = 'stateGraphCanvas';
 var __STATEGRAPH_DISPLAY_EDGES = false;
