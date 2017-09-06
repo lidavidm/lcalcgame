@@ -123,6 +123,8 @@ class MissingExpression extends Expression {
                     wrapper.anchor = anchor;
                     //wrapper.color = 'magenta';
 
+                    showHelpText("Press ENTER when finished typing.");
+
                     ShapeExpandEffect.run(wrapper, 500, (e) => Math.pow(e, 0.5), 'magenta', 1.5);
 
                     challenge.focus();
