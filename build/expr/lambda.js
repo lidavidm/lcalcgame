@@ -473,7 +473,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
                                     c.scale = n.absoluteScale;
                                     // Lock child nodes that are not placeholders
                                     c.lockSubexpressions(function (e) {
-                                        return !(e.isPlaceholder() || e instanceof LambdaHoleExpr);
+                                        return !(e.isPlaceholder() || e instanceof LambdaHoleExpr) || e instanceof VarExpr;
                                     });
                                     var pos = addPos(c.pos, { x: 0, y: -40 });
                                     final_nodes.push(c);
@@ -1103,7 +1103,7 @@ var LambdaExpr = function (_Expression) {
                                 reduced_expr.forEach(function (e) {
                                     if (_this13.locked) e.lock();else e.unlock();
                                     e.lockSubexpressions(function (node) {
-                                        return !(node.isPlaceholder() || node instanceof LambdaHoleExpr);
+                                        return !(node.isPlaceholder() || node instanceof LambdaHoleExpr) || node instanceof VarExpr;
                                     });
                                 });
                                 parent.swap(this, reduced_expr); // swap 'this' (on the board) with an array of its reduced expressions
@@ -1117,7 +1117,7 @@ var LambdaExpr = function (_Expression) {
                 else reduced_expr.unlock();
                 //console.warn(this, reduced_expr);
                 reduced_expr.lockSubexpressions(function (node) {
-                    return !(node.isPlaceholder() || node instanceof LambdaHoleExpr);
+                    return !(node.isPlaceholder() || node instanceof LambdaHoleExpr) || node instanceof VarExpr;
                 });
 
                 if (parent) parent.swap(this, reduced_expr);

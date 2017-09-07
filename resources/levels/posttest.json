@@ -13,6 +13,16 @@
             "showFade": false
         },
         {
+            "board": ["x => _t_single", "x => x x x", "['none', 'a', 'c']", "['e', 'none', 'b']", "['z', 'u', 'none']"],
+            "goal": ["['none', 'a', 'c']"],
+            "toolbox": ["[0, 'a', 'c']", "['e', 0, 'b']", "['z', 'u', 0]"]
+        },
+        {
+            "board": ["_t_single", "x => x x x"],
+            "goal": ["['a', 'a', 'a']"],
+            "toolbox": ["a", "'t'", "'t'", "'z'", "'z'"]
+        },
+        {
             "board": ["x => _t_single", "x => x x x"],
             "goal": ["'no'", "'yes'", "'yes'"],
             "toolbox": ["0", "1", "1"]

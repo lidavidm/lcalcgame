@@ -268,22 +268,29 @@
             Chapter: <span id="chap_name"></span>
         </div>
 
-        <div class="centered" id="variants_div">
-           <input type="radio" id="block_variant" name="variant" value="block_variant"> Blocks-only
-           <input type="radio" id="verbatim_variant" name="variant" value="verbatim_variant"> Verbatim Typing
-           <input type="radio" id="typing_variant" name="variant" value=""> Constructive Typing
-        </div>
+        <!-- <div id="explanation" class="centered">
+            <p>
+                Drop expressions into <span style="color:#666;">holes</span> inside other expressions. <br />
+                If an expression blinks <span style="color:ForestGreen;">green</span>, click it to reduce.
+            </p>
+        </div> -->
 
         <div class="centered">
-          <select id="chapterSelect">
-          </select>
-        </div>
-
-        <div class="centered">
-            <p></p>
+            <p><button type="button" name="button" onclick="toggleDevInfo()">Show dev info</button></p>
         </div>
 
         <div id="devinfo">
+
+            <div class="centered" id="variants_div">
+               <input type="radio" id="block_variant" name="variant" value="block_variant"> Blocks-only
+               <input type="radio" id="verbatim_variant" name="variant" value="verbatim_variant"> Verbatim Typing
+               <input type="radio" id="typing_variant" name="variant" value=""> Constructive Typing
+            </div>
+
+            <div class="centered">
+              <select id="chapterSelect">
+              </select>
+            </div>
 
             <div id="duplicate_buttons" class="centered">
                 <button onclick="prev()">Prev</button>
@@ -297,12 +304,6 @@
                 <button onclick="UnitTest.run(stage)">Run Unit Tests</button>
             </div>
 
-            <div id="explanation" class="centered">
-                <p>
-                    Drop expressions into <span style="color:#666;">holes</span> inside other expressions. <br />
-                    If an expression blinks <span style="color:ForestGreen;">green</span>, click it to reduce.
-                </p>
-            </div>
         </div>
 
         <div class="centered">
@@ -333,6 +334,10 @@
 
             </div>
         </div>
+
+
+
+
 
         <div id="footer">
 

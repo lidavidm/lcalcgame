@@ -7,7 +7,7 @@ var GLOBAL_DEFAULT_SCREENSIZE = null;
 var stage;
 var canvas;
 
-var __ACTIVE_LEVEL_VARIANT = 'block_variant';
+var __ACTIVE_LEVEL_VARIANT = getCookie('active_variant') || null;
 const __DEBUG_DISPLAY_STATEGRAPH = false;
 
 const __VIS_CANVAS_ID = 'stateGraphCanvas';
@@ -62,6 +62,7 @@ function init() {
         else
             __ACTIVE_LEVEL_VARIANT = null;
         Logger.log('active-variant', __ACTIVE_LEVEL_VARIANT);
+        setCookie('active_variant', __ACTIVE_LEVEL_VARIANT);
         initBoard();
     });
 
@@ -84,7 +85,7 @@ function init() {
     LOAD_REDUCT_RESOURCES(Resource);
 
     if (!__SHOW_DEV_INFO) {
-        $('#devinfo').hide();
+        toggleDevInfo();
     }
     if (!__DEBUG_DISPLAY_STATEGRAPH) {
         $('#stateGraphCanvas').hide();
@@ -146,6 +147,8 @@ function init() {
                             $('#fade_status').text('ON');
                         }
                     }
+
+                    toggleDevInfo();
 
                     lockFocus();
                     return loadChapterSelect();

@@ -9,7 +9,7 @@ var GLOBAL_DEFAULT_SCREENSIZE = null;
 var stage;
 var canvas;
 
-var __ACTIVE_LEVEL_VARIANT = 'block_variant';
+var __ACTIVE_LEVEL_VARIANT = getCookie('active_variant') || null;
 var __DEBUG_DISPLAY_STATEGRAPH = false;
 
 var __VIS_CANVAS_ID = 'stateGraphCanvas';
@@ -60,6 +60,7 @@ function init() {
     $('input[type=radio][name=variant]').change(function () {
         if (this.value != '') __ACTIVE_LEVEL_VARIANT = this.value;else __ACTIVE_LEVEL_VARIANT = null;
         Logger.log('active-variant', __ACTIVE_LEVEL_VARIANT);
+        setCookie('active_variant', __ACTIVE_LEVEL_VARIANT);
         initBoard();
     });
 
@@ -82,7 +83,7 @@ function init() {
     LOAD_REDUCT_RESOURCES(Resource);
 
     if (!__SHOW_DEV_INFO) {
-        $('#devinfo').hide();
+        toggleDevInfo();
     }
     if (!__DEBUG_DISPLAY_STATEGRAPH) {
         $('#stateGraphCanvas').hide();
@@ -144,6 +145,8 @@ function init() {
                             $('#fade_status').text('ON');
                         }
                     }
+
+                    toggleDevInfo();
 
                     lockFocus();
                     return loadChapterSelect();
@@ -520,7 +523,8 @@ function hideEndGame() {
 function showHelpText(txt) {
     var help = $('#help');
     var size = canvas.getBoundingClientRect();
-    help.css({ top: size.height / 1.3, color: '#AAA' });
+    var toolboxHeight = stage ? stage.toolbox.size.h : Toolbox.defaultRowHeight;
+    help.css({ top: (size.height - toolboxHeight) / 1.15, color: '#AAA' });
     if (txt) $('#help_text').text(txt);
     help.show();
 }
