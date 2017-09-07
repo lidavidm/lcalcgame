@@ -530,7 +530,8 @@ function hideEndGame() {
 function showHelpText(txt) {
     var help = $('#help');
     var size = canvas.getBoundingClientRect();
-    help.css( { top:size.height / 1.3, color:'#AAA' } );
+    const toolboxHeight = stage ? stage.toolbox.size.h : Toolbox.defaultRowHeight;
+    help.css( { top: (size.height - toolboxHeight) / 1.15, color:'#AAA' } );
     if (txt) $('#help_text').text(txt);
     help.show();
 }
