@@ -182,6 +182,8 @@ var MissingExpression = function (_Expression) {
                         wrapper.anchor = anchor;
                         //wrapper.color = 'magenta';
 
+                        showHelpText("Press ENTER when finished typing.");
+
                         stage.saveState({ name: "verbatim-prompt", text: code });
                         Logger.log('verbatim-prompt', { text: code });
 

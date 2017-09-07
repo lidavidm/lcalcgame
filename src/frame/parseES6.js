@@ -206,6 +206,18 @@ class ES6Parser {
                     return e;
                 } else if (node.callee.type === 'Identifier' && node.callee.name === '_op') { // Special case: Operators like +, =, !=, ==, etc...
                     return new OpLiteral(node.arguments[0].value);
+                // } else if (node.callee.type === 'Identifier' && node.callee.name === '_t_arrow') { // LambdaExpr missing the => operator. It's argument *is* a lambda...
+                //     const lambda = this.parseNode(node.arguments[0]);
+                //     if (lambda.hole.arrow) { // Swap the '=>' arrow text for a text box.
+                //         const t = TypeInTextExpr.fromExprCode('_t_arrow');
+                //         t.enforceHint('=>');
+                //         //t.__remain_unlocked = true;
+                //         //t.unlock();
+                //         lambda.hole.arrow = t;
+                //         lambda.hole.children[1] = t;
+                //     }
+                //     console.log(lambda);
+                //     return lambda;
                 } else if (node.callee.type === 'MemberExpression' && node.callee.property.name === 'map') {
                     return new (ExprManager.getClass('map'))(this.parseNode(node.arguments[0]), this.parseNode(node.callee.object));
                 } else if (node.callee.type === 'Identifier') {

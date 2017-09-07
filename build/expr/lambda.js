@@ -272,7 +272,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
             // Variables must be reduced before application
             if (node instanceof VarExpr || node instanceof AssignExpr || node instanceof VtableVarExpr) return;
             // Disallow interaction with nested lambdas
-            if (this.parent && this.parent.parent instanceof LambdaExpr) return;
+            if (this.parent && this.parent.parent) return;
             _get(LambdaHoleExpr.prototype.__proto__ || Object.getPrototypeOf(LambdaHoleExpr.prototype), "ondropenter", this).call(this, node, pos);
 
             // Special case: Funnel representation of 'map' hovered over hole.
@@ -349,7 +349,7 @@ var LambdaHoleExpr = function (_MissingExpression) {
             if (node instanceof LambdaHoleExpr) node = node.parent;
 
             // Disallow interaction with nested lambda
-            if (this.parent && this.parent.parent instanceof LambdaExpr) {
+            if (this.parent && this.parent.parent) {
                 return null;
             }
 
@@ -1702,6 +1702,7 @@ var FadedES6LambdaHoleExpr = function (_LambdaHoleExpr4) {
         _this23.padding.left = 5;
         _this23.addArg(new TextExpr(" " + varname + " "));
         _this23.addArg(new TextExpr("=>"));
+
         _this23.label.color = "#000";
         _this23.arrow.color = "#000";
         return _this23;
@@ -1715,6 +1716,9 @@ var FadedES6LambdaHoleExpr = function (_LambdaHoleExpr4) {
         value: function hits(pos, options) {
             if (this.ignoreEvents) return null; // All children are ignored as well.
             else if (!this.isOpen) return null;
+
+            // if (this.arrow instanceof TypeInTextExpr)
+            //     if (this.arrow.hits(pos, options)) return this.arrow;
 
             var boundingSize = this.label.absoluteSize;
             var upperLeftPos = this.label.upperLeftPos(this.absolutePos, boundingSize);
@@ -1754,6 +1758,9 @@ var FadedES6LambdaHoleExpr = function (_LambdaHoleExpr4) {
         key: "arrow",
         get: function get() {
             return this.holes[1];
+        },
+        set: function set(a) {
+            this.holes[1] = a;
         }
     }]);
 

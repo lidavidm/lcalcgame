@@ -1285,6 +1285,7 @@ class FadedES6LambdaHoleExpr extends LambdaHoleExpr {
         this.padding.left = 5;
         this.addArg(new TextExpr(" " + varname + " "));
         this.addArg(new TextExpr("=>"));
+
         this.label.color = "#000";
         this.arrow.color = "#000";
     }
@@ -1296,11 +1297,17 @@ class FadedES6LambdaHoleExpr extends LambdaHoleExpr {
     get arrow() {
         return this.holes[1];
     }
+    set arrow(a) {
+        this.holes[1] = a;
+    }
 
     // Events
     hits(pos, options) {
         if (this.ignoreEvents) return null; // All children are ignored as well.
         else if (!this.isOpen) return null;
+
+        // if (this.arrow instanceof TypeInTextExpr)
+        //     if (this.arrow.hits(pos, options)) return this.arrow;
 
         var boundingSize = this.label.absoluteSize;
         var upperLeftPos = this.label.upperLeftPos(this.absolutePos, boundingSize);

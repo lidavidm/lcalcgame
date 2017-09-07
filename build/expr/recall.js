@@ -814,6 +814,9 @@ var TypeInTextExpr = function (_TextExpr) {
             };
 
             var validators = {
+                'arrow': function arrow(txt) {
+                    return txt === '=>';
+                },
                 'fullstring': function fullstring(txt) {
                     return __PARSER.parse(txt) instanceof StringValueExpr;
                 },

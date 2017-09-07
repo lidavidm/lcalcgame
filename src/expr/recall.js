@@ -609,6 +609,7 @@ class TypeInTextExpr extends TextExpr {
         else if (code === 'innerarray')  transformer = txt => `[${txt}]`;
 
         let validators = {
+            'arrow':(txt) => txt === '=>',
             'fullstring':(txt) => (__PARSER.parse(txt) instanceof StringValueExpr),
             'innerstring':(txt) => (__PARSER.parse(transformer(txt)) instanceof StringValueExpr),
             'nonneg':(txt) => {
