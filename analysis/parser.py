@@ -1,3 +1,4 @@
+import ast
 import collections
 import glob
 import json
@@ -154,17 +155,40 @@ def merge_graphs(graphs):
             edge_weights[edge] += 1
 
     graph = nx.DiGraph()
-    max_node_count = max(node_weights.values())
+    max_node_count = max(node_weights.values()) if node_weights else 0
     for node, count in node_weights.items():
         graph.add_node(node, weight=count/max_node_count, count=count,
                        terminal=True, initial=True)
-    max_count = max(edge_weights.values())
+    max_count = max(edge_weights.values()) if edge_weights else 0
     for edge, count in edge_weights.items():
         graph.node[edge[0]]["terminal"] = False
         graph.node[edge[1]]["initial"] = False
         graph.add_edge(*edge, weight=count/max_count, count=count)
 
     graph.graph["weighted"] = True
+
+    return graph
+
+
+def mark_liveness(graph):
+    """
+    Mark nodes in a graph as 'live' if they lead to a non-RESET
+    terminal state, and 'dead' otherwise.
+    """
+    terminal = []
+    for node, data in graph.nodes(data=True):
+        data["live"] = False
+        if data["terminal"]:
+            terminal.append(node)
+
+    while terminal:
+        node = terminal.pop()
+        if node == "reset" or graph.node[node]["live"]:
+            continue
+
+        graph.node[node]["live"] = True
+        for pred in graph.predecessors(node):
+            terminal.append(pred)
 
     return graph
 
@@ -176,3 +200,14 @@ def get_complete_merged_graph(level_sequence, level_id):
     """
     return merge_graphs(only_complete_graphs(
         get_complete_state_graphs(level_sequence, level_id)))
+
+
+def get_all_complete_merged_graphs(level_sequence):
+    seen = set()
+    result = []
+    for level in level_sequence:
+        if level.id in seen:
+            continue
+        seen.add(level.id)
+        result.append(get_complete_merged_graph(level_sequence, level.id))
+    return result
