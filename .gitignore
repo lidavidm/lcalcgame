@@ -8,3 +8,4 @@ resources/graphics/starboy/menu-assets.png
 *.el
 *~
 *.DS_Store
+analysis/userlogs
