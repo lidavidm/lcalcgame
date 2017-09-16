@@ -1,127 +1,47 @@
 {
-    "chapterName":"Intro to Strings",
-    "description":"Brief intro to strings",
-    "language":"JavaScript",
+    "chapterName":"Sequences and Typing",
+    "description":"Free Form Input with Mutable State",
+    "language": "JavaScript",
     "levels": [
         {
-            "goal" : "'pineapple'",
-            "board": ["_ + _", "'pine'", "'apple'"],
+            "description": "Sequence operator",
+            "board": ["x = _; y = x + 1;", "y"],
+            "goal": "3",
+            "toolbox": ["1", "2", "3", "4"]
+        },
+        {
+            "goal": "'rice'",
+            "board": ["x = _t_single; y = x", "y"],
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "goal": "false",
+            "board": ["_t_variable = 'bread'; b = 'rice'; k = a == b", "k"],
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "goal": "true",
+            "board": ["_t_variable = _t_single; _t_variable = 'rice'; k = x == y", "k"],
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "goal": ["true"],
+            "board": ["_t_variable = 'kitty'; desc = _t_single + cat; k = (_t_single == desc)", "k"],
+            "toolbox": "",
+            "globals": {
+            }
+        },
+        {
+            "description": "Typing strings with sequences.",
+            "goal" : "'abracadabra'",
+            "board": ["x = 'a'; y = x + _t_single; z = y + x; y = z + _t_single + z;", "y"],
             "toolbox": ""
-        },
-        {
-            "goal" : "'crabapple'",
-            "board": ["_ + _", "_ + _"],
-            "toolbox": ["'bap'", "'app'", "'cra'", "'ple'"]
-        },
-        {
-            "description":"Choice of boolean",
-            "board":["_b ? 'i' : 'n'", "_b ? 'i' : 't'"],
-            "goal": "'it'",
-            "toolbox":["true", "false", "_ + _"]
-        },
-        {
-            "description": "Intro to typing text with concat.",
-            "goal": "'mountains'",
-            "board": "'mount' + _t_string",
-            "toolbox": "",
-            "block_variant": {
-                "board": "__verbatim; 'mount' + _;",
-                "toolbox": ["'ins'", "'ains'", "'tains'"]
-            },
-            "verbatim_variant": {
-                "board": "_t_string + _",
-                "toolbox": ["'ins'", "'ains'", "'tains'"],
-                "typing_hints": [ "mount" ]
-            }
-        },
-        {
-            "description": "Multiple text-enter boxes. Spaces I.",
-            "goal": "'penguin shuffle'",
-            "board": ["'pen' + _t_string", "_t_string + 'fle'", "_ + _"],
-            "toolbox": "",
-            "block_variant": {
-                "board": ["__verbatim; _ + 'guin';", "' '", "_ + 'shu'", "__verbatim; _ + 'fle';"],
-                "toolbox": ["'pen'", "'uff'", "'f'", "_ + _", "_ + _"]
-            },
-            "verbatim_variant": {
-                "board": ["_ + _t_string", "' '", "_ + _t_string", "_ + _t_string"],
-                "toolbox": ["'pen'", "'uff'", "'f'", "_ + _", "_ + _"],
-                "typing_hints": [ "guin", "shu", "fle" ]
-            }
-        },
-        {
-            "description": "Typing operators I.",
-            "goal": ["true", "'river'"],
-            "board": ["'r' >>> 'r'", "'r' >>> 'iver'"],
-            "toolbox": "",
-            "typing_hints": [ "==", "+" ],
-            "typing_options": {
-                ">>>": ["==", "+"]
-            },
-            "fade":{
-                "==":2,
-                "true":1,
-                "false":1
-            },
-            "showFade":false,
-            "block_variant": {
-                "board": ["'r' >> 'r'", "'r' >> 'iver'"],
-                "toolbox": ["_op('+')", "_op('==')"]
-            }
-        },
-        {
-            "description": "Typing operators II.",
-            "goal": "true",
-            "board": ["'r' >>> _", "_ >>> 'river'", "_t_string"],
-            "toolbox": "",
-            "typing_hints": [ "+", "==" ],
-            "typing_options": {
-                ">>>": ["==", "+"]
-            },
-            "block_variant": {
-                "board": ["'r' >> _", "__verbatim; _ >> 'river';"],
-                "toolbox": ["'ver'", "'iver'", "'river'", "_op('+')", "_op('==')"]
-            },
-            "verbatim_variant": {
-                "board": ["'r' >>> _", "_ >>> 'river'"],
-                "toolbox": ["iver", "r", "river"]
-            }
-        },
-        {
-            "description": "Typing operators III.",
-            "goal": "true",
-            "board": ["_ >>> 'time'", "_ >>> 'spacetime'", "_t_string"],
-            "toolbox": "",
-            "typing_options": {
-                ">>>": ["==", "+"]
-            },
-            "block_variant": {
-                "board": ["__verbatim; _ >> 'time';", "_ >> 'spacetime'"],
-                "toolbox": ["'space'", "'time'", "_op('+')", "_op('+')", "_op('==')", "_op('==')"]
-            },
-            "verbatim_variant": {
-                "board": ["_ >>> 'time'", "_ >>> 'spacetime'"],
-                "toolbox": ["'space'", "'time'"],
-                "typing_hints": [ "+", "==" ]
-            }
-        },
-        {
-            "description": "Typing operators III.",
-            "goal": "true",
-            "board": ["_ >>> _", "_ >>> _t_string"],
-            "toolbox": ["'b'", "'e'"],
-            "typing_options": {
-                ">>>": ["==", "+"]
-            },
-            "block_variant": {
-                "board": ["__verbatim; _ >> _;", "__verbatim; _ >> _;"],
-                "toolbox": ["'b'", "'e'", "_op('+')", "_op('==')", "_op('+')", "_op('==')", "'be'"]
-            },
-            "verbatim_variant": {
-                "board": ["_ >>> _", "_ >>> _"],
-                "toolbox": ["'b'", "'e'", "'be'"],
-                "typing_hints": [ "==", "+" ]
-            }
         }
     ],
     "resources":{

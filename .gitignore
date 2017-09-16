@@ -7,3 +7,4 @@ resources/graphics/starboy/menu-assets.png
 *.xcf
 *.el
 *~
+*.DS_Store

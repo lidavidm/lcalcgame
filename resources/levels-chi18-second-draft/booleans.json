@@ -1,131 +1,108 @@
 {
-    "chapterName":"Intro to Strings",
-    "description":"Brief intro to strings",
+    "chapterName":"Equality",
+    "description":"Boolean equality",
     "language":"JavaScript",
+    "macros": {
+        "a":"'A'",
+        "b":"'B'",
+        "c":"'C'"
+    },
     "levels": [
         {
-            "goal" : "'pineapple'",
-            "board": ["_ + _", "'pine'", "'apple'"],
+            "description": "Introduces concept: Reduction; Boolean comparison.",
+            "board": ["a == a"],
+            "goal": "true",
+            "toolbox": "",
+            "fade": {
+                "true":1,
+                "false":1,
+                "==":1,
+                "number":1,
+                "primitives":1
+            },
+            "showFade": false
+        },
+        {
+            "description": "Introduces concept: Holes.",
+            "board": ["'apple' == _", "'apple'"],
+            "goal": "true",
             "toolbox": ""
         },
         {
-            "goal" : "'crabapple'",
-            "board": ["_ + _", "_ + _"],
-            "toolbox": ["'bap'", "'app'", "'cra'", "'ple'"]
-        },
-        {
-            "description":"Choice of boolean",
-            "board":["_b ? 'i' : 'n'", "_b ? 'i' : 't'"],
-            "goal": "'it'",
-            "toolbox":["true", "false", "_ + _"]
-        },
-        {
-            "description": "Intro to typing text with concat.",
-            "goal": "'mountains'",
-            "board": "'mount' + _t_string",
-            "toolbox": "",
-            "block_variant": {
-                "board": "__verbatim; 'mount' + _;",
-                "toolbox": ["'ins'", "'ains'", "'tains'"]
-            },
-            "verbatim_variant": {
-                "board": "_t_string + _",
-                "toolbox": ["'ins'", "'ains'", "'tains'"],
-                "typing_hints": [ "mount" ]
-            }
-        },
-        {
-            "description": "Multiple text-enter boxes. Spaces I.",
-            "goal": "'penguin shuffle'",
-            "board": ["'pen' + _t_string", "_t_string + 'fle'", "_ + _"],
-            "toolbox": "",
-            "block_variant": {
-                "board": ["__verbatim; _ + 'guin';", "' '", "_ + 'shu'", "__verbatim; _ + 'fle';"],
-                "toolbox": ["'pen'", "'uff'", "'f'", "_ + _", "_ + _"]
-            },
-            "verbatim_variant": {
-                "board": ["_ + _t_string", "' '", "_ + _t_string", "_ + _t_string"],
-                "toolbox": ["'pen'", "'uff'", "'f'", "_ + _", "_ + _"],
-                "typing_hints": [ "guin", "shu", "fle" ]
-            }
-        },
-        {
-            "description": "Typing operators I.",
-            "goal": ["true", "'river'"],
-            "board": ["'r' >>> 'r'", "'r' >>> 'iver'"],
-            "toolbox": "",
-            "typing_hints": [ "==", "+" ],
-            "typing_options": {
-                ">>>": ["==", "+"]
-            },
-            "fade":{
-                "==":2,
-                "true":1,
-                "false":1
-            },
-            "showFade":false,
-            "block_variant": {
-                "board": ["'r' >> 'r'", "'r' >> 'iver'"],
-                "toolbox": ["_op('+')", "_op('==')"]
-            }
-        },
-        {
-            "description": "Typing operators II.",
+            "description": "Introduces concept: Choice of true and false.",
+            "board": "3 == _",
             "goal": "true",
-            "board": ["'r' >>> _", "_ >>> 'river'", "_t_string"],
+            "toolbox": ["0", "1", "2", "3", "4"]
+        },
+        {
+            "description": "Introduces false.",
+            "board": "'hi' == 'bye'",
+            "goal": "false",
+            "toolbox": ""
+        },
+        {
+            "description": "Introduces concept: More than one free slot. Also choice of false.",
+            "board": ["_ == _", "'small'"],
+            "goal": "false",
+            "toolbox": ["'large'", "'small'"]
+        },
+        {
+            "description": "Applying function to boolean",
+            "board": "'cat' == _",
+            "goal": ["true", "true"],
+            "toolbox": ["x => xx", "'cat'", "'dog'", "x => x"]
+        },
+        {
+            "description": "Typing with ==, one side.",
+            "goal": "true",
+            "board": ["_t_string == 'jupiter'"],
             "toolbox": "",
-            "typing_hints": [ "+", "==" ],
-            "typing_options": {
-                ">>>": ["==", "+"]
-            },
             "block_variant": {
-                "board": ["'r' >> _", "__verbatim; _ >> 'river';"],
-                "toolbox": ["'ver'", "'iver'", "'river'", "_op('+')", "_op('==')"]
+                "board": ["__verbatim; _ == 'jupiter';"],
+                "toolbox": ["'saturn'", "'jupiter'", "'neptune'"],
+                "help_text": ""
             },
             "verbatim_variant": {
-                "board": ["'r' >>> _", "_ >>> 'river'"],
-                "toolbox": ["iver", "r", "river"]
+                "board": ["_t_string == 'jupiter'"],
+                "toolbox": "",
+                "typing_hints": [ "jupiter" ]
+            },
+            "help_text": "Press ENTER when finished typing."
+        },
+        {
+            "description": "Typing with ==, twice. Spaces.",
+            "goal": ["false", "true"],
+            "board": ["'hot' == _t_string", "'cold' == _t_string"],
+            "toolbox": "",
+            "block_variant": {
+                "board": ["'hot' == _", "__verbatim; 'cold' == _;"],
+                "toolbox": ["'lukewarm'", "'cold'", "'hot'", "'chilly'"]
+            },
+            "verbatim_variant": {
+                "board": ["_t_string == _", "_t_string == _"],
+                "toolbox": ["'lukewarm'", "'cold'", "'hot'", "'chilly'"],
+                "typing_hints": [ "hot", "cold" ]
             }
         },
         {
-            "description": "Typing operators III.",
-            "goal": "true",
-            "board": ["_ >>> 'time'", "_ >>> 'spacetime'", "_t_string"],
+            "description": "Typing with ==, both sides.",
+            "goal": ["false", "true"],
+            "board": ["_t_string == _t_string", "_t_string == _t_string"],
             "toolbox": "",
-            "typing_options": {
-                ">>>": ["==", "+"]
-            },
             "block_variant": {
-                "board": ["__verbatim; _ >> 'time';", "_ >> 'spacetime'"],
-                "toolbox": ["'space'", "'time'", "_op('+')", "_op('+')", "_op('==')", "_op('==')"]
+                "board": ["__verbatim; _ == _;", "__verbatim; _ == _;"],
+                "toolbox": ["'a'", "'b'", "'a'", "'c'", "'b'", "'c'"]
             },
             "verbatim_variant": {
-                "board": ["_ >>> 'time'", "_ >>> 'spacetime'"],
-                "toolbox": ["'space'", "'time'"],
-                "typing_hints": [ "+", "==" ]
-            }
-        },
-        {
-            "description": "Typing operators III.",
-            "goal": "true",
-            "board": ["_ >>> _", "_ >>> _t_string"],
-            "toolbox": ["'b'", "'e'"],
-            "typing_options": {
-                ">>>": ["==", "+"]
-            },
-            "block_variant": {
-                "board": ["__verbatim; _ >> _;", "__verbatim; _ >> _;"],
-                "toolbox": ["'b'", "'e'", "_op('+')", "_op('==')", "_op('+')", "_op('==')", "'be'"]
-            },
-            "verbatim_variant": {
-                "board": ["_ >>> _", "_ >>> _"],
-                "toolbox": ["'b'", "'e'", "'be'"],
-                "typing_hints": [ "==", "+" ]
+                "board": ["_ == _", "_ == _", "_t_string", "_t_string"],
+                "toolbox": ["'a'", "'b'", "'c'", "'b'", "'c'"],
+                "typing_hints": [ "a", "c" ]
             }
         }
     ],
     "resources":{
         "planet":"planet-boolili",
+        "aliens":["alien-boolean-1", "alien-boolean-2", "alien-boolean-3", "alien-boolean-4", "alien-boolean-5"],
         "curve":[
             {"x":0.15820825567078808, "y":-0.6234722536626294},
             {"x":0.15820825567078808, "y":-0.6234722536626294},

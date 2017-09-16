@@ -37,8 +37,8 @@
         {
             "description": "Multiple text-enter boxes. Spaces I.",
             "goal": "'penguin shuffle'",
-            "board": ["'pen' + _t_string", "_t_string + 'fle'", "_ + _"],
-            "toolbox": "",
+            "board": ["_t_string + 'guin'", "' '", "_ + 'shu'", "_t_string + 'fle'"],
+            "toolbox": ["_ + _", "_ + _"],
             "block_variant": {
                 "board": ["__verbatim; _ + 'guin';", "' '", "_ + 'shu'", "__verbatim; _ + 'fle';"],
                 "toolbox": ["'pen'", "'uff'", "'f'", "_ + _", "_ + _"]
