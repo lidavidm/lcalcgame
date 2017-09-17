@@ -64,9 +64,9 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     var chapterDigraph = {
         'intro': ['booleans'],
         'booleans': ['conditionals'],
-        'conditionals': ['strings'],
-        'strings': ['bindings'],
-        'bindings': ['confusing_strings'],
+        'conditionals': ['bindings'],
+        'bindings': ['strings'],
+        'strings': ['confusing_strings'],
         'confusing_strings': ['map'],
         'map': []
         // 'map': ['variables'],
