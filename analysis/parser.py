@@ -190,6 +190,9 @@ def mark_liveness(graph):
         for pred in graph.predecessors(node):
             terminal.append(pred)
 
+    for start, end, data in graph.edges(data=True):
+        data["live"] = graph.node[end]["live"]
+
     return graph
 
 
