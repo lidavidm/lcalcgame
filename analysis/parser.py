@@ -56,6 +56,9 @@ def get_state_graphs(level):
     for action in level.actions:
         if action["1"]["action_id"] == "victory":
             graphs[-1].graph["victory"] = True
+        elif action["1"]["action_id"] == "dead-end":
+            # TODO: synthesize a reset event?
+            graphs[-1].graph["reset"] = True
 
         if action["1"]["action_id"] != "state-path-save":
             continue
@@ -64,7 +67,7 @@ def get_state_graphs(level):
         graph = nx.DiGraph(victory=False, reset=False)
         nodes = []
         for idx, node in enumerate(graph_detail["nodes"]):
-            if "data" in node and node["data"] == "reset":
+            if node["data"] == "reset":
                 nodes.append("reset")
                 graph.graph["reset"] = True
                 graph.add_node("reset")
@@ -77,6 +80,8 @@ def get_state_graphs(level):
         for edge in graph_detail["edges"]:
             graph.add_edge(nodes[edge["from"]], nodes[edge["to"]])
 
+        graph.graph["dynamic_quest_id"] = action["1"]["dynamic_quest_id"]
+        graph.graph["quest_seq_id"] = action["1"]["quest_seq_id"]
         graphs.append(graph)
     return graphs
 
@@ -94,7 +99,26 @@ def only_complete_graphs(graphs):
     """
     Filter out graphs not caused by victory or reset.
     """
-    return [graph for graph in graphs if graph.graph["reset"] or graph.graph["victory"]]
+    finished_quests = set()
+    max_quest_seq_id = {}
+    result = []
+    for graph in graphs:
+        dynamic_quest_id = graph.graph["dynamic_quest_id"]
+        quest_seq_id = graph.graph["quest_seq_id"]
+        if graph.graph["reset"] or graph.graph["victory"]:
+            result.append(graph)
+            finished_quests.add(dynamic_quest_id)
+        else:
+            if dynamic_quest_id not in max_quest_seq_id:
+                max_quest_seq_id[dynamic_quest_id] = (graph, quest_seq_id)
+            elif quest_seq_id > max_quest_seq_id[dynamic_quest_id][1]:
+                max_quest_seq_id[dynamic_quest_id] = (graph, quest_seq_id)
+
+    for dynamic_quest_id, (graph, _) in max_quest_seq_id.items():
+        if dynamic_quest_id not in finished_quests:
+            result.append(graph)
+
+    return result
 
 
 def draw_graph(graph, size=(20, 20)):
