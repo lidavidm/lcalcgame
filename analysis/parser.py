@@ -197,7 +197,10 @@ def merge_graphs(graphs):
         graph.add_edge(*edge, weight=count/max_count, count=count)
 
     graph.graph["weighted"] = True
-    graph.graph["condition"] = graphs[0].graph["condition"]
+    if graphs:
+        graph.graph["condition"] = graphs[0].graph["condition"]
+    else:
+        graph.graph["condition"] = None
 
     return graph
 
