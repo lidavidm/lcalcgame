@@ -53,8 +53,11 @@ def get_state_graphs(level):
     Get all the state graphs for a given playthough of a given level.
     """
     graphs = []
+    condition = None
     for action in level.actions:
-        if action["1"]["action_id"] == "victory":
+        if action["1"]["action_id"] == "condition":
+            condition = action["1"]["action_detail"]
+        elif action["1"]["action_id"] == "victory":
             graphs[-1].graph["victory"] = True
         elif action["1"]["action_id"] == "dead-end":
             # TODO: synthesize a reset event?
@@ -83,6 +86,10 @@ def get_state_graphs(level):
         graph.graph["dynamic_quest_id"] = action["1"]["dynamic_quest_id"]
         graph.graph["quest_seq_id"] = action["1"]["quest_seq_id"]
         graphs.append(graph)
+
+    for graph in graphs:
+        graph.graph["condition"] = condition
+
     return graphs
 
 
@@ -190,6 +197,7 @@ def merge_graphs(graphs):
         graph.add_edge(*edge, weight=count/max_count, count=count)
 
     graph.graph["weighted"] = True
+    graph.graph["condition"] = graphs[0].graph["condition"]
 
     return graph
 
