@@ -19,13 +19,13 @@
         },
         {
             "description": "Intro II.",
-            "board": ["x => x == 'A'", "x => x", "'B'"],
+            "board": ["n => n == 'A'", "y => y", "'B'"],
             "goal": "false",
             "toolbox": ""
         },
         {
             "description": "Choice of function w/ typing.",
-            "board": ["'cat'", "x => x == _t_string"],
+            "board": ["'cat'", "t => t == _t_string"],
             "goal": "false",
             "block_variant": {
                 "board": ["'cat'", "__verbatim; x => x == _;"],
@@ -37,7 +37,7 @@
         },
         {
             "description": "Reinforces concept: Pipes outside of pure lambdas.",
-            "board": ["x => x == 'a'", "x => x == _t_string"],
+            "board": ["z => z == 'a'", "k => k == _t_string"],
             "goal": ["true", "true"],
             "toolbox": ["'c'", "'b'", "'a'"],
             "block_variant": {
@@ -47,6 +47,25 @@
             "verbatim_variant": {
                 "typing_hints": ["b"]
             }
+        },
+        {
+            "description": "Conditionals, booleans, and one-param functions.",
+            "board": ["'C'", "x => _b ? 'K' : 'G'"],
+            "goal": "'K'",
+            "toolbox": ["x == 'A'", "x == 'G'", "x == 'C'", "x == 'K'"]
+        },
+        {
+            "description": "Conditionals, booleans, and one-param functions II.",
+            "board": ["'Y'", "z => _b ? 'X' : 'T'", "z => _b ? 'B' : 'O'"],
+            "goal": "'X'",
+            "toolbox": ["z == 'T'", "z == 'Y'", "z == 'C'", "z == 'X'", "z == 'B'"]
+        },
+        {
+            "description": "Conditionals, booleans, and one-param functions III: Typing equality, verbatim.",
+            "board": ["_t_single", "'feline'", "'hound'", "x => xx"],
+            "typing_hints": ["x == \"feline\""],
+            "goal": ["'cat'", "'wolf'"],
+            "toolbox": ["x => _b ? 'cat' : 'dog'", "x => _b ? 'lion' : 'wolf'"]
         }
     ],
     "resources":{

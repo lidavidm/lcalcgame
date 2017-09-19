@@ -49,7 +49,11 @@ function constructGanttChart(table, chapters) {
     let concepts = {
         'Lambda':{
             'color': rgb(200, 200, 200),
-            'matches': [ 'λ', 'lambda', '(x) =>' ]
+            'matches': [ 'λ', 'lambda', '=>' ]
+        },
+        'Numbers':{
+            'color': rgb(160, 160, 160),
+            'matches': [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+' ]
         },
         'Boolean':{
             'color': rgb(255, 105, 180),
@@ -59,41 +63,48 @@ function constructGanttChart(table, chapters) {
             'color': rgb(255, 182, 193),
             'matches': [ '==', '!=' ]
         },
-        'Operators':{
-            'color': rgb(255, 182, 213),
-            'matches': [ '&&', '||', '!', ' > ', ' < ' ]
-        },
         'Conditional':{
             'color': rgb(0, 206, 209),
-            'matches': [ 'if', 'ifelse' ]
-        },
-        'Bags':{
-            'color': rgb(255, 239, 0),
-            'matches': [ 'bag' ]
+            'matches': [ 'if', 'ifelse', /([^?]*)\?([^:]*):([^;]*)/ ] // matches the ternary op, thanks https://stackoverflow.com/a/26739863
         },
         'Map':{
             'color': rgb(120, 200, 120),
             'matches': [ 'map' ]
         },
+        'Typing Str.': {
+            'color': rgb(255, 239, 0),
+            'matches': ['_t_string', '_t_fullstring']
+        },
+        'Typing Verb.': {
+            'color': rgb(255,228,181),
+            'matches': [],
+            'matcher': (lvl) => 'typing_hints' in lvl
+        },
+        'Typing Free': {
+            'color': rgb(255,165,0),
+            'matches': [ '_t_', '>>>' ],
+            'excluding': (lvl, exprs) => ('typing_hints' in lvl) ||
+                         exprs.some(e => /_t_string|_t_fullstring/.test(e))
+        },
+        'L. Operators':{
+            'color': rgb(255, 182, 213),
+            'matches': [ '&&', '||', '!', ' > ', ' < ' ]
+        },
+        'Bags':{
+            'color': rgb(255, 239, 0),
+            'matches': [ 'bag' ]
+        },
         'Array Objects':{
             'color': rgb(40, 200, 40),
-            'matches': [ 'arrayobj', '[]', '__' ]
+            'matches': [ 'arrayobj', '[]', '__', "_t_array" ]
         },
         'Object define':{
             'color': rgb(154,205,50),
             'matches': [ 'class' ]
         },
-        'Numbers':{
-            'color': rgb(160, 160, 160),
-            'matches': [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '+' ]
-        },
         'Define':{
             'color': rgb(255, 40, 40),
             'matches': [ 'define' ]
-        },
-        'Typing': {
-            'color': rgb(240,230,140),
-            'matches': [ '_t_', '>>>' ]
         },
         'Variables':{
             'color': rgb(80, 120, 244),
@@ -133,7 +144,10 @@ function constructGanttChart(table, chapters) {
 
     const conceptContainsExpr = (concept, e) => {
         for (let match of concept.matches) {
-            if (e.indexOf(match) > -1) {
+            if (match instanceof RegExp) { // Concepts can be expressed as regex patterns.
+                if (match.test(e)) return true;
+            }
+            else if (e.indexOf(match) > -1) {
                 // We have a match.
                 return true;
             }
@@ -157,13 +171,33 @@ function constructGanttChart(table, chapters) {
         if (level.goal) exprs = merge(level.goal, exprs);
         if (level.globals) exprs = merge(level.globals, exprs);
 
+        // This info is useful in typing-based
+        // levels where it's hard to determine what
+        // concepts are needed to solve the problem.
+        let typing_verbatim = [];
+        let typing_free = [];
+        if (level.typing_hints) typing_verbatim = merge(level.typing_hints, typing_verbatim);
+        if (level.typing_solution) typing_free = merge(level.typing_solution, typing_free);
+
         // Now iterate through and check for concept matches:
-        for (let e of exprs) {
-            if (conceptContainsExpr(concept, e)) {
-                // We have a match.
+        let match = false;
+        const conceptMatch = (exprs) => {
+            for (let e of exprs) {
+                if (conceptContainsExpr(concept, e)) {
+                    if (!('excluding' in concept) || !concept.excluding(level, exprs)) {
+                        // We have a match.
+                        return true;
+                    }
+                }
+            }
+            if ('matcher' in concept && concept.matcher(level, exprs)) {
                 return true;
             }
+            return false;
         }
+        if (conceptMatch(typing_verbatim)) return 'typed-verbatim';
+        if (conceptMatch(typing_free)) return 'typed-free';
+        if (conceptMatch(exprs)) return true;
 
         // No match found!
         return false;
@@ -171,10 +205,19 @@ function constructGanttChart(table, chapters) {
 
     // Checks whether level contains a given concept,
     // and creates a table cell out of it.
-    let toCell = (level, lvl_idx, concept) => {
+    let toCell = (level, lvl_idx, concept, conceptName) => {
         let url = 'index.html?level=' + lvl_idx;
-        if (levelContainsConcept(level, concept)) {
+        let contains = levelContainsConcept(level, concept);
+        if (contains !== false) {
             let color = concept.color;
+
+            if (conceptName.indexOf('Typing') === -1) {
+                if (contains === 'typed-verbatim') // Make typed expressions appear darker in the chart.
+                    color = mixColors(color, rgb(100,0,255), 0.25)
+                else if (contains === 'typed-free') // Make typed-free expressions appear even darker in the chart.
+                    color = mixColors(color, rgb(0,0,255), 0.5)
+            }
+
             if (level.fade && !('showFade' in level && level.showFade === false)) {
                 for (let e in level.fade) {
                     if (conceptContainsExpr(concept, e)) {
@@ -199,7 +242,7 @@ function constructGanttChart(table, chapters) {
         levels.forEach((level, idx) => {
             for (let row of rows) {
                 let concept = concepts[row[0].text];
-                row.push( toCell(level, curr_lvl_count + idx, concept) );
+                row.push( toCell(level, curr_lvl_count + idx, concept, row[0].text) );
             } // for each row, # of cells == # of levels + 1
 
             if (idx === 0) {
@@ -251,12 +294,10 @@ function constructGanttChart(table, chapters) {
             });
             $(DOMcell).mouseenter(function () {
                 let c = rgbToCSS(mixColors(clr, rgb(255,255,255), 0.6));
-                console.log(c);
                 $(this).css('background-color', c);
             });
             $(DOMcell).mouseleave(function() {
                 $(this).css('background-color', rgbToCSS(clr));
-                console.log('leave');
             });
         }
         //$(DOMcell).innerHTML = '<p>' + ('text' in cell_desc ? cell_desc.text : ' ') + '</p>';

@@ -9,34 +9,24 @@
             "goal": "[2, 3, 4]",
             "toolbox": "",
             "fade": {
+                "==":1,
+                "true":1,
+                "false":1,
                 "map": 1
             },
             "showFade": false
         },
         {
-            "description": "Function placement.",
-            "board": "[0, 1, 0].map(_l)",
-            "goal": "[false, true, false]",
-            "toolbox": ["n => 0 == n", "m => 1 == m", "k => 1 + k"]
-        },
-        {
-            "description": "Test cases I.",
-            "board": ["__.map(x => x == 0)"],
-            "goal": ["[true, false, false]"],
-            "toolbox": ["[1, 0, 0]", "[0, 1, 0]", "[0, 1, 1]", "[1, 1, 1]", "[1, 0, 1]", "[1, 1, 0]"],
-            "fade": {
-                "==":1,
-                "true":1,
-                "false":1,
-                "map":1
-            },
-            "showFade":false
+            "description": "Intro to typing entire statements in bindings",
+            "board": ["[3, 5, 7, 1].map(x => _)"],
+            "goal": ["[8, 10, 12, 6]"],
+            "toolbox": ["1 + x", "x + 3", "x + 4", "5 + x", "7 + x"]
         },
         {
             "description": "Intro to typing entire statements in bindings",
             "board": ["[1, 2, 3].map(x => _t_single)"],
-            "typing_hints": ["x + 1"],
-            "goal": ["[2, 3, 4]"],
+            "typing_hints": ["x + 9"],
+            "goal": ["[10, 11, 12]"],
             "toolbox": "",
             "block_variant": {
                 "board": ["x => x + 1", "x => xxx"]
@@ -46,6 +36,7 @@
             "description": "Intro to typing entire statements in bindings II",
             "board": ["[2, 4, 6].map(x => _t_single)"],
             "goal": ["[6, 8, 10]"],
+            "typing_solution": ["x + 4"],
             "toolbox": "",
             "block_variant": {
                 "board": ["__verbatim; x => _;", "x => xxx"],
@@ -53,6 +44,33 @@
             },
             "verbatim_variant": {
                 "typing_hints": ["x + 4"]
+            }
+        },
+        {
+            "description": "Function placement.",
+            "board": "[0, 1, 0].map(_l)",
+            "goal": "[false, true, false]",
+            "toolbox": ["n => n == 0", "m => m == 2", "k => 1 == 1", "w => w == 1"]
+        },
+        {
+            "description": "Test cases I.",
+            "board": ["__.map(n => n == 0)"],
+            "goal": ["[true, false, false]"],
+            "toolbox": ["[1, 0, 0]", "[0, 1, 0]", "[0, 1, 1]", "[1, 1, 1]", "[1, 0, 1]", "[1, 1, 0]"]
+        },
+        {
+            "description": "Intro to typing entire statements in bindings III",
+            "board": ["[10, 20, 30, 10].map(y => _t_single)"],
+            "goal": ["[true, false, false, true]"],
+            "typing_solution": ["y == 10"],
+            "toolbox": "",
+            "typing_help": ["There's a == or + in there somewhere."],
+            "block_variant": {
+                "board": ["__verbatim; x => _;", "x => xxx"],
+                "toolbox": ["x", "x", "_ + _", "_ == _", "10", "10", "10", "20", "20", "20"]
+            },
+            "verbatim_variant": {
+                "typing_hints": ["x == 20"]
             }
         },
         {
@@ -70,20 +88,6 @@
             }
         },
         {
-            "description": "Intro to typing entire statements in bindings III",
-            "board": ["[10, 20, 30, 10].map(x => _t_single)"],
-            "goal": ["[true, false, false, true]"],
-            "toolbox": "",
-            "typing_help": ["There's a == or + in there somewhere."],
-            "block_variant": {
-                "board": ["__verbatim; x => _;", "x => xxx"],
-                "toolbox": ["x", "x", "_ + _", "_ == _", "10", "10", "10", "20", "20", "20"]
-            },
-            "verbatim_variant": {
-                "typing_hints": ["x == 20"]
-            }
-        },
-        {
             "description": "Typing entire lines I.",
             "board": ["[33, 44].map(_t_single)"],
             "typing_hints": ["x => x + x"],
@@ -97,7 +101,9 @@
             "description": "Typing entire line without any hints.",
             "board": ["[10, 20, 30].map(_t_single)"],
             "goal": ["[17, 27, 37]"],
+            "typing_solution": ["x => x + 7"],
             "toolbox": "",
+            "typing_help": ["Remember => and =="],
             "block_variant": {
                 "board": ["x => xxx"],
                 "toolbox": ["__verbatim; x => _;", "_ + _", "x", "x", "n", "10", "10", "20", "20", "30", "30"]
@@ -107,24 +113,12 @@
             }
         },
         {
-            "description": "Typing entire lines IV: Functions as deleters.",
-            "board": ["_t_single", "_t_single", "_t_single", "7", "13", "29"],
-            "typing_help": ["Remember =>"],
-            "goal": ["true", "20", "false"],
-            "block_variant": {
-                "board": ["7", "13", "29"],
-                "toolbox": ["__verbatim; x => _ == _;", "__verbatim; x => _ + _;", "__verbatim; x => _ == _;", "__verbatim; x => _ + _;", "x", "x", "x", "x", "3", "3", "7", "7", "9", "9"]
-            },
-            "verbatim_variant": {
-                "typing_hints": ["x => x == 7", "x => x + 7", "x => x == 3"]
-            }
-        },
-        {
-            "description": "Intro to map: Typing function body.",
-            "board": "[0, 1, 0, 1].map(n => _t_single)",
+            "description": "Intro to map: Typing function body with non-n parameter.",
+            "board": "[0, 1, 0, 1].map(_t_single)",
             "goal": "[true, false, true, false]",
+            "typing_solution": ["x => x == 0"],
             "toolbox": "",
-            "typing_help": ["Remember =="],
+            "typing_help": ["Remember => and =="],
             "block_variant": {
                 "board": "__verbatim; [0, 1, 0, 1].map(n => _);",
                 "toolbox": ["0", "1", "2", "3", "4", "_ == _", "_ == _", "n", "n", "true", "false", "_b ? _ : _"]
@@ -134,36 +128,11 @@
             }
         },
         {
-            "description": "Intro to map: Typing II.",
-            "board": "['ne', 'li', 'be'].map(s => _t_single)",
-            "goal": "['near', 'liar', 'bear']",
-            "toolbox": "",
-            "block_variant": {
-                "board": "__verbatim; ['ne', 'li', 'be'].map(s => _);",
-                "toolbox": ["_ + _", "_ == _", "'ar'", "s", "s", "_b ? _ : _", "x => _"]
-            },
-            "verbatim_variant": {
-                "typing_hints": ["s + \"ar\""]
-            }
-        },
-        {
-            "description": "Intro to map: Choosing arrays.",
-            "board": "__.map(a => _t_single)",
-            "goal": "['met', 'net']",
-            "toolbox": ["['b', 'a']", "['n', 'm']", "['m', 'n']"],
-            "block_variant": {
-                "board": "__verbatim; __.map(a => _);",
-                "toolbox": ["['b', 'a']", "['n', 'm']", "['m', 'n']", "a + 'et'"]
-            },
-            "verbatim_variant": {
-                "typing_hints": ["a + \"et\""]
-            }
-        },
-        {
             "description": "Intro to map: Choosing arrays II.",
             "board": "__.map(_t_single)",
             "goal": "[false, true]",
             "toolbox": ["['0', '1']", "[0, 0]", "['a', 'b']", "[3, 5]"],
+            "typing_solution": ["x => x == 'b'"],
             "block_variant": {
                 "board": "__verbatim; __.map(_l);",
                 "toolbox": ["x => x == _", "0", "1", "['0', '1']", "[1, 0]"]
@@ -173,16 +142,10 @@
             }
         },
         {
-            "description": "Typing arrays.",
-            "board": ["_t_array.map(x => x + 'er')"],
-            "goal": "['better', 'faster', 'stronger']",
-            "block_variant": {
-                "board": "__verbatim; __.map(x => x + 'er');",
-                "toolbox": ["['bet', 'fas', 'stron']", "['bett', 'fast', 'strong']", "['be', 'fa', 'stro']", "['better', 'faster', 'stronget']"]
-            },
-            "verbatim_variant": {
-                "typing_hints": ["\"bett\", \"fast\", \"strong\""]
-            }
+            "description": "Conditionals and map I.",
+            "board": ["['DNA', 'RNA', 'RNA'].map(x => _)"],
+            "goal": ["['T', 'U', 'U']"],
+            "toolbox": ["_ == _", "'DNA'", "'RNA'", "'T'", "'U'", "_b ? _ : _", "x", "x"]
         },
         {
             "description": "Typing conditionals inside map.",
@@ -190,6 +153,7 @@
             "goal": ["['pass', 'fail', 'fail']"],
             "toolbox": "",
             "typing_help": ["You'll have to use =>, ?, and :"],
+            "typing_solution": ["x => x == 'A' ? 'pass' : 'fail'"],
             "block_variant": {
                 "board": ["__verbatim; ['A', 'F', 'F'].map(_l);", "'pass'", "'fail'"],
                 "toolbox": ["y => _", "_ == _", "y", "y", "'A'", "'F'", "_b ? _ : _"]
@@ -205,6 +169,7 @@
             "goal": ["['two', 'one', 'two']"],
             "toolbox": "",
             "typing_help": ["You'll have to use =>, ?, and :"],
+            "typing_solution": ["2, 1, 2", "x => x == 2 ? 'two' : 'one'"],
             "block_variant": {
                 "board": ["__verbatim; __.map(_l);" ],
                 "toolbox": ["[1, 2, 1]", "['a', 'b', 'b']", "1", "2", "'a'", "'b'", "x", "n", "_b ? _ : _", "'two'", "'one'", "x => _", "n => _", "_ == _"]

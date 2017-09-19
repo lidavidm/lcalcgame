@@ -227,6 +227,13 @@ var Expression = function (_mag$RoundedRect) {
             });
 
             this.children = this.holes; // for rendering
+
+            // Apply green outline to reducable expressions:
+            // if (this.canReduce && this.canReduce()) {
+            //     this.strokeGlow = '#0F0';
+            // } else {
+            //     this.strokeGlow = null;
+            // }
         }
 
         // Apply arguments to expression
