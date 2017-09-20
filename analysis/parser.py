@@ -44,6 +44,9 @@ def read_events(directory):
                 current_level = level_id
             actions.append(event)
 
+    if current_level is not None and actions:
+        level_sequence.append(Level(current_level, actions))
+
     return events, level_sequence
 
 # TODO: account for prev/next
@@ -57,7 +60,7 @@ def get_state_graphs(level):
     for action in level.actions:
         if action["1"]["action_id"] == "condition":
             condition = action["1"]["action_detail"]
-        elif action["1"]["action_id"] == "victory":
+        elif action["1"]["action_id"] in ("victory", "game-complete"):
             graphs[-1].graph["victory"] = True
         elif action["1"]["action_id"] == "dead-end":
             # TODO: synthesize a reset event?
