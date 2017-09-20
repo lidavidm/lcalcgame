@@ -64,11 +64,11 @@ function LOAD_REDUCT_RESOURCES(Resource) {
     var chapterDigraph = {
         'intro': ['booleans'],
         'booleans': ['conditionals'],
-        'conditionals': ['strings'],
-        'strings': ['bindings'],
-        'bindings': ['confusing_strings'],
-        'confusing_strings': ['map'],
-        'map': []
+        'conditionals': ['bindings'],
+        'bindings': ['map'],
+        'map': ['strings'],
+        'strings': ['confusing_strings'],
+        'confusing_strings': []
         // 'map': ['variables'],
         // 'variables': ['typing_variables'],
         // 'typing_variables': []
@@ -101,7 +101,7 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         json.levels.forEach(function (lvl) {
             lvl.language = lang;
             if (macros) lvl.macros = macros;
-            if (lvl.fade) {
+            if (lvl.fade && 'ExprManager' in window) {
                 // Shorthand: specify "lambda" to fade both var and
                 // hole. If one has fewer fade levels than the other,
                 // saturate the fade level.

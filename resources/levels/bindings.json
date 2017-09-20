@@ -19,13 +19,13 @@
         },
         {
             "description": "Intro II.",
-            "board": ["x => x == 'A'", "x => x", "'B'"],
+            "board": ["n => n == 'A'", "y => y", "'B'"],
             "goal": "false",
             "toolbox": ""
         },
         {
             "description": "Choice of function w/ typing.",
-            "board": ["'cat'", "x => x == _t_string"],
+            "board": ["'cat'", "t => t == _t_string"],
             "goal": "false",
             "block_variant": {
                 "board": ["'cat'", "__verbatim; x => x == _;"],
@@ -37,7 +37,7 @@
         },
         {
             "description": "Reinforces concept: Pipes outside of pure lambdas.",
-            "board": ["x => x == 'a'", "x => x == _t_string"],
+            "board": ["z => z == 'a'", "k => k == _t_string"],
             "goal": ["true", "true"],
             "toolbox": ["'c'", "'b'", "'a'"],
             "block_variant": {
@@ -49,139 +49,23 @@
             }
         },
         {
-            "description": "Must be solved with free binding.",
-            "board": ["x => x >>> 'E'", "x => x >>> 'E'"],
-            "goal": ["'BE'", "true"],
-            "typing_hints": ["+", "=="],
-            "toolbox": ["'E'", "'B'", "'M'"],
-            "typing_options": {
-                ">>>": ["==", "+"]
-            },
-            "block_variant": {
-                "board": ["x => x + 'E'", "x => x == 'E'"],
-                "toolbox": ["'E'", "'B'", "'M'"]
-            },
-            "fade": {
-                "==":2,
-                "true":1,
-                "false":1
-            },
-            "showFade":false
+            "description": "Conditionals, booleans, and one-param functions.",
+            "board": ["'C'", "x => _b ? 'K' : 'G'"],
+            "goal": "'K'",
+            "toolbox": ["x == 'A'", "x == 'G'", "x == 'C'", "x == 'K'"]
         },
         {
-            "board": ["x => x >>> 'R'", "x => x >>> ' ELSE!'"],
-            "goal": ["'OR ELSE!'"],
-            "toolbox": ["'O'", "'E'", "'L'", "'S'", "'E'"],
-            "typing_options": {
-                ">>>": ["==", "+"]
-            },
-            "block_variant": {
-                "board": ["__verbatim; x => x >> 'R';", "x => x >> ' ELSE!'"],
-                "toolbox": ["_op('+')", "_op('+')", "_op('==')", "_op('==')", "'O'", "'E'", "'L'"]
-            },
-            "verbatim_variant": {
-                "typing_hints": ["+", "=="]
-            }
+            "description": "Conditionals, booleans, and one-param functions II.",
+            "board": ["'Y'", "z => _b ? 'X' : 'T'", "z => _b ? 'B' : 'O'"],
+            "goal": "'X'",
+            "toolbox": ["z == 'T'", "z == 'Y'", "z == 'C'", "z == 'X'", "z == 'B'"]
         },
         {
-            "description": "Test cases I.",
-            "board": ["__.map(x => x == 0)"],
-            "goal": ["[true, false, false]"],
-            "toolbox": ["[1, 0, 0]", "[0, 1, 0]", "[0, 1, 1]", "[1, 1, 1]", "[1, 0, 1]", "[1, 1, 0]"],
-            "fade": {
-                "==":1,
-                "true":1,
-                "false":1,
-                "map":1
-            },
-            "showFade":false
-        },
-        {
-            "description": "Intro to typing entire statements in bindings",
-            "board": ["[1, 2, 3].map(x => _t_single)"],
-            "typing_hints": ["x + 1"],
-            "goal": ["[2, 3, 4]"],
-            "toolbox": "",
-            "block_variant": {
-                "board": ["x => x + 1", "x => xxx"]
-            }
-        },
-        {
-            "description": "Intro to typing entire statements in bindings II",
-            "board": ["[2, 4, 6].map(x => _t_single)"],
-            "goal": ["[6, 8, 10]"],
-            "toolbox": "",
-            "block_variant": {
-                "board": ["__verbatim; x => _;", "x => xxx"],
-                "toolbox": ["x", "x", "_ + _", "_ == _", "2", "3", "4", "4", "5", "6"]
-            },
-            "verbatim_variant": {
-                "typing_hints": ["x + 4"]
-            }
-        },
-        {
-            "description": "Typing one entire line without hint text.",
-            "board": ["_t_single", "_t_single", "1", "2"],
-            "typing_hints": ["x => x == 1"],
-            "toolbox": "",
-            "goal": ["true", "true"],
-            "block_variant": {
-                "board": ["1", "2", "x => x == 1", "__verbatim; x => _;"],
-                "toolbox": ["_ == _", "_ + _", "x", "x", "n", "0", "1", "2"]
-            },
-            "verbatim_variant": {
-                "typing_hints": ["x => x == 1", "x => x == 2"]
-            }
-        },
-        {
-            "description": "Intro to typing entire statements in bindings III",
-            "board": ["[10, 20, 30, 10].map(x => _t_single)"],
-            "goal": ["[true, false, false, true]"],
-            "toolbox": "",
-            "typing_help": ["There's a == or + in there somewhere."],
-            "block_variant": {
-                "board": ["__verbatim; x => _;", "x => xxx"],
-                "toolbox": ["x", "x", "_ + _", "_ == _", "10", "10", "10", "20", "20", "20"]
-            },
-            "verbatim_variant": {
-                "typing_hints": ["x == 20"]
-            }
-        },
-        {
-            "description": "Typing entire lines I.",
-            "board": ["[33, 44].map(_t_single)"],
-            "typing_hints": ["x => x + x"],
-            "goal": ["[66, 88]"],
-            "toolbox": "",
-            "block_variant": {
-                "board": ["x => x + x", "x => xx"]
-            }
-        },
-        {
-            "description": "Typing entire line without any hints.",
-            "board": ["[10, 20, 30].map(_t_single)"],
-            "goal": ["[17, 27, 37]"],
-            "toolbox": "",
-            "block_variant": {
-                "board": ["x => xxx"],
-                "toolbox": ["__verbatim; x => _;", "_ + _", "x", "x", "n", "10", "10", "20", "20", "30", "30"]
-            },
-            "verbatim_variant": {
-                "typing_hints": ["x => x + 10"]
-            }
-        },
-        {
-            "description": "Typing entire lines IV: Functions as deleters.",
-            "board": ["_t_single", "_t_single", "_t_single", "7", "13", "29"],
-            "typing_help": ["Remember =>"],
-            "goal": ["true", "20", "false"],
-            "block_variant": {
-                "board": ["7", "13", "29"],
-                "toolbox": ["__verbatim; x => _ == _;", "__verbatim; x => _ + _;", "__verbatim; x => _ == _;", "__verbatim; x => _ + _;", "x", "x", "x", "x", "3", "3", "7", "7", "9", "9"]
-            },
-            "verbatim_variant": {
-                "typing_hints": ["x => x == 7", "x => x + 7", "x => x == 3"]
-            }
+            "description": "Conditionals, booleans, and one-param functions III: Typing equality, verbatim.",
+            "board": ["_t_single", "'feline'", "'hound'", "x => xx"],
+            "typing_hints": ["x == \"feline\""],
+            "goal": ["'cat'", "'wolf'"],
+            "toolbox": ["x => _b ? 'cat' : 'dog'", "x => _b ? 'lion' : 'wolf'"]
         }
     ],
     "resources":{

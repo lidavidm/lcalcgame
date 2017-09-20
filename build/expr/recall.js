@@ -459,6 +459,35 @@ var TypeBox = function (_mag$RoundedRect) {
         value: function animatePlaceholderStatus() {
             if (this.stage && !this.stage.keyEventDelegate) this.focus();
         }
+
+        // Artificially insert spaces in the text if
+        // the player typed the next appropriate character,
+        // so that players aren't forced to match the spacing of the code snippet.
+
+    }, {
+        key: 'attemptToAlignTextToHintText',
+        value: function attemptToAlignTextToHintText() {
+            if (!this.hasHint()) return false;
+
+            // Verify text against hint text:
+            var txt = this.text;
+            var hint = this.hintTextExpr.text;
+            var char_w = this.charWidthPerLine();
+            for (var i = 0; i < txt.length && i < hint.length - 1; i++) {
+                var c = txt[i];
+                if (hint[i] === ' ' && c !== hint[i]) {
+                    // Check if the typed character is actually the next
+                    // character in the hint text.
+                    if (c === hint[i + 1]) {
+                        // artifically insert a space:
+                        this.text = txt.substring(0, i) + ' ' + c + txt.substring(i + 1);
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
     }, {
         key: 'updateHintErrorBox',
         value: function updateHintErrorBox() {
@@ -506,9 +535,11 @@ var TypeBox = function (_mag$RoundedRect) {
                 this.text += str;else if (charIdx > 0) // insert in between text
                 this.text = txt.substring(0, charIdx) + str + txt.substring(charIdx);else // insert at beginning of text
                 this.text = str + txt;
+            if (this.attemptToAlignTextToHintText()) charIdx += 1;
             Resource.play('key-press-' + Math.floor(Math.random() * 4 + 1));
             this.updateCursorPosition(charIdx + 1);
             if (this.onTextChanged) this.onTextChanged();
+            this.attemptToAlignTextToHintText();
             this.updateHintErrorBox();
             this.stage.update();
             this._logState('after-key-press', str);
