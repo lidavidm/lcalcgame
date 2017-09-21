@@ -1,3 +1,4 @@
+import ast
 import collections
 import glob
 import json
@@ -43,6 +44,9 @@ def read_events(directory):
                 current_level = level_id
             actions.append(event)
 
+    if current_level is not None and actions:
+        level_sequence.append(Level(current_level, actions))
+
     return events, level_sequence
 
 # TODO: account for prev/next
@@ -52,9 +56,15 @@ def get_state_graphs(level):
     Get all the state graphs for a given playthough of a given level.
     """
     graphs = []
+    condition = None
     for action in level.actions:
-        if action["1"]["action_id"] == "victory":
+        if action["1"]["action_id"] == "condition":
+            condition = action["1"]["action_detail"]
+        elif action["1"]["action_id"] in ("victory", "game-complete"):
             graphs[-1].graph["victory"] = True
+        elif action["1"]["action_id"] == "dead-end":
+            # TODO: synthesize a reset event?
+            graphs[-1].graph["reset"] = True
 
         if action["1"]["action_id"] != "state-path-save":
             continue
@@ -63,7 +73,7 @@ def get_state_graphs(level):
         graph = nx.DiGraph(victory=False, reset=False)
         nodes = []
         for idx, node in enumerate(graph_detail["nodes"]):
-            if "data" in node and node["data"] == "reset":
+            if node["data"] == "reset":
                 nodes.append("reset")
                 graph.graph["reset"] = True
                 graph.add_node("reset")
@@ -76,7 +86,13 @@ def get_state_graphs(level):
         for edge in graph_detail["edges"]:
             graph.add_edge(nodes[edge["from"]], nodes[edge["to"]])
 
+        graph.graph["dynamic_quest_id"] = action["1"]["dynamic_quest_id"]
+        graph.graph["quest_seq_id"] = action["1"]["quest_seq_id"]
         graphs.append(graph)
+
+    for graph in graphs:
+        graph.graph["condition"] = condition
+
     return graphs
 
 
@@ -93,7 +109,26 @@ def only_complete_graphs(graphs):
     """
     Filter out graphs not caused by victory or reset.
     """
-    return [graph for graph in graphs if graph.graph["reset"] or graph.graph["victory"]]
+    finished_quests = set()
+    max_quest_seq_id = {}
+    result = []
+    for graph in graphs:
+        dynamic_quest_id = graph.graph["dynamic_quest_id"]
+        quest_seq_id = graph.graph["quest_seq_id"]
+        if graph.graph["reset"] or graph.graph["victory"]:
+            result.append(graph)
+            finished_quests.add(dynamic_quest_id)
+        else:
+            if dynamic_quest_id not in max_quest_seq_id:
+                max_quest_seq_id[dynamic_quest_id] = (graph, quest_seq_id)
+            elif quest_seq_id > max_quest_seq_id[dynamic_quest_id][1]:
+                max_quest_seq_id[dynamic_quest_id] = (graph, quest_seq_id)
+
+    for dynamic_quest_id, (graph, _) in max_quest_seq_id.items():
+        if dynamic_quest_id not in finished_quests:
+            result.append(graph)
+
+    return result
 
 
 def draw_graph(graph, size=(20, 20)):
@@ -154,17 +189,47 @@ def merge_graphs(graphs):
             edge_weights[edge] += 1
 
     graph = nx.DiGraph()
-    max_node_count = max(node_weights.values())
+    max_node_count = max(node_weights.values()) if node_weights else 0
     for node, count in node_weights.items():
         graph.add_node(node, weight=count/max_node_count, count=count,
                        terminal=True, initial=True)
-    max_count = max(edge_weights.values())
+    max_count = max(edge_weights.values()) if edge_weights else 0
     for edge, count in edge_weights.items():
         graph.node[edge[0]]["terminal"] = False
         graph.node[edge[1]]["initial"] = False
         graph.add_edge(*edge, weight=count/max_count, count=count)
 
     graph.graph["weighted"] = True
+    if graphs:
+        graph.graph["condition"] = graphs[0].graph["condition"]
+    else:
+        graph.graph["condition"] = None
+
+    return graph
+
+
+def mark_liveness(graph):
+    """
+    Mark nodes in a graph as 'live' if they lead to a non-RESET
+    terminal state, and 'dead' otherwise.
+    """
+    terminal = []
+    for node, data in graph.nodes(data=True):
+        data["live"] = False
+        if data["terminal"]:
+            terminal.append(node)
+
+    while terminal:
+        node = terminal.pop()
+        if node == "reset" or graph.node[node]["live"]:
+            continue
+
+        graph.node[node]["live"] = True
+        for pred in graph.predecessors(node):
+            terminal.append(pred)
+
+    for start, end, data in graph.edges(data=True):
+        data["live"] = graph.node[end]["live"]
 
     return graph
 
@@ -176,3 +241,14 @@ def get_complete_merged_graph(level_sequence, level_id):
     """
     return merge_graphs(only_complete_graphs(
         get_complete_state_graphs(level_sequence, level_id)))
+
+
+def get_all_complete_merged_graphs(level_sequence):
+    seen = set()
+    result = []
+    for level in level_sequence:
+        if level.id in seen:
+            continue
+        seen.add(level.id)
+        result.append(get_complete_merged_graph(level_sequence, level.id))
+    return result

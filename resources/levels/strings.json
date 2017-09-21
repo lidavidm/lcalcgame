@@ -27,16 +27,26 @@
             "block_variant": {
                 "board": "__verbatim; 'mount' + _;",
                 "toolbox": ["'ins'", "'ains'", "'tains'"]
+            },
+            "verbatim_variant": {
+                "board": "_t_string + _",
+                "toolbox": ["'ins'", "'ains'", "'tains'"],
+                "typing_hints": [ "mount" ]
             }
         },
         {
             "description": "Multiple text-enter boxes. Spaces I.",
-            "goal": "'bluewhale'",
-            "board": ["'bl' + _t_string", "_t_string + 'ale'", "_ + _"],
+            "goal": "'penguin shuffle'",
+            "board": ["'pen' + _t_string", "_t_string + 'fle'", "_ + _"],
             "toolbox": "",
             "block_variant": {
-                "board": ["__verbatim; 'bl' + _;", "__verbatim; _ + 'ale';", "_ + _"],
-                "toolbox": ["'whale'", "'ue'", "'wh'", "'u'", "'ew'", "'h'", "'blue'"]
+                "board": ["__verbatim; _ + 'guin';", "' '", "_ + 'shu'", "__verbatim; _ + 'fle';"],
+                "toolbox": ["'pen'", "'uff'", "'f'", "_ + _", "_ + _"]
+            },
+            "verbatim_variant": {
+                "board": ["_ + _t_string", "' '", "_ + _t_string", "_ + _t_string"],
+                "toolbox": ["'pen'", "'uff'", "'f'", "_ + _", "_ + _"],
+                "typing_hints": [ "guin", "shu", "fle" ]
             }
         },
         {
@@ -71,6 +81,10 @@
             "block_variant": {
                 "board": ["'r' >> _", "__verbatim; _ >> 'river';"],
                 "toolbox": ["'ver'", "'iver'", "'river'", "_op('+')", "_op('==')"]
+            },
+            "verbatim_variant": {
+                "board": ["'r' >>> _", "_ >>> 'river'"],
+                "toolbox": ["iver", "r", "river"]
             }
         },
         {
@@ -84,10 +98,15 @@
             "block_variant": {
                 "board": ["__verbatim; _ >> 'time';", "_ >> 'spacetime'"],
                 "toolbox": ["'space'", "'time'", "_op('+')", "_op('+')", "_op('==')", "_op('==')"]
+            },
+            "verbatim_variant": {
+                "board": ["_ >>> 'time'", "_ >>> 'spacetime'"],
+                "toolbox": ["'space'", "'time'"],
+                "typing_hints": [ "+", "==" ]
             }
         },
         {
-            "description": "Typing operators IV.",
+            "description": "Typing operators III.",
             "goal": "true",
             "board": ["_ >>> _", "_ >>> _t_string"],
             "toolbox": ["'b'", "'e'"],
@@ -97,41 +116,11 @@
             "block_variant": {
                 "board": ["__verbatim; _ >> _;", "__verbatim; _ >> _;"],
                 "toolbox": ["'b'", "'e'", "_op('+')", "_op('==')", "_op('+')", "_op('==')", "'be'"]
-            }
-        },
-        {
-            "description": "Must be solved with free binding.",
-            "board": ["x => x >>> 'E'", "x => x >>> 'E'"],
-            "goal": ["'BE'", "true"],
-            "typing_hints": ["+", "=="],
-            "toolbox": ["'E'", "'B'", "'M'"],
-            "typing_options": {
-                ">>>": ["==", "+"]
-            },
-            "block_variant": {
-                "board": ["x => x + 'E'", "x => x == 'E'"],
-                "toolbox": ["'E'", "'B'", "'M'"]
-            },
-            "fade": {
-                "==":2,
-                "true":1,
-                "false":1
-            },
-            "showFade":false
-        },
-        {
-            "board": ["x => x >>> 'R'", "x => x >>> ' ELSE!'"],
-            "goal": ["'OR ELSE!'"],
-            "toolbox": ["'O'", "'E'", "'L'", "'S'", "'E'"],
-            "typing_options": {
-                ">>>": ["==", "+"]
-            },
-            "block_variant": {
-                "board": ["__verbatim; x => x >> 'R';", "x => x >> ' ELSE!'"],
-                "toolbox": ["_op('+')", "_op('+')", "_op('==')", "_op('==')", "'O'", "'E'", "'L'"]
             },
             "verbatim_variant": {
-                "typing_hints": ["+", "=="]
+                "board": ["_ >>> _", "_ >>> _"],
+                "toolbox": ["'b'", "'e'", "'be'"],
+                "typing_hints": [ "==", "+" ]
             }
         },
         {
