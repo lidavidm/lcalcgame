@@ -62,6 +62,7 @@ def get_state_graphs(level):
             condition = action["1"]["action_detail"]
         elif action["1"]["action_id"] in ("victory", "game-complete"):
             graphs[-1].graph["victory"] = True
+            graphs[-1].graph["victory_reason"] = action["1"]["action_id"]
         elif action["1"]["action_id"] == "dead-end":
             # TODO: synthesize a reset event?
             graphs[-1].graph["reset"] = True
@@ -88,10 +89,17 @@ def get_state_graphs(level):
 
         graph.graph["dynamic_quest_id"] = action["1"]["dynamic_quest_id"]
         graph.graph["quest_seq_id"] = action["1"]["quest_seq_id"]
+
         graphs.append(graph)
 
     for graph in graphs:
         graph.graph["condition"] = condition
+        victory = graph.graph["victory"]
+        for node, data in graph.nodes(data=True):
+            if victory and graph.out_degree(node) == 0:
+                data["victory"] = True
+            else:
+                data["victory"] = False
 
     return graphs
 
@@ -175,6 +183,7 @@ def merge_graphs(graphs):
     """
     nodes = []
     node_mapping = {} # board_label -> node_idx
+    victory = set()
     edge_weights = collections.Counter()
     node_weights = collections.Counter()
 
@@ -185,6 +194,9 @@ def merge_graphs(graphs):
                 nodes.append(node)
                 node_mapping[node] = len(nodes) - 1
 
+            if graph.node[node]["victory"]:
+                victory.add(node)
+
         for edge in graph.edges():
             edge_weights[edge] += 1
 
@@ -192,7 +204,7 @@ def merge_graphs(graphs):
     max_node_count = max(node_weights.values()) if node_weights else 0
     for node, count in node_weights.items():
         graph.add_node(node, weight=count/max_node_count, count=count,
-                       terminal=True, initial=True)
+                       terminal=True, initial=True, victory=node in victory)
     max_count = max(edge_weights.values()) if edge_weights else 0
     for edge, count in edge_weights.items():
         graph.node[edge[0]]["terminal"] = False
