@@ -37,8 +37,20 @@ def read_events(directory):
     for event in events:
         if event["0"] == "action":
             level_id = event["1"]["quest_id"]
+            if level_id is None:
+                print(event)
+                continue
+
             if level_id != current_level:
                 if current_level is not None:
+                    if level_id < current_level:
+                        actions.append({
+                            "0": "action",
+                            "1": {
+                                "quest_id": current_level,
+                                "action_id": "prev",
+                            }
+                        })
                     level_sequence.append(Level(current_level, actions))
                 actions = []
                 current_level = level_id
@@ -66,12 +78,16 @@ def get_state_graphs(level):
         elif action["1"]["action_id"] == "dead-end":
             # TODO: synthesize a reset event?
             graphs[-1].graph["reset"] = True
+        elif action["1"]["action_id"] == "prev":
+            # This is a fake event
+            graphs[-1].add_node("prev", victory=False)
+            graphs[-1].graph["prev"] = True
 
         if action["1"]["action_id"] != "state-path-save":
             continue
 
         graph_detail = json.loads(action["1"]["action_detail"])
-        graph = nx.DiGraph(victory=False, reset=False)
+        graph = nx.DiGraph(victory=False, reset=False, prev=False)
         nodes = []
         for idx, node in enumerate(graph_detail["nodes"]):
             if node["data"] == "reset":
@@ -99,6 +115,10 @@ def get_state_graphs(level):
             if victory and graph.out_degree(node) == 0:
                 data["victory"] = True
             else:
+                if (node != "prev" and
+                    graph.out_degree(node) == 0 and
+                    graph.graph["prev"]):
+                    graph.add_edge(node, "prev")
                 data["victory"] = False
 
     return graphs
@@ -123,7 +143,9 @@ def only_complete_graphs(graphs):
     for graph in graphs:
         dynamic_quest_id = graph.graph["dynamic_quest_id"]
         quest_seq_id = graph.graph["quest_seq_id"]
-        if graph.graph["reset"] or graph.graph["victory"]:
+        if (graph.graph["reset"] or
+            graph.graph["victory"] or
+            graph.graph["prev"]):
             result.append(graph)
             finished_quests.add(dynamic_quest_id)
         else:
@@ -233,7 +255,7 @@ def mark_liveness(graph):
 
     while terminal:
         node = terminal.pop()
-        if node == "reset" or graph.node[node]["live"]:
+        if node == "reset" or node == "prev" or graph.node[node]["live"]:
             continue
 
         graph.node[node]["live"] = True
