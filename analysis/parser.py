@@ -86,12 +86,12 @@ def get_state_graphs(level):
     """
     graphs = []
     condition = None
+    victory = False
     for action in level.actions:
         if action["1"]["action_id"] == "condition":
             condition = action["1"]["action_detail"]
         elif action["1"]["action_id"] in ("victory", "game-complete"):
-            graphs[-1].graph["victory"] = True
-            graphs[-1].graph["victory_reason"] = action["1"]["action_id"]
+            victory = True
         elif action["1"]["action_id"] == "dead-end":
             # TODO: synthesize a reset event?
             graphs[-1].graph["reset"] = True
@@ -129,6 +129,9 @@ def get_state_graphs(level):
         graph.graph["quest_seq_id"] = action["1"]["quest_seq_id"]
 
         graphs.append(graph)
+
+    if victory:
+        graphs[-1].graph["victory"] = True
 
     for graph in graphs:
         graph.graph["condition"] = condition
