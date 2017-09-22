@@ -38,17 +38,34 @@ def read_events(directory):
         if event["0"] == "action":
             level_id = event["1"]["quest_id"]
             if level_id is None:
+                print("WARNING: This event has no level ID:")
                 print(event)
                 continue
 
             if level_id != current_level:
                 if current_level is not None:
-                    if level_id < current_level:
+                    # Exclude going back to first level, because we
+                    # just concat all the levels and so changing users
+                    # looks like going back a level
+                    if level_id < current_level and level_id != 0:
                         actions.append({
                             "0": "action",
                             "1": {
                                 "quest_id": current_level,
                                 "action_id": "prev",
+                            }
+                        })
+                    # Player likely used next, so synthesize a
+                    # fake event for that case
+                    if (level_id == current_level + 1 and
+                        not any(event["1"]["action_id"] == "victory"
+                                for event in actions
+                                if event["0"] == "action")):
+                        actions.append({
+                            "0": "action",
+                            "1": {
+                                "quest_id": current_level,
+                                "action_id": "next",
                             }
                         })
                     level_sequence.append(Level(current_level, actions))
@@ -82,12 +99,17 @@ def get_state_graphs(level):
             # This is a fake event
             graphs[-1].add_node("prev", victory=False)
             graphs[-1].graph["prev"] = True
+        elif action["1"]["action_id"] == "next":
+            # This is a fake event
+            graphs[-1].add_node("next", victory=False)
+            graphs[-1].graph["next"] = True
 
         if action["1"]["action_id"] != "state-path-save":
             continue
 
         graph_detail = json.loads(action["1"]["action_detail"])
-        graph = nx.DiGraph(victory=False, reset=False, prev=False)
+        graph = nx.DiGraph(victory=False, reset=False,
+                           prev=False, next=False)
         nodes = []
         for idx, node in enumerate(graph_detail["nodes"]):
             if node["data"] == "reset":
@@ -112,13 +134,18 @@ def get_state_graphs(level):
         graph.graph["condition"] = condition
         victory = graph.graph["victory"]
         for node, data in graph.nodes(data=True):
-            if victory and graph.out_degree(node) == 0:
+            out_degree = graph.out_degree(node)
+            if victory and out_degree == 0:
                 data["victory"] = True
             else:
                 if (node != "prev" and
-                    graph.out_degree(node) == 0 and
+                    out_degree == 0 and
                     graph.graph["prev"]):
                     graph.add_edge(node, "prev")
+                if (node != "next" and
+                    out_degree == 0 and
+                    graph.graph["next"]):
+                    graph.add_edge(node, "next")
                 data["victory"] = False
 
     return graphs
@@ -145,7 +172,8 @@ def only_complete_graphs(graphs):
         quest_seq_id = graph.graph["quest_seq_id"]
         if (graph.graph["reset"] or
             graph.graph["victory"] or
-            graph.graph["prev"]):
+            graph.graph["prev"] or
+            graph.graph["next"]):
             result.append(graph)
             finished_quests.add(dynamic_quest_id)
         else:
