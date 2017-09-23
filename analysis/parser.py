@@ -78,7 +78,6 @@ def read_events(directory):
 
     return events, level_sequence
 
-# TODO: account for prev/next
 
 def get_state_graphs(level):
     """
@@ -120,10 +119,11 @@ def get_state_graphs(level):
                 # Nodes are labeled with the sorted string representation
                 # of the board state
                 nodes.append(repr(list(sorted(node["data"]["board"]))))
-                graph.add_node(nodes[-1], node_data=node["data"])
+                graph.add_node(nodes[-1], node_data=node)
 
         for edge in graph_detail["edges"]:
-            graph.add_edge(nodes[edge["from"]], nodes[edge["to"]])
+            graph.add_edge(nodes[edge["from"]], nodes[edge["to"]],
+                           uid=edge["uid"], edge_data=edge)
 
         graph.graph["dynamic_quest_id"] = action["1"]["dynamic_quest_id"]
         graph.graph["quest_seq_id"] = action["1"]["quest_seq_id"]
@@ -144,11 +144,13 @@ def get_state_graphs(level):
                 if (node != "prev" and
                     out_degree == 0 and
                     graph.graph["prev"]):
-                    graph.add_edge(node, "prev")
+                    new_uid = max((data["uid"] for _, _, data in graph.edges(data=True)), default=0) + 1
+                    graph.add_edge(node, "prev", uid=new_uid)
                 if (node != "next" and
                     out_degree == 0 and
                     graph.graph["next"]):
-                    graph.add_edge(node, "next")
+                    new_uid = max((data["uid"] for _, _, data in graph.edges(data=True)), default=0) + 1
+                    graph.add_edge(node, "next", uid=new_uid)
                 data["victory"] = False
 
     return graphs
@@ -190,42 +192,6 @@ def only_complete_graphs(graphs):
             result.append(graph)
 
     return result
-
-
-def draw_graph(graph, size=(20, 20)):
-    """
-    Draw a graph via Matplotlib.
-    """
-    # Make the plot bigger
-    plt.figure(3,figsize=size)
-    if graph.graph.get("weighted"):
-        high = [(u,v) for (u, v, d) in graph.edges(data=True) if d["weight"] > 0.5]
-        med = [(u,v) for (u, v, d) in graph.edges(data=True) if 0.25 < d['weight'] <= 0.5]
-        low = [(u,v) for (u, v, d) in graph.edges(data=True) if d['weight'] <= 0.25]
-        pos = nx.shell_layout(graph)
-        nx.draw_networkx_edges(graph, pos, edgelist=high, width=5)
-        nx.draw_networkx_edges(graph, pos, edgelist=med, width=3,
-                               alpha=0.8, style="dashed")
-        nx.draw_networkx_edges(graph, pos, edgelist=low,
-                               width=1, alpha=0.5, style="dashed")
-
-        terminal = [node for (node, d) in graph.nodes(data=True) if d["terminal"]]
-        initial = [node for (node, d) in graph.nodes(data=True) if d["initial"]]
-        high = [node for (node, d) in graph.nodes(data=True) if d["weight"] > 0.5]
-        low = [node for (node, d) in graph.nodes(data=True) if d["weight"] <= 0.5]
-        nx.draw_networkx_nodes(graph, pos, high, node_size=300)
-        nx.draw_networkx_nodes(graph, pos, low, node_size=150)
-        nx.draw_networkx_nodes(graph, pos, terminal, node_color="blue")
-        nx.draw_networkx_nodes(graph, pos, initial, node_color="green")
-
-        nx.draw_networkx_labels(graph, pos, font_size=16, font_family='sans-serif')
-    else:
-        nx.draw_networkx(
-            graph,
-            with_labels=True,
-        )
-    plt.axis('off')
-    plt.tight_layout()
 
 
 def merge_graphs(graphs):
@@ -271,6 +237,50 @@ def merge_graphs(graphs):
         graph.graph["condition"] = None
 
     return graph
+
+
+def temporal_graph(graphs):
+    """
+    Given all of a player's playthoughs, construct a temporal graph.
+    """
+    heights = {}  # node: y position
+    nodes = set()
+    next_height = 0
+
+    result = nx.DiGraph()
+
+    for graph in graphs:
+        prev_dst = None
+        for idx, (src, dst, data) in enumerate(
+                sorted(graph.edges(data=True),
+                       key=lambda item: item[2]["uid"])):
+            if prev_dst is not None and src != prev_dst:
+                print("Warning: graph is broken - src of edge does not match dst of previous edge in time")
+            prev_dst = dst
+
+            uid = idx
+            if src not in heights:
+                heights[src] = next_height
+                next_height += 1
+            if dst not in heights:
+                heights[dst] = next_height
+                next_height += 1
+
+            if (uid, src) not in nodes:
+                result.add_node((uid, src),
+                                initial=uid == 0, time=uid, terminal=False,
+                                label=src, victory=graph.node[src]["victory"])
+            else:
+                result.node[(uid, src)]["terminal"] = False
+
+            if (uid + 1, dst) not in nodes:
+                result.add_node((uid + 1, dst),
+                                initial=False, time=uid + 1, terminal=True,
+                                label=dst, victory=graph.node[dst]["victory"])
+
+            result.add_edge((uid, src), (uid + 1, dst))
+
+    return result
 
 
 def mark_liveness(graph):
