@@ -291,12 +291,12 @@ def mark_liveness(graph):
     terminal = []
     for node, data in graph.nodes(data=True):
         data["live"] = False
-        if data["terminal"]:
+        if data["terminal"] and data["victory"]:
             terminal.append(node)
 
     while terminal:
         node = terminal.pop()
-        if node == "reset" or node == "prev" or graph.node[node]["live"]:
+        if graph.node[node]["live"]:
             continue
 
         graph.node[node]["live"] = True
