@@ -243,10 +243,9 @@ def temporal_graph(graphs):
     """
     Given all of a player's playthoughs, construct a temporal graph.
     """
-    heights = {}  # node: y position
     nodes = set()
+    heights = {}
     next_height = 0
-
     result = nx.DiGraph()
 
     for graph in graphs:
@@ -258,7 +257,6 @@ def temporal_graph(graphs):
                 print("Warning: graph is broken - src of edge does not match dst of previous edge in time")
             prev_dst = dst
 
-            uid = idx
             if src not in heights:
                 heights[src] = next_height
                 next_height += 1
@@ -266,19 +264,21 @@ def temporal_graph(graphs):
                 heights[dst] = next_height
                 next_height += 1
 
-            if (uid, src) not in nodes:
-                result.add_node((uid, src),
-                                initial=uid == 0, time=uid, terminal=False,
-                                label=src, victory=graph.node[src]["victory"])
+            if (idx, src) not in nodes:
+                result.add_node((idx, src),
+                                initial=idx == 0, time=idx, terminal=False,
+                                label=src, victory=graph.node[src]["victory"],
+                                height=heights[src])
             else:
-                result.node[(uid, src)]["terminal"] = False
+                result.node[(idx, src)]["terminal"] = False
 
-            if (uid + 1, dst) not in nodes:
-                result.add_node((uid + 1, dst),
-                                initial=False, time=uid + 1, terminal=True,
-                                label=dst, victory=graph.node[dst]["victory"])
+            if (idx + 1, dst) not in nodes:
+                result.add_node((idx + 1, dst),
+                                initial=False, time=idx + 1, terminal=True,
+                                label=dst, victory=graph.node[dst]["victory"],
+                                height=heights[dst])
 
-            result.add_edge((uid, src), (uid + 1, dst))
+            result.add_edge((idx, src), (idx + 1, dst))
 
     return result
 
