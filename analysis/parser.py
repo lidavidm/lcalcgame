@@ -96,11 +96,11 @@ def get_state_graphs(level):
             graphs[-1].graph["reset"] = True
         elif action["1"]["action_id"] == "prev":
             # This is a fake event
-            graphs[-1].add_node("prev", victory=False)
+            graphs[-1].add_node("prev", victory=False, reset=False)
             graphs[-1].graph["prev"] = True
         elif action["1"]["action_id"] == "next":
             # This is a fake event
-            graphs[-1].add_node("next", victory=False)
+            graphs[-1].add_node("next", victory=False, reset=True)
             graphs[-1].graph["next"] = True
 
         if action["1"]["action_id"] != "state-path-save":
@@ -114,12 +114,12 @@ def get_state_graphs(level):
             if node["data"] == "reset":
                 nodes.append("reset")
                 graph.graph["reset"] = True
-                graph.add_node("reset")
+                graph.add_node("reset", reset=True)
             else:
                 # Nodes are labeled with the sorted string representation
                 # of the board state
                 nodes.append(repr(list(sorted(node["data"]["board"]))))
-                graph.add_node(nodes[-1], node_data=node)
+                graph.add_node(nodes[-1], node_data=node, reset=False)
 
         for edge in graph_detail["edges"]:
             graph.add_edge(nodes[edge["from"]], nodes[edge["to"]],
@@ -223,7 +223,8 @@ def merge_graphs(graphs):
     max_node_count = max(node_weights.values()) if node_weights else 0
     for node, count in node_weights.items():
         graph.add_node(node, weight=count/max_node_count, count=count,
-                       terminal=True, initial=True, victory=node in victory)
+                       terminal=True, initial=True, victory=node in victory,
+                       reset=node in ("reset", "prev", "next"))
     max_count = max(edge_weights.values()) if edge_weights else 0
     for edge, count in edge_weights.items():
         graph.node[edge[0]]["terminal"] = False
@@ -243,7 +244,6 @@ def temporal_graph(graphs):
     """
     Given all of a player's playthoughs, construct a temporal graph.
     """
-    nodes = set()
     heights = {}
     next_height = 0
     result = nx.DiGraph()
@@ -264,21 +264,39 @@ def temporal_graph(graphs):
                 heights[dst] = next_height
                 next_height += 1
 
-            if (idx, src) not in nodes:
+            if (idx, src) not in result:
                 result.add_node((idx, src),
                                 initial=idx == 0, time=idx, terminal=False,
                                 label=src, victory=graph.node[src]["victory"],
-                                height=heights[src])
+                                height=heights[src], count=1, reset=False)
             else:
                 result.node[(idx, src)]["terminal"] = False
+                result.node[(idx, src)]["count"] += 1
 
-            if (idx + 1, dst) not in nodes:
+            if (idx + 1, dst) not in result:
                 result.add_node((idx + 1, dst),
                                 initial=False, time=idx + 1, terminal=True,
                                 label=dst, victory=graph.node[dst]["victory"],
-                                height=heights[dst])
+                                height=heights[dst], count=1,
+                                reset=dst in ("prev", "next", "reset"))
+            else:
+                result.node[(idx + 1, dst)]["count"] += 1
 
             result.add_edge((idx, src), (idx + 1, dst))
+
+    # Adjust heights afterwards
+    by_level = collections.defaultdict(list)
+    global_frequency = collections.Counter()
+    for (level, node), data in sorted(result.nodes(data=True), key=lambda x:x[1]["time"]):
+        by_level[level].append((node, data))
+        global_frequency[node] += 1
+
+    relative_ordering = {}
+    for idx, (node, _) in enumerate(sorted(global_frequency.items(), key=lambda x: x[1], reverse=True)):
+        relative_ordering[node] = idx
+    for level, nodes in by_level.items():
+        for i, (node, data) in enumerate(sorted(nodes, key=lambda x: relative_ordering[x[0]])):
+            data["linear_height"] = i
 
     return result
 
@@ -305,6 +323,7 @@ def mark_liveness(graph):
 
     for start, end, data in graph.edges(data=True):
         data["live"] = graph.node[end]["live"]
+        data["reset"] = graph.node[end]["reset"]
 
     return graph
 
