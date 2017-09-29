@@ -37,6 +37,12 @@ class NormalizeVisitor(esprima.NodeVisitor):
         node.arguments = [self.transform(n, None, **kwargs) for n in node.arguments]
         return node
 
+    def transform_BinaryExpression(self, node, metadata, **kwargs):
+        if isinstance(node.left, esprima.nodes.Literal) and \
+           not isinstance(node.right, esprima.nodes.Literal):
+            node.left, node.right = node.right, node.left
+        return node
+
     def transform_Literal(self, node, metadata, **kwargs):
         # Normalize literal values
         if kwargs.get("preserve"):
@@ -46,8 +52,8 @@ class NormalizeVisitor(esprima.NodeVisitor):
             node.value = 0
             node.raw = str(node.value)
         elif isinstance(node.value, str):
-            node.value = ' '
-            node.raw = str(node.value)
+            node.value = 'str'
+            node.raw = repr(node.value)
         return node
 
 
@@ -109,11 +115,7 @@ class SerializeVisitor(esprima.NodeVisitor):
 
 
 def normalize(js):
-    try:
-        return SerializeVisitor().visit(esprima.parse(js, delegate=NormalizeVisitor()))
-    except Exception as e:
-        print("Could not normalize", js, e)
-        return js
+    return SerializeVisitor().visit(esprima.parse(js, delegate=NormalizeVisitor()))
 
 
 def read_events(directory):
@@ -222,7 +224,9 @@ def get_state_graphs(level):
             else:
                 # Nodes are labeled with the sorted string representation
                 # of the board state
-                nodes.append(repr(list(sorted(normalize(js) for js in node["data"]["board"]))))
+
+                # Seems like WatExpr made it in somehow? '?' in some board states
+                nodes.append(repr(list(sorted(normalize(js) for js in node["data"]["board"] if js != '?'))))
                 graph.add_node(nodes[-1], node_data=node, reset=False)
 
         for edge in graph_detail["edges"]:
