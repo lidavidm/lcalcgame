@@ -5,11 +5,115 @@ import json
 import os
 
 
+import esprima
 import matplotlib.pyplot as plt
 import networkx as nx
 
 
 Level = collections.namedtuple("Level", "id actions")
+
+
+class NormalizeVisitor(esprima.NodeVisitor):
+    def transform(self, node, metadata, **kwargs):
+        """Transform a node."""
+        if isinstance(node, esprima.nodes.Node):
+            method = 'transform_' + node.__class__.__name__
+            transformer = getattr(self, method, self.generic_transform)
+            new_node = transformer(node, metadata, **kwargs)
+            if new_node is not None:
+                node = new_node
+        return node
+
+    def generic_transform(self, node, metadata, **kwargs):
+        """Called if no explicit transform function exists for a node."""
+        return node
+
+    def transform_CallExpression(self, node, metadata, **kwargs):
+        callee = SerializeVisitor().visit(node.callee)
+        if callee.startswith("_"):
+            kwargs = kwargs.copy()
+            kwargs["preserve"] = True
+        node.callee = self.transform(node.callee, None, **kwargs)
+        node.arguments = [self.transform(n, None, **kwargs) for n in node.arguments]
+        return node
+
+    def transform_Literal(self, node, metadata, **kwargs):
+        # Normalize literal values
+        if kwargs.get("preserve"):
+            return node
+
+        if isinstance(node.value, int) and not isinstance(node.value, bool):
+            node.value = 0
+            node.raw = str(node.value)
+        elif isinstance(node.value, str):
+            node.value = ' '
+            node.raw = str(node.value)
+        return node
+
+
+class SerializeVisitor(esprima.NodeVisitor):
+    def visit(self, node, **kwargs):
+        """Visit a node."""
+        if isinstance(node, esprima.nodes.Node):
+            method = 'visit_' + node.__class__.__name__
+            visitor = getattr(self, method, self.generic_visit)
+            return visitor(node, **kwargs)
+        return node
+
+    def visit_Literal(self, node, **kwargs):
+        return node.raw
+
+    def visit_Identifier(self, node, **kwargs):
+        return node.name
+
+    def visit_BinaryExpression(self, node, **kwargs):
+        return "({} {} {})".format(self.visit(node.left), node.operator, self.visit(node.right))
+
+    def visit_ArrowFunctionExpression(self, node, **kwargs):
+        return "({}) => {}".format(", ".join([
+            self.visit(x) for x in node.params
+        ]), self.visit(node.body))
+
+    def visit_Expression(self, node, **kwargs):
+        return self.visit(node.body)
+
+    def visit_ExpressionStatement(self, node, **kwargs):
+        return self.visit(node.expression)
+
+    def visit_Script(self, node, **kwargs):
+        return "\n".join(self.visit(n) for n in node.body)
+
+    def visit_Directive(self, node, **kwargs):
+        return self.visit(node.expression)
+
+    def visit_ConditionalExpression(self, node, **kwargs):
+        return "{} ? {} : {}".format(self.visit(node.test),
+                                     self.visit(node.consequent),
+                                     self.visit(node.alternate))
+
+    def visit_CallExpression(self, node, **kwargs):
+        callee = self.visit(node.callee, **kwargs)
+        return "{}({})".format(
+            callee,
+            ", ".join(self.visit(n, **kwargs) for n in node.arguments))
+
+    def visit_ArrayExpression(self, node, **kwargs):
+        return "[{}]".format(", ".join(
+            self.visit(n, **kwargs)
+            for n in node.elements
+        ))
+
+    def visit_StaticMemberExpression(self, node, **kwargs):
+        return "{}.{}".format(self.visit(node.object, **kwargs),
+                              self.visit(node.property, **kwargs))
+
+
+def normalize(js):
+    try:
+        return SerializeVisitor().visit(esprima.parse(js, delegate=NormalizeVisitor()))
+    except Exception as e:
+        print("Could not normalize", js, e)
+        return js
 
 
 def read_events(directory):
@@ -118,7 +222,7 @@ def get_state_graphs(level):
             else:
                 # Nodes are labeled with the sorted string representation
                 # of the board state
-                nodes.append(repr(list(sorted(node["data"]["board"]))))
+                nodes.append(repr(list(sorted(normalize(js) for js in node["data"]["board"]))))
                 graph.add_node(nodes[-1], node_data=node, reset=False)
 
         for edge in graph_detail["edges"]:
