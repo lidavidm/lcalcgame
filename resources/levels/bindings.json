@@ -49,6 +49,12 @@
             }
         },
         {
+            "description": "Conditionals, bindings I: Reminder of what they do.",
+            "board": ["'pass'", "x => _b ? 'accept' : 'reject'"],
+            "goal": "'reject'",
+            "toolbox": ["x == _", "'pass'", "'fail'"]
+        },
+        {
             "description": "Conditionals, booleans, and one-param functions.",
             "board": ["'C'", "x => _b ? 'K' : 'G'"],
             "goal": "'K'",
