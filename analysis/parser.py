@@ -185,7 +185,7 @@ def read_events(directory):
     return events, level_sequence
 
 
-def get_state_graphs(level):
+def get_state_graphs(level, do_normalize=False):
     """
     Get all the state graphs for a given playthough of a given level.
     """
@@ -226,7 +226,17 @@ def get_state_graphs(level):
                 # of the board state
 
                 # Seems like WatExpr made it in somehow? '?' in some board states
-                nodes.append(repr(list(sorted(normalize(js) for js in node["data"]["board"] if js != '?'))))
+                if do_normalize:
+                    nodes.append(repr(
+                        list(sorted(normalize(js)
+                                    for js in node["data"]["board"]
+                                    if js != '?'))))
+                else:
+                    nodes.append(repr(
+                        list(sorted(js
+                                    for js in node["data"]["board"]
+                                    if js != '?'))))
+
                 graph.add_node(nodes[-1], node_data=node, reset=False)
 
         for edge in graph_detail["edges"]:
@@ -264,12 +274,12 @@ def get_state_graphs(level):
     return graphs
 
 
-def get_complete_state_graphs(level_sequence, level_id):
+def get_complete_state_graphs(level_sequence, level_id, do_normalize=False):
     """Get all state graphs for all playthroughs of a given level."""
     graphs = []
     for level in level_sequence:
         if level.id == level_id:
-            graphs.extend(get_state_graphs(level))
+            graphs.extend(get_state_graphs(level, do_normalize=do_normalize))
     return graphs
 
 
@@ -436,13 +446,13 @@ def mark_liveness(graph):
     return graph
 
 
-def get_complete_merged_graph(level_sequence, level_id):
+def get_complete_merged_graph(level_sequence, level_id, do_normalize=False):
     """
     Merge all complete graphs (completed level or reset) for all
     playthoughs of a given level.
     """
     return merge_graphs(only_complete_graphs(
-        get_complete_state_graphs(level_sequence, level_id)))
+        get_complete_state_graphs(level_sequence, level_id, do_normalize=do_normalize)))
 
 
 def get_all_complete_merged_graphs(level_sequence):
