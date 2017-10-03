@@ -68,7 +68,15 @@ var Logger = function () {
     // Load from previous logs; for instance if user accidentally
     // closed the tab / window, we still want to load the
     // full (local) log upon their return:
-    if (window.localStorage && window.localStorage["static_log"]) static_log = JSON.parse(window.localStorage["static_log"]);
+    if (window.localStorage && window.localStorage["static_log"]) {
+        static_log = JSON.parse(window.localStorage["static_log"]);
+        console.log('%c Loaded prior play data from localStorage.', 'background: #bada55; color: #eee');
+    }
+    pub.clearStoredStaticLogs = function () {
+        delete window.localStorage["static_log"];
+        static_log = [];
+        console.log('%c Cleared prior play data from localStorage.', 'background: #900; color: #c99');
+    };
 
     var logStatic = function logStatic(funcname, data, uploaded) {
         if (!uploaded) data['error_message'] = 'This log failed to upload to the server.';
@@ -164,7 +172,7 @@ var Logger = function () {
     pub.startSession = function () {
         return new Promise(function (resolve, reject) {
 
-            var userID = getFromCookie('user_id');
+            var userID = parseInt(getFromCookie('user_id'));
             var cond = getFromCookie('cond');
             var params = BASE_PARAMS();
             if (userID) params['user_id'] = userID;
@@ -193,7 +201,13 @@ var Logger = function () {
             }, function () {
 
                 // Rejected response. Create dummy ID and session ID to let user play game.
-                if (__OFFLINE_NAME_PROMPT) currentUserID = window.prompt('Welcome! Please enter your name.', 'unknown');else if (pub.playerId) currentUserID = pub.playerId;else currentUserID = Date.now();
+                if (__OFFLINE_NAME_PROMPT) currentUserID = window.prompt('Welcome! Please enter your name.', 'unknown');else if (pub.playerId) currentUserID = pub.playerId;else if (!userID) {
+                    currentUserID = Date.now();
+                    storeCookie('user_id', currentUserID);
+                } else {
+                    currentUserID = userID;
+                }
+
                 currentSessionID = Date.now();
 
                 if (!cond || cond === 'B') {
