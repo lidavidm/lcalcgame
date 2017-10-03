@@ -74,20 +74,6 @@
             }
         },
         {
-            "description": "Typing one entire line without hint text.",
-            "board": ["_t_single", "_t_single", "1", "2"],
-            "typing_hints": ["x => x == 1"],
-            "toolbox": "",
-            "goal": ["true", "true"],
-            "block_variant": {
-                "board": ["1", "2", "x => x == 1", "__verbatim; x => _;"],
-                "toolbox": ["_ == _", "_ + _", "x", "x", "n", "0", "1", "2"]
-            },
-            "verbatim_variant": {
-                "typing_hints": ["x => x == 1", "x => x == 2"]
-            }
-        },
-        {
             "description": "Typing entire lines I.",
             "board": ["[33, 44].map(_t_single)"],
             "typing_hints": ["x => x + x"],
@@ -143,9 +129,23 @@
         },
         {
             "description": "Conditionals and map I.",
+            "board": ["[0, 1, 0, 1].map(_t_single)"],
+            "typing_hints": ["n => n == 0 ? \"zero\" : \"one\""],
+            "goal": ["['zero', 'one', 'zero', 'one']"]
+        },
+        {
+            "description": "Conditionals and map: Blocks.",
             "board": ["['DNA', 'RNA', 'RNA'].map(x => _)"],
             "goal": ["['T', 'U', 'U']"],
             "toolbox": ["_ == _", "'DNA'", "'RNA'", "'T'", "'U'", "_b ? _ : _", "x", "x"]
+        },
+        {
+            "description": "Typing conditionals inside map: Only equality section.",
+            "board": ["['zero', 'one', 'one'].map(n => _t_single)"],
+            "goal": ["[0, 1, 1]"],
+            "toolbox": "",
+            "typing_help": ["You'll have to use ==, ? and :"],
+            "typing_solution": ["x == \"zero\""]
         },
         {
             "description": "Typing conditionals inside map.",
@@ -153,7 +153,7 @@
             "goal": ["['pass', 'fail', 'fail']"],
             "toolbox": "",
             "typing_help": ["You'll have to use =>, ?, and :"],
-            "typing_solution": ["x => x == 'A' ? 'pass' : 'fail'"],
+            "typing_solution": ["x => x == \"A\" ? \"pass\" : \"fail\""],
             "block_variant": {
                 "board": ["__verbatim; ['A', 'F', 'F'].map(_l);", "'pass'", "'fail'"],
                 "toolbox": ["y => _", "_ == _", "y", "y", "'A'", "'F'", "_b ? _ : _"]
