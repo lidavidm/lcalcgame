@@ -61,17 +61,16 @@
             "toolbox": ["x == 'A'", "x == 'G'", "x == 'C'", "x == 'K'"]
         },
         {
+            "description": "Conditionals, bindings II: Choice of conditional.",
+            "board": ["w == 1", "w == 0"],
+            "goal": "11",
+            "toolbox": ["w => _b ? 7 : 3", "w => _b ? 2 : 4", "_ + _", "0", "0", "1", "1"]
+        },
+        {
             "description": "Conditionals, booleans, and one-param functions II.",
             "board": ["'Y'", "z => _b ? 'X' : 'T'", "z => _b ? 'B' : 'O'"],
             "goal": "'X'",
             "toolbox": ["z == 'T'", "z == 'Y'", "z == 'C'", "z == 'X'", "z == 'B'"]
-        },
-        {
-            "description": "Conditionals, booleans, and one-param functions III: Typing equality, verbatim.",
-            "board": ["_t_single", "'feline'", "'hound'", "x => xx"],
-            "typing_hints": ["x == \"feline\""],
-            "goal": ["'cat'", "'wolf'"],
-            "toolbox": ["x => _b ? 'cat' : 'dog'", "x => _b ? 'lion' : 'wolf'"]
         }
     ],
     "resources":{
