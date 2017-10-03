@@ -2,6 +2,7 @@ bleach==2.0.0
 cycler==0.10.0
 decorator==4.1.2
 entrypoints==0.2.3
+esprima==4.0.0.dev11
 html5lib==0.999999999
 ipykernel==4.6.1
 ipython==6.1.0
