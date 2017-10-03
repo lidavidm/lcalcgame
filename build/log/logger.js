@@ -64,10 +64,20 @@ var Logger = function () {
     // Static logging. (as backup)
     var isOfflineSession = true;
     var static_log = [];
+
+    // Load from previous logs; for instance if user accidentally
+    // closed the tab / window, we still want to load the
+    // full (local) log upon their return:
+    if (window.localStorage && window.localStorage["static_log"]) static_log = JSON.parse(window.localStorage["static_log"]);
+
     var logStatic = function logStatic(funcname, data, uploaded) {
         if (!uploaded) data['error_message'] = 'This log failed to upload to the server.';
+
         static_log.push([funcname, data]);
-        //console.log('Log static: ', funcname, data);
+
+        // Push to local data storage, so we have backup in case
+        // user exits the page:
+        if (window.localStorage) window.localStorage["static_log"] = JSON.stringify(static_log);
 
         if (__LOCAL_LOGGING) {
             var xhr = new XMLHttpRequest();
