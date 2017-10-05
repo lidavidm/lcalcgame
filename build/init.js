@@ -64,6 +64,9 @@ function init() {
         initBoard();
     });
 
+    // Mute by default.
+    Resource.mute();
+
     // -- TEST CORS --
     // $.ajax({
     //     type: "GET",

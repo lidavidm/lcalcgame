@@ -66,6 +66,9 @@ function init() {
         initBoard();
     });
 
+    // Mute by default.
+    Resource.mute();
+
     // -- TEST CORS --
     // $.ajax({
     //     type: "GET",
@@ -282,7 +285,7 @@ function __DEBUG_TESTBED(stage) {
     // stage.add(ee2);
     //
     // EntangledExpr.pairedAnimate(ee, ee2);
-    // 
+    //
     // let typebox = new SummoningTypeBox(500, 200, 80, 40);
     // stage.add(typebox);
     //
