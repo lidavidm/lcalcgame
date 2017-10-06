@@ -133,17 +133,28 @@ var IfStatement = function (_Expression) {
                             //this.playJimmyAnimation(afterEffects);
                         } else {
                                 if (_this2.cond.value() === true) {
-                                    _this2.branch.stroke = { color: 'blue', lineWidth: 4 };
-                                    ShapeExpandEffect.run(_this2.branch, 500, function (e) {
+                                    _this2.cond.stroke = { color: 'blue', lineWidth: 4 };
+                                    ShapeExpandEffect.run(_this2.cond, 750, function (e) {
                                         return Math.pow(e, 0.5);
-                                    }, 'blue', 1.5);
+                                    }, 'blue', 1.5, function () {
+                                        _this2.branch.stroke = { color: 'blue', lineWidth: 4 };
+                                        ShapeExpandEffect.run(_this2.branch, 750, function (e) {
+                                            return Math.pow(e, 0.5);
+                                        }, 'blue', 1.5);
+                                        _this2.playUnlockAnimation(afterEffects);
+                                    });
                                 } else {
-                                    _this2.elseBranch.stroke = { color: 'blue', lineWidth: 4 };
-                                    ShapeExpandEffect.run(_this2.elseBranch, 500, function (e) {
+                                    _this2.cond.stroke = { color: 'red', lineWidth: 4 };
+                                    ShapeExpandEffect.run(_this2.cond, 750, function (e) {
                                         return Math.pow(e, 0.5);
-                                    }, 'blue', 1.5);
+                                    }, 'red', 1.5, function () {
+                                        _this2.elseBranch.stroke = { color: 'red', lineWidth: 4 };
+                                        ShapeExpandEffect.run(_this2.elseBranch, 750, function (e) {
+                                            return Math.pow(e, 0.5);
+                                        }, 'red', 1.5);
+                                        _this2.playUnlockAnimation(afterEffects);
+                                    });
                                 }
-                                _this2.playUnlockAnimation(afterEffects);
                             }
 
                         _this2.ignoreEvents = true;
@@ -255,7 +266,6 @@ var IfElseStatement = function (_IfStatement2) {
         value: function reduce() {
             if (!this.cond || !this.branch || !this.elseBranch) return this; // irreducible
             var cond_val = this.cond.value();
-            console.log(this.cond, cond_val);
             if (cond_val === true) return this.branch; // return the inner branch
             else if (cond_val === false) return this.elseBranch; // disappear
                 else return this; // something's not reducable...

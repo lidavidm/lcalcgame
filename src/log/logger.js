@@ -10,7 +10,7 @@ var Logger = (function() {
     const __VERSION_ID = 0.54;
     const __OFFLINE_NAME_PROMPT = false;
     const __RUNNING_LOCALLY = location.hostname === "localhost" || location.hostname === "127.0.0.1";
-    const __LOCAL_LOGGING = __RUNNING_LOCALLY;
+    const __LOCAL_LOGGING = false && __RUNNING_LOCALLY;
     const __LOCAL_LOGGER_PORT = 3333;
     const __GDIAC_BASEURL = 'http://gdiac.cs.cornell.edu/research_games/';
     const __PAGE_LOAD_URL = __GDIAC_BASEURL + 'page_load.php';
@@ -309,7 +309,7 @@ var Logger = (function() {
         return new Promise(function(resolve, reject) {
 
             // For now...
-            console.log('@ Logger.log: ', actionID, data);
+            // console.log('@ Logger.log: ', actionID, data);
 
             if (data && typeof data === 'object')
                 data = JSON.stringify(data);

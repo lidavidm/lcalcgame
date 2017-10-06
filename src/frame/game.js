@@ -138,9 +138,12 @@ class Level {
             let matching = goal.test(exprs.map((n) => n.clone()), this.environmentDisplay);
             if (matching && matching.unpaired) {
                 if (!stage.mightBeCompleted()) {
-                    Animate.wait(1000).after(() => {
+                    Animate.wait(500).after(() => {
                         for (let idx of matching.unpaired) {
-                            Animate.blink(exprs[idx], 2500, [1, 0, 0], 5);
+                            const blink = (e) => Animate.blink(e, 2500, [1, 0, 0], 5).after(() => {
+                                blink(e);
+                            });
+                            blink(exprs[idx]);
                         }
                     });
                 }

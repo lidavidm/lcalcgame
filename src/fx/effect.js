@@ -1,5 +1,5 @@
 class ShapeExpandEffect {
-    static run(node, dur=500, smoothFunc=(e)=>e, color='white', maxScale=4) {
+    static run(node, dur=500, smoothFunc=(e)=>e, color='white', maxScale=4, after=null) {
 
         if (!node.stage) {
             console.warn('@ ShapeExpandEffect: Node is not member of stage.');
@@ -26,6 +26,7 @@ class ShapeExpandEffect {
         // Expand and fadeout effect
         Animate.tween(rect, { scale:{x:scaleX, y:maxScale}, opacity:0.0 }, dur, smoothFunc).after(() => {
             stage.remove(rect);
+            if (after) after();
         });
 
     }

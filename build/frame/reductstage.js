@@ -311,6 +311,7 @@ var ReductStage = function (_mag$Stage) {
                     var r = new mag.Rect(0, 0, GLOBAL_DEFAULT_SCREENSIZE.w, GLOBAL_DEFAULT_SCREENSIZE.h);
                     r.color = "black";
                     r.opacity = 0.0;
+                    r.ignoreEvents = true;
                     this.add(r);
                     this.add(btn_reset); // puts the button over r
                     this.ranResetNotifier = true;
@@ -462,7 +463,10 @@ var ReductStage = function (_mag$Stage) {
             // For jumping into a textbox if the user
             // starts typing off of it; for instance,
             // used if they are hovering the mouse over a TypeBox.
-            if (!this.keyEventDelegate && this.keyEventCandidate) {
+            if (this.keyEventCandidate) {
+                if (this.keyEventDelegate) {
+                    this.keyEventDelegate.blur();
+                }
                 this.keyEventCandidate.focus();
                 this.keyEventCandidate = null;
             }
@@ -539,13 +543,13 @@ var ReductStage = function (_mag$Stage) {
             // Check if new 'state' is really new...
             // Only if something's changed should we push onto the stateStack
             // and save to the server.
-            if (this.stateGraph.length > 0) {
-                // if (this.stateGraph.has({data: state})) // Nothing's changed. Abort the save.
-                //     return;
-                // else {
-                console.log('State diff: ', ReductStage.stateDiff(this.stateGraph.lastAddedNode.data, state));
-                // }
-            } // If we reach here, then something has changed...
+            // if (this.stateGraph.length > 0) {
+            // if (this.stateGraph.has({data: state})) // Nothing's changed. Abort the save.
+            //     return;
+            // else {
+            // console.log('State diff: ', ReductStage.stateDiff(this.stateGraph.lastAddedNode.data, state));
+            // }
+            // } // If we reach here, then something has changed...
 
             // Push new state and save serialized version to logger.
             // * This will automatically check for duplicates...

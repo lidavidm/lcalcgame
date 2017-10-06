@@ -111,13 +111,21 @@ class IfStatement extends Expression {
                 }
                 else {
                     if (this.cond.value() === true) {
-                        this.branch.stroke = { color:'blue', lineWidth:4 };
-                        ShapeExpandEffect.run(this.branch, 500, (e) => Math.pow(e, 0.5), 'blue', 1.5);
+                        this.cond.stroke = { color:'blue', lineWidth:4 };
+                        ShapeExpandEffect.run(this.cond, 750, (e) => Math.pow(e, 0.5), 'blue', 1.5, () => {
+                            this.branch.stroke = { color:'blue', lineWidth:4 };
+                            ShapeExpandEffect.run(this.branch, 750, (e) => Math.pow(e, 0.5), 'blue', 1.5);
+                            this.playUnlockAnimation(afterEffects);
+                        });
+
                     } else {
-                        this.elseBranch.stroke = { color:'blue', lineWidth:4 };
-                        ShapeExpandEffect.run(this.elseBranch, 500, (e) => Math.pow(e, 0.5), 'blue', 1.5);
+                        this.cond.stroke = { color:'red', lineWidth:4 };
+                        ShapeExpandEffect.run(this.cond, 750, (e) => Math.pow(e, 0.5), 'red', 1.5, () => {
+                            this.elseBranch.stroke = { color:'red', lineWidth:4 };
+                            ShapeExpandEffect.run(this.elseBranch, 750, (e) => Math.pow(e, 0.5), 'red', 1.5);
+                            this.playUnlockAnimation(afterEffects);
+                        });
                     }
-                    this.playUnlockAnimation(afterEffects);
                 }
 
                 this.ignoreEvents = true;
@@ -171,7 +179,6 @@ class IfElseStatement extends IfStatement {
     reduce() {
         if (!this.cond || !this.branch || !this.elseBranch) return this; // irreducible
         var cond_val = this.cond.value();
-        console.log(this.cond, cond_val);
         if (cond_val === true)          return this.branch; // return the inner branch
         else if (cond_val === false)    return this.elseBranch; // disappear
         else                            return this; // something's not reducable...
