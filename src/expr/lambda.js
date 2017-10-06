@@ -797,6 +797,9 @@ class LambdaExpr extends Expression {
         // TODO: need to convert performReductions here
         // If we don't have all our arguments, refuse to evaluate.
         if (this.takesArgument) {
+            if (this.getPlaceholderChildren().length === 0) {
+                Animate.blink(this.holes[0]);
+            }
             return this;
         }
 

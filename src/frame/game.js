@@ -136,7 +136,16 @@ class Level {
 
         stage.testBoard = function(exprs) {
             let matching = goal.test(exprs.map((n) => n.clone()), this.environmentDisplay);
-            if (matching) { // Pair nodes so that goal nodes reference the actual nodes on-screen (they aren't clones).
+            if (matching && matching.unpaired) {
+                if (!stage.mightBeCompleted()) {
+                    Animate.wait(1000).after(() => {
+                        for (let idx of matching.unpaired) {
+                            Animate.blink(exprs[idx], 2500, [1, 0, 0], 5);
+                        }
+                    });
+                }
+            }
+            else if (matching) { // Pair nodes so that goal nodes reference the actual nodes on-screen (they aren't clones).
                 // goal.test returns an array of indexes, referring to the indexes of the expressions passed into the test,
                 // ordered by the order of the goal nodes displayed on screen. So the info needed to pair an expression to a goal node.
                 // With this we can reconstruct the actual pairing for the nodes on-screen (not clones).
@@ -957,7 +966,40 @@ class ExpressionPattern {
         }
 
         // If sets of expressions have different length, they can't be equal.
-        if (lvl_exprs.length !== es.length) return false;
+        // Still try to make a matching so we can blink the extraneous expressions.
+        if (lvl_exprs.length !== es.length) {
+            let es = this.exprs.map((e) => e);
+            let es_idxs = this.exprs.map((e, i) => i);
+            let unpaired = [];
+
+            let idx = 0;
+            for (let lvl_e of lvl_exprs) {
+                let valid = -1;
+                for (let i = 0; i < es.length; i++) {
+                    if (compare(es[i], lvl_e)) {
+                        valid = i;
+                        break;
+                    }
+                }
+                if (valid > -1) {
+                    //console.log(' > array was ', es);
+                    //console.log(' > removing element ', es[valid]);
+                    es.splice(valid, 1);
+                    es_idxs.splice(valid, 1);
+                    //console.log(' > array is now ', es);
+                }
+                else {
+                    unpaired.push(idx);
+                }
+                idx++;
+            }
+            if (es.length === 0) {
+                return {
+                    "unpaired": unpaired,
+                };
+            }
+            return false;
+        }
 
         for (let lvl_e of lvl_exprs) {
             var valid = -1;
