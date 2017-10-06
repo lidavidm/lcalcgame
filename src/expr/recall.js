@@ -182,6 +182,10 @@ class TypeBox extends mag.RoundedRect {
         SET_CURSOR_STYLE(CONST.CURSOR.TEXT);
 
         if (this.stage) this.stage.keyEventCandidate = this;
+        if (this.stage && this.stage.keyEventDelegate) {
+            this.stage.keyEventDelegate.blur();
+        }
+        this.focus();
     }
     onmousedown(pos) {
         this._logState('mouse-down');
