@@ -72,6 +72,15 @@ class Expression extends mag.RoundedRect {
         });
     }
 
+    // Repel dropped nodes.
+    ondropped(node, pos) {
+        if (node.pos.y > this.absolutePos.y)
+            Animate.tween(node, { pos:{ x:node.pos.x, y:this.centerPos().y + this.absoluteSize.h * 1.2 } }, 160, (e) => Math.pow(e, 0.5));
+        else
+            Animate.tween(node, { pos:{ x:node.pos.x, y:this.centerPos().y - this.absoluteSize.h * 1.2 } }, 160, (e) => Math.pow(e, 0.5));
+        super.ondropped(node, pos);
+    }
+
     addHole(hole) {
         this.holes.push(hole);
     }

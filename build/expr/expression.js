@@ -102,6 +102,19 @@ var Expression = function (_mag$RoundedRect) {
                 }
             });
         }
+
+        // Repel dropped nodes.
+
+    }, {
+        key: 'ondropped',
+        value: function ondropped(node, pos) {
+            if (node.pos.y > this.absolutePos.y) Animate.tween(node, { pos: { x: node.pos.x, y: this.centerPos().y + this.absoluteSize.h * 1.2 } }, 160, function (e) {
+                return Math.pow(e, 0.5);
+            });else Animate.tween(node, { pos: { x: node.pos.x, y: this.centerPos().y - this.absoluteSize.h * 1.2 } }, 160, function (e) {
+                return Math.pow(e, 0.5);
+            });
+            _get(Expression.prototype.__proto__ || Object.getPrototypeOf(Expression.prototype), 'ondropped', this).call(this, node, pos);
+        }
     }, {
         key: 'addHole',
         value: function addHole(hole) {

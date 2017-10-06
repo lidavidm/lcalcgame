@@ -44,7 +44,6 @@ class MissingExpression extends Expression {
         if (!this.accepts(node))
             return;
 
-        super.ondropped(node, pos);
         if (node.dragging) { // Reattach node.
 
             // Should not be able to stick lambdas in MissingExpression holes (exception of Map and Define)
