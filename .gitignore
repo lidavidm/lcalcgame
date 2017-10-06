@@ -9,3 +9,4 @@ resources/graphics/starboy/menu-assets.png
 *~
 *.DS_Store
 analysis/userlogs
+analysis/.ipynb_checkpoints

@@ -459,6 +459,14 @@ var ReductStage = function (_mag$Stage) {
         key: 'onkeypress',
         value: function onkeypress(event) {
 
+            // For jumping into a textbox if the user
+            // starts typing off of it; for instance,
+            // used if they are hovering the mouse over a TypeBox.
+            if (!this.keyEventDelegate && this.keyEventCandidate) {
+                this.keyEventCandidate.focus();
+                this.keyEventCandidate = null;
+            }
+
             if (this.keyEventDelegate) {
                 if (event.keyCode === 13) {
                     this.keyEventDelegate.carriageReturn();

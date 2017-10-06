@@ -219,6 +219,8 @@ var TypeBox = function (_mag$RoundedRect) {
             this._logState('mouse-enter');
             this.stroke = { color: 'blue', lineWidth: 2 };
             SET_CURSOR_STYLE(CONST.CURSOR.TEXT);
+
+            if (this.stage) this.stage.keyEventCandidate = this;
         }
     }, {
         key: 'onmousedown',
@@ -257,6 +259,8 @@ var TypeBox = function (_mag$RoundedRect) {
             this._logState('mouse-leave');
             this.stroke = null;
             SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
+
+            if (this.stage) this.stage.keyEventCandidate = null;
         }
 
         /* VIRTUAL CURSOR */
@@ -432,11 +436,15 @@ var TypeBox = function (_mag$RoundedRect) {
         key: 'focus',
         value: function focus() {
             if (this.isFocused()) return;
+            var stage = this.stage;
             this.hideEmptyIcon();
             this.addChild(this.cursor);
             this.cursor.startBlinking();
             this.stroke = { color: 'cyan', lineWidth: 2 };
-            if (this.stage) this.stage.keyEventDelegate = this;
+            if (stage) {
+                stage.keyEventDelegate = this;
+                stage.keyEventCandidate = null;
+            }
             this._logState('focused');
 
             if (this.onFocus) this.onFocus();
@@ -445,10 +453,13 @@ var TypeBox = function (_mag$RoundedRect) {
         key: 'blur',
         value: function blur() {
             if (!this.isFocused()) return;
+            var stage = this.stage;
             this.cursor.stopBlinking();
             this.removeChild(this.cursor);
             this.stroke = null;
-            if (this.stage && this.stage.keyEventDelegate == this) this.stage.keyEventDelegate = null;
+            if (stage && stage.keyEventDelegate == this) {
+                stage.keyEventDelegate = null;
+            }
             if (this.text === '') this.showEmptyIcon();
             this._logState('blurred');
 
