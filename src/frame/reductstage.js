@@ -411,7 +411,10 @@ class ReductStage extends mag.Stage {
         // For jumping into a textbox if the user
         // starts typing off of it; for instance,
         // used if they are hovering the mouse over a TypeBox.
-        if (!this.keyEventDelegate && this.keyEventCandidate) {
+        if (this.keyEventCandidate) {
+            if (this.keyEventDelegate) {
+                this.keyEventDelegate.blur();
+            }
             this.keyEventCandidate.focus();
             this.keyEventCandidate = null;
         }
