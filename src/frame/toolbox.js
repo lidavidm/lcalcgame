@@ -149,6 +149,7 @@ class Toolbox extends mag.ImageRect {
 
             if (this.putBackCount > 2 || (prevTime !== null && Date.now() - prevTime < 2000)) {
                 showHelpText("You can't put things back.");
+                Animate.wait(5000).after(function() { hideHelpText(); });
             }
 
             return;
