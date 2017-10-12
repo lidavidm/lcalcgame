@@ -684,7 +684,7 @@ var Expression = function (_mag$RoundedRect) {
         value: function updateReducibilityIndicator() {
             // Apply green outline to reducable expressions:
             if (this.canReduce && this.canReduce() && !this.parent) {
-                this.baseStroke = { color: "green",
+                this.baseStroke = { color: "#00FF7F",
                     lineWidth: 4,
                     opacity: 1 };
             } else {
@@ -731,11 +731,15 @@ var Expression = function (_mag$RoundedRect) {
         key: 'onmouseenter',
         value: function onmouseenter(pos) {
             if (this.forceTypingOnFill) this.stroke = { color: 'purple', lineWidth: 4 };else _get(Expression.prototype.__proto__ || Object.getPrototypeOf(Expression.prototype), 'onmouseenter', this).call(this, pos);
+
+            if (this.baseStroke) SET_CURSOR_STYLE(CONST.CURSOR.HAND);
         }
     }, {
         key: 'onmouseleave',
         value: function onmouseleave(pos) {
             if (this.forceTypingOnFill) this.stroke = { color: 'magenta', lineWidth: 4 };else _get(Expression.prototype.__proto__ || Object.getPrototypeOf(Expression.prototype), 'onmouseleave', this).call(this, pos);
+
+            if (this.baseStroke) SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
         }
     }, {
         key: 'onmousedrag',
