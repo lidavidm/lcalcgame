@@ -195,7 +195,7 @@ var Toolbox = function (_mag$ImageRect) {
                 // Can't drag nodes onto toolbox that aren't already elements --
                 // once it's placed on the board, you can't drag it back.
                 Logger.log('toolbox-reject', node.toString());
-                Animate.tween(node, { pos: { x: node.pos.x, y: this.topLeftEdgePos.y - node.size.h * 1.2 } }, 200, function (elapsed) {
+                Animate.tween(node, { pos: { x: node.pos.x, y: this.topLeftEdgePos.y - node.absoluteSize.h * 2 } }, 200, function (elapsed) {
                     return Math.pow(elapsed, 2);
                 });
                 return;
