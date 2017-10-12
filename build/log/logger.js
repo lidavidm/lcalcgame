@@ -16,7 +16,7 @@ var Logger = function () {
     var __RUNNING_LOCALLY = location.hostname === "localhost" || location.hostname === "127.0.0.1";
     var __LOCAL_LOGGING = false && __RUNNING_LOCALLY;
     var __LOCAL_LOGGER_PORT = 3333;
-    var __LOCAL_CACHING = false;
+    var __LOCAL_CACHING = true;
     var __GDIAC_BASEURL = 'http://gdiac.cs.cornell.edu/research_games/';
     var __PAGE_LOAD_URL = __GDIAC_BASEURL + 'page_load.php';
     var __TASK_BEGIN_URL = __GDIAC_BASEURL + 'player_quest.php';
@@ -37,6 +37,16 @@ var Logger = function () {
     };
     pub.isLogging = function () {
         return __IS_LOGGING;
+    };
+
+    pub.setup = function () {
+        if (__LOCAL_CACHING) {
+            window.onbeforeunload = function (e) {
+                // Push to local data storage, so we have backup in case
+                // user exits the page:
+                if (window.localStorage) window.localStorage["static_log"] = JSON.stringify(static_log);
+            };
+        }
     };
 
     var __ACTION_ID_MAP = {
@@ -83,10 +93,6 @@ var Logger = function () {
         if (!uploaded) data['error_message'] = 'This log failed to upload to the server.';
 
         static_log.push([funcname, data]);
-
-        // Push to local data storage, so we have backup in case
-        // user exits the page:
-        if (__LOCAL_CACHING && window.localStorage) window.localStorage["static_log"] = JSON.stringify(static_log);
 
         if (__LOCAL_LOGGING) {
             var xhr = new XMLHttpRequest();

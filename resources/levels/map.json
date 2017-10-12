@@ -135,6 +135,12 @@
         },
         {
             "description": "Conditionals and map: Blocks.",
+            "board": ["['H', 'T', 'T'].map(c => _ == _ ? 'win' : 'lose')"],
+            "goal": ["['win', 'lose', 'lose']"],
+            "toolbox": ["c", "c", "'H'", "'T'"]
+        },
+        {
+            "description": "Conditionals and map: Blocks.",
             "board": ["['DNA', 'RNA', 'RNA'].map(x => _)"],
             "goal": ["['T', 'U', 'U']"],
             "toolbox": ["_ == _", "'DNA'", "'RNA'", "'T'", "'U'", "_b ? _ : _", "x", "x"]

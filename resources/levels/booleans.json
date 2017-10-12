@@ -47,10 +47,10 @@
             "toolbox": ["'large'", "'small'"]
         },
         {
-            "description": "Applying function to boolean",
+            "description": "Building two booleans",
             "board": "'cat' == _",
             "goal": ["true", "true"],
-            "toolbox": ["x => xx", "'cat'", "'dog'", "x => x"]
+            "toolbox": ["_ == _", "'cat'", "'cat'", "'dog'", "'dog'"]
         },
         {
             "description": "Typing with ==, one side.",

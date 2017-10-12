@@ -52,6 +52,8 @@ function __TEST() {
 
 function init() {
 
+    Logger.setup();
+
     Logger.log('active-variant', __ACTIVE_LEVEL_VARIANT);
 
     // DEBUG: Level variant radio buttons.

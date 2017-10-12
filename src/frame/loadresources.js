@@ -63,8 +63,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
         'conditionals': ['bindings'],
         'bindings': ['map'],
         'map': ['strings'],
-        'strings': []
-        // 'confusing_strings': []
+        'strings': ['confusing_strings'],
+        'confusing_strings': []
         // 'map': ['variables'],
         // 'variables': ['typing_variables'],
         // 'typing_variables': []
