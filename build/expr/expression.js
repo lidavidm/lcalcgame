@@ -684,9 +684,9 @@ var Expression = function (_mag$RoundedRect) {
         value: function updateReducibilityIndicator() {
             // Apply green outline to reducable expressions:
             if (this.canReduce && this.canReduce() && !this.parent) {
-                this.baseStroke = { color: "#00FF7F",
+                this.baseStroke = { color: "#00FF00",
                     lineWidth: 4,
-                    opacity: 1 };
+                    opacity: 0.5 };
             } else {
                 this.baseStroke = null;
             }
@@ -732,7 +732,10 @@ var Expression = function (_mag$RoundedRect) {
         value: function onmouseenter(pos) {
             if (this.forceTypingOnFill) this.stroke = { color: 'purple', lineWidth: 4 };else _get(Expression.prototype.__proto__ || Object.getPrototypeOf(Expression.prototype), 'onmouseenter', this).call(this, pos);
 
-            if (this.baseStroke) SET_CURSOR_STYLE(CONST.CURSOR.HAND);
+            if (this.baseStroke) {
+                SET_CURSOR_STYLE(CONST.CURSOR.HAND);
+                this.stroke = { color: '#0f0', lineWidth: 4 };
+            }
         }
     }, {
         key: 'onmouseleave',

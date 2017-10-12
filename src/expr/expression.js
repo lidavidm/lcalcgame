@@ -568,9 +568,9 @@ class Expression extends mag.RoundedRect {
     updateReducibilityIndicator() {
         // Apply green outline to reducable expressions:
         if (this.canReduce && this.canReduce() && !this.parent) {
-            this.baseStroke = { color: "#00FF7F",
+            this.baseStroke = { color: "#00FF00",
                                 lineWidth: 4,
-                                opacity: 1 };
+                                opacity: 0.5 };
         }
         else {
             this.baseStroke = null;
@@ -615,8 +615,10 @@ class Expression extends mag.RoundedRect {
         else
             super.onmouseenter(pos);
 
-        if (this.baseStroke)
+        if (this.baseStroke) {
             SET_CURSOR_STYLE(CONST.CURSOR.HAND);
+            this.stroke = { color:'#0f0', lineWidth:4 };
+        }
     }
     onmouseleave(pos) {
         if (this.forceTypingOnFill)
