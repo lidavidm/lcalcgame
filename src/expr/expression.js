@@ -569,16 +569,17 @@ class Expression extends mag.RoundedRect {
         // Replace TypeInTextExpr#canReduce to prevent auto-commit and
         // logging calls
         const fakeReduce = function() {
-            if (this.typeBox) {
-                if (this._origValidator) {
-                    // Logging calls slow down this drastically, so
-                    // avoid it if possible (event will get logged by
-                    // the normal keypress handler)
-                    return this._origValidator(this.typeBox.text);
-                }
-                return this.validator(this.typeBox.text);
-            }
-            else return true;
+            return false;
+            // if (this.typeBox) {
+            //     if (this._origValidator) {
+            //         // Logging calls slow down this drastically, so
+            //         // avoid it if possible (event will get logged by
+            //         // the normal keypress handler)
+            //         return false && this._origValidator(this.typeBox.text);
+            //     }
+            //     return false && this.validator(this.typeBox.text);
+            // }
+            // else return true;
         };
 
         const patchup = [];
