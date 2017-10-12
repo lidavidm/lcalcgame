@@ -16,6 +16,7 @@ class MapFunc extends FuncExpr {
         this.update();
 
         this.color = "YellowGreen";
+        this.reducableStrokeColor = "#00FF7F";
     }
 
     updateArrowPaths() {

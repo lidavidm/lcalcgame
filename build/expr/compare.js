@@ -43,6 +43,7 @@ var CompareExpr = function (_Expression) {
         _this.funcName = compareFuncName;
         _this.color = "HotPink";
         _this._origColor = "HotPink";
+        _this.reducableStrokeColor = "DeepPink";
         _this.padding = { left: 20, inner: 10, right: 30 };
         return _this;
     }

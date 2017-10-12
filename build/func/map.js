@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
@@ -36,11 +36,12 @@ var MapFunc = function (_FuncExpr) {
         _this2.update();
 
         _this2.color = "YellowGreen";
+        _this2.reducableStrokeColor = "#00FF7F";
         return _this2;
     }
 
     _createClass(MapFunc, [{
-        key: 'updateArrowPaths',
+        key: "updateArrowPaths",
         value: function updateArrowPaths() {
             // Arrow from func expr to left bag:
             function topMiddlePoint(expr) {
@@ -88,17 +89,17 @@ var MapFunc = function (_FuncExpr) {
             this.arrowPaths = [bagToFuncArrowPath, funcToReturnBagArrowPath];
         }
     }, {
-        key: 'toString',
+        key: "toString",
         value: function toString() {
             return '(map ' + this.func.toString() + ' ' + this.bag.toString() + ')';
         }
     }, {
-        key: 'toJavaScript',
+        key: "toJavaScript",
         value: function toJavaScript() {
-            return this.bag.toJavaScript() + '.map(' + this.func.toJavaScript() + ')';
+            return this.bag.toJavaScript() + ".map(" + this.func.toJavaScript() + ")";
         }
     }, {
-        key: 'canReduce',
+        key: "canReduce",
         value: function canReduce() {
             if (!this.bag || !this.func) {
                 return false;
@@ -141,7 +142,7 @@ var MapFunc = function (_FuncExpr) {
             return true;
         }
     }, {
-        key: 'reduce',
+        key: "reduce",
         value: function reduce() {
             this.update();
             if (!this.bag || !this.func) return this;else if (!(this.bag instanceof BagExpr)) {
@@ -155,13 +156,13 @@ var MapFunc = function (_FuncExpr) {
             } else return this;
         }
     }, {
-        key: 'reduceCompletely',
+        key: "reduceCompletely",
         value: function reduceCompletely() {
             // A map's reduce function is the most complete reduction possible.
             return this.reduce();
         }
     }, {
-        key: 'performReduction',
+        key: "performReduction",
         value: function performReduction() {
             var _this3 = this;
 
@@ -189,7 +190,7 @@ var MapFunc = function (_FuncExpr) {
                     superReduce = function superReduce() {
                         _this3.bag = bagCopy;
                         _this3.update();
-                        return _get(MapFunc.prototype.__proto__ || Object.getPrototypeOf(MapFunc.prototype), 'performReduction', _this3).call(_this3).then(function (bag) {
+                        return _get(MapFunc.prototype.__proto__ || Object.getPrototypeOf(MapFunc.prototype), "performReduction", _this3).call(_this3).then(function (bag) {
                             _this3.bag = bag;
                             stage.draw();
                         });
@@ -336,7 +337,7 @@ var MapFunc = function (_FuncExpr) {
                     }
                 }();
 
-                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+                if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
             } else if (!(this.func instanceof LambdaExpr)) {
                 WatEffect.run(this.func);
                 return Promise.reject("Cannot reduce map; attempting to apply non-function");
@@ -348,22 +349,22 @@ var MapFunc = function (_FuncExpr) {
         // Sizes to match its children.
 
     }, {
-        key: 'constructorArgs',
+        key: "constructorArgs",
         get: function get() {
             return [this.func.clone(), this.bag.clone()];
         }
     }, {
-        key: 'returnBag',
+        key: "returnBag",
         get: function get() {
             return this.holes[0];
         }
     }, {
-        key: 'func',
+        key: "func",
         get: function get() {
             return this.holes[1];
         }
     }, {
-        key: 'bag',
+        key: "bag",
         get: function get() {
             return this.holes[2];
         },
@@ -371,9 +372,9 @@ var MapFunc = function (_FuncExpr) {
             this.holes[2] = bg;
         }
     }, {
-        key: 'size',
+        key: "size",
         get: function get() {
-            var sz = _get(MapFunc.prototype.__proto__ || Object.getPrototypeOf(MapFunc.prototype), 'size', this);
+            var sz = _get(MapFunc.prototype.__proto__ || Object.getPrototypeOf(MapFunc.prototype), "size", this);
             sz.h = DEFAULT_EXPR_HEIGHT * this.heightScalar;
             return sz;
         }
@@ -400,7 +401,7 @@ var SimpleMapFunc = function (_MapFunc) {
     }
 
     _createClass(SimpleMapFunc, [{
-        key: 'updateArrowPaths',
+        key: "updateArrowPaths",
         value: function updateArrowPaths() {
 
             if (!this.bag || !this.func) return;
@@ -437,17 +438,17 @@ var SimpleMapFunc = function (_MapFunc) {
             this.arrowPaths = [bagToFuncArrowPath];
         }
     }, {
-        key: 'returnBag',
+        key: "returnBag",
         get: function get() {
             return null;
         }
     }, {
-        key: 'func',
+        key: "func",
         get: function get() {
             return this.holes[1];
         }
     }, {
-        key: 'bag',
+        key: "bag",
         get: function get() {
             return this.holes[0];
         },
@@ -489,17 +490,17 @@ var FadedSimpleMapFunc = function (_SimpleMapFunc) {
     }
 
     _createClass(FadedSimpleMapFunc, [{
-        key: 'returnBag',
+        key: "returnBag",
         get: function get() {
             return null;
         }
     }, {
-        key: 'func',
+        key: "func",
         get: function get() {
             return this.holes[2];
         }
     }, {
-        key: 'bag',
+        key: "bag",
         get: function get() {
             return this.holes[0];
         },
@@ -533,11 +534,11 @@ var FadedMapFunc = function (_FadedSimpleMapFunc) {
     }
 
     _createClass(FadedMapFunc, [{
-        key: 'updateArrowPaths',
+        key: "updateArrowPaths",
         value: function updateArrowPaths() {} // remove arrow
 
     }, {
-        key: 'update',
+        key: "update",
         value: function update() {
             var _this7 = this;
 
@@ -615,7 +616,7 @@ var FunnelMapFunc = function (_MapFunc2) {
     }
 
     _createClass(FunnelMapFunc, [{
-        key: 'update',
+        key: "update",
         value: function update() {
             var _this9 = this;
 
@@ -640,25 +641,25 @@ var FunnelMapFunc = function (_MapFunc2) {
             this.updateReducibilityIndicator();
         }
     }, {
-        key: 'onmouseenter',
+        key: "onmouseenter",
         value: function onmouseenter(pos) {
             this.funnel.onmouseenter(pos);
             this.func.onmouseenter(pos);
         }
     }, {
-        key: 'onmouseleave',
+        key: "onmouseleave",
         value: function onmouseleave(pos) {
             this.funnel.onmouseleave(pos);
             this.func.onmouseleave(pos);
         }
     }, {
-        key: 'updateArrowPaths',
+        key: "updateArrowPaths",
         value: function updateArrowPaths() {}
     }, {
-        key: 'drawInternal',
+        key: "drawInternal",
         value: function drawInternal(ctx, pos, boundingSize) {}
     }, {
-        key: 'hits',
+        key: "hits",
         value: function hits(pos, options) {
             var b = this.bag.hits(pos, options);
             if (b) return b;
@@ -668,12 +669,12 @@ var FunnelMapFunc = function (_MapFunc2) {
             if (h) return this;else return null;
         }
     }, {
-        key: 'returnBag',
+        key: "returnBag",
         get: function get() {
             return null;
         }
     }, {
-        key: 'func',
+        key: "func",
         get: function get() {
             return this.holes[0];
         },
@@ -682,7 +683,7 @@ var FunnelMapFunc = function (_MapFunc2) {
             this.holes[0] = f;
         }
     }, {
-        key: 'bag',
+        key: "bag",
         get: function get() {
             return this.holes[2];
         },
@@ -712,7 +713,7 @@ var ReduceFunc = function (_FuncExpr2) {
     }
 
     _createClass(ReduceFunc, [{
-        key: 'step',
+        key: "step",
 
 
         // Reduce algorithm.
@@ -778,17 +779,17 @@ var ReduceFunc = function (_FuncExpr2) {
             //return new ReduceFunc( this.func.clone(), iter, reduced );
         }
     }, {
-        key: 'reduce',
+        key: "reduce",
         value: function reduce() {
             if (this.step()) return this.initializer;else return this;
         }
     }, {
-        key: 'reduceCompletely',
+        key: "reduceCompletely",
         value: function reduceCompletely() {
             return this;
         }
     }, {
-        key: 'updateArrowPaths',
+        key: "updateArrowPaths",
         value: function updateArrowPaths() {
 
             // Arrow from func expr to left bag:
@@ -859,17 +860,17 @@ var ReduceFunc = function (_FuncExpr2) {
         // Sizes to match its children.
 
     }, {
-        key: 'toString',
+        key: "toString",
         value: function toString() {
             return '(reduce ' + this.func.toString() + ' ' + this.iterable.toString() + ' ' + (this.initializer ? this.initializer.toString() : '()') + ')';
         }
     }, {
-        key: 'toJavaScript',
+        key: "toJavaScript",
         value: function toJavaScript() {
-            return this.iterable.toJavaScript() + '.reduce(' + this.func.toJavaScript() + ')';
+            return this.iterable.toJavaScript() + ".reduce(" + this.func.toJavaScript() + ")";
         }
     }, {
-        key: 'constructorArgs',
+        key: "constructorArgs",
         get: function get() {
             return [this.func.clone(), this.iterable.clone(), this.initializer.clone()];
         }
@@ -877,7 +878,7 @@ var ReduceFunc = function (_FuncExpr2) {
         // Accessors
 
     }, {
-        key: 'initializer',
+        key: "initializer",
         get: function get() {
             return this.holes[1];
         },
@@ -885,7 +886,7 @@ var ReduceFunc = function (_FuncExpr2) {
             this.holes[1] = e;
         }
     }, {
-        key: 'iterable',
+        key: "iterable",
         get: function get() {
             return this.holes[0];
         },
@@ -893,7 +894,7 @@ var ReduceFunc = function (_FuncExpr2) {
             this.holes[0] = e;
         }
     }, {
-        key: 'func',
+        key: "func",
         get: function get() {
             return this.holes[2];
         },
@@ -901,9 +902,9 @@ var ReduceFunc = function (_FuncExpr2) {
             this.holes[2] = e;
         }
     }, {
-        key: 'size',
+        key: "size",
         get: function get() {
-            var sz = _get(ReduceFunc.prototype.__proto__ || Object.getPrototypeOf(ReduceFunc.prototype), 'size', this);
+            var sz = _get(ReduceFunc.prototype.__proto__ || Object.getPrototypeOf(ReduceFunc.prototype), "size", this);
             sz.h = DEFAULT_EXPR_HEIGHT * 2.3;
             return sz;
         }

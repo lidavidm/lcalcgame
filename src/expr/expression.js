@@ -598,7 +598,7 @@ class Expression extends mag.RoundedRect {
             (n) => !(n instanceof VarExpr || n instanceof TypeInTextExpr));
         const placeholders = placeholderChildren && placeholderChildren.length > 0;
         if (!placeholders && this.canReduce && this.canReduce() && !this.parent) {
-            this.baseStroke = { color: "#00FF7F",
+            this.baseStroke = { color: this.reducableStrokeColor ? this.reducableStrokeColor : "#00FF7F",
                                 lineWidth: 4,
                                 opacity: 0.5 };
         }
@@ -652,7 +652,7 @@ class Expression extends mag.RoundedRect {
 
         if (this.baseStroke) {
             SET_CURSOR_STYLE(CONST.CURSOR.HAND);
-            this.stroke = { color:'#0f0', lineWidth:4 };
+            this.stroke = { color: this.reducableStrokeColor ? this.reducableStrokeColor : '#0f0', lineWidth:4 };
         }
     }
     onmouseleave(pos) {

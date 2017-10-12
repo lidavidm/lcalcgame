@@ -25,6 +25,7 @@ var IfStatement = function (_Expression) {
         var _this = _possibleConstructorReturn(this, (IfStatement.__proto__ || Object.getPrototypeOf(IfStatement)).call(this, [cond, question_mark, branch, else_text]));
 
         _this.color = 'LightBlue';
+        _this.reducableStrokeColor = "DarkTurquoise";
         return _this;
     }
 

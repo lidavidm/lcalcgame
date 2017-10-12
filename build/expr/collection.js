@@ -43,6 +43,8 @@ var BagExpr = function (_CollectionExpr) {
             _this2.graphicNode.anchor = { x: 0.5, y: 0.5 };
         }
 
+        _this2.reducableStrokeColor = "#ddd";
+
         //this.graphicNode.clipChildren = true;
         //this.graphicNode.clipBackground = 'bag-background';
 

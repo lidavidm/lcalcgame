@@ -12,6 +12,8 @@ class BagExpr extends CollectionExpr {
             this.graphicNode.anchor = { x:0.5, y:0.5 };
         }
 
+        this.reducableStrokeColor = "#ddd";
+
         //this.graphicNode.clipChildren = true;
         //this.graphicNode.clipBackground = 'bag-background';
 

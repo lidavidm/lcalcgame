@@ -15,6 +15,7 @@ class CompareExpr extends Expression {
         this.funcName = compareFuncName;
         this.color = "HotPink";
         this._origColor = "HotPink";
+        this.reducableStrokeColor = "DeepPink";
         this.padding = { left:20, inner:10, right:30 };
     }
     get constructorArgs() { return [this.holes[0].clone(), this.holes[2].clone(), this.funcName]; }

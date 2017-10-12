@@ -8,6 +8,7 @@ class IfStatement extends Expression {
         super([cond, question_mark, branch, else_text]);
 
         this.color = 'LightBlue';
+        this.reducableStrokeColor = "DarkTurquoise";
     }
 
     get cond() { return this.holes[0]; }
