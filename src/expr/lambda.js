@@ -1292,7 +1292,7 @@ class FadedES6LambdaHoleExpr extends LambdaHoleExpr {
     constructor(varname) {
         super(varname);
         this.padding.left = 5;
-        this.addArg(new TextExpr(" " + varname + " "));
+        this.addArg(new TextExpr("(" + varname + ")"));
         this.addArg(new TextExpr("=>"));
 
         this.label.color = "#000";

@@ -76,7 +76,7 @@
         {
             "description": "Typing entire lines I.",
             "board": ["[33, 44].map(_t_single)"],
-            "typing_hints": ["x => x + x"],
+            "typing_hints": ["(x) => x + x"],
             "goal": ["[66, 88]"],
             "toolbox": "",
             "block_variant": {
@@ -87,7 +87,7 @@
             "description": "Typing entire line without any hints.",
             "board": ["[10, 20, 30].map(_t_single)"],
             "goal": ["[17, 27, 37]"],
-            "typing_solution": ["x => x + 7"],
+            "typing_solution": ["(x) => x + 7"],
             "toolbox": "",
             "typing_help": ["Remember => and =="],
             "block_variant": {
@@ -102,7 +102,7 @@
             "description": "Intro to map: Typing function body with non-n parameter.",
             "board": "[0, 1, 0, 1].map(_t_single)",
             "goal": "[true, false, true, false]",
-            "typing_solution": ["x => x == 0"],
+            "typing_solution": ["(x) => x == 0"],
             "toolbox": "",
             "typing_help": ["Remember => and =="],
             "block_variant": {
@@ -118,13 +118,13 @@
             "board": "__.map(_t_single)",
             "goal": "[false, true]",
             "toolbox": ["['0', '1']", "[0, 0]", "['a', 'b']", "[3, 5]"],
-            "typing_solution": ["x => x == 'b'"],
+            "typing_solution": ["(x) => x == 'b'"],
             "block_variant": {
                 "board": "__verbatim; __.map(_l);",
                 "toolbox": ["x => x == _", "0", "1", "['0', '1']", "[1, 0]"]
             },
             "verbatim_variant": {
-                "typing_hints": ["x => x == \"b\""]
+                "typing_hints": ["(x) => x == \"b\""]
             }
         },
         {
@@ -153,13 +153,13 @@
             "goal": ["['pass', 'fail', 'fail']"],
             "toolbox": "",
             "typing_help": ["You'll have to use =>, ?, and :"],
-            "typing_solution": ["x => x == \"A\" ? \"pass\" : \"fail\""],
+            "typing_solution": ["(x) => x == \"A\" ? \"pass\" : \"fail\""],
             "block_variant": {
                 "board": ["__verbatim; ['A', 'F', 'F'].map(_l);", "'pass'", "'fail'"],
                 "toolbox": ["y => _", "_ == _", "y", "y", "'A'", "'F'", "_b ? _ : _"]
             },
             "verbatim_variant": {
-                "typing_hints": ["x => x == \"A\" ? \"pass\" : \"fail\""],
+                "typing_hints": ["(x) => x == \"A\" ? \"pass\" : \"fail\""],
                 "typing_help": null
             }
         },
@@ -169,7 +169,7 @@
             "goal": ["['two', 'one', 'two']"],
             "toolbox": "",
             "typing_help": ["You'll have to use =>, ?, and :"],
-            "typing_solution": ["2, 1, 2", "x => x == 2 ? 'two' : 'one'"],
+            "typing_solution": ["2, 1, 2", "(x) => x == 2 ? 'two' : 'one'"],
             "block_variant": {
                 "board": ["__verbatim; __.map(_l);" ],
                 "toolbox": ["[1, 2, 1]", "['a', 'b', 'b']", "1", "2", "'a'", "'b'", "x", "n", "_b ? _ : _", "'two'", "'one'", "x => _", "n => _", "_ == _"]

@@ -106,7 +106,7 @@
             "board": ["_t_single", "x => xx"],
             "goal": ["1", "0"],
             "toolbox": ["true", "false", "true", "false"],
-            "typing_hints": ["n => n ? 1 : 0"],
+            "typing_hints": ["(n) => n ? 1 : 0"],
             "block_variant": {
                 "board": ["n => n ? 1 : 0", "x => xx"]
             }
@@ -123,7 +123,7 @@
             },
             "verbatim_variant": {
                 "board": ["_t_single", "x => xxx"],
-                "typing_hints": ["x => x ? \"yes\" : \"no\""]
+                "typing_hints": ["(x) => x ? \"yes\" : \"no\""]
             }
         }
     ],

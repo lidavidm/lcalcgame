@@ -1703,7 +1703,7 @@ var FadedES6LambdaHoleExpr = function (_LambdaHoleExpr4) {
         var _this23 = _possibleConstructorReturn(this, (FadedES6LambdaHoleExpr.__proto__ || Object.getPrototypeOf(FadedES6LambdaHoleExpr)).call(this, varname));
 
         _this23.padding.left = 5;
-        _this23.addArg(new TextExpr(" " + varname + " "));
+        _this23.addArg(new TextExpr("(" + varname + ")"));
         _this23.addArg(new TextExpr("=>"));
 
         _this23.label.color = "#000";
