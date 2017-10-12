@@ -13,6 +13,7 @@
              this._color = "lightgray";
              this._highlightColor = 'yellow';
              this.stroke = null;
+             this._baseStroke = null;
              this.shadowOffset = 4;
              this.shadowColor = 'black';
          }
@@ -51,6 +52,14 @@
          set anchor(anch) { this._anchor = anch; }
          set scale(sc) { this._scale = sc; }
          set color(clr) { this._color = clr; }
+         get baseStroke() { return this._baseStroke; }
+         set baseStroke(s) {
+             let oldStroke = this._baseStroke;
+             this._baseStroke = s;
+             if (!this.stroke || this.stroke === oldStroke) {
+                 this.stroke = s;
+             }
+         }
          upperLeftPos(pos, boundingSize) {
              if (!pos && !boundingSize) {
                  pos = this.absolutePos;
@@ -154,6 +163,9 @@
          }
          onmouseleave(pos) {
              this.stroke = null;
+             if (this.baseStroke) {
+                 this.stroke = this.baseStroke;
+             }
          }
          onmouseup(pos) { }
      }

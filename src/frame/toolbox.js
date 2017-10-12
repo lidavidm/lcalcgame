@@ -7,6 +7,9 @@ class Toolbox extends mag.ImageRect {
         this.padding = 20;
         this.numRows = 1;
         this.rowHeight = Toolbox.defaultRowHeight;
+
+        this.putBackCount = 0;
+        this.putBackTime = null;
     }
 
     static get defaultRowHeight() { return (__IS_MOBILE && this.md.phone()) ? 70 : 90; }
@@ -139,6 +142,16 @@ class Toolbox extends mag.ImageRect {
             // once it's placed on the board, you can't drag it back.
             Logger.log('toolbox-reject', node.toString());
             Animate.tween(node, { pos:{x:node.pos.x, y:this.topLeftEdgePos.y - node.size.h * 1.2} }, 200, (elapsed) => Math.pow(elapsed, 2));
+
+            this.putBackCount++;
+            const prevTime = this.putBackTime;
+            this.putBackTime = Date.now();
+
+            if (this.putBackCount > 2 || (prevTime !== null && Date.now() - prevTime < 2000)) {
+                showHelpText("You can't put things back.");
+                Animate.wait(5000).after(function() { hideHelpText(); });
+            }
+
             return;
         } else if (node.toolbox && node.toolbox != this) {
             console.error('@ Toolbox.ondropped: Node toolbox does not match current toolbox instance.');

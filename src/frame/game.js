@@ -134,10 +134,10 @@ class Level {
             return this.nodes.filter((n) => n.toolbox && n.toolbox instanceof Toolbox && !n.fadingOut);
         }.bind(stage);
 
-        stage.testBoard = function(exprs) {
+        stage.testBoard = function(exprs, checkUnpaired=true) {
             let matching = goal.test(exprs.map((n) => n.clone()), this.environmentDisplay);
             if (matching && matching.unpaired) {
-                if (!stage.mightBeCompleted()) {
+                if (checkUnpaired && !stage.mightBeCompleted()) {
                     Animate.wait(500).after(() => {
                         for (let idx of matching.unpaired) {
                             const blink = (e) => Animate.blink(e, 2500, [1, 0, 0], 5).after(() => {
