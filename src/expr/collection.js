@@ -587,6 +587,7 @@ class SmallStepBagExpr extends BracketArrayExpr {
         super(x, y, w, h, holding);
         this.overlay = false;
         this.finished = false;
+        this.ignoreAutoResize = true;
     }
 
     start() {
