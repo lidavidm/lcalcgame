@@ -586,10 +586,11 @@ class SmallStepBagExpr extends BracketArrayExpr {
     constructor(x, y, w, h, holding=[]) {
         super(x, y, w, h, holding);
         this.overlay = false;
+        this.finished = false;
     }
 
     start() {
-        if (!this.overlay) {
+        if (!this.overlay && !this.finished) {
             this.overlay = true;
             let overlay = this.stage.showOverlay(0.5);
             const stage = this.stage;
@@ -600,21 +601,31 @@ class SmallStepBagExpr extends BracketArrayExpr {
     }
 
     finish() {
-        const stage = this.stage;
-        let clone = new BracketArrayExpr();
-        this.items.forEach(clone.addItem.bind(clone));
-        (this.parent || this.stage).swap(this, clone);
-        Animate.tween(this.overlayNode, {
-            opacity: 0,
-        }, 1000).after(() => {
-            stage.remove(this.overlayNode);
-            stage.ranResetNotifier = false;
-            stage.update();
-        });
+        if (!this.finished) {
+            const stage = this.stage;
+            let clone = new BracketArrayExpr();
+            this.items.forEach(clone.addItem.bind(clone));
+            (this.parent || this.stage).swap(this, clone);
+            if (this.overlayNode) {
+                Animate.tween(this.overlayNode, {
+                    opacity: 0,
+                }, 1000).after(() => {
+                    stage.remove(this.overlayNode);
+                    stage.ranResetNotifier = false;
+                    stage.update();
+                });
+            }
+            this.finished = true;
+            this.overlay = false;
+        }
     }
 
     update() {
-        if (this.stage && !this.overlay) {
+        if (this._items.every(n => n.isValue() || !n.canReduce())) {
+            this.finish();
+        }
+
+        if (this.stage && !this.overlay && !this.finished) {
             this.start();
         }
         super.update();
@@ -628,18 +639,13 @@ class SmallStepBagExpr extends BracketArrayExpr {
         this._items.forEach((item) => this.graphicNode.removeArg(item));
         this.graphicNode.reset();
         this._items = [];
-        let allValues = true;
         items.forEach((item) => {
             this.addItem(item);
             item.onmousedrag = () => {};
             if (!item.isValue()) {
                 item.unlock();
-                allValues = false;
             }
         });
-        if (allValues && (this.parent || this.stage)) {
-            this.finish();
-        }
     }
 
     addItem(item) {
