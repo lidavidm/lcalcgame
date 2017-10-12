@@ -128,7 +128,9 @@ class BagExpr extends CollectionExpr {
                 new_func.unlockSubexpressions();
                 new_func.lockSubexpressions((expr) => (expr instanceof ValueExpr || expr instanceof FadedValueExpr || expr instanceof BooleanPrimitive || expr.isValue())); // lock primitives
                 bag.addItem(new_func);
-                new_func.unlock();
+                if (!new_func.isValue()) {
+                    new_func.unlock();
+                }
                 this.stage.remove(new_func);
             }
         }
@@ -581,6 +583,43 @@ class PopExpr extends Expression {
 }
 
 class SmallStepBagExpr extends BracketArrayExpr {
+    constructor(x, y, w, h, holding=[]) {
+        super(x, y, w, h, holding);
+        this.overlay = false;
+    }
+
+    start() {
+        if (!this.overlay) {
+            this.overlay = true;
+            let overlay = this.stage.showOverlay(0.5);
+            const stage = this.stage;
+            stage.remove(this);
+            stage.add(this);
+            this.overlayNode = overlay;
+        }
+    }
+
+    finish() {
+        const stage = this.stage;
+        let clone = new BracketArrayExpr();
+        this.items.forEach(clone.addItem.bind(clone));
+        (this.parent || this.stage).swap(this, clone);
+        Animate.tween(this.overlayNode, {
+            opacity: 0,
+        }, 1000).after(() => {
+            stage.remove(this.overlayNode);
+            stage.ranResetNotifier = false;
+            stage.update();
+        });
+    }
+
+    update() {
+        if (this.stage && !this.overlay) {
+            this.start();
+        }
+        super.update();
+    }
+
     get items() {
         return this._items.slice();
     }
@@ -599,9 +638,7 @@ class SmallStepBagExpr extends BracketArrayExpr {
             }
         });
         if (allValues && (this.parent || this.stage)) {
-            let clone = new BracketArrayExpr();
-            this.items.forEach(clone.addItem.bind(clone));
-            (this.parent || this.stage).swap(this, clone);
+            this.finish();
         }
     }
 

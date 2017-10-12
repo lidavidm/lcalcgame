@@ -264,18 +264,8 @@ class ReductStage extends mag.Stage {
                 this.saveSubstate('dead-end');
                 Logger.log('dead-end', {'final_state':this.toString()} );
 
+                this.showOverlay();
                 let btn_reset = this.uiNodes[1];
-                this.remove(btn_reset);
-                let r = new mag.Rect(0,0,GLOBAL_DEFAULT_SCREENSIZE.w, GLOBAL_DEFAULT_SCREENSIZE.h);
-                r.color = "black";
-                r.opacity = 0.0;
-                r.ignoreEvents = true;
-                this.add(r);
-                this.add(btn_reset); // puts the button over r
-                this.ranResetNotifier = true;
-
-                Animate.tween(r, {opacity:0.12}, 1000);
-
                 btn_reset.images.default = "btn-reset-force";
                 btn_reset.image = btn_reset.images.default;
                 this.draw();
@@ -355,6 +345,22 @@ class ReductStage extends mag.Stage {
                 this.ranCompletionAnim = true;
             }
         }
+    }
+
+    showOverlay(opacity=0.12) {
+        let btn_reset = this.uiNodes[1];
+        this.remove(btn_reset);
+        let r = new mag.Rect(0,0,GLOBAL_DEFAULT_SCREENSIZE.w, GLOBAL_DEFAULT_SCREENSIZE.h);
+        r.color = "black";
+        r.opacity = 0.0;
+        r.ignoreEvents = true;
+        this.add(r);
+        this.add(btn_reset); // puts the button over r
+        this.ranResetNotifier = true;
+
+        Animate.tween(r, {opacity: opacity}, 1000);
+
+        return r;
     }
 
     onmousedown(pos) {
