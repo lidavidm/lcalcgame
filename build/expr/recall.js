@@ -928,6 +928,7 @@ var TypeInTextExpr = function (_TextExpr) {
 
         var _this10 = _possibleConstructorReturn(this, (TypeInTextExpr.__proto__ || Object.getPrototypeOf(TypeInTextExpr)).call(this, " "));
 
+        _this10._origValidator = validator;
         _this10.validator = function (txt) {
             var valid = validator(txt);
             Logger.log('check-validity', { 'text': txt, 'isValid': valid === true });

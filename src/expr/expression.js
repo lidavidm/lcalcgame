@@ -566,15 +566,45 @@ class Expression extends mag.RoundedRect {
     }
 
     updateReducibilityIndicator() {
+        // Replace TypeInTextExpr#canReduce to prevent auto-commit and
+        // logging calls
+        const fakeReduce = function() {
+            if (this.typeBox) {
+                if (this._origValidator) {
+                    // Logging calls slow down this drastically, so
+                    // avoid it if possible (event will get logged by
+                    // the normal keypress handler)
+                    return this._origValidator(this.typeBox.text);
+                }
+                return this.validator(this.typeBox.text);
+            }
+            else return true;
+        };
+
+        const patchup = [];
+        mag.Stage.getNodesWithClass(TypeInTextExpr, [], true, [this]).forEach((n) => {
+            n.__origReduce = n.canReduce;
+            n.canReduce = fakeReduce.bind(n);
+            patchup.push(n);
+        });
+
         // Apply green outline to reducable expressions:
-        if (this.canReduce && this.canReduce() && !this.parent) {
-            this.baseStroke = { color: "#00FF00",
+        const placeholderChildren = this.getPlaceholderChildren().filter(
+            (n) => !(n instanceof VarExpr || n instanceof TypeInTextExpr));
+        const placeholders = placeholderChildren && placeholderChildren.length > 0;
+        if (!placeholders && this.canReduce && this.canReduce() && !this.parent) {
+            this.baseStroke = { color: "#00FF7F",
                                 lineWidth: 4,
                                 opacity: 0.5 };
         }
         else {
             this.baseStroke = null;
         }
+
+        patchup.forEach((n) => {
+            n.canReduce = n.__origReduce.bind(n);
+            delete n.__origReduce;
+        });
     }
 
     lockInteraction() {
