@@ -587,6 +587,11 @@ class Expression extends mag.RoundedRect {
             n.canReduce = fakeReduce.bind(n);
             patchup.push(n);
         });
+        mag.Stage.getNodesWithClass(ContextualTypeInTextExpr, [], true, [this]).forEach((n) => {
+            n.__origReduce = n.canReduce;
+            n.canReduce = fakeReduce.bind(n);
+            patchup.push(n);
+        });
 
         // Apply green outline to reducable expressions:
         const placeholderChildren = this.getPlaceholderChildren().filter(

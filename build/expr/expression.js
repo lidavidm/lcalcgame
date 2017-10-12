@@ -702,6 +702,11 @@ var Expression = function (_mag$RoundedRect) {
                 n.canReduce = fakeReduce.bind(n);
                 patchup.push(n);
             });
+            mag.Stage.getNodesWithClass(ContextualTypeInTextExpr, [], true, [this]).forEach(function (n) {
+                n.__origReduce = n.canReduce;
+                n.canReduce = fakeReduce.bind(n);
+                patchup.push(n);
+            });
 
             // Apply green outline to reducable expressions:
             var placeholderChildren = this.getPlaceholderChildren().filter(function (n) {
