@@ -810,6 +810,7 @@ var Expression = function (_mag$RoundedRect) {
                 this.posBeforeDrag = this.absolutePos;
                 if (this.stage) this.stage.bringToFront(this);
                 this.dragging = true;
+                SET_CURSOR_STYLE(CONST.CURSOR.GRABBING);
             }
 
             // Fire notch events
@@ -860,6 +861,9 @@ var Expression = function (_mag$RoundedRect) {
 
                 Logger.log('detach-commit', this.toString());
             }
+
+            SET_CURSOR_STYLE(CONST.CURSOR.DEFAULT);
+
             var toplevel = this.rootParent;
             if (!toplevel) toplevel = this;
             if (this.dragging || toplevel.dragging) {

@@ -316,7 +316,7 @@ var ReductStage = function (_mag$Stage) {
                     this.add(btn_reset); // puts the button over r
                     this.ranResetNotifier = true;
 
-                    Animate.tween(r, { opacity: 0.2 }, 1000);
+                    Animate.tween(r, { opacity: 0.12 }, 1000);
 
                     btn_reset.images.default = "btn-reset-force";
                     btn_reset.image = btn_reset.images.default;
