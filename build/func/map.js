@@ -577,6 +577,7 @@ var FadedMapFunc = function (_FadedSimpleMapFunc) {
             });
 
             this.children = this.holes; // for rendering
+            this.updateReducibilityIndicator();
         }
     }]);
 
@@ -636,6 +637,7 @@ var FunnelMapFunc = function (_MapFunc2) {
             this.holes.forEach(function (h) {
                 _this9.addChild(h);
             });
+            this.updateReducibilityIndicator();
         }
     }, {
         key: 'onmouseenter',

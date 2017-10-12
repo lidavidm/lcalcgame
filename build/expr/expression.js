@@ -241,12 +241,7 @@ var Expression = function (_mag$RoundedRect) {
 
             this.children = this.holes; // for rendering
 
-            // Apply green outline to reducable expressions:
-            // if (this.canReduce && this.canReduce()) {
-            //     this.strokeGlow = '#0F0';
-            // } else {
-            //     this.strokeGlow = null;
-            // }
+            this.updateReducibilityIndicator();
         }
 
         // Apply arguments to expression
@@ -685,6 +680,18 @@ var Expression = function (_mag$RoundedRect) {
             });
         }
     }, {
+        key: 'updateReducibilityIndicator',
+        value: function updateReducibilityIndicator() {
+            // Apply green outline to reducable expressions:
+            if (this.canReduce && this.canReduce() && !this.parent) {
+                this.baseStroke = { color: "green",
+                    lineWidth: 4,
+                    opacity: 1 };
+            } else {
+                this.baseStroke = null;
+            }
+        }
+    }, {
         key: 'lockInteraction',
         value: function lockInteraction() {
             if (!this.lockedInteraction) {
@@ -728,7 +735,7 @@ var Expression = function (_mag$RoundedRect) {
     }, {
         key: 'onmouseleave',
         value: function onmouseleave(pos) {
-            if (this.forceTypingOnFill) this.stroke = { color: 'magenta', lineWidth: 4 };else this.stroke = null;
+            if (this.forceTypingOnFill) this.stroke = { color: 'magenta', lineWidth: 4 };else _get(Expression.prototype.__proto__ || Object.getPrototypeOf(Expression.prototype), 'onmouseleave', this).call(this, pos);
         }
     }, {
         key: 'onmousedrag',

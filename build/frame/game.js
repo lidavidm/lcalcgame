@@ -214,11 +214,13 @@ var Level = function () {
             stage.testBoard = function (exprs) {
                 var _this2 = this;
 
+                var checkUnpaired = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
                 var matching = goal.test(exprs.map(function (n) {
                     return n.clone();
                 }), this.environmentDisplay);
                 if (matching && matching.unpaired) {
-                    if (!stage.mightBeCompleted()) {
+                    if (checkUnpaired && !stage.mightBeCompleted()) {
                         Animate.wait(500).after(function () {
                             var _iteratorNormalCompletion4 = true;
                             var _didIteratorError4 = false;
@@ -426,7 +428,7 @@ var Level = function () {
 
                     var wPadding = (screen.width - width) / (_row.length + 1);
 
-                    var _x4 = screen.x + wPadding;
+                    var _x5 = screen.x + wPadding;
                     var _iteratorNormalCompletion8 = true;
                     var _didIteratorError8 = false;
                     var _iteratorError8 = undefined;
@@ -441,12 +443,12 @@ var Level = function () {
                             // padding. This helps make it look a little less
                             // grid-based.
                             _e2.pos = {
-                                x: _x4 + (Math.seededRandom() - 0.5) * 0.8 * wPadding,
+                                x: _x5 + (Math.seededRandom() - 0.5) * 0.8 * wPadding,
                                 y: y + (Math.seededRandom() - 0.5) * 0.8 * hPadding
                             };
                             result.push(_e2);
 
-                            _x4 += wPadding + _size.w;
+                            _x5 += wPadding + _size.w;
                             _dy = Math.max(_dy, _size.h);
                         }
                     } catch (err) {

@@ -31,6 +31,7 @@ var mag = function (_) {
             _this._color = "lightgray";
             _this._highlightColor = 'yellow';
             _this.stroke = null;
+            _this._baseStroke = null;
             _this.shadowOffset = 4;
             _this.shadowColor = 'black';
             return _this;
@@ -214,6 +215,9 @@ var mag = function (_) {
             key: 'onmouseleave',
             value: function onmouseleave(pos) {
                 this.stroke = null;
+                if (this.baseStroke) {
+                    this.stroke = this.baseStroke;
+                }
             }
         }, {
             key: 'onmouseup',
@@ -287,6 +291,18 @@ var mag = function (_) {
             },
             set: function set(sc) {
                 this._scale = sc;
+            }
+        }, {
+            key: 'baseStroke',
+            get: function get() {
+                return this._baseStroke;
+            },
+            set: function set(s) {
+                var oldStroke = this._baseStroke;
+                this._baseStroke = s;
+                if (!this.stroke || this.stroke === oldStroke) {
+                    this.stroke = s;
+                }
             }
         }]);
 

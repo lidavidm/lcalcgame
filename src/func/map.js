@@ -442,6 +442,7 @@ class FadedMapFunc extends FadedSimpleMapFunc {
         });
 
         this.children = this.holes; // for rendering
+        this.updateReducibilityIndicator();
     }
 }
 
@@ -487,6 +488,7 @@ class FunnelMapFunc extends MapFunc {
         this.holes.forEach((h) => {
             this.addChild(h);
         });
+        this.updateReducibilityIndicator();
     }
     onmouseenter(pos) {
         this.funnel.onmouseenter(pos);

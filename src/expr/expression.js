@@ -240,12 +240,7 @@ class Expression extends mag.RoundedRect {
 
         this.children = this.holes; // for rendering
 
-        // Apply green outline to reducable expressions:
-        // if (this.canReduce && this.canReduce()) {
-        //     this.strokeGlow = '#0F0';
-        // } else {
-        //     this.strokeGlow = null;
-        // }
+        this.updateReducibilityIndicator();
     }
 
     // Apply arguments to expression
@@ -570,6 +565,18 @@ class Expression extends mag.RoundedRect {
         });
     }
 
+    updateReducibilityIndicator() {
+        // Apply green outline to reducable expressions:
+        if (this.canReduce && this.canReduce() && !this.parent) {
+            this.baseStroke = { color: "green",
+                                lineWidth: 4,
+                                opacity: 1 };
+        }
+        else {
+            this.baseStroke = null;
+        }
+    }
+
     lockInteraction() {
         if (!this.lockedInteraction) {
             this.lockedInteraction = true;
@@ -612,7 +619,7 @@ class Expression extends mag.RoundedRect {
         if (this.forceTypingOnFill)
             this.stroke = { color:'magenta', lineWidth:4 };
         else
-            this.stroke = null;
+            super.onmouseleave(pos);
     }
 
     onmousedrag(pos) {

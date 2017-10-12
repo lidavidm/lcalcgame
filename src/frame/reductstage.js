@@ -229,14 +229,14 @@ class ReductStage extends mag.Stage {
         // If there's only one thing,
         // add it to board and test new board against the Goal.
         if (toolbox_exprs.length === 1)
-            return this.testBoard(remaining_exprs);
+            return this.testBoard(remaining_exprs, false);
 
         // Construct list of all possible board states
         // using powerset of toolbox exprs.
         const subsets = powerset(toolbox_exprs);
         for (let s of subsets) {
             if (s.length === 0) continue; // empty set falls under our assumption, so skip it.
-            if (this.testBoard(exprs.concat(s)) !== false)
+            if (this.testBoard(exprs.concat(s), false) !== false)
                 return true; // if at least one possible board state works, this level can be solved.
         }
 

@@ -246,7 +246,7 @@ var ReductStage = function (_mag$Stage) {
 
             // If there's only one thing,
             // add it to board and test new board against the Goal.
-            if (toolbox_exprs.length === 1) return this.testBoard(remaining_exprs);
+            if (toolbox_exprs.length === 1) return this.testBoard(remaining_exprs, false);
 
             // Construct list of all possible board states
             // using powerset of toolbox exprs.
@@ -260,7 +260,7 @@ var ReductStage = function (_mag$Stage) {
                     var s = _step.value;
 
                     if (s.length === 0) continue; // empty set falls under our assumption, so skip it.
-                    if (this.testBoard(exprs.concat(s)) !== false) return true; // if at least one possible board state works, this level can be solved.
+                    if (this.testBoard(exprs.concat(s), false) !== false) return true; // if at least one possible board state works, this level can be solved.
                 }
 
                 // None of the possible board states could be solved.
