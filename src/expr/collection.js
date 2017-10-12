@@ -629,7 +629,29 @@ class SmallStepBagExpr extends BracketArrayExpr {
         if (this.stage && !this.overlay && !this.finished) {
             this.start();
         }
+
         super.update();
+
+        // Fix the position
+        if (this.stage) {
+            const pos = clonePos(this.pos);
+            this.anchor = { x: 0, y: 0.5 };
+            if (this.absoluteSize.w < this.stage.boundingSize.w) {
+                pos.x = (this.stage.boundingSize.w - this.absoluteSize.w) / 2;
+            }
+            else {
+                let offset = 0;
+                for (const item of this._items) {
+                    if (!item.isValue() || item.canReduce()) {
+                        pos.x = -offset + 50;
+                        break;
+                    }
+                    offset += item.absoluteSize.w;
+                }
+            }
+
+            this.pos = pos;
+        }
     }
 
     get items() {
