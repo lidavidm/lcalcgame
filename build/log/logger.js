@@ -16,6 +16,7 @@ var Logger = function () {
     var __RUNNING_LOCALLY = location.hostname === "localhost" || location.hostname === "127.0.0.1";
     var __LOCAL_LOGGING = false && __RUNNING_LOCALLY;
     var __LOCAL_LOGGER_PORT = 3333;
+    var __LOCAL_CACHING = false;
     var __GDIAC_BASEURL = 'http://gdiac.cs.cornell.edu/research_games/';
     var __PAGE_LOAD_URL = __GDIAC_BASEURL + 'page_load.php';
     var __TASK_BEGIN_URL = __GDIAC_BASEURL + 'player_quest.php';
@@ -68,7 +69,7 @@ var Logger = function () {
     // Load from previous logs; for instance if user accidentally
     // closed the tab / window, we still want to load the
     // full (local) log upon their return:
-    if (window.localStorage && window.localStorage["static_log"]) {
+    if (__LOCAL_CACHING && window.localStorage && window.localStorage["static_log"]) {
         static_log = JSON.parse(window.localStorage["static_log"]);
         console.log('%c Loaded prior play data from localStorage.', 'background: #bada55; color: #eee');
     }
@@ -85,7 +86,7 @@ var Logger = function () {
 
         // Push to local data storage, so we have backup in case
         // user exits the page:
-        if (window.localStorage) window.localStorage["static_log"] = JSON.stringify(static_log);
+        if (__LOCAL_CACHING && window.localStorage) window.localStorage["static_log"] = JSON.stringify(static_log);
 
         if (__LOCAL_LOGGING) {
             var xhr = new XMLHttpRequest();
