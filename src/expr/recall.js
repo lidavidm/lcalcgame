@@ -735,6 +735,7 @@ class TypeInTextExpr extends TextExpr {
     constructor(validator, afterCommit, charLimit=1) {
         super(" ");
 
+        this._origValidator = validator;
         this.validator = (txt) => {
             const valid = validator(txt);
             Logger.log('check-validity', { 'text':txt, 'isValid':valid === true });
@@ -916,6 +917,7 @@ class TypeInTextExpr extends TextExpr {
         }
         else return true;
     }
+
     isComplete() {
         if (this.typeBox) {
             let txt = this.typeBox.text;
