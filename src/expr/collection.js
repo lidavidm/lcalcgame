@@ -94,8 +94,10 @@ class BagExpr extends CollectionExpr {
             console.error('@ BagExpr.applyFunc: Func expr does not take argument.');
             return undefined;
         }
-        let bag = this.clone();
+
+        let bag = new SmallStepBagExpr();
         bag.graphicNode.reset();
+
         let items = this.items.map((i) => i.clone());
         bag.items = [];
         let new_items = [];
@@ -124,8 +126,9 @@ class BagExpr extends CollectionExpr {
             for (let new_func of new_funcs) {
                 new_func.pos = pos;
                 new_func.unlockSubexpressions();
-                new_func.lockSubexpressions((expr) => (expr instanceof ValueExpr || expr instanceof FadedValueExpr || expr instanceof BooleanPrimitive)); // lock primitives
-                bag.addItem(new_func.reduceCompletely());
+                new_func.lockSubexpressions((expr) => (expr instanceof ValueExpr || expr instanceof FadedValueExpr || expr instanceof BooleanPrimitive || expr.isValue())); // lock primitives
+                bag.addItem(new_func);
+                new_func.unlock();
                 this.stage.remove(new_func);
             }
         }
@@ -307,6 +310,7 @@ class BracketBag extends Expression {
 
     reset() {
         this.holes = [this.l_brak, this.r_brak];
+        this.children = [this.l_brak, this.r_brak];
     }
 
     swap(arg, otherArg) {
@@ -574,4 +578,39 @@ class PopExpr extends Expression {
         }
     }
     toString() { return '(pop ' + this.collection.toString() + ')'; }
+}
+
+class SmallStepBagExpr extends BracketArrayExpr {
+    get items() {
+        return this._items.slice();
+    }
+
+    set items(items) {
+        this._items.forEach((item) => this.graphicNode.removeArg(item));
+        this.graphicNode.reset();
+        this._items = [];
+        let allValues = true;
+        items.forEach((item) => {
+            this.addItem(item);
+            item.onmousedrag = () => {};
+            if (!item.isValue()) {
+                item.unlock();
+                allValues = false;
+            }
+        });
+        if (allValues && (this.parent || this.stage)) {
+            let clone = new BracketArrayExpr();
+            this.items.forEach(clone.addItem.bind(clone));
+            (this.parent || this.stage).swap(this, clone);
+        }
+    }
+
+    addItem(item) {
+        item.onmousedrag = () => {};
+        super.addItem(item);
+    }
+
+    isValue() {
+        return false;
+    }
 }
