@@ -94,8 +94,10 @@ class BagExpr extends CollectionExpr {
             console.error('@ BagExpr.applyFunc: Func expr does not take argument.');
             return undefined;
         }
-        let bag = this.clone();
+
+        let bag = new SmallStepBagExpr();
         bag.graphicNode.reset();
+
         let items = this.items.map((i) => i.clone());
         bag.items = [];
         let new_items = [];
@@ -124,8 +126,11 @@ class BagExpr extends CollectionExpr {
             for (let new_func of new_funcs) {
                 new_func.pos = pos;
                 new_func.unlockSubexpressions();
-                new_func.lockSubexpressions((expr) => (expr instanceof ValueExpr || expr instanceof FadedValueExpr || expr instanceof BooleanPrimitive)); // lock primitives
-                bag.addItem(new_func.reduceCompletely());
+                new_func.lockSubexpressions((expr) => (expr instanceof ValueExpr || expr instanceof FadedValueExpr || expr instanceof BooleanPrimitive || expr.isValue())); // lock primitives
+                bag.addItem(new_func);
+                if (!new_func.isValue()) {
+                    new_func.unlock();
+                }
                 this.stage.remove(new_func);
             }
         }
@@ -307,6 +312,7 @@ class BracketBag extends Expression {
 
     reset() {
         this.holes = [this.l_brak, this.r_brak];
+        this.children = [this.l_brak, this.r_brak];
     }
 
     swap(arg, otherArg) {
@@ -574,4 +580,103 @@ class PopExpr extends Expression {
         }
     }
     toString() { return '(pop ' + this.collection.toString() + ')'; }
+}
+
+class SmallStepBagExpr extends BracketArrayExpr {
+    constructor(x, y, w, h, holding=[]) {
+        super(x, y, w, h, holding);
+        this.overlay = false;
+        this.finished = false;
+        this.ignoreAutoResize = true;
+    }
+
+    start() {
+        if (!this.overlay && !this.finished) {
+            this.overlay = true;
+            let overlay = this.stage.showOverlay(0.5);
+            const stage = this.stage;
+            stage.remove(this);
+            stage.add(this);
+            this.overlayNode = overlay;
+        }
+    }
+
+    finish() {
+        if (!this.finished) {
+            const stage = this.stage;
+            let clone = new BracketArrayExpr();
+            this.items.forEach(clone.addItem.bind(clone));
+            (this.parent || this.stage).swap(this, clone);
+            if (this.overlayNode) {
+                Animate.tween(this.overlayNode, {
+                    opacity: 0,
+                }, 1000).after(() => {
+                    stage.remove(this.overlayNode);
+                    stage.ranResetNotifier = false;
+                    stage.update();
+                });
+            }
+            this.finished = true;
+            this.overlay = false;
+        }
+    }
+
+    update() {
+        if (this._items.every(n => n.isValue() || !n.canReduce())) {
+            this.finish();
+        }
+
+        if (this.stage && !this.overlay && !this.finished) {
+            this.start();
+        }
+
+        super.update();
+
+        // Fix the position
+        if (this.stage) {
+            const pos = clonePos(this.pos);
+            this.anchor = { x: 0, y: 0.5 };
+            if (this.absoluteSize.w < this.stage.boundingSize.w) {
+                pos.x = (this.stage.boundingSize.w - this.absoluteSize.w) / 2;
+            }
+            else {
+                let offset = 0;
+                for (const item of this._items) {
+                    if (!item.isValue() || item.canReduce()) {
+                        pos.x = -offset + 50;
+                        break;
+                    }
+                    offset += item.absoluteSize.w;
+                }
+            }
+
+            this.pos = pos;
+        }
+    }
+
+    get items() {
+        return this._items.slice();
+    }
+
+    set items(items) {
+        this._items.forEach((item) => this.graphicNode.removeArg(item));
+        this.graphicNode.reset();
+        this._items = [];
+        items.forEach((item) => {
+            this.addItem(item);
+            item.onmousedrag = () => {};
+            if (!item.isValue()) {
+                item.unlock();
+            }
+        });
+    }
+
+    addItem(item) {
+        item.onmousedrag = () => {};
+        super.addItem(item);
+    }
+
+    isValue() {
+        return false;
+    }
 }

@@ -41,7 +41,8 @@ class IfStatement extends Expression {
     }
 
     canReduce() {
-        return this.cond && (this.cond.canReduce() || this.cond.isValue()) &&
+        return this.cond && (this.cond.canReduce() ||
+                             (this.cond.isValue() && this.cond instanceof BooleanPrimitive)) &&
             this.branch && (this.branch.canReduce() || this.branch.isValue());
     }
 

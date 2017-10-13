@@ -22,6 +22,7 @@ class Expression extends mag.RoundedRect {
         this.lockedInteraction = false;
         this._subexpScale = DEFAULT_SUBEXPR_SCALE;
         this._reducing = false;
+        this.ignoreAutoResize = false;
 
         if (this.holes) {
             var _this = this;
