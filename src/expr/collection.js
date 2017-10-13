@@ -601,6 +601,9 @@ class SmallStepBagExpr extends BracketArrayExpr {
         }
     }
 
+    onmouseenter() {}
+    onmousedrag() {}
+
     finish() {
         if (!this.finished) {
             const stage = this.stage;
@@ -635,6 +638,7 @@ class SmallStepBagExpr extends BracketArrayExpr {
         // Fix the position
         if (this.stage) {
             const pos = clonePos(this.pos);
+            pos.y = this.stage.boundingSize.h / 2;
             this.anchor = { x: 0, y: 0.5 };
             if (this.absoluteSize.w < this.stage.boundingSize.w) {
                 pos.x = (this.stage.boundingSize.w - this.absoluteSize.w) / 2;
@@ -667,12 +671,14 @@ class SmallStepBagExpr extends BracketArrayExpr {
             item.onmousedrag = () => {};
             if (!item.isValue()) {
                 item.unlock();
+                item.forceReducibilityIndicator = true;
             }
         });
     }
 
     addItem(item) {
         item.onmousedrag = () => {};
+        item.forceReducibilityIndicator = true;
         super.addItem(item);
     }
 

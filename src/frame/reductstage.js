@@ -353,6 +353,8 @@ class ReductStage extends mag.Stage {
         let r = new mag.Rect(0,0,GLOBAL_DEFAULT_SCREENSIZE.w, GLOBAL_DEFAULT_SCREENSIZE.h);
         r.color = "black";
         r.opacity = 0.0;
+        // Disable stroke on mouse enter
+        r.onmouseenter = () => {};
         // Hack to prevent repel-on-drop from interacting with the
         // overlay
         Object.defineProperty(r, "pos", {

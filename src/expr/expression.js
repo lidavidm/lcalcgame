@@ -23,6 +23,7 @@ class Expression extends mag.RoundedRect {
         this._subexpScale = DEFAULT_SUBEXPR_SCALE;
         this._reducing = false;
         this.ignoreAutoResize = false;
+        this.forceReducibilityIndicator = false;
 
         if (this.holes) {
             var _this = this;
@@ -599,7 +600,8 @@ class Expression extends mag.RoundedRect {
         const placeholderChildren = this.getPlaceholderChildren().filter(
             (n) => !(n instanceof VarExpr || n instanceof TypeInTextExpr));
         const placeholders = placeholderChildren && placeholderChildren.length > 0;
-        if (!placeholders && this.canReduce && this.canReduce() && !this.parent) {
+        if (!placeholders && this.canReduce && this.canReduce() &&
+            (!this.parent || this.forceReducibilityIndicator)) {
             this.baseStroke = { color: this.reducableStrokeColor ? this.reducableStrokeColor : "#00FF7F",
                                 lineWidth: 4,
                                 opacity: 0.5 };
