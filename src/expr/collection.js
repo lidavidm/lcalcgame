@@ -601,6 +601,9 @@ class SmallStepBagExpr extends BracketArrayExpr {
         }
     }
 
+    onmouseenter() {}
+    onmousedrag() {}
+
     finish() {
         if (!this.finished) {
             const stage = this.stage;
