@@ -353,7 +353,15 @@ class ReductStage extends mag.Stage {
         let r = new mag.Rect(0,0,GLOBAL_DEFAULT_SCREENSIZE.w, GLOBAL_DEFAULT_SCREENSIZE.h);
         r.color = "black";
         r.opacity = 0.0;
-        r.ignoreEvents = true;
+        // Hack to prevent repel-on-drop from interacting with the
+        // overlay
+        Object.defineProperty(r, "pos", {
+            get: function() {
+                return { x: r._pos.x, y: r._pos.y };
+            },
+            set: function() {}
+        });
+
         this.add(r);
         this.add(btn_reset); // puts the button over r
         this.ranResetNotifier = true;
