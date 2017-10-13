@@ -268,6 +268,8 @@ class ReductStage extends mag.Stage {
                 let btn_reset = this.uiNodes[1];
                 btn_reset.images.default = "btn-reset-force";
                 btn_reset.image = btn_reset.images.default;
+                this.remove(btn_reset);
+                this.add(btn_reset);  // Put reset button over the overlay
                 this.draw();
             }
 
@@ -348,8 +350,6 @@ class ReductStage extends mag.Stage {
     }
 
     showOverlay(opacity=0.12) {
-        let btn_reset = this.uiNodes[1];
-        this.remove(btn_reset);
         let r = new mag.Rect(0,0,GLOBAL_DEFAULT_SCREENSIZE.w, GLOBAL_DEFAULT_SCREENSIZE.h);
         r.color = "black";
         r.opacity = 0.0;
@@ -365,7 +365,6 @@ class ReductStage extends mag.Stage {
         });
 
         this.add(r);
-        this.add(btn_reset); // puts the button over r
         this.ranResetNotifier = true;
 
         Animate.tween(r, {opacity: opacity}, 1000);
