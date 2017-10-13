@@ -228,6 +228,11 @@ class ShatterExpressionEffect extends ExpressionEffect {
         return new Promise(function(resolve, reject) {
             Animate.tween(_this, { 'opacity':1.0 }, 400, (elapsed) => Math.pow(elapsed, 0.4)).after(() => {
                 if (_this.fadeCb) _this.fadeCb();
+                if (_this.stage) {
+                    _this.stage.update();
+                    _this.stage.drawImpl();
+                }
+
                 resolve();
             });
             Resource.play('heatup');

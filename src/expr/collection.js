@@ -625,20 +625,9 @@ class SmallStepBagExpr extends BracketArrayExpr {
     }
 
     update() {
-        if (this._items.every(n => n.isValue() || !n.canReduce())) {
-            this.finish();
-        }
-
-        if (this.stage && !this.overlay && !this.finished) {
-            this.start();
-        }
-
-        super.update();
-
         // Fix the position
         if (this.stage) {
             const pos = clonePos(this.pos);
-            pos.y = this.stage.boundingSize.h / 2;
             this.anchor = { x: 0, y: 0.5 };
             if (this.absoluteSize.w < this.stage.boundingSize.w) {
                 pos.x = (this.stage.boundingSize.w - this.absoluteSize.w) / 2;
@@ -655,6 +644,16 @@ class SmallStepBagExpr extends BracketArrayExpr {
             }
 
             this.pos = pos;
+        }
+
+        super.update();
+
+        if (this._items.every(n => n.isValue() || !n.canReduce())) {
+            this.finish();
+        }
+
+        if (this.stage && !this.overlay && !this.finished) {
+            this.start();
         }
     }
 
@@ -674,6 +673,8 @@ class SmallStepBagExpr extends BracketArrayExpr {
                 item.forceReducibilityIndicator = true;
             }
         });
+        this.graphicNode.update();
+        if (this.stage) super.update();
     }
 
     addItem(item) {
