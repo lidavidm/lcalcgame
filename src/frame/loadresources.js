@@ -1,3 +1,35 @@
+/* For fast-switching between game progressions. */
+const __ACTIVE_PROGRESSION = 'Hour of Code';
+const __PROGRESSIONS = {
+    'Typing Study': {
+        dir: 'levels/',
+        digraph: {
+            'intro': ['booleans'],
+            'booleans': ['conditionals'],
+            'conditionals': ['bindings'],
+            'bindings': ['map'],
+            'map': ['strings'],
+            'strings': ['confusing_strings'],
+            'confusing_strings': []
+        }
+    },
+    'Hour of Code': {
+        dir: 'levels-hourofcode/',
+        digraph: {
+            'intro': ['booleans'],
+            'booleans': ['conditionals'],
+            'conditionals': ['bindings'],
+            'bindings': ['bags'],
+            'bags': ['combination'],
+            'combination': ['map'],
+            'map': ['variables'],
+            'variables': ['sequence'],
+            'sequence': ['typing_variables'],
+            'typing_variables': []
+        }
+    }
+};
+
 function LOAD_REDUCT_GAMEAUDIO(Resource) {
     var loadAudio = Resource.loadAudio;
     var loadMusic = Resource.loadMusic;
@@ -47,28 +79,8 @@ function LOAD_REDUCT_GAMEAUDIO(Resource) {
 
 function LOAD_REDUCT_RESOURCES(Resource) {
     const __RESOURCE_PATH = Resource.path;
-    const __LEVELS_PATH = __RESOURCE_PATH + 'levels/';
-
-    // Add levels here:
-    // const chapterDigraph = {
-    //     'intro': ['booleans'],
-    //     'booleans': ['strings'],
-    //     'strings': ['variables'],
-    //     'variables': ['typing_variables'],
-    //     'typing_variables': []
-    // };
-    const chapterDigraph = {
-        'intro': ['booleans'],
-        'booleans': ['conditionals'],
-        'conditionals': ['bindings'],
-        'bindings': ['map'],
-        'map': ['strings'],
-        'strings': ['confusing_strings'],
-        'confusing_strings': []
-        // 'map': ['variables'],
-        // 'variables': ['typing_variables'],
-        // 'typing_variables': []
-    };
+    const __LEVELS_PATH = __RESOURCE_PATH + __PROGRESSIONS[__ACTIVE_PROGRESSION].dir;
+    const chapterDigraph = __PROGRESSIONS[__ACTIVE_PROGRESSION].digraph;
 
     var loadAudio = Resource.loadAudio;
     var loadImage = Resource.loadImage;
