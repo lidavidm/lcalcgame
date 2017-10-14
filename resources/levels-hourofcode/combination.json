@@ -45,10 +45,7 @@
             "board":"(bag) (star)",
             "goal":"(bag star)",
             "toolbox":"",
-            "description":"Faded bag.",
-            "fade": {
-                "bag":1
-            }
+            "description":"Faded bag."
         },
         {
             "board":"(bag star star)",

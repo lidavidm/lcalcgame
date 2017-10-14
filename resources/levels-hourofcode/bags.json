@@ -6,7 +6,11 @@
             "description":"Introduces the bag",
             "board":"(bag) (star)",
             "goal":"(bag star)",
-            "toolbox":""
+            "toolbox":"",
+            "fade": {
+                "bag":1
+            },
+            "showFade": false
         },
         {
             "description": "Can put multiple items in a bag.",
