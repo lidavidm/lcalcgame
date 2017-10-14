@@ -112,7 +112,7 @@ var ReductStage = function (_mag$Stage) {
                 if (__SHOW_DEV_INFO) {
                     this.add(btn_back);
 
-                    if (!__ALLOW_SKIPPING && ProgressManager.isLevelComplete(level_idx)) this.add(btn_next);
+                    if (__ALLOW_SKIPPING || ProgressManager.isLevelComplete(level_idx)) this.add(btn_next);
                 } else {
                     btn_menu.pos = btn_reset.pos;
                     btn_reset.pos = btn_next.pos;

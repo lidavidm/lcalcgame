@@ -99,7 +99,7 @@ class ReductStage extends mag.Stage {
             if (__SHOW_DEV_INFO) {
                 this.add(btn_back);
 
-                if (!__ALLOW_SKIPPING && ProgressManager.isLevelComplete(level_idx))
+                if (__ALLOW_SKIPPING || ProgressManager.isLevelComplete(level_idx))
                     this.add(btn_next);
             }
             else {
