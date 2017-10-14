@@ -79,7 +79,7 @@ class IfStatement extends Expression {
             var reduction = this.reduce();
             if (reduction != this) {
 
-                const abs_pos = this.parent ? null : reduction.centerPos();
+                const abs_pos = this.parent ? null : (reduction ? reduction.centerPos() : null);
 
                 let stage = this.stage;
                 let afterEffects = () => {
@@ -101,7 +101,7 @@ class IfStatement extends Expression {
                 if (reduction === null) {
                     this.playJimmyAnimation(afterEffects);
                 }
-                else if (reduction instanceof NullExpr) {
+                else if (reduction instanceof NullExpr || reduction instanceof FadedNullExpr) {
                     let red = afterEffects().then((red) => {
                         red.ignoreEvents = true; // don't let them move a null.
                         Resource.play('pop');
@@ -119,7 +119,6 @@ class IfStatement extends Expression {
                             ShapeExpandEffect.run(this.branch, 750, (e) => Math.pow(e, 0.5), 'blue', 1.5);
                             this.playUnlockAnimation(afterEffects);
                         });
-
                     } else {
                         this.cond.stroke = { color:'red', lineWidth:4 };
                         ShapeExpandEffect.run(this.cond, 750, (e) => Math.pow(e, 0.5), 'red', 1.5, () => {

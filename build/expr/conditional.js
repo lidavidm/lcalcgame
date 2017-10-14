@@ -102,7 +102,7 @@ var IfStatement = function (_Expression) {
                 if (reduction != _this2) {
                     (function () {
 
-                        var abs_pos = _this2.parent ? null : reduction.centerPos();
+                        var abs_pos = _this2.parent ? null : reduction ? reduction.centerPos() : null;
 
                         var stage = _this2.stage;
                         var afterEffects = function afterEffects() {
@@ -123,7 +123,7 @@ var IfStatement = function (_Expression) {
 
                         if (reduction === null) {
                             _this2.playJimmyAnimation(afterEffects);
-                        } else if (reduction instanceof NullExpr) {
+                        } else if (reduction instanceof NullExpr || reduction instanceof FadedNullExpr) {
                             var red = afterEffects().then(function (red) {
                                 red.ignoreEvents = true; // don't let them move a null.
                                 Resource.play('pop');
