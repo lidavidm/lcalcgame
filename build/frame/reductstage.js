@@ -222,7 +222,7 @@ var ReductStage = function (_mag$Stage) {
             // If every expression is a value, nothing can be reduced,
             // so continue with check.
             var contains_reducable_expr = remaining_exprs.some(function (e) {
-                return !e.isValue();
+                return !e.isValue() || e instanceof CollectionExpr;
             });
 
             // Quit if there's an expression in the game
@@ -236,7 +236,7 @@ var ReductStage = function (_mag$Stage) {
                 if (this.goalNodes.every(function (e) {
                     return e instanceof BracketArrayExpr;
                 }) && !remaining_exprs.some(function (e) {
-                    return e instanceof MapFunc || e instanceof SmallStepBagExpr;
+                    return e instanceof MapFunc || e instanceof SmallStepBagExpr || e instanceof BracketArrayExpr;
                 }) && this.getNodesWithClass(TypeInTextExpr).length === 0) {
                     return false;
                 }

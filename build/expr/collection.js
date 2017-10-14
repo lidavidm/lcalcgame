@@ -49,7 +49,6 @@ var BagExpr = function (_CollectionExpr) {
         //this.graphicNode.clipBackground = 'bag-background';
 
         _this2.anchor = { x: 0.5, y: 0.5 };
-        _this2._spillDisabled = true;
         return _this2;
     }
 
@@ -281,7 +280,7 @@ var BagExpr = function (_CollectionExpr) {
             } else if (this.toolbox) {
                 console.warn('@ BagExpr.spill: Cannot spill bag while it\'s inside the toolbox.');
                 return;
-            } else if (this._spillDisabled) return;
+            } else if (!__ALLOW_ARRAY_EVENTS || this._spillDisabled) return;
 
             var stage = this.stage;
             var items = this.items;
@@ -545,7 +544,6 @@ var BracketArrayExpr = function (_BagExpr) {
         _this8.addArg(new BracketBag());
 
         _this8._items = holding;
-        _this8._spillDisabled = true;
         //this.color = "tan";
         return _this8;
     }
@@ -629,7 +627,7 @@ var BracketArrayExpr = function (_BagExpr) {
             } else if (this.toolbox) {
                 console.warn('@ BracketArrayExpr.spill: Cannot spill array while it\'s inside the toolbox.');
                 return;
-            } else if (this._spillDisabled) {
+            } else if (!__ALLOW_ARRAY_EVENTS || this._spillDisabled) {
                 // alert('You can no longer spill collections onto the board.\n\nInstead, try .pop().');
                 return;
             }
@@ -683,16 +681,14 @@ var BracketArrayExpr = function (_BagExpr) {
     }, {
         key: 'ondropenter',
         value: function ondropenter(node, pos) {
-            // DISABLE bag add for now.
-            return;
+            if (!__ALLOW_ARRAY_EVENTS) return;
 
             this.onmouseenter(pos);
         }
     }, {
         key: 'ondropexit',
         value: function ondropexit(node, pos) {
-            // DISABLE bag add for now.
-            return;
+            if (!__ALLOW_ARRAY_EVENTS) return;
 
             this.onmouseleave(pos);
         }
@@ -701,8 +697,7 @@ var BracketArrayExpr = function (_BagExpr) {
         value: function ondropped(node, pos) {
             this.ondropexit(node, pos);
 
-            // DISABLE bag add for now.
-            return;
+            if (!__ALLOW_ARRAY_EVENTS) return;
 
             if (this.parent) return;
 

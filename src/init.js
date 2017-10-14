@@ -9,6 +9,7 @@ var canvas;
 
 var __ALLOW_PARTIAL_REPLICATION = false;
 var __ALLOW_SKIPPING = false;
+var __ALLOW_ARRAY_EVENTS = false;
 
 var __ACTIVE_LEVEL_VARIANT = getCookie('active_variant') || null;
 const __DEBUG_DISPLAY_STATEGRAPH = false;

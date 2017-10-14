@@ -207,7 +207,7 @@ class ReductStage extends mag.Stage {
 
         // If every expression is a value, nothing can be reduced,
         // so continue with check.
-        const contains_reducable_expr = remaining_exprs.some(e => (!e.isValue()));
+        const contains_reducable_expr = remaining_exprs.some(e => (!e.isValue() || e instanceof CollectionExpr));
 
         // Quit if there's an expression in the game
         // that can be reduced, like == or lambda.
@@ -217,8 +217,8 @@ class ReductStage extends mag.Stage {
             // * This is only valid in the CHI '18 version.
             // If the goal is an array, and no MapExprs remain,
             // then this level can't be completed no matter what is left.
-            if (this.goalNodes.every(e => e instanceof BracketArrayExpr) &&
-                !(remaining_exprs.some(e => e instanceof MapFunc || e instanceof SmallStepBagExpr)) &&
+            if (this.goalNodes.every(e => (e instanceof BracketArrayExpr)) &&
+                !(remaining_exprs.some(e => e instanceof MapFunc || e instanceof SmallStepBagExpr || e instanceof BracketArrayExpr)) &&
                 this.getNodesWithClass(TypeInTextExpr).length === 0) {
                 return false;
             }

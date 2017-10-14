@@ -18,7 +18,6 @@ class BagExpr extends CollectionExpr {
         //this.graphicNode.clipBackground = 'bag-background';
 
         this.anchor = { x:0.5, y:0.5 };
-        this._spillDisabled = true;
     }
     get items() { return this._items.slice(); }
     set items(items) {
@@ -152,7 +151,7 @@ class BagExpr extends CollectionExpr {
         } else if (this.toolbox) {
             console.warn('@ BagExpr.spill: Cannot spill bag while it\'s inside the toolbox.');
             return;
-        } else if (this._spillDisabled) return;
+        } else if (!__ALLOW_ARRAY_EVENTS || this._spillDisabled) return;
 
         let stage = this.stage;
         let items = this.items;
@@ -342,7 +341,6 @@ class BracketArrayExpr extends BagExpr {
         this.addArg(new BracketBag());
 
         this._items = holding;
-        this._spillDisabled = true;
         //this.color = "tan";
     }
     get items() { return this._items.slice(); }
@@ -415,7 +413,7 @@ class BracketArrayExpr extends BagExpr {
         } else if (this.toolbox) {
             console.warn('@ BracketArrayExpr.spill: Cannot spill array while it\'s inside the toolbox.');
             return;
-        } else if (this._spillDisabled) {
+        } else if (!__ALLOW_ARRAY_EVENTS || this._spillDisabled) {
             // alert('You can no longer spill collections onto the board.\n\nInstead, try .pop().');
             return;
         }
@@ -468,15 +466,15 @@ class BracketArrayExpr extends BagExpr {
     }
 
     ondropenter(node, pos) {
-        // DISABLE bag add for now.
-        return;
+        if (!__ALLOW_ARRAY_EVENTS)
+            return;
 
         this.onmouseenter(pos);
 
     }
     ondropexit(node, pos) {
-        // DISABLE bag add for now.
-        return;
+        if (!__ALLOW_ARRAY_EVENTS)
+            return;
 
         this.onmouseleave(pos);
 
@@ -484,8 +482,8 @@ class BracketArrayExpr extends BagExpr {
     ondropped(node, pos) {
         this.ondropexit(node, pos);
 
-        // DISABLE bag add for now.
-        return;
+        if (!__ALLOW_ARRAY_EVENTS)
+            return;
 
         if (this.parent) return;
 
