@@ -633,14 +633,7 @@ class SmallStepBagExpr extends BracketArrayExpr {
                 pos.x = (this.stage.boundingSize.w - this.absoluteSize.w) / 2;
             }
             else {
-                let offset = 0;
-                for (const item of this._items) {
-                    if (!item.isValue() || item.canReduce()) {
-                        pos.x = -offset + 50;
-                        break;
-                    }
-                    offset += item.absoluteSize.w;
-                }
+                pos.x = 0;
             }
 
             this.pos = pos;
