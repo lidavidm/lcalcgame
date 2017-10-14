@@ -665,6 +665,7 @@ class SmallStepBagExpr extends BracketArrayExpr {
                 item.unlock();
                 item.forceReducibilityIndicator = true;
             }
+            item.lockSubexpressions();
         });
         this.graphicNode.update();
         if (this.stage) super.update();
@@ -673,6 +674,7 @@ class SmallStepBagExpr extends BracketArrayExpr {
     addItem(item) {
         item.onmousedrag = () => {};
         item.forceReducibilityIndicator = true;
+        item.lockSubexpressions();
         super.addItem(item);
     }
 
