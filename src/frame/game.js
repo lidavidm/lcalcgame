@@ -110,6 +110,7 @@ class Level {
                 if (this.uiNodes.indexOf(n) > -1 ||
                     n.constructor.name === 'Rect' ||
                     n.constructor.name === 'ImageRect' ||
+                    n.constructor.name === 'MirrorShatterEffect' ||
                     !(n instanceof Expression) ||
                     n.fadingOut ||
                     n.toolbox || n.isSnapped()) continue;

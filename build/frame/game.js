@@ -152,7 +152,7 @@ var Level = function () {
                     for (var _iterator2 = this.nodes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                         var n = _step2.value;
 
-                        if (this.uiNodes.indexOf(n) > -1 || n.constructor.name === 'Rect' || n.constructor.name === 'ImageRect' || !(n instanceof Expression) || n.fadingOut || n.toolbox || n.isSnapped()) continue;else if (n instanceof NotchHangerExpr) continue;
+                        if (this.uiNodes.indexOf(n) > -1 || n.constructor.name === 'Rect' || n.constructor.name === 'ImageRect' || n.constructor.name === 'MirrorShatterEffect' || !(n instanceof Expression) || n.fadingOut || n.toolbox || n.isSnapped()) continue;else if (n instanceof NotchHangerExpr) continue;
                         nodes.push(n);
                     }
                 } catch (err) {
