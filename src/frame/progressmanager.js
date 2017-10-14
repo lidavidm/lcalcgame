@@ -12,6 +12,7 @@ var ProgressManager = (function() {
 
         if (window.localStorage["progress"])
             levelStatuses = JSON.parse(window.localStorage["progress"]);
+
         //pub.save();
     };
     pub.save = () => {

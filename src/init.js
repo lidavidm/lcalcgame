@@ -8,6 +8,7 @@ var stage;
 var canvas;
 
 var __ALLOW_PARTIAL_REPLICATION = false;
+var __ALLOW_SKIPPING = false;
 
 var __ACTIVE_LEVEL_VARIANT = getCookie('active_variant') || null;
 const __DEBUG_DISPLAY_STATEGRAPH = false;
@@ -440,7 +441,7 @@ let prepareCanvas = (function() {
 })();
 
 function saveProgress() {
-    //ProgressManager.save();
+    ProgressManager.save();
 
     // Last level player was on...
     var cookie = getCookie('level_idx');

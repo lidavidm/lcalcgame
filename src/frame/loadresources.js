@@ -13,7 +13,8 @@ const __PROGRESSIONS = {
             'confusing_strings': []
         },
         settings: { // This sets global flags.
-            '__ALLOW_PARTIAL_REPLICATION': false
+            '__ALLOW_PARTIAL_REPLICATION': false,
+            '__ALLOW_SKIPPING': true
         }
     },
     'Hour of Code': {
@@ -31,7 +32,8 @@ const __PROGRESSIONS = {
             'typing_variables': []
         },
         settings: { // This sets global flags.
-            '__ALLOW_PARTIAL_REPLICATION': true
+            '__ALLOW_PARTIAL_REPLICATION': true,
+            '__ALLOW_SKIPPING': true
         }
     }
 };

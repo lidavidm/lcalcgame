@@ -98,7 +98,9 @@ class ReductStage extends mag.Stage {
         else {
             if (__SHOW_DEV_INFO) {
                 this.add(btn_back);
-                this.add(btn_next);
+
+                if (!__ALLOW_SKIPPING && ProgressManager.isLevelComplete(level_idx))
+                    this.add(btn_next);
             }
             else {
                 btn_menu.pos = btn_reset.pos;
@@ -144,7 +146,9 @@ class ReductStage extends mag.Stage {
         let btn_next = this.uiNodes[2];
         let btn_hamburger = this.uiNodes[3];
 
-        const NUM_BUTTONS = (__IS_MOBILE ? 3 : 2) + (__SHOW_DEV_INFO ? 2 : 0);
+        let NUM_BUTTONS = (__IS_MOBILE ? 3 : 2) + (__SHOW_DEV_INFO ? 2 : 0);
+        if (!btn_next.stage)
+            NUM_BUTTONS--;
 
         for (let i = 0; i < NUM_BUTTONS; i++) {
             this.uiNodes[i].pos = {

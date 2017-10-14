@@ -111,7 +111,8 @@ var ReductStage = function (_mag$Stage) {
             } else {
                 if (__SHOW_DEV_INFO) {
                     this.add(btn_back);
-                    this.add(btn_next);
+
+                    if (!__ALLOW_SKIPPING && ProgressManager.isLevelComplete(level_idx)) this.add(btn_next);
                 } else {
                     btn_menu.pos = btn_reset.pos;
                     btn_reset.pos = btn_next.pos;
@@ -157,6 +158,7 @@ var ReductStage = function (_mag$Stage) {
             var btn_hamburger = this.uiNodes[3];
 
             var NUM_BUTTONS = (__IS_MOBILE ? 3 : 2) + (__SHOW_DEV_INFO ? 2 : 0);
+            if (!btn_next.stage) NUM_BUTTONS--;
 
             for (var i = 0; i < NUM_BUTTONS; i++) {
                 this.uiNodes[i].pos = {

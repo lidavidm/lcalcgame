@@ -10,6 +10,7 @@ var ProgressManager = function () {
         if (window.localStorage["spendUnits"]) score = parseInt(window.localStorage["spendUnits"]);else score = 0;
 
         if (window.localStorage["progress"]) levelStatuses = JSON.parse(window.localStorage["progress"]);
+
         //pub.save();
     };
     pub.save = function () {
