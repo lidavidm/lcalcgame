@@ -38,7 +38,7 @@ var __PROGRESSIONS = {
         },
         settings: { // This sets global flags.
             '__ALLOW_PARTIAL_REPLICATION': true,
-            '__ALLOW_SKIPPING': true,
+            '__ALLOW_SKIPPING': false,
             '__ALLOW_ARRAY_EVENTS': true
         }
     }
@@ -87,8 +87,9 @@ function LOAD_REDUCT_GAMEAUDIO(Resource) {
     loadAudio('unlock-planet', '325112__fisch12345__success.wav');
 
     // Bg music
-    loadMusic('bg1', 'bg-night-owl-loop.mp3');
-    loadMusic('bg-menu', 'bg-zabriskie-cylinder-nine.mp3');
+    // DISABLED for now... takes too long to load!
+    // loadMusic('bg1', 'bg-night-owl-loop.mp3');
+    // loadMusic('bg-menu', 'bg-zabriskie-cylinder-nine.mp3');
 }
 
 function LOAD_REDUCT_RESOURCES(Resource) {

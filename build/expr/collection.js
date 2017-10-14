@@ -938,35 +938,7 @@ var SmallStepBagExpr = function (_BracketArrayExpr) {
                 if (this.absoluteSize.w < this.stage.boundingSize.w) {
                     pos.x = (this.stage.boundingSize.w - this.absoluteSize.w) / 2;
                 } else {
-                    var offset = 0;
-                    var _iteratorNormalCompletion4 = true;
-                    var _didIteratorError4 = false;
-                    var _iteratorError4 = undefined;
-
-                    try {
-                        for (var _iterator4 = this._items[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                            var item = _step4.value;
-
-                            if (!item.isValue() || item.canReduce()) {
-                                pos.x = -offset + 50;
-                                break;
-                            }
-                            offset += item.absoluteSize.w;
-                        }
-                    } catch (err) {
-                        _didIteratorError4 = true;
-                        _iteratorError4 = err;
-                    } finally {
-                        try {
-                            if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                                _iterator4.return();
-                            }
-                        } finally {
-                            if (_didIteratorError4) {
-                                throw _iteratorError4;
-                            }
-                        }
-                    }
+                    pos.x = 0;
                 }
 
                 this.pos = pos;
@@ -989,6 +961,7 @@ var SmallStepBagExpr = function (_BracketArrayExpr) {
         value: function addItem(item) {
             item.onmousedrag = function () {};
             item.forceReducibilityIndicator = true;
+            item.lockSubexpressions();
             _get(SmallStepBagExpr.prototype.__proto__ || Object.getPrototypeOf(SmallStepBagExpr.prototype), 'addItem', this).call(this, item);
         }
     }, {
@@ -1016,6 +989,7 @@ var SmallStepBagExpr = function (_BracketArrayExpr) {
                     item.unlock();
                     item.forceReducibilityIndicator = true;
                 }
+                item.lockSubexpressions();
             });
             this.graphicNode.update();
             if (this.stage) _get(SmallStepBagExpr.prototype.__proto__ || Object.getPrototypeOf(SmallStepBagExpr.prototype), 'update', this).call(this);

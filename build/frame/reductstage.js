@@ -236,7 +236,7 @@ var ReductStage = function (_mag$Stage) {
                 if (this.goalNodes.every(function (e) {
                     return e instanceof BracketArrayExpr;
                 }) && !remaining_exprs.some(function (e) {
-                    return e instanceof MapFunc || e instanceof SmallStepBagExpr || e instanceof BracketArrayExpr;
+                    return e instanceof MapFunc || e instanceof SmallStepBagExpr || e instanceof BracketArrayExpr || e instanceof IfStatement;
                 }) && this.getNodesWithClass(TypeInTextExpr).length === 0) {
                     return false;
                 }
@@ -345,6 +345,7 @@ var ReductStage = function (_mag$Stage) {
                                 });
                             } else {
                                 // Skip victory jingle on every level after first.
+                                // Resource.play('victory');
                                 next();
                             }
                         };

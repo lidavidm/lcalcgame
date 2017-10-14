@@ -218,7 +218,7 @@ class ReductStage extends mag.Stage {
             // If the goal is an array, and no MapExprs remain,
             // then this level can't be completed no matter what is left.
             if (this.goalNodes.every(e => (e instanceof BracketArrayExpr)) &&
-                !(remaining_exprs.some(e => e instanceof MapFunc || e instanceof SmallStepBagExpr || e instanceof BracketArrayExpr)) &&
+                !(remaining_exprs.some(e => e instanceof MapFunc || e instanceof SmallStepBagExpr || e instanceof BracketArrayExpr || e instanceof IfStatement)) &&
                 this.getNodesWithClass(TypeInTextExpr).length === 0) {
                 return false;
             }
@@ -302,6 +302,7 @@ class ReductStage extends mag.Stage {
                             next();
                         });
                     } else { // Skip victory jingle on every level after first.
+                        // Resource.play('victory');
                        next();
                     }
                 };

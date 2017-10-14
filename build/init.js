@@ -71,7 +71,7 @@ function init() {
     });
 
     // Mute by default.
-    Resource.mute();
+    // Resource.mute();
 
     // -- TEST CORS --
     // $.ajax({
