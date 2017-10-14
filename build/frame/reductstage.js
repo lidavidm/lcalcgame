@@ -234,8 +234,10 @@ var ReductStage = function (_mag$Stage) {
                 if (this.goalNodes.every(function (e) {
                     return e instanceof BracketArrayExpr;
                 }) && !remaining_exprs.some(function (e) {
-                    return e instanceof MapFunc;
-                }) && this.getNodesWithClass(TypeInTextExpr).length === 0) return false;
+                    return e instanceof MapFunc || e instanceof SmallStepBagExpr;
+                }) && this.getNodesWithClass(TypeInTextExpr).length === 0) {
+                    return false;
+                }
 
                 return true;
             }
@@ -306,20 +308,12 @@ var ReductStage = function (_mag$Stage) {
                     this.saveSubstate('dead-end');
                     Logger.log('dead-end', { 'final_state': this.toString() });
 
+                    this.showOverlay();
                     var btn_reset = this.uiNodes[1];
-                    this.remove(btn_reset);
-                    var r = new mag.Rect(0, 0, GLOBAL_DEFAULT_SCREENSIZE.w, GLOBAL_DEFAULT_SCREENSIZE.h);
-                    r.color = "black";
-                    r.opacity = 0.0;
-                    r.ignoreEvents = true;
-                    this.add(r);
-                    this.add(btn_reset); // puts the button over r
-                    this.ranResetNotifier = true;
-
-                    Animate.tween(r, { opacity: 0.12 }, 1000);
-
                     btn_reset.images.default = "btn-reset-force";
                     btn_reset.image = btn_reset.images.default;
+                    this.remove(btn_reset);
+                    this.add(btn_reset); // Put reset button over the overlay
                     this.draw();
                 }
             } else {
@@ -395,6 +389,32 @@ var ReductStage = function (_mag$Stage) {
                     })();
                 }
             }
+        }
+    }, {
+        key: 'showOverlay',
+        value: function showOverlay() {
+            var opacity = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0.12;
+
+            var r = new mag.Rect(0, 0, GLOBAL_DEFAULT_SCREENSIZE.w, GLOBAL_DEFAULT_SCREENSIZE.h);
+            r.color = "black";
+            r.opacity = 0.0;
+            // Disable stroke on mouse enter
+            r.onmouseenter = function () {};
+            // Hack to prevent repel-on-drop from interacting with the
+            // overlay
+            Object.defineProperty(r, "pos", {
+                get: function get() {
+                    return { x: r._pos.x, y: r._pos.y };
+                },
+                set: function set() {}
+            });
+
+            this.add(r);
+            this.ranResetNotifier = true;
+
+            Animate.tween(r, { opacity: opacity }, 1000);
+
+            return r;
         }
     }, {
         key: 'onmousedown',

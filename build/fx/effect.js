@@ -321,6 +321,11 @@ var ShatterExpressionEffect = function (_ExpressionEffect) {
                     return Math.pow(elapsed, 0.4);
                 }).after(function () {
                     if (_this.fadeCb) _this.fadeCb();
+                    if (_this.stage) {
+                        _this.stage.update();
+                        _this.stage.drawImpl();
+                    }
+
                     resolve();
                 });
                 Resource.play('heatup');

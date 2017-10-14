@@ -414,6 +414,9 @@ var mag = function (_) {
                     // Ignore nodes that are not expressions
                     if (!(n instanceof Expression) || n.toolbox) return;
 
+                    // Ignore nodes that opt out
+                    if (n.ignoreAutoResize) return;
+
                     var left = n.pos.x - n.anchor.x * n.absoluteSize.w;
                     var top = n.pos.y - n.anchor.y * n.absoluteSize.h;
                     var right = left + n.absoluteSize.w;

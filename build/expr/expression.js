@@ -43,6 +43,8 @@ var Expression = function (_mag$RoundedRect) {
         _this2.lockedInteraction = false;
         _this2._subexpScale = DEFAULT_SUBEXPR_SCALE;
         _this2._reducing = false;
+        _this2.ignoreAutoResize = false;
+        _this2.forceReducibilityIndicator = false;
 
         if (_this2.holes) {
             var _this = _this2;
@@ -715,7 +717,7 @@ var Expression = function (_mag$RoundedRect) {
                 return !(n instanceof VarExpr || n instanceof TypeInTextExpr);
             });
             var placeholders = placeholderChildren && placeholderChildren.length > 0;
-            if (!placeholders && this.canReduce && this.canReduce() && !this.parent) {
+            if (!placeholders && this.canReduce && this.canReduce() && (!this.parent || this.forceReducibilityIndicator)) {
                 this.baseStroke = { color: this.reducableStrokeColor ? this.reducableStrokeColor : "#00FF7F",
                     lineWidth: 4,
                     opacity: 0.5 };

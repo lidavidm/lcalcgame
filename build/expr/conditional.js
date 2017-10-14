@@ -61,7 +61,7 @@ var IfStatement = function (_Expression) {
     }, {
         key: 'canReduce',
         value: function canReduce() {
-            return this.cond && (this.cond.canReduce() || this.cond.isValue()) && this.branch && (this.branch.canReduce() || this.branch.isValue());
+            return this.cond && (this.cond.canReduce() || this.cond.isValue() && this.cond instanceof BooleanPrimitive) && this.branch && (this.branch.canReduce() || this.branch.isValue());
         }
     }, {
         key: 'performReduction',

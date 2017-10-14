@@ -147,8 +147,10 @@ var BagExpr = function (_CollectionExpr) {
                 console.error('@ BagExpr.applyFunc: Func expr does not take argument.');
                 return undefined;
             }
-            var bag = this.clone();
+
+            var bag = new SmallStepBagExpr();
             bag.graphicNode.reset();
+
             var items = this.items.map(function (i) {
                 return i.clone();
             });
@@ -215,9 +217,12 @@ var BagExpr = function (_CollectionExpr) {
                             _new_func.pos = pos;
                             _new_func.unlockSubexpressions();
                             _new_func.lockSubexpressions(function (expr) {
-                                return expr instanceof ValueExpr || expr instanceof FadedValueExpr || expr instanceof BooleanPrimitive;
+                                return expr instanceof ValueExpr || expr instanceof FadedValueExpr || expr instanceof BooleanPrimitive || expr.isValue();
                             }); // lock primitives
-                            bag.addItem(_new_func.reduceCompletely());
+                            bag.addItem(_new_func);
+                            if (!_new_func.isValue()) {
+                                _new_func.unlock();
+                            }
                             this.stage.remove(_new_func);
                         }
                     } catch (err) {
@@ -498,6 +503,7 @@ var BracketBag = function (_Expression) {
         key: 'reset',
         value: function reset() {
             this.holes = [this.l_brak, this.r_brak];
+            this.children = [this.l_brak, this.r_brak];
         }
     }, {
         key: 'swap',
@@ -867,3 +873,159 @@ var PopExpr = function (_Expression3) {
 
     return PopExpr;
 }(Expression);
+
+var SmallStepBagExpr = function (_BracketArrayExpr) {
+    _inherits(SmallStepBagExpr, _BracketArrayExpr);
+
+    function SmallStepBagExpr(x, y, w, h) {
+        var holding = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : [];
+
+        _classCallCheck(this, SmallStepBagExpr);
+
+        var _this13 = _possibleConstructorReturn(this, (SmallStepBagExpr.__proto__ || Object.getPrototypeOf(SmallStepBagExpr)).call(this, x, y, w, h, holding));
+
+        _this13.overlay = false;
+        _this13.finished = false;
+        _this13.ignoreAutoResize = true;
+        return _this13;
+    }
+
+    _createClass(SmallStepBagExpr, [{
+        key: 'start',
+        value: function start() {
+            if (!this.overlay && !this.finished) {
+                this.overlay = true;
+                var overlay = this.stage.showOverlay(0.5);
+                var stage = this.stage;
+                stage.remove(this);
+                stage.add(this);
+                this.overlayNode = overlay;
+            }
+        }
+    }, {
+        key: 'onmouseenter',
+        value: function onmouseenter() {}
+    }, {
+        key: 'onmousedrag',
+        value: function onmousedrag() {}
+    }, {
+        key: 'finish',
+        value: function finish() {
+            var _this14 = this;
+
+            if (!this.finished) {
+                (function () {
+                    var stage = _this14.stage;
+                    var clone = new BracketArrayExpr();
+                    _this14.items.forEach(clone.addItem.bind(clone));
+                    (_this14.parent || _this14.stage).swap(_this14, clone);
+                    if (_this14.overlayNode) {
+                        Animate.tween(_this14.overlayNode, {
+                            opacity: 0
+                        }, 1000).after(function () {
+                            stage.remove(_this14.overlayNode);
+                            stage.ranResetNotifier = false;
+                            stage.update();
+                        });
+                    }
+                    _this14.finished = true;
+                    _this14.overlay = false;
+                })();
+            }
+        }
+    }, {
+        key: 'update',
+        value: function update() {
+            // Fix the position
+            if (this.stage) {
+                var pos = clonePos(this.pos);
+                this.anchor = { x: 0, y: 0.5 };
+                if (this.absoluteSize.w < this.stage.boundingSize.w) {
+                    pos.x = (this.stage.boundingSize.w - this.absoluteSize.w) / 2;
+                } else {
+                    var offset = 0;
+                    var _iteratorNormalCompletion4 = true;
+                    var _didIteratorError4 = false;
+                    var _iteratorError4 = undefined;
+
+                    try {
+                        for (var _iterator4 = this._items[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                            var item = _step4.value;
+
+                            if (!item.isValue() || item.canReduce()) {
+                                pos.x = -offset + 50;
+                                break;
+                            }
+                            offset += item.absoluteSize.w;
+                        }
+                    } catch (err) {
+                        _didIteratorError4 = true;
+                        _iteratorError4 = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                                _iterator4.return();
+                            }
+                        } finally {
+                            if (_didIteratorError4) {
+                                throw _iteratorError4;
+                            }
+                        }
+                    }
+                }
+
+                this.pos = pos;
+            }
+
+            _get(SmallStepBagExpr.prototype.__proto__ || Object.getPrototypeOf(SmallStepBagExpr.prototype), 'update', this).call(this);
+
+            if (this._items.every(function (n) {
+                return n.isValue() || !n.canReduce();
+            })) {
+                this.finish();
+            }
+
+            if (this.stage && !this.overlay && !this.finished) {
+                this.start();
+            }
+        }
+    }, {
+        key: 'addItem',
+        value: function addItem(item) {
+            item.onmousedrag = function () {};
+            item.forceReducibilityIndicator = true;
+            _get(SmallStepBagExpr.prototype.__proto__ || Object.getPrototypeOf(SmallStepBagExpr.prototype), 'addItem', this).call(this, item);
+        }
+    }, {
+        key: 'isValue',
+        value: function isValue() {
+            return false;
+        }
+    }, {
+        key: 'items',
+        get: function get() {
+            return this._items.slice();
+        },
+        set: function set(items) {
+            var _this15 = this;
+
+            this._items.forEach(function (item) {
+                return _this15.graphicNode.removeArg(item);
+            });
+            this.graphicNode.reset();
+            this._items = [];
+            items.forEach(function (item) {
+                _this15.addItem(item);
+                item.onmousedrag = function () {};
+                if (!item.isValue()) {
+                    item.unlock();
+                    item.forceReducibilityIndicator = true;
+                }
+            });
+            this.graphicNode.update();
+            if (this.stage) _get(SmallStepBagExpr.prototype.__proto__ || Object.getPrototypeOf(SmallStepBagExpr.prototype), 'update', this).call(this);
+        }
+    }]);
+
+    return SmallStepBagExpr;
+}(BracketArrayExpr);
