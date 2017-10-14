@@ -9,6 +9,8 @@ var GLOBAL_DEFAULT_SCREENSIZE = null;
 var stage;
 var canvas;
 
+var __ALLOW_PARTIAL_REPLICATION = false;
+
 var __ACTIVE_LEVEL_VARIANT = getCookie('active_variant') || null;
 var __DEBUG_DISPLAY_STATEGRAPH = false;
 

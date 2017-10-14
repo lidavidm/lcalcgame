@@ -337,8 +337,14 @@ class LambdaHoleExpr extends MissingExpression {
             }
             return false;
         };
-        if (hasTextbox(node) || hasPlaceholder(node))  return null;
-        if (hasTextbox(lambdaExpr) || hasPlaceholder(lambdaExpr))  return null;
+
+        if (__ALLOW_PARTIAL_REPLICATION === true) {
+            if (hasTextbox(node) || hasTextbox(lambdaExpr) || hasPlaceholder(lambdaExpr))
+                return null;
+        } else {
+            if (hasTextbox(node) || hasPlaceholder(node))  return null;
+            if (hasTextbox(lambdaExpr) || hasPlaceholder(lambdaExpr))  return null;
+        }
 
         if (node.dragging) { // Make sure node is being dragged by the user.
 

@@ -15,6 +15,9 @@ var __PROGRESSIONS = {
             'map': ['strings'],
             'strings': ['confusing_strings'],
             'confusing_strings': []
+        },
+        settings: { // This sets global flags.
+            '__ALLOW_PARTIAL_REPLICATION': false
         }
     },
     'Hour of Code': {
@@ -30,6 +33,9 @@ var __PROGRESSIONS = {
             'variables': ['sequence'],
             'sequence': ['typing_variables'],
             'typing_variables': []
+        },
+        settings: { // This sets global flags.
+            '__ALLOW_PARTIAL_REPLICATION': true
         }
     }
 };
@@ -82,9 +88,17 @@ function LOAD_REDUCT_GAMEAUDIO(Resource) {
 }
 
 function LOAD_REDUCT_RESOURCES(Resource) {
+    var __PROG = __PROGRESSIONS[__ACTIVE_PROGRESSION];
     var __RESOURCE_PATH = Resource.path;
-    var __LEVELS_PATH = __RESOURCE_PATH + __PROGRESSIONS[__ACTIVE_PROGRESSION].dir;
-    var chapterDigraph = __PROGRESSIONS[__ACTIVE_PROGRESSION].digraph;
+    var __LEVELS_PATH = __RESOURCE_PATH + __PROG.dir;
+    var chapterDigraph = __PROG.digraph;
+
+    if ('settings' in __PROG) {
+        var settings = __PROG.settings;
+        for (var s in settings) {
+            if (s in window) window[s] = settings[s];else console.warn('Setting "' + s + '" is not a member of window object. Skipping...');
+        }
+    }
 
     var loadAudio = Resource.loadAudio;
     var loadImage = Resource.loadImage;
