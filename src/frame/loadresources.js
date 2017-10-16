@@ -1,5 +1,5 @@
 /* For fast-switching between game progressions. */
-const __ACTIVE_PROGRESSION = 'Hour of Code';
+const __ACTIVE_PROGRESSION = 'Typing Study';
 const __PROGRESSIONS = {
     'Typing Study': {
         dir: 'levels/',
@@ -9,8 +9,7 @@ const __PROGRESSIONS = {
             'conditionals': ['bindings'],
             'bindings': ['map'],
             'map': ['strings'],
-            'strings': ['confusing_strings'],
-            'confusing_strings': []
+            'strings': []
         },
         settings: { // This sets global flags.
             '__ALLOW_PARTIAL_REPLICATION': false,

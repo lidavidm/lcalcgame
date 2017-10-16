@@ -3,7 +3,7 @@
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 /* For fast-switching between game progressions. */
-var __ACTIVE_PROGRESSION = 'Hour of Code';
+var __ACTIVE_PROGRESSION = 'Typing Study';
 var __PROGRESSIONS = {
     'Typing Study': {
         dir: 'levels/',
@@ -13,8 +13,7 @@ var __PROGRESSIONS = {
             'conditionals': ['bindings'],
             'bindings': ['map'],
             'map': ['strings'],
-            'strings': ['confusing_strings'],
-            'confusing_strings': []
+            'strings': []
         },
         settings: { // This sets global flags.
             '__ALLOW_PARTIAL_REPLICATION': false,
