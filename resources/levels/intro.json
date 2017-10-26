@@ -25,9 +25,39 @@
         },
         {
             "description":"Introduces concept: Toolbox. (*used to be deletion)",
-            "board":"a",
-            "goal":"(a) (a)",
+            "board":"",
+            "goal":"a",
             "toolbox":"(b) (a)"
+        },
+        {
+            "description":"Introduces concept: Replication.",
+            "board":"(λx #x #x) (a)",
+            "goal":"(a) (a)",
+            "toolbox":""
+        },
+        {
+            "description":"Toolbox can hold expressions.",
+            "board":"",
+            "goal":"(b) (b)",
+            "toolbox":"(a) (b) (λx #x #x)"
+        },
+        {
+            "description":"Functions are first-class.",
+            "board":"(λx #x) (λx #x #x)",
+            "goal":"(λx #x) (λx #x)",
+            "toolbox":""
+        },
+        {
+            "description":"Functions are first-class!",
+            "board":"(λx #x #x #x) (λx #x) (a)",
+            "goal":"a",
+            "toolbox":""
+        },
+        {
+            "description":"Tests knowledge of all concepts in this chapter.",
+            "board":"(b) (λx #x #x)",
+            "goal":"(a) (b)",
+            "toolbox":"(a) (λx #x)"
         }
     ],
     "resources":{

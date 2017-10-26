@@ -9,11 +9,12 @@ var __PROGRESSIONS = {
         dir: 'levels/',
         digraph: {
             'intro': ['booleans'],
-            'booleans': ['conditionals'],
+            'booleans': ['strings'],
+            'strings': ['confusing_strings'],
+            'confusing_strings': ['conditionals'],
             'conditionals': ['bindings'],
             'bindings': ['map'],
-            'map': ['strings'],
-            'strings': []
+            'map': []
         },
         settings: { // This sets global flags.
             '__ALLOW_PARTIAL_REPLICATION': false,

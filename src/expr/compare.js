@@ -107,7 +107,6 @@ class CompareExpr extends Expression {
             });
         }
         if (this.reduce() != this) {
-            console.log('reducing');
             if (animated) {
                 return new Promise((resolve, _reject) => {
                     var shatter = new ShatterExpressionEffect(this);

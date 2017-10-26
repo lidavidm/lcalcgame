@@ -4,6 +4,7 @@ var ProgressManager = function () {
     var pub = {};
     var score = 0;
     var levelStatuses = {};
+    var syntaxKnowledge = null;
 
     /* SAVING AND LOADING PROGRESS TO CACHE */
     pub.load = function () {
@@ -11,11 +12,17 @@ var ProgressManager = function () {
 
         if (window.localStorage["progress"]) levelStatuses = JSON.parse(window.localStorage["progress"]);
 
+        if (window.localStorage["knowledge"]) {
+            syntaxKnowledge = new SyntaxKnowledge(JSON.parse(window.localStorage["knowledge"]));
+        }
+
         //pub.save();
     };
     pub.save = function () {
         window.localStorage["spendUnits"] = score.toString();
         window.localStorage["progress"] = JSON.stringify(levelStatuses);
+
+        if (syntaxKnowledge) window.localStorage["knowledge"] = JSON.stringify(syntaxKnowledge);
     };
     pub.resetProgress = function () {
         score = 0;

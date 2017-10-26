@@ -134,7 +134,6 @@ var CompareExpr = function (_Expression) {
                 });
             }
             if (this.reduce() != this) {
-                console.log('reducing');
                 if (animated) {
                     return new Promise(function (resolve, _reject) {
                         var shatter = new ShatterExpressionEffect(_this2);

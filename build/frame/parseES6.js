@@ -228,37 +228,27 @@ var ES6Parser = function () {
                     } else if (node.callee.type === 'Identifier' && node.callee.name === '_op') {
                         // Special case: Operators like +, =, !=, ==, etc...
                         return new OpLiteral(node.arguments[0].value);
-                        // } else if (node.callee.type === 'Identifier' && node.callee.name === '_t_arrow') { // LambdaExpr missing the => operator. It's argument *is* a lambda...
-                        //     const lambda = this.parseNode(node.arguments[0]);
-                        //     if (lambda.hole.arrow) { // Swap the '=>' arrow text for a text box.
-                        //         const t = TypeInTextExpr.fromExprCode('_t_arrow');
-                        //         t.enforceHint('=>');
-                        //         //t.__remain_unlocked = true;
-                        //         //t.unlock();
-                        //         lambda.hole.arrow = t;
-                        //         lambda.hole.children[1] = t;
-                        //     }
-                        //     console.log(lambda);
-                        //     return lambda;
+                    } else if (node.callee.type === 'Identifier' && node.callee.name === 'give') {
+                        return new (ExprManager.getClass('give'))(_this2.parseNode(node.arguments[0]), _this2.parseNode(node.arguments[1]));
                     } else if (node.callee.type === 'MemberExpression' && node.callee.property.name === 'map') {
-                            return new (ExprManager.getClass('map'))(_this2.parseNode(node.arguments[0]), _this2.parseNode(node.callee.object));
-                        } else if (node.callee.type === 'Identifier') {
+                        return new (ExprManager.getClass('map'))(_this2.parseNode(node.arguments[0]), _this2.parseNode(node.callee.object));
+                    } else if (node.callee.type === 'Identifier') {
 
-                            if (node.callee.name.substring(0, 2) === '_t') {
-                                var type_expr = TypeInTextExpr.fromExprCode(node.name);
-                                if (node.arguments.length === 1 && node.arguments[0].type === 'Literal') type_expr.typeBox.text = node.arguments[0].value;
-                                return type_expr;
-                            }
-
-                            // Special case 'foo(_t_params)': Call parameters (including paretheses) will be entered by player.
-                            if (node.arguments.length === 1 && node.arguments[0].type === 'Identifier' && node.arguments[0].name === '_t_params') return new NamedFuncExpr(node.callee.name, '_t_params');else // All other cases, including special case _t_varname(...) specifying that call name will be entered by player.
-                                return new (Function.prototype.bind.apply(NamedFuncExpr, [null].concat([node.callee.name, null], _toConsumableArray(node.arguments.map(function (a) {
-                                    return _this2.parseNode(a);
-                                })))))();
-                        } else {
-                            console.error('Call expressions involving callee name resolution are currently undefined.');
-                            return null;
+                        if (node.callee.name.substring(0, 2) === '_t') {
+                            var type_expr = TypeInTextExpr.fromExprCode(node.name);
+                            if (node.arguments.length === 1 && node.arguments[0].type === 'Literal') type_expr.typeBox.text = node.arguments[0].value;
+                            return type_expr;
                         }
+
+                        // Special case 'foo(_t_params)': Call parameters (including paretheses) will be entered by player.
+                        if (node.arguments.length === 1 && node.arguments[0].type === 'Identifier' && node.arguments[0].name === '_t_params') return new NamedFuncExpr(node.callee.name, '_t_params');else // All other cases, including special case _t_varname(...) specifying that call name will be entered by player.
+                            return new (Function.prototype.bind.apply(NamedFuncExpr, [null].concat([node.callee.name, null], _toConsumableArray(node.arguments.map(function (a) {
+                                return _this2.parseNode(a);
+                            })))))();
+                    } else {
+                        console.error('Call expressions involving callee name resolution are currently undefined.');
+                        return null;
+                    }
                 },
 
                 /* Anonymous functions of the form (x) => x */

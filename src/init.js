@@ -163,7 +163,6 @@ function init() {
                     return loadChapterSelect();
 
                 }).then(afterLoad);
-
             });
         }
 

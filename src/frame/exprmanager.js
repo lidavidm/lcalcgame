@@ -63,7 +63,8 @@ var ExprManager = (function() {
         'return':   [ReturnStatement],
         'string':   [StringValueExpr, ColorlessStringValueExpr],
         'typing_str':   [TypeInStringValueExpr, ColorlessTypeInStringValueExpr],
-        'typing_array':   [TypeInArrayExpr]
+        'typing_array':   [TypeInArrayExpr],
+        'give':     [GiveExpr]
     };
     var fade_levels = {};
     var DEFAULT_FADE_LEVEL = 0;
