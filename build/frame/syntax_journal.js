@@ -19,6 +19,9 @@ var SyntaxJournal = function (_mag$Rect) {
         var _this = _possibleConstructorReturn(this, (SyntaxJournal.__proto__ || Object.getPrototypeOf(SyntaxJournal)).call(this, 0, 0, GLOBAL_DEFAULT_SCREENSIZE.w / 1.8, GLOBAL_DEFAULT_SCREENSIZE.h / 1.4));
 
         _this._viewingStage = null;
+        _this.shadowOffset = 0;
+        _this.color = 'beige';
+        _this.highlightColor = null;
         return _this;
     }
 
@@ -31,9 +34,10 @@ var SyntaxJournal = function (_mag$Rect) {
         key: 'renderKnowledge',
         value: function renderKnowledge() {
             this.children = [];
-            var exprs = this._syntaxKnowledge.expressions();
-            var pos = { x: 0, y: 0 };
-            var padding = 4;
+            var exprs = this._syntaxKnowledge.expressions;
+            var VERT_PAD = 20;
+            var CORNER_PAD = 20;
+            var pos = { x: CORNER_PAD, y: CORNER_PAD };
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
             var _iteratorError = undefined;
@@ -45,7 +49,7 @@ var SyntaxJournal = function (_mag$Rect) {
                     e.pos = clonePos(pos);
                     this.addChild(e);
                     this.update();
-                    pos.y += e.absoluteSize.h + padding;
+                    pos.y += e.absoluteSize.h + VERT_PAD;
                 }
             } catch (err) {
                 _didIteratorError = true;
@@ -73,20 +77,53 @@ var SyntaxJournal = function (_mag$Rect) {
     }, {
         key: 'open',
         value: function open(stage) {
+            var _this2 = this;
+
             if (this.isOpen) {
                 if (stage != this._viewingStage) console.warn('Stage mismatch.');
                 return;
             }
+
+            var sz = stage.boundingSize;
+
+            var bg = new mag.Rect(sz.w / 2.0, sz.h / 2.0, sz.w, sz.h);
+            bg.anchor = { x: 0.5, y: 0.5 };
+            bg.color = "black";
+            bg.highlightColor = null;
+            bg.opacity = 0.0;
+            bg.onmousedown = function () {
+                return _this2.onmousedown();
+            };
+            stage.add(bg);
+
+            Animate.tween(bg, { opacity: 0.5 }, 200, function (e) {
+                return e * e;
+            });
+
+            this.anchor = { x: 0.5, y: 0.5 };
+            this.pos = { x: sz.w / 2.0, y: sz.h / 2.0 };
             stage.add(this);
+
+            this._bg = bg;
             this._viewingStage = stage;
             this.ignoreEvents = false;
+
+            stage.update();
+            stage.draw();
         }
     }, {
         key: 'close',
         value: function close() {
             if (!this.isOpen) return;
             this._viewingStage.remove(this);
+            this._viewingStage.remove(this._bg);
             this._viewingStage = null;
+            this._bg = null;
+        }
+    }, {
+        key: 'onmousedown',
+        value: function onmousedown() {
+            this.close();
         }
     }, {
         key: 'knowledge',
@@ -106,6 +143,62 @@ var SyntaxJournal = function (_mag$Rect) {
 
     return SyntaxJournal;
 }(mag.Rect);
+
+/* Button for accessing the journal. */
+
+
+var SyntaxJournalButton = function (_mag$Button) {
+    _inherits(SyntaxJournalButton, _mag$Button);
+
+    function SyntaxJournalButton(syntaxJournal) {
+        var _this3;
+
+        _classCallCheck(this, SyntaxJournalButton);
+
+        var imgs = {
+            default: 'journal-default',
+            hover: 'journal-hover',
+            down: 'journal-mousedown'
+        };
+        return _this3 = _possibleConstructorReturn(this, (SyntaxJournalButton.__proto__ || Object.getPrototypeOf(SyntaxJournalButton)).call(this, imgs, function () {
+            //onclick
+            syntaxJournal.toggle(_this3.stage);
+            _this3.stage.bringToFront(_this3);
+
+            if (!syntaxJournal.isOpen) {
+                var e = ES6Parser.parse('x => _');
+                e.pos = { x: 300, y: 300 };
+                _this3.stage.add(e);
+                _this3.flyIn(e);
+            }
+        }));
+    }
+
+    // Animate the expression on the stage
+    // to 'fly into' the journal icon.
+    // Used to visualize 'collecting' syntax.
+
+
+    _createClass(SyntaxJournalButton, [{
+        key: 'flyIn',
+        value: function flyIn(expr) {
+            if (!expr.stage) return;
+
+            var stage = expr.stage;
+            Animate.tween(expr, { pos: this.absolutePos, anchor: { x: 0.5, y: 0.5 }, scale: { x: 0.5, y: 0.5 } }, 2000, Animate.EASE.SIGMOID).after(function () {
+                expr.opacity = 1.0;
+                ShapeExpandEffect.run(expr, 400);
+                Animate.tween(expr, { opacity: 0.0 }, 400).after(function () {
+                    stage.remove(expr);
+                });
+            });
+
+            //ShapeExpandEffect.run(expr);
+        }
+    }]);
+
+    return SyntaxJournalButton;
+}(mag.Button);
 
 /* Model for storing syntax knowledge acquired through play. */
 
@@ -127,38 +220,6 @@ var SyntaxKnowledge = function () {
     }
 
     _createClass(SyntaxKnowledge, [{
-        key: 'expressions',
-        value: regeneratorRuntime.mark(function expressions() {
-            var len, i;
-            return regeneratorRuntime.wrap(function expressions$(_context) {
-                while (1) {
-                    switch (_context.prev = _context.next) {
-                        case 0:
-                            len = this._unlocked.length;
-                            i = 0;
-
-                        case 2:
-                            if (!(i < len)) {
-                                _context.next = 8;
-                                break;
-                            }
-
-                            _context.next = 5;
-                            return ES6Parser.parse(this._map[this._unlocked[i]]);
-
-                        case 5:
-                            i++;
-                            _context.next = 2;
-                            break;
-
-                        case 8:
-                        case 'end':
-                            return _context.stop();
-                    }
-                }
-            }, expressions, this);
-        })
-    }, {
         key: 'unlock',
         value: function unlock(syntaxKey) {
             if (syntaxKey in map) {
@@ -179,32 +240,23 @@ var SyntaxKnowledge = function () {
         value: function toJSON() {
             return JSON.stringify(this._unlocked);
         }
+    }, {
+        key: 'expressions',
+        get: function get() {
+            var _this4 = this;
+
+            var dfl = ExprManager.getDefaultFadeLevel();
+            ExprManager.setDefaultFadeLevel(1); // disable concrete representations for this parsing
+            var es = this._unlocked.map(function (e) {
+                return ES6Parser.parse(_this4._map[e]);
+            });
+            es.forEach(function (e) {
+                e.ignoreEvents = true;
+            });
+            ExprManager.setDefaultFadeLevel(dfl);
+            return es;
+        }
     }]);
 
     return SyntaxKnowledge;
 }();
-
-/* Button for accessing the journal. */
-
-
-var SyntaxJournalButton = function (_mag$Button) {
-    _inherits(SyntaxJournalButton, _mag$Button);
-
-    function SyntaxJournalButton(syntaxJournal) {
-        var _this2;
-
-        _classCallCheck(this, SyntaxJournalButton);
-
-        var imgs = {
-            default: 'journal-default',
-            hover: 'journal-hover',
-            down: 'journal-mousedown'
-        };
-        return _this2 = _possibleConstructorReturn(this, (SyntaxJournalButton.__proto__ || Object.getPrototypeOf(SyntaxJournalButton)).call(this, imgs, function () {
-            //onclick
-            syntaxJournal.toggle(_this2.stage);
-        }));
-    }
-
-    return SyntaxJournalButton;
-}(mag.Button);

@@ -4,6 +4,9 @@ class SyntaxJournal extends mag.Rect {
         super(0, 0, GLOBAL_DEFAULT_SCREENSIZE.w / 1.8,
                     GLOBAL_DEFAULT_SCREENSIZE.h / 1.4);
         this._viewingStage = null;
+        this.shadowOffset = 0;
+        this.color = 'beige';
+        this.highlightColor = null;
     }
 
     // Setting expressions in the journal,
@@ -16,14 +19,15 @@ class SyntaxJournal extends mag.Rect {
     }
     renderKnowledge() {
         this.children = [];
-        const exprs = this._syntaxKnowledge.expressions();
-        let pos = { x:0, y:0 };
-        const padding = 4;
+        const exprs = this._syntaxKnowledge.expressions;
+        const VERT_PAD = 20;
+        const CORNER_PAD = 20;
+        let pos = { x:CORNER_PAD, y:CORNER_PAD };
         for (const e of exprs) {
             e.pos = clonePos(pos);
             this.addChild(e);
             this.update();
-            pos.y += e.absoluteSize.h + padding;
+            pos.y += e.absoluteSize.h + VERT_PAD;
         }
     }
 
@@ -39,15 +43,83 @@ class SyntaxJournal extends mag.Rect {
                 console.warn('Stage mismatch.');
             return;
         }
+
+        const sz = stage.boundingSize;
+
+        const bg = new mag.Rect(sz.w/2.0, sz.h/2.0, sz.w, sz.h);
+        bg.anchor = { x:0.5, y:0.5 };
+        bg.color = "black";
+        bg.highlightColor = null;
+        bg.opacity = 0.0;
+        bg.onmousedown = () => this.onmousedown();
+        stage.add(bg);
+
+        Animate.tween(bg, {opacity:0.5}, 200, (e) => e * e);
+
+        this.anchor = { x:0.5, y:0.5 };
+        this.pos = { x:sz.w/2.0, y:sz.h/2.0 };
         stage.add(this);
+
+        this._bg = bg;
         this._viewingStage = stage;
         this.ignoreEvents = false;
+
+        stage.update();
+        stage.draw();
     }
     close() {
         if (!this.isOpen) return;
         this._viewingStage.remove(this);
+        this._viewingStage.remove(this._bg);
         this._viewingStage = null;
+        this._bg = null;
     }
+
+    onmousedown() {
+        this.close();
+    }
+}
+
+/* Button for accessing the journal. */
+class SyntaxJournalButton extends mag.Button {
+
+    constructor(syntaxJournal) {
+        const imgs = {
+            default: 'journal-default',
+            hover:   'journal-hover',
+            down:    'journal-mousedown'
+        };
+        super(imgs, () => { //onclick
+            syntaxJournal.toggle(this.stage);
+            this.stage.bringToFront(this);
+
+            if (!syntaxJournal.isOpen) {
+                const e = ES6Parser.parse('x => _');
+                e.pos = { x:300, y:300 };
+                this.stage.add( e );
+                this.flyIn(e);
+            }
+        });
+    }
+
+    // Animate the expression on the stage
+    // to 'fly into' the journal icon.
+    // Used to visualize 'collecting' syntax.
+    flyIn(expr) {
+        if (!expr.stage) return;
+
+        const stage = expr.stage;
+        Animate.tween(expr, { pos: this.absolutePos, anchor: {x:0.5, y:0.5}, scale:{ x:0.5, y:0.5 } }, 2000, Animate.EASE.SIGMOID).after(() => {
+            expr.opacity = 1.0;
+            ShapeExpandEffect.run(expr, 400);
+            Animate.tween(expr, { opacity: 0.0 }, 400).after(() => {
+                stage.remove(expr);
+            });
+        });
+
+        //ShapeExpandEffect.run(expr);
+    }
+
 }
 
 /* Model for storing syntax knowledge acquired through play. */
@@ -62,13 +134,15 @@ class SyntaxKnowledge {
         this._map = map;
         this._unlocked = defaultsUnlocked;
     }
-    * expressions() {
-        const len = this._unlocked.length;
-        let i = 0;
-        while(i < len) {
-            yield ES6Parser.parse(this._map[this._unlocked[i]]);
-            i++;
-        }
+    get expressions() {
+        const dfl = ExprManager.getDefaultFadeLevel();
+        ExprManager.setDefaultFadeLevel(1); // disable concrete representations for this parsing
+        const es = this._unlocked.map((e) => ES6Parser.parse(this._map[e]));
+        es.forEach((e) => {
+            e.ignoreEvents = true;
+        });
+        ExprManager.setDefaultFadeLevel(dfl);
+        return es;
     }
     unlock(syntaxKey) {
         if (syntaxKey in map) {
@@ -84,20 +158,4 @@ class SyntaxKnowledge {
     // e.g. we can call JSON.stringify(syntaxKnowledge) directly.
     // See JSON.stringify spec @ Mozilla for more details.
     toJSON() { return JSON.stringify(this._unlocked); }
-}
-
-/* Button for accessing the journal. */
-class SyntaxJournalButton extends mag.Button {
-
-    constructor(syntaxJournal) {
-        const imgs = {
-            default: 'journal-default',
-            hover:   'journal-hover',
-            down:    'journal-mousedown'
-        };
-        super(imgs, () => { //onclick
-            syntaxJournal.toggle(this.stage);
-        });
-    }
-
 }

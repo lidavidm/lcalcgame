@@ -7,6 +7,13 @@ var mag = (function(_) {
 
     class _Animate {
 
+        static get EASE() {
+            return {
+                OUT: (e => e * e),
+                IN: (e => Math.sqrt(e)),
+                SIGMOID: (e => 1.0 / (Math.exp(11*(-e + 0.5)) + 1))
+            };
+        }
         static wait(dur=1000) {
             var twn = new Tween(() => {}, dur);
             twn.run();

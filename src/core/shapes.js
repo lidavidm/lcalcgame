@@ -159,7 +159,8 @@
              //this.pos = pos;
          }
          onmouseenter(pos) {
-             this.stroke = { color:this.highlightColor, lineWidth:2 };
+             if (this.highlightColor)
+                this.stroke = { color:this.highlightColor, lineWidth:2 };
          }
          onmouseleave(pos) {
              this.stroke = null;

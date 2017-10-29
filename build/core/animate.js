@@ -293,6 +293,21 @@ var mag = function (_) {
                     })();
                 }
             }
+        }, {
+            key: 'EASE',
+            get: function get() {
+                return {
+                    OUT: function OUT(e) {
+                        return e * e;
+                    },
+                    IN: function IN(e) {
+                        return Math.sqrt(e);
+                    },
+                    SIGMOID: function SIGMOID(e) {
+                        return 1.0 / (Math.exp(11 * (-e + 0.5)) + 1);
+                    }
+                };
+            }
         }]);
 
         return _Animate;

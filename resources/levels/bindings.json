@@ -5,7 +5,7 @@
     "levels": [
         {
             "description": "Introduces concept: Pipes outside of pure lambdas.",
-            "board": ["x => x == x", "'A'"],
+            "board": ["x => x == x", "'A'", "give(3, x=>x)"],
             "goal": "true",
             "toolbox": "",
             "fade": {

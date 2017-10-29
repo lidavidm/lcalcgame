@@ -209,7 +209,7 @@ var mag = function (_) {
         }, {
             key: 'onmouseenter',
             value: function onmouseenter(pos) {
-                this.stroke = { color: this.highlightColor, lineWidth: 2 };
+                if (this.highlightColor) this.stroke = { color: this.highlightColor, lineWidth: 2 };
             }
         }, {
             key: 'onmouseleave',

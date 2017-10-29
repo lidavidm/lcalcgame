@@ -257,6 +257,16 @@ function initChapterSelectMenu(flyToChapIdx) {
 
 function __DEBUG_TESTBED(stage) {
 
+    const CORNER_PAD = 12;
+    let journal = new SyntaxJournal();
+    let journal_btn = new SyntaxJournalButton(journal);
+    journal_btn.pos = { x:GLOBAL_DEFAULT_SCREENSIZE.w - 32 - CORNER_PAD, y:GLOBAL_DEFAULT_SCREENSIZE.h - 32 - CORNER_PAD};
+    journal_btn.anchor = { x:0.5, y:0.5 };
+    stage.add(journal_btn);
+
+    journal.knowledge = new SyntaxKnowledge(['==', '?:', '=>']);
+
+
     // let tree = new TreeGraphic(TreeModel.test());
     // tree.pos = { x:200, y:200 };
     // stage.add(tree);
