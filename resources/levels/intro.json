@@ -13,7 +13,8 @@
             "goal":"(a)",
             "toolbox":"",
             "fade": {
-                "lambda": 2
+                "lambda": 2,
+                "number": 1
             },
             "showFade": false
         },
@@ -31,7 +32,7 @@
         },
         {
             "description":"Introduces concept: Replication.",
-            "board":"(λx #x #x) (a)",
+            "board":"(give /2 _) (a)",
             "goal":"(a) (a)",
             "toolbox":""
         },
@@ -39,23 +40,23 @@
             "description":"Toolbox can hold expressions.",
             "board":"",
             "goal":"(b) (b)",
-            "toolbox":"(a) (b) (λx #x #x)"
+            "toolbox":"(a) (b) (give /2 _)"
         },
         {
             "description":"Functions are first-class.",
-            "board":"(λx #x) (λx #x #x)",
+            "board":"(λx #x) (give /2 _)",
             "goal":"(λx #x) (λx #x)",
             "toolbox":""
         },
         {
             "description":"Functions are first-class!",
-            "board":"(λx #x #x #x) (λx #x) (a)",
+            "board":"(give /3 _) (λx #x) (a)",
             "goal":"a",
             "toolbox":""
         },
         {
             "description":"Tests knowledge of all concepts in this chapter.",
-            "board":"(b) (λx #x #x)",
+            "board":"(b) (give /2 _)",
             "goal":"(a) (b)",
             "toolbox":"(a) (λx #x)"
         }

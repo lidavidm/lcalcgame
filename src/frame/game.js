@@ -218,7 +218,8 @@ class Level {
             typing_options: typing_options,
             typing_hints: typing_hints,
             typing_help: typing_help,
-            help_text: help_text
+            help_text: help_text,
+            syntax_unlock: syntax_unlock
         } = desc;
 
         const setupVariant = (variant) => {
@@ -231,13 +232,11 @@ class Level {
         };
 
         const variant = __ACTIVE_LEVEL_VARIANT == "verbatim_variant" ? "block_variant" : __ACTIVE_LEVEL_VARIANT;
-        if (variant && variant in desc) {
+        if (variant && variant in desc)
             setupVariant(desc[variant]);
-        }
 
-        if (help_text && help_text.length > 0) {
+        if (help_text && help_text.length > 0)
             showHelpText(help_text);
-        }
 
         var lvl = new Level(
             Level.parse(expr_descs, language, macros, typing_options),
@@ -249,7 +248,22 @@ class Level {
         if (typing_hints) {
             let typing_exprs = mag.Stage.getNodesWithClass(TypeInTextExpr, [], true, lvl.exprs);
             for (let i = 0; i < typing_exprs.length && i < typing_hints.length; i++) {
-                typing_exprs[i].enforceHint(typing_hints[i]);
+
+                const hint = typing_hints[i];
+                if (typeof hint === "object") {
+                    typing_exprs[i].enforceHint(hint.hint);
+                    if ("syntax_unlock" in hint) {
+                        const syntax_key = hint.syntax_unlock;
+                        typing_exprs[i].runOnCommit(function () {
+                            const stage = this.stage;
+                            if (!stage) console.error('Cannot unlock syntax: Expression is not part of stage', this);
+                            return stage.unlockSyntax(syntax_key, this).then(Promise.reject);
+                        });
+                    }
+                } else {
+                    typing_exprs[i].enforceHint(hint);
+                }
+
                 typing_exprs[i].typeBox.update();
             }
         }
@@ -495,7 +509,8 @@ class Level {
                 let circ = new CircleExpr(0,0,18);
                 circ.color = 'gold';
                 return circ;
-            })()
+            })(),
+            'give':ExprManager.getClass('give')
         };
 
         // Macro swap:

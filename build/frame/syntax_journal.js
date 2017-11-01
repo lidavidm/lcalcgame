@@ -14,6 +14,8 @@ var SyntaxJournal = function (_mag$Rect) {
     _inherits(SyntaxJournal, _mag$Rect);
 
     function SyntaxJournal() {
+        var knowledge = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
         _classCallCheck(this, SyntaxJournal);
 
         var _this = _possibleConstructorReturn(this, (SyntaxJournal.__proto__ || Object.getPrototypeOf(SyntaxJournal)).call(this, 0, 0, GLOBAL_DEFAULT_SCREENSIZE.w / 1.8, GLOBAL_DEFAULT_SCREENSIZE.h / 1.4));
@@ -22,6 +24,7 @@ var SyntaxJournal = function (_mag$Rect) {
         _this.shadowOffset = 0;
         _this.color = 'beige';
         _this.highlightColor = null;
+        _this._syntaxKnowledge = knowledge;
         return _this;
     }
 
@@ -126,6 +129,9 @@ var SyntaxJournal = function (_mag$Rect) {
             this.close();
         }
     }, {
+        key: 'onmousedrag',
+        value: function onmousedrag() {}
+    }, {
         key: 'knowledge',
         get: function get() {
             return this._syntaxKnowledge;
@@ -151,8 +157,6 @@ var SyntaxJournalButton = function (_mag$Button) {
     _inherits(SyntaxJournalButton, _mag$Button);
 
     function SyntaxJournalButton(syntaxJournal) {
-        var _this3;
-
         _classCallCheck(this, SyntaxJournalButton);
 
         var imgs = {
@@ -160,18 +164,23 @@ var SyntaxJournalButton = function (_mag$Button) {
             hover: 'journal-hover',
             down: 'journal-mousedown'
         };
-        return _this3 = _possibleConstructorReturn(this, (SyntaxJournalButton.__proto__ || Object.getPrototypeOf(SyntaxJournalButton)).call(this, imgs, function () {
+
+        var _this3 = _possibleConstructorReturn(this, (SyntaxJournalButton.__proto__ || Object.getPrototypeOf(SyntaxJournalButton)).call(this, imgs, function () {
             //onclick
             syntaxJournal.toggle(_this3.stage);
             _this3.stage.bringToFront(_this3);
 
             if (!syntaxJournal.isOpen) {
-                var e = ES6Parser.parse('x => _');
+                var e = new TextExpr('==');
+                e.anchor = { x: 0.5, y: 0.5 };
                 e.pos = { x: 300, y: 300 };
                 _this3.stage.add(e);
                 _this3.flyIn(e);
             }
         }));
+
+        _this3.journal = syntaxJournal;
+        return _this3;
     }
 
     // Animate the expression on the stage
@@ -184,12 +193,20 @@ var SyntaxJournalButton = function (_mag$Button) {
         value: function flyIn(expr) {
             if (!expr.stage) return;
 
+            expr.ignoreEvents = true;
             var stage = expr.stage;
-            Animate.tween(expr, { pos: this.absolutePos, anchor: { x: 0.5, y: 0.5 }, scale: { x: 0.5, y: 0.5 } }, 2000, Animate.EASE.SIGMOID).after(function () {
-                expr.opacity = 1.0;
-                ShapeExpandEffect.run(expr, 400);
-                Animate.tween(expr, { opacity: 0.0 }, 400).after(function () {
-                    stage.remove(expr);
+            var pos = this.absolutePos;
+            return new Promise(function (resolve, reject) {
+                //ShapeExpandEffect.run(expr, 1200, e=>e, "white", 2, () => {
+                Animate.wait(400).after(function () {
+                    Animate.tween(expr, { pos: pos, anchor: { x: 0.5, y: 0.5 }, scale: { x: 0.5, y: 0.5 } }, 2000, Animate.EASE.SIGMOID).after(function () {
+                        expr.opacity = 1.0;
+                        ShapeExpandEffect.run(expr, 400);
+                        Animate.tween(expr, { opacity: 0.0 }, 400).after(function () {
+                            stage.remove(expr);
+                            resolve();
+                        });
+                    });
                 });
             });
 
@@ -222,7 +239,7 @@ var SyntaxKnowledge = function () {
     _createClass(SyntaxKnowledge, [{
         key: 'unlock',
         value: function unlock(syntaxKey) {
-            if (syntaxKey in map) {
+            if (syntaxKey in this._map) {
                 this._unlocked.push(syntaxKey);
                 return true;
             } else {
@@ -238,7 +255,7 @@ var SyntaxKnowledge = function () {
     }, {
         key: 'toJSON',
         value: function toJSON() {
-            return JSON.stringify(this._unlocked);
+            return this._unlocked;
         }
     }, {
         key: 'expressions',

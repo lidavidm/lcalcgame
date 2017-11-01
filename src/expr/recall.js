@@ -786,18 +786,27 @@ class TypeInTextExpr extends TextExpr {
                 _thisTextExpr.commit(txt);
                 Resource.play('carriage-return');
 
-                if (afterCommit) afterCommit(txt);
+                let prom = Promise.resolve();
+                if (_thisTextExpr._runOnCommitCb) { // Delay for the callback animation.
+                    prom = _thisTextExpr._runOnCommitCb();
+                    delete _thisTextExpr._runOnCommitCb;
+                }
 
-                Logger.log('after-commit-text', {'text': txt, 'rootParent':rootParent ? rootParent.toJavaScript() : 'UNKNOWN' });
-                if (stage) stage.saveState();
+                prom.then(() => {
+                    if (afterCommit) afterCommit(txt);
 
-                // Also reduce the root parent if possible (removes
-                // need for redundant clicking). Don't reduce things
-                // that are already in the process of reducing,
-                // though.
-                if (rootParent && !rootParent.hasPlaceholderChildren() &&
-                    !(rootParent instanceof LambdaExpr) && !rootParent._reducting)
-                    rootParent.performUserReduction();
+                    Logger.log('after-commit-text', {'text': txt, 'rootParent':rootParent ? rootParent.toJavaScript() : 'UNKNOWN' });
+                    if (stage) stage.saveState();
+
+                    // Also reduce the root parent if possible (removes
+                    // need for redundant clicking). Don't reduce things
+                    // that are already in the process of reducing,
+                    // though.
+                    if (rootParent && !rootParent.hasPlaceholderChildren() &&
+                        !(rootParent instanceof LambdaExpr) && !rootParent._reducting)
+                        rootParent.performUserReduction();
+                });
+
             } else {
                 Animate.blink(this, 1000, [1, 0, 0], 2); // blink red
             }
@@ -844,6 +853,9 @@ class TypeInTextExpr extends TextExpr {
         // Set the hint and changes the validator to only accept the hint text...
         this.validator = (s) => (s === hintText);
         this.setHint(hintText);
+    }
+    runOnCommit(f) {
+        this._runOnCommitCb = f.bind(this);
     }
 
     parsedValue() {

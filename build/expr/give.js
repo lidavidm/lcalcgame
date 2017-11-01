@@ -85,6 +85,8 @@ var GiveExpr = function (_Expression) {
                     reduced_exprs.forEach(function (e) {
                         e.pos = { x: x + (give_sz.w - full_w) / 2.0, y: y + (give_sz.h - e.absoluteSize.h) / 2.0 };
                         e.anchor = { x: 0, y: 0 };
+                        e.shadowOffset = 4;
+                        e.scale = { x: 1, y: 1 };
                         x += e.absoluteSize.w + padding;
                     });
 

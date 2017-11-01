@@ -85,7 +85,9 @@ var MissingExpression = function (_Expression) {
                 // Reattach node.
 
                 // Should not be able to stick lambdas in MissingExpression holes (exception of Map and Define)
-                if (node instanceof LambdaExpr && !(this.parent instanceof MapFunc) && !(this.parent instanceof DefineExpr) && !(this.parent instanceof ObjectExtensionExpr)) return;
+                // if (node instanceof LambdaExpr && !(this.parent instanceof MapFunc)
+                //     && !(this.parent instanceof DefineExpr) && !(this.parent instanceof ObjectExtensionExpr))
+                //     return;
 
                 // Should not be able to use choice exprs or snappables, ever
                 if (node instanceof ChoiceExpr || node instanceof Snappable) return;

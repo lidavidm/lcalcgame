@@ -46,6 +46,20 @@ var TextExpr = function (_ExpressionPlus) {
             return (this.shouldWrap() ? Math.trunc((this.text.length - 1) / this.wrap) : 0) + 1;
         }
     }, {
+        key: 'getAbsoluteBoundsForSubstring',
+        value: function getAbsoluteBoundsForSubstring(str) {
+            var i = this._text.indexOf(str);
+            if (i > -1) {
+                var sz = this.absoluteSize;
+                var pos = this.absolutePos;
+                var char_w = sz.w / this._text.length;
+                return { pos: addPos(pos, { x: char_w * i, y: 0 }), size: { w: char_w * str.length, h: sz.h } };
+            } else {
+                console.warn('Substring \'' + str + '\' is not in TextExpr with text \'' + this._text + '\'');
+                return { pos: this.absolutePos, size: { w: 0, h: 0 } };
+            }
+        }
+    }, {
         key: 'drawInternal',
         value: function drawInternal(ctx, pos, boundingSize) {
             // If wrap is specified as a number and text size exceeds wrap limit...

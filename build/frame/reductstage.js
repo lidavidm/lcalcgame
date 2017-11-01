@@ -35,6 +35,28 @@ var ReductStage = function (_mag$Stage) {
     }
 
     _createClass(ReductStage, [{
+        key: 'buildSyntaxJournalUI',
+        value: function buildSyntaxJournalUI() {
+            var CORNER_PAD = 12;
+            var journal = new SyntaxJournal();
+            var journal_btn = new SyntaxJournalButton(journal);
+            journal_btn.pos = { x: GLOBAL_DEFAULT_SCREENSIZE.w - 32 - CORNER_PAD, y: GLOBAL_DEFAULT_SCREENSIZE.h - 32 - CORNER_PAD };
+            journal_btn.anchor = { x: 0.5, y: 0.5 };
+            this.add(journal_btn);
+
+            journal.knowledge = ProgressManager.getKnowledge();
+            this.syntaxJournalButton = journal_btn;
+
+            // programmatically define getter so that
+            // this.syntaxKnowledge returns a pointer to the one in journal button...
+            // This way we don't have to worry about inconsistencies.
+            Object.defineProperty(this, 'syntaxKnowledge', {
+                get: function get() {
+                    return this.syntaxJournalButton.journal.knowledge;
+                }
+            });
+        }
+    }, {
         key: 'buildUI',
         value: function buildUI(showEnvironment, envDisplayWidth) {
             var _this2 = this;
@@ -138,6 +160,8 @@ var ReductStage = function (_mag$Stage) {
             this.uiNodes = [btn_back, btn_reset, btn_next, btn_hamburger, toolbox, env];
 
             this.layoutUI();
+
+            this.buildSyntaxJournalUI();
 
             if (!Resource.isPlayingBackgroundMusic('bg1')) Resource.playBackgroundMusic('bg1');
         }
@@ -418,6 +442,28 @@ var ReductStage = function (_mag$Stage) {
             Animate.tween(r, { opacity: opacity }, 1000);
 
             return r;
+        }
+
+        // Visually 'unlocks' syntax given the syntax key.
+        // This checks the textExpr's text and positions a new TextExpr
+        // around it, isolating just the syntax unlocked, and that
+        // new text "flies" into the player's syntax journal.
+
+    }, {
+        key: 'unlockSyntax',
+        value: function unlockSyntax(syntax_key, textExpr) {
+
+            // Unlock internally
+            this.syntaxKnowledge.unlock(syntax_key);
+
+            // Animate unlock for player:
+            var t = new TextExpr(syntax_key);
+            var bounds = textExpr.getAbsoluteBoundsForSubstring(syntax_key);
+            t.pos = bounds.pos;
+            t.anchor = { x: 0, y: 0.5 };
+            t.color = 'magenta';
+            this.add(t);
+            return this.syntaxJournalButton.flyIn(t);
         }
     }, {
         key: 'onmousedown',

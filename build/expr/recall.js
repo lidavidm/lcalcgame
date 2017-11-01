@@ -974,21 +974,32 @@ var TypeInTextExpr = function (_TextExpr) {
             var txt = this.text; // this.text is the TypeBox's text string, *not* the TextExpr's!
             console.log(txt);
             if (_thisTextExpr.validator(txt)) {
-                var rootParent = _thisTextExpr.rootParent;
-                var stage = _thisTextExpr.stage;
-                _thisTextExpr.commit(txt);
-                Resource.play('carriage-return');
+                (function () {
+                    var rootParent = _thisTextExpr.rootParent;
+                    var stage = _thisTextExpr.stage;
+                    _thisTextExpr.commit(txt);
+                    Resource.play('carriage-return');
 
-                if (afterCommit) afterCommit(txt);
+                    var prom = Promise.resolve();
+                    if (_thisTextExpr._runOnCommitCb) {
+                        // Delay for the callback animation.
+                        prom = _thisTextExpr._runOnCommitCb();
+                        delete _thisTextExpr._runOnCommitCb;
+                    }
 
-                Logger.log('after-commit-text', { 'text': txt, 'rootParent': rootParent ? rootParent.toJavaScript() : 'UNKNOWN' });
-                if (stage) stage.saveState();
+                    prom.then(function () {
+                        if (afterCommit) afterCommit(txt);
 
-                // Also reduce the root parent if possible (removes
-                // need for redundant clicking). Don't reduce things
-                // that are already in the process of reducing,
-                // though.
-                if (rootParent && !rootParent.hasPlaceholderChildren() && !(rootParent instanceof LambdaExpr) && !rootParent._reducting) rootParent.performUserReduction();
+                        Logger.log('after-commit-text', { 'text': txt, 'rootParent': rootParent ? rootParent.toJavaScript() : 'UNKNOWN' });
+                        if (stage) stage.saveState();
+
+                        // Also reduce the root parent if possible (removes
+                        // need for redundant clicking). Don't reduce things
+                        // that are already in the process of reducing,
+                        // though.
+                        if (rootParent && !rootParent.hasPlaceholderChildren() && !(rootParent instanceof LambdaExpr) && !rootParent._reducting) rootParent.performUserReduction();
+                    });
+                })();
             } else {
                 Animate.blink(this, 1000, [1, 0, 0], 2); // blink red
             }
@@ -1035,6 +1046,11 @@ var TypeInTextExpr = function (_TextExpr) {
                 return s === hintText;
             };
             this.setHint(hintText);
+        }
+    }, {
+        key: 'runOnCommit',
+        value: function runOnCommit(f) {
+            this._runOnCommitCb = f.bind(this);
         }
     }, {
         key: 'parsedValue',

@@ -1,12 +1,13 @@
 /* The journal overlay. */
 class SyntaxJournal extends mag.Rect {
-    constructor() {
+    constructor(knowledge=null) {
         super(0, 0, GLOBAL_DEFAULT_SCREENSIZE.w / 1.8,
                     GLOBAL_DEFAULT_SCREENSIZE.h / 1.4);
         this._viewingStage = null;
         this.shadowOffset = 0;
         this.color = 'beige';
         this.highlightColor = null;
+        this._syntaxKnowledge = knowledge;
     }
 
     // Setting expressions in the journal,
@@ -78,6 +79,7 @@ class SyntaxJournal extends mag.Rect {
     onmousedown() {
         this.close();
     }
+    onmousedrag() {}
 }
 
 /* Button for accessing the journal. */
@@ -94,12 +96,14 @@ class SyntaxJournalButton extends mag.Button {
             this.stage.bringToFront(this);
 
             if (!syntaxJournal.isOpen) {
-                const e = ES6Parser.parse('x => _');
+                const e = new TextExpr('==');
+                e.anchor = { x:0.5, y:0.5 };
                 e.pos = { x:300, y:300 };
                 this.stage.add( e );
                 this.flyIn(e);
             }
         });
+        this.journal = syntaxJournal;
     }
 
     // Animate the expression on the stage
@@ -108,12 +112,20 @@ class SyntaxJournalButton extends mag.Button {
     flyIn(expr) {
         if (!expr.stage) return;
 
+        expr.ignoreEvents = true;
         const stage = expr.stage;
-        Animate.tween(expr, { pos: this.absolutePos, anchor: {x:0.5, y:0.5}, scale:{ x:0.5, y:0.5 } }, 2000, Animate.EASE.SIGMOID).after(() => {
-            expr.opacity = 1.0;
-            ShapeExpandEffect.run(expr, 400);
-            Animate.tween(expr, { opacity: 0.0 }, 400).after(() => {
-                stage.remove(expr);
+        const pos = this.absolutePos;
+        return new Promise(function(resolve, reject) {
+            //ShapeExpandEffect.run(expr, 1200, e=>e, "white", 2, () => {
+            Animate.wait(400).after(() => {
+                Animate.tween(expr, { pos: pos, anchor: {x:0.5, y:0.5}, scale:{ x:0.5, y:0.5 } }, 2000, Animate.EASE.SIGMOID).after(() => {
+                    expr.opacity = 1.0;
+                    ShapeExpandEffect.run(expr, 400);
+                    Animate.tween(expr, { opacity: 0.0 }, 400).after(() => {
+                        stage.remove(expr);
+                        resolve();
+                    });
+                });
             });
         });
 
@@ -145,7 +157,7 @@ class SyntaxKnowledge {
         return es;
     }
     unlock(syntaxKey) {
-        if (syntaxKey in map) {
+        if (syntaxKey in this._map) {
             this._unlocked.push(syntaxKey);
             return true;
         } else {
@@ -157,5 +169,5 @@ class SyntaxKnowledge {
     // This lets us makes the class JSON serialization,
     // e.g. we can call JSON.stringify(syntaxKnowledge) directly.
     // See JSON.stringify spec @ Mozilla for more details.
-    toJSON() { return JSON.stringify(this._unlocked); }
+    toJSON() { return this._unlocked; }
 }

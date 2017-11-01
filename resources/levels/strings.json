@@ -14,12 +14,6 @@
             "toolbox": ["'bap'", "'app'", "'cra'", "'ple'"]
         },
         {
-            "description":"Choice of boolean",
-            "board":["_b ? 'i' : 'n'", "_b ? 'i' : 't'"],
-            "goal": "'it'",
-            "toolbox":["true", "false", "_ + _"]
-        },
-        {
             "description": "Intro to typing text with concat.",
             "goal": "'mountains'",
             "board": "'mount' + _t_string",
@@ -54,7 +48,14 @@
             "goal": ["true", "'river'"],
             "board": ["'r' >>> 'r'", "'r' >>> 'iver'"],
             "toolbox": "",
-            "typing_hints": [ "==", "+" ],
+            "typing_hints": [
+                {
+                    "hint": "==",
+                    "syntax_unlock": "=="
+                }, {
+                    "hint": "+",
+                    "syntax_unlock": "+"
+                }],
             "typing_options": {
                 ">>>": ["==", "+"]
             },
@@ -121,44 +122,6 @@
                 "board": ["_ >>> _", "_ >>> _"],
                 "toolbox": ["'b'", "'e'", "'be'"],
                 "typing_hints": [ "==", "+" ]
-            }
-        },
-        {
-            "description": "Intro to map: Typing II.",
-            "board": "['ne', 'li', 'be'].map(s => _t_single)",
-            "goal": "['near', 'liar', 'bear']",
-            "toolbox": "",
-            "block_variant": {
-                "board": "__verbatim; ['ne', 'li', 'be'].map(s => _);",
-                "toolbox": ["_ + _", "_ == _", "'ar'", "s", "s", "_b ? _ : _", "x => _"]
-            },
-            "verbatim_variant": {
-                "typing_hints": ["s + \"ar\""]
-            }
-        },
-        {
-            "description": "Intro to map: Choosing arrays.",
-            "board": "__.map(a => _t_single)",
-            "goal": "['met', 'net']",
-            "toolbox": ["['b', 'a']", "['n', 'm']", "['m', 'n']"],
-            "block_variant": {
-                "board": "__verbatim; __.map(a => _);",
-                "toolbox": ["['b', 'a']", "['n', 'm']", "['m', 'n']", "a + 'et'"]
-            },
-            "verbatim_variant": {
-                "typing_hints": ["a + \"et\""]
-            }
-        },
-        {
-            "description": "Typing arrays.",
-            "board": ["_t_array.map(x => x + 'er')"],
-            "goal": "['better', 'faster', 'stronger']",
-            "block_variant": {
-                "board": "__verbatim; __.map(x => x + 'er');",
-                "toolbox": ["['bet', 'fas', 'stron']", "['bett', 'fast', 'strong']", "['be', 'fa', 'stro']", "['better', 'faster', 'stronget']"]
-            },
-            "verbatim_variant": {
-                "typing_hints": ["\"bett\", \"fast\", \"strong\""]
             }
         }
     ],

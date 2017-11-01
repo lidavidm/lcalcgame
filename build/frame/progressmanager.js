@@ -27,6 +27,7 @@ var ProgressManager = function () {
     pub.resetProgress = function () {
         score = 0;
         levelStatuses = {};
+        syntaxKnowledge = new SyntaxKnowledge();
         pub.save();
     };
 
@@ -46,6 +47,13 @@ var ProgressManager = function () {
     };
     pub.getScore = function () {
         return score;
+    };
+
+    /* PLAYER KNOWLEDGE */
+    pub.getKnowledge = function () {
+        if (!syntaxKnowledge) syntaxKnowledge = new SyntaxKnowledge();
+        console.log(syntaxKnowledge);
+        return syntaxKnowledge;
     };
 
     /* PLAYER PROGRESS */

@@ -30,6 +30,18 @@ class TextExpr extends ExpressionPlus {
     getNumLines() {
         return (this.shouldWrap() ? Math.trunc((this.text.length-1) / this.wrap) : 0) + 1;
     }
+    getAbsoluteBoundsForSubstring(str) {
+        const i = this._text.indexOf(str);
+        if (i > -1) {
+            const sz = this.absoluteSize;
+            const pos = this.absolutePos;
+            const char_w = sz.w / this._text.length;
+            return { pos:addPos(pos, {x:char_w*i, y:0}), size:{w:char_w*str.length, h:sz.h} };
+        } else {
+            console.warn(`Substring '${str}' is not in TextExpr with text '${this._text}'`);
+            return { pos: this.absolutePos, size:{w:0, h:0} };
+        }
+    }
     get size() {
         var ctx = this.ctx || GLOBAL_DEFAULT_CTX;
         if (!ctx) {

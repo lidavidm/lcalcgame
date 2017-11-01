@@ -724,6 +724,7 @@ var Level = function () {
             var typing_hints = desc.typing_hints;
             var typing_help = desc.typing_help;
             var help_text = desc.help_text;
+            var syntax_unlock = desc.syntax_unlock;
 
 
             var setupVariant = function setupVariant(variant) {
@@ -736,20 +737,33 @@ var Level = function () {
             };
 
             var variant = __ACTIVE_LEVEL_VARIANT == "verbatim_variant" ? "block_variant" : __ACTIVE_LEVEL_VARIANT;
-            if (variant && variant in desc) {
-                setupVariant(desc[variant]);
-            }
+            if (variant && variant in desc) setupVariant(desc[variant]);
 
-            if (help_text && help_text.length > 0) {
-                showHelpText(help_text);
-            }
+            if (help_text && help_text.length > 0) showHelpText(help_text);
 
             var lvl = new Level(Level.parse(expr_descs, language, macros, typing_options), new Goal(new ExpressionPattern(Level.parse(goal_descs, language, macros, typing_options)), goal_descs, resources.aliens), toolbox_descs ? Level.parse(toolbox_descs, language, macros, typing_options) : null, Environment.parse(globals_descs));
 
             if (typing_hints) {
                 var typing_exprs = mag.Stage.getNodesWithClass(TypeInTextExpr, [], true, lvl.exprs);
                 for (var i = 0; i < typing_exprs.length && i < typing_hints.length; i++) {
-                    typing_exprs[i].enforceHint(typing_hints[i]);
+
+                    var hint = typing_hints[i];
+                    if ((typeof hint === 'undefined' ? 'undefined' : _typeof(hint)) === "object") {
+                        typing_exprs[i].enforceHint(hint.hint);
+                        if ("syntax_unlock" in hint) {
+                            (function () {
+                                var syntax_key = hint.syntax_unlock;
+                                typing_exprs[i].runOnCommit(function () {
+                                    var stage = this.stage;
+                                    if (!stage) console.error('Cannot unlock syntax: Expression is not part of stage', this);
+                                    return stage.unlockSyntax(syntax_key, this).then(Promise.reject);
+                                });
+                            })();
+                        }
+                    } else {
+                        typing_exprs[i].enforceHint(hint);
+                    }
+
                     typing_exprs[i].typeBox.update();
                 }
             }
@@ -817,7 +831,7 @@ var Level = function () {
             } else if (language === "reduct-scheme" || !language) {
                 var descs;
 
-                var _ret3 = function () {
+                var _ret4 = function () {
 
                     // Split string by top-level parentheses.
                     descs = _this3.splitParen(desc);
@@ -838,7 +852,7 @@ var Level = function () {
                     };
                 }();
 
-                if ((typeof _ret3 === 'undefined' ? 'undefined' : _typeof(_ret3)) === "object") return _ret3.v;
+                if ((typeof _ret4 === 'undefined' ? 'undefined' : _typeof(_ret4)) === "object") return _ret4.v;
             }
         }
     }, {
@@ -939,7 +953,7 @@ var Level = function () {
                         op_class.pos = { x: 0, y: 80 };
                         return op_class;
                     } else if (op_class instanceof BagExpr) {
-                        var _ret4 = function () {
+                        var _ret5 = function () {
                             var bag = op_class;
                             var sz = bag.graphicNode.size;
                             var topsz = bag.graphicNode.topSize ? bag.graphicNode.topSize(sz.w / 2.0) : { w: 0, h: 0 };
@@ -965,7 +979,7 @@ var Level = function () {
                             };
                         }();
 
-                        if ((typeof _ret4 === 'undefined' ? 'undefined' : _typeof(_ret4)) === "object") return _ret4.v;
+                        if ((typeof _ret5 === 'undefined' ? 'undefined' : _typeof(_ret5)) === "object") return _ret5.v;
                     } else if (args[0] in CompareExpr.operatorMap()) {
                         // op name is supported comparison operation like ==, !=, etc
                         //console.log('constructing comparator ' + args[0] + ' with exprs ', exprs.slice(1));
@@ -1032,7 +1046,8 @@ var Level = function () {
                     var circ = new CircleExpr(0, 0, 18);
                     circ.color = 'gold';
                     return circ;
-                }()
+                }(),
+                'give': ExprManager.getClass('give')
             };
 
             // Macro swap:

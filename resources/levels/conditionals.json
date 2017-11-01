@@ -30,6 +30,12 @@
             "toolbox": ["true", "false", "true", "false"]
         },
         {
+            "description":"Choice of boolean",
+            "board":["_b ? 'i' : 'n'", "_b ? 'i' : 't'"],
+            "goal": "'it'",
+            "toolbox":["true", "false", "_ + _"]
+        },
+        {
             "description": "intro to booleans with conditionals",
             "board": ["'cry' == _", "_b ? 'grape' : 'onion'"],
             "goal": "'onion'",
@@ -69,6 +75,31 @@
                 "board": ["_t_string == _", "_b ? _ : _"],
                 "toolbox": ["'yes'", "'no'", "'maybe'", "'okay'"],
                 "typing_hints": [ "okay" ]
+            }
+        },
+        {
+            "description": "Typing conditionals I.",
+            "board": ["_t_single", "give(2, _)"],
+            "goal": ["1", "0"],
+            "toolbox": ["true", "false", "true", "false"],
+            "typing_hints": ["(n) => n ? 1 : 0"],
+            "block_variant": {
+                "board": ["n => n ? 1 : 0", "give(2, _)"]
+            }
+        },
+        {
+            "description": "Typing conditionals II.",
+            "board": ["_t_single", "give(3, _)"],
+            "goal": ["'yes'", "'no'", "'no'"],
+            "toolbox": ["true", "false", "true", "false"],
+            "typing_help": ["You'll have to use =>, ?, and :"],
+            "block_variant": {
+                "board": ["__verbatim; b => _ ? _ : _;", "give(3, _)"],
+                "toolbox": ["_ == _", "b", "b", "'yes'", "'no'", "true", "false", "false"]
+            },
+            "verbatim_variant": {
+                "board": ["_t_single", "give(3, _)"],
+                "typing_hints": ["(x) => x ? \"yes\" : \"no\""]
             }
         }
     ],

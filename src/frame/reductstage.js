@@ -13,6 +13,25 @@ class ReductStage extends mag.Stage {
         this.onorientationchange();
     }
 
+    buildSyntaxJournalUI() {
+        const CORNER_PAD = 12;
+        let journal = new SyntaxJournal();
+        let journal_btn = new SyntaxJournalButton(journal);
+        journal_btn.pos = { x:GLOBAL_DEFAULT_SCREENSIZE.w - 32 - CORNER_PAD, y:GLOBAL_DEFAULT_SCREENSIZE.h - 32 - CORNER_PAD};
+        journal_btn.anchor = { x:0.5, y:0.5 };
+        this.add(journal_btn);
+
+        journal.knowledge = ProgressManager.getKnowledge();
+        this.syntaxJournalButton = journal_btn;
+
+        // programmatically define getter so that
+        // this.syntaxKnowledge returns a pointer to the one in journal button...
+        // This way we don't have to worry about inconsistencies.
+        Object.defineProperty(this, 'syntaxKnowledge', {
+            get: function() { return this.syntaxJournalButton.journal.knowledge; }
+        });
+    }
+
     buildUI(showEnvironment, envDisplayWidth) {
         const TOOLBOX_HEIGHT = Toolbox.defaultRowHeight;
 
@@ -127,6 +146,8 @@ class ReductStage extends mag.Stage {
         this.uiNodes = [ btn_back, btn_reset, btn_next, btn_hamburger, toolbox, env ];
 
         this.layoutUI();
+
+        this.buildSyntaxJournalUI();
 
         if (!Resource.isPlayingBackgroundMusic('bg1'))
             Resource.playBackgroundMusic('bg1');
@@ -375,6 +396,25 @@ class ReductStage extends mag.Stage {
         Animate.tween(r, {opacity: opacity}, 1000);
 
         return r;
+    }
+
+    // Visually 'unlocks' syntax given the syntax key.
+    // This checks the textExpr's text and positions a new TextExpr
+    // around it, isolating just the syntax unlocked, and that
+    // new text "flies" into the player's syntax journal.
+    unlockSyntax(syntax_key, textExpr) {
+
+        // Unlock internally
+        this.syntaxKnowledge.unlock(syntax_key);
+
+        // Animate unlock for player:
+        const t = new TextExpr(syntax_key);
+        const bounds = textExpr.getAbsoluteBoundsForSubstring(syntax_key);
+        t.pos = bounds.pos;
+        t.anchor = { x:0, y:0.5 };
+        t.color = 'magenta';
+        this.add(t);
+        return this.syntaxJournalButton.flyIn(t);
     }
 
     onmousedown(pos) {
