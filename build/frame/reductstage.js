@@ -37,6 +37,7 @@ var ReductStage = function (_mag$Stage) {
     _createClass(ReductStage, [{
         key: 'buildSyntaxJournalUI',
         value: function buildSyntaxJournalUI() {
+
             var CORNER_PAD = 12;
             var journal = new SyntaxJournal();
             var journal_btn = new SyntaxJournalButton(journal);
@@ -455,6 +456,7 @@ var ReductStage = function (_mag$Stage) {
 
             // Unlock internally
             this.syntaxKnowledge.unlock(syntax_key);
+            this.syntaxJournalButton.journal.renderKnowledge();
 
             // Animate unlock for player:
             var t = new TextExpr(syntax_key);

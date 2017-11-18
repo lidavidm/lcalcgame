@@ -10,15 +10,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 /* The journal overlay. */
 
-var SyntaxJournal = function (_mag$Rect) {
-    _inherits(SyntaxJournal, _mag$Rect);
+var SyntaxJournal = function (_mag$ImageRect) {
+    _inherits(SyntaxJournal, _mag$ImageRect);
 
     function SyntaxJournal() {
         var knowledge = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
         _classCallCheck(this, SyntaxJournal);
 
-        var _this = _possibleConstructorReturn(this, (SyntaxJournal.__proto__ || Object.getPrototypeOf(SyntaxJournal)).call(this, 0, 0, GLOBAL_DEFAULT_SCREENSIZE.w / 1.8, GLOBAL_DEFAULT_SCREENSIZE.h / 1.4));
+        var _this = _possibleConstructorReturn(this, (SyntaxJournal.__proto__ || Object.getPrototypeOf(SyntaxJournal)).call(this, 0, 0, GLOBAL_DEFAULT_SCREENSIZE.w / 1.8, GLOBAL_DEFAULT_SCREENSIZE.h / 1.4, 'journal-bg'));
 
         _this._viewingStage = null;
         _this.shadowOffset = 0;
@@ -38,9 +38,10 @@ var SyntaxJournal = function (_mag$Rect) {
         value: function renderKnowledge() {
             this.children = [];
             var exprs = this._syntaxKnowledge.expressions;
-            var VERT_PAD = 20;
+            var VERT_PAD = 8;
             var CORNER_PAD = 20;
-            var pos = { x: CORNER_PAD, y: CORNER_PAD };
+            var TOP_PAD = 40;
+            var pos = { x: CORNER_PAD, y: TOP_PAD + CORNER_PAD };
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
             var _iteratorError = undefined;
@@ -148,7 +149,7 @@ var SyntaxJournal = function (_mag$Rect) {
     }]);
 
     return SyntaxJournal;
-}(mag.Rect);
+}(mag.ImageRect);
 
 /* Button for accessing the journal. */
 
@@ -169,14 +170,6 @@ var SyntaxJournalButton = function (_mag$Button) {
             //onclick
             syntaxJournal.toggle(_this3.stage);
             _this3.stage.bringToFront(_this3);
-
-            if (!syntaxJournal.isOpen) {
-                var e = new TextExpr('==');
-                e.anchor = { x: 0.5, y: 0.5 };
-                e.pos = { x: 300, y: 300 };
-                _this3.stage.add(e);
-                _this3.flyIn(e);
-            }
         }));
 
         _this3.journal = syntaxJournal;
@@ -226,20 +219,56 @@ var SyntaxKnowledge = function () {
 
         _classCallCheck(this, SyntaxKnowledge);
 
+        var img_prefix = 'journal-syntax-';
+        var img = function img(tag) {
+            return img_prefix + tag;
+        };
         var map = {
-            '==': '_ == _',
-            '?:': '_b ? _ : _',
-            '=>': '(x) => _',
-            'map': '__.map(_l)'
+            '==': {
+                form: '_ == _',
+                src: img('equality')
+            },
+            '?:': {
+                form: '_b ? _ : _',
+                src: img('ternary')
+            },
+            '=>': {
+                form: '(x) => _',
+                src: img('anonfunc')
+            },
+            'map': {
+                form: '__.map(_l)',
+                src: img('map')
+            },
+            '+': {
+                form: '_ + _',
+                src: img('concat')
+            },
+            '""': {
+                form: '"..."',
+                src: img('quotes')
+            },
+            '[]': {
+                form: '[0, 1, 2]',
+                src: img('list')
+            }
         };
         this._map = map;
         this._unlocked = defaultsUnlocked;
     }
 
     _createClass(SyntaxKnowledge, [{
+        key: 'isUnlocked',
+        value: function isUnlocked(syntaxKey) {
+            return this._unlocked.indexOf(syntaxKey) > -1;
+        }
+    }, {
         key: 'unlock',
         value: function unlock(syntaxKey) {
-            if (syntaxKey in this._map) {
+            if (this.isUnlocked(syntaxKey)) {
+                // Already unlocked this key.
+                return false;
+            } else if (syntaxKey in this._map) {
                 this._unlocked.push(syntaxKey);
                 return true;
             } else {
@@ -262,15 +291,17 @@ var SyntaxKnowledge = function () {
         get: function get() {
             var _this4 = this;
 
-            var dfl = ExprManager.getDefaultFadeLevel();
-            ExprManager.setDefaultFadeLevel(1); // disable concrete representations for this parsing
+            //const dfl = ExprManager.getDefaultFadeLevel();
+            //ExprManager.setDefaultFadeLevel(1); // disable concrete representations for this parsing
+            //const es = this._unlocked.map((e) => ES6Parser.parse(this._map[e].form));
             var es = this._unlocked.map(function (e) {
-                return ES6Parser.parse(_this4._map[e]);
+                return new ImageExpr(_this4._map[e].src);
             });
             es.forEach(function (e) {
                 e.ignoreEvents = true;
+                e.graphicNode.blendMode = 'multiply';
             });
-            ExprManager.setDefaultFadeLevel(dfl);
+            //ExprManager.setDefaultFadeLevel(dfl);
             return es;
         }
     }]);

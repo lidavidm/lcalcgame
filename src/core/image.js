@@ -39,7 +39,15 @@ var mag = (function(_) {
                 console.error('@ ImageRect: Cannot find resource image named ', this.image);
                 return;
             }
-            ri.draw(ctx, pos.x + this._offset.x, pos.y + this._offset.y, boundingSize.w, boundingSize.h);
+
+            if (this.blendMode) {
+                ctx.save();
+                ctx.globalCompositeOperation = this.blendMode;
+                ri.draw(ctx, pos.x + this._offset.x, pos.y + this._offset.y, boundingSize.w, boundingSize.h);
+                ctx.restore();
+            } else {
+                ri.draw(ctx, pos.x + this._offset.x, pos.y + this._offset.y, boundingSize.w, boundingSize.h);
+            }
         }
     }
 

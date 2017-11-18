@@ -14,6 +14,7 @@ class ReductStage extends mag.Stage {
     }
 
     buildSyntaxJournalUI() {
+        
         const CORNER_PAD = 12;
         let journal = new SyntaxJournal();
         let journal_btn = new SyntaxJournalButton(journal);
@@ -406,6 +407,7 @@ class ReductStage extends mag.Stage {
 
         // Unlock internally
         this.syntaxKnowledge.unlock(syntax_key);
+        this.syntaxJournalButton.journal.renderKnowledge();
 
         // Animate unlock for player:
         const t = new TextExpr(syntax_key);

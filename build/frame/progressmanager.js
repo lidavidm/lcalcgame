@@ -19,6 +19,7 @@ var ProgressManager = function () {
         //pub.save();
     };
     pub.save = function () {
+        console.log('saving');
         window.localStorage["spendUnits"] = score.toString();
         window.localStorage["progress"] = JSON.stringify(levelStatuses);
 
@@ -52,7 +53,6 @@ var ProgressManager = function () {
     /* PLAYER KNOWLEDGE */
     pub.getKnowledge = function () {
         if (!syntaxKnowledge) syntaxKnowledge = new SyntaxKnowledge();
-        console.log(syntaxKnowledge);
         return syntaxKnowledge;
     };
 

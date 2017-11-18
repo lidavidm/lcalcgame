@@ -940,8 +940,10 @@ var mag = function (_) {
             };
             var onkeypress = function onkeypress(e) {
                 var event = getCBKeyEvent(e);
-                // console.log(event.char);
                 stage.onkeypress(event);
+
+                // Backspace on Firefox goes back a page. Disable this behavior.
+                if (e.keyCode === 8) e.preventDefault();
             };
             var onkeyup = function onkeyup(e) {
                 var event = getCBKeyEvent(e);
