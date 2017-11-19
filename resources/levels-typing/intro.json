@@ -35,17 +35,17 @@
         },
         {
             "description": "Intro to typing (numbers)",
-            "board":["_t_num + 5"],
+            "board":["_t_int + 5"],
             "goal":["8"],
             "toolbox":""
         },
         {
-            "board":["_t_num + 2", "_t_num + 3", "_t_num + 4"],
+            "board":["_t_int + 2", "_t_int + 3", "_t_int + 4"],
             "goal":["12", "15", "17"],
             "toolbox":""
         },
         {
-            "board":["_t_num + _t_num", "_ - 3"],
+            "board":["_t_int + _t_int", "_ - 3"],
             "goal":["10"],
             "toolbox":""
         }

@@ -14,12 +14,12 @@
             "toolbox":["0", "1", "2", "3"]
         },
         {
-            "board":["_t_num == 18", "4 == _t_num"],
+            "board":["_t_int == 18", "4 == _t_int"],
             "goal":["true", "false"],
             "toolbox":""
         },
         {
-            "board":["_ == _", "_t_num + 3", "_t_num - _t_num"],
+            "board":["_ == _", "_t_int + 3", "_t_int - _t_int"],
             "goal":["true"],
             "toolbox":""
         },
