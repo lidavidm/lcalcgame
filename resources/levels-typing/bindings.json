@@ -45,36 +45,61 @@
             "description": "Intro to typing bindings.",
             "board":["give(3, _)", "(n) => _t_single"],
             "goal":["2", "3", "4"],
-            "toolbox":["1", "2", "3"]
+            "toolbox":["1", "2", "3"],
+            "block_variant": {
+                "board": ["give(3, _)", "(n) => _"],
+                "toolbox": ["1", "1", "2", "2", "3", "3", "n", "_ + _"]
+            }
         },
         {
             "board":["give(3, _)", "(x) => _t_single"],
             "goal":["true", "false", "false"],
-            "toolbox":["1", "0", "0"]
+            "toolbox":["1", "0", "0"],
+            "block_variant": {
+                "board": ["give(3, _)", "(x) => _"],
+                "toolbox": ["1", "1", "0", "0", "x", "_ == _"]
+            }
         },
         {
             "description": "Intro to typing LHS of arrow function.",
             "board":["_t_anon(a - 2)", "_t_anon(b - 3)", "_t_anon(c - 4)"],
             "goal":["0", "0", "0"],
             "toolbox":["2", "3", "4"],
-            "typing_hints": ["(a) =>", "(b) =>"]
+            "typing_hints": ["(a) =>", "(b) =>"],
+            "block_variant": {
+                "board": ["a - 2", "b - 3", "c - 4"],
+                "toolbox": ["(x) => _", "(a) => _", "(b) => _", "(c) => _", "2", "3", "4"],
+                "typing_hints": []
+            }
         },
         {
             "description": "Intro to typing entire function",
             "board":["give(3, _)", "_t_single"],
             "goal":["1", "2", "3"],
-            "toolbox":["9", "8", "7"]
+            "toolbox":["9", "8", "7"],
+            "block_variant": {
+                "board": ["give(3, _)"],
+                "toolbox": ["9", "8", "7", "6", "5", "(a) => _", "(b) => _", "a", "b", "_ - _"]
+            }
         },
         {
             "board":["give(2, _)", "_t_single"],
             "goal":["true", "false"],
-            "toolbox":["500", "1000", "250", "500"]
+            "toolbox":["500", "1000", "250", "500"],
+            "block_variant": {
+                "board": ["give(2, _)"],
+                "toolbox": ["500", "1000", "250", "500", "(a) => _", "(b) => _", "a", "a", "b", "b", "_ - _", "_ == _"]
+            }
         },
         {
             "description": "Hard; transfer level; player has to realize x + x is possible.",
             "board":["give(3, _)", "_t_single"],
             "goal":["16", "24", "30"],
-            "toolbox":["8", "12", "15"]
+            "toolbox":["8", "12", "15"],
+            "block_variant": {
+                "board": ["give(3, _)"],
+                "toolbox": ["8", "12", "15", "(a) => _", "(b) => _", "a", "a", "b", "b", "_ + _", "_ - _", "_ == _"]
+            }
         }
     ],
     "resources":{

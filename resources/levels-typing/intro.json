@@ -37,17 +37,29 @@
             "description": "Intro to typing (numbers)",
             "board":["_t_int + 5"],
             "goal":["8"],
-            "toolbox":""
+            "toolbox":"",
+            "block_variant": {
+                "board": ["_ + 5"],
+                "toolbox": ["1", "2", "3", "4", "5"]
+            }
         },
         {
             "board":["_t_int + 2", "_t_int + 3", "_t_int + 4"],
             "goal":["12", "15", "17"],
-            "toolbox":""
+            "toolbox":"",
+            "block_variant": {
+                "board": ["_ + 2", "_ + 3", "_ + 4"],
+                "toolbox": ["7", "8", "9", "10", "11", "12", "13", "14", "15"]
+            }
         },
         {
             "board":["_t_int + _t_int", "_ - 3"],
             "goal":["10"],
-            "toolbox":""
+            "toolbox":"",
+            "block_variant": {
+                "board": ["_ + _", "_ - 3"],
+                "toolbox": ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+            }
         }
     ],
     "resources":{
