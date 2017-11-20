@@ -23,7 +23,7 @@ var NumberExpr = function (_Expression) {
         var _this2 = _possibleConstructorReturn(this, (NumberExpr.__proto__ || Object.getPrototypeOf(NumberExpr)).call(this, [new DiceNumber(num)]));
 
         _this2.number = num;
-        _this2.color = 'Ivory';
+        _this2.color = 'Cornsilk'; //'Ivory';
         _this2.highlightColor = 'OrangeRed';
         return _this2;
     }
@@ -96,9 +96,14 @@ var OperatorExpr = function (_Expression2) {
     function OperatorExpr(left, op, right) {
         _classCallCheck(this, OperatorExpr);
 
-        return _possibleConstructorReturn(this, (OperatorExpr.__proto__ || Object.getPrototypeOf(OperatorExpr)).call(this, [left, op, right]));
         // if (op instanceof TextExpr)
         //     op.color = "#660037";
+
+        var _this4 = _possibleConstructorReturn(this, (OperatorExpr.__proto__ || Object.getPrototypeOf(OperatorExpr)).call(this, [left, op, right]));
+
+        _this4.color = '#ffcc00';
+        _this4.reducableStrokeColor = '#ff6600';
+        return _this4;
     }
 
     _createClass(OperatorExpr, [{

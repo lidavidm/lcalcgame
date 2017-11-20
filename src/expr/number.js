@@ -3,7 +3,7 @@ class NumberExpr extends Expression {
     constructor(num) {
         super([ new DiceNumber(num) ]);
         this.number = num;
-        this.color = 'Ivory';
+        this.color = 'Cornsilk'; //'Ivory';
         this.highlightColor = 'OrangeRed';
     }
     get constructorArgs() {
@@ -47,6 +47,8 @@ class OperatorExpr extends Expression {
         super([left, op, right]);
         // if (op instanceof TextExpr)
         //     op.color = "#660037";
+        this.color = '#ffcc00';
+        this.reducableStrokeColor = '#ff6600';
     }
 
     canReduce() {

@@ -7,7 +7,12 @@
             "description": "Intro to bindings.",
             "board":["(a) => a + 1"],
             "goal":["2"],
-            "toolbox":["1", "2", "3", "4"]
+            "toolbox":["1", "2", "3", "4"],
+            "fade": {
+                "var": 7,
+                "==": 1
+            },
+            "showFade": false
         },
         {
             "board":["(a) => a + 3", "(b) => b - 3"],
