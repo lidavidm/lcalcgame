@@ -682,6 +682,15 @@ class LambdaVarExpr extends ImageExpr {
         return this;
     }
 
+    canReduce() {
+        let environment = this.getEnvironment();
+        return environment && environment.lookup(this.name);
+    }
+
+    isValue() {
+        return false;
+    }
+
     //onmousedrag() {}
     drawInternal(ctx, pos, boundingSize) {
         super.drawInternal(ctx, pos, boundingSize);

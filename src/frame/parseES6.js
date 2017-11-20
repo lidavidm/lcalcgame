@@ -213,7 +213,7 @@ class ES6Parser {
                 } else if (node.callee.type === 'Identifier') {
 
                     if (node.callee.name.substring(0, 2) === '_t') {
-                        let type_expr = TypeInTextExpr.fromExprCode(node.name);
+                        let type_expr = TypeInTextExpr.fromExprCode(node.callee.name);
                         if (node.arguments.length === 1 && node.arguments[0].type === 'Literal')
                             type_expr.typeBox.text = node.arguments[0].value;
                         return type_expr;

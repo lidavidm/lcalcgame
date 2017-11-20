@@ -96,6 +96,7 @@ class GiveExpr extends Expression {
                 parent.remove(this);
                 reduced_exprs.forEach((e) => {
                     stage.add(e);
+                    e.lockSubexpressions();
                 });
 
                 // Call update() on the new exprs.

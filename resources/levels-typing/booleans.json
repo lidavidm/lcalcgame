@@ -14,35 +14,60 @@
             "toolbox":["0", "1", "2", "3"]
         },
         {
-            "board":["_t_num == 18", "4 == _t_num"],
+            "board":["_t_int == 18", "4 == _t_int"],
             "goal":["true", "false"],
-            "toolbox":""
+            "toolbox":"",
+            "block_variant": {
+                "board": ["_ == 18", "4 == _"],
+                "toolbox": ["4", "6", "8", "10", "12", "14", "16", "18"]
+            }
         },
         {
-            "board":["_ == _", "_t_num + 3", "_t_num - _t_num"],
+            "board":["_ == _", "_t_int + 3", "_t_int - _t_int"],
             "goal":["true"],
-            "toolbox":""
+            "toolbox":"",
+            "block_variant": {
+                "board": ["_ == _", "_ + 3", "_ - _"],
+                "toolbox": ["1", "2", "3", "4", "5", "6", "7"]
+            }
         },
         {
             "board":["4 >>> 4", "3 >>> 3"],
             "goal":["true", "6"],
             "toolbox":"",
-            "typing_hints": ["==", "+"]
+            "typing_hints": ["==", "+"],
+            "block_variant": {
+                "board": ["4 >> 4", "3 >> 3"],
+                "toolbox": ["_op('+')", "_op('==')"]
+            }
         },
         {
             "board":["2 >>> 2", "1 >>> 1"],
             "goal":["true", "4"],
-            "toolbox":""
+            "toolbox":"",
+            "block_variant": {
+                "board": ["2 >> 2", "1 >> 1"],
+                "toolbox": ["_op('+')", "_op('==')"]
+            }
         },
         {
             "board":["_ >>> 6", "4 >>> _"],
             "goal":["true"],
-            "toolbox":["1", "2", "3", "4", "5"]
+            "toolbox":["1", "2", "3", "4", "5"],
+            "block_variant": {
+                "board": ["_ >> 6", "4 >> _"],
+                "toolbox": ["1", "2", "3", "4", "5", "_op('+')", "_op('==')"]
+            }
         },
         {
             "board":["0 >>> 1", "1 >>> 0", "_ >>> 1", "0 >>> _"],
             "goal":["false", "false"],
-            "toolbox":""
+            "toolbox":"",
+            "block_variant": {
+                "board": ["0 >> 1", "1 >> 0", "_ >> 1", "0 >> _"],
+                "toolbox": ["_op('+')", "_op('+')", "_op('+')",
+                            "_op('==')", "_op('==')", "_op('==')"]
+            }
         }
     ],
     "resources":{

@@ -259,7 +259,12 @@ class Expression extends mag.RoundedRect {
     getEnvironment() {
         if (this.environment) return this.environment;
 
-        if (this.parent) return this.parent.getEnvironment();
+        if (this.parent) {
+            let current = this.parent;
+            while (current && !current.getEnvironment) current = current.parent;
+            if (current.getEnvironment)
+                return current.getEnvironment();
+        }
 
         if (this.stage) return this.stage.environment;
 
