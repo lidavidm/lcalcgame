@@ -108,6 +108,7 @@ var GiveExpr = function (_Expression) {
                     parent.remove(_this2);
                     reduced_exprs.forEach(function (e) {
                         stage.add(e);
+                        e.lockSubexpressions();
                     });
 
                     // Call update() on the new exprs.

@@ -235,7 +235,7 @@ var ES6Parser = function () {
                     } else if (node.callee.type === 'Identifier') {
 
                         if (node.callee.name.substring(0, 2) === '_t') {
-                            var type_expr = TypeInTextExpr.fromExprCode(node.name);
+                            var type_expr = TypeInTextExpr.fromExprCode(node.callee.name);
                             if (node.arguments.length === 1 && node.arguments[0].type === 'Literal') type_expr.typeBox.text = node.arguments[0].value;
                             return type_expr;
                         }

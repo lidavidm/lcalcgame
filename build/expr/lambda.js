@@ -806,6 +806,17 @@ var LambdaVarExpr = function (_ImageExpr) {
             }
             return this;
         }
+    }, {
+        key: "canReduce",
+        value: function canReduce() {
+            var environment = this.getEnvironment();
+            return environment && environment.lookup(this.name);
+        }
+    }, {
+        key: "isValue",
+        value: function isValue() {
+            return false;
+        }
 
         //onmousedrag() {}
 

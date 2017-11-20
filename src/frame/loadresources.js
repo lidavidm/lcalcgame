@@ -1,7 +1,7 @@
 /* For fast-switching between game progressions. */
 const __ACTIVE_PROGRESSION = 'Typing Study';
 const __PROGRESSIONS = {
-    'Typing Study': {
+    'Default': {
         dir: 'levels/',
         digraph: {
             'intro': ['booleans'],
@@ -11,6 +11,21 @@ const __PROGRESSIONS = {
             'conditionals': ['bindings'],
             'bindings': ['map'],
             'map': []
+        },
+        settings: { // This sets global flags.
+            '__ALLOW_PARTIAL_REPLICATION': false,
+            '__ALLOW_SKIPPING': true,
+            '__ALLOW_ARRAY_EVENTS': false
+        }
+    },
+    'Typing Study': {
+        dir: 'levels-typing/',
+        digraph: {
+            'intro': ['lambdas'],
+            'lambdas': ['booleans'],
+            'booleans': ['bindings'],
+            'bindings': ['ternaries'],
+            'ternaries': []
         },
         settings: { // This sets global flags.
             '__ALLOW_PARTIAL_REPLICATION': false,
