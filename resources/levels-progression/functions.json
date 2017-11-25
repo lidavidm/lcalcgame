@@ -1,6 +1,6 @@
 {
-    "chapterName":"Chapter 1",
-    "description":"Anonymous functions",
+    "chapterName":"Anonymous functions",
+    "description":"Introduction to anonymous functions",
     "language":"JavaScript",
     "macros": {
         "A":"star",
@@ -9,46 +9,135 @@
     },
     "levels": [
         {
-            "board":["x => x", "A"],
-            "goal":"A",
-            "toolbox":""
+            "board": ["x => x", "A"],
+            "goal": "A",
+            "toolbox": ""
         },
         {
-            "board":["x => x", "x => x", "x => x", "A"],
-            "goal":"A",
-            "toolbox":""
+            "board": ["x => x", "x => x", "x => x", "A"],
+            "goal": "A",
+            "toolbox": ""
         },
         {
-            "board":["x => x", "x => x", "x => x"],
-            "goal":"x => x",
-            "toolbox":""
+            "board": ["x => x", "x => x", "x => x"],
+            "goal": "x => x",
+            "toolbox": ""
         },
         {
-            "board":"B",
-            "goal":["B", "B"],
-            "toolbox":["C", "B", "A"]
+            "board": "B",
+            "goal": ["B", "B"],
+            "toolbox": ["C", "B", "A"]
         },
         {
-            "board":["x => A", "A", "B"],
-            "goal":["A", "A"],
-            "toolbox":""
+            "board": ["x => A", "A", "B"],
+            "goal": ["A", "A"],
+            "toolbox": ""
         },
         {
-            "board":["x => x", "x => A", "x => B", "A", "C", "C"],
-            "goal":["C", "B", "A"],
-            "toolbox":""
+            "board": ["x => x", "x => A", "x => B", "A", "C", "C"],
+            "goal": ["C", "B", "A"],
+            "toolbox": ""
         },
         {
-            "board":"x => _",
-            "goal":"B",
-            "toolbox":["A", "B"]
+            "board": "x => _",
+            "goal": "B",
+            "toolbox": ["A", "B"]
         },
         {
-            "board":"x => _",
-            "goal":"A",
-            "toolbox":["A", "x", "y"]
+            "board": "x => _",
+            "goal": "A",
+            "toolbox": ["A", "x", "y"]
         },
-
+        {
+            "board": ["x => _", "y => _", "A", "B", "C"],
+            "goal": "B",
+            "toolbox": ""
+        },
+        {
+            "board": "x => x",
+            "goal": "B",
+            "toolbox": ["x => B", "x => C", "A"]
+        },
+        {
+            "board": "x => x",
+            "goal": "B",
+            "toolbox": ["x => B", "x => C"]
+        },
+        {
+            "board": "x => xx",
+            "goal": ["C", "C"],
+            "toolbox": ["A", "B", "C"]
+        },
+        {
+            "board": ["x => xx", "x => C"],
+            "goal": ["A", "B"],
+            "toolbox": ["A", "B"]
+        },
+        {
+            "board": ["x => xx", "x => x", "A"],
+            "goal": ["A"],
+            "toolbox": ""
+        },
+        {
+            "board": ["x => xx", "B"],
+            "goal": ["A", "B"],
+            "toolbox": ["A", "x", "x => _"]
+        },
+        {
+            "board": ["x => xx", "x => C", "A"],
+            "goal": ["B", "C"],
+            "toolbox": "B"
+        },
+        {
+            "board": ["x => y => x", "A", "B"],
+            "goal": "A",
+            "toolbox": ""
+        },
+        {
+            "board": ["x => y => y", "A", "B"],
+            "goal": "A",
+            "toolbox": ""
+        },
+        {
+            "board": ["x => y => x", "A", "B", "C"],
+            "goal": ["A", "C"],
+            "toolbox": ""
+        },
+        {
+            "board": ["x => y => x", "x => y => y", "A", "B", "B", "C"],
+            "goal": ["A", "C"],
+            "toolbox": ""
+        },
+        {
+            "board": "x => y => _",
+            "goal": "A",
+            "toolbox": ["A", "B", "x", "y"]
+        },
+        {
+            "board": ["x => y => A", "B", "B"],
+            "goal": "A",
+            "toolbox": ""
+        },
+        {
+            "board": ["x => y => C", "x => x"],
+            "goal": ["A", "C"],
+            "toolbox": ["A", "B", "C"]
+        },
+        {
+            "board": ["x => _", "y => _", "x => xx", "C", "B", "B", "A"],
+            "goal": ["A", "C"],
+            "toolbox": ""
+        },
+        {
+            "board": ["x => y => _", "y => x => _", "A", "A", "B", "C", "C"],
+            "goal": ["A", "B"],
+            "toolbox": ["x", "y"]
+        },
+        {
+            "board": ["x => y => _", "y => x => _", "A", "A", "A", "B", "C"],
+            "goal": "B",
+            "toolbox": ["x", "y"]
+        }
     ],
     "resources":{
         "planet":"planet-functiana",
