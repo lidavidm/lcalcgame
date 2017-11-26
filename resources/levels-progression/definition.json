@@ -1,37 +1,201 @@
 {
-    "chapterName": "Application",
-    "description": "Introduction to function application",
+    "chapterName": "Function Definition",
+    "description": "Introduction to function definitions",
     "language": "JavaScript",
+    "macros": {
+        "A": "star",
+        "B": "rect",
+        "C": "triangle",
+        "D": "circle"
+    },
     "levels": [
         {
-            "board": "(x => x)(1)",
-            "goal": "1",
+            "board": "function star() { return A; }",
+            "goal": "A",
             "toolbox": ""
         },
         {
-            "board": ["(x => x + 1)(_)", "(x => x)(_)"],
-            "goal": "4",
-            "toolbox": ["2", "3", "4"]
+            "board": ["function star() { return A; }", "function rect() { return B; }"],
+            "goal": ["B", "B", "A"],
+            "toolbox": ""
         },
         {
-            "board": ["_(2)", "_(_)"],
-            "goal": "4",
-            "toolbox": ["x => x + 1", "x => x + 2", "x => x"],
+            "board": ["function makeStar(x) { return A; }", "D", "B", "C"],
+            "goal": ["A", "A", "A"],
+            "toolbox": ""
         },
         {
-            "board": ["_(5)", "_(3)", "_(8)"],
-            "goal": ["1", "6", "8"],
-            "toolbox": ["x => x + 1", "x => x - 2", "x => x", "x => x + 3"],
+            "board": ["function triangle() { return _; }", "C"],
+            "goal": ["C", "C", "C"],
+            "toolbox": ""
         },
         {
-            "board": ["_(_)", "x => x + _"],
+            "board": ["function trianglify(x) { return _; }", "A", "B", "C"],
+            "goal": ["C", "C"],
+            "toolbox": ""
+        },
+        {
+            "problem": "squarify's syntax?",
+            "board": ["let squarify = _;", "x => _", "A", "A", "B", "C"],
+            "goal": ["B", "B", "B"],
+            "toolbox": ""
+        },
+        {
+            "board": ["function addOne(x) { return _; }", "2", "4"],
+            "goal": ["3", "6"],
+            "toolbox": ["x", "_ + 1"]
+        },
+        {
+            "problem": "addOne should already be defined",
+            "board": ["function addOne(x) { return x + 1; }", "3", "7"],
+            "goal": ["6", "9"],
+            "toolbox": ""
+        },
+        {
+            "board": ["function addOne(x) { return x + 1; }", "addOne(7)", "addOne(_)"],
+            "goal": ["7", "8"],
+            "toolbox": ["1", "2", "3", "4", "5", "6", "7", "8"]
+        },
+        {
+            "board": ["function addOne(x) { return x + 1; }", "let doNothing = _;", "_(7)", "_(3)"],
+            "goal": ["4", "7"],
+            "toolbox": ["x => _", "x"]
+        },
+        {
+            "board": ["function addOne(x) { return x + 1; }", "function doNothing(x) { return x; }", "_(3)", "_(4)", "_(8)"],
+            "goal": ["3", "6", "8"],
+            "toolbox": ""
+        },
+        {
+            "board": ["function addOne(x) { return x + 1; }", "function doNothing(x) { return x; }", "_(3)", "_(8)", "addOne(_)"],
+            "goal": ["4", "8"],
+            "toolbox": ""
+        },
+        {
+            "board": ["_(addOne(4))}", "_(_(1))}", "addOne(_(10))}"],
+            "goal": ["2", "6", "11"],
+            "toolbox": ["addOne", "addOne", "doNothing", "doNothing"]
+        },
+        {
+            "board": ["x => C", "__tests(f(A), f(B))"],
+            "goal": ["C", "C"],
+            "toolbox": ""
+        },
+        {
+            "board": ["__tests(f(A), f(C))"],
+            "goal": ["A", "A"],
+            "toolbox": ["x => A", "x => B", "x => C"]
+        },
+        {
+            "board": ["__tests(f(2), f(6))", "function addOne(x) { return x + 1; }"],
+            "goal": ["3", "7"],
+            "toolbox": ""
+        },
+        {
+            "board": ["function starify(x) { return A; }", "function squarify(x) { return B; }", "__tests(f(C), f(B))"],
+            "goal": ["A", "A"],
+            "toolbox": ""
+        },
+        {
+            "board": ["let threeify = _;", "__tests(f(1), f(2), f(3))"],
+            "goal": ["3", "3", "3"],
+            "toolbox": ["x => _", "x", "1", "2", "3"]
+        },
+        {
+            "board": "__tests(f(2), f(3), f(1))",
+            "goal": ["2", "3", "4"],
+            "toolbox": ["threeify", "addOne", "doNothing"]
+        },
+        {
+            "problem": "Need to specify how many of addOne",
+            "board": ["function addThree(x) { return _; }", "__tests(f(2), f(6))", "_(_)", "_(_)", "_(x)"],
+            "goal": ["5", "9"],
+            "toolbox": ["addOne", "addOne", "addOne", "doNothing"]
+        },
+        {
+            "board": ["twice(addOne)", "_(_)"],
             "goal": "7",
+            "toolbox": ["3", "4", "5", "6"]
+        },
+        {
+            "board": ["twice(_)", "_(_)"],
+            "goal": "7",
+            "toolbox": ["addOne", "addThree", "1", "5", "9"]
+        },
+        {
+            "board": ["twice", "_(_)", "_(_)", "x", "function addTwo(x) { return _; }", "__tests(f(3), f(7), f(11))"],
+            "goal": ["5", "9", "13"],
+            "toolbox": "addOne"
+        },
+        {
+            "board": ["twice", "_(_)", "_(_)", "x", "function addFour(x) { return _; }", "__tests(f(1), f(f(5))"],
+            "goal": ["5", "13"],
+            "toolbox": "addTwo"
+        },
+        {
+            "board": "(repeat(2))(addOne)",
+            "goal": "5",
             "toolbox": ["1", "2", "3", "4"]
         },
         {
-            "board": ["_(2)", "_(_)", "_(_)", "(x => x + 2)(_)", "1", "3"],
-            "goal": ["6", "7"],
-            "toolbox": ["x => x + _", "x => x + 2", "x => x + 3", "x => x"],
+            "board": ["(repeat(_))(addOne)", "_(_)"],
+            "goal": "11",
+            "toolbox": ["3", "4", "5", "6"]
+        },
+        {
+            "board": ["(repeat(3))(_)", "_(_)"],
+            "goal": "8",
+            "toolbox": ["doNothing", "addOne", "addTwo", "0", "1", "2"]
+        },
+        {
+            "board": ["(repeat(_))(_)", "_(_)", "x", "function addSix(x) { return _; }", "__tests(f(5), f(9))"],
+            "goal": ["11", "15"],
+            "toolbox": ["addThree", "addTwo", "1", "3", "5"]
+        },
+        {
+            "board": "__tests(f(_), f(_))",
+            "goal": ["9", "12"],
+            "toolbox": ["addSix", "1", "2", "3", "4", "5", "6"]
+        },
+        {
+            "board": ["repeat(x)", "_(_)", "_(_)", "x", "addOne", "function double(x) { return _; }", "__tests(f(4), f(5))"],
+            "goal": ["8", "10"],
+            "toolbox": ""
+        },
+        {
+            "board": ["(repeat(_))(_)", "_(_)", "x", "x", "function triple(x) { return _; }", "__tests(f(3), f(_))"],
+            "goal": ["6", "9"],
+            "toolbox": ["addTwo", "addOne", "0", "1", "2"]
+        },
+        {
+            "board": ["function first(left, right) { return left; }", "__tests(f(3, 6), f(7, 3), f(_, _))"],
+            "goal": ["3", "7", "9"],
+            "toolbox": ["8", "9", "10"]
+        },
+        {
+            "board": ["function second(left, right) { return _; }", "__tests(f(_, _), f(_, 8))"],
+            "goal": ["5", "8"],
+            "toolbox": ["left", "right", "1", "2", "3", "4", "5"]
+        },
+        {
+            "board": ["function secondPlusOne(a, b) { return _; }", "__tests(f(1, 6), f(_, _), f(_, _))", "addOne(_)", "a", "b"],
+            "goal": ["2", "6", "7"],
+            "toolbox": ""
+        },
+        {
+            "board": ["function firstPlusTwo(left, right) { return _; }", "__tests(f(_, _), f(_, _), f(7, 9))", "a", "b", "2", "3", "4", "5"],
+            "goal": ["4", "7", "9"],
+            "toolbox": ["addOne", "addTwo"]
+        },
+        {
+            "board": ["function apply(func) { return _; }", "__tests(f(doNothing, 3), f(addSix, 3), f(triple, 4))", "_(_)"],
+            "goal": ["3", "9", "12"],
+            "toolbox": ["num => _", "func", "num"]
+        },
+        {
+            "board": ["function addTogether(a, b) { return _; }", "__tests(f(_, _), f(_, _), f(1, 2))", "repeat(_)", "a", "b", "addOne"],
+            "goal": ["3", "8", "9"],
+            "toolbox": ["_(_)", "_(_)", "2", "3", "5", "7"]
         }
     ],
     "resources":{

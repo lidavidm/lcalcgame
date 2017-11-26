@@ -1,11 +1,11 @@
 {
-    "chapterName":"Anonymous functions",
-    "description":"Introduction to anonymous functions",
-    "language":"JavaScript",
+    "chapterName": "Anonymous functions",
+    "description": "Introduction to anonymous functions",
+    "language": "JavaScript",
     "macros": {
-        "A":"star",
-        "B":"rect",
-        "C":"triangle"
+        "A": "star",
+        "B": "rect",
+        "C": "triangle"
     },
     "levels": [
         {
