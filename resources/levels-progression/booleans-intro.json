@@ -99,12 +99,12 @@
             "toolbox": ["x == _", "'triangle'", "'rect'", "'star'"]
         },
         {
-            "board": ["function isZero() { return _; }", "_ == _", "__tests(f(1), f(0), f(3), f(0))"],
+            "board": ["let isZero = () => _", "_ == _", "__tests(f(1), f(0), f(3), f(0))"],
             "goal": ["false", "true", "false", "true"],
             "toolbox": ["(x) => _", "x", "y", "0", "1", "2"]
         },
         {
-            "board": ["function equals() { return _; }", "_ == _", "(y) => _", "__tests(f(1, 2), f(2, 2), f(3, 3))"],
+            "board": ["let equals = () => _", "_ == _", "(y) => _", "__tests(f(1, 2), f(2, 2), f(3, 3))"],
             "goal": ["false", "true", "true"],
             "toolbox": ["(x) => _", "x", "y", "0", "1"]
         },
@@ -114,7 +114,7 @@
             "toolbox": ["'star'", "'rect'", "'triangle'"]
         },
         {
-            "board": ["function alwaysOne() { return _; }", "_ ? x : 1", "(x) => _", "__tests(f(1) == 1, f(2) == 1, f(3) == 1)"],
+            "board": ["let alwaysOne = () => _", "_ ? x : 1", "(x) => _", "__tests(f(1) == 1, f(2) == 1, f(3) == 1)"],
             "goal": ["true", "true", "true"],
             "toolbox": ["_ == _", "1 == _", "2", "3"]
         },

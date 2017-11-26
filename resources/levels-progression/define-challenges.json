@@ -14,7 +14,7 @@
             "toolbox": ["addTogether", "_(_)", "5", "6", "7", "8"]
         },
         {
-            "board": ["function addEight() { return _; }", "_(_)", "__tests(f(1), f(4), f(7))"],
+            "board": ["function addEight(x) { return _; }", "_(_)", "__tests(f(1), f(4), f(7))"],
             "goal": ["9", "12", "15"],
             "toolbox": ["addTogether", "5", "6", "7", "8"]
         },
