@@ -25,22 +25,26 @@
         {
             "board": ["function countdown(x) { return _; }", "_(0)", "_(1)", "_(2)", "isZero(x) ? 0 : countdown(x - 1)"],
             "goal": ["0", "0", "0"],
-            "toolbox": []
+            "toolbox": ["__unlimited; countdown;"],
+            "defines": "function countdown(x) { return isZero(x) ? 0 : countdown(x - 1); }"
         },
         {
             "board": ["function justOne(x) { return _ ? _ : justOne(x - 1); }", "justOne(0)", "justOne(1)", "_ == 1", "justOne(3)"],
             "goal": ["1", "1", "1"],
-            "toolbox": ["x", "x", "1", "2"]
+            "toolbox": ["__unlimited; justOne;", "x", "x", "1", "2"],
+            "defines": "function justOne(x) { return x == 1 ? 1 : justOne(x - 1); }"
         },
         {
             "board": ["function justTwo(x) { return _; }", "_ ? _ : _(_)", "justTwo", "_(0)", "_(2)"],
             "goal": ["2", "2", "2"],
-            "toolbox": ["x", "x", "x", "_ == _", "_ - 1", "0", "1", "2"]
+            "toolbox": ["__unlimited; justTwo;", "x", "x", "x", "_ == _", "_ - 1", "0", "1", "2"],
+            "defines": "function justTwo(x) { return x == 2 ? x : justTwo(x - 1); }"
         },
         {
             "board": ["function countToFive(x) { return _; }", "_(0)", "_(4)", "_(5)", "x == _", "5", "countToFive(_)", "_ ? 5 : _"],
             "goal": ["5", "5"],
-            "toolbox": ["x", "x - 1", "x + 1", "x + 2", "0"]
+            "toolbox": ["__unlimited; countToFive;", "x", "x - 1", "x + 1", "x + 2", "0"],
+            "defines": "function countToFive(x) { return x == 5 ? x : countToFive(x + 1); }"
         },
         {
             "board": ["function howFarFromTen(x) { return _; }", "__tests(f(3), f(8), f(10))",
@@ -50,7 +54,8 @@
                       "howFarFromTen",
                       "_(_)"],
             "goal": ["7", "2", "0"],
-            "toolbox": ["_ + 1", "_ - 1"]
+            "toolbox": ["__unlimited; howFarFromTen;", "_ + 1", "_ - 1"],
+            "defines": "function howFarFromTen(x) { return x == 10 ? 0 : 1 + howFarFromTen(x + 1); }"
         },
         {
             "board": [
@@ -62,18 +67,20 @@
                 "__tests(f(Tue), f(Sun), f(Fri), f(Sat))"
             ],
             "goal": ["4", "0", "1", "0"],
-            "toolbox": ["isWeekend", "tomorrow", "x", "x", "1 + _"]
+            "toolbox": ["__unlimited; howFarFromWeekend;", "isWeekend", "tomorrow", "x", "x", "1 + _"],
+            "defines": "function howFarFromWeekend(x) { return isWeekend(x) ? 0 : 1 + howFarFromWeekend(tomorrow(x)); }"
         },
         {
             "board": [
                 "function twice(f, x) { return _; }",
-                "_(_, _)",
+                "_(_(_))",
                 "twice(add1, 2)",
                 "twice(add2, 3)",
                 "twice(doNothing, 1)"
             ],
             "goal": ["4", "7", "1"],
-            "toolbox": ["twice", "f", "f", "x", "x"]
+            "toolbox": ["twice", "f", "f", "x", "x"],
+            "defines": "function twice(f, x) { return f(f(x)); }"
         },
         {
             "board": [
@@ -83,7 +90,8 @@
                 "thrice(add6, 2)"
             ],
             "goal": ["7", "6", "20"],
-            "toolbox": ["twice", "thrice", "f", "f", "x", "x", "_(_)", "_(_)"]
+            "toolbox": ["twice", "thrice", "f", "f", "x", "x", "_(_)", "_(_)"],
+            "defines": "function thrice(f, x) { return f(twice(f, x)); }"
         },
         {
             "board": [
@@ -95,7 +103,8 @@
                 "double(3)"
             ],
             "goal": ["2", "0", "6"],
-            "toolbox": ["y", "y - 1", "y + 1", "0", "1", "2", "_ == _"]
+            "toolbox": ["y", "y - 1", "y + 1", "0", "1", "2", "_ == _"],
+            "defines": "function double(y) { return y == 0 ? 0 : 2 + double(y - 1); }"
         },
         {
             "board": [
@@ -108,7 +117,8 @@
                 "triple(1)"
             ],
             "goal": ["0", "6", "3"],
-            "toolbox": ["3 + _", "2 + _", "triple", "triple", "_ - _", "0", "1", "2", "4"]
+            "toolbox": ["3 + _", "2 + _", "triple", "triple", "_ - _", "0", "1", "2", "4"],
+            "defines": "function triple(z) { return z == 0 ? 0 : 3 + triple(z - 1); }"
         },
         {
             "board": [
@@ -122,7 +132,8 @@
                 "multiplyBy4(2)"
             ],
             "goal": ["4", "16", "8"],
-            "toolbox": ["_ == _", "0", "1", "2", "3", "4", "5", "x"]
+            "toolbox": ["multiplyBy4", "_ == _", "0", "1", "2", "3", "4", "5", "x"],
+            "defines": "function multiplyBy4(x) { return x == 0 ? 0 : 4 + multiplyBy4(x - 1); }"
         },
         {
             "board": [
@@ -136,7 +147,8 @@
                 "xTimes4PlusY(2, 3)"
             ],
             "goal": ["5", "16", "11"],
-            "toolbox": ["x", "y", "0", "1", "2", "3", "4", "_ - 1"]
+            "toolbox": ["xTimes4PlusY", "x", "y", "0", "1", "2", "3", "4", "_ - 1"],
+            "defines": "function xTimes4PlusY(x, y) { return x == 0 ? y : x + xTimes4PlusY(x - 1, y); }"
         },
         {
             "board": [
@@ -150,20 +162,22 @@
                 "xTimes5PlusY(1, 0)"
             ],
             "goal": ["7", "13", "5"],
-            "toolbox": ["x", "x", "y", "y", "0", "1", "3", "5", "_ == _"]
+            "toolbox": ["xTimes5PlusY", "x", "x", "y", "y", "0", "1", "3", "5", "_ == _"],
+            "defines": "function xTimes5PlusY(x, y) { return x == 0 ? y : x + xTimes5PlusY(x - 1, y); }"
         },
         {
             "board": [
                 "function repeatAdd1(x,n) { return _; }",
-                "_ ? x : add1(_)",
+                "_ ? n : add1(_)",
                 "_ == 0",
                 "repeatAdd1(0, 5)",
                 "repeatAdd1(1, 5)",
                 "repeatAdd1(0, 3)"
             ],
             "goal": ["5", "6", "3"],
-            "toolbox": ["repeatAdd1(x, n)", "repeatAdd1(x - 1, n)",
-                        "repeatAdd1(x, n-1)", "x", "n"]
+            "toolbox": ["repeatAdd1", "repeatAdd1(x, n)", "repeatAdd1(x - 1, n)",
+                        "repeatAdd1(x, n-1)", "x", "n"],
+            "defines": "function repeatAdd1(x, n) { return x == 0 ? n : add1(repeatAdd1(x - 1, n)); }"
         },
         {
             "board": [
@@ -176,7 +190,8 @@
                 "repeatAdd2(1, 2)"
             ],
             "goal": ["10", "8", "5"],
-            "toolbox": ["_ == _", "x - 1", "n - 1", "x - 2", "n - 2", "n", "x", "x"]
+            "toolbox": ["repeatAdd2", "_ == _", "x - 1", "n - 1", "x - 2", "n - 2", "n", "n", "x"],
+            "defines": "function repeatAdd2(x, n) { return x == 0 ? n : add2(repeatAdd2(x - 1, n)); }"
         },
         {
             "board": [
@@ -189,7 +204,8 @@
                 "repeatAdd3(1, 3)"
             ],
             "goal": ["3", "8", "10"],
-            "toolbox": ["_ == _", "_ - 1", "_ - 2", "0", "1", "2", "3", "x", "x", "n", "n"]
+            "toolbox": ["repeatAdd3", "_ == _", "_ - 1", "_ - 2", "0", "1", "2", "3", "x", "x", "n", "n"],
+            "defines": "function repeatAdd3(x, n) { return x == 0 ? n : add3(repeatAdd3(x - 1, n)); }"
         },
         {
             "board": [
@@ -201,7 +217,8 @@
                 "repeatAddA(3, 1, 3)"
             ],
             "goal": ["5", "11", "6"],
-            "toolbox": ["_ == _", "_ + _", "_ - _", "x", "x", "n", "n", "a", "a", "0", "1", "2", "3"]
+            "toolbox": ["repeatAddA", "_ == _", "_ + _", "_ - _", "x", "x", "n", "n", "a", "a", "0", "1", "2", "3"],
+            "defines": "function repeatAddA(x, n, a) { return x == 0 ? n : a + repeatAddA(x - 1, n, a); }"
         },
         {
             "board": [
@@ -215,7 +232,8 @@
                 "repeatFunction(1, 3, add2)"
             ],
             "goal": ["5", "10", "4", "7"],
-            "toolbox": ["_ == _", "_ - _", "0", "1", "2", "x", "n", "f"]
+            "toolbox": ["repeatFunction", "_ == _", "_ - _", "0", "1", "2", "x", "n", "f"],
+            "defines": "function repeatFunction(x, n, f) { return x == 0 ? n : f(repeatFunction(x - 1, n, f)); }"
         }
     ],
     "resources":{

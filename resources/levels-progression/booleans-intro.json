@@ -91,42 +91,55 @@
         {
             "board": ["function isTriangle(x) { return x == 'triangle'; }", "__tests(f('triangle'), f('rect'))"],
             "goal": ["true", "false"],
-            "toolbox": []
+            "toolbox": ["__unlimited; isTriangle;"],
+            "defines": "function isTriangle(x) { }"
         },
         {
             "board": ["function isStar(x) { return _; }", "__tests(f('star'), f('rect'), f('star'))"],
             "goal": ["true", "false", "true"],
-            "toolbox": ["x == _", "'triangle'", "'rect'", "'star'"]
+            "toolbox": ["__unlimited; isStar;", "x == _", "'triangle'", "'rect'", "'star'"],
+            "defines": "function isStar(x) { return x == 'star'; }"
         },
         {
-            "board": ["let isZero = () => _", "_ == _", "__tests(f(1), f(0), f(3), f(0))"],
+            "board": ["let isZero = _", "_ == _", "__tests(f(1), f(0), f(3), f(0))"],
             "goal": ["false", "true", "false", "true"],
-            "toolbox": ["(x) => _", "x", "y", "0", "1", "2"]
+            "toolbox": ["__unlimited; isZero;", "(x) => _", "x", "y", "0", "1", "2"],
+            "defines": "function isZero(x) { return x == 0; }"
         },
         {
-            "board": ["let equals = () => _", "_ == _", "(y) => _", "__tests(f(1, 2), f(2, 2), f(3, 3))"],
+            "board": ["let equals = _", "_ == _", "(y) => _", "__tests(f(1, 2), f(2, 2), f(3, 3))"],
             "goal": ["false", "true", "true"],
-            "toolbox": ["(x) => _", "x", "y", "0", "1"]
+            "toolbox": ["__unlimited; equals;", "(x) => _", "x", "y", "0", "1"],
+            "defines": "function equals(x, y) { return x == y; }"
+        },
+        {
+            "board": ["_ ? 'star' : 'triangle'", "true"],
+            "goal": "'star'",
+            "toolbox": []
         },
         {
             "board": ["function noStar(x) { return _ ? 'rect' : x; }", "x == _", "__tests(f('rect') == 'rect', f('star') == 'rect', f('triangle') == 'triangle')"],
             "goal": ["true", "true", "true"],
-            "toolbox": ["'star'", "'rect'", "'triangle'"]
+            "toolbox": ["__unlimited; noStar;", "'star'", "'rect'", "'triangle'"],
+            "defines": "function noStar(x) { return x == 'star' ? 'rect' : x; }"
         },
         {
-            "board": ["let alwaysOne = () => _", "_ ? x : 1", "(x) => _", "__tests(f(1) == 1, f(2) == 1, f(3) == 1)"],
+            "board": ["let alwaysOne = _", "_ ? x : 1", "(x) => _", "__tests(f(1) == 1, f(2) == 1, f(3) == 1)"],
             "goal": ["true", "true", "true"],
-            "toolbox": ["_ == _", "1 == _", "2", "3"]
+            "toolbox": ["__unlimited; alwaysOne;", "_ == _", "1 == _", "2", "3"],
+            "defines": "function alwaysOne(x) { return x == 1 ? x : 1; }"
         },
         {
             "board": ["function firstNonZero(x, y) { return _; }", "_ ? _ : x", "_(_)", "__tests(f(1, 2) == 1, f(0, 1) == 1, f(2, 0) == 2, f(3, 2) == 3)"],
             "goal": ["true", "true", "true", "true"],
-            "toolbox": ["__unlimited(isZero)", "x", "y", "x", "y"]
+            "toolbox": ["__unlimited;isZero;", "__unlimited; firstNonZero; ", "x", "y", "x", "y"],
+            "defines": "function firstNonZero(x, y) { return x == 0 ? x : y; }"
         },
         {
             "board": ["function nextDayOfWeek(x) { return _; }", "_ ? _ : _", "__tests(f(2) == 3, f(7) == 1, f(5) == 6)"],
             "goal": ["true", "true", "true"],
-            "toolbox": ["__unlimited(addOne)", "__unlimited(addTwo)", "x == _", "1", "2", "3", "4", "5", "6", "7"]
+            "toolbox": ["__unlimited; addOne;", "__unlimited; addTwo;", "__unlimited; nextDayOfWeek;", "x == _", "1", "2", "3", "4", "5", "6", "7"],
+            "defines": "function nextDayOfWeek(x) { return x == 7 ? 1 : addOne(x); }"
         }
     ],
     "resources":{
