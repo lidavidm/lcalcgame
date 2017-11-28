@@ -1,6 +1,20 @@
 /* For fast-switching between game progressions. */
-const __ACTIVE_PROGRESSION = 'Typing Study';
+const __ACTIVE_PROGRESSION = 'Elementary';
 const __PROGRESSIONS = {
+    'Elementary': {
+        dir: 'levels-progression/',
+        digraph: {
+            'arithmetic': ['define-challenges'],
+            'define-challenges': ['booleans-intro'],
+            'booleans-intro': ['recursion'],
+            'recursion': [],
+        },
+        settings: { // This sets global flags.
+            '__ALLOW_PARTIAL_REPLICATION': false,
+            '__ALLOW_SKIPPING': true,
+            '__ALLOW_ARRAY_EVENTS': false
+        }
+    },
     'Default': {
         dir: 'levels/',
         digraph: {
