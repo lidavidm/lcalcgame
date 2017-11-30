@@ -220,12 +220,16 @@ class ES6Parser {
                     }
                     else if (node.callee.name === "_") {
                         // ApplyExpr with placeholder
-                        if (node.arguments.length !== 1) {
-                            console.error("Multi-argument call expressions are currently undefined.");
+                        if (node.arguments.length === 0) {
+                            console.error("Zero-argument call expressions are currently undefined.");
                             return;
                         }
-                        return new ApplyExpr(this.parseNode(node.arguments[0]),
-                                             new MissingExpression());
+
+                        let base = new MissingExpression();
+                        for (let arg of node.arguments) {
+                            base = new ApplyExpr(this.parseNode(arg), base);
+                        }
+                        return base;
                     }
 
                     // Special case 'foo(_t_params)': Call parameters (including paretheses) will be entered by player.
