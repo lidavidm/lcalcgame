@@ -415,7 +415,20 @@ class ES6Parser {
             },
             'ReturnStatement': (node) => {
                 return new (ExprManager.getClass('return'))(this.parseNode(node.argument));
-            }
+            },
+            'VariableDeclaration': (node) => {
+                if (node.kind !== "let") {
+                    console.error("Only let-statements are supported.");
+                    return;
+                }
+                if (node.declarations.length !== 1) {
+                    console.error("Only one definition per let expression is supported.");
+                    return null;
+                }
+                return new (ExprManager.getClass('define'))(
+                    this.parseNode(node.declarations[0].init),
+                    node.declarations[0].id.name, []);
+            },
         }
 
         // Apply!
