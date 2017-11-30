@@ -225,8 +225,11 @@ class ES6Parser {
                     else // All other cases, including special case _t_varname(...) specifying that call name will be entered by player.
                         return new NamedFuncExpr(node.callee.name, null, ...node.arguments.map((a) => this.parseNode(a)));
                 } else {
-                    console.error('Call expressions involving callee name resolution are currently undefined.');
-                    return null;
+                    if (node.arguments.length != 1) {
+                        console.error("Multi-argument call expressions are currently undefined.");
+                    }
+                    return new ApplyExpr(this.parseNode(node.arguments[0]),
+                                         this.parseNode(node.callee));
                 }
             },
 
