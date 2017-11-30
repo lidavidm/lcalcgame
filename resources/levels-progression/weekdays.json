@@ -36,7 +36,7 @@
                       "function yesterday(x) { return x == mon ? sun : (x == tue ? mon : (x == wed ? tue : (x == thu ? wed : (x == fri ? thu : (x == sat ? fri : sat))))) }"]
         },
         {
-            "board": [ "(_)_", "_ == tue"],
+            "board": [ "_(_)", "_ == tue"],
             "goal": "true",
             "toolbox": ["tomorrow", "yesterday", "mon"]
         },
