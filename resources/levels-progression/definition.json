@@ -35,7 +35,6 @@
             "toolbox": ""
         },
         {
-            "problem": "squarify's syntax?",
             "board": ["let squarify = _;", "x => _", "A", "A", "B", "C"],
             "goal": ["B", "B", "B"],
             "toolbox": ""
@@ -43,33 +42,34 @@
         {
             "board": ["function addOne(x) { return _; }", "2", "4"],
             "goal": ["3", "6"],
-            "toolbox": ["x", "_ + 1"]
+            "toolbox": ["x", "_ + 1"],
+            "defines": "function addOne(x) { return x + 1; }"
         },
         {
-            "problem": "addOne should already be defined",
-            "board": ["function addOne(x) { return x + 1; }", "3", "7"],
+            "board": ["3", "7"],
             "goal": ["6", "9"],
-            "toolbox": ""
+            "toolbox": "__unlimited;addOne;"
         },
         {
-            "board": ["function addOne(x) { return x + 1; }", "addOne(7)", "addOne(_)"],
+            "board": ["addOne(7)", "addOne(_)"],
             "goal": ["7", "8"],
-            "toolbox": ["1", "2", "3", "4", "5", "6", "7", "8"]
+            "toolbox": ["__unlimited;addOne;", "1", "2", "3", "4", "5", "6", "7", "8"]
         },
         {
-            "board": ["function addOne(x) { return x + 1; }", "let doNothing = _;", "_(7)", "_(3)"],
+            "board": ["let doNothing = _;", "_(7)", "_(3)"],
             "goal": ["4", "7"],
-            "toolbox": ["x => _", "x"]
+            "toolbox": ["__unlimited;addOne;", "x => _", "x"],
+            "defines": "function doNothing(x) { return x; }"
         },
         {
-            "board": ["function addOne(x) { return x + 1; }", "function doNothing(x) { return x; }", "_(3)", "_(4)", "_(8)"],
+            "board": ["_(3)", "_(4)", "_(8)"],
             "goal": ["3", "6", "8"],
-            "toolbox": ""
+            "toolbox": "__unlimited;addOne;doNothing;"
         },
         {
-            "board": ["function addOne(x) { return x + 1; }", "function doNothing(x) { return x; }", "_(3)", "_(8)", "addOne(_)"],
+            "board": ["_(3)", "_(8)", "addOne(_)"],
             "goal": ["4", "8"],
-            "toolbox": ""
+            "toolbox": "__unlimited;addOne;doNothing;"
         },
         {
             "board": ["_(addOne(4))}", "_(_(1))}", "addOne(_(10))}"],
@@ -87,9 +87,9 @@
             "toolbox": ["x => A", "x => B", "x => C"]
         },
         {
-            "board": ["__tests(f(2), f(6))", "function addOne(x) { return x + 1; }"],
+            "board": ["__tests(f(2), f(6))"],
             "goal": ["3", "7"],
-            "toolbox": ""
+            "toolbox": "__unlimited;addOne;"
         },
         {
             "board": ["function starify(x) { return A; }", "function squarify(x) { return B; }", "__tests(f(C), f(B))"],
@@ -99,7 +99,8 @@
         {
             "board": ["let threeify = _;", "__tests(f(1), f(2), f(3))"],
             "goal": ["3", "3", "3"],
-            "toolbox": ["x => _", "x", "1", "2", "3"]
+            "toolbox": ["x => _", "x", "1", "2", "3"],
+            "defines": "function threeify(x) { return 3; }"
         },
         {
             "board": "__tests(f(2), f(3), f(1))",
@@ -107,15 +108,16 @@
             "toolbox": ["threeify", "addOne", "doNothing"]
         },
         {
-            "problem": "Need to specify how many of addOne",
             "board": ["function addThree(x) { return _; }", "__tests(f(2), f(6))", "_(_)", "_(_)", "_(x)"],
             "goal": ["5", "9"],
-            "toolbox": ["addOne", "addOne", "addOne", "doNothing"]
+            "toolbox": ["addOne", "addOne", "addOne", "__unlimited;doNothing;"],
+            "defines": "function addThree(x) { return addOne(addOne(addOne(x))); }"
         },
         {
             "board": ["twice(addOne)", "_(_)"],
             "goal": "7",
-            "toolbox": ["3", "4", "5", "6"]
+            "toolbox": ["3", "4", "5", "6"],
+            "defines": "function twice(f) { return (x) => f(f(x)); }"
         },
         {
             "board": ["twice(_)", "_(_)"],
@@ -125,17 +127,20 @@
         {
             "board": ["twice", "_(_)", "_(_)", "x", "function addTwo(x) { return _; }", "__tests(f(3), f(7), f(11))"],
             "goal": ["5", "9", "13"],
-            "toolbox": "addOne"
+            "toolbox": "addOne",
+            "defines": "function addTwo(x) { return (twice(addOne))(x); }"
         },
         {
             "board": ["twice", "_(_)", "_(_)", "x", "function addFour(x) { return _; }", "__tests(f(1), f(f(5))"],
             "goal": ["5", "13"],
-            "toolbox": "addTwo"
+            "toolbox": "addTwo",
+            "defines": "function addTwo(x) { return (twice(addTwo))(x); }"
         },
         {
             "board": "(repeat(2))(addOne)",
             "goal": "5",
-            "toolbox": ["1", "2", "3", "4"]
+            "toolbox": ["1", "2", "3", "4"],
+            "defines": "function repeat(n, f) { return (x) => n == 0 ? x : f((repeat(n - 1, f))(x)); }"
         },
         {
             "board": ["(repeat(_))(addOne)", "_(_)"],
@@ -150,7 +155,8 @@
         {
             "board": ["(repeat(_))(_)", "_(_)", "x", "function addSix(x) { return _; }", "__tests(f(5), f(9))"],
             "goal": ["11", "15"],
-            "toolbox": ["addThree", "addTwo", "1", "3", "5"]
+            "toolbox": ["addThree", "addTwo", "1", "3", "5"],
+            "defines": "function addSix(x) { return (repeat(3, addTwo))(x); }"
         },
         {
             "board": "__tests(f(_), f(_))",
@@ -160,12 +166,14 @@
         {
             "board": ["repeat(x)", "_(_)", "_(_)", "x", "addOne", "function double(x) { return _; }", "__tests(f(4), f(5))"],
             "goal": ["8", "10"],
-            "toolbox": ""
+            "toolbox": "",
+            "defines": "function double(x) { return (repeat(x, addOne))(x); }"
         },
         {
             "board": ["(repeat(_))(_)", "_(_)", "x", "x", "function triple(x) { return _; }", "__tests(f(3), f(_))"],
             "goal": ["6", "9"],
-            "toolbox": ["addTwo", "addOne", "0", "1", "2"]
+            "toolbox": ["addTwo", "addOne", "0", "1", "2"],
+            "defines": "function triple(x) { return (repeat(x, addTwo))(x); }"
         },
         {
             "board": ["function first(left, right) { return left; }", "__tests(f(3, 6), f(7, 3), f(_, _))"],
@@ -195,7 +203,8 @@
         {
             "board": ["function addTogether(a, b) { return _; }", "__tests(f(_, _), f(_, _), f(1, 2))", "repeat(_)", "a", "b", "addOne"],
             "goal": ["3", "8", "9"],
-            "toolbox": ["_(_)", "_(_)", "2", "3", "5", "7"]
+            "toolbox": ["_(_)", "_(_)", "2", "3", "5", "7"],
+            "defines": "function addTogether(a, b) { return ((repeat(a, addOne))(b); }"
         }
     ],
     "resources":{
