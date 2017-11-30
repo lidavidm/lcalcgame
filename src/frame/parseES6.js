@@ -218,6 +218,15 @@ class ES6Parser {
                             type_expr.typeBox.text = node.arguments[0].value;
                         return type_expr;
                     }
+                    else if (node.callee.name === "_") {
+                        // ApplyExpr with placeholder
+                        if (node.arguments.length !== 1) {
+                            console.error("Multi-argument call expressions are currently undefined.");
+                            return;
+                        }
+                        return new ApplyExpr(this.parseNode(node.arguments[0]),
+                                             new MissingExpression());
+                    }
 
                     // Special case 'foo(_t_params)': Call parameters (including paretheses) will be entered by player.
                     if (node.arguments.length === 1 && node.arguments[0].type === 'Identifier' && node.arguments[0].name === '_t_params')
@@ -227,6 +236,7 @@ class ES6Parser {
                 } else {
                     if (node.arguments.length != 1) {
                         console.error("Multi-argument call expressions are currently undefined.");
+                        return;
                     }
                     return new ApplyExpr(this.parseNode(node.arguments[0]),
                                          this.parseNode(node.callee));
