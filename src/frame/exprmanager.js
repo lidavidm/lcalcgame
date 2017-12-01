@@ -2,6 +2,7 @@ var ExprManager = (function() {
     let pub = {};
 
     var _FADE_MAP = {
+        'apply':    [ApplyExpr],
         'if':       [LockIfStatement, InlineLockIfStatement, IfStatement],
         'ifelse':   [IfElseStatement],
         'ifelseblock': [IfElseBlockStatement],

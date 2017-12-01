@@ -227,7 +227,7 @@ class ES6Parser {
 
                         let base = new MissingExpression();
                         for (let arg of node.arguments) {
-                            base = new ApplyExpr(this.parseNode(arg), base);
+                            base = new (ExprManager.getClass('apply'))(this.parseNode(arg), base);
                         }
                         return base;
                     }
@@ -242,8 +242,8 @@ class ES6Parser {
                         console.error("Multi-argument call expressions are currently undefined.");
                         return;
                     }
-                    return new ApplyExpr(this.parseNode(node.arguments[0]),
-                                         this.parseNode(node.callee));
+                    return new (ExprManager.getClass('apply'))(this.parseNode(node.arguments[0]),
+                                                               this.parseNode(node.callee));
                 }
             },
 
