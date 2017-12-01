@@ -169,8 +169,8 @@ function LOAD_REDUCT_RESOURCES(Resource) {
                 // hole. If one has fewer fade levels than the other,
                 // saturate the fade level.
                 if (lvl.fade["lambda"]) {
-                    lvl.fade["var"] = Math.min(lvl.fade["lambda"], ExprManager.getNumOfFadeLevels("var"));
-                    lvl.fade["hole"] = Math.min(lvl.fade["lambda"], ExprManager.getNumOfFadeLevels("hole"));
+                    lvl.fade["var"] = Math.min(lvl.fade["lambda"], ExprManager.getNumOfFadeLevels("var") - 1);
+                    lvl.fade["hole"] = Math.min(lvl.fade["lambda"], ExprManager.getNumOfFadeLevels("hole") - 1);
                     delete lvl.fade["lambda"];
                 }
             }
