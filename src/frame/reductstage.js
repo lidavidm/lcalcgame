@@ -248,6 +248,12 @@ class ReductStage extends mag.Stage {
             return true;
         }
 
+        // If there are defined things, put a copy of each in the toolbox.
+        const snappedNodes = this.snappedNodes();
+        for (const snapped of snappedNodes) {
+            toolbox_exprs.push(snapped.generateNamedExpr());
+        }
+
         // If there's nothing in the toolbox,
         // we can assume level is incomplete.
         if (toolbox_exprs.length === 0)

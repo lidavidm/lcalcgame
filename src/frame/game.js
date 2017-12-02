@@ -134,6 +134,9 @@ class Level {
         stage.toolboxNodes = function() {
             return this.nodes.filter((n) => n.toolbox && n.toolbox instanceof Toolbox && !n.fadingOut);
         }.bind(stage);
+        stage.snappedNodes = function() {
+            return this.nodes.filter((n) => n.isSnapped());
+        };
 
         stage.testBoard = function(exprs, checkUnpaired=true) {
             let matching = goal.test(exprs.map((n) => n.clone()), this.environmentDisplay);
