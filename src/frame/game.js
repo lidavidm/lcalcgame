@@ -238,8 +238,20 @@ class Level {
         if (help_text && help_text.length > 0)
             showHelpText(help_text);
 
+        const exprs = Level.parse(expr_descs, language, macros, typing_options);
+        for (let expr of exprs) {
+            if (expr === null || expr === undefined) {
+                console.warning("Undefined or null expression when constructing level");
+                console.info(expr_descs);
+            }
+            else if (expr instanceof ExprManager.getClass('define')) {
+                // Auto-insert notches for definitions
+                exprs.push(new (ExprManager.getClass('notch'))(1));
+            }
+        }
+
         var lvl = new Level(
-            Level.parse(expr_descs, language, macros, typing_options),
+            exprs,
             new Goal(new ExpressionPattern(Level.parse(goal_descs, language, macros, typing_options)), goal_descs, resources.aliens),
             toolbox_descs ? Level.parse(toolbox_descs, language, macros, typing_options) : null,
             Environment.parse(globals_descs)
