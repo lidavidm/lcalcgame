@@ -11,6 +11,7 @@ var ExprManager = (function() {
         'star':     [StarExpr],//, FadedStarExpr, StringStarExpr],
         'circle':   [CircleExpr],//, FadedCircleExpr, StringCircleExpr],
         'diamond':  [RectExpr],//, FadedRectExpr, StringRectExpr],
+        'dynamic_variant':  [DynamicVariantExpr],
         '_':        [MissingExpression],
         '__':       [MissingBracketExpression],
         '_b':       [MissingKeyExpression, MissingBooleanExpression],

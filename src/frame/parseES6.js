@@ -144,6 +144,17 @@ class ES6Parser {
                     return this.makePrimitive(node.name);
                 else if (node.name.indexOf('__') === 0 && ExprManager.isPrimitive(node.name.substring(2))) // e.g. __star
                     return this.makePrimitive(node.name.substring(2));
+                else if (node.name.indexOf('__') === 0 && node.name.substring(2, 9) === "variant") { // dynamic variant types
+                    const description = node.name.substring(10).split("_");
+                    if (description.length !== 2) {
+                        console.error("Invalid dynamic variant description", node.name);
+                        console.debug(description);
+                        return null;
+                    }
+                    const variantClass = description[0];
+                    const variantValue = description[1];
+                    return new (ExprManager.getClass('dynamic_variant'))(variantClass, variantValue);
+                }
 
                 // Otherwise, treat this as a variable name...
                 return new (ExprManager.getClass('var'))(node.name);
