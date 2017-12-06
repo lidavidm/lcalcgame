@@ -135,7 +135,7 @@ class Level {
             return this.nodes.filter((n) => n.toolbox && n.toolbox instanceof Toolbox && !n.fadingOut);
         }.bind(stage);
         stage.snappedNodes = function() {
-            return this.nodes.filter((n) => n.isSnapped());
+            return this.nodes.filter((n) => n.isSnapped && n.isSnapped());
         };
 
         stage.testBoard = function(exprs, checkUnpaired=true) {
