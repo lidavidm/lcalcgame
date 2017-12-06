@@ -397,7 +397,17 @@ class ES6Parser {
                 return new (ExprManager.getClass('define'))(this.parseNode(node.body), node.id ? node.id : '???', node.params.map((id) => id.name));
             },
             'FunctionDeclaration': (node) => {
-                return new (ExprManager.getClass('define'))(this.parseNode(node.body), node.id ? node.id.name : '???', node.params.map((id) => id.name));
+                let body = this.parseNode(node.body);
+                if (node.params.length > 0) {
+                    node.params.reverse().forEach((param) => {
+                        let newBody = new (ExprManager.getClass('lambda_abstraction'))([
+                            new (ExprManager.getClass('hole'))(param.name),
+                        ]);
+                        newBody.addArg(body);
+                        body = newBody;
+                    });
+                }
+                return new (ExprManager.getClass('define'))(body, node.id ? node.id.name : '???', node.params.map((id) => id.name));
             },
             'BlockStatement': (node) => {
                 if (node.body.length === 1) {
