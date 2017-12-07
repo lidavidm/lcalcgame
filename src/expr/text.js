@@ -14,6 +14,11 @@ class TextExpr extends ExpressionPlus {
         this._baseline = "alphabetic";
         this.stroke = null;
     }
+
+    kind() {
+        return "display";
+    }
+
     get text() {
         return this._text;
     }

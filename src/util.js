@@ -840,6 +840,7 @@ function reduceExprs(exprList, delay=300) {
 }
 
 function after(ms) {
+    if (ms === 0) return Promise.resolve();
     return new Promise((resolve, reject) => {
         window.setTimeout(() => {
             resolve();

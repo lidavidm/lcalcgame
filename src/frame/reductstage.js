@@ -229,7 +229,8 @@ class ReductStage extends mag.Stage {
 
         // If every expression is a value, nothing can be reduced,
         // so continue with check.
-        const contains_reducable_expr = remaining_exprs.some(e => (!e.isValue() || e instanceof CollectionExpr));
+        const contains_reducable_expr = remaining_exprs.some(e => (e.kind() !== "value" ||
+                                                                   e instanceof CollectionExpr));
 
         // Quit if there's an expression in the game
         // that can be reduced, like == or lambda.

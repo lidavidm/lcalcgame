@@ -933,7 +933,8 @@ class ExpressionPattern {
             // which are otherwise structurally equal. The check here
             // is recursive, for cases like bags, where the value can
             // itself contain expressions.
-            if (e instanceof Expression && f instanceof Expression && e.isValue() && f.isValue()) {
+            if (e instanceof Expression && f instanceof Expression &&
+                e.kind() === "value" && f.kind() === "value") {
                 let ev = e.value();
                 let fv = f.value();
 
@@ -954,7 +955,7 @@ class ExpressionPattern {
                     }
                 }
                 else {
-                    valuesMatch = ev === fv && e.isValue() && f.isValue();
+                    valuesMatch = ev === fv;
                 }
             }
             else {
@@ -967,7 +968,7 @@ class ExpressionPattern {
                 //console.log(' > Constructors don\'t match.');
                 return false; // expressions don't match
             }
-            else if (e instanceof Expression && f instanceof Expression && (e.isValue() != f.isValue() || !valuesMatch)) {
+            else if (e instanceof Expression && f instanceof Expression && (e.kind() !== f.kind() || !valuesMatch)) {
                 return false;
             }
             else { // Check whether the expressions at this level have the same # of children. If so, do one-to-one comparison.

@@ -9,12 +9,15 @@ class NumberExpr extends Expression {
     get constructorArgs() {
         return [this.number];
     }
+
     value() {
         return this.number;
     }
-    isValue() {
-        return true;
+
+    kind() {
+        return "value";
     }
+
     toString() {
         return (this.locked ? '/' : '') + this.number.toString();
     }
@@ -51,9 +54,17 @@ class OperatorExpr extends Expression {
         this.reducableStrokeColor = '#ff6600';
     }
 
-    canReduce() {
-        return this.leftExpr && (this.leftExpr.isValue() || this.leftExpr.canReduce()) &&
-            this.rightExpr && (this.rightExpr.isValue() || this.rightExpr.canReduce());
+    kind() {
+        return 'expression';
+    }
+
+    subexpressions() {
+        return [this.leftExpr, this.rightExpr];
+    }
+
+    canStep() {
+        return (this.leftExpr.kind() === "value" && this.rightExpr.kind() === "value") ||
+            this.subexpressions().some((expr) => expr.canStep());
     }
 
     get leftExpr() {
@@ -177,24 +188,85 @@ class AddExpr extends OperatorExpr {
         super(left, op, right);
     }
 
-    canReduce() {
-        // Disallow booleans
-        return super.canReduce() && (this.leftExpr && !(this.leftExpr instanceof BooleanPrimitive))
-            && (this.rightExpr && !(this.rightExpr instanceof BooleanPrimitive));
+    canStep() {
+        return (this.leftExpr instanceof NumberExpr && this.rightExp instanceof NumberExpr) ||
+            this.subexpressions().some((expr) => expr.canStep());
     }
 
     /* This 'add' should work for string concatenation as well. */
-    reduce() {
-        if (!this.canReduce()) return this;
-        else if (this.leftExpr instanceof NumberExpr && this.rightExpr instanceof NumberExpr) {
-            return new (ExprManager.getClass('number'))(this.leftExpr.value() + this.rightExpr.value());
+    smallStep(subexpressions) {
+        const leftExpr = subexpressions[0];
+        const rightExpr = subexpressions[1];
+        if (leftExpr instanceof NumberExpr && rightExpr instanceof NumberExpr) {
+            return new (ExprManager.getClass('number'))(leftExpr.value() + rightExpr.value());
         }
-        else if (this.leftExpr instanceof StringValueExpr || this.rightExpr instanceof StringValueExpr) {
-            let result = this.leftExpr.value() + this.rightExpr.value();
+        else if (leftExpr instanceof StringValueExpr || rightExpr instanceof StringValueExpr) {
+            let result = leftExpr.value() + rightExpr.value();
             if (typeof result === 'string')
                 return new (ExprManager.getClass('string'))(result);
+            else return null;
         }
-        else return this;
+        else return null;
+    }
+
+    onmouseclick() {
+        if (!this._reducing) {
+            console.log(this.bigStep());
+            this.performReduction();
+        }
+    }
+
+    animateStep(value=null) {
+        if (!value) value = this.bigStep();
+        const stage = this.stage;
+        this.ignoreEvents = true;
+
+        return new Promise((resolve, _reject) => {
+            var shatter = new ShatterExpressionEffect(this);
+            shatter.run(stage, () => {
+                this.ignoreEvents = false;
+                resolve(value);
+            });
+        });
+    }
+
+    performReduction() {
+        if (this._reducing) return this._reducing;
+
+        const mode = document.querySelector('input[name="evalmode"]:checked').value;
+        const repr = this.toJavaScript();
+        console.log(`${mode} of ${repr}`);
+
+        const promise = new Promise((resolve, reject) => {
+            if (mode === "bigStep") {
+                const result = this.bigStep();
+                return this.animateStep(result).then(() => {
+                    (this.parent || this.stage).swap(this, result);
+                    console.log(`${repr} finished.`);
+                    resolve(result);
+                });
+            }
+            else if (mode === "manyStep") {
+                return this.takeSteps().then((result) => {
+                    console.log(`${repr} finished.`);
+                    resolve(result);
+                });
+            }
+            else if (mode === "smallStep") {
+                this.takeStep().then((expr) => {
+                    this._reducing = null;
+                    console.log(`${repr} finished.`);
+                    resolve(expr);
+                });
+            }
+            else {
+                const error = `Invalid execution mode ${mode}`;
+                console.error(error);
+                throw error;
+            }
+        });
+        this._reducing = promise;
+        return promise;
     }
 }
 
