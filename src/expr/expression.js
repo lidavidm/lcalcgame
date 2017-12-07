@@ -245,57 +245,6 @@ class Expression extends mag.RoundedRect {
         this.updateReducibilityIndicator();
     }
 
-    // Apply arguments to expression
-    apply(args) {
-        // ... //
-    }
-
-    // Apply a single argument at specified arg index
-    applyAtIndex(idx, arg) {
-        // ... //
-    }
-
-    // Get the containing environment for this expression
-    getEnvironment() {
-        if (this.environment) return this.environment;
-
-        if (this.parent) {
-            let current = this.parent;
-            while (current && !current.getEnvironment) current = current.parent;
-            if (current.getEnvironment)
-                return current.getEnvironment();
-        }
-
-        if (this.stage) return this.stage.environment;
-
-        return null;
-    }
-
-    // Can this expression step to a value?
-    canReduce() {
-        return false;
-    }
-
-    // Is this expression already a value?
-    isValue() {
-        return false;
-    }
-
-    // Is this expression missing any subexpressions?
-    isComplete() {
-        if (this.isPlaceholder()) return false;
-        for (let child of this.holes) {
-            if (child instanceof Expression && !child.isComplete()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    // Is this expression a placeholder for something else?
-    isPlaceholder() {
-        return false;
-    }
 
     // Play an animation to remind the user that this is a placeholder.
     animatePlaceholderStatus() {
@@ -305,9 +254,12 @@ class Expression extends mag.RoundedRect {
     hasPlaceholderChildren() {
         return this.getPlaceholderChildren().length > 0;
     }
+
     getPlaceholderChildren() {
-        return mag.Stage.getAllNodes([this]).filter((e) => e instanceof Expression && e.isPlaceholder());
+        return mag.Stage.getAllNodes([this])
+            .filter((e) => e instanceof Expression && e.kind() === "placeholder");
     }
+
     animatePlaceholderChildren() {
         let missing = this.getPlaceholderChildren();
         for (let e of missing)
@@ -341,6 +293,104 @@ class Expression extends mag.RoundedRect {
                 lineDashOffset: this._reducingTime,
             };
         }
+    }
+
+    // Get the containing environment for this expression
+    getEnvironment() {
+        if (this.environment) return this.environment;
+
+        if (this.parent) {
+            let current = this.parent;
+            while (current && !current.getEnvironment) current = current.parent;
+            if (current.getEnvironment)
+                return current.getEnvironment();
+        }
+
+        if (this.stage) return this.stage.environment;
+
+        return null;
+    }
+
+    // Can this expression take a small-step?
+    canStep() {
+        return false;
+    }
+
+    // Is this expression a 'value', 'expression', 'statement', 'placeholder', or 'display'?
+    kind() {
+        const error = `kind() is undefined for ${this.constructor.name} expression`;
+        console.error(error);
+        throw error;
+    }
+
+    subexpressions() {
+        return [];
+    }
+
+    // Is this expression missing any subexpressions?
+    isComplete() {
+        return this.kind() !== "placeholder" &&
+            this.subexpressions().every((expr) => expr.isComplete());
+    }
+
+    // Take a small step, given that subexpressions are all evaluated.
+    smallStep(subexpressions) {
+        return null;
+    }
+
+    bigStep() {
+        let subexprs = this.subexpressions().map((n) => {
+            if (n.kind() === "value") return n;
+            return n.bigStep();
+        });
+        return this.smallStep(subexprs);
+    }
+
+    // TODO: mutual recursion with performReduction
+    takeStep() {
+        const subexpressions = this.subexpressions();
+        for (let subexpr of subexpressions) {
+            if (subexpr.kind() !== "value") {
+                return subexpr.performReduction();
+            }
+        }
+
+        return this.animateStep().then(() => {
+            const result = this.smallStep(this.subexpressions());
+            (this.parent || this.stage).swap(this, result);
+            if (this.locked) result.lock();
+            return result;
+        });
+    }
+
+    takeSteps() {
+        const subexpressions = this.subexpressions();
+        let base = Promise.resolve();
+        let delay = 0;
+        for (let subexpr of subexpressions) {
+            if (subexpr.kind() !== "value") {
+                delay = 500;
+                base = base.then(() => {
+                    return after(300).then(() => subexpr.performReduction());
+                });
+            }
+        }
+
+        return base.then(() => {
+            return after(delay).then(() => {
+                return this.animateStep().then(() => {
+                    const result = this.smallStep(this.subexpressions());
+                    (this.parent || this.stage).swap(this, result);
+                    if (this.locked) result.lock();
+                    return result;
+                });
+            });
+        });
+    }
+
+    //
+    animateStep() {
+        return Promise.resolve();
     }
 
     // Wrapper for performReduction intended for interactive use
