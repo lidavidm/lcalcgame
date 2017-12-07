@@ -1048,8 +1048,13 @@ class ExpressionPlus extends Expression {
             extras.forEach((c) => this.removeChild(c));
             let cln = super.clone(parent);
             extras.forEach((c) => this.addChild(c));
+            cln._reducing = null;
             return cln;
-        } else
-            return super.clone(parent);
+        }
+        else {
+            const clone = super.clone(parent);
+            clone._reducing = null;
+            return clone;
+        }
     }
 }
