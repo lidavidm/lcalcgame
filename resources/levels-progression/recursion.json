@@ -117,7 +117,7 @@
                 "triple(1)"
             ],
             "goal": ["0", "6", "3"],
-            "toolbox": ["3 + _", "2 + _", "triple", "triple", "_ - _", "0", "1", "2", "4"],
+            "toolbox": ["3 + _", "2 + _", "triple", "triple", "_ - _", "0", "1", "2", "4", "z", "z"],
             "defines": "function triple(z) { return z == 0 ? 0 : 3 + triple(z - 1); }"
         },
         {
