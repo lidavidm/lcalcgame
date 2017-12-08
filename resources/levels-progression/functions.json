@@ -70,7 +70,7 @@
         },
         {
             "board": ["x => xx", "x => C"],
-            "goal": ["A", "B"],
+            "goal": ["B", "C"],
             "toolbox": ["A", "B"]
         },
         {
